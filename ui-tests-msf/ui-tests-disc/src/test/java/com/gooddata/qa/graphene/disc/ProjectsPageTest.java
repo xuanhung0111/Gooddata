@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmp
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
@@ -18,7 +19,6 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -32,7 +32,6 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
@@ -40,7 +39,6 @@ import com.gooddata.qa.graphene.enums.disc.ProjectStateFilters;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 
 public class ProjectsPageTest extends AbstractOverviewProjectsTest {
 
@@ -92,17 +90,15 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkScheduledProjectsFilterOptions() {
-        ProjectInfo projectInfo = new ProjectInfo().setProjectName("Disc-test-scheduled-filter-option");
-        List<ProjectInfo> additionalProjects = Arrays.asList(projectInfo);
-        createMultipleProjects(additionalProjects);
+        String projectId = createBlankProject("Disc-test-scheduled-filter-option");
         try {
-            prepareDataForAdditionalProjects(additionalProjects);
-            prepareDataForProjectsPageTest(ProjectStateFilters.SCHEDULED, getWorkingProject());
+            prepareDataForAdditionalProjects(singletonList(projectId));
+            prepareDataForProjectsPageTest(ProjectStateFilters.SCHEDULED, testParams.getProjectId());
 
             initDISCProjectsPage();
-            checkProjectFilter(ProjectStateFilters.SCHEDULED, getProjects());
+            checkProjectFilter(ProjectStateFilters.SCHEDULED, singletonList(testParams.getProjectId()));
         } finally {
-            deleteProjects(additionalProjects);
+            deleteProjects(singletonList(projectId));
         }
     }
 
@@ -120,7 +116,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
     public void checkDataLoadingProcess() {
         String processName1 = "Check Data Loading Processes 1";
         String processName2 = "Check Data Loading Processes 2";
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         deployInProjectDetailPage(DeployPackages.BASIC, processName1);
         deployInProjectDetailPage(DeployPackages.BASIC, processName2);
 
@@ -138,23 +134,23 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         initDISCProjectsPage();
         waitForFragmentVisible(discProjectsList);
         final String expectedDataLoadingProcess = String.format("%d processes, %d schedules", 2, 3);
-        assertThat(discProjectsList.getProcessesLabel(getWorkingProject()), is(expectedDataLoadingProcess));
+        assertThat(discProjectsList.getProcessesLabel(testParams.getProjectId()), is(expectedDataLoadingProcess));
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkLastSuccessfulExecution() {
         String processName = "Check Last Successful Execution";
-        openProjectDetailByUrl(testParams.getProjectId());
+        openProjectDetailPage(testParams.getProjectId());
         deployInProjectDetailPage(DeployPackages.BASIC, processName);
 
         initDISCProjectsPage();
         waitForElementVisible(discProjectsList.getRoot());
-        assertTrue(discProjectsList.getLastSuccessfulExecutionInfo(getWorkingProject()).isEmpty(),
+        assertTrue(discProjectsList.getLastSuccessfulExecutionInfo(testParams.getProjectId()).isEmpty(),
                 "Last successful execution info is not empty for new deployed process!");
 
         ScheduleBuilder scheduleBuilder1 =
                 new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.SUCCESSFUL_GRAPH);
-        openProjectDetailByUrl(testParams.getProjectId());
+        openProjectDetailPage(testParams.getProjectId());
         createSchedule(scheduleBuilder1);
         scheduleDetail.manualRun();
         assertSuccessfulExecution();
@@ -170,14 +166,14 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
 
         initDISCProjectsPage();
         waitForFragmentVisible(discProjectsList);
-        assertEquals(discProjectsList.getLastSuccessfulExecutionInfo(getWorkingProject()),
+        assertEquals(discProjectsList.getLastSuccessfulExecutionInfo(testParams.getProjectId()),
                 Joiner.on(" ").join(lastSuccessfulExecutionDate, lastSuccessfulExecutionTime.substring(14)));
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkLastSuccessfulAutoExecution() {
         String processName = "Check Last Successful Auto Execution";
-        openProjectDetailByUrl(testParams.getProjectId());
+        openProjectDetailPage(testParams.getProjectId());
         deployInProjectDetailPage(DeployPackages.BASIC, processName);
 
         ScheduleBuilder scheduleBuilder =
@@ -193,7 +189,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
 
         initDISCProjectsPage();
         waitForFragmentVisible(discProjectsList);
-        assertEquals(discProjectsList.getLastSuccessfulExecutionInfo(getWorkingProject()),
+        assertEquals(discProjectsList.getLastSuccessfulExecutionInfo(testParams.getProjectId()),
                 Joiner.on(" ").join(lastSuccessfulExecutionDate, lastSuccessfulExecutionTime.substring(14)));
     }
 
@@ -207,13 +203,13 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
             signIn(false, UserRoles.VIEWER);
 
             initDISCProjectsPage();
-            assertProjectNotAdmin(getWorkingProject().getProjectName());
+            assertProjectNotAdmin(projectTitle);
 
             openUrl(PAGE_PROJECTS);
             logout();
             signIn(false, UserRoles.EDITOR);
             initDISCProjectsPage();
-            assertProjectNotAdmin(getWorkingProject().getProjectName());
+            assertProjectNotAdmin(projectTitle);
         } catch (ParseException e) {
             System.out.println("There is problem during adding user to project: ");
             e.printStackTrace();
@@ -252,13 +248,11 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         waitForCollectionIsNotEmpty(projectsPage.getProjectsElements());
         int projectsNumber =
                 projectsPage.getProjectsElements().size() + projectsPage.getDemoProjectsElements().size();
-        List<ProjectInfo> additionalProjects = new ArrayList<ProjectInfo>();
+        List<String> additionalProjectIds = new ArrayList<>();
         if (projectsNumber <= MINIMUM_NUMBER_OF_PROJECTS) {
             for (int i = 0; i < 25 - projectsNumber + 1; i++) {
-                ProjectInfo projectInfo = new ProjectInfo().setProjectName("Disc-test-paging-projects-page-" + i);
-                additionalProjects.add(projectInfo);
+                additionalProjectIds.add(createBlankProject("Disc-test-paging-projects-page-" + i));
             }
-            createMultipleProjects(additionalProjects);
         }
 
         try {
@@ -319,7 +313,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
                             "The project number in the last page: " + discProjectsList.getNumberOfRows());
             }
         } finally {
-            deleteProjects(additionalProjects);
+            deleteProjects(additionalProjectIds);
         }
     }
 
@@ -380,15 +374,13 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
     @Test(dependsOnMethods = {"createProject"})
     public void checkSearchProjectInUnscheduledState() {
         initDISCProjectsPage();
-        searchProjectInSpecificState(ProjectStateFilters.UNSCHEDULED, getWorkingProject());
+        searchProjectInSpecificState(ProjectStateFilters.UNSCHEDULED, testParams.getProjectId(), projectTitle);
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkSearchUnicodeProjectName() {
         String unicodeProjectName = "Tiếng Việt ພາສາລາວ  résumé";
-        ProjectInfo projectInfo = new ProjectInfo().setProjectName(unicodeProjectName);
-        List<ProjectInfo> additionalProjects = Arrays.asList(projectInfo);
-        createMultipleProjects(additionalProjects);
+        String projectId = createBlankProject(unicodeProjectName);
         try {
             initDISCProjectsPage();
             discProjectsPage.enterSearchKey(unicodeProjectName);
@@ -397,7 +389,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
             assertTrue(discProjectsList.isCorrectSearchedProjectByUnicodeName(unicodeProjectName),
                     "Incorrect search result by unicode name!");
         } finally {
-            deleteProjects(additionalProjects);
+            deleteProjects(singletonList(projectId));
         }
 
     }
@@ -424,16 +416,16 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkProjectListAfterLeaveAProject() {
-        List<ProjectInfo> additionalProjects = Lists.newArrayList();
         String secondAdmin = testParams.getEditorUser();
         String secondAdminPassword = testParams.getEditorPassword();
+        String projectId = "";
+
         try {
             addUserToProject(secondAdmin, UserRoles.ADMIN);
             logout();
             signInAtUI(secondAdmin, secondAdminPassword);
 
-            additionalProjects.add(new ProjectInfo().setProjectName("Additional Project"));
-            createMultipleProjects(additionalProjects);
+            projectId = createBlankProject("Additional Project");
 
             initProjectsAndUsersPage();
             projectAndUsersPage.leaveProject();
@@ -441,16 +433,14 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
 
             initDISCProjectsPage();
             waitForElementVisible(discProjectsList.getRoot());
-            for (ProjectInfo project : additionalProjects) {
-                assertNotNull(discProjectsList.selectProjectWithAdminRole(project), "Cannot find project "
-                        + project.getProjectId());
-            }
-            assertNull(discProjectsList.selectProjectWithAdminRole(getWorkingProject()),
+            assertNotNull(discProjectsList.selectProjectWithAdminRole(projectId), "Cannot find project " + projectId);
+            assertNull(discProjectsList.selectProjectWithAdminRole(testParams.getProjectId()),
                     "Project is still shown on DIC projects page after user leave it!!");
         } catch (Exception e) {
             throw new IllegalStateException("There is exeception when adding user to project!", e);
         } finally {
-            deleteProjects(additionalProjects);
+            if (!projectId.isEmpty())
+                deleteProjects(singletonList(projectId));
             logout();
             signInAtUI(testParams.getUser(), testParams.getPassword());
         }
@@ -473,7 +463,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
 
     private void assertProjectNotAdmin(String projectName) {
         WebElement selectedProject =
-                discProjectsList.selectProjectWithNonAdminRole(getWorkingProject().getProjectName());
+                discProjectsList.selectProjectWithNonAdminRole(projectTitle);
         assertNotNull(selectedProject, "Project is not found!");
         try {
             discProjectsList.clickOnProjectWithNonAdminRole(selectedProject);

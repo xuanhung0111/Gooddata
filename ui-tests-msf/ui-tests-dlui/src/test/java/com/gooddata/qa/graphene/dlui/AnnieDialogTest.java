@@ -456,7 +456,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
             initManagePage();
             assertThat(datasetsTable.getAllItems(), containsInAnyOrder("person", "opportunity", "Payroll", 
                     "Date (Paydate)")); 
-            openProjectDetailPage(getWorkingProject());
+            openProjectDetailPage(testParams.getProjectId());
             ScheduleBuilder scheduleBuilder = new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
                                     .setCronTime(ScheduleCronTimes.CRON_EVERYDAY)
                                     .setHasDataloadProcess(true)
@@ -507,7 +507,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
     private void customOutputStageMetadata(final DataSource... dataSources)
             throws ParseException, IOException, JSONException {
         final String putBody = prepareOutputStageMetadata(dataSources);
-        final String putUri = format(AdsHelper.OUTPUT_STAGE_METADATA_URI, getWorkingProject().getProjectId());
+        final String putUri = format(AdsHelper.OUTPUT_STAGE_METADATA_URI, testParams.getProjectId());
         getResource(getRestApiClient(),
                 getRestApiClient().newPutMethod(putUri, putBody),
                 req -> req.setHeader("Accept", ACCEPT_HEADER_VALUE_WITH_VERSION),

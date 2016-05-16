@@ -62,7 +62,6 @@ import com.gooddata.md.report.GridElement;
 import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
-import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.entity.dlui.DataSource;
 import com.gooddata.qa.graphene.entity.dlui.Dataset;
@@ -95,7 +94,6 @@ public class AbstractMSFTest extends AbstractProjectTest {
     protected String technicalUserPassword;
     protected String initialLdmMaqlFile = "create-ldm.txt";
 
-    protected ProjectInfo workingProject;
     protected DataloadProcess cloudconnectProcess;
     protected Warehouse ads;
 
@@ -360,10 +358,8 @@ public class AbstractMSFTest extends AbstractProjectTest {
         assertTrue(isEqualCollection(metrics, metricValues), "Incorrect metric values!");
     }
 
-    protected void openProjectDetailPage(ProjectInfo project) {
-        openUrl(DISC_PROJECTS_PAGE_URL);
-        waitForElementVisible(discProjectsList.getRoot());
-        discProjectsList.clickOnProjectTitle(project);
+    protected void openProjectDetailPage(String projectId) {
+        openUrl(DISC_PROJECTS_PAGE_URL + "/" + projectId);
         waitForElementVisible(projectDetailPage.getRoot());
     }
 
@@ -374,14 +370,8 @@ public class AbstractMSFTest extends AbstractProjectTest {
             asList("1000", "1200", "1400", "1600", "1800", "2000", "700", "800"));
     }
 
-    protected ProjectInfo getWorkingProject() {
-        if (workingProject == null)
-            workingProject = new ProjectInfo(projectTitle, testParams.getProjectId());
-        return workingProject;
-    }
-
     private String sendRequestToUpdateModel(final String maql) throws ParseException, JSONException, IOException {
-        return executeMAQL(getRestApiClient(), getWorkingProject().getProjectId(), maql);
+        return executeMAQL(getRestApiClient(), testParams.getProjectId(), maql);
     }
 
     protected enum AdditionalDatasets {

@@ -68,7 +68,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"setUp"}, groups = {"schedule", "tests", "dataloadSchedulesTest"})
     public void createDataloadScheduleWithAllDatasets() throws JSONException {
         try {
-            openProjectDetailByUrl(testParams.getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             ScheduleBuilder scheduleBuilder = new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
                     .setCronTime(ScheduleCronTimes.CRON_15_MINUTES)
@@ -84,7 +84,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"setUp"}, groups = {"schedule", "tests", "dataloadSchedulesTest"})
     public void createDataloadScheduleWithCustomDatasets() throws JSONException {
         try {
-            openProjectDetailPage(getWorkingProject());
+            openProjectDetailPage(testParams.getProjectId());
 
             ScheduleBuilder scheduleBuilder = new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
                     .setCronTime(ScheduleCronTimes.CRON_15_MINUTES)
@@ -102,7 +102,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
             "dataloadSchedulesTest"})
     public void editDataloadScheduleWithCustomDatasets() throws JSONException {
         try {
-            openProjectDetailPage(getWorkingProject());
+            openProjectDetailPage(testParams.getProjectId());
 
             ScheduleBuilder scheduleBuilder = new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
                     .setCronTime(ScheduleCronTimes.CRON_15_MINUTES)
@@ -147,7 +147,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
         String invalidKey = "!@#$%%";
         String multiResultsKey = "p";
         try {
-            openProjectDetailByUrl(testParams.getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             ScheduleBuilder scheduleBuilder = new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
                     .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).setConfirmed(true).setHasDataloadProcess(true)
@@ -183,11 +183,11 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
                         .setDatasetsToSynchronize(asList(OPPORTUNITY_DATASET))
                         .setScheduleName(OPPORTUNITY_DATASET + " (2)");
         try {
-            openProjectDetailByUrl(testParams.getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
             createSchedule(schedule1);
             schedule1.setScheduleUrl(browser.getCurrentUrl());
 
-            openProjectDetailByUrl(testParams.getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
             createSchedule(schedule2);
             browser.navigate().refresh();
             waitForFragmentVisible(scheduleDetail);
@@ -223,7 +223,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
                 .setDatasetsToSynchronize(asList(OPPORTUNITY_DATASET))
                 .setScheduleName("Check Schedule Owner");
 
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         createSchedule(schedule);
         try {
             String scheduleOwner = String.format("\"ownerLogin\":\"%s\"", testParams.getUser());
@@ -269,7 +269,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
                 .setScheduleName("Overlap")
                 .setDataloadDatasetsOverlap(true);
         try {
-            openProjectDetailPage(getWorkingProject());
+            openProjectDetailPage(testParams.getProjectId());
             createSchedule(allDatasetsLoad);
             allDatasetsLoad.setScheduleUrl(browser.getCurrentUrl());
             assertSchedule(allDatasetsLoad);
@@ -294,7 +294,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
         try {
             deleteAndCreateDefaultModel();
 
-            openProjectDetailByUrl(testParams.getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
             createSchedule(scheduleBuilder);
             scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
 
@@ -319,7 +319,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
         try {
             deleteAndCreateDefaultModel();
 
-            openProjectDetailByUrl(testParams.getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
             createSchedule(scheduleBuilder);
             scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
 
@@ -348,7 +348,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
         try {
             deleteAndCreateDefaultModel();
 
-            openProjectDetailByUrl(testParams.getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
             createSchedule(scheduleBuilder);
             scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
 
@@ -374,7 +374,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
         try {
             deleteAndCreateDefaultModel();
 
-            openProjectDetailByUrl(testParams.getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
             createSchedule(scheduleBuilder);
             scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
 
@@ -406,7 +406,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
                         .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHasDataloadProcess(true)
                         .setSynchronizeAllDatasets(true).setScheduleName("Check Auto Creation Connecting");
 
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         createSchedule(schedule);
         try {
             schedule.setScheduleUrl(browser.getCurrentUrl());
@@ -427,7 +427,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"setUp"}, groups = {"dataloadSchedulesTest"}, priority = 1)
     public void autoRunDataloadSchedule() {
         try {
-            openProjectDetailByUrl(testParams.getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
@@ -447,7 +447,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"setUp"}, groups = {"dataloadSchedulesTest"})
     public void disableDataloadSchedule() {
         try {
-            openProjectDetailByUrl(testParams.getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
@@ -488,7 +488,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
                         .setCronTime(ScheduleCronTimes.AFTER).setTriggerScheduleGroup(processName)
                         .setTriggerScheduleOption(triggerScheduleBuilder.getScheduleName());
         try {
-            openProjectDetailByUrl(testParams.getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
             createAndAssertSchedule(triggerScheduleBuilder);
             triggerScheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
             createAndAssertSchedule(dependentScheduleBuilder);
@@ -508,7 +508,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"setUp"}, groups = {"dataloadSchedulesTest"})
     public void addRetryToDataloadSchedule() {
         try {
-            openProjectDetailByUrl(testParams.getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
@@ -525,7 +525,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
 
     @Test(dependsOnMethods = {"setUp"}, groups = {"dataloadSchedulesTest"})
     public void checkDataloadScheduleAtOverviewPage() {
-        openProjectDetailByUrl(testParams.getProjectId());
+        openProjectDetailPage(testParams.getProjectId());
 
         ScheduleBuilder scheduleBuilder =
                 new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
@@ -542,7 +542,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
             discOverview.selectOverviewState(OverviewProjectStates.SUCCESSFUL);
             waitForElementVisible(discOverviewProjects.getRoot());
             assertOverviewCustomScheduleName(OverviewProjectStates.SUCCESSFUL,
-                    getWorkingProject(), scheduleBuilder);
+                    testParams.getProjectId(), scheduleBuilder);
         } finally {
             openScheduleViaUrl(scheduleBuilder.getScheduleUrl());
             scheduleDetail.disableSchedule();
@@ -551,7 +551,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
 
     @Test(dependsOnMethods = {"setUp"}, groups = {"dataloadSchedulesTest"})
     public void deleteDataloadSchedule() {
-        openProjectDetailByUrl(testParams.getProjectId());
+        openProjectDetailPage(testParams.getProjectId());
 
         ScheduleBuilder scheduleBuilder =
                 new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)

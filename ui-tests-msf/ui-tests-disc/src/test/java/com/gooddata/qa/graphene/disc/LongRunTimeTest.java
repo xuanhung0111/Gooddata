@@ -29,7 +29,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"autoRun"})
     public void checkScheduleAutoRun() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Check Auto Run Schedule";
             ScheduleBuilder scheduleBuilder =
@@ -48,7 +48,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"autoRun"})
     public void checkErrorExecution() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Check Error Execution of Schedule";
             ScheduleBuilder scheduleBuilder =
@@ -67,7 +67,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"autoRun"})
     public void checkRetryExecution() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Check Retry Schedule";
             ScheduleBuilder scheduleBuilder =
@@ -93,7 +93,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"autoRun"})
     public void checkStopAutoExecution() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Check Stop Auto Execution";
             ScheduleBuilder scheduleBuilder =
@@ -119,7 +119,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"autoRun"})
     public void checkLongTimeExecution() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Check Long Time Execution";
             ScheduleBuilder scheduleBuilder =
@@ -138,7 +138,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"disabledSchedule"})
     public void disableSchedule() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Disable Schedule";
             ScheduleBuilder scheduleBuilder =
@@ -162,7 +162,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"repeatedFailures"})
     public void checkScheduleFailForManyTimes() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Check Failed Schedule";
             ScheduleBuilder scheduleBuilder =

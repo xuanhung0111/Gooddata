@@ -40,25 +40,25 @@ public class NotificationsTest extends AbstractNotificationTest {
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
     public void prepareDataForSucessEvent() {
-        openProjectDetailByUrl(getWorkingProject().getProjectId());
+        openProjectDetailPage(testParams.getProjectId());
         deployInProjectDetailPage(DeployPackages.BASIC, SUCCESS_NOTIFICATION_TEST_PROCESS);
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
     public void prepareDataForFailureEvent() {
-        openProjectDetailByUrl(getWorkingProject().getProjectId());
+        openProjectDetailPage(testParams.getProjectId());
         deployInProjectDetailPage(DeployPackages.BASIC, FAILURE_NOTIFICATION_TEST_PROCESS);
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
     public void prepareDataForNotificationFormChecking() {
-        openProjectDetailByUrl(getWorkingProject().getProjectId());
+        openProjectDetailPage(testParams.getProjectId());
         deployInProjectDetailPage(DeployPackages.BASIC, NOTIFICATION_TEST_PROCESS);
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
     public void prepareDataForCustomEvent() {
-        openProjectDetailByUrl(getWorkingProject().getProjectId());
+        openProjectDetailPage(testParams.getProjectId());
         deployInProjectDetailPage(DeployPackages.CTL_EVENT, CUSTOM_NOTIFICATION_TEST_PROCESS);
     }
 
@@ -111,7 +111,7 @@ public class NotificationsTest extends AbstractNotificationTest {
 
     @Test(dependsOnMethods = {"createNotificationForSuccessEvent"}, groups = {"notification"})
     public void successEventTrigger() {
-        openProjectDetailByUrl(getWorkingProject().getProjectId());
+        openProjectDetailPage(testParams.getProjectId());
         ScheduleBuilder scheduleBuilder =
                 new ScheduleBuilder().setProcessName(SUCCESS_NOTIFICATION_TEST_PROCESS)
                         .setExecutable(Executables.SUCCESSFUL_GRAPH).setCronTime(ScheduleCronTimes.CRON_EVERYDAY)
@@ -128,7 +128,7 @@ public class NotificationsTest extends AbstractNotificationTest {
 
     @Test(dependsOnMethods = {"createNotificationForFailureEvent"}, groups = {"notification"})
     public void failureEventTrigger() {
-        openProjectDetailByUrl(getWorkingProject().getProjectId());
+        openProjectDetailPage(testParams.getProjectId());
         ScheduleBuilder scheduleBuilder =
                 new ScheduleBuilder().setProcessName(FAILURE_NOTIFICATION_TEST_PROCESS)
                         .setExecutable(Executables.FAILED_GRAPH).setCronTime(ScheduleCronTimes.CRON_EVERYDAY)
@@ -146,7 +146,7 @@ public class NotificationsTest extends AbstractNotificationTest {
 
     @Test(dependsOnMethods = {"createNotificationForCustomEvent"}, groups = {"notification"})
     public void customEventTrigger() {
-        openProjectDetailByUrl(getWorkingProject().getProjectId());
+        openProjectDetailPage(testParams.getProjectId());
         ScheduleBuilder scheduleBuilder =
                 new ScheduleBuilder().setProcessName(CUSTOM_NOTIFICATION_TEST_PROCESS)
                         .setExecutable(Executables.CTL_GRAPH).setCronTime(ScheduleCronTimes.CRON_EVERYDAY)
@@ -234,7 +234,7 @@ public class NotificationsTest extends AbstractNotificationTest {
 
     @Test(dependsOnMethods = {"prepareDataForNotificationFormChecking"}, groups = {"notification"})
     public void checkEmptyNotificationFieldsError() {
-        openProjectDetailByUrl(getWorkingProject().getProjectId());
+        openProjectDetailPage(testParams.getProjectId());
         projectDetailPage.activeProcess(NOTIFICATION_TEST_PROCESS).clickOnNotificationRuleButton();
         waitForElementVisible(discNotificationRules.getRoot());
         discNotificationRules.clickOnAddNotificationButton();
@@ -257,7 +257,7 @@ public class NotificationsTest extends AbstractNotificationTest {
 
     @Test(dependsOnMethods = {"prepareDataForNotificationFormChecking"}, groups = {"notification"})
     public void checkEmailFieldError() {
-        openProjectDetailByUrl(getWorkingProject().getProjectId());
+        openProjectDetailPage(testParams.getProjectId());
         projectDetailPage.activeProcess(NOTIFICATION_TEST_PROCESS).clickOnNotificationRuleButton();
         waitForElementVisible(discNotificationRules.getRoot());
         discNotificationRules.clickOnAddNotificationButton();
@@ -269,7 +269,7 @@ public class NotificationsTest extends AbstractNotificationTest {
 
     @Test(dependsOnMethods = {"prepareDataForNotificationFormChecking"}, groups = {"notification"})
     public void checkAvailableParams() {
-        openProjectDetailByUrl(getWorkingProject().getProjectId());
+        openProjectDetailPage(testParams.getProjectId());
         projectDetailPage.activeProcess(NOTIFICATION_TEST_PROCESS).clickOnNotificationRuleButton();
         waitForElementVisible(discNotificationRules.getRoot());
         discNotificationRules.clickOnAddNotificationButton();
@@ -298,7 +298,7 @@ public class NotificationsTest extends AbstractNotificationTest {
     public void checkNotificationNumber() {
         String processName = "Check Notification Number";
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
             deployInProjectDetailPage(DeployPackages.BASIC, processName);
 
             NotificationBuilder notificationInfo =
@@ -317,7 +317,7 @@ public class NotificationsTest extends AbstractNotificationTest {
 
     @Test(dependsOnMethods = {"prepareDataForNotificationFormChecking"}, groups = {"notification"})
     public void checkCancelCreateNotification() {
-        openProjectDetailByUrl(getWorkingProject().getProjectId());
+        openProjectDetailPage(testParams.getProjectId());
 
         String notificationNumber =
                 projectDetailPage.activeProcess(NOTIFICATION_TEST_PROCESS).getNotificationRuleNumber();
@@ -327,14 +327,14 @@ public class NotificationsTest extends AbstractNotificationTest {
                         .setSubject(notificationSubject).setMessage(notificationMessage).setSaved(false);
         createNotification(notificationBuilder);
 
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         assertEquals(projectDetailPage.activeProcess(NOTIFICATION_TEST_PROCESS).getNotificationRuleNumber(),
                 notificationNumber);
     }
 
     @Test(dependsOnMethods = {"prepareDataForNotificationFormChecking"}, groups = {"notification"})
     public void checkDeleteNotification() {
-        openProjectDetailByUrl(getWorkingProject().getProjectId());
+        openProjectDetailPage(testParams.getProjectId());
         projectDetailPage.activeProcess(NOTIFICATION_TEST_PROCESS).clickOnNotificationRuleButton();
         waitForElementVisible(discNotificationRules.getRoot());
         int notificationNumber = discNotificationRules.getNotificationNumber();
@@ -351,7 +351,7 @@ public class NotificationsTest extends AbstractNotificationTest {
 
     @Test(dependsOnMethods = {"prepareDataForNotificationFormChecking"}, groups = {"notification"})
     public void checkCancelDeleteNotification() {
-        openProjectDetailByUrl(getWorkingProject().getProjectId());
+        openProjectDetailPage(testParams.getProjectId());
         projectDetailPage.activeProcess(NOTIFICATION_TEST_PROCESS).clickOnNotificationRuleButton();
         waitForElementVisible(discNotificationRules.getRoot());
         int notificationNumber = discNotificationRules.getNotificationNumber();
@@ -369,7 +369,7 @@ public class NotificationsTest extends AbstractNotificationTest {
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
     public void checkEditNotification() throws MessagingException {
-        openProjectDetailByUrl(getWorkingProject().getProjectId());
+        openProjectDetailPage(testParams.getProjectId());
         String processName = "Check Edit Notification";
         try {
             deployInProjectDetailPage(DeployPackages.BASIC, processName);
@@ -386,7 +386,7 @@ public class NotificationsTest extends AbstractNotificationTest {
                     .setSubject(subject + Calendar.getInstance().getTime())
                     .setEvent(NotificationEvents.PROCESS_STARTED));
 
-            openProjectDetailPage(getWorkingProject());
+            openProjectDetailPage(testParams.getProjectId());
             createSchedule(new ScheduleBuilder().setProcessName(processName)
                     .setExecutable(Executables.SUCCESSFUL_GRAPH).setCronTime(ScheduleCronTimes.CRON_EVERYDAY)
                     .setHourInDay("23").setMinuteInHour("59"));
@@ -404,7 +404,7 @@ public class NotificationsTest extends AbstractNotificationTest {
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
     public void checkCancelEditNotification() throws MessagingException {
-        openProjectDetailByUrl(getWorkingProject().getProjectId());
+        openProjectDetailPage(testParams.getProjectId());
         String processName = "Check Cancel Edit Notification";
         try {
             deployInProjectDetailPage(DeployPackages.BASIC, processName);
@@ -425,7 +425,7 @@ public class NotificationsTest extends AbstractNotificationTest {
             editNotification(editedNotificationInfo);
             assertNotification(notificationInfo);
 
-            openProjectDetailPage(getWorkingProject());
+            openProjectDetailPage(testParams.getProjectId());
             createSchedule(new ScheduleBuilder().setProcessName(processName)
                     .setExecutable(Executables.SUCCESSFUL_GRAPH).setCronTime(ScheduleCronTimes.CRON_EVERYDAY)
                     .setHourInDay("23").setMinuteInHour("59"));
@@ -453,7 +453,7 @@ public class NotificationsTest extends AbstractNotificationTest {
             logout();
 
             signInAtUI(imapUser, imapPassword);
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
             String processName = "Check Repeated Failures Notification" + Calendar.getInstance().getTimeInMillis();
             deployInProjectDetailPage(DeployPackages.BASIC, processName);
             ScheduleBuilder scheduleBuilder =
@@ -480,11 +480,11 @@ public class NotificationsTest extends AbstractNotificationTest {
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
     public void checkEmptyStateNotificationList() {
-        openProjectDetailByUrl(getWorkingProject().getProjectId());
+        openProjectDetailPage(testParams.getProjectId());
         String processName = "Check Empty State Notification List";
         try {
             deployInProjectDetailPage(DeployPackages.BASIC, processName);
-            openProjectDetailPage(getWorkingProject());
+            openProjectDetailPage(testParams.getProjectId());
             projectDetailPage.activeProcess(processName).clickOnNotificationRuleButton();
             waitForElementVisible(discNotificationRules.getRoot());
             assertTrue(discNotificationRules.getEmptyStateMessage().contains(

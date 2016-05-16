@@ -7,26 +7,21 @@ import java.util.List;
 
 public class OverviewProjectDetails {
 
-    private ProjectInfo projectInfo;
+    private String projectId;
+    private String projectName;
     private List<OverviewProcess> overviewProcesses;
 
     public OverviewProjectDetails() {
         this.overviewProcesses = new ArrayList<OverviewProcess>();
     }
 
-    public OverviewProjectDetails setProjectInfo(ProjectInfo projectInfo) {
-        this.projectInfo = projectInfo;
+    public OverviewProjectDetails setProjectId(String projectId) {
+        this.projectId = projectId;
         return this;
     }
 
-    public ProjectInfo getProjectInfo() {
-        return this.projectInfo;
-    }
-
-    public String getProjectName() {
-        if (projectInfo == null)
-            return null;
-        return projectInfo.getProjectName();
+    public String getProjectId() {
+        return this.projectId;
     }
 
     public List<OverviewProcess> getOverviewProcesses() {
@@ -45,6 +40,15 @@ public class OverviewProjectDetails {
 
     public OverviewProcess newProcess() {
         return new OverviewProcess();
+    }
+
+    public OverviewProjectDetails setProjectName(String projectName) {
+        this.projectName = projectName;
+        return this;
+    }
+
+    public String getProjectName() {
+        return projectName;
     }
 
     public int getProjectScheduleNumber() {
