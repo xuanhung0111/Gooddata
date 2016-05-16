@@ -55,13 +55,13 @@ public final class ModelRestUtils {
      * 
      * @param restApiClient
      * @param projectId
-     * @param includeProduction
+     * @param includeNonProduction
      * @return model view
      */
     public static JSONObject getProductionProjectModelView(final RestApiClient restApiClient, final String projectId, 
-            final boolean includeProduction) throws ParseException, JSONException, IOException {
+            final boolean includeNonProduction) throws ParseException, JSONException, IOException {
         final String nonProductionURL = PROJECT_MODEL_VIEW_LINK + "?includeNonProduction=%s";
-        return getProjectModelViewByModelLink(restApiClient, format(nonProductionURL, projectId, includeProduction));
+        return getProjectModelViewByModelLink(restApiClient, format(nonProductionURL, projectId, includeNonProduction));
     }
 
     /**

@@ -6,10 +6,12 @@ import static com.gooddata.qa.graphene.enums.ResourceDirectory.SQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.ZIP_FILES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.http.RestUtils.ACCEPT_TEXT_PLAIN_WITH_VERSION;
 import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static com.gooddata.qa.utils.http.RestUtils.getResource;
 import static com.gooddata.qa.utils.http.model.ModelRestUtils.getDatasetElementFromModelView;
+import static com.gooddata.qa.utils.http.process.ProcessRestUtils.DATALOAD_PROCESS_TYPE;
 import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.executeMAQL;
 import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.getAsyncTaskStatus;
 import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.waitingForAsyncTask;
@@ -18,7 +20,6 @@ import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableMap;
-import static java.util.Objects.isNull;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -78,23 +79,10 @@ import com.google.common.collect.Lists;
 
 public class AbstractMSFTest extends AbstractProjectTest {
 
-    protected static final String DATALOAD = "DATALOAD";
-
-    protected static final String OUTPUTSTAGE_URI = "/gdc/dataload/projects/%s/outputStage/";
-    protected static final String OUTPUT_STAGE_METADATA_URI = OUTPUTSTAGE_URI + "metadata";
-    protected static final String INTERNAL_OUTPUT_STAGE_URI = "/gdc/dataload/internal/projects/%s/outputStage/";
-    protected static final String MAPPING_RESOURCE = INTERNAL_OUTPUT_STAGE_URI + "mapping";
-    protected static final String OUTPUT_STATE_MODEL_RESOURCE = INTERNAL_OUTPUT_STAGE_URI + "model";
-    protected static final String PROJECT_MODEL_VIEW = "/gdc/projects/%s/model/view";
-
     protected static final String DEFAULT_DATAlOAD_PROCESS_NAME = "Automated Data Distribution";
     protected static final String CLOUDCONNECT_PROCESS_PACKAGE = "dlui.zip";
     protected static final String DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS =
             "DLUI/graph/CreateAndCopyDataToADS.grf";
-    protected static final String ADS_URL =
-            "jdbc:gdc:datawarehouse://${host}/gdc/datawarehouse/instances/${adsId}";
-    protected static final String ACCEPT_APPLICATION_JSON_WITH_VERSION = "application/json; version=1";
-    protected static final String ACCEPT_TEXT_PLAIN_WITH_VERSION = "text/plain; version=1";
 
     @SuppressWarnings("serial")
     protected static final Map<String, String> SYNCHRONIZE_ALL_PARAM = unmodifiableMap(new HashMap<String, String>() {{
@@ -102,7 +90,6 @@ public class AbstractMSFTest extends AbstractProjectTest {
     }});
 
     private String dssAuthorizationToken;
-    private AdsHelper adsHelper;
 
     protected String technicalUser;
     protected String technicalUserPassword;
@@ -125,12 +112,6 @@ public class AbstractMSFTest extends AbstractProjectTest {
      */
     protected void addUsersToProject() {}
     protected void addUsersToAdsInstance() {}
-
-    protected AdsHelper getAdsHelper() {
-        if (isNull(adsHelper))
-            adsHelper = new AdsHelper(getGoodDataClient(), getRestApiClient());
-        return adsHelper;
-    }
 
     protected Warehouse createAds(final String name) {
         return getAdsHelper().createAds(name, dssAuthorizationToken);
@@ -171,16 +152,6 @@ public class AbstractMSFTest extends AbstractProjectTest {
         getAdsHelper().associateAdsWithProject(ads, testParams.getProjectId());
     }
 
-    protected void customOutputStageMetadata(final DataSource... dataSources)
-            throws ParseException, IOException, JSONException {
-        final String putBody = prepareOutputStageMetadata(dataSources);
-        final String putUri = format(OUTPUT_STAGE_METADATA_URI, getWorkingProject().getProjectId());
-        getResource(getRestApiClient(),
-                getRestApiClient().newPutMethod(putUri, putBody),
-                req -> req.setHeader("Accept", ACCEPT_APPLICATION_JSON_WITH_VERSION),
-                HttpStatus.OK);
-    }
-
     protected void createUpdateADSTableBySQLFiles(final String createTableFile, final String copyTableFile,
             final Warehouse ads) {
         final Map<String, String> params = prepareParamsToUpdateADS(createTableFile, copyTableFile, ads.getId());
@@ -209,7 +180,7 @@ public class AbstractMSFTest extends AbstractProjectTest {
         final Map<String, String> params = new HashMap<>();
         final String createTableSql = getResourceAsString("/" + SQL_FILES + "/" + createTableSqlFile);
         final String copyTableSql = getResourceAsString("/" + SQL_FILES + "/" + copyTableSqlFile);
-        final String adsUrl = ADS_URL.replace("${host}", testParams.getHost()).replace("${adsId}", adsId);
+        final String adsUrl = AdsHelper.ADS_URL.replace("${host}", testParams.getHost()).replace("${adsId}", adsId);
 
         params.put("CREATE_TABLE", createTableSql);
         params.put("COPY_TABLE", copyTableSql);
@@ -247,7 +218,7 @@ public class AbstractMSFTest extends AbstractProjectTest {
     }
 
     protected DataloadProcess createProcess(final String name, final String type) {
-        if (DATALOAD.equals(type)) {
+        if (DATALOAD_PROCESS_TYPE.equals(type)) {
             final Optional<DataloadProcess> dataloadProcess = getProcessService()
                 .listProcesses(getProject())
                 .stream()
@@ -285,7 +256,7 @@ public class AbstractMSFTest extends AbstractProjectTest {
         if (dataloadProcess.isPresent()) {
             getProcessService().removeProcess(dataloadProcess.get());
         }
-        return createProcess(DEFAULT_DATAlOAD_PROCESS_NAME, DATALOAD);
+        return createProcess(DEFAULT_DATAlOAD_PROCESS_NAME, DATALOAD_PROCESS_TYPE);
     }
 
     protected String getDataloadProcessUri() {
@@ -300,7 +271,7 @@ public class AbstractMSFTest extends AbstractProjectTest {
         return getProcessService()
             .listProcesses(getProject())
             .stream()
-            .filter(process -> DATALOAD.equals(process.getType()))
+            .filter(process -> DATALOAD_PROCESS_TYPE.equals(process.getType()))
             .findFirst();
     }
 
@@ -319,7 +290,7 @@ public class AbstractMSFTest extends AbstractProjectTest {
 
     protected int redeployDataLoadProcess(final RestApiClient restApiClient) throws IOException, JSONException {
         final String body = new JSONObject().put("process", new JSONObject() {{
-            put("type", DATALOAD);
+            put("type", DATALOAD_PROCESS_TYPE);
             put("name", DEFAULT_DATAlOAD_PROCESS_NAME);
         }}).toString();
 
@@ -333,15 +304,7 @@ public class AbstractMSFTest extends AbstractProjectTest {
     protected String getDiffResourceContent(final RestApiClient restApiClient, final HttpStatus status)
             throws ParseException, IOException {
         return getResource(restApiClient,
-                restApiClient.newGetMethod(format(OUTPUTSTAGE_URI, testParams.getProjectId()) + "diff"),
-                req -> req.setHeader("Accept", ACCEPT_TEXT_PLAIN_WITH_VERSION),
-                status);
-    }
-
-    protected String getMappingResourceContent(final RestApiClient restApiClient, final HttpStatus status)
-            throws ParseException, IOException {
-        return getResource(restApiClient,
-                restApiClient.newGetMethod(format(MAPPING_RESOURCE, testParams.getProjectId())),
+                restApiClient.newGetMethod(format(AdsHelper.OUTPUT_STAGE_URI, testParams.getProjectId()) + "diff"),
                 req -> req.setHeader("Accept", ACCEPT_TEXT_PLAIN_WITH_VERSION),
                 status);
     }
@@ -415,30 +378,6 @@ public class AbstractMSFTest extends AbstractProjectTest {
         if (workingProject == null)
             workingProject = new ProjectInfo(projectTitle, testParams.getProjectId());
         return workingProject;
-    }
-
-    private String prepareOutputStageMetadata(final DataSource... dataSources) throws JSONException {
-        final JSONObject metaObject = new JSONObject();
-
-        final Collection<JSONObject> metadataObjects = Lists.newArrayList();
-        for (DataSource dataSource : dataSources) {
-            for (Dataset dataset : dataSource.getAvailableDatasets(FieldTypes.ALL)) {
-                metadataObjects.add(prepareMetadataObject(dataset.getName(), dataSource.getName()));
-            }
-        }
-        metaObject.put("outputStageMetadata", new JSONObject().put("tableMeta", metadataObjects));
-
-        return metaObject.toString();
-    }
-
-    private JSONObject prepareMetadataObject(final String tableName, final String dataSourceName) throws JSONException {
-        return new JSONObject() {{
-            put("tableMetadata", new JSONObject() {{
-                put("table", tableName);
-                put("defaultSource", dataSourceName);
-                put("columnMeta", new JSONArray());
-            }});
-        }};
     }
 
     private String sendRequestToUpdateModel(final String maql) throws ParseException, JSONException, IOException {

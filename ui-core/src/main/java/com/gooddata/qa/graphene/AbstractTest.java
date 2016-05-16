@@ -21,6 +21,7 @@ import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.common.TestParameters;
 import com.gooddata.qa.graphene.utils.WaitUtils;
+import com.gooddata.qa.utils.ads.AdsHelper;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.testng.listener.AuxiliaryFailureScreenshotListener;
 import com.gooddata.qa.utils.testng.listener.ConsoleStatusListener;
@@ -43,6 +44,7 @@ public abstract class AbstractTest extends Arquillian {
 
     protected GoodData goodDataClient = null;
     protected RestApiClient restApiClient = null;
+    protected AdsHelper adsHelper = null;
 
     protected StartPageContext startPageContext = null;
     protected static final String PAGE_PROJECTS = "projects.html";
@@ -142,10 +144,16 @@ public abstract class AbstractTest extends Arquillian {
         }
         return goodDataClient;
     }
-    
+
     public GoodData getGoodDataClient(final String userLogin, final String userPassword) {
         final HttpHost httpHost = RestApiClient.parseHost(testParams.getHost());
         return new GoodData(httpHost.getHostName(), userLogin, userPassword, httpHost.getPort());
+    }
+
+    public AdsHelper getAdsHelper() {
+        if (adsHelper == null)
+            adsHelper = new AdsHelper(getGoodDataClient(), getRestApiClient());
+        return adsHelper;
     }
 
     public String generateEmail(String email) {

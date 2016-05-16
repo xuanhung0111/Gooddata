@@ -2,8 +2,12 @@ package com.gooddata.qa.graphene.dlui;
 
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.API_RESOURCES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
+import static com.gooddata.qa.utils.http.RestUtils.ACCEPT_TEXT_PLAIN_WITH_VERSION;
+import static com.gooddata.qa.utils.http.RestUtils.getResource;
+import static com.gooddata.qa.utils.http.process.ProcessRestUtils.DATALOAD_PROCESS_TYPE;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -20,11 +24,12 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractMSFTest;
+import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.warehouse.Warehouse;
 import com.google.common.base.Strings;
 
 public class DataloadResourcesTest extends AbstractMSFTest {
-    
+
     private static final String DIFF_WITH_MAPPING_MATCH_TEXT = "-- ADS and LDM column mapping matches.";
     private static final String DIFF_WITH_EMPTY_OUTPUT_STAGE_FILE = "diff-output-stage-empty.txt";
     private static final String NO_DATA_WAREHOUSE_ERROR_MESSAGE =
@@ -32,6 +37,7 @@ public class DataloadResourcesTest extends AbstractMSFTest {
     private static final String NO_DATALOAD_PROCESS_MESSAGE = "No DATALOAD process exists in project %s.";
     private static final String DIFF_KEY = Strings.repeat("-", 50);
     private static final String MAPPING_OUTPUT_STAGE_EMPTY_FILE = "mapping-output-stage-empty.txt";
+    private static final String MAPPING_RESOURCE = "/gdc/dataload/internal/projects/%s/outputStage/mapping";
 
     @BeforeClass
     public void initialProjectTitle() {
@@ -139,7 +145,7 @@ public class DataloadResourcesTest extends AbstractMSFTest {
             assertResourceContent(getMappingResourceContent(getRestApiClient(), HttpStatus.OK),
                     readAllLinesOfFile("mapping-all-cases.txt"));
 
-            assertTrue(executeProcess(createProcess(DEFAULT_DATAlOAD_PROCESS_NAME, DATALOAD), "", SYNCHRONIZE_ALL_PARAM).isSuccess());
+            assertTrue(executeProcess(createProcess(DEFAULT_DATAlOAD_PROCESS_NAME, DATALOAD_PROCESS_TYPE), "", SYNCHRONIZE_ALL_PARAM).isSuccess());
         } finally {
             setDefaultSchemaForOutputStage(ads);
             getAdsHelper().removeAds(newAds);
@@ -166,4 +172,11 @@ public class DataloadResourcesTest extends AbstractMSFTest {
         }
     }
 
+    private String getMappingResourceContent(final RestApiClient restApiClient, final HttpStatus status)
+            throws ParseException, IOException {
+        return getResource(restApiClient,
+                restApiClient.newGetMethod(format(MAPPING_RESOURCE, testParams.getProjectId())),
+                req -> req.setHeader("Accept", ACCEPT_TEXT_PLAIN_WITH_VERSION),
+                status);
+    }
 }

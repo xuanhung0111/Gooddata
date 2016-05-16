@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.dlui;
 
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.API_RESOURCES;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.utils.http.process.ProcessRestUtils.DATALOAD_PROCESS_TYPE;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
 import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
@@ -67,7 +68,7 @@ public class DataloadProcessTest extends AbstractMSFTest {
 
         try {
             getProcessService().createProcess(getProject(),
-                new DataloadProcess(DEFAULT_DATAlOAD_PROCESS_NAME, DATALOAD));
+                new DataloadProcess(DEFAULT_DATAlOAD_PROCESS_NAME, DATALOAD_PROCESS_TYPE));
             fail("Still create another dataload process.");
         } catch (GoodDataException e) {}
 
@@ -76,7 +77,7 @@ public class DataloadProcessTest extends AbstractMSFTest {
 
     @Test(dependsOnGroups = {"initialData"}, priority = 1)
     public void changeAdsInstanceWhenHavingDataloadProcess() throws IOException, JSONException {
-        final String dataloadProcessId = createProcess(DEFAULT_DATAlOAD_PROCESS_NAME, DATALOAD).getId();
+        final String dataloadProcessId = createProcess(DEFAULT_DATAlOAD_PROCESS_NAME, DATALOAD_PROCESS_TYPE).getId();
         final Warehouse newAds = createAds("ADS Instance for DLUI test 2");
         setDefaultSchemaForOutputStage(newAds);
 
@@ -92,7 +93,7 @@ public class DataloadProcessTest extends AbstractMSFTest {
 
     @Test(dependsOnGroups = {"initialData"}, priority = 1)
     public void changeAdsInstanceAfterDeleteDataloadProcess() throws IOException, JSONException {
-        final DataloadProcess dataloadProcess = createProcess(DEFAULT_DATAlOAD_PROCESS_NAME, DATALOAD);
+        final DataloadProcess dataloadProcess = createProcess(DEFAULT_DATAlOAD_PROCESS_NAME, DATALOAD_PROCESS_TYPE);
         getProcessService().removeProcess(dataloadProcess);
         assertFalse(getDataloadProcess().isPresent());
 

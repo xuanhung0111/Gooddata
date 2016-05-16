@@ -26,15 +26,17 @@ import com.gooddata.warehouse.Warehouse;
 
 public final class AdsHelper {
 
+    public static final String ADS_URL = "jdbc:gdc:datawarehouse://${host}/gdc/datawarehouse/instances/${adsId}";
     public static final String ADS_INSTANCES_URI = "/gdc/datawarehouse/instances/";
     public static final String ADS_INSTANCE_SCHEMA_URI = ADS_INSTANCES_URI + "%s/schemas/default";
     public static final String OUTPUT_STAGE_URI = "/gdc/dataload/projects/%s/outputStage/";
+    public static final String OUTPUT_STAGE_METADATA_URI = OUTPUT_STAGE_URI + "metadata";
     public static final String ADS_INSTANCES_USERS_URI = ADS_INSTANCES_URI + "%s/users";
 
     private static final String ACCEPT_HEADER_VALUE_WITH_VERSION = "application/json; version=1";
-    
+
     private static final String ADD_USER_CONTENT_BODY;
-    
+
     static {
         try {
             ADD_USER_CONTENT_BODY = new JSONObject() {{
