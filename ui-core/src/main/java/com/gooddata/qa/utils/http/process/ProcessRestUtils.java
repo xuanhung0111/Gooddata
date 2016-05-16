@@ -26,6 +26,8 @@ public final class ProcessRestUtils {
 
     private static final Logger log = Logger.getLogger(ProcessRestUtils.class.getName());
 
+    public static final String DATALOAD_PROCESS_TYPE = "DATALOAD";
+
     private ProcessRestUtils() {
     }
 
@@ -58,7 +60,7 @@ public final class ProcessRestUtils {
         JSONObject it;
         for (int i = 0, n = processes.length(); i < n; i++) {
             it = processes.getJSONObject(i).getJSONObject("process");
-            if (!"DATALOAD".equals(it.getString("type"))) continue;
+            if (!DATALOAD_PROCESS_TYPE.equals(it.getString("type"))) continue;
             return it.getString("ownerLogin");
         }
         throw new RuntimeException("Cannot find dataload process!");

@@ -19,6 +19,9 @@ import org.springframework.http.HttpStatus;
  */
 public final class RestUtils {
 
+    public static final String ACCEPT_TEXT_PLAIN_WITH_VERSION = "text/plain; version=1";
+    public static final String ACCEPT_HEADER_VALUE_WITH_VERSION = "application/json; version=1";
+
     public static final String CREATE_AND_GET_OBJ_LINK = "/gdc/md/%s/obj?createAndGet=true";
 
     private RestUtils() {

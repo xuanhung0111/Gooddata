@@ -5,20 +5,27 @@ import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.http.RestUtils.ACCEPT_HEADER_VALUE_WITH_VERSION;
+import static com.gooddata.qa.utils.http.RestUtils.getResource;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
+import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
+import org.springframework.http.HttpStatus;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -32,6 +39,7 @@ import com.gooddata.qa.graphene.entity.dlui.Field.FieldTypes;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.AnnieUIDialogFragment;
+import com.gooddata.qa.utils.ads.AdsHelper;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
@@ -494,5 +502,39 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
 
     private Dataset prepareDataset(AdditionalDatasets additionalDataset) {
         return additionalDataset.getDataset();
+    }
+
+    private void customOutputStageMetadata(final DataSource... dataSources)
+            throws ParseException, IOException, JSONException {
+        final String putBody = prepareOutputStageMetadata(dataSources);
+        final String putUri = format(AdsHelper.OUTPUT_STAGE_METADATA_URI, getWorkingProject().getProjectId());
+        getResource(getRestApiClient(),
+                getRestApiClient().newPutMethod(putUri, putBody),
+                req -> req.setHeader("Accept", ACCEPT_HEADER_VALUE_WITH_VERSION),
+                HttpStatus.OK);
+    }
+
+    private String prepareOutputStageMetadata(final DataSource... dataSources) throws JSONException {
+        final JSONObject metaObject = new JSONObject();
+
+        final Collection<JSONObject> metadataObjects = Lists.newArrayList();
+        for (DataSource dataSource : dataSources) {
+            for (Dataset dataset : dataSource.getAvailableDatasets(FieldTypes.ALL)) {
+                metadataObjects.add(prepareMetadataObject(dataset.getName(), dataSource.getName()));
+            }
+        }
+        metaObject.put("outputStageMetadata", new JSONObject().put("tableMeta", metadataObjects));
+
+        return metaObject.toString();
+    }
+
+    private JSONObject prepareMetadataObject(final String tableName, final String dataSourceName) throws JSONException {
+        return new JSONObject() {{
+            put("tableMetadata", new JSONObject() {{
+                put("table", tableName);
+                put("defaultSource", dataSourceName);
+                put("columnMeta", new JSONArray());
+            }});
+        }};
     }
 }
