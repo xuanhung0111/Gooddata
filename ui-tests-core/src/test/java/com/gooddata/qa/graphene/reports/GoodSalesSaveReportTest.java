@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForReportsPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -108,6 +109,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
 
         moveToAnotherPage();
         waitForElementVisible(UNSAVED_CHANGES_DONT_SAVE_BUTTON, browser).click();
+        waitForDataPageLoaded(browser);
 
         initReportsPage();
         waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder(UNSORTED);
@@ -146,6 +148,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
 
         moveToAnotherPage();
         waitForElementVisible(UNSAVED_CHANGES_DONT_SAVE_BUTTON, browser).click();
+        waitForDataPageLoaded(browser);
 
         initReportsPage();
         waitForFragmentVisible(reportsPage).getReportsList().openReport(VERSION_REPORT);
@@ -171,6 +174,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         moveToAnotherPage();
         waitForElementVisible(UNSAVED_CHANGES_SAVE_BUTTON, browser).click();
         waitForElementVisible(CREATE_REPORT_BUTTON, browser).click();
+        waitForDataPageLoaded(browser);
 
         initReportsPage();
         waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder(UNSORTED);
@@ -195,6 +199,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         moveToAnotherPage();
         waitForElementVisible(UNSAVED_CHANGES_SAVE_BUTTON, browser).click();
         waitForElementVisible(WARNING_DIALOG_SAVE_BUTTON, browser).click();
+        waitForDataPageLoaded(browser);
 
         initReportsPage();
         waitForFragmentVisible(reportsPage).getReportsList().openReport(TOTAL_LOST);
