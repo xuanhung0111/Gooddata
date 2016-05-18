@@ -5,7 +5,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmp
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
-import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
@@ -18,7 +17,6 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -92,13 +90,13 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
     public void checkScheduledProjectsFilterOptions() {
         String projectId = createBlankProject("Disc-test-scheduled-filter-option");
         try {
-            prepareDataForAdditionalProjects(singletonList(projectId));
+            prepareDataForProject(projectId);
             prepareDataForProjectsPageTest(ProjectStateFilters.SCHEDULED, testParams.getProjectId());
 
             initDISCProjectsPage();
-            checkProjectFilter(ProjectStateFilters.SCHEDULED, singletonList(testParams.getProjectId()));
+            checkProjectFilter(ProjectStateFilters.SCHEDULED, testParams.getProjectId());
         } finally {
-            deleteProjects(singletonList(projectId));
+            deleteProjects(projectId);
         }
     }
 
@@ -248,10 +246,11 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         waitForCollectionIsNotEmpty(projectsPage.getProjectsElements());
         int projectsNumber =
                 projectsPage.getProjectsElements().size() + projectsPage.getDemoProjectsElements().size();
-        List<String> additionalProjectIds = new ArrayList<>();
+        String[] additionalProjectIds = null;
         if (projectsNumber <= MINIMUM_NUMBER_OF_PROJECTS) {
-            for (int i = 0; i < 25 - projectsNumber + 1; i++) {
-                additionalProjectIds.add(createBlankProject("Disc-test-paging-projects-page-" + i));
+            additionalProjectIds = new String[MINIMUM_NUMBER_OF_PROJECTS - projectsNumber + 1];
+            for (int i = 0; i < additionalProjectIds.length; i++) {
+                additionalProjectIds[i] = createBlankProject("Disc-test-paging-projects-page-" + i);
             }
         }
 
@@ -313,7 +312,8 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
                             "The project number in the last page: " + discProjectsList.getNumberOfRows());
             }
         } finally {
-            deleteProjects(additionalProjectIds);
+            if (additionalProjectIds != null)
+                deleteProjects(additionalProjectIds);
         }
     }
 
@@ -389,7 +389,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
             assertTrue(discProjectsList.isCorrectSearchedProjectByUnicodeName(unicodeProjectName),
                     "Incorrect search result by unicode name!");
         } finally {
-            deleteProjects(singletonList(projectId));
+            deleteProjects(projectId);
         }
 
     }
@@ -440,7 +440,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
             throw new IllegalStateException("There is exeception when adding user to project!", e);
         } finally {
             if (!projectId.isEmpty())
-                deleteProjects(singletonList(projectId));
+                deleteProjects(projectId);
             logout();
             signInAtUI(testParams.getUser(), testParams.getPassword());
         }

@@ -6,6 +6,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
+import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -17,6 +18,9 @@ import static org.testng.Assert.fail;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import javax.mail.Message;
+import javax.mail.MessagingException;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
@@ -26,13 +30,16 @@ import org.openqa.selenium.support.ui.Select;
 import com.gooddata.qa.graphene.AbstractMSFTest;
 import com.gooddata.qa.graphene.entity.disc.NotificationBuilder;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
+import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 import com.gooddata.qa.graphene.enums.disc.NotificationEvents;
 import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.fragments.disc.NotificationRule;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.mail.ImapClient;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 
 public abstract class AbstractDISCTest extends AbstractMSFTest {
 
@@ -44,15 +51,14 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
         cleanProcessesInWorkingProject();
     }
 
-    protected void deployInProjectsPage(List<String> projectIds, DeployPackages deployPackage,
-            String processName) {
+    protected void deployInProjectsPage(DeployPackages deployPackage, String processName, String... projectIds) {
         openUrl(DISC_PROJECTS_PAGE_URL);
         selectProjectsToDeployInProjectsPage(projectIds);
 
         String filePath = getFilePathFromResource("/" + ZIP_FILES + "/" + deployPackage.getPackageName());
         deployForm.deployProcess(filePath, deployPackage.getPackageType(), processName);
         waitForFragmentNotVisible(deployForm);
-        assertDeployedProcessInProjects(processName, projectIds, deployPackage);
+        assertDeployedProcessInProjects(processName, deployPackage, projectIds);
     }
 
     protected String deployInProjectDetailPage(DeployPackages deployPackage, String processName) {
@@ -290,7 +296,7 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
                     "Incorrect custom event name!");
     }
 
-    protected void selectProjectsToDeployInProjectsPage(List<String> projectIds) {
+    protected void selectProjectsToDeployInProjectsPage(String... projectIds) {
         waitForFragmentVisible(discProjectsList);
         discProjectsList.checkOnProjects(projectIds);
         assertTrue(discProjectsList.getDeployProcessButton().isEnabled(),
@@ -312,7 +318,7 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
         return "";
     }
 
-    protected void deleteProjects(List<String> projectIds) {
+    protected void deleteProjects(String... projectIds) {
         for (String projectId : projectIds) {
             cleanProcessesInProject(projectId);
             deleteProject(projectId);
@@ -321,6 +327,10 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
 
     protected void cleanProcessesInWorkingProject() {
         cleanProcessesInProject(testParams.getProjectId());
+    }
+
+    protected Message getNotification(final ImapClient imapClient, final String subject) throws MessagingException {
+        return Iterables.getLast(waitForMessages(imapClient, GDEmails.NO_REPLY, subject, 1));
     }
 
     private void assertOkExecutionGroupInfo(WebElement okExecutionGroup, String groupDescription) {
@@ -391,8 +401,7 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
         projectDetailPage.deleteAllProcesses();
     }
 
-    private void assertDeployedProcessInProjects(String processName, List<String> projectIds,
-            DeployPackages deployPackage) {
+    private void assertDeployedProcessInProjects(String processName, DeployPackages deployPackage, String... projectIds) {
         for (String projectId : projectIds) {
             openUrl(DISC_PROJECTS_PAGE_URL + "/" + projectId);
             waitForElementVisible(projectDetailPage.getRoot());

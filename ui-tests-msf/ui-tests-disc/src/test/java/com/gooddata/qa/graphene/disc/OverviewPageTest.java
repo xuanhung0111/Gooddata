@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.disc;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -102,8 +101,8 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         OverviewProcess overviewProcess =
                 overviewProject.newProcess().setProcessName("Check Scheduled State Number");
         OverviewSchedule overviewSchedule = overviewProcess.newSchedule().setScheduleName("Scheduled schedule");
-        prepareDataForOverviewScheduledStateTests(singletonList(testParams.getProjectId()),
-                overviewProject.addProcess(overviewProcess.addSchedule(overviewSchedule)));
+        prepareDataForProject(testParams.getProjectId());
+        prepareDataForScheduledProject(overviewProject.addProcess(overviewProcess.addSchedule(overviewSchedule)));
 
         initDISCOverviewPage();
         discOverview.selectOverviewState(OverviewProjectStates.SCHEDULED);
@@ -327,5 +326,21 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser).click();
         waitForElementVisible(BY_LOGOUT_LINK, browser).click();
         waitForFragmentVisible(loginFragment);
+    }
+
+    private void prepareDataForScheduledProject(OverviewProjectDetails overviewProject) {
+        for (OverviewProcess overviewProcess : overviewProject.getOverviewProcesses()) {
+            openProjectDetailPage(testParams.getProjectId());
+            String processUrl = deployInProjectDetailPage(DeployPackages.BASIC, overviewProcess.getProcessName());
+            overviewProcess.setProcessUrl(processUrl);
+            for (OverviewSchedule overviewSchedule : overviewProcess.getOverviewSchedules()) {
+                createSchedule(new ScheduleBuilder().setProcessName(overviewProcess.getProcessName())
+                        .setExecutable(Executables.LONG_TIME_RUNNING_GRAPH)
+                        .setScheduleName(overviewSchedule.getScheduleName())
+                        .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23").setMinuteInHour("59"));
+                overviewSchedule.setScheduleUrl(browser.getCurrentUrl());
+                scheduleDetail.manualRun();
+            }
+        }
     }
 }
