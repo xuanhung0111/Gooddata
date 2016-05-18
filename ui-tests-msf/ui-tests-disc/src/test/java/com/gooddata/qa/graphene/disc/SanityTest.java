@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.disc;
 
 import static com.gooddata.qa.utils.http.RestUtils.getResource;
+import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -10,6 +11,7 @@ import java.util.Calendar;
 
 import org.apache.http.ParseException;
 import org.springframework.http.HttpStatus;
+
 import javax.mail.MessagingException;
 
 import org.testng.annotations.BeforeClass;
@@ -38,7 +40,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
     public void deployCloudConnectInProjectsPage() {
         try {
-            deployInProjectsPage(getProjects(), DeployPackages.CLOUDCONNECT, "CloudConnect - Projects List Page");
+            deployInProjectsPage(singletonList(testParams.getProjectId()), DeployPackages.CLOUDCONNECT, "CloudConnect - Projects List Page");
         } finally {
             cleanProcessesInWorkingProject();
         }
@@ -47,7 +49,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
     public void deployCloudConnectInProjectDetailPage() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
             deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, "CloudConnect - Project Detail Page");
         } finally {
             cleanProcessesInWorkingProject();
@@ -57,7 +59,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
     public void redeployProcessWithDifferentPackage() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
             String processName = "Redeploy process with different package";
             deployInProjectDetailPage(DeployPackages.EXECUTABLES_GRAPH, processName);
             redeployProcess(processName, DeployPackages.CLOUDCONNECT, processName);
@@ -69,7 +71,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void createAndAssertSchedule() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Create Schedule with Custom Input";
             deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
@@ -85,7 +87,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void checkManualExecution() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Check Manual Execution";
             ScheduleBuilder scheduleBuilder =
@@ -110,7 +112,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void checkRubyExecution() throws ParseException, IOException {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Check Ruby Execution";
             ScheduleBuilder scheduleBuilder =
@@ -131,7 +133,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void checkScheduleAutoRun() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Check Auto Run Schedule";
             ScheduleBuilder scheduleBuilder =
@@ -149,7 +151,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
     public void createAndAssertNotification() throws MessagingException {
-        openProjectDetailByUrl(getWorkingProject().getProjectId());
+        openProjectDetailPage(testParams.getProjectId());
         String processName = "Check Notification";
         try {
             deployInProjectDetailPage(DeployPackages.BASIC, processName);
@@ -162,7 +164,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
                             .setMessage(message).setEvent(NotificationEvents.SUCCESS);
             createAndAssertNotification(notificationInfo);
 
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
             browser.navigate().refresh();
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.SUCCESSFUL_GRAPH)

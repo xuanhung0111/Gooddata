@@ -15,7 +15,6 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 
-import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 import com.gooddata.qa.graphene.enums.disc.ProcessTypes;
 import com.gooddata.qa.utils.graphene.Screenshots;
@@ -41,10 +40,10 @@ public abstract class AbstractDeployProcessTest extends AbstractDISCTest {
     private static final String FAILED_DEPLOY_ERROR_BAR_IN_PROJECTS_PAGE =
             "Failed to deploy the %s process as %s to the projects below. Reasons: Process contains no executables.";
 
-    protected void failedDeployInProjectsPage(List<ProjectInfo> projects, DeployPackages deployPackage,
+    protected void failedDeployInProjectsPage(List<String> projectIds, DeployPackages deployPackage,
             ProcessTypes processType, String processName) {
         openUrl(DISC_PROJECTS_PAGE_URL);
-        selectProjectsToDeployInProjectsPage(projects);
+        selectProjectsToDeployInProjectsPage(projectIds);
 
         String filePath = getFilePathFromResource("/" + ZIP_FILES + "/" + deployPackage.getPackageName());
         deployForm.tryToDeployProcess(filePath, processType, processName);
@@ -102,20 +101,20 @@ public abstract class AbstractDeployProcessTest extends AbstractDISCTest {
         checkDeployDialogMessageInProjectDetail(deployPackage, processType, false);
     }
 
-    protected void checkSuccessfulDeployDialogMessageInProjectsPage(List<ProjectInfo> projects,
+    protected void checkSuccessfulDeployDialogMessageInProjectsPage(List<String> projectIds,
             DeployPackages deployPackage, ProcessTypes processType) {
-        checkDeployDialogMessageInProjectsPage(projects, deployPackage, processType, true);
+        checkDeployDialogMessageInProjectsPage(projectIds, deployPackage, processType, true);
     }
 
-    protected void checkFailedDeployDialogMessageInProjectsPage(List<ProjectInfo> projects,
+    protected void checkFailedDeployDialogMessageInProjectsPage(List<String> projectIds,
             DeployPackages deployPackage, ProcessTypes processType) {
-        checkDeployDialogMessageInProjectsPage(projects, deployPackage, processType, false);
+        checkDeployDialogMessageInProjectsPage(projectIds, deployPackage, processType, false);
     }
 
-    private void checkDeployDialogMessageInProjectsPage(List<ProjectInfo> projects, DeployPackages deployPackage,
+    private void checkDeployDialogMessageInProjectsPage(List<String> projectIds, DeployPackages deployPackage,
             ProcessTypes processType, boolean isSuccessful) {
         openUrl(DISC_PROJECTS_PAGE_URL);
-        selectProjectsToDeployInProjectsPage(projects);
+        selectProjectsToDeployInProjectsPage(projectIds);
         String processName = "Check Deploy Dialog Message";
         String zipFileName = deployPackage.getPackageName();
         final String progressDialogMessage =

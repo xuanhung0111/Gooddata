@@ -50,7 +50,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void createScheduleWithCustomInput() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Create Schedule with Custom Input";
             deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
@@ -71,7 +71,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void createScheduleForSpecificExecutable() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Create Schedule for Specific Executable";
             deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
@@ -90,7 +90,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void createScheduleFromSchedulesList() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Create Schedule from Schedule List";
             deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
@@ -108,7 +108,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void createScheduleWithEveryWeekCronTime() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Edit Cron Time of Schedule";
             deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
@@ -127,7 +127,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void createScheduleWithEveryDayCronTime() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Schedule every day";
             deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
@@ -145,7 +145,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void createScheduleWithCronExpression() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Schedule with cron expression";
             deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
@@ -163,7 +163,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void checkManualExecution() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Check Manual Execution";
             ScheduleBuilder scheduleBuilder =
@@ -183,7 +183,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void checkStopManualExecution() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Check Stop Manual Execution";
             ScheduleBuilder scheduleBuilder =
@@ -211,7 +211,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void changeExecutableOfSchedule() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Change Executable of Schedule";
             ScheduleBuilder scheduleBuilder =
@@ -230,7 +230,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void deleteSchedule() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Delete Schedule";
             ScheduleBuilder scheduleBuilder =
@@ -251,7 +251,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void changeScheduleCronTime() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Change Cron Time of Schedule";
             ScheduleBuilder scheduleBuilder =
@@ -270,7 +270,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void editScheduleParameters() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Edit schedule parameters";
             deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
@@ -299,7 +299,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void addNewParametersForSchedule() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Add New Parameters for Schedule";
             deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
@@ -329,7 +329,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void createScheduleWithIncorrectCron() {
-        openProjectDetailByUrl(getWorkingProject().getProjectId());
+        openProjectDetailPage(testParams.getProjectId());
 
         deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, "Create Schedule With Error Cron");
 
@@ -350,7 +350,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void editScheduleWithIncorrectCron() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Edit Schedule With Error Cron";
             deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
@@ -380,7 +380,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void checkBrokenSchedule() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Check Broken Schedule";
             deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
@@ -416,7 +416,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void checkBrokenScheduleWithRenamedGraph() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Check Broken Schedule With Deleted Graph";
             deployInProjectDetailPage(DeployPackages.ONE_GRAPH, processName);
@@ -452,7 +452,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void checkDeleteScheduleParams() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Delete Schedule Parameter";
             deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
@@ -476,7 +476,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void checkCancelDeleteScheduleParams() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Cancel Delete Schedule Parameter";
             deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
@@ -500,7 +500,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void checkIncorrectRetryDelay() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Check Incorrect Retry Schedule";
             ScheduleBuilder scheduleBuilder =
@@ -524,7 +524,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void checkCancelCreateSchedule() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Cancel Create Schedule";
             deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
@@ -543,7 +543,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void checkCancelChangeScheduleExecutable() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Cancel Change Executable";
 
@@ -562,7 +562,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void checkCancelChangeScheduleCronTime() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Cancel Change Cron Time of Schedule";
             ScheduleBuilder scheduleBuilder =
@@ -581,7 +581,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void checkCancelAddRetryDelay() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Check Retry Schedule";
             ScheduleBuilder scheduleBuilder =
@@ -604,7 +604,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void checkCancelEditScheduleParams() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Cancel Edit schedule parameters";
             deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
@@ -630,7 +630,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void checkCancelDeleteSchedule() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Cancel Delete Schedule";
             ScheduleBuilder scheduleBuilder =
@@ -648,7 +648,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void checkRemoveRetry() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Check Retry Schedule";
             ScheduleBuilder scheduleBuilder =
@@ -668,7 +668,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void checkExecutionHistoryEmptyState() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Check Execution History Empty State";
             ScheduleBuilder scheduleBuilder =
@@ -688,7 +688,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void checkScheduleExecutionState() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Check Schedule Execution State";
 
@@ -704,7 +704,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
             ScheduleBuilder scheduleBuilder2 =
                     new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.SUCCESSFUL_GRAPH)
                             .setConfirmed(true);
-            openProjectDetailPage(getWorkingProject());
+            openProjectDetailPage(testParams.getProjectId());
             createAndAssertSchedule(scheduleBuilder2);
 
             scheduleDetail.manualRun();
@@ -718,7 +718,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void checkSuccessfulExecutionGroup() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Check Schedule Execution State";
 
@@ -740,7 +740,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void createScheduleWithCustomName() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName("Create Schedule With Custom Name")
                             .setScheduleName("Custom Schedule Name").setExecutable(Executables.SUCCESSFUL_GRAPH)
@@ -755,7 +755,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void editScheduleWithCustomName() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Edit Schedule With Custom Name";
             ScheduleBuilder scheduleBuilder =
@@ -776,7 +776,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void createScheduleWithEmptyCustomName() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Create Schedule With Empty Custom Name";
             deployInProjectDetailPage(DeployPackages.BASIC, processName);
@@ -797,7 +797,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void editScheduleWithEmptyCustomName() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Edit Schedule With Empty Custom Name";
             ScheduleBuilder scheduleBuilder =
@@ -815,7 +815,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void createScheduleNotUniqueName() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Create Schedule With Not Unique Name";
             ScheduleBuilder scheduleBuilder =
@@ -838,7 +838,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void editScheduleWithNotUniqueName() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
             String processName = "Create Schedule With Custom Name";
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.SUCCESSFUL_GRAPH)
@@ -860,7 +860,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void cancelEditScheduleName() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Edit Schedule With Custom Name";
             ScheduleBuilder scheduleBuilder =
@@ -879,7 +879,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void createScheduleWithCustomNameForRubyScript() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Create Schedule With Custom Name For Ruby Script";
             deployInProjectDetailPage(DeployPackages.RUBY, processName);
@@ -915,7 +915,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         try {
             String processName = "Check Schedule Trigger With 1 Schedule In Project";
 
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
             deployInProjectDetailPage(DeployPackages.BASIC, processName);
 
             projectDetailPage.clickOnNewScheduleButton();
@@ -971,7 +971,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void checkScheduleTriggerByItself() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
             String processName = "Check Schedule With Trigger Schedule";
             String triggerScheduleName = Executables.SUCCESSFUL_GRAPH.getExecutableName();
             Executables triggerScheduleExecutable = Executables.SUCCESSFUL_GRAPH;
@@ -1005,7 +1005,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
             waitForFragmentVisible(scheduleDetail);
             scheduleDetail.deleteSchedule(Confirmation.SAVE_CHANGES);
 
-            openProjectDetailByUrl(testParams.getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
             projectDetailPage.activeProcess(processName).clickOnScheduleTab();
             assertEquals(schedulesTable.getScheduleCron(dependentScheduleBuilder.getScheduleName()).getText(),
                     TRIGGER_SCHEDULE_MISSING, "Incorrect missing trigger schedule message on project detail page!");
@@ -1025,7 +1025,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void checkExecutionLog() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Check Execution Log";
             ScheduleBuilder successfulSchedule =
@@ -1054,7 +1054,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void editScheduleNameWithPencilIcon() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Edit schedule name by pencil icon";
             ScheduleBuilder scheduleBuilder =
@@ -1076,7 +1076,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
             addUserToProject(testParams.getEditorUser(), UserRoles.ADMIN);
             addUserToProject(testParams.getViewerUser(), UserRoles.ADMIN);
 
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Check Effective User of Schedule";
             ScheduleBuilder scheduleBuilder =
@@ -1121,7 +1121,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void checkExecutionTooltipOnTimeLine() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Check Execution Tooltip On Timeline";
             ScheduleBuilder successfulSchedule =
@@ -1150,7 +1150,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void closeScheduleDetail() {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Close schedule detail";
             ScheduleBuilder successfulSchedule =

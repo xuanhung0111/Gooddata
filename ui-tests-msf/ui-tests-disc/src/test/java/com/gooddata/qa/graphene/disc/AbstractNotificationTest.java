@@ -181,7 +181,7 @@ public class AbstractNotificationTest extends AbstractDISCTest {
     }
 
     protected void editNotification(NotificationBuilder newNotificationBuilder) {
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         projectDetailPage.activeProcess(newNotificationBuilder.getProcessName()).clickOnNotificationRuleButton();
         waitForFragmentVisible(discNotificationRules);
         int notificationIndex = newNotificationBuilder.getIndex();
@@ -237,7 +237,7 @@ public class AbstractNotificationTest extends AbstractDISCTest {
     }
 
     protected void checkNotificationNumber(int expectedNotificationNumber, String processName) {
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         waitForFragmentVisible(projectDetailPage);
         projectDetailPage.activeProcess(processName);
         if (expectedNotificationNumber == 0) {
@@ -257,7 +257,7 @@ public class AbstractNotificationTest extends AbstractDISCTest {
     }
 
     protected void deleteNotification(NotificationBuilder notificationInfo) {
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         projectDetailPage.activeProcess(notificationInfo.getProcessName()).clickOnNotificationRuleButton();
         waitForFragmentVisible(discNotificationRules);
         discNotificationRules.getNotificationRule(notificationInfo.getIndex()).deleteNotification(true);

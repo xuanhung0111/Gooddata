@@ -16,7 +16,6 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.entity.disc.OverviewProjectDetails;
 import com.gooddata.qa.graphene.entity.disc.OverviewProjectDetails.OverviewProcess;
 import com.gooddata.qa.graphene.entity.disc.OverviewProjectDetails.OverviewProcess.OverviewSchedule;
-import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
@@ -97,19 +96,18 @@ public class OverviewProjects extends AbstractFragment {
         return waitForElementVisible(BY_OVERVIEW_PROJECT_TITLE_LINK, overviewProject);
     }
 
-    public void accessProjectDetailPage(ProjectInfo project) {
-        waitForElementVisible(BY_OVERVIEW_PROJECT_TITLE_LINK, getOverviewProjectWithAdminRole(project)).click();
+    public void accessProjectDetailPage(String projectId) {
+        waitForElementVisible(BY_OVERVIEW_PROJECT_TITLE_LINK, getOverviewProjectWithAdminRole(projectId)).click();
     }
 
-    public WebElement getOverviewProjectWithAdminRole(final ProjectInfo projectInfo) {
+    public WebElement getOverviewProjectWithAdminRole(final String projectId) {
         waitForCollectionIsNotEmpty(overviewProjects);
         return overviewProjects.stream()
             .filter(project -> {
                 WebElement projectTitle = waitForElementVisible(project)
                         .findElement(BY_OVERVIEW_PROJECT_TITLE_LINK);
                 return project.findElement(BY_OVERVIEW_PROJECT_CHECKBOX).isEnabled()
-                        && projectTitle.getText().equals(projectInfo.getProjectName())
-                        && projectTitle.getAttribute("href").contains(projectInfo.getProjectId());
+                        && projectTitle.getAttribute("href").contains(projectId);
         })
         .findFirst().orElse(null);
     }
@@ -120,14 +118,14 @@ public class OverviewProjects extends AbstractFragment {
     }
 
     public void checkOnSelectedProjects(OverviewProjectDetails selectedProject) {
-        WebElement overviewProject = getOverviewProjectWithAdminRole(selectedProject.getProjectInfo());
+        WebElement overviewProject = getOverviewProjectWithAdminRole(selectedProject.getProjectId());
         assertNotNull(overviewProject);
         overviewProject.findElement(BY_OVERVIEW_PROJECT_CHECKBOX).click();
     }
 
     public void checkOnOverviewSchedules(OverviewProjectDetails selectedOverviewProject) {
         WebElement overviewProjectDetail =
-                getOverviewProjectWithAdminRole(selectedOverviewProject.getProjectInfo());
+                getOverviewProjectWithAdminRole(selectedOverviewProject.getProjectId());
         assertNotNull(overviewProjectDetail);
         if (!overviewProjectDetail.getAttribute("class").contains("expanded-border"))
             overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_EXPAND_BUTTON).click();
@@ -236,9 +234,9 @@ public class OverviewProjects extends AbstractFragment {
         return waitForElementVisible(overviewEmptyState).getText();
     }
 
-    public WebElement getOverviewScheduleName(OverviewProjectStates overviewState, ProjectInfo projectInfo,
+    public WebElement getOverviewScheduleName(OverviewProjectStates overviewState, String projectId,
             String scheduleUrl) {
-        WebElement overviewProject = getOverviewProjectWithAdminRole(projectInfo);
+        WebElement overviewProject = getOverviewProjectWithAdminRole(projectId);
         overviewProject.findElement(BY_OVERVIEW_PROJECT_EXPAND_BUTTON).click();
         String xpathScheduleTitle =
                 overviewState == OverviewProjectStates.FAILED ? XPATH_OVERVIEW_ERROR_SCHEDULE_TITLE

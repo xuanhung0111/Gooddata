@@ -15,7 +15,6 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -26,7 +25,6 @@ import org.openqa.selenium.support.ui.Select;
 
 import com.gooddata.qa.graphene.AbstractMSFTest;
 import com.gooddata.qa.graphene.entity.disc.NotificationBuilder;
-import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
@@ -38,15 +36,7 @@ import com.google.common.base.Predicate;
 
 public abstract class AbstractDISCTest extends AbstractMSFTest {
 
-    private List<ProjectInfo> projects;
-
     private static final String OK_GROUP_DESCRIPTION_FORMAT = "OK %d×";
-
-    protected List<ProjectInfo> getProjects() {
-        if (projects == null)
-            projects = Arrays.asList(getWorkingProject());
-        return projects;
-    }
 
     protected void cleanWorkingProjectAfterTest(Method m) {
         if (!m.getDeclaringClass().equals(this.getClass()))
@@ -54,20 +44,15 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
         cleanProcessesInWorkingProject();
     }
 
-    protected void openProjectDetailByUrl(String projectId) {
-        openUrl(DISC_PROJECTS_PAGE_URL + "/" + projectId);
-        waitForElementVisible(projectDetailPage.getRoot());
-    }
-
-    protected void deployInProjectsPage(List<ProjectInfo> projects, DeployPackages deployPackage,
+    protected void deployInProjectsPage(List<String> projectIds, DeployPackages deployPackage,
             String processName) {
         openUrl(DISC_PROJECTS_PAGE_URL);
-        selectProjectsToDeployInProjectsPage(projects);
+        selectProjectsToDeployInProjectsPage(projectIds);
 
         String filePath = getFilePathFromResource("/" + ZIP_FILES + "/" + deployPackage.getPackageName());
         deployForm.deployProcess(filePath, deployPackage.getPackageType(), processName);
         waitForFragmentNotVisible(deployForm);
-        assertDeployedProcessInProjects(processName, projects, deployPackage);
+        assertDeployedProcessInProjects(processName, projectIds, deployPackage);
     }
 
     protected String deployInProjectDetailPage(DeployPackages deployPackage, String processName) {
@@ -103,13 +88,13 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
                 getClass());
     }
 
-    protected void assertOverviewCustomScheduleName(OverviewProjectStates overviewState, ProjectInfo projectInfo,
+    protected void assertOverviewCustomScheduleName(OverviewProjectStates overviewState, String projectId,
             ScheduleBuilder scheduleBuilder) {
         String scheduleUrl = scheduleBuilder.getScheduleUrl();
         String overviewScheduleLink = scheduleUrl.substring(scheduleUrl.indexOf("#"));
 
         WebElement scheduleWrapper =
-                discOverviewProjects.getOverviewScheduleName(overviewState, projectInfo, overviewScheduleLink);
+                discOverviewProjects.getOverviewScheduleName(overviewState, projectId, overviewScheduleLink);
 
         String overviewScheduleName = discOverviewProjects.getOverviewScheduleName(scheduleWrapper);
         String overviewScheduleGraphName = discOverviewProjects.getOverviewScheduleGraphName(scheduleWrapper);
@@ -265,7 +250,7 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
     }
 
     protected NotificationBuilder createNotification(NotificationBuilder notificationBuilder) {
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         projectDetailPage.activeProcess(notificationBuilder.getProcessName()).clickOnNotificationRuleButton();
         waitForFragmentVisible(discNotificationRules);
         discNotificationRules.clickOnAddNotificationButton();
@@ -282,7 +267,7 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
     }
 
     protected void assertNotification(NotificationBuilder notificationBuilder) {
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         projectDetailPage.activeProcess(notificationBuilder.getProcessName()).clickOnNotificationRuleButton();
         waitForFragmentVisible(discNotificationRules);
         NotificationRule notificationRule =
@@ -305,38 +290,37 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
                     "Incorrect custom event name!");
     }
 
-    protected void selectProjectsToDeployInProjectsPage(List<ProjectInfo> projects) {
+    protected void selectProjectsToDeployInProjectsPage(List<String> projectIds) {
         waitForFragmentVisible(discProjectsList);
-        discProjectsList.checkOnProjects(projects);
+        discProjectsList.checkOnProjects(projectIds);
         assertTrue(discProjectsList.getDeployProcessButton().isEnabled(),
                 "Deploy process button is not enabled on projects page!");
         discProjectsList.clickOnDeployProcessButton();
         waitForFragmentVisible(deployForm);
     }
 
-    protected void createMultipleProjects(List<ProjectInfo> additionalProjects) {
-        for (ProjectInfo project : additionalProjects) {
-            openUrl(PAGE_GDC_PROJECTS);
-            waitForElementVisible(gpProject.getRoot());
-            try {
-                project.setProjectId(gpProject.createProject(project.getProjectName(), project.getProjectName(),
-                        null, testParams.getAuthorizationToken(), testParams.getProjectDriver(),
-                        testParams.getProjectEnvironment(), projectCreateCheckIterations));
-            } catch (JSONException e) {
-                fail("There is problem when creating new project: " + e);
-            }
+    protected String createBlankProject(String projectName) {
+        openUrl(PAGE_GDC_PROJECTS);
+        waitForElementVisible(gpProject.getRoot());
+        try {
+            return gpProject.createProject(projectName, projectName,
+                    null, testParams.getAuthorizationToken(), testParams.getProjectDriver(),
+                    testParams.getProjectEnvironment(), projectCreateCheckIterations);
+        } catch (JSONException e) {
+            fail("There is problem when creating new project: " + e);
         }
+        return "";
     }
 
-    protected void deleteProjects(List<ProjectInfo> projectsToDelete) {
-        for (ProjectInfo projectToDelete : projectsToDelete) {
-            cleanProcessesInProject(projectToDelete);
-            deleteProject(projectToDelete.getProjectId());
+    protected void deleteProjects(List<String> projectIds) {
+        for (String projectId : projectIds) {
+            cleanProcessesInProject(projectId);
+            deleteProject(projectId);
         }
     }
 
     protected void cleanProcessesInWorkingProject() {
-        cleanProcessesInProject(getWorkingProject());
+        cleanProcessesInProject(testParams.getProjectId());
     }
 
     private void assertOkExecutionGroupInfo(WebElement okExecutionGroup, String groupDescription) {
@@ -402,16 +386,15 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
         Graphene.waitGui().until(processIsFocused);
     }
 
-    private void cleanProcessesInProject(ProjectInfo projectInfo) {
-        openProjectDetailByUrl(projectInfo.getProjectId());
+    private void cleanProcessesInProject(String projectId) {
+        openProjectDetailPage(projectId);
         projectDetailPage.deleteAllProcesses();
     }
 
-    private void assertDeployedProcessInProjects(String processName, List<ProjectInfo> projects,
+    private void assertDeployedProcessInProjects(String processName, List<String> projectIds,
             DeployPackages deployPackage) {
-        for (ProjectInfo project : projects) {
-            waitForElementVisible(discProjectsList.getRoot());
-            discProjectsList.clickOnProjectTitle(project);
+        for (String projectId : projectIds) {
+            openUrl(DISC_PROJECTS_PAGE_URL + "/" + projectId);
             waitForElementVisible(projectDetailPage.getRoot());
             projectDetailPage.activeProcess(processName);
             projectDetailPage.clickOnScheduleTab();

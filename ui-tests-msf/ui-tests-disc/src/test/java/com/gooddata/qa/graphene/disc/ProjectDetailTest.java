@@ -56,14 +56,14 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkProjectInfo() {
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         String processName = "Check Project Info";
         int processNumber = projectDetailPage.getNumberOfProcesses();
         deployInProjectDetailPage(DeployPackages.BASIC, processName);
 
         assertEquals(processNumber + 1, projectDetailPage.getNumberOfProcesses(),
                 "The number of processes is incorrect!");
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         waitForElementVisible(projectDetailPage.getRoot());
         assertEquals(projectTitle, projectDetailPage.getDisplayedProjectTitle());
         assertEquals(testParams.getProjectId(), projectDetailPage.getProjectMetadata("Project ID"));
@@ -71,7 +71,7 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkProcessInfo() {
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         String processName = "Check Process Info";
         deployInProjectDetailPage(DeployPackages.BASIC, processName);
 
@@ -97,7 +97,7 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkGoToDashboardsLinkInProjectDetailPage() {
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         waitForElementVisible(projectDetailPage.getRoot());
         projectDetailPage.goToDashboards();
         waitForDashboardPageLoaded(browser);
@@ -105,7 +105,7 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkEmptyProjectState() {
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         waitForElementVisible(projectDetailPage.getRoot());
         assertEquals(PROJECT_EMPTY_STATE_TITLE, projectDetailPage.getProjectEmptyStateTitle());
         assertEquals(PROJECT_EMPTY_STATE_MESSAGE, projectDetailPage.getProjectEmptyStateMessage());
@@ -113,7 +113,7 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void downloadProcess() {
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         String processName = "Download Process Test";
         deployInProjectDetailPage(DeployPackages.BASIC, processName);
 
@@ -140,39 +140,39 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkSortedProcesses() {
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         deployInProjectDetailPage(DeployPackages.BASIC, "Process-A");
         deployInProjectDetailPage(DeployPackages.BASIC, "Process-Z");
         deployInProjectDetailPage(DeployPackages.BASIC, "Process-B");
         deployInProjectDetailPage(DeployPackages.BASIC, "Process-P");
 
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         checkSortedProcessList();
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkSortedProcessesAfterRedeploy() {
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         deployInProjectDetailPage(DeployPackages.BASIC, "Process-A");
         deployInProjectDetailPage(DeployPackages.BASIC, "Process-P");
         deployInProjectDetailPage(DeployPackages.BASIC, "Process-R");
 
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         redeployProcess("Process-R", DeployPackages.EXECUTABLES_GRAPH, "Process-B");
 
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         checkSortedProcessList();
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkDeleteProcess() {
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         deployInProjectDetailPage(DeployPackages.BASIC, "Process-A");
         deployInProjectDetailPage(DeployPackages.BASIC, "Process-Z");
         deployInProjectDetailPage(DeployPackages.BASIC, "Process-B");
         deployInProjectDetailPage(DeployPackages.BASIC, "Process-P");
 
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         projectDetailPage.activeProcess("Process-P").deleteProcess();
         assertFalse(projectDetailPage.isExistingProcess("Process-P"));
         checkSortedProcessList();
@@ -180,12 +180,12 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkProcessDeleteDialog() {
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         deployInProjectDetailPage(DeployPackages.BASIC, "Process-B");
         String processName = "Process-A";
         deployInProjectDetailPage(DeployPackages.BASIC, processName);
 
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         String deleteProcessTitle = String.format(DELETE_PROCESS_DIALOG_TITLE, processName);
         String deleteProcessMessage = String.format(DELETE_PROCESS_DIALOG_MESSAGE, processName);
         projectDetailPage.activeProcess(processName).clickOnDeleteButton();
@@ -196,7 +196,7 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkCancelProcessDeleteDialog() {
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         String processName = "Process-A";
         deployInProjectDetailPage(DeployPackages.BASIC, processName);
 
@@ -207,7 +207,7 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkExecutableScheduleNumber() {
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         String processName = "Process-A";
         deployInProjectDetailPage(DeployPackages.BASIC, processName);
         createSchedule(new ScheduleBuilder().setProcessName(processName).setExecutable(
@@ -221,7 +221,7 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkProcessScheduleList() {
-        openProjectDetailPage(getWorkingProject());
+        openProjectDetailPage(testParams.getProjectId());
         String processName = "Check Process Schedule List";
         deployInProjectDetailPage(DeployPackages.BASIC, processName);
         ScheduleBuilder successfulScheduleBuilder =

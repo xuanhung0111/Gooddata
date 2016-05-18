@@ -13,7 +13,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.fragments.AbstractTable;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
@@ -48,23 +47,22 @@ public class ProjectsList extends AbstractTable {
     @FindBy(css = ".ait-projects-empty-state")
     private WebElement projectsEmptyState;
 
-    public String getProcessesLabel(ProjectInfo project) {
-        return selectProjectWithAdminRole(project).findElement(BY_DISC_PROJECT_DATA_LOADING_PROCESSES).getText();
+    public String getProcessesLabel(String projectId) {
+        return selectProjectWithAdminRole(projectId).findElement(BY_DISC_PROJECT_DATA_LOADING_PROCESSES).getText();
     }
 
     public void clickOnProjectWithNonAdminRole(WebElement selectedProject) {
         selectedProject.findElement(BY_DISC_PROJECT_NAME_NOT_ADMIN).click();
     }
 
-    public String getLastSuccessfulExecutionInfo(ProjectInfo project) {
+    public String getLastSuccessfulExecutionInfo(String projectId) {
         return waitForElementPresent(BY_DISC_PROJECT_LAST_SUCCESSFUL_EXECUTION,
-                selectProjectWithAdminRole(project)).getText();
+                selectProjectWithAdminRole(projectId)).getText();
     }
 
-    public WebElement selectProjectWithAdminRole(final ProjectInfo project) {
+    public WebElement selectProjectWithAdminRole(final String projectId) {
         Predicate<WebElement> predicate = row -> row.findElement(BY_PROJECT_CHECKBOX).isEnabled()
-              && row.findElement(BY_DISC_PROJECT_NAME).getText().equals(project.getProjectName())
-              && row.findElement(BY_DISC_PROJECT_NAME).getAttribute("href").contains(project.getProjectId());
+              && row.findElement(BY_DISC_PROJECT_NAME).getAttribute("href").contains(projectId);
         return selectProject(predicate);
     }
 
@@ -98,16 +96,16 @@ public class ProjectsList extends AbstractTable {
         return waitForElementVisible(projectsEmptyState);
     }
 
-    public void checkOnProjects(List<ProjectInfo> projects) {
-        for (ProjectInfo project : projects) {
-            WebElement selectedProject = selectProjectWithAdminRole(project);
+    public void checkOnProjects(List<String> projectIds) {
+        for (String projectId : projectIds) {
+            WebElement selectedProject = selectProjectWithAdminRole(projectId);
             assertNotNull(selectedProject, "Project is not found!");
             selectedProject.findElement(BY_PROJECT_CHECKBOX).click();
         }
     }
 
-    public void clickOnProjectTitle(ProjectInfo project) {
-        WebElement selectedProject = selectProjectWithAdminRole(project);
+    public void clickOnProjectTitle(String projectId) {
+        WebElement selectedProject = selectProjectWithAdminRole(projectId);
         assertNotNull(selectedProject, String.format("Project is not found!"));
         selectedProject.findElement(BY_DISC_PROJECT_NAME).click();
     }

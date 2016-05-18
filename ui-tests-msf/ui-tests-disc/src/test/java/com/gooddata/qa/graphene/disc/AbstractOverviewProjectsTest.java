@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.disc;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -27,7 +28,6 @@ import org.openqa.selenium.WebElement;
 import com.gooddata.qa.graphene.entity.disc.OverviewProjectDetails;
 import com.gooddata.qa.graphene.entity.disc.OverviewProjectDetails.OverviewProcess;
 import com.gooddata.qa.graphene.entity.disc.OverviewProjectDetails.OverviewProcess.OverviewSchedule;
-import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
@@ -42,7 +42,7 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
 
     private static final int NUMBER_OF_ADDITIONAL_SCHEDULES = 30;
 
-    protected void checkFilteredOutOverviewProject(OverviewProjectStates state, final ProjectInfo projectInfo) {
+    protected void checkFilteredOutOverviewProject(OverviewProjectStates state, final String projectId) {
         discOverview.selectOverviewState(state);
         waitForFragmentVisible(discOverviewProjects);
         if (discOverview.getStateNumber(state).equals("0"))
@@ -51,7 +51,7 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
         else {
             try {
                 Predicate<WebDriver> projectsFilteredOut = 
-                        webDriver -> discOverviewProjects.getOverviewProjectWithAdminRole(projectInfo) == null;
+                        webDriver -> discOverviewProjects.getOverviewProjectWithAdminRole(projectId) == null;
                 Graphene.waitGui().until(projectsFilteredOut);
             } catch (TimeoutException e) {
                 fail("Project is not filtered out on overview page! " + e);
@@ -59,37 +59,31 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
         }
     }
 
-    protected void checkOtherOverviewStates(OverviewProjectStates state, ProjectInfo projectInfo) {
+    protected void checkOtherOverviewStates(OverviewProjectStates state, String projectId) {
         List<OverviewProjectStates> projectStateToCheck =
                 Arrays.asList(OverviewProjectStates.FAILED, OverviewProjectStates.RUNNING,
                         OverviewProjectStates.SUCCESSFUL);
-        /*
-         * Remove checking step in SCHEDULED state until MSF-7415 is fixed
-         * 
-         * List<OverviewProjectStates> projectStateToCheck =
-         * Arrays.asList(OverviewProjectStates.FAILED, OverviewProjectStates.RUNNING,
-         * OverviewProjectStates.SCHEDULED, OverviewProjectStates.SUCCESSFUL);
-         */
+
         for (OverviewProjectStates projectState : projectStateToCheck) {
             if (projectState == state)
                 continue;
             if (state != OverviewProjectStates.SCHEDULED) {
-                checkFilteredOutOverviewProject(projectState, projectInfo);
+                checkFilteredOutOverviewProject(projectState, projectId);
                 continue;
             }
             if (projectState != OverviewProjectStates.RUNNING)
-                checkFilteredOutOverviewProject(projectState, projectInfo);
+                checkFilteredOutOverviewProject(projectState, projectId);
         }
     }
 
-    protected void prepareDataForOverviewScheduledStateTests(List<ProjectInfo> additionalProjects,
+    protected void prepareDataForOverviewScheduledStateTests(List<String> additionalProjectIds,
             OverviewProjectDetails overviewProject) {
-        prepareDataForAdditionalProjects(additionalProjects);
+        prepareDataForAdditionalProjects(additionalProjectIds);
         prepareDataForScheduledProject(overviewProject);
     }
 
     protected void checkOverviewStateNumber(OverviewProjectStates projectState) {
-        OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectInfo(getWorkingProject());
+        OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectId(testParams.getProjectId());
         OverviewProcess overviewProcess =
                 overviewProject.newProcess().setProcessName("Check Overview Project Number");
         OverviewSchedule overviewSchedule = overviewProcess.newSchedule().setScheduleName("Schedule");
@@ -120,7 +114,7 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
                 executable = Executables.SUCCESSFUL_GRAPH;
         }
 
-        openProjectDetailByUrl(overviewProject.getProjectInfo().getProjectId());
+        openProjectDetailPage(overviewProject.getProjectId());
         for (OverviewProcess overviewProcess : overviewProject.getOverviewProcesses()) {
             String processUrl = deployInProjectDetailPage(DeployPackages.BASIC, overviewProcess.getProcessName());
             overviewProcess.setProcessUrl(processUrl);
@@ -154,8 +148,11 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
         return overviewProject;
     }
 
-    protected void checkOverviewProjectWithoutAdminRole(OverviewProjectStates projectState) {
-        OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectInfo(getWorkingProject());
+    protected void checkOverviewProjectWithoutAdminRole(OverviewProjectStates projectState)
+            throws JSONException, ParseException, IOException {
+        OverviewProjectDetails overviewProject = new OverviewProjectDetails()
+            .setProjectId(testParams.getProjectId())
+            .setProjectName(projectTitle);
         OverviewProcess overviewProcess =
                 overviewProject.newProcess().setProcessName("Check Overview Project With Non-Admin Role");
         OverviewSchedule overviewSchedule = overviewProcess.newSchedule().setScheduleName("Schedule");
@@ -181,25 +178,15 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
             discOverview.selectOverviewState(projectState);
             waitForFragmentVisible(discOverviewProjects);
             checkProjectNotAdmin(projectState, overviewProject);
-        } catch (ParseException e) {
-            fail("There is problem when adding user to project: " + e);
-        } catch (IOException e) {
-            fail("There is problem when adding user to project: " + e);
-        } catch (JSONException e) {
-            fail("There is problem when adding user to project or signIn: " + e);
         } finally {
             openUrl(PAGE_PROJECTS);
             logout();
-            try {
-                signIn(false, UserRoles.ADMIN);
-            } catch (JSONException e) {
-                fail("There is problem when signIn: " + e);
-            }
+            signIn(false, UserRoles.ADMIN);
         }
     }
 
     protected void disableProjectInOverviewPage(OverviewProjectStates projectState) {
-        OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectInfo(getWorkingProject());
+        OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectId(testParams.getProjectId());
         OverviewProcess overviewProcess =
                 overviewProject.newProcess().setProcessName("Check Disable Overview Project");
         OverviewSchedule overviewSchedule = overviewProcess.newSchedule().setScheduleName("Schedule");
@@ -215,8 +202,8 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
         discOverviewProjects.disableAction();
         browser.navigate().refresh();
         waitForFragmentVisible(discOverviewProjects);
-        checkFilteredOutOverviewProject(projectState, getWorkingProject());
-        checkOtherOverviewStates(projectState, getWorkingProject());
+        checkFilteredOutOverviewProject(projectState, testParams.getProjectId());
+        checkOtherOverviewStates(projectState, testParams.getProjectId());
 
         browser.get(overviewSchedule.getScheduleUrl());
         waitForFragmentVisible(scheduleDetail);
@@ -234,13 +221,13 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
         discOverviewProjects.checkOnSelectedProjects(overviewProject);
         discOverviewProjects.bulkAction(projectState);
         browser.navigate().refresh();
-        checkFilteredOutOverviewProject(projectState, getWorkingProject());
+        checkFilteredOutOverviewProject(projectState, testParams.getProjectId());
 
         return overviewProject;
     }
 
     protected void disableScheduleInOverviewPage(OverviewProjectStates projectState) {
-        OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectInfo(getWorkingProject());
+        OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectId(testParams.getProjectId());
         OverviewProcess overviewProcess =
                 overviewProject.newProcess().setProcessName("Check Disable Overview Schedule 1");
         OverviewSchedule overviewSchedule = overviewProcess.newSchedule().setScheduleName("Schedule");
@@ -255,8 +242,8 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
         initDISCOverviewPage();
         discOverview.selectOverviewState(projectState);
         waitForFragmentVisible(discOverviewProjects);
-        discOverviewProjects.checkOnOverviewSchedules(new OverviewProjectDetails().setProjectInfo(
-                getWorkingProject()).addProcess(disabledProcess));
+        discOverviewProjects.checkOnOverviewSchedules(new OverviewProjectDetails().setProjectId(
+                testParams.getProjectId()).addProcess(disabledProcess));
         discOverviewProjects.disableAction();
         overviewProject.removeProcess(disabledProcess);
         discOverview.getStateNumber(projectState);
@@ -269,7 +256,7 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
     }
 
     protected void bulkActionsScheduleInOverviewPage(OverviewProjectStates projectState) {
-        OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectInfo(getWorkingProject());
+        OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectId(testParams.getProjectId());
         OverviewProcess overviewProcess =
                 overviewProject.newProcess().setProcessName("Check Bulk Action Overview Schedule 1");
         OverviewSchedule overviewSchedule = overviewProcess.newSchedule().setScheduleName("Schedule");
@@ -286,12 +273,12 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
         discOverview.selectOverviewState(projectState);
         waitForFragmentVisible(discOverviewProjects);
         OverviewProjectDetails selectedProjectSchedule =
-                new OverviewProjectDetails().setProjectInfo(getWorkingProject()).addProcess(selectedProcess);
+                new OverviewProjectDetails().setProjectId(testParams.getProjectId()).addProcess(selectedProcess);
         discOverviewProjects.checkOnOverviewSchedules(selectedProjectSchedule);
         discOverviewProjects.bulkAction(projectState);
         browser.navigate().refresh();
         waitForFragmentVisible(discOverviewProjects);
-        assertOverviewProject(projectState, new OverviewProjectDetails().setProjectInfo(getWorkingProject())
+        assertOverviewProject(projectState, new OverviewProjectDetails().setProjectId(testParams.getProjectId())
                 .addProcess(overviewProcess));
 
         browser.get(selectedSchedule.getScheduleUrl());
@@ -313,14 +300,14 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
         }
     }
 
-    protected void cleanupProcessesAndProjects(boolean deleteProjects, List<ProjectInfo> additionalProjects) {
+    protected void cleanupProcessesAndProjects(boolean deleteProjects, List<String> additionalProjectIds) {
         cleanProcessesInWorkingProject();
         if (deleteProjects)
-            deleteProjects(additionalProjects);
+            deleteProjects(additionalProjectIds);
     }
 
-    protected void prepareDataForProjectsPageTest(ProjectStateFilters projectFilter, ProjectInfo workingProject) {
-        openProjectDetailByUrl(workingProject.getProjectId());
+    protected void prepareDataForProjectsPageTest(ProjectStateFilters projectFilter, String workingProjectId) {
+        openProjectDetailPage(workingProjectId);
         String processName = "Process for projects page tests";
         deployInProjectDetailPage(DeployPackages.BASIC, processName);
 
@@ -366,15 +353,15 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
     }
 
     protected void checkProjectsFilter(ProjectStateFilters projectState) {
-        prepareDataForProjectsPageTest(projectState, getWorkingProject());
+        prepareDataForProjectsPageTest(projectState, testParams.getProjectId());
         initDISCProjectsPage();
-        checkProjectFilter(projectState, getProjects());
+        checkProjectFilter(projectState, singletonList(testParams.getProjectId()));
     }
 
     protected void checkSearchProjectInSpecificState(ProjectStateFilters projectFilter) {
-        prepareDataForProjectsPageTest(projectFilter, getWorkingProject());
+        prepareDataForProjectsPageTest(projectFilter, testParams.getProjectId());
         initDISCProjectsPage();
-        searchProjectInSpecificState(projectFilter, getWorkingProject());
+        searchProjectInSpecificState(projectFilter, testParams.getProjectId(), projectTitle);
     }
 
     protected void checkSearchWorkingProjectByName() {
@@ -384,13 +371,13 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
 
     protected void checkSearchWorkingProjectById() {
         initDISCProjectsPage();
-        searchProjectById(getWorkingProject());
+        searchProjectById(testParams.getProjectId());
     }
 
-    protected void prepareDataForAdditionalProjects(List<ProjectInfo> additionalProjects) {
+    protected void prepareDataForAdditionalProjects(List<String> additionalProjectIds) {
         String additionalProcessName = "Process for additional projects";
-        for (ProjectInfo project : additionalProjects) {
-            openProjectDetailByUrl(project.getProjectId());
+        for (String projectId : additionalProjectIds) {
+            openProjectDetailPage(projectId);
             deployInProjectDetailPage(DeployPackages.BASIC, additionalProcessName);
             prepareAdditionalSchedulesForScheduledState(additionalProcessName);
         }
@@ -403,8 +390,8 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
         assertTrue(discProjectsList.isCorrectSearchResultByName(searchKey), "Incorrect search result by name!");
     }
 
-    protected void searchProjectById(ProjectInfo project) {
-        discProjectsPage.enterSearchKey(project.getProjectId());
+    protected void searchProjectById(String projectId) {
+        discProjectsPage.enterSearchKey(projectId);
         waitForFragmentVisible(discProjectsList);
         Predicate<WebDriver> projectSearched = webDriver -> discProjectsList.getNumberOfRows() == 1;
         try {
@@ -412,17 +399,16 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
         } catch (TimeoutException e) {
             fail("Incorrect number of projects in search result: " + discProjectsList.getNumberOfRows());
         }
-        assertNotNull(discProjectsList.selectProjectWithAdminRole(project),
-                "Cannot find project " + project.getProjectName());
+        assertNotNull(discProjectsList.selectProjectWithAdminRole(projectId), "Cannot find project id" + projectId);
     }
 
-    protected void searchProjectInSpecificState(ProjectStateFilters projectFilter, ProjectInfo project) {
+    protected void searchProjectInSpecificState(ProjectStateFilters projectFilter, String projectId, String projectName) {
         discProjectsPage.selectFilterOption(projectFilter);
-        searchProjectByName(project.getProjectName());
-        searchProjectById(project);
+        searchProjectByName(projectName);
+        searchProjectById(projectId);
     }
 
-    protected void checkProjectFilter(final ProjectStateFilters filterOption, List<ProjectInfo> projects) {
+    protected void checkProjectFilter(final ProjectStateFilters filterOption, List<String> projectIds) {
         List<ProjectStateFilters> filterOutOptions = Stream.of(ProjectStateFilters.DISABLED, ProjectStateFilters.FAILED, 
                 ProjectStateFilters.RUNNING,ProjectStateFilters.SCHEDULED, ProjectStateFilters.SUCCESSFUL, 
                 ProjectStateFilters.UNSCHEDULED)
@@ -434,18 +420,18 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
                         return true;
                     })
                     .collect(toList());
-        checkFilteredProjects(filterOption, projects);
+        checkFilteredProjects(filterOption, projectIds);
         if (filterOption == ProjectStateFilters.DISABLED)
-            checkFilteredProjects(ProjectStateFilters.UNSCHEDULED, projects);
+            checkFilteredProjects(ProjectStateFilters.UNSCHEDULED, projectIds);
         for (ProjectStateFilters filterOutOption : filterOutOptions) {
-            checkFilteredOutProjects(filterOutOption, projects);
+            checkFilteredOutProjects(filterOutOption, projectIds);
   }
     }
 
     protected void assertOverviewProject(OverviewProjectStates projectState,
             OverviewProjectDetails expectedOverviewProject) {
         WebElement overviewProjectDetail =
-                discOverviewProjects.getOverviewProjectWithAdminRole(expectedOverviewProject.getProjectInfo());
+                discOverviewProjects.getOverviewProjectWithAdminRole(expectedOverviewProject.getProjectId());
         assertNotNull(overviewProjectDetail, "Cannot find working project on overview page!");
         assertTrue(discOverviewProjects.getOverviewProjectExpandButton(overviewProjectDetail).isEnabled(),
                 "Overview project expand button is not enabled!");
@@ -619,26 +605,24 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
     }
 
     private void checkFilteredOutProjects(ProjectStateFilters filterOutOption,
-            List<ProjectInfo> filteredOutProjects) {
+            List<String> filteredOutProjectIds) {
         discProjectsPage.selectFilterOption(filterOutOption);
         waitForFragmentVisible(discProjectsList);
-        for (ProjectInfo filteredOutProject : filteredOutProjects) {
-            assertNull(discProjectsList.selectProjectWithAdminRole(filteredOutProject),
+        for (String projectId : filteredOutProjectIds) {
+            assertNull(discProjectsList.selectProjectWithAdminRole(projectId),
                     "Project isn't filtered out!");
-            System.out.println("Project " + filteredOutProject.getProjectName() + "(id = "
-                    + filteredOutProject.getProjectId() + ") is filtered out.");
+            System.out.println("Project id = "+ projectId + " is filtered out.");
         }
     }
 
-    private void checkFilteredProjects(ProjectStateFilters filterOption, List<ProjectInfo> filteredProjects) {
+    private void checkFilteredProjects(ProjectStateFilters filterOption, List<String> filteredProjectIds) {
         System.out.println("Check filter option:" + filterOption);
         discProjectsPage.selectFilterOption(filterOption);
         waitForFragmentVisible(discProjectsList);
-        for (ProjectInfo filteredProject : filteredProjects) {
-            assertNotNull(discProjectsList.selectProjectWithAdminRole(filteredProject),
+        for (String projectId : filteredProjectIds) {
+            assertNotNull(discProjectsList.selectProjectWithAdminRole(projectId),
                     "Project doesn't present in filtered list!");
-            System.out.println("Project " + filteredProject.getProjectName() + " (id = "
-                    + filteredProject.getProjectId() + ") is in filtered list.");
+            System.out.println("Project id "+ projectId + " is in filtered list.");
         }
     }
 
@@ -661,7 +645,7 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
 
     private void prepareDataForScheduledProject(OverviewProjectDetails overviewProject) {
         for (OverviewProcess overviewProcess : overviewProject.getOverviewProcesses()) {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
             String processUrl = deployInProjectDetailPage(DeployPackages.BASIC, overviewProcess.getProcessName());
             overviewProcess.setProcessUrl(processUrl);
             for (OverviewSchedule overviewSchedule : overviewProcess.getOverviewSchedules()) {

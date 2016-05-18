@@ -75,7 +75,7 @@ public abstract class AbstractSchedulesTest extends AbstractDISCTest {
 
     protected void checkScheduleNameInOverviewPage(OverviewProjectStates overviewState) {
         try {
-            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Check Custom Schedule Name In Overview Page";
             String scheduleName = "Custom Schedule Name";
@@ -123,7 +123,7 @@ public abstract class AbstractSchedulesTest extends AbstractDISCTest {
             waitForFragmentVisible(discOverview);
             discOverview.selectOverviewState(overviewState);
             waitForFragmentVisible(discOverviewProjects);
-            assertOverviewCustomScheduleName(overviewState, getWorkingProject(), scheduleBuilder);
+            assertOverviewCustomScheduleName(overviewState, testParams.getProjectId(), scheduleBuilder);
         } finally {
             cleanProcessesInWorkingProject();
         }
@@ -134,7 +134,7 @@ public abstract class AbstractSchedulesTest extends AbstractDISCTest {
         verifyScheduleForTriggerScheduleTest(triggerScheduleBuilder);
         verifyScheduleForTriggerScheduleTest(dependentScheduleBuilder);
 
-        openProjectDetailByUrl(getWorkingProject().getProjectId());
+        openProjectDetailPage(testParams.getProjectId());
 
         String triggerScheduleProcess = triggerScheduleBuilder.getProcessName();
         deployInProjectDetailPage(triggerScheduleBuilder.getExecutable().getExecutablePackage(),
