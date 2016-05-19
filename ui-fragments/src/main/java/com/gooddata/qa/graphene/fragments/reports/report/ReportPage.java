@@ -201,7 +201,9 @@ public class ReportPage extends AbstractFragment {
     public ReportPage selectMetric(String metric) {
         return selectMetric(metric, e -> {
             e.click();
-            waitForElementVisible(cssSelector(".c-metricDetailViewButton"), browser);
+            //wait for metric details displayed in third column of SND dialog
+            //or warning dialog of "You have reached the limit of metrics in report"
+            waitForElementVisible(cssSelector(".c-metricDetailViewButton,[name=reportEditorForm]"), browser);
         });
     }
 
