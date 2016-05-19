@@ -76,6 +76,7 @@ public class TableReport extends AbstractReport {
             if(e.getAttribute("class").contains(howToSort.toString())) {
                 //have tried to use WebElement.click() but it's unstable
                 getActions().moveToElement(e).click().perform();
+                break;
             }
         }
 
