@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.disc;
 
 import static com.gooddata.qa.utils.http.RestUtils.getResource;
-import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -40,7 +39,8 @@ public class SanityTest extends AbstractOverviewProjectsTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
     public void deployCloudConnectInProjectsPage() {
         try {
-            deployInProjectsPage(singletonList(testParams.getProjectId()), DeployPackages.CLOUDCONNECT, "CloudConnect - Projects List Page");
+            deployInProjectsPage(DeployPackages.CLOUDCONNECT, "CloudConnect - Projects List Page",
+                    testParams.getProjectId());
         } finally {
             cleanProcessesInWorkingProject();
         }
@@ -174,7 +174,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
             assertSuccessfulExecution();
 
             final ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword);
-            AbstractNotificationTest.getNotification(imapClient, subject);
+            getNotification(imapClient, subject);
         } finally {
             cleanProcessesInWorkingProject();
         }

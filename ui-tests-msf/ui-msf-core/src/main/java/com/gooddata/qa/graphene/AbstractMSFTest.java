@@ -359,6 +359,8 @@ public class AbstractMSFTest extends AbstractProjectTest {
     }
 
     protected void openProjectDetailPage(String projectId) {
+        openUrl(DISC_PROJECTS_PAGE_URL);
+        waitForElementVisible(discProjectsList.getRoot());
         openUrl(DISC_PROJECTS_PAGE_URL + "/" + projectId);
         waitForElementVisible(projectDetailPage.getRoot());
     }

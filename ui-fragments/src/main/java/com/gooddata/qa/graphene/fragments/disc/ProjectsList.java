@@ -7,8 +7,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertNotNull;
 
-import java.util.List;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -96,7 +94,7 @@ public class ProjectsList extends AbstractTable {
         return waitForElementVisible(projectsEmptyState);
     }
 
-    public void checkOnProjects(List<String> projectIds) {
+    public void checkOnProjects(String... projectIds) {
         for (String projectId : projectIds) {
             WebElement selectedProject = selectProjectWithAdminRole(projectId);
             assertNotNull(selectedProject, "Project is not found!");
