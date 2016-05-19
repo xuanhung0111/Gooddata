@@ -47,16 +47,6 @@ public class DeployProcessTest extends AbstractDISCTest {
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void deployCloudConnectInProjectsPage() {
-        try {
-            deployInProjectsPage(DeployPackages.CLOUDCONNECT, "CloudConnect - Projects List Page",
-                    testParams.getProjectId());
-        } finally {
-            cleanProcessesInWorkingProject();
-        }
-    }
-
-    @Test(dependsOnMethods = {"createProject"})
     public void deployRubyInProjectsPage() {
         try {
             deployInProjectsPage(DeployPackages.RUBY, "Ruby - Projects List Page",
@@ -67,32 +57,10 @@ public class DeployProcessTest extends AbstractDISCTest {
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void deployCloudConnectInProjectDetailPage() {
-        try {
-            openProjectDetailPage(testParams.getProjectId());
-            deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, "CloudConnect - Project Detail Page");
-        } finally {
-            cleanProcessesInWorkingProject();
-        }
-    }
-
-    @Test(dependsOnMethods = {"createProject"})
     public void deployRubyInProjectDetailPage() {
         try {
             openProjectDetailPage(testParams.getProjectId());
             deployInProjectDetailPage(DeployPackages.RUBY, "Ruby - Project Detail Page");
-        } finally {
-            cleanProcessesInWorkingProject();
-        }
-    }
-
-    @Test(dependsOnMethods = {"createProject"})
-    public void redeployProcessWithDifferentPackage() {
-        try {
-            openProjectDetailPage(testParams.getProjectId());
-            String processName = "Redeploy process with different package";
-            deployInProjectDetailPage(DeployPackages.EXECUTABLES_GRAPH, processName);
-            redeployProcess(processName, DeployPackages.CLOUDCONNECT, processName);
         } finally {
             cleanProcessesInWorkingProject();
         }

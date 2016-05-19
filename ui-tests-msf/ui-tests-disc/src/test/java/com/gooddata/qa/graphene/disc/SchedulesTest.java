@@ -161,26 +161,6 @@ public class SchedulesTest extends AbstractSchedulesTest {
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void checkManualExecution() {
-        try {
-            openProjectDetailPage(testParams.getProjectId());
-
-            String processName = "Check Manual Execution";
-            ScheduleBuilder scheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.SUCCESSFUL_GRAPH)
-                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
-            prepareScheduleWithBasicPackage(scheduleBuilder);
-
-            scheduleDetail.manualRun();
-            assertSuccessfulExecution();
-            assertTrue(scheduleDetail.isLastExecutionManualIconDisplay(),
-                    "Manual icon is not shown for manual execution!");
-        } finally {
-            cleanProcessesInWorkingProject();
-        }
-    }
-
-    @Test(dependsOnMethods = {"createProject"})
     public void checkStopManualExecution() {
         try {
             openProjectDetailPage(testParams.getProjectId());
