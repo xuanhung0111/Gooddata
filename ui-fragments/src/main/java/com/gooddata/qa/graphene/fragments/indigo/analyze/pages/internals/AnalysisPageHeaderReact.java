@@ -7,9 +7,9 @@ import org.openqa.selenium.support.FindBy;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.cssSelector;
 
-public class AnalysisPageHeader extends AbstractFragment {
+public class AnalysisPageHeaderReact extends AbstractFragment {
 
-    @FindBy(className = "s-reset")
+    @FindBy(className = "s-clear")
     private WebElement resetButton;
 
     @FindBy(className = "s-export-to-report")

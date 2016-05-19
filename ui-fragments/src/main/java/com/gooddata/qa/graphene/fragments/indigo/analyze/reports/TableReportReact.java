@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.reports;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -14,7 +15,7 @@ import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.tagName;
 
-public class TableReport extends AbstractFragment {
+public class TableReportReact extends AbstractFragment {
 
     @FindBy(css = ".public_fixedDataTable_header ." + CELL_CONTENT)
     private List<WebElement> headers;
@@ -49,10 +50,10 @@ public class TableReport extends AbstractFragment {
             .orElse("");
     }
 
-    public TableReport sortBaseOnHeader(final String name) {
+    public TableReportReact sortBaseOnHeader(final String name) {
         waitForCollectionIsNotEmpty(headers).stream()
             .filter(e -> name.equalsIgnoreCase(e.getText()))
-            .map(e -> e.findElement(BY_LINK))
+            .map(e -> e.findElement(By.tagName("span")))
             .findFirst()
             .orElseThrow(() -> new NoSuchElementException("Cannot find table header: " + name))
             .click();

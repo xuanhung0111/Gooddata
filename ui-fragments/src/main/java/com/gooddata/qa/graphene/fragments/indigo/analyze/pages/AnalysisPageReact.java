@@ -6,7 +6,7 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.*;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReportReact;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -27,16 +27,16 @@ import static org.testng.Assert.assertTrue;
 public class AnalysisPageReact extends AbstractFragment {
 
     @FindBy(className = "adi-editor-header")
-    private AnalysisPageHeader pageHeader;
+    private AnalysisPageHeaderReact pageHeader;
 
     @FindBy(className = "s-catalogue")
     private CataloguePanelReact cataloguePanel;
 
     @FindBy(className = "adi-editor-main")
-    private MainEditor mainEditor;
+    private MainEditorReact mainEditor;
 
     @FindBy(className = "s-visualization-picker")
-    private VisualizationReportTypePicker reportTypePicker;
+    private VisualizationReportTypePickerReact reportTypePicker;
 
     @FindBy(className = "s-bucket-metrics")
     private MetricsBucket metricsBucket;
@@ -239,7 +239,7 @@ public class AnalysisPageReact extends AbstractFragment {
         return this;
     }
 
-    public TableReport getTableReport() {
+    public TableReportReact getTableReport() {
         return getMainEditor().getTableReport();
     }
 
@@ -267,11 +267,11 @@ public class AnalysisPageReact extends AbstractFragment {
         return waitForFragmentVisible(filterBuckets);
     }
 
-    public MainEditor getMainEditor() {
+    public MainEditorReact getMainEditor() {
         return waitForFragmentVisible(mainEditor);
     }
 
-    public AnalysisPageHeader getPageHeader() {
+    public AnalysisPageHeaderReact getPageHeader() {
         return waitForFragmentVisible(pageHeader);
     }
 
