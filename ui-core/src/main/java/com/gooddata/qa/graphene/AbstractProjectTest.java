@@ -136,27 +136,28 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     @AfterClass(dependsOnMethods = {"validateProjectTearDown"}, alwaysRun = true)
     public void deleteProjectTearDown(ITestContext context) {
         if (testParams.isReuseProject()) {
-            System.out.println("Project is being re-used and won't be deleted.");
+            log.info("Project is being re-used and won't be deleted.");
             return;
         }
-        System.out.println("Delete mode is set to " + testParams.getDeleteMode().toString());
+
+        log.info("Delete mode is set to " + testParams.getDeleteMode().toString());
         String projectId = testParams.getProjectId();
         if (projectId != null && projectId.length() > 0) {
             switch (testParams.getDeleteMode()) {
                 case DELETE_ALWAYS:
-                    System.out.println("Project will be deleted...");
-                    deleteProject(projectId);
+                    log.info("Project will be deleted: " + projectId);
+                    ProjectRestUtils.deleteProject(getGoodDataClient(), projectId);
                     break;
                 case DELETE_IF_SUCCESSFUL:
                     if (context.getFailedTests().size() == 0) {
-                        System.out.println("Test was successful, project will be deleted...");
-                        deleteProject(projectId);
+                        log.info("Test was successful, project will be deleted: " + projectId);
+                        ProjectRestUtils.deleteProject(getGoodDataClient(), projectId);
                     } else {
-                        System.out.println("Test wasn't successful, project won't be deleted...");
+                        log.info("Test wasn't successful, project won't be deleted...");
                     }
                     break;
                 case DELETE_NEVER:
-                    System.out.println("Delete mode set to NEVER, project won't be deleted...");
+                    log.info("Delete mode set to NEVER, project won't be deleted...");
                     break;
             }
         } else {
