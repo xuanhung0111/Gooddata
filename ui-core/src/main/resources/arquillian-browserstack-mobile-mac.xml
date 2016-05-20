@@ -35,6 +35,6 @@
     </extension>
 
     <extension qualifier="drone">
-        <property name="instantiationTimeoutInSeconds">300</property>
+        <property name="instantiationTimeoutInSeconds">600</property>
     </extension>
 </arquillian>
