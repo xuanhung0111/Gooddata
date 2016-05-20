@@ -68,7 +68,7 @@ public class TrendingRecommendationTest extends AbstractAdE2ETest {
         analysisPageReact.waitForReportComputing();
         assertTrue(analysisPageReact.getFilterBuckets().isDateFilterVisible());
         assertThat(waitForElementVisible(cssSelector(
-                ".s-date-filter label"), browser).getText(),
+                ".s-date-filter .s-attribute-filter-label"), browser).getText(),
                 containsString("Last 4 quarters"));
     }
 }
