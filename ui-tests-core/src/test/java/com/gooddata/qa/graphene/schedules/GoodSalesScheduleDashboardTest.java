@@ -38,7 +38,7 @@ import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEmbedDialog;
+import com.gooddata.qa.graphene.fragments.dashboards.EmbedDashboardDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestUtils;
@@ -216,7 +216,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         // get embed link as admin (not accessible for viewer)
         loginAs(UserRoles.ADMIN);
         initDashboardsPage();
-        DashboardEmbedDialog ded = dashboardsPage.embedDashboard();
+        EmbedDashboardDialog ded = dashboardsPage.openEmbedDashboardDialog();
         String embeddedDashboardUri = ded.getPreviewURI();
 
         try {

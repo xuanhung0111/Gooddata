@@ -258,7 +258,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         String dashboardId = url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("|"));
         String dashboardIdentifier = getIdentifierFromObjId(dashboardId, ObjectType.PROJECT_DASHBOARD);
 
-        String previewUri = dashboardsPage.embedDashboard().getPreviewURI();
+        String previewUri = dashboardsPage.openEmbedDashboardDialog().getPreviewURI();
         String dashboardSchedule = createDashboardSchedule(DASHBOARD_NAME);
 
         dropObject(dashboardIdentifier, DropStrategy.CASCADE);

@@ -50,6 +50,7 @@ public class SimpleMenu extends AbstractFragment {
         waitForAllItemsVisible();
         items.stream()
             .filter(filter)
+            .map(e -> e.findElement(BY_LINK))
             .findFirst()
             .get()
             .click();

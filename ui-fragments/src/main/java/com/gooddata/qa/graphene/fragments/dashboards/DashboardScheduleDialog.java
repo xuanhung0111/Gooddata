@@ -83,10 +83,12 @@ public class DashboardScheduleDialog extends AbstractFragment {
         return waitForElementVisible(emailSubjectInput).getAttribute("value");
     }
 
-    public void setCustomEmailSubject(String newValue) {
+    public DashboardScheduleDialog setCustomEmailSubject(String newValue) {
         waitForElementVisible(emailSubjectInput).click();
         emailSubjectInput.clear();
         emailSubjectInput.sendKeys(newValue);
+
+        return this;
     }
 
     public String getCustomEmailMessage() {
@@ -103,16 +105,20 @@ public class DashboardScheduleDialog extends AbstractFragment {
         return waitForElementVisible(infoText).getText();
     }
 
-    public void showCustomForm() {
+    public DashboardScheduleDialog showCustomForm() {
         waitForElementVisible(showCustomFormButton).click();
         waitForElementVisible(emailSubjectInput);
         waitForElementVisible(emailMessageInput);
+
+        return this;
     }
 
-    public void setCustomRecipients(List<String> recipients) {
+    public DashboardScheduleDialog setCustomRecipients(List<String> recipients) {
         waitForElementVisible(emailRecipientsInput).click();
         emailRecipientsInput.clear();
         emailRecipientsInput.sendKeys(Joiner.on(",").join(recipients));
+
+        return this;
     }
     
     public String getSelectedTab() {

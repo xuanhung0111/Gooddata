@@ -6,6 +6,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static org.jboss.arquillian.graphene.Graphene.createPageFragment;
 import static org.openqa.selenium.By.className;
+import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 
@@ -13,11 +14,11 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.enums.dashboard.TextObject;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.EmbeddedWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.VariableStatusWidget;
 import com.gooddata.qa.graphene.fragments.reports.report.AbstractReport;
@@ -35,18 +36,15 @@ public class DashboardContent extends AbstractFragment {
     @FindBy(css = ".c-collectionWidget:not(.gdc-hidden) .yui3-c-filterdashboardwidget")
     private List<WebElement> filters;
 
-    @FindBy(css = ".yui3-selectionbox-resize-tl")
-    private WebElement topLeftWidgetResizeButton;
-
-    @FindBy(css = ".yui3-selectionbox-resize-br")
-    private WebElement bottomRightWidgetResizeButton;
-
     @FindBy(css = ".c-collectionWidget:not(.gdc-hidden) .yui3-c-dashboardcollectionwidget-content .yui3-c-dashboardwidget")
     private List<WebElement> widgets;
 
     private static final By REPORT_TITLE_LOCATOR = By.cssSelector(".yui3-c-reportdashboardwidget-reportTitle");
     private static final By REPORT_LOCATOR =
             By.cssSelector(".c-collectionWidget:not(.gdc-hidden) .yui3-c-reportdashboardwidget");
+
+    private static final By BY_EMBEDDED_WIDGET = 
+            By.cssSelector(".c-collectionWidget:not(.gdc-hidden) .yui3-c-iframedashboardwidget");
 
     private static String REPORT_IMAGE_LOCATOR = "div.s-${reportName} img";
     private static String REPORT_IMAGE_LOADED_LOCATOR =
@@ -122,14 +120,6 @@ public class DashboardContent extends AbstractFragment {
         return widgets.size() == 0;
     }
 
-    public void resizeWidgetTopLeft(int xOffset, int yOffset) {
-        resizeWidget(topLeftWidgetResizeButton, xOffset, yOffset);
-    }
-
-    public void resizeWidgetBottomRight(int xOffset, int yOffset) {
-        resizeWidget(bottomRightWidgetResizeButton, xOffset, yOffset);
-    }
-
     public VariableStatusWidget getVariableStatus(final String variable) {
         return browser.findElements(className(TextObject.VARIABLE_STATUS.getLabel()))
             .stream()
@@ -139,9 +129,16 @@ public class DashboardContent extends AbstractFragment {
             .orElseThrow(() -> new NoSuchElementException("Cannot find variable status: " + variable));
     }
 
-    private void resizeWidget(WebElement resizeButton, int xOffset, int yOffset) {
-        Actions action = new Actions(browser);
-        action.clickAndHold(resizeButton).moveByOffset(xOffset, yOffset).release().perform();
+    public EmbeddedWidget getLastEmbeddedWidget() {
+        return Iterables.getLast(getEmbeddedWidgets());
+    }
+
+    private List<EmbeddedWidget> getEmbeddedWidgets() {
+        return browser.findElements(BY_EMBEDDED_WIDGET)
+                .stream()
+                .map(e -> waitForElementVisible(e))
+                .map(e -> Graphene.createPageFragment(EmbeddedWidget.class, e))
+                .collect(toList());
     }
 
     private List<WebElement> getReports() {

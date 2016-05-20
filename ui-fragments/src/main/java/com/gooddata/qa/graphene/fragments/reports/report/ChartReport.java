@@ -9,7 +9,7 @@ import org.openqa.selenium.support.FindBy;
  *  - Report page
  *  - Drill dialog
  */
-public class ChartReport extends AbstractReport {
+public class ChartReport extends AbstractDashboardReport {
 
     @FindBy(css = ".yui3-c-chart")
     protected WebElement chartEl;

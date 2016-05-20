@@ -6,31 +6,38 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static java.util.Objects.isNull;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.is;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.ParseException;
+import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.report.WhatItem;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
-import com.gooddata.qa.graphene.fragments.reports.report.EmbeddedReportWidget;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.EmbeddedWidget;
+import com.gooddata.qa.graphene.fragments.reports.report.EmbeddedReportContainer;
 import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportEmbedDialog;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
-import com.gooddata.qa.graphene.utils.Sleeper;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.google.common.collect.Lists;
 
 public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
@@ -44,18 +51,14 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
     private final static String ATTRIBUTE_NAME = "Status";
     private final static String METRIC_NAME = "Amount";
 
+    private GoodData editorGoodDataClient;
+
     private String additionalProjectId = "";
     private String reportUrl;
     private String htmlEmbedCode;
     private String embedUri;
     private List<String> attributeValues;
     private List<Float> metricValues;
-
-    @FindBy(xpath = "//iframe[contains(@class, 'yui3-c-iframewidget')]")
-    private EmbeddedReportWidget embeddedReportWidget;
-
-    @FindBy(id = "content")
-    private EmbeddedReportWidget embeddedReportWithoutIframe;
 
     @BeforeClass
     public void setProjectTitle() {
@@ -80,6 +83,8 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = "createReportToShare")
     public void addEditorAndSignInAsEditor() throws ParseException, IOException, JSONException {
         addEditorUserToProject();
+
+        logout();
         signInAtGreyPages(testParams.getEditorUser(), testParams.getEditorPassword());
     }
 
@@ -98,80 +103,78 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"editorGetEmbedCode"})
     public void createAdditionalProject() throws JSONException, InterruptedException {
-        openUrl(PAGE_GDC_PROJECTS);
-        waitForElementVisible(gpProject.getRoot());
-        additionalProjectId =
-                gpProject.createProject(ADDITIONAL_PROJECT_TITLE, ADDITIONAL_PROJECT_TITLE, GOODSALES_TEMPLATE,
-                        testParams.getAuthorizationToken(), testParams.getProjectDriver(),
-                        testParams.getProjectEnvironment(), projectCreateCheckIterations);
+        additionalProjectId = ProjectRestUtils.createProject(getEditorGoodDataClient(),
+                ADDITIONAL_PROJECT_TITLE, GOODSALES_TEMPLATE, testParams.getAuthorizationToken(),
+                testParams.getProjectDriver(), testParams.getProjectEnvironment());
     }
 
-    @Test(dependsOnMethods = {"createAdditionalProject"})
-    public void shareTableReportToOtherProjectDashboard() {
-        embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Share table report");
-
-        assertEquals(embeddedReportWidget.getEmbeddedReportTitleInframe(), EMBEDDED_REPORT_TITLE);
-        assertAttributeHeadersInFrame(Lists.newArrayList(ATTRIBUTE_NAME));
-        assertAttributeValuesInframe(attributeValues);
-        assertMetricHeadersInFrame(Lists.newArrayList(METRIC_NAME));
-        assertMetricValuesInframe(metricValues);
+    @DataProvider(name = "embeddedReport")
+    public Object[][] getEmbeddedReportProvider() {
+        return new Object[][] {
+            {true},
+            {false}
+        };
     }
 
-    @Test(dependsOnMethods = {"createAdditionalProject"})
-    public void viewEmbeddedReportOnReportPage() {
-        embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId,
-                "View embedded report on report page");
-        embeddedReportWidget.viewEmbeddedReportInFrame();
+    @Test(dependsOnMethods = {"createAdditionalProject"}, dataProvider = "embeddedReport")
+    public void shareTableReportToOtherProjectDashboard(boolean withIframe) {
+        EmbeddedReportContainer embeddedReportContainer = null;
+
+        if (withIframe) {
+            embeddedReportContainer =
+                    embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Share table report");
+        } else {
+            embeddedReportContainer = initEmbeddedReportWithUri(embedUri);
+        }
+
+        assertEquals(embeddedReportContainer.getInfo(), EMBEDDED_REPORT_TITLE);
+
+        TableReport tableReport = embeddedReportContainer.getTableReport();
+
+        assertThat(tableReport.getAttributesHeader(), is(newArrayList(ATTRIBUTE_NAME)));
+        assertThat(tableReport.getAttributeElements(), is(attributeValues));
+
+        assertThat(tableReport.getMetricsHeader(), is(newHashSet(METRIC_NAME)));
+        assertThat(tableReport.getMetricElements(), is(metricValues));
+    }
+
+    @Test(dependsOnMethods = {"createAdditionalProject"}, dataProvider = "embeddedReport")
+    public void viewEmbeddedReportOnReportPage(boolean withIframe) {
+        EmbeddedReportContainer embeddedReportContainer = null;
+
+        if (withIframe) {
+            embeddedReportContainer = embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId,
+                    "View embedded report on report page");
+        } else {
+            embeddedReportContainer = initEmbeddedReportWithUri(embedUri);
+        }
+
+        embeddedReportContainer.openReportInfoViewPanel().clickViewReportButton();
+
         switchToPopUpWindow(EMBEDDED_REPORT_TITLE);
         waitForFragmentVisible(reportPage);
-        reportPage.getTableReport().waitForReportLoading();
         assertEquals(reportPage.getReportName(), EMBEDDED_REPORT_TITLE, "Incorrect report title!");
-        assertAttributeValuesOnReportPage(attributeValues);
-        assertMetricValuesOnReportPage(metricValues);
+
+        TableReport tableReport = reportPage.getTableReport().waitForReportLoading();
+        assertThat(tableReport.getAttributeElements(), is(attributeValues));
+        assertThat(tableReport.getMetricElements(), is(metricValues));
     }
 
-    @Test(dependsOnMethods = {"createAdditionalProject"})
-    public void downloadEmbeddedReport() {
-        embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Download embedded report");
+    @Test(dependsOnMethods = {"createAdditionalProject"}, dataProvider = "embeddedReport")
+    public void downloadEmbeddedReport(boolean withIframe) {
+        EmbeddedReportContainer embeddedReportContainer = null;
 
-        embeddedReportWidget.downloadEmbeddedReportInFrame(ExportFormat.CSV);
+        if (withIframe) {
+            embeddedReportContainer =
+                    embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Download embedded report");
+        } else {
+            embeddedReportContainer = initEmbeddedReportWithUri(embedUri);
+        }
+
+        embeddedReportContainer.openReportInfoViewPanel().downloadReportAsFormat(ExportFormat.CSV);
         verifyReportExport(ExportFormat.CSV, EMBEDDED_REPORT_TITLE, MINIMUM_EMBEDDED_REPORT_CSV_SIZE);
-        embeddedReportWidget.downloadEmbeddedReportInFrame(ExportFormat.PDF_LANDSCAPE);
-        verifyReportExport(ExportFormat.PDF_LANDSCAPE, EMBEDDED_REPORT_TITLE, MINIMUM_EMBEDDED_REPORT_PDF_SIZE);
-    }
 
-    @Test(dependsOnMethods = {"editorGetEmbedCode"})
-    public void shareReportWithoutIframe() {
-        browser.get(embedUri);
-        waitForFragmentVisible(embeddedReportWithoutIframe);
-        assertEquals(embeddedReportWithoutIframe.getReportTitle(), EMBEDDED_REPORT_TITLE);
-        assertAttributeHeaders(Lists.newArrayList(ATTRIBUTE_NAME));
-        assertAttributeValues(attributeValues);
-        assertMetricHeaders(Lists.newArrayList(METRIC_NAME));
-        assertMetricValues(metricValues);
-    }
-
-    @Test(dependsOnMethods = {"editorGetEmbedCode"})
-    public void viewEmbeddedReportWithoutIframeOnReportPage() {
-        browser.get(embedUri);
-        waitForFragmentVisible(embeddedReportWithoutIframe);
-        embeddedReportWithoutIframe.viewEmbeddedReport();
-        switchToPopUpWindow(EMBEDDED_REPORT_TITLE);
-        waitForFragmentVisible(reportPage);
-        reportPage.getTableReport().waitForReportLoading();
-        assertEquals(reportPage.getReportName(), EMBEDDED_REPORT_TITLE, "Incorrect report title!");
-        assertAttributeValuesOnReportPage(attributeValues);
-        assertMetricValuesOnReportPage(metricValues);
-    }
-
-    @Test(dependsOnMethods = {"editorGetEmbedCode"})
-    public void downloadEmbeddedReportWithoutIframe() {
-        browser.get(embedUri);
-        waitForFragmentVisible(embeddedReportWithoutIframe);
-
-        embeddedReportWithoutIframe.downloadEmbeddedReport(ExportFormat.CSV);
-        verifyReportExport(ExportFormat.CSV, EMBEDDED_REPORT_TITLE, MINIMUM_EMBEDDED_REPORT_CSV_SIZE);
-        embeddedReportWithoutIframe.downloadEmbeddedReport(ExportFormat.PDF_LANDSCAPE);
+        embeddedReportContainer.openReportInfoViewPanel().downloadReportAsFormat(ExportFormat.PDF_LANDSCAPE);
         verifyReportExport(ExportFormat.PDF_LANDSCAPE, EMBEDDED_REPORT_TITLE, MINIMUM_EMBEDDED_REPORT_PDF_SIZE);
     }
 
@@ -192,19 +195,18 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         embedDialog.closeEmbedDialog();
 
         // Check headline report with iframe
-        embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, headlineReportTitle);
-        assertEquals(embeddedReportWidget.getHeadlineDescriptionInFrame(), headlineReportDescription,
-                "Incorrect embedded headline report description!");
-        assertEquals(embeddedReportWidget.getHeadlineValueInFrame(), headlineReportNumber,
-                "Incorrect headline report number!");
+        OneNumberReport embeddedHeadlineReport = 
+                embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, headlineReportTitle)
+                .getHeadlineReport();
+
+        assertEquals(embeddedHeadlineReport.getDescription(), headlineReportDescription);
+        assertEquals(embeddedHeadlineReport.getValue(), headlineReportNumber);
 
         // Check headline report without iframe
-        browser.get(embedUri);
-        waitForFragmentVisible(embeddedReportWithoutIframe);
-        assertEquals(embeddedReportWithoutIframe.getHeadlineDescription(), headlineReportDescription,
-                "Incorrect embedded headline report description!");
-        assertEquals(embeddedReportWithoutIframe.getHeadlineValue(), headlineReportNumber,
-                "Incorrect headline report number!");
+        embeddedHeadlineReport = initEmbeddedReportWithUri(embedUri).getHeadlineReport();
+
+        assertEquals(embeddedHeadlineReport.getDescription(), headlineReportDescription);
+        assertEquals(embeddedHeadlineReport.getValue(), headlineReportNumber);
     }
 
     @Test(dependsOnMethods = {"createAdditionalProject"})
@@ -221,7 +223,6 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         embedDialog.closeEmbedDialog();
 
         embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, reportTitle);
-        String dashboardUrl = browser.getCurrentUrl();
 
         openReportByUrl(reportUrl);
         String[] filteredValues =
@@ -229,14 +230,14 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         reportPage.addFilter(FilterItem.Factory.createAttributeFilter("Stage Name", filteredValues));
         reportPage.saveReport();
 
-        browser.get(dashboardUrl);
-        waitForFragmentVisible(dashboardsPage);
-        waitForFragmentVisible(embeddedReportWidget);
-        assertAttributeValuesInframe(Lists.newArrayList(filteredValues));
+        TableReport embeddedTableReport = initDashboardsPage(additionalProjectId)
+                .getLastEmbeddedWidget()
+                .getEmbeddedReportContainer()
+                .getTableReport();
+        assertThat(embeddedTableReport.getAttributeElements(), is(newArrayList(filteredValues)));
 
-        browser.get(embedUri);
-        waitForFragmentVisible(embeddedReportWithoutIframe);
-        assertAttributeValues(Lists.newArrayList(filteredValues));
+        embeddedTableReport = initEmbeddedReportWithUri(embedUri).getTableReport();
+        assertThat(embeddedTableReport.getAttributeElements(), is(newArrayList(filteredValues)));
     }
 
     @Test(dependsOnMethods = {"createAdditionalProject"})
@@ -264,16 +265,20 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         String embedUri = embedDialog.getEmbedUri();
         embedDialog.closeEmbedDialog();
 
-        embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, reportTitle + " to dashaboard");
-        assertEquals(embeddedReportWidget.getEmbeddedReportTitleInframe(), reportTitle);
-        assertAttributeValuesInframe(attributeValues);
-        assertMetricValuesInframe(metricValues);
+        EmbeddedReportContainer embeddedReportContainer =
+                embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, reportTitle + " to dashaboard");
+        assertEquals(embeddedReportContainer.getInfo(), reportTitle);
 
-        browser.get(embedUri);
-        waitForFragmentVisible(embeddedReportWithoutIframe);
-        assertEquals(embeddedReportWithoutIframe.getReportTitle(), reportTitle);
-        assertAttributeValues(attributeValues);
-        assertMetricValues(metricValues);
+        TableReport tableReport = embeddedReportContainer.getTableReport();
+        assertThat(tableReport.getAttributeElements(), is(attributeValues));
+        assertThat(tableReport.getMetricElements(), is(metricValues));
+
+        embeddedReportContainer = initEmbeddedReportWithUri(embedUri);
+        assertEquals(embeddedReportContainer.getInfo(), reportTitle);
+
+        tableReport = embeddedReportContainer.getTableReport();
+        assertThat(tableReport.getAttributeElements(), is(attributeValues));
+        assertThat(tableReport.getMetricElements(), is(metricValues));
     }
 
     @Test(dependsOnMethods = {"createAdditionalProject"})
@@ -290,13 +295,12 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         String embedUri = embedDialog.getEmbedUri();
         embedDialog.closeEmbedDialog();
 
-        embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Embed empty report");
-        assertTrue(waitForFragmentVisible(embeddedReportWidget).isEmptyReportInFrame(),
-                "Embedded Empty Report is not empty!");
+        EmbeddedReportContainer embeddedReportContainer =
+                embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Embed empty report");
+        assertTrue(embeddedReportContainer.getTableReport().isNoData(), "Embedded Empty Report is not empty!");
 
-        browser.get(embedUri);
-        assertTrue(waitForFragmentVisible(embeddedReportWithoutIframe).isEmptyReport(),
-                "Embedded Empty Report is not empty!");
+        embeddedReportContainer = initEmbeddedReportWithUri(embedUri);
+        assertTrue(embeddedReportContainer.getTableReport().isNoData(), "Embedded Empty Report is not empty!");
     }
 
     @Test(dependsOnMethods = {"createAdditionalProject"})
@@ -311,18 +315,22 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         String embedUri = embedDialog.getEmbedUri();
         embedDialog.closeEmbedDialog();
 
-        embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId,
-                "Embedded Chart Report on dashboard");
+        EmbeddedReportContainer embeddedReportContainer =
+                embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Embedded Chart Report on dashboard");
         checkRedBar(browser);
-        embeddedReportWidget.downloadEmbeddedReportInFrame(ExportFormat.CSV);
+
+        embeddedReportContainer.openReportInfoViewPanel().downloadReportAsFormat(ExportFormat.CSV);
         verifyReportExport(ExportFormat.CSV, reportDefinition.getName(), MINIMUM_EMBEDDED_CHART_REPORT_CSV_SIZE);
-        embeddedReportWidget.downloadEmbeddedReportInFrame(ExportFormat.PDF);
+
+        embeddedReportContainer.openReportInfoViewPanel().downloadReportAsFormat(ExportFormat.PDF);
         verifyReportExport(ExportFormat.PDF, reportDefinition.getName(), MINIMUM_EMBEDDED_CHART_REPORT_PDF_SIZE);
 
-        browser.get(embedUri);
-        embeddedReportWithoutIframe.downloadEmbeddedReport(ExportFormat.CSV);
+        embeddedReportContainer = initEmbeddedReportWithUri(embedUri);
+
+        embeddedReportContainer.openReportInfoViewPanel().downloadReportAsFormat(ExportFormat.CSV);
         verifyReportExport(ExportFormat.CSV, reportDefinition.getName(), MINIMUM_EMBEDDED_CHART_REPORT_CSV_SIZE);
-        embeddedReportWithoutIframe.downloadEmbeddedReport(ExportFormat.PDF);
+
+        embeddedReportContainer.openReportInfoViewPanel().downloadReportAsFormat(ExportFormat.PDF);
         verifyReportExport(ExportFormat.PDF, reportDefinition.getName(), MINIMUM_EMBEDDED_CHART_REPORT_PDF_SIZE);
     }
 
@@ -339,12 +347,14 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         String htmlEmbedCode = embedDialog.getHtmlCode();
         String embedUri = embedDialog.getEmbedUri();
 
-        embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Share report with url parameter");
-        assertAttributeValuesInframe(Lists.newArrayList(filteredAttributeValues));
+        EmbeddedReportContainer embeddedReportContainer =
+                embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Share report with url parameter");
+        assertThat(embeddedReportContainer.getTableReport().getAttributeElements(),
+                is(newArrayList(filteredAttributeValues)));
 
-        browser.get(embedUri);
-        waitForFragmentVisible(embeddedReportWithoutIframe);
-        assertAttributeValues(Lists.newArrayList(filteredAttributeValues));
+        embeddedReportContainer = initEmbeddedReportWithUri(embedUri);
+        assertThat(embeddedReportContainer.getTableReport().getAttributeElements(),
+                is(newArrayList(filteredAttributeValues)));
     }
 
     @Test(dependsOnMethods = {"createAdditionalProject"})
@@ -370,37 +380,42 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         List<Float> drilledInReportMetricValues =
                 Lists.newArrayList(1980676.1F, 326592.22F, 466158.62F, 2773427.0F);
 
-        embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Drill embedded report with iframe");
-        embeddedReportWidget.drillAttributeValueInFrame(attributeValueToDrill);
-        System.out.println("Drill attributes: " + embeddedReportWidget.getAttributeElementsInFrame());
-        System.out.println("Drill metric: " + embeddedReportWidget.getMetricElementsInFrame());
-        assertAttributeValuesInframe(drilledDownReportAttributeValues);
-        assertMetricValuesInframe(drilledDownReportMetricValues);
+        EmbeddedReportContainer embeddedReportContainer =
+                embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Drill embedded report with iframe");
+
+        TableReport tableReport = embeddedReportContainer.getTableReport().drillOnAttributeValue(attributeValueToDrill);
+
+        assertThat(tableReport.getAttributeElements(), is(drilledDownReportAttributeValues));
+        assertThat(tableReport.getMetricElements(), is(drilledDownReportMetricValues));
+
+        tableReport = refreshDashboardPage()
+                .getLastEmbeddedWidget()
+                .getEmbeddedReportContainer()
+                .getTableReport()
+                .drillOnMetricValue(metricValueToDrill);
+
+        assertThat(tableReport.getAttributeElements(), is(drilledInReportAttributeValues));
+        assertThat(tableReport.getMetricElements(), is(drilledInReportMetricValues));
+
+        embeddedReportContainer = initEmbeddedReportWithUri(embedUri);
+
+        tableReport = embeddedReportContainer.getTableReport().drillOnAttributeValue(attributeValueToDrill);
+
+        assertThat(tableReport.getAttributeElements(), is(drilledDownReportAttributeValues));
+        assertThat(tableReport.getMetricElements(), is(drilledDownReportMetricValues));
 
         browser.navigate().refresh();
-        waitForFragmentVisible(dashboardsPage);
+        tableReport = waitForFragmentVisible(embeddedReportContainer)
+                .getTableReport()
+                .drillOnMetricValue(metricValueToDrill);
 
-        embeddedReportWidget.drillMetricValueInFrame(metricValueToDrill);
-        System.out.println("Drill attributes: " + embeddedReportWidget.getAttributeElementsInFrame());
-        System.out.println("Drill metric: " + embeddedReportWidget.getMetricElementsInFrame());
-        assertAttributeValuesInframe(drilledInReportAttributeValues);
-        assertMetricValuesInframe(drilledInReportMetricValues);
-
-        browser.get(embedUri);
-        embeddedReportWithoutIframe.drillAttributeValue(attributeValueToDrill);
-        assertAttributeValues(drilledDownReportAttributeValues);
-        assertMetricValues(drilledDownReportMetricValues);
-
-        browser.navigate().refresh();
-        embeddedReportWithoutIframe.drillMetricValue(metricValueToDrill);
-        assertAttributeValues(drilledInReportAttributeValues);
-        assertMetricValues(drilledInReportMetricValues);
+        assertThat(tableReport.getAttributeElements(), is(drilledInReportAttributeValues));
+        assertThat(tableReport.getMetricElements(), is(drilledInReportMetricValues));
     }
 
-    @AfterClass
+    @AfterClass(alwaysRun = true)
     public void cleanUp() throws JSONException {
-        deleteProject(additionalProjectId);
-        signInAtGreyPages(testParams.getUser(), testParams.getPassword());
+        ProjectRestUtils.deleteProject(getEditorGoodDataClient(), additionalProjectId);
     }
 
     private void openReportByUrl(String reportUrl) {
@@ -416,84 +431,44 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         }
     }
 
-    private void embedReportToOtherProjectDashboard(String embedCode, String projectToShare, String dashboardName) {
-        initProjectsPage();
-        openUrl(PAGE_UI_PROJECT_PREFIX + projectToShare + DASHBOARD_PAGE_SUFFIX);
+    private EmbeddedReportContainer embedReportToOtherProjectDashboard(String embedCode,
+            String projectToShare, String dashboardName) {
+        EmbeddedWidget embeddedWidget = initDashboardsPage(projectToShare)
+                .addNewDashboard(dashboardName)
+                .addWebContentToDashboard(embedCode)
+                .getLastEmbeddedWidget()
+                .resizeFromTopLeftButton(-300, 0)
+                .resizeFromBottomRightButton(200, 600);
+
+        dashboardsPage.saveDashboard();
+        return embeddedWidget.getEmbeddedReportContainer();
+    }
+
+    private EmbeddedReportContainer initEmbeddedReportWithUri(String embedUri) {
+        browser.get(embedUri);
+        return Graphene.createPageFragment(EmbeddedReportContainer.class,
+                waitForElementVisible(EmbeddedReportContainer.LOCATOR, browser));
+    }
+
+    private DashboardsPage initDashboardsPage(String projectId) {
+        openUrl(PAGE_UI_PROJECT_PREFIX + projectId + DASHBOARD_PAGE_SUFFIX);
         waitForDashboardPageLoaded(browser);
-        waitForFragmentVisible(dashboardsPage);
-        dashboardsPage.addNewDashboard(dashboardName);
-        dashboardsPage.editDashboard();
-        DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-        dashboardEditBar.addWebContentToDashboard(embedCode);
-        dashboardEditBar.saveDashboard();
-        Sleeper.sleepTightInSeconds(3);
+
+        return dashboardsPage;
+    }
+
+    private DashboardsPage refreshDashboardPage() {
         browser.navigate().refresh();
-        waitForFragmentVisible(dashboardsPage);
-        waitForFragmentVisible(embeddedReportWidget);
+        waitForDashboardPageLoaded(browser);
+
+        return dashboardsPage;
     }
 
-    private void assertAttributeHeadersInFrame(List<String> expectedValues) {
-        assertTrue(
-                CollectionUtils.isEqualCollection(Lists.newArrayList(expectedValues),
-                        embeddedReportWidget.getAttributeHeadersInFrame()),
-                "Incorrect attribute values in embedded report without iframe!");
-    }
+    private GoodData getEditorGoodDataClient() {
+        if (isNull(editorGoodDataClient)) {
+            editorGoodDataClient = getGoodDataClient(testParams.getEditorUser(), testParams.getEditorPassword());
+        }
 
-    private void assertAttributeHeaders(List<String> expectedValues) {
-        assertTrue(
-                CollectionUtils.isEqualCollection(Lists.newArrayList(expectedValues),
-                        embeddedReportWithoutIframe.getAttributeHeaders()),
-                "Incorrect attribute values in embedded report without iframe!");
-    }
-
-    private void assertMetricHeadersInFrame(List<String> expectedValues) {
-        assertTrue(
-                CollectionUtils.isEqualCollection(Lists.newArrayList(expectedValues),
-                        embeddedReportWidget.getMetricHeadersInFrame()),
-                "Incorrect attribute values in embedded report without iframe!");
-    }
-
-    private void assertMetricHeaders(List<String> expectedValues) {
-        assertTrue(
-                CollectionUtils.isEqualCollection(Lists.newArrayList(expectedValues),
-                        embeddedReportWithoutIframe.getMetricHeaders()),
-                "Incorrect attribute values in embedded report without iframe!");
-    }
-
-    private void assertAttributeValues(List<String> expectedValues) {
-        assertTrue(
-                CollectionUtils.isEqualCollection(Lists.newArrayList(expectedValues),
-                        embeddedReportWithoutIframe.getAttributeElements()),
-                "Incorrect attribute values in embedded report without iframe!");
-    }
-
-    private void assertAttributeValuesInframe(List<String> expectedValues) {
-        assertTrue(
-                CollectionUtils.isEqualCollection(expectedValues,
-                        embeddedReportWidget.getAttributeElementsInFrame()),
-                "Incorrect attribute values in embedded report with iframe!");
-    }
-
-    private void assertMetricValues(List<Float> expectedValues) {
-        assertTrue(
-                CollectionUtils.isEqualCollection(Lists.newArrayList(expectedValues),
-                        embeddedReportWithoutIframe.getMetricElements()),
-                "Incorrect metric values in embedded report without iframe!");
-    }
-
-    private void assertMetricValuesInframe(List<Float> expectedValues) {
-        assertTrue(
-                CollectionUtils.isEqualCollection(expectedValues, embeddedReportWidget.getMetricElementsInFrame()),
-                "Incorrect metric values in embedded report with iframe!");
-    }
-
-    private void assertAttributeValuesOnReportPage(List<String> expectedValues) {
-        assertTrue(CollectionUtils.isEqualCollection(expectedValues, reportPage.getTableReport()
-                .getAttributeElements()));
-    }
-
-    private void assertMetricValuesOnReportPage(List<Float> expectedValues) {
-        assertTrue(CollectionUtils.isEqualCollection(expectedValues, reportPage.getTableReport()
-                .getMetricElements()));
+        return editorGoodDataClient;
     }
 }

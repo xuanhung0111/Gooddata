@@ -39,7 +39,7 @@ import com.google.common.collect.Lists;
  *  - Report page
  *  - Drill dialog
  */
-public class TableReport extends AbstractReport {
+public class TableReport extends AbstractDashboardReport {
 
     @FindBy(css = ".containerBody .gridTabPlate .gridTile .element span.captionWrapper")
     private List<WebElement> attributeElementInGrid;
@@ -280,8 +280,9 @@ public class TableReport extends AbstractReport {
         throw new IllegalArgumentException("No metric value to drill on");
     }
 
-    public void drillOnMetricValue(String value) {
+    public TableReport drillOnMetricValue(String value) {
         getMetricElement(value).click();
+        return this;
     }
 
     public WebElement getMetricElement(String value) {
@@ -314,8 +315,9 @@ public class TableReport extends AbstractReport {
         throw new IllegalArgumentException("No attribute value to drill on");
     }
 
-    public void drillOnAttributeValue(String value) {
+    public TableReport drillOnAttributeValue(String value) {
         getAttributeValueElement(value).click();
+        return this;
     }
 
     public WebElement getAttributeValueElement(String value) {
@@ -331,7 +333,7 @@ public class TableReport extends AbstractReport {
         throw new IllegalArgumentException("Cannot find attribute value " + value);
     }
 
-    public void waitForReportLoading() {
+    public TableReport waitForReportLoading() {
         Graphene.waitGui().until(new Predicate<WebDriver>() {
             @Override
             public boolean apply(WebDriver input) {
@@ -347,6 +349,7 @@ public class TableReport extends AbstractReport {
                 }
             }
         });
+        return this;
     }
 
     public boolean isNoData() {

@@ -86,6 +86,8 @@ public class ReportPage extends AbstractFragment {
     @FindBy(css = ".s-btn-options")
     private WebElement optionsButton;
 
+    public static final By LOCATOR = By.id("p-analysisPage");
+
     private static final String WEIRD_STRING_TO_CLEAR_ALL_ITEMS = "!@#$%^";
 
     private static final By METRIC_ATTRIBUTE_CONTAINER_LOCATOR =
@@ -154,7 +156,7 @@ public class ReportPage extends AbstractFragment {
     }
 
     public String getReportName() {
-        return reportName.getAttribute("title");
+        return waitForElementVisible(reportName).getAttribute("title");
     }
 
     public ReportPage openWhatPanel() {

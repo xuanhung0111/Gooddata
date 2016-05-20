@@ -8,6 +8,7 @@ import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
@@ -51,11 +52,8 @@ public class DashboardEditBar extends AbstractFragment {
     @FindBy(xpath = "//div[contains(@class,'gdc-overlay-simple') and not(contains(@class,'yui3-overlay-hidden'))]")
     private DashboardAddWidgetPanel dashboardAddWidgetPanel;
 
-    @FindBy(xpath = "//span[text()='Web Content']")
-    private WebElement addwebContent;
-
-    @FindBy(xpath = "//div[contains(@class,'yui3-d-modaldialog')]")
-    private DashboardWebContent dashboardWebContent;
+    @FindBy(className = "s-btn-web_content")
+    private WebElement webContentButton;
 
     @FindBy(xpath = "//button[contains(@class,'s-btn-text')]")
     private WebElement addText;
@@ -132,13 +130,15 @@ public class DashboardEditBar extends AbstractFragment {
         dashboardAddWidgetPanel.addGeoChart(metricLabel, attributeLayer);
     }
 
-    public void addWebContentToDashboard(String embedCode) {
-        int widgetCountBefore = listDashboardWidgets.size();
-        waitForElementVisible(addwebContent).click();
-        waitForElementVisible(dashboardWebContent.getRoot());
-        dashboardWebContent.addWebContent(embedCode);
-        Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1,
-                "Widget wasn't added");
+    public DashboardEditBar addWebContentToDashboard(String urlOrEmbedCode) {
+        waitForElementVisible(webContentButton).click();
+        waitForElementVisible(By.className("addUrl"), browser).sendKeys(urlOrEmbedCode);
+
+        WebElement saveButton = waitForElementVisible(By.cssSelector(".c-addUrlDialog .s-btn-save"), browser);
+        saveButton.click();
+        waitForElementNotPresent(saveButton);
+
+        return this;
     }
 
     public DashboardEditBar addListFilterToDashboard(DashFilterTypes type, String name) {
