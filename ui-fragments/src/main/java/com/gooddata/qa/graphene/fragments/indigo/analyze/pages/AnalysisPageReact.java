@@ -42,7 +42,7 @@ public class AnalysisPageReact extends AbstractFragment {
     private MetricsBucket metricsBucket;
 
     @FindBy(className = "s-bucket-categories")
-    private AttributesBucket attributesBucket;
+    private AttributesBucketReact attributesBucket;
 
     @FindBy(className = StacksBucket.CSS_CLASS)
     private StacksBucket stacksBucket;
@@ -255,7 +255,7 @@ public class AnalysisPageReact extends AbstractFragment {
         return waitForFragmentVisible(metricsBucket);
     }
 
-    public AttributesBucket getAttributesBucket() {
+    public AttributesBucketReact getAttributesBucket() {
         return waitForFragmentVisible(attributesBucket);
     }
 

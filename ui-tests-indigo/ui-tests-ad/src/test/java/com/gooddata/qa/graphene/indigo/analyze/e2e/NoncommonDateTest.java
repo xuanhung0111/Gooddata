@@ -49,7 +49,7 @@ public class NoncommonDateTest extends AbstractAdE2ETest {
         dateFilter.click();
 
         analysisPageReact.addDate();
-        assertTrue(isElementPresent(cssSelector(".s-date-dimension-switch:not(.disabled)"), browser));
+        assertTrue(isElementPresent(cssSelector(".s-date-dataset-switch:not(.disabled)"), browser));
 
         // date dimension picker in select is now disabled
         dateFilter.click();

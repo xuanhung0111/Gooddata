@@ -26,7 +26,7 @@ public class ResetButtonTest extends AbstractAdE2ETest {
         analysisPageReact.changeReportType(ReportType.BAR_CHART)
             .addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
-            .addStack(ACCOUNT)
+            .addStack(DEPARTMENT)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-visualization-bar"), browser));
 
@@ -61,7 +61,7 @@ public class ResetButtonTest extends AbstractAdE2ETest {
 
         analysisPageReact.resetToBlankState()
             .addDate();
-        assertEquals(new Select(waitForElementVisible(cssSelector(".s-date-dimension-switch"), browser))
-            .getFirstSelectedOption().getAttribute("value"), "activity.dim_date");
+        assertEquals(new Select(waitForElementVisible(cssSelector(".s-date-dataset-switch"), browser))
+            .getFirstSelectedOption().getAttribute("value"), "activity.dataset.dt");
     }
 }
