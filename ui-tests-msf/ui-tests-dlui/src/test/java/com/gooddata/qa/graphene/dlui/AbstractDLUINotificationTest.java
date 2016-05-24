@@ -103,8 +103,8 @@ public abstract class AbstractDLUINotificationTest extends AbstractAnnieDialogTe
 
         assertEquals(getElementLink(message, exploreNewData), expectedExploreNewDataLink,
                 "Incorrect empty report link in email content!");
-        assertEquals(getElementLink(message, testParams.getProjectId()),
-                getWorkingProjectLink(), "Incorrect project link in email content!");
+        assertEquals(getElementLink(message, projectTitle), getWorkingProjectLink(),
+                "Incorrect project link in email content!");
 
         String receivedTimeMessage = message.getElementsContainingOwnText(receivedTimeText).text();
         assertTrue(isThisDateValid(receivedTimeMessage.replace(receivedTimeText, "")),
@@ -119,8 +119,8 @@ public abstract class AbstractDLUINotificationTest extends AbstractAnnieDialogTe
     private void assertFailedDataAddingEmailContent(Document message, String... fieldNames) {
         String gdSupportLinkTitle = "GoodData Customer Support";
 
-        assertEquals(getElementLink(message, testParams.getProjectId()),
-                getWorkingProjectLink(), "Incorrect project link in email content!");
+        assertEquals(getElementLink(message, projectTitle), getWorkingProjectLink(),
+                "Incorrect project link in email content!");
         verifyValidLink(getRestApiClient(), getElementLink(message, "execution log"));
         assertEquals(getElementLink(message, gdSupportLinkTitle), GD_SUPPORT_LINK,
                 "Incorrect support link in email content!");
@@ -129,8 +129,8 @@ public abstract class AbstractDLUINotificationTest extends AbstractAnnieDialogTe
     }
 
     private void assertFailedDataAddingEmailContentForEditor(Document message, String... fieldNames) {
-        assertEquals(getElementLink(message, testParams.getProjectId()),
-                getWorkingProjectLink(), "Incorrect project link in email content!");
+        assertEquals(getElementLink(message, projectTitle), getWorkingProjectLink(),
+                "Incorrect project link in email content!");
         assertTrue(message.getElementsContainingOwnText("execution log").isEmpty());
         assertEquals(getElementLink(message, GD_SUPPORT_LINK), GD_SUPPORT_LINK,
                 "Incorrect support link in email content!");
@@ -163,7 +163,7 @@ public abstract class AbstractDLUINotificationTest extends AbstractAnnieDialogTe
         Collection<Message> notifications =
                 ImapUtils.waitForMessages(imapClient,
                         GDEmails.NO_REPLY,
-                        String.format(subject, testParams.getProjectId()), receivedTime, 1);
+                        String.format(subject, projectTitle), receivedTime, 1);
 
         return Iterables.getLast(notifications);
     }
