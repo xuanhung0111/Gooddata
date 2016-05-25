@@ -424,6 +424,23 @@ public class TableReport extends AbstractReport {
                 .findElement(By.tagName("img")));
     }
 
+    public void copyMetricCell(final String cell) {
+        WebElement target = getMetricElement(cell).findElement(BY_PARENT);
+        target.click();
+
+        //wait until the cell is actually selected
+        Predicate<WebDriver> predicate = browser -> target.getAttribute("class").contains("highlight");
+        Graphene.waitGui().until(predicate);
+
+        //use keyDown and single calling to make test more stable
+        try {
+            getActions().keyDown(Keys.CONTROL).perform();
+            getActions().sendKeys("c").perform();
+        } finally {
+            getActions().keyUp(Keys.CONTROL).perform();
+        }
+    }
+
     private Pair<Integer, Integer> getPossitionFromRegion(String region) {
         String[] parts = region.split(",");
         return Pair.of(Integer.parseInt(parts[0].trim()), Integer.parseInt(parts[1].trim()));

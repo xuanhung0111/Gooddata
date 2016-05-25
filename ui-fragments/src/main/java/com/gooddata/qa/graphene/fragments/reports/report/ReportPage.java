@@ -776,6 +776,25 @@ public class ReportPage extends AbstractFragment {
         return this;
     }
 
+    public ReportPage showMoreReportInfo() {
+        waitForElementVisible(className("s-btn-more_report_info"), browser).click();
+        return this;
+    }
+
+    public void openUsedData(final String data) {
+        browser.findElements(cssSelector(".moreInfo .report")).stream()
+                .map(e -> e.findElement(By.tagName("a")))
+                .filter(e -> data.equals(e.getText()))
+                .findFirst()
+                .get()
+                .click();
+    }
+
+    public List<WebElement> getReportUsageLinks() {
+        return waitForElementVisible(className("yui3-c-reportusageinfo-content"), browser)
+                .findElements(cssSelector(".content a"));
+    }
+
     private ReportPage selectAttribute(String attribute, Consumer<WebElement> howToSelect) {
         searchAttribute(attribute);
         howToSelect.accept(findAttribute(attribute));
