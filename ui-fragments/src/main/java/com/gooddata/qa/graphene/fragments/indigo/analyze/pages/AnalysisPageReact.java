@@ -160,7 +160,8 @@ public class AnalysisPageReact extends AbstractFragment {
     }
 
     public AnalysisPageReact removeMetric(String metric) {
-        return drag(getMetricsBucket().get(metric),
+        WebElement header = getMetricsBucket().get(metric).findElement(By.className("s-bucket-item-header"));
+        return drag(header ,
                 () -> waitForElementPresent(BY_TRASH_PANEL, browser));
     }
 
