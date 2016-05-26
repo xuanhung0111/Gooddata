@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.dashboards.widget.configuration;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static java.util.stream.Collectors.toList;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -41,6 +42,14 @@ public class FiltersConfigPanel extends AbstractFragment {
                 return input.findElement(BY_LABEL).getText();
             }
         }));
+    }
+
+    public List<String> getAllDisabledFilters() {
+        return waitForCollectionIsNotEmpty(filters)
+            .stream()
+            .filter(e -> e.getAttribute("class").contains(DISABLED))
+            .map(e -> e.findElement(BY_LABEL).getText())
+            .collect(toList());
     }
 
     public boolean areAllFiltersDisabled() {

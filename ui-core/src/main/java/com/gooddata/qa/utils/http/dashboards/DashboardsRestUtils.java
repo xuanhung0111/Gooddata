@@ -37,6 +37,7 @@ public final class DashboardsRestUtils {
     private static final String MUF_LINK = "/gdc/md/%s/userfilters";
     private static final String OBJ_LINK = "/gdc/md/%s/obj/";
     private static final String DASHBOARD_EDIT_MODE_LINK = "/gdc/md/%s/obj/%s?mode=edit";
+    private static final String VARIABLE_LINK = "/gdc/md/%s/variables/item";
 
     private static final Supplier<String> MUF_OBJ =  () -> {
         try {
@@ -189,6 +190,53 @@ public final class DashboardsRestUtils {
                     .getJSONObject("comment")
                     .getJSONObject("meta")
                     .getString("uri");
+    }
+
+    /**
+     * Create filter variable
+     * 
+     * @param restApiClient
+     * @param projectId
+     * @param name           variable name
+     * @return attributeUri
+     */
+    public static String createFilterVariable(final RestApiClient restApiClient, final String projectId,
+            final String name, final String attributeUri) throws ParseException, JSONException, IOException {
+        final String content = new JSONObject() {{
+            put("prompt", new JSONObject() {{
+                put("content", new JSONObject() {{
+                    put("attribute", attributeUri);
+                    put("type", "filter");
+                }});
+                put("meta", new JSONObject() {{
+                    put("tags", "");
+                    put("deprecated", 0);
+                    put("summary", "");
+                    put("isProduction", 1);
+                    put("title", name);
+                    put("category", "prompt");
+                }});
+            }});
+        }}.toString();
+
+        String variableUri = getJsonObject(restApiClient,
+                restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId), content))
+                .getJSONObject("prompt")
+                .getJSONObject("meta")
+                .getString("uri");
+
+        getJsonObject(restApiClient, restApiClient.newPostMethod(format(VARIABLE_LINK, projectId),
+                new JSONObject() {{
+                    put("variable", new JSONObject() {{
+                        put("expression", "TRUE");
+                        put("level", "project");
+                        put("prompt", variableUri);
+                        put("related", format("/gdc/projects/%s", projectId));
+                        put("type", "filter");
+                    }});
+                }}.toString()));
+
+        return variableUri;
     }
 
     /**
