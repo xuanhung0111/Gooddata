@@ -1,5 +1,15 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
+import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.TrendingRecommendation;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
+import org.jboss.arquillian.graphene.Graphene;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -7,17 +17,6 @@ import static org.hamcrest.Matchers.containsString;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-
-import org.jboss.arquillian.graphene.Graphene;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.TrendingRecommendation;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
 public class PopRecommendationTest extends AbstractAdE2ETest {
 
@@ -36,28 +35,19 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
             .waitForReportComputing();
 
         assertFalse(isElementPresent(cssSelector(
-                ".adi-components .visualization-column .highcharts-series [fill=\"rgb(172,220,254)\"]"), browser));
+                ".adi-chart-container .highcharts-series [fill=\"rgb(172,220,254)\"]"), browser));
 
         Graphene.createPageFragment(RecommendationContainer.class,
             waitForElementVisible(RecommendationContainer.LOCATOR, browser))
             .<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).apply();
 
         analysisPageReact.waitForReportComputing();
-        assertTrue(isElementPresent(cssSelector(
-                ".adi-components .visualization-column .s-property-color.s-id-metricnames"), browser));
-        assertTrue(isElementPresent(cssSelector(
-                ".adi-components .visualization-column .s-property-y.s-id-metricvalues"), browser));
-
-        assertTrue(isElementPresent(cssSelector(".adi-components .visualization-column .s-property-where.s-id-" +
-                getAttributeDisplayFormIdentifier("Quarter/Year (Activity)", "Short")), browser));
-        assertTrue(isElementPresent(cssSelector(
-                ".adi-components .visualization-column .s-property-where.s-where-___between___0_0__"), browser));
 
         assertThat(waitForElementVisible(cssSelector(
-                ".adi-components .visualization-column .highcharts-legend-item tspan"), browser).getText(),
+                ".adi-chart-container .highcharts-legend-item tspan"), browser).getText(),
                 containsString("# of Activities - previous year"));
         assertTrue(isElementPresent(cssSelector(
-                ".adi-components .visualization-column .highcharts-series [fill=\"rgb(00,131,255)\"]"), browser));
+                ".adi-chart-container .highcharts-series [fill=\"rgb(00,131,255)\"]"), browser));
 
         assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
     }
@@ -76,10 +66,6 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
             .<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).select("This month").apply();
 
         analysisPageReact.waitForReportComputing();
-        assertTrue(isElementPresent(cssSelector(".adi-components .visualization-column .s-property-where.s-id-" +
-                getAttributeDisplayFormIdentifier("Month/Year (Activity)", "Short")), browser));
-        assertTrue(isElementPresent(cssSelector(
-                ".adi-components .visualization-column .s-property-where.s-where-___between___0_0__"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -94,16 +80,16 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
 
         analysisPageReact.waitForReportComputing();
         assertFalse(isElementPresent(cssSelector(
-                ".adi-components .visualization-column .highcharts-series [fill=\"rgb(172,220,254)\"]"), browser));
+                ".adi-chart-container .highcharts-series [fill=\"rgb(172,220,254)\"]"), browser));
 
         container.<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).apply();
 
         analysisPageReact.waitForReportComputing();
         assertThat(waitForElementVisible(cssSelector(
-                ".adi-components .visualization-column .highcharts-legend-item tspan"), browser).getText(),
+                ".adi-chart-container .highcharts-legend-item tspan"), browser).getText(),
                 containsString(NUMBER_OF_ACTIVITIES + " - previous year"));
         assertTrue(isElementPresent(cssSelector(
-                ".adi-components .visualization-column .highcharts-series [fill=\"rgb(00,131,255)\"]"), browser));
+                ".adi-chart-container .highcharts-series [fill=\"rgb(00,131,255)\"]"), browser));
 
         assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-with-period"), browser));
     }
@@ -153,6 +139,7 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
         assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-with-period"), browser));
         assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
         assertTrue(isElementPresent(cssSelector(".s-recommendation-trending"), browser));
-        assertTrue(isElementPresent(cssSelector(".s-recommendation-comparison"), browser));
+//        enable with CL-9443
+//        assertTrue(isElementPresent(cssSelector(".s-recommendation-comparison"), browser));
     }
 }

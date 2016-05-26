@@ -1,29 +1,26 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
+import com.gooddata.md.Metric;
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import org.apache.http.ParseException;
+import org.json.JSONException;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.IntStream;
+
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Collections.sort;
 import static org.openqa.selenium.By.cssSelector;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.stream.IntStream;
-
-import org.apache.http.ParseException;
-import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import com.gooddata.md.Metric;
-import com.gooddata.qa.graphene.enums.indigo.FieldType;
-import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import static org.testng.Assert.*;
 
 public class TableTest extends AbstractAdE2ETest {
 
@@ -236,8 +233,8 @@ public class TableTest extends AbstractAdE2ETest {
 
     private void beforeOrderingTable() {
         analysisPageReact.changeReportType(ReportType.TABLE)
-            .addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
+            .addMetric(NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
     }
 

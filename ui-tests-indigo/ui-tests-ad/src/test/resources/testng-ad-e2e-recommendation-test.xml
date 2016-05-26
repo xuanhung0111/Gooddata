@@ -1,7 +1,8 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="GD_UI_Selenium_Tests">
 
-    <test name="comparison-recommendation" enabled="true">
+    <!--Not yet implemented - https://jira.intgdc.com/browse/CL-9443-->
+    <test name="comparison-recommendation" enabled="false">
         <classes>
             <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.ComparisonRecommendationTest" />
         </classes>
@@ -25,7 +26,8 @@
         </classes>
     </test>
 
-    <test name="drag-recommendation" enabled="true">
+    <!--Enable with https://jira.intgdc.com/browse/CL-9645-->
+    <test name="drag-recommendation" enabled="false">
         <classes>
             <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.DragRecommendationsTest" />
         </classes>

@@ -6,7 +6,7 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.*;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReportReact;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -18,30 +18,30 @@ import java.util.function.Supplier;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.*;
 import static org.openqa.selenium.By.className;
+import static org.testng.Assert.assertTrue;
 
 /**
- * assertTrue(isBlankState()) is commented out from resetToBlankState()
- * method until main-editor is fully functional.
+ * many React fragments used
  */
 public class AnalysisPageReact extends AbstractFragment {
 
     @FindBy(className = "adi-editor-header")
-    private AnalysisPageHeader pageHeader;
+    private AnalysisPageHeaderReact pageHeader;
 
     @FindBy(className = "s-catalogue")
     private CataloguePanelReact cataloguePanel;
 
     @FindBy(className = "adi-editor-main")
-    private MainEditor mainEditor;
+    private MainEditorReact mainEditor;
 
     @FindBy(className = "s-visualization-picker")
-    private VisualizationReportTypePicker reportTypePicker;
+    private VisualizationReportTypePickerReact reportTypePicker;
 
     @FindBy(className = "s-bucket-metrics")
     private MetricsBucket metricsBucket;
 
     @FindBy(className = "s-bucket-categories")
-    private AttributesBucket attributesBucket;
+    private AttributesBucketReact attributesBucket;
 
     @FindBy(className = StacksBucket.CSS_CLASS)
     private StacksBucket stacksBucket;
@@ -159,7 +159,8 @@ public class AnalysisPageReact extends AbstractFragment {
     }
 
     public AnalysisPageReact removeMetric(String metric) {
-        return drag(getMetricsBucket().get(metric),
+        WebElement header = getMetricsBucket().get(metric).findElement(By.className("s-bucket-item-header"));
+        return drag(header ,
                 () -> waitForElementPresent(BY_TRASH_PANEL, browser));
     }
 
@@ -194,7 +195,7 @@ public class AnalysisPageReact extends AbstractFragment {
 
     public AnalysisPageReact resetToBlankState() {
         getPageHeader().resetToBlankState();
-//        assertTrue(isBlankState());
+        assertTrue(isBlankState());
         return this;
     }
 
@@ -238,7 +239,7 @@ public class AnalysisPageReact extends AbstractFragment {
         return this;
     }
 
-    public TableReport getTableReport() {
+    public TableReportReact getTableReport() {
         return getMainEditor().getTableReport();
     }
 
@@ -254,7 +255,7 @@ public class AnalysisPageReact extends AbstractFragment {
         return waitForFragmentVisible(metricsBucket);
     }
 
-    public AttributesBucket getAttributesBucket() {
+    public AttributesBucketReact getAttributesBucket() {
         return waitForFragmentVisible(attributesBucket);
     }
 
@@ -266,11 +267,11 @@ public class AnalysisPageReact extends AbstractFragment {
         return waitForFragmentVisible(filterBuckets);
     }
 
-    public MainEditor getMainEditor() {
+    public MainEditorReact getMainEditor() {
         return waitForFragmentVisible(mainEditor);
     }
 
-    public AnalysisPageHeader getPageHeader() {
+    public AnalysisPageHeaderReact getPageHeader() {
         return waitForFragmentVisible(pageHeader);
     }
 

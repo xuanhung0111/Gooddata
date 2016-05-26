@@ -1,18 +1,17 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
+import org.openqa.selenium.support.ui.Select;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-
-import org.openqa.selenium.support.ui.Select;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import com.gooddata.qa.graphene.enums.indigo.FieldType;
-import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
 public class ResetButtonTest extends AbstractAdE2ETest {
 
@@ -27,9 +26,9 @@ public class ResetButtonTest extends AbstractAdE2ETest {
         analysisPageReact.changeReportType(ReportType.BAR_CHART)
             .addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
-            .addStack(ACCOUNT)
+            .addStack(DEPARTMENT)
             .waitForReportComputing();
-        assertTrue(isElementPresent(cssSelector(".adi-components .dda-bar-component"), browser));
+        assertTrue(isElementPresent(cssSelector(".s-visualization-bar"), browser));
 
         analysisPageReact.resetToBlankState();
     }
@@ -40,7 +39,7 @@ public class ResetButtonTest extends AbstractAdE2ETest {
         analysisPageReact.changeReportType(ReportType.TABLE)
             .addAttribute(ACTIVITY_TYPE)
             .waitForReportComputing();
-        assertTrue(isElementPresent(cssSelector(".adi-components .dda-table-component"), browser));
+        assertTrue(isElementPresent(cssSelector(".s-visualization-table"), browser));
 
         analysisPageReact.resetToBlankState();
     }
@@ -62,7 +61,7 @@ public class ResetButtonTest extends AbstractAdE2ETest {
 
         analysisPageReact.resetToBlankState()
             .addDate();
-        assertEquals(new Select(waitForElementVisible(cssSelector(".s-date-dimension-switch"), browser))
-            .getFirstSelectedOption().getAttribute("value"), "activity.dim_date");
+        assertEquals(new Select(waitForElementVisible(cssSelector(".s-date-dataset-switch"), browser))
+            .getFirstSelectedOption().getAttribute("value"), "activity.dataset.dt");
     }
 }

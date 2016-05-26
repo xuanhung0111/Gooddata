@@ -47,7 +47,8 @@ public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
         assertFalse(analysisPageReact.getCataloguePanel().getFieldNamesInViewPort().contains(DATE));
         analysisPageReact.addMetric(AMOUNT, FieldType.FACT)
             .waitForReportComputing();
-        assertTrue(isElementPresent(cssSelector(".s-recommendation-comparison"), browser));
+//        enable with CL-9443
+//        assertTrue(isElementPresent(cssSelector(".s-recommendation-comparison"), browser));
         assertFalse(isElementPresent(cssSelector(".s-recommendation-trending"), browser));
     }
 
