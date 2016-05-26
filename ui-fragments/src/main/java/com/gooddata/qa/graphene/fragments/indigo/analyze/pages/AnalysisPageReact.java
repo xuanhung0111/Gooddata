@@ -21,8 +21,7 @@ import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertTrue;
 
 /**
- * assertTrue(isBlankState()) is commented out from resetToBlankState()
- * method until main-editor is fully functional.
+ * many React fragments used
  */
 public class AnalysisPageReact extends AbstractFragment {
 

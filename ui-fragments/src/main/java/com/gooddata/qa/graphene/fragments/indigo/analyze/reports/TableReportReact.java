@@ -15,6 +15,9 @@ import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.tagName;
 
+/**
+ * finding by span instead of BY_LINK in sortBaseOnHeader()
+ */
 public class TableReportReact extends AbstractFragment {
 
     @FindBy(css = ".public_fixedDataTable_header ." + CELL_CONTENT)

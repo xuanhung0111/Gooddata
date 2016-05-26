@@ -10,12 +10,14 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
+/**
+ * s-date-dimension-switch renamed to s-date-dataset-switch
+ */
 public class AttributesBucketReact extends AbstractBucket {
 
     @FindBy(className = "s-date-granularity-switch")
     private Select granularity;
 
-    // s-date-dimension-switch renamed to s-date-dataset-switch
     @FindBy(className = "s-date-dataset-switch")
     private Select dimensionSwitch;
 

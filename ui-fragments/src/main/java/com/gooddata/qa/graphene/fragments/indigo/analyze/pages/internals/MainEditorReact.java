@@ -14,6 +14,11 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.cssSelector;
 
+/**
+ * dda-table-component-content renamed to indigo-table-component-content
+ * switchable-visualization-component renamed to highcharts-container
+ * TableReportReact fragment is used instead of TableReport
+ */
 public class MainEditorReact extends AbstractFragment {
 
     @FindBy(css = CSS_EXPLORER_MESSAGE)

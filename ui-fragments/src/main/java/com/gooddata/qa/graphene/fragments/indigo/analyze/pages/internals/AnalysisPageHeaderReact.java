@@ -7,6 +7,9 @@ import org.openqa.selenium.support.FindBy;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.cssSelector;
 
+/**
+ * resetButton now has s-clear css class
+ */
 public class AnalysisPageHeaderReact extends AbstractFragment {
 
     @FindBy(className = "s-clear")
