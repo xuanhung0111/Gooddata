@@ -50,10 +50,10 @@ public class ProjectSwitchTest  extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"precondition"})
     public void prepareUserForSwitchingTest() throws ParseException, JSONException, IOException {
-        newAdminUser = generateUniqueUserEmail(testParams.getUser());
+        newAdminUser = generateEmail(testParams.getUser());
         newAdminPassword = testParams.getPassword();
 
-        embededDashboardUser = generateUniqueUserEmail(testParams.getUser());
+        embededDashboardUser = generateEmail(testParams.getUser());
         embededDashboardUserPassword = testParams.getPassword();
 
         newAdminUserUri = UserManagementRestUtils.createUser(getRestApiClient(), newAdminUser, newAdminPassword);
@@ -179,11 +179,6 @@ public class ProjectSwitchTest  extends DashboardWithWidgetsTest {
 
         UserManagementRestUtils.deleteUserByUri(getRestApiClient(), newAdminUserUri);
         UserManagementRestUtils.deleteUserByUri(getRestApiClient(), embededDashboardUserUri);
-    }
-
-    private String generateUniqueUserEmail(String email) {
-        String append = UUID.randomUUID().toString().substring(0, 6);
-        return email.replace("@", "+switch_" + append + "@");
     }
 
     private GoodData getNewAdminGoodDataClient() {

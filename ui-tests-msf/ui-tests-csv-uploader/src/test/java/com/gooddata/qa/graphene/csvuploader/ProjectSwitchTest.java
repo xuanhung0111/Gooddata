@@ -38,7 +38,7 @@ public class ProjectSwitchTest extends AbstractCsvUploaderTest {
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"precondition"})
     public void prepareUserForSwitchingTest() throws ParseException, JSONException, IOException {
-        newAdminUser = generateUniqueUserEmail(testParams.getUser());
+        newAdminUser = generateEmail(testParams.getUser());
         newAdminPassword = testParams.getPassword();
 
         newAdminUserUri = UserManagementRestUtils.createUser(getRestApiClient(), newAdminUser, newAdminPassword);
@@ -98,10 +98,5 @@ public class ProjectSwitchTest extends AbstractCsvUploaderTest {
     public void tearDown() throws JSONException {
         logoutAndLoginAs(true, UserRoles.ADMIN);
         UserManagementRestUtils.deleteUserByUri(getRestApiClient(), newAdminUserUri);
-    }
-
-    private String generateUniqueUserEmail(String email) {
-        String append = UUID.randomUUID().toString().substring(0, 6);
-        return email.replace("@", "+switch_" + append + "@");
     }
 }
