@@ -15,7 +15,7 @@ public class VisualizationReportTypePickerReact extends AbstractFragment {
         if (isSelected(type))
             return;
 
-        waitForElementVisible(type.getLocator(), browser).findElement(By.cssSelector("button")).click();
+        waitForElementVisible(type.getLocator(), browser).findElement(By.tagName("button")).click();
 
         Predicate<WebDriver> visualizationIsSelected = browser -> isSelected(type);
         Graphene.waitGui().until(visualizationIsSelected);

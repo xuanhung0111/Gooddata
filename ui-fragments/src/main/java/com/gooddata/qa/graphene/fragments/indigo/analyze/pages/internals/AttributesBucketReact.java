@@ -15,6 +15,7 @@ public class AttributesBucketReact extends AbstractBucket {
     @FindBy(className = "s-date-granularity-switch")
     private Select granularity;
 
+    // s-date-dimension-switch renamed to s-date-dataset-switch
     @FindBy(className = "s-date-dataset-switch")
     private Select dimensionSwitch;
 
