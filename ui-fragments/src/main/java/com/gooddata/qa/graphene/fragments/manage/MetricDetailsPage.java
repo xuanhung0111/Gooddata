@@ -107,7 +107,7 @@ public class MetricDetailsPage extends AbstractFragment {
         Sleeper.sleepTightInSeconds(1);
     }
 
-    private String getName() {
+    public String getName() {
         return waitForElementVisible(name).getText();
     }
 }
