@@ -108,7 +108,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
         testParams.setProjectId(getProjectId(GOODDATA_PRODUCT_TOUR_PROJECT));
 
-        initAnalysePageByUrl();
+        initAnalysePage();
         assertTrue(isWalkmeDisplayed(), "Walkme-dialog-is-not-visible");
 
         initProjectsAndUsersPage();

@@ -14,8 +14,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucketReact;
 
 public class GoodSalesDateDimensionTest extends GoodSalesAbstractAnalyseTest {
 
@@ -29,67 +29,66 @@ public class GoodSalesDateDimensionTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void applyOnFilter() {
-        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
+        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
 
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addMetric("_Snapshot [BOP]")
             .addDateFilter();
-        assertEquals(filtersBucket.getFilterText(ACTIVITY), ACTIVITY + ": All time");
-        assertEquals(analysisPage.getChartReport().getTrackersCount(), 2);
+        assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ": All time");
+        assertEquals(analysisPageReact.getChartReport().getTrackersCount(), 2);
 
-        WebElement filter = filtersBucket.getFilter(ACTIVITY);
+        WebElement filter = filtersBucketReact.getFilter(ACTIVITY);
         filter.click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
-        assertTrue(isEqualCollection(panel.getDimensionSwitchs(),
-                asList(ACTIVITY, "Closed", CREATED, "Snapshot", "Timeline")));
+        assertTrue(isEqualCollection(panel.getDimensionSwitchs(), asList(ACTIVITY, CREATED)));
 
         panel.select("This year");
-        analysisPage.waitForReportComputing();
-        assertEquals(filtersBucket.getFilterText(ACTIVITY), ACTIVITY + ": This year");
-        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
+        analysisPageReact.waitForReportComputing();
+        assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ": This year");
+        assertTrue(analysisPageReact.getChartReport().getTrackersCount() >= 1);
         checkingOpenAsReport("applyOnFilter");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void applyOnBucket() {
-        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
+        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
 
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
-        assertEquals(filtersBucket.getFilterText(ACTIVITY), ACTIVITY + ": All time");
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
+        assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ": All time");
 
-        analysisPage.getAttributesBucket().changeGranularity("Month");
-        analysisPage.waitForReportComputing();
+        analysisPageReact.getAttributesBucket().changeGranularity("Month");
+        analysisPageReact.waitForReportComputing();
 
-        filtersBucket.configDateFilter("Last 90 days");
-        analysisPage.waitForReportComputing();
-        if (analysisPage.isExplorerMessageVisible()) {
-            log.info("Visual cannot be rendered! Message: " + analysisPage.getExplorerMessage());
+        filtersBucketReact.configDateFilter("Last 90 days");
+        analysisPageReact.waitForReportComputing();
+        if (analysisPageReact.isExplorerMessageVisible()) {
+            log.info("Visual cannot be rendered! Message: " + analysisPageReact.getExplorerMessage());
             return;
         }
-        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
+        assertTrue(analysisPageReact.getChartReport().getTrackersCount() >= 1);
         checkingOpenAsReport("applyOnBucket");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void applyOnBothFilterAndBucket() {
-        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
+        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
 
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDateFilter();
-        assertEquals(filtersBucket.getFilterText(ACTIVITY), ACTIVITY + ": All time");
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDateFilter();
+        assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ": All time");
 
-        filtersBucket.changeDateDimension(ACTIVITY, CREATED);
-        assertEquals(filtersBucket.getFilterText(CREATED), CREATED + ": All time");
+        filtersBucketReact.changeDateDimension(ACTIVITY, CREATED);
+        assertEquals(filtersBucketReact.getFilterText(CREATED), CREATED + ": All time");
 
-        analysisPage.addDate();
-        WebElement filter = filtersBucket.getFilter(CREATED);
+        analysisPageReact.addDate();
+        WebElement filter = filtersBucketReact.getFilter(CREATED);
         filter.click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
               waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
         assertFalse(panel.isDimensionSwitcherEnabled());
 
-        analysisPage.getAttributesBucket().changeDateDimension(ACTIVITY);
-        assertEquals(filtersBucket.getFilterText(ACTIVITY), ACTIVITY + ": All time");
+        analysisPageReact.getAttributesBucket().changeDateDimension(ACTIVITY);
+        assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ": All time");
         checkingOpenAsReport("applyOnBothFilterAndBucket");
     }
 }

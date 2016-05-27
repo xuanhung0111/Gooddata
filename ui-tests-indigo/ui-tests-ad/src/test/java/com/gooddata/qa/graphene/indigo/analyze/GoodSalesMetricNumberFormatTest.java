@@ -67,7 +67,7 @@ public class GoodSalesMetricNumberFormatTest extends GoodSalesAbstractAnalyseTes
         try {
             verifyFormatInAdReport(format, expectedValue, compareFormat);
 
-            analysisPage.exportReport();
+            analysisPageReact.exportReport();
             String currentWindowHandle = browser.getWindowHandle();
             for (String handle : browser.getWindowHandles()) {
                 if (!handle.equals(currentWindowHandle))
@@ -99,7 +99,7 @@ public class GoodSalesMetricNumberFormatTest extends GoodSalesAbstractAnalyseTes
         changeMetricFormat(getRestApiClient(), percentOfGoalUri, format.toString());
 
         try {
-            String dataLabel = analysisPage.addMetric(METRIC_PERCENT_OF_GOAL)
+            String dataLabel = analysisPageReact.addMetric(METRIC_PERCENT_OF_GOAL)
                     .addAttribute(ATTR_IS_WON)
                     .waitForReportComputing()
                     .changeReportType(ReportType.BAR_CHART)
@@ -128,7 +128,7 @@ public class GoodSalesMetricNumberFormatTest extends GoodSalesAbstractAnalyseTes
     }
 
     private void verifyFormatInAdReport(Formatter format, String expectedValue, boolean compareFormat) {
-        List<List<String>> tooltip = analysisPage.addMetric(METRIC_PERCENT_OF_GOAL)
+        List<List<String>> tooltip = analysisPageReact.addMetric(METRIC_PERCENT_OF_GOAL)
             .addAttribute(ATTR_IS_WON)
             .waitForReportComputing()
             .getChartReport()

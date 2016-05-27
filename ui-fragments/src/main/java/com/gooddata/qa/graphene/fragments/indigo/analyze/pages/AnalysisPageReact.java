@@ -5,7 +5,7 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.*;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReportReact;
 import com.google.common.base.Predicate;
 
@@ -263,7 +263,7 @@ public class AnalysisPageReact extends AbstractFragment {
         return getMainEditor().getTableReport();
     }
 
-    public ChartReport getChartReport() {
+    public ChartReportReact getChartReport() {
         return getMainEditor().getChartReport();
     }
 

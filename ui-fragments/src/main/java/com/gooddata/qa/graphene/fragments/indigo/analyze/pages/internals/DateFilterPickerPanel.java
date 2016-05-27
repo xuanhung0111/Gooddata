@@ -28,7 +28,7 @@ public class DateFilterPickerPanel extends AbstractFragment {
     private List<WebElement> periods;
 
     // ****************  date range section  ****************
-    @FindBy(className = "s-tab-date-range")
+    @FindBy(css = ".adi-date-filter-tabs div:nth-child(2)")
     private WebElement dateRangeSection;
 
     @FindBy(css = ".adi-date-input-from > input")
@@ -37,15 +37,15 @@ public class DateFilterPickerPanel extends AbstractFragment {
     @FindBy(css = ".adi-date-input-to > input")
     private WebElement toDate;
 
-    @FindBy(css = ".adi-tab-date-range .s-btn-cancel")
+    @FindBy(className = "s-date-range-cancel")
     private WebElement cancelButton;
 
-    @FindBy(css = ".adi-tab-date-range .s-btn-apply")
+    @FindBy(className = "s-date-range-apply")
     private WebElement applyButton;
 
     public static final By LOCATOR = By.className("adi-date-filter-picker");
 
-    private static final String DIMENSION_SWITCH_LOCATOR = ".adi-dimension-select> select"; 
+    private static final String DIMENSION_SWITCH_LOCATOR = ".adi-date-dataset-select select"; 
 
     public void select(final String period) {
         waitForCollectionIsNotEmpty(periods).stream()

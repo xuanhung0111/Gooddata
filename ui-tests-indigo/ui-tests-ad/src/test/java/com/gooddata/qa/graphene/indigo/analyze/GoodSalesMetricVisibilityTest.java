@@ -45,7 +45,7 @@ public class GoodSalesMetricVisibilityTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"test"})
     public void testPrivateMetric() {
-        assertEquals(analysisPage.addMetric(RATIO_METRIC)
+        assertEquals(analysisPageReact.addMetric(RATIO_METRIC)
                 .addAttribute(ATTR_DEPARTMENT)
                 .waitForReportComputing()
                 .getChartReport()
@@ -61,7 +61,7 @@ public class GoodSalesMetricVisibilityTest extends GoodSalesAbstractAnalyseTest 
             signIn(false, UserRoles.EDITOR);
 
             initAnalysePage();
-            assertFalse(analysisPage.getCataloguePanel().search(RATIO_METRIC));
+            assertFalse(analysisPageReact.getCataloguePanel().search(RATIO_METRIC));
         } finally {
             logout();
             signIn(false, UserRoles.ADMIN);

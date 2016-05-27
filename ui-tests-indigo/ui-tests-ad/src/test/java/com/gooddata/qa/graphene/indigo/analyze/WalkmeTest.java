@@ -80,7 +80,7 @@ public class WalkmeTest extends AbstractUITest {
     public void testWalkme() {
         testParams.setProjectId(getProjectId(GOODDATA_PRODUCT_TOUR_PROJECT));
 
-        initAnalysePageByUrl();
+        initAnalysePage();
 
         WalkmeDialog walkmeDialog = WalkmeDialog.getInstance(browser);
 

@@ -34,7 +34,7 @@ public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest
 
     private static final String UNIQUE_ID = UUID.randomUUID().toString().substring(0, 10);
     private static final String NEW_PROJECT_NAME = "New-project-navigation-" + UNIQUE_ID;
-    private static final String ANALYZE_PAGE_URL = "analyze";
+    private static final String ANALYZE_PAGE_URL = "analyze-new";
 
     private String newAdminUser;
     private String newAdminPassword;
@@ -111,8 +111,8 @@ public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest
 
         testParams.setProjectId(newProjectId);
         try {
-            initAnalysePageByUrl();
-            analysisPage.switchProject(projectTitle);
+            initAnalysePage();
+            analysisPageReact.switchProject(projectTitle);
 
             if (role == UserRoles.DASHBOARD_ONLY) {
                 // With Embeded Dashboard role, user cannot access to Analyze
@@ -146,9 +146,9 @@ public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest
         ProjectRestUtils.setFeatureFlagInProject(getNewAdminGoodDataClient(), newProjectId,
                 ProjectFeatureFlags.ANALYTICAL_DESIGNER, false);
 
-        initAnalysePageByUrl();
+        initAnalysePage();
 
-        analysisPage.switchProject(NEW_PROJECT_NAME);
+        analysisPageReact.switchProject(NEW_PROJECT_NAME);
         waitForDashboardPageLoaded(browser);
 
         takeScreenshot(browser, "User-cannot-access-to-Analyse-Page-when-Feature-Flag-disabled", getClass());
@@ -160,16 +160,16 @@ public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest
         ProjectRestUtils.setFeatureFlagInProject(getNewAdminGoodDataClient(), newProjectId,
                 ProjectFeatureFlags.ANALYTICAL_DESIGNER, true);
 
-        initAnalysePageByUrl();
+        initAnalysePage();
 
-        analysisPage.switchProject(NEW_PROJECT_NAME);
-        waitForFragmentVisible(analysisPage);
+        analysisPageReact.switchProject(NEW_PROJECT_NAME);
+        waitForFragmentVisible(analysisPageReact);
 
         takeScreenshot(browser, "Switch-to-project-" + NEW_PROJECT_NAME, getClass());
         assertThat(browser.getCurrentUrl(), containsString(newProjectId));
 
-        analysisPage.switchProject(projectTitle);
-        waitForFragmentVisible(analysisPage);
+        analysisPageReact.switchProject(projectTitle);
+        waitForFragmentVisible(analysisPageReact);
 
         takeScreenshot(browser, "Switch-to-project-" + projectTitle, getClass());
         assertThat(browser.getCurrentUrl(), containsString(currentProjectId));
@@ -180,10 +180,10 @@ public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest
         ProjectRestUtils.setFeatureFlagInProject(getNewAdminGoodDataClient(), newProjectId,
                 ProjectFeatureFlags.ANALYTICAL_DESIGNER, true);
 
-        initAnalysePageByUrl();
+        initAnalysePage();
 
-        analysisPage.switchProject(NEW_PROJECT_NAME);
-        waitForFragmentVisible(analysisPage);
+        analysisPageReact.switchProject(NEW_PROJECT_NAME);
+        waitForFragmentVisible(analysisPageReact);
 
         takeScreenshot(browser, "Switch-to-project-" + NEW_PROJECT_NAME, getClass());
         assertThat(browser.getCurrentUrl(), containsString(newProjectId));
@@ -192,7 +192,7 @@ public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest
         try {
             initDashboardsPage();
             openUrl(ANALYZE_PAGE_URL);
-            waitForFragmentVisible(analysisPage);
+            waitForFragmentVisible(analysisPageReact);
 
             takeScreenshot(browser,
                     "User-is-directed-to-Analyze-Page-of-last-visited-project-" + NEW_PROJECT_NAME, getClass());
@@ -202,11 +202,11 @@ public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest
             testParams.setProjectId(currentProjectId);
         }
 
-        initAnalysePageByUrl();
+        initAnalysePage();
         initProjectsPage();
 
         openUrl(ANALYZE_PAGE_URL);
-        waitForFragmentVisible(analysisPage);
+        waitForFragmentVisible(analysisPageReact);
 
         takeScreenshot(browser,
                 "User-is-directed-to-Analyze-Page-of-last-visited-project-" + projectTitle, getClass());
@@ -241,7 +241,7 @@ public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest
             testParams.setProjectId(currentProjectId);
         }
 
-        initAnalysePageByUrl();
+        initAnalysePage();
         takeScreenshot(browser, "Re-open-Analyse-page-of-project-:"
                 + currentProjectId + "after-delete-project-" + newProjectId, getClass());
         assertThat(browser.getCurrentUrl(), containsString(currentProjectId));

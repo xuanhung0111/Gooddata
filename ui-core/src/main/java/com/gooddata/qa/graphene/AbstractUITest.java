@@ -199,9 +199,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(css = ".ait-overview-projects-fragment")
     protected OverviewProjects discOverviewProjects;
 
-    @FindBy(className = AnalysisPage.MAIN_CLASS)
-    protected AnalysisPage analysisPage;
-
     @FindBy(className = AnalysisPageReact.MAIN_CLASS)
     protected AnalysisPageReact analysisPageReact;
 
@@ -550,15 +547,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void initAnalysePage() {
-        // work around CL-8058
-        initEmptyDashboardsPage();
-        ApplicationHeaderBar.goToAnalysisPage(browser);
-        waitForFragmentVisible(analysisPage);
-    }
-
-    public void initAnalysePageByUrl() {
-        openUrl(PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/reportId/edit");
-        waitForFragmentVisible(analysisPage);
+        openUrl(PAGE_UI_ANALYSE_PREFIX.replace("analyze", "analyze-new") + testParams.getProjectId()
+                + "/reportId/edit");
+        waitForFragmentVisible(analysisPageReact);
     }
 
     public void initAccountPage() {

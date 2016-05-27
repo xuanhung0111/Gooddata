@@ -37,16 +37,16 @@ import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucketReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanelReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucketReact;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.TrendingRecommendation;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReportReact;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -96,7 +96,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
             .map(Entry::getTitle)
             .filter(metric -> {
                 final boolean goodMetric = isGoodMetric(metric);
-                analysisPage.resetToBlankState();
+                analysisPageReact.resetToBlankState();
                 if (!goodMetric) {
                     log.info(format("Metric [%s] is not good to test."
                         + " Maybe it has empty value, no data or it's not connected to any attributes.", metric));
@@ -110,8 +110,8 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
     public void testCustomDiscovery() {
         initAnalysePage();
 
-        String metric = doSafetyMetricAction(analysisPage::addMetric, "testCustomDiscovery");
-        ChartReport report = analysisPage.getChartReport();
+        String metric = doSafetyMetricAction(analysisPageReact::addMetric, "testCustomDiscovery");
+        ChartReportReact report = analysisPageReact.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -119,13 +119,13 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        analysisPage.changeReportType(ReportType.BAR_CHART);
+        analysisPageReact.changeReportType(ReportType.BAR_CHART);
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
 
-        doSafetyAttributeAction(metric, analysisPage::addAttribute, "testCustomDiscovery");
+        doSafetyAttributeAction(metric, analysisPageReact::addAttribute, "testCustomDiscovery");
 
         assertTrue(report.getTrackersCount() >= 1);
-        analysisPage.resetToBlankState();
+        analysisPageReact.resetToBlankState();
     }
 
     @Test(dependsOnGroups = {"prepare"})
@@ -133,18 +133,18 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
         String attribute = getRandomAttribute();
         initAnalysePage();
 
-        assertEquals(analysisPage.addAttribute(attribute).getExplorerMessage(), "Now select a measure to display");
+        assertEquals(analysisPageReact.addAttribute(attribute).getExplorerMessage(), "Now select a measure to display");
 
-        assertEquals(analysisPage.changeReportType(ReportType.BAR_CHART).getExplorerMessage(),
+        assertEquals(analysisPageReact.changeReportType(ReportType.BAR_CHART).getExplorerMessage(),
                 "Now select a measure to display");
 
-        assertEquals(analysisPage.changeReportType(ReportType.LINE_CHART).getExplorerMessage(),
+        assertEquals(analysisPageReact.changeReportType(ReportType.LINE_CHART).getExplorerMessage(),
                 "Now select a measure to display");
 
-        analysisPage.changeReportType(ReportType.TABLE);
-        if (analysisPage.isExplorerMessageVisible()) {
+        analysisPageReact.changeReportType(ReportType.TABLE);
+        if (analysisPageReact.isExplorerMessageVisible()) {
             System.out.println("Cannot render table because of message:");
-            System.out.println(analysisPage.getExplorerMessage());
+            System.out.println(analysisPageReact.getExplorerMessage());
         }
     }
 
@@ -157,12 +157,12 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
         String metric = doSafetyMetricAction(
             data -> {
-                WebElement source = analysisPage.getCataloguePanel().searchAndGet(data, FieldType.METRIC);
-                analysisPage.drag(source, recommendation);
+                WebElement source = analysisPageReact.getCataloguePanel().searchAndGet(data, FieldType.METRIC);
+                analysisPageReact.drag(source, recommendation);
             },
             "dragMetricToColumnChartShortcutPanel");
 
-        ChartReport report = analysisPage.getChartReport();
+        ChartReportReact report = analysisPageReact.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -170,10 +170,10 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        analysisPage.changeReportType(ReportType.BAR_CHART);
+        analysisPageReact.changeReportType(ReportType.BAR_CHART);
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
 
-        doSafetyAttributeAction(metric, analysisPage::addAttribute, "dragMetricToColumnChartShortcutPanel");
+        doSafetyAttributeAction(metric, analysisPageReact::addAttribute, "dragMetricToColumnChartShortcutPanel");
 
         assertTrue(report.getTrackersCount() >= 1);
     }
@@ -187,17 +187,17 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
         doSafetyMetricAction(
             data -> {
-                WebElement source = analysisPage.getCataloguePanel().searchAndGet(data, FieldType.METRIC);
-                analysisPage.drag(source, recommendation);
+                WebElement source = analysisPageReact.getCataloguePanel().searchAndGet(data, FieldType.METRIC);
+                analysisPageReact.drag(source, recommendation);
             },
             "dragMetricToTrendShortcutPanel");
 
-        ChartReport report = analysisPage.getChartReport();
+        ChartReportReact report = analysisPageReact.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
 
-        FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
-        assertTrue(filtersBucket.isDateFilterVisible());
-        assertTrue(filtersBucket.getDateFilterText().endsWith(": Last 4 quarters"));
+        FiltersBucketReact FiltersBucketReact = analysisPageReact.getFilterBuckets();
+        assertTrue(FiltersBucketReact.isDateFilterVisible());
+        assertTrue(FiltersBucketReact.getDateFilterText().endsWith(": Last 4 quarters"));
 
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -209,10 +209,10 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
     public void testSimpleContribution() {
         initAnalysePage();
 
-        String metric = doSafetyMetricAction(analysisPage::addMetric, "testSimpleContribution");
-        final String attribute = doSafetyAttributeAction(metric, analysisPage::addAttribute, "testSimpleContribution");
+        String metric = doSafetyMetricAction(analysisPageReact::addMetric, "testSimpleContribution");
+        final String attribute = doSafetyAttributeAction(metric, analysisPageReact::addAttribute, "testSimpleContribution");
 
-        final ChartReport report = analysisPage.getChartReport();
+        final ChartReportReact report = analysisPageReact.getChartReport();
         int oldTrackersCount = report.getTrackersCount();
         assertTrue(oldTrackersCount >= 1);
         RecommendationContainer recommendationContainer =
@@ -220,10 +220,10 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_PERCENTS).apply();
-        assertTrue(analysisPage.isReportTypeSelected(ReportType.BAR_CHART));
+        assertTrue(analysisPageReact.isReportTypeSelected(ReportType.BAR_CHART));
         assertEquals(report.getTrackersCount(), oldTrackersCount);
 
-        MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
+        MetricConfiguration metricConfiguration = analysisPageReact.getMetricsBucket()
                 .getMetricConfiguration("% " + metric)
                 .expandConfiguration();
         assertTrue(metricConfiguration.isShowPercentEnabled());
@@ -232,7 +232,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
         doSafetyAttributeAction(metric, attr -> this.replaceAttribute(attribute, attr),
                 "testSimpleContribution");
 
-        assertTrue(analysisPage.isReportTypeSelected(ReportType.BAR_CHART));
+        assertTrue(analysisPageReact.isReportTypeSelected(ReportType.BAR_CHART));
         assertTrue(report.getTrackersCount() >= 1);
         assertTrue(metricConfiguration.isShowPercentEnabled());
     }
@@ -241,8 +241,8 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
     public void testAnotherApproachToShowContribution() {
         initAnalysePage();
 
-        String metric = doSafetyMetricAction(analysisPage::addMetric, "testAnotherApproachToShowContribution");
-        ChartReport report = analysisPage.getChartReport();
+        String metric = doSafetyMetricAction(analysisPageReact::addMetric, "testAnotherApproachToShowContribution");
+        ChartReportReact report = analysisPageReact.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -252,7 +252,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
         final ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
 
-        final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
+        final CataloguePanelReact cataloguePanel = analysisPageReact.getCataloguePanel();
         String attribute;
         while (true) {
             attribute = getRandomeAttributeFromMetric(metric);
@@ -264,14 +264,14 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
                 continue;
             }
 
-            analysisPage.addAttribute(attribute).waitForReportComputing();
-            if (analysisPage.isExplorerMessageVisible()) {
+            analysisPageReact.addAttribute(attribute).waitForReportComputing();
+            if (analysisPageReact.isExplorerMessageVisible()) {
                 System.out.println(format("Report with metric [%s] and attribute [%s] shows message: %s",
-                        metric, attribute, analysisPage.getExplorerMessage()));
+                        metric, attribute, analysisPageReact.getExplorerMessage()));
                 System.out.println("Try another attribute");
-                analysisPage.removeAttribute(attribute).waitForReportComputing();
+                analysisPageReact.removeAttribute(attribute).waitForReportComputing();
             } else {
-                analysisPage.removeAttribute(attribute).waitForReportComputing();
+                analysisPageReact.removeAttribute(attribute).waitForReportComputing();
                 System.out.println(format("Good pair to test: metric [%s] and attribute [%s]", metric, attribute));
                 break;
             }
@@ -287,8 +287,8 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
     public void testSimpleComparison() {
         initAnalysePage();
 
-        String metric = doSafetyMetricAction(analysisPage::addMetric, "testSimpleComparison");
-        ChartReport report = analysisPage.getChartReport();
+        String metric = doSafetyMetricAction(analysisPageReact::addMetric, "testSimpleComparison");
+        ChartReportReact report = analysisPageReact.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -297,20 +297,20 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
         final ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
-        final String attribute = doSafetyAttributeAction(metric, analysisPage::addAttribute, "testSimpleComparison");
+        final String attribute = doSafetyAttributeAction(metric, analysisPageReact::addAttribute, "testSimpleComparison");
 
-        analysisPage.resetToBlankState().addMetric(metric);
+        analysisPageReact.resetToBlankState().addMetric(metric);
         waitForFragmentVisible(comparisonRecommendation);
 
         comparisonRecommendation.select(attribute).apply();
 
-        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(attribute));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText(attribute), attribute + ": All");
+        assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(attribute));
+        assertEquals(analysisPageReact.getFilterBuckets().getFilterText(attribute), attribute + ": All");
 
-        if (analysisPage.waitForReportComputing().isExplorerMessageVisible()) {
+        if (analysisPageReact.waitForReportComputing().isExplorerMessageVisible()) {
             log.info(format(
                     "Report with metric [%s] and attribute [%s] shows message: %s", metric,
-                    attribute, analysisPage.getExplorerMessage()));
+                    attribute, analysisPageReact.getExplorerMessage()));
         } else {
             assertTrue(report.getTrackersCount() >= 1);
             assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
@@ -319,13 +319,13 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
         String newAttribute = doSafetyAttributeAction(metric,
                 attr -> this.replaceAttribute(attribute, attr), "testSimpleComparison");
 
-        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(newAttribute));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText(newAttribute), newAttribute + ": All");
+        assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(newAttribute));
+        assertEquals(analysisPageReact.getFilterBuckets().getFilterText(newAttribute), newAttribute + ": All");
 
-        if (analysisPage.waitForReportComputing().isExplorerMessageVisible()) {
+        if (analysisPageReact.waitForReportComputing().isExplorerMessageVisible()) {
             log.info(format(
                     "Report with metric [%s] and attribute [%s] shows message: %s", metric,
-                    newAttribute, analysisPage.getExplorerMessage()));
+                    newAttribute, analysisPageReact.getExplorerMessage()));
         } else {
             assertTrue(report.getTrackersCount() >= 1);
             assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
@@ -338,8 +338,8 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
         String metric;
 
         initAnalysePage();
-        final AttributesBucket categoriesBucket = analysisPage.getAttributesBucket();
-        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
+        final AttributesBucketReact categoriesBucket = analysisPageReact.getAttributesBucket();
+        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         while (true) {
             if (badMetrics.size() >= 3) {
@@ -348,14 +348,14 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
             }
 
             while (true) {
-                metric = doSafetyMetricAction(analysisPage::addMetric, "supportParameter");
+                metric = doSafetyMetricAction(analysisPageReact::addMetric, "supportParameter");
                 if (!badMetrics.contains(metric)) {
                     break;
                 }
-                analysisPage.resetToBlankState();
+                analysisPageReact.resetToBlankState();
             }
 
-            ChartReport report = analysisPage.getChartReport();
+            ChartReportReact report = analysisPageReact.getChartReport();
             assertEquals(report.getTrackersCount(), 1);
             RecommendationContainer recommendationContainer =
                     Graphene.createPageFragment(RecommendationContainer.class,
@@ -366,12 +366,12 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
             TrendingRecommendation trendingRecommendation =
                     recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND);
             trendingRecommendation.select("Month").apply();
-            analysisPage.waitForReportComputing();
+            analysisPageReact.waitForReportComputing();
             assertTrue(categoriesBucket.getItemNames().contains(DATE));
-            assertTrue(filtersBucket.isDateFilterVisible());
-            assertTrue(filtersBucket.getDateFilterText().endsWith(": Last 4 quarters"));
+            assertTrue(filtersBucketReact.isDateFilterVisible());
+            assertTrue(filtersBucketReact.getDateFilterText().endsWith(": Last 4 quarters"));
 
-            MetricConfiguration metricConfiguration =  analysisPage.getMetricsBucket()
+            MetricConfiguration metricConfiguration =  analysisPageReact.getMetricsBucket()
                     .getMetricConfiguration(metric).expandConfiguration();
             assertTrue(metricConfiguration.isShowPercentEnabled());
             assertTrue(metricConfiguration.isPopEnabled());
@@ -383,10 +383,10 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
                 return;
             }
             System.out.println(format("Report with metric [%s] shows message when comparing "
-                    + "last 4 quarters: %s", metric, analysisPage.getExplorerMessage()));
+                    + "last 4 quarters: %s", metric, analysisPageReact.getExplorerMessage()));
             System.out.println("trying with another metric");
             badMetrics.add(metric);
-            analysisPage.resetToBlankState();
+            analysisPageReact.resetToBlankState();
         }
     }
 
@@ -394,25 +394,25 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
     public void displayInColumnChartWithOnlyMetric() {
         initAnalysePage();
 
-        String metric = doSafetyMetricAction(analysisPage::addMetric, "displayInColumnChartWithOnlyMetric");
-        ChartReport report = analysisPage.getChartReport();
+        String metric = doSafetyMetricAction(analysisPageReact::addMetric, "displayInColumnChartWithOnlyMetric");
+        ChartReportReact report = analysisPageReact.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
 
-        doSafetyAttributeAction(metric, analysisPage::addFilter, "displayInColumnChartWithOnlyMetric");
+        doSafetyAttributeAction(metric, analysisPageReact::addFilter, "displayInColumnChartWithOnlyMetric");
 
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
 
-        analysisPage.changeReportType(ReportType.BAR_CHART);
+        analysisPageReact.changeReportType(ReportType.BAR_CHART);
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
 
-        analysisPage.changeReportType(ReportType.COLUMN_CHART);
+        analysisPageReact.changeReportType(ReportType.COLUMN_CHART);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
 
-        doSafetyAttributeAction(metric, analysisPage::addAttribute, "displayInColumnChartWithOnlyMetric");
+        doSafetyAttributeAction(metric, analysisPageReact::addAttribute, "displayInColumnChartWithOnlyMetric");
 
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
     }
@@ -420,23 +420,23 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
     @Test(dependsOnGroups = {"prepare"})
     public void displayWhenDraggingFirstMetric() {
         initAnalysePage();
-        final AttributesBucket categoriesBucket = analysisPage.getAttributesBucket();
-        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
+        final AttributesBucketReact categoriesBucket = analysisPageReact.getAttributesBucket();
+        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         final Supplier<WebElement> recommendation = () ->
             waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
 
         doSafetyMetricAction(
             data -> {
-                WebElement source = analysisPage.getCataloguePanel().searchAndGet(data, FieldType.METRIC);
-                analysisPage.drag(source, recommendation);
+                WebElement source = analysisPageReact.getCataloguePanel().searchAndGet(data, FieldType.METRIC);
+                analysisPageReact.drag(source, recommendation);
             },
             "displayWhenDraggingFirstMetric");
 
         assertTrue(categoriesBucket.getItemNames().contains(DATE));
-        assertTrue(filtersBucket.isDateFilterVisible());
-        assertTrue(filtersBucket.getDateFilterText().endsWith(": Last 4 quarters"));
-        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
+        assertTrue(filtersBucketReact.isDateFilterVisible());
+        assertTrue(filtersBucketReact.getDateFilterText().endsWith(": Last 4 quarters"));
+        assertTrue(analysisPageReact.getChartReport().getTrackersCount() >= 1);
     }
 
     @Test(dependsOnGroups = {"prepare"})
@@ -444,15 +444,15 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
         initAnalysePage();
 
         String metric = doSafetyMetricAction(
-                data -> analysisPage.addMetric(data).changeReportType(ReportType.TABLE),
+                data -> analysisPageReact.addMetric(data).changeReportType(ReportType.TABLE),
                 "exportCustomDiscovery");
-        doSafetyAttributeAction(metric, analysisPage::addAttribute, "exportCustomDiscovery");
+        doSafetyAttributeAction(metric, analysisPageReact::addAttribute, "exportCustomDiscovery");
 
-        assertTrue(analysisPage.getPageHeader().isExportButtonEnabled());
-        TableReport analysisReport = analysisPage.getTableReport();
+        assertTrue(analysisPageReact.getPageHeader().isExportButtonEnabled());
+        TableReportReact analysisReport = analysisPageReact.getTableReport();
         List<List<String>> analysisContent = analysisReport.getContent();
 
-        analysisPage.exportReport();
+        analysisPageReact.exportReport();
         String currentWindowHandel = browser.getWindowHandle();
         for (String handel : browser.getWindowHandles()) {
             if (!handel.equals(currentWindowHandel))
@@ -491,27 +491,27 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
     public void exportVisualizationWithOneAttributeInChart() {
         initAnalysePage();
 
-        assertEquals(analysisPage.addAttribute(getRandomAttribute()).getExplorerMessage(),
+        assertEquals(analysisPageReact.addAttribute(getRandomAttribute()).getExplorerMessage(),
                 "Now select a measure to display");
-        assertFalse(analysisPage.getPageHeader().isExportButtonEnabled());
+        assertFalse(analysisPageReact.getPageHeader().isExportButtonEnabled());
     }
 
     @Test(dependsOnGroups = {"prepare"})
     public void filterOnDateAttribute() {
         initAnalysePage();
-        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
+        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         String metric = doSafetyMetricAction(
-                data -> analysisPage.addMetric(data).addDateFilter(),
+                data -> analysisPageReact.addMetric(data).addDateFilter(),
                 "filterOnDateAttribute");
-        doSafetyAttributeAction(metric, analysisPage::addAttribute, "filterOnDateAttribute");
+        doSafetyAttributeAction(metric, analysisPageReact::addAttribute, "filterOnDateAttribute");
 
-        ChartReport report = analysisPage.getChartReport();
+        ChartReportReact report = analysisPageReact.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
-        assertTrue(filtersBucket.getDateFilterText().endsWith(": All time"));
+        assertTrue(filtersBucketReact.getDateFilterText().endsWith(": All time"));
 
-        filtersBucket.configDateFilter("This year");
-        assertTrue(filtersBucket.getDateFilterText().endsWith(": This year"));
+        filtersBucketReact.configDateFilter("This year");
+        assertTrue(filtersBucketReact.getDateFilterText().endsWith(": This year"));
     }
 
     @Test(dependsOnGroups = {"prepare"})
@@ -519,31 +519,31 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
         initAnalysePage();
 
         doSafetyMetricAction(
-                data -> analysisPage.addMetric(data).addDate(),
+                data -> analysisPageReact.addMetric(data).addDate(),
                 "testDateInCategoryAndDateInFilter");
-        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
-        assertTrue(analysisPage.getFilterBuckets().getDateFilterText().endsWith(": All time"));
-        assertTrue(isEqualCollection(analysisPage.getAttributesBucket().getAllGranularities(),
+        assertTrue(analysisPageReact.getChartReport().getTrackersCount() >= 1);
+        assertTrue(analysisPageReact.getFilterBuckets().getDateFilterText().endsWith(": All time"));
+        assertTrue(isEqualCollection(analysisPageReact.getAttributesBucket().getAllGranularities(),
                 asList("Day", "Week (Sun-Sat)", "Month", "Quarter", "Year")));
     }
 
     @Test(dependsOnGroups = {"prepare"})
     public void trendingRecommendationOverrideDateFilter() {
         initAnalysePage();
-        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
+        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         String metric = doSafetyMetricAction(
-                data -> analysisPage.addMetric(data).addDateFilter(),
+                data -> analysisPageReact.addMetric(data).addDateFilter(),
                 "trendingRecommendationOverrideDateFilter");
-        assertTrue(filtersBucket.getDateFilterText().endsWith(": All time"));
+        assertTrue(filtersBucketReact.getDateFilterText().endsWith(": All time"));
 
         boolean timeFilterOk = false;
-        for (String period : Sets.newHashSet(filtersBucket.getDateFilterOptions())) {
+        for (String period : Sets.newHashSet(filtersBucketReact.getDateFilterOptions())) {
             if ("All time".equals(period)) continue;
             System.out.println(format("Try with time period [%s]", period));
-            filtersBucket.configDateFilter(period);
-            if (analysisPage.waitForReportComputing().isExplorerMessageVisible()) {
-                System.out.println(format("Report shows message: %s", analysisPage.getExplorerMessage()));
+            filtersBucketReact.configDateFilter(period);
+            if (analysisPageReact.waitForReportComputing().isExplorerMessageVisible()) {
+                System.out.println(format("Report shows message: %s", analysisPageReact.getExplorerMessage()));
             } else {
                 System.out.println(format("Time period [%s] is ok with metric [%s]", period, metric));
                 timeFilterOk = true;
@@ -560,35 +560,35 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();;
-        assertTrue(filtersBucket.getDateFilterText().endsWith(": Last 4 quarters"));
+        assertTrue(filtersBucketReact.getDateFilterText().endsWith(": Last 4 quarters"));
     }
 
     @Test(dependsOnGroups = {"prepare"})
     public void dragAndDropAttributeToFilterBucket() {
         initAnalysePage();
-        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
+        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
 
-        String metric = doSafetyMetricAction(analysisPage::addMetric, "dragAndDropAttributeToFilterBucket");
-        String attribute = doSafetyAttributeAction(metric, analysisPage::addAttribute,
+        String metric = doSafetyMetricAction(analysisPageReact::addMetric, "dragAndDropAttributeToFilterBucket");
+        String attribute = doSafetyAttributeAction(metric, analysisPageReact::addAttribute,
                 "dragAndDropAttributeToFilterBucket");
 
-        ChartReport report = analysisPage.getChartReport();
+        ChartReportReact report = analysisPageReact.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
-        assertEquals(filtersBucket.getFilterText(attribute), attribute + ": All");
+        assertEquals(filtersBucketReact.getFilterText(attribute), attribute + ": All");
 
-        attribute = doSafetyAttributeAction(metric, analysisPage::addFilter, "dragAndDropAttributeToFilterBucket");
+        attribute = doSafetyAttributeAction(metric, analysisPageReact::addFilter, "dragAndDropAttributeToFilterBucket");
 
-        assertEquals(filtersBucket.getFilterText(attribute), attribute + ": All");
+        assertEquals(filtersBucketReact.getFilterText(attribute), attribute + ": All");
     }
 
     @Test(dependsOnGroups = {"prepare"})
     public void addFilterDoesNotHideRecommendation() {
         initAnalysePage();
 
-        String metric = doSafetyMetricAction(analysisPage::addMetric, "addFilterDoesNotHideRecommendation");
-        doSafetyAttributeAction(metric, analysisPage::addAttribute, "addFilterDoesNotHideRecommendation");
+        String metric = doSafetyMetricAction(analysisPageReact::addMetric, "addFilterDoesNotHideRecommendation");
+        doSafetyAttributeAction(metric, analysisPageReact::addAttribute, "addFilterDoesNotHideRecommendation");
 
-        ChartReport report = analysisPage.getChartReport();
+        ChartReportReact report = analysisPageReact.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -596,7 +596,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        doSafetyAttributeAction(metric, analysisPage::addFilter, "addFilterDoesNotHideRecommendation");
+        doSafetyAttributeAction(metric, analysisPageReact::addFilter, "addFilterDoesNotHideRecommendation");
 
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
@@ -605,15 +605,15 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
     @Test(dependsOnGroups = {"prepare"})
     public void testSimplePoP() {
         initAnalysePage();
-        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
+        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         final String metric1 = doSafetyMetricAction(
-                data -> analysisPage.addMetric(data).addDate(),
+                data -> analysisPageReact.addMetric(data).addDate(),
                 "testSimplePoP");
 
-        assertTrue(filtersBucket.isDateFilterVisible());
-        assertTrue(filtersBucket.getDateFilterText().endsWith(": All time"));
-        ChartReport report = analysisPage.getChartReport();
+        assertTrue(filtersBucketReact.isDateFilterVisible());
+        assertTrue(filtersBucketReact.getDateFilterText().endsWith(": All time"));
+        ChartReportReact report = analysisPageReact.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -631,10 +631,10 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
     @Test(dependsOnGroups = {"prepare"})
     public void testAnotherApproachToShowPoP() {
         initAnalysePage();
-        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
+        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
 
-        doSafetyMetricAction(analysisPage::addMetric, "testAnotherApproachToShowPoP");
-        ChartReport report = analysisPage.getChartReport();
+        doSafetyMetricAction(analysisPageReact::addMetric, "testAnotherApproachToShowPoP");
+        ChartReportReact report = analysisPageReact.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -642,13 +642,13 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();
 
-        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
-        assertTrue(filtersBucket.isDateFilterVisible());
-        assertTrue(filtersBucket.getDateFilterText().endsWith(": Last 4 quarters"));
+        assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(DATE));
+        assertTrue(filtersBucketReact.isDateFilterVisible());
+        assertTrue(filtersBucketReact.getDateFilterText().endsWith(": Last 4 quarters"));
 
-        if (analysisPage.isExplorerMessageVisible()) {
+        if (analysisPageReact.isExplorerMessageVisible()) {
             System.out.println(format("After applying 'see trend', report shows message: %s",
-                    analysisPage.getExplorerMessage()));
+                    analysisPageReact.getExplorerMessage()));
             return;
         }
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
@@ -657,21 +657,21 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
     @Test(dependsOnGroups = {"prepare"})
     public void compararisonRecommendationOverrideDateFilter() {
         initAnalysePage();
-        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
+        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         String metric = doSafetyMetricAction(
-                data -> analysisPage.addMetric(data).addDateFilter(),
+                data -> analysisPageReact.addMetric(data).addDateFilter(),
                 "compararisonRecommendationOverrideDateFilter");
-        String attribute = doSafetyAttributeAction(metric, analysisPage::addAttribute,
+        String attribute = doSafetyAttributeAction(metric, analysisPageReact::addAttribute,
                 "compararisonRecommendationOverrideDateFilter");
 
         boolean timeFilterOk = false;
-        for (String period : Sets.newHashSet(filtersBucket.getDateFilterOptions())) {
+        for (String period : Sets.newHashSet(filtersBucketReact.getDateFilterOptions())) {
             if ("All time".equals(period)) continue;
             System.out.println(format("Try with time period [%s]", period));
-            filtersBucket.configDateFilter(period);
-            if (analysisPage.waitForReportComputing().isExplorerMessageVisible()) {
-                System.out.println(format("Report shows message: %s", analysisPage.getExplorerMessage()));
+            filtersBucketReact.configDateFilter(period);
+            if (analysisPageReact.waitForReportComputing().isExplorerMessageVisible()) {
+                System.out.println(format("Report shows message: %s", analysisPageReact.getExplorerMessage()));
             } else {
                 System.out.println(format("Time period [%s] is ok with metric [%s] and attribute [%s]",
                         period, metric, attribute));
@@ -692,14 +692,14 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select("This month").apply();
-        assertTrue(filtersBucket.getDateFilterText().endsWith(": This month"));
-        if (analysisPage.waitForReportComputing().isExplorerMessageVisible()) {
+        assertTrue(filtersBucketReact.getDateFilterText().endsWith(": This month"));
+        if (analysisPageReact.waitForReportComputing().isExplorerMessageVisible()) {
             System.out.println(format("After comparing 'This month', report shows message: %s",
-                    analysisPage.getExplorerMessage()));
+                    analysisPageReact.getExplorerMessage()));
             return;
         }
 
-        ChartReport report = analysisPage.getChartReport();
+        ChartReportReact report = analysisPageReact.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
         List<String> legends = report.getLegends();
         assertEquals(legends.size(), 2);
@@ -746,13 +746,13 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
     }
 
     private boolean isGoodMetric(String metric) {
-        analysisPage.addMetric(metric)
+        analysisPageReact.addMetric(metric)
             .waitForReportComputing();
 
-        if (analysisPage.isExplorerMessageVisible())
+        if (analysisPageReact.isExplorerMessageVisible())
             return false;
 
-        if (analysisPage.getChartReport().getTrackersCount() == 0)
+        if (analysisPageReact.getChartReport().getTrackersCount() == 0)
             return false;
 
         if (!isElementPresent(RecommendationContainer.LOCATOR, browser))
@@ -771,9 +771,9 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
         while (true) {
             metric = getRandomMetric();
 
-            if (analysisPage.getCataloguePanel().search(metric)) {
+            if (analysisPageReact.getCataloguePanel().search(metric)) {
                 action.accept(metric);
-                analysisPage.waitForReportComputing();
+                analysisPageReact.waitForReportComputing();
             } else {
                 Screenshots.takeScreenshot(browser, "[Inapplicable metric]" + screenshot +
                         System.currentTimeMillis(), this.getClass());
@@ -782,13 +782,13 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
                 continue;
             }
 
-            if (!analysisPage.isExplorerMessageVisible())
+            if (!analysisPageReact.isExplorerMessageVisible())
                 break;
 
             Screenshots.takeScreenshot(browser, screenshot + System.currentTimeMillis(),
                     this.getClass());
             System.out.println(format("Report with metric [%s] shows message: %s", metric,
-                    analysisPage.getExplorerMessage()));
+                    analysisPageReact.getExplorerMessage()));
             brokenMetrics.add(metric);
             failedAction.accept(metric);
             continue;
@@ -798,19 +798,19 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
     }
 
     private String doSafetyMetricAction(Consumer<String> action, String screenshot) {
-        return doSafetyMetricAction(action, metric -> analysisPage.resetToBlankState(), screenshot);
+        return doSafetyMetricAction(action, metric -> analysisPageReact.resetToBlankState(), screenshot);
     }
 
     private String doSafetyAttributeAction(String metric, Consumer<String> action, Consumer<String> failedAction,
             String screenshot) {
-        CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
+        CataloguePanelReact cataloguePanel = analysisPageReact.getCataloguePanel();
         String attribute;
         while (true) {
             attribute = getRandomeAttributeFromMetric(metric);
 
             if (cataloguePanel.search(attribute) && cataloguePanel.isDataApplicable(attribute)) {
                 action.accept(attribute);
-                analysisPage.waitForReportComputing();
+                analysisPageReact.waitForReportComputing();
             } else {
                 Screenshots.takeScreenshot(browser, "[Inapplicable attribute]" + screenshot +
                         System.currentTimeMillis(), this.getClass());
@@ -819,14 +819,14 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
                 continue;
             }
 
-            if (!analysisPage.isExplorerMessageVisible())
+            if (!analysisPageReact.isExplorerMessageVisible())
                 break;
 
             Screenshots.takeScreenshot(browser, screenshot + System.currentTimeMillis(),
                     this.getClass());
             System.out.println(format(
                     "Report with metric [%s] and attribute [%s] shows message: %s", metric,
-                    attribute, analysisPage.getExplorerMessage()));
+                    attribute, analysisPageReact.getExplorerMessage()));
             failedAction.accept(attribute);
             System.out.println("Try another pair to test");
             continue;
@@ -836,22 +836,22 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
     }
 
     private String doSafetyAttributeAction(String metric, Consumer<String> action, String screenshot) {
-        return doSafetyAttributeAction(metric, action, analysisPage::removeAttribute, screenshot);
+        return doSafetyAttributeAction(metric, action, analysisPageReact::removeAttribute, screenshot);
     }
 
     private void replaceAttribute(String oldAttr, String newAttr) {
-        if (analysisPage.getAttributesBucket().getItemNames().contains(oldAttr)) {
-            analysisPage.replaceAttribute(oldAttr, newAttr);
+        if (analysisPageReact.getAttributesBucket().getItemNames().contains(oldAttr)) {
+            analysisPageReact.replaceAttribute(oldAttr, newAttr);
         } else {
-            analysisPage.addAttribute(newAttr);
+            analysisPageReact.addAttribute(newAttr);
         }
     }
 
     private void replaceMetric(String oldMetric, String newMetric) {
-        if (analysisPage.getMetricsBucket().getItemNames().contains(oldMetric)) {
-            analysisPage.replaceMetric(oldMetric, newMetric);
+        if (analysisPageReact.getMetricsBucket().getItemNames().contains(oldMetric)) {
+            analysisPageReact.replaceMetric(oldMetric, newMetric);
         } else {
-            analysisPage.addMetric(newMetric);
+            analysisPageReact.addMetric(newMetric);
         }
     }
 }

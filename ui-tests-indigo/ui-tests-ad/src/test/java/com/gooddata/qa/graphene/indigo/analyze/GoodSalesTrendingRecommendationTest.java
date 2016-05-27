@@ -13,12 +13,12 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucketReact;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.TrendingRecommendation;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
 
 public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalyseTest {
 
@@ -29,29 +29,29 @@ public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalys
 
     @Test(dependsOnGroups = {"init"})
     public void testOverrideDateFilter() {
-        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
+        final FiltersBucketReact FiltersBucketReact = analysisPageReact.getFilterBuckets();
 
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDateFilter();
-        assertEquals(filtersBucket.getFilterText("Activity"), "Activity: All time");
-        filtersBucket.configDateFilter("Last 12 months");
-        ChartReport report = analysisPage.getChartReport();
+        assertEquals(FiltersBucketReact.getFilterText("Activity"), "Activity: All time");
+        FiltersBucketReact.configDateFilter("Last 12 months");
+        ChartReportReact report = analysisPageReact.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
 
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();
-        assertEquals(filtersBucket.getFilterText("Activity"), "Activity: Last 4 quarters");
+        assertEquals(FiltersBucketReact.getFilterText("Activity"), "Activity: Last 4 quarters");
         assertTrue(report.getTrackersCount() >= 1);
         checkingOpenAsReport("testOverrideDateFilter");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void applyParameter() {
-        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .getChartReport();
-        final MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
+        final MetricConfiguration metricConfiguration = analysisPageReact.getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
 
@@ -65,10 +65,10 @@ public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalys
         TrendingRecommendation trendingRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND);
         trendingRecommendation.select("Month").apply();
-        analysisPage.waitForReportComputing();
-        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
-        assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity: Last 4 quarters");
+        analysisPageReact.waitForReportComputing();
+        assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(DATE));
+        assertTrue(analysisPageReact.getFilterBuckets().isFilterVisible("Activity"));
+        assertEquals(analysisPageReact.getFilterBuckets().getFilterText("Activity"), "Activity: Last 4 quarters");
         assertTrue(metricConfiguration.isShowPercentEnabled());
         assertTrue(metricConfiguration.isPopEnabled());
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
@@ -79,23 +79,23 @@ public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalys
 
     @Test(dependsOnGroups = {"init"})
     public void displayInColumnChartWithOnlyMetric() {
-        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).getChartReport();
+        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
 
-        analysisPage.addFilter(ATTR_ACTIVITY_TYPE);
+        analysisPageReact.addFilter(ATTR_ACTIVITY_TYPE);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
 
-        analysisPage.changeReportType(ReportType.BAR_CHART);
+        analysisPageReact.changeReportType(ReportType.BAR_CHART);
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
 
-        analysisPage.changeReportType(ReportType.COLUMN_CHART);
+        analysisPageReact.changeReportType(ReportType.COLUMN_CHART);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
 
-        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE);
+        analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE);
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         checkingOpenAsReport("displayInColumnChartWithOnlyMetric");
     }

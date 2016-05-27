@@ -1,8 +1,9 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReportReact;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -39,8 +40,8 @@ public class MainEditorReact extends AbstractFragment {
                 waitForElementVisible(BY_TABLE_REPORT, browser));
     }
 
-    public ChartReport getChartReport() {
-        return Graphene.createPageFragment(ChartReport.class,
+    public ChartReportReact getChartReport() {
+        return Graphene.createPageFragment(ChartReportReact.class,
                 waitForElementVisible(BY_CHART_REPORT, browser));
     }
 
