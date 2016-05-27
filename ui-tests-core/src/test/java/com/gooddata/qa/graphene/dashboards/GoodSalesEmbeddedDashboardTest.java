@@ -1,29 +1,30 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static org.openqa.selenium.By.className;
+import static java.nio.file.Files.deleteIfExists;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.lang.String.valueOf;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.is;
 
-import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
+import java.nio.file.Paths;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.ParseException;
+import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
@@ -34,16 +35,18 @@ import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEmbedDialog;
-import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboardWidget;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
+import com.gooddata.qa.graphene.fragments.dashboards.EmbedDashboardDialog;
+import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.EmbeddedWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.StyleConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel.Tab;
+import com.gooddata.qa.graphene.fragments.reports.report.ChartReport;
 import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
+import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
-import com.gooddata.qa.graphene.utils.Sleeper;
-import com.gooddata.qa.graphene.utils.frame.InFrameAction;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.google.common.collect.Lists;
 
@@ -60,12 +63,6 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
     private static final long EXPECTED_EXPORT_DASHBOARD_SIZE = 1200000L;
     private static final long EXPECTED_EXPORT_CHART_SIZE = 28000L;
-
-    @FindBy(css = "iframe.yui3-c-iframewidget-content")
-    private EmbeddedDashboardWidget embeddedDashboardWidget;
-
-    @FindBy(id = "root")
-    private EmbeddedDashboardWidget embeddedDashboarWidgetWithoutIframe;
 
     private UiReportDefinition tabularReportDef;
     private List<String> attributeValues;
@@ -110,158 +107,132 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = "prepareReportsForEmbeddedDashboard")
     public void createDashboardToShare() {
         initDashboardsPage();
-        dashboardsPage.addNewDashboard("Embedded Dashboard");
-        dashboardsPage.editDashboard();
-        DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-        dashboardEditBar.addReportToDashboard(tabularReportDef.getName());
-        dashboardsPage.addNewTab("chart_report");
-        dashboardEditBar.addReportToDashboard(chartReportDef.getName());
-        dashboardsPage.addNewTab("headline_report");
-        dashboardEditBar.addReportToDashboard(headlineReportDef.getName());
-        dashboardsPage.addNewTab("other_widgets");
-        dashboardEditBar.addLineToDashboard();
-        dashboardEditBar.addWebContentToDashboard("https://www.gooddata.com");
-        dashboardEditBar.addWidgetToDashboard(WidgetTypes.KEY_METRIC, "Amount");
-        dashboardEditBar.addWidgetToDashboard(WidgetTypes.GEO_CHART, "Amount");
-        dashboardEditBar.saveDashboard();
+        dashboardsPage.addNewDashboard("Embedded Dashboard")
+                .addReportToDashboard(tabularReportDef.getName())
+                .addNewTab("chart_report")
+                .addReportToDashboard(chartReportDef.getName())
+                .addNewTab("headline_report")
+                .addReportToDashboard(headlineReportDef.getName())
+                .addNewTab("other_widgets")
+                .addLineToDashboard()
+                .addWebContentToDashboard("https://www.gooddata.com")
+                .addWidgetToDashboard(WidgetTypes.KEY_METRIC, "Amount")
+                .addWidgetToDashboard(WidgetTypes.GEO_CHART, "Amount")
+                .saveDashboard();
+
         sharedDashboardUrl = browser.getCurrentUrl();
-        DashboardEmbedDialog dashboardEmbedDialog = dashboardsPage.embedDashboard();
-        Sleeper.sleepTightInSeconds(3);
-        embedUri = dashboardEmbedDialog.getPreviewURI();
-        htmlEmbedCode = dashboardEmbedDialog.getEmbedCode();
+
+        EmbedDashboardDialog embedDashboardDialog = dashboardsPage.openEmbedDashboardDialog();
+
+        embedUri = embedDashboardDialog.getPreviewURI();
+        htmlEmbedCode = embedDashboardDialog.getEmbedCode();
     }
 
     @Test(dependsOnMethods = "createDashboardToShare")
     public void createAdditionalProject() throws JSONException {
-        openUrl(PAGE_GDC_PROJECTS);
-        waitForElementVisible(gpProject.getRoot());
-        additionalProjectId =
-                gpProject.createProject(ADDITIONAL_PROJECT_TITLE, ADDITIONAL_PROJECT_TITLE, GOODSALES_TEMPLATE,
-                        testParams.getAuthorizationToken(), testParams.getProjectDriver(),
-                        testParams.getProjectEnvironment(), projectCreateCheckIterations);
+        additionalProjectId = ProjectRestUtils
+                .createProject(getGoodDataClient(), ADDITIONAL_PROJECT_TITLE, GOODSALES_TEMPLATE,
+                        testParams.getAuthorizationToken(), testParams.getProjectDriver(), testParams.getProjectEnvironment());
     }
 
-    @Test(dependsOnMethods = "createAdditionalProject")
-    public void shareDashboardWithIframe(Method m) {
-        embedDashboardToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Embedded Dashboard");
-        assertEquals(embeddedDashboardWidget.getNumberOfTabsInFrame(), NUMBER_OF_TABS,
-                "Incorrect tab number on embedded dashboard!");
-
-        embeddedDashboardWidget.openTabInFrame(TABULAR_REPORT_TAB_INDEX);
-        assertTabularReportInFrame(tabularReportDef.getName(), attributeValues, metricValues);
-
-        embeddedDashboardWidget.openTabInFrame(CHART_REPORT_TAB_INDEX).exportChartReportInFrame(
-                chartReportDef.getName());
-        try {
-            verifyReportExport(ExportFormat.PDF, chartReportDef.getName(), EXPECTED_EXPORT_CHART_SIZE);
-        } finally {
-            String newExportedReportFileName = chartReportDef.getName() + "_" + m.getName();
-            renameExportedFileName(chartReportDef.getName(), newExportedReportFileName, ExportFormat.PDF);
-        }
-        embeddedDashboardWidget.openTabInFrame(HEADLINE_REPORT_TAB_INDEX);
-        assertHeadlineReportInFrame(headlineReportDef.getName(), headlineReportDescription, headlineReportValue);
-
-        String exportedDashboardName =
-                embeddedDashboardWidget.downloadEmbeddedDashboardInFrame(OTHER_WIDGETS_TAB_INDEX);
-        try {
-            verifyDashboardExport(exportedDashboardName, EXPECTED_EXPORT_DASHBOARD_SIZE);
-        } finally {
-            String newExportedDashboardFileName = exportedDashboardName + "_" + m.getName();
-            renameExportedFileName(exportedDashboardName, newExportedDashboardFileName, ExportFormat.PDF);
-        }
-        embeddedDashboardWidget.checkRedBarInFrame();
+    @DataProvider(name = "embeddedDashboard")
+    public Object[][] getEmbeddedDashboardProvider() {
+        return new Object[][] {
+            {true},
+            {false}
+        };
     }
 
-    @Test(dependsOnMethods = "createDashboardToShare")
-    public void shareDashboardWithoutIframe(Method m) {
-        browser.get(embedUri);
-        waitForFragmentVisible(embeddedDashboarWidgetWithoutIframe).waitForEmbeddedDashboardLoaded();
-        assertEquals(dashboardsPage.getTabs().getNumberOfTabs(), NUMBER_OF_TABS,
+    @Test(dependsOnMethods = "createAdditionalProject", dataProvider = "embeddedDashboard")
+    public void embedDashboard(boolean withIframe) throws IOException {
+        EmbeddedDashboard embeddedDashboard = null;
+
+        if (withIframe) {
+            embeddedDashboard =
+                    embedDashboardToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Embedded Dashboard");
+        } else {
+            embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
+        }
+
+        assertEquals(embeddedDashboard.getTabs().getNumberOfTabs(), NUMBER_OF_TABS,
                 "Incorrect tab number on embedded dashboard!");
 
-        embeddedDashboarWidgetWithoutIframe.openTab(TABULAR_REPORT_TAB_INDEX);
-        assertTabularReport(tabularReportDef.getName(), attributeValues, metricValues);
+        TableReport tableReport = embeddedDashboard.openTab(TABULAR_REPORT_TAB_INDEX)
+                .getReport(tabularReportDef.getName(), TableReport.class);
 
-        embeddedDashboarWidgetWithoutIframe.openTab(CHART_REPORT_TAB_INDEX).exportChartReport(
-                chartReportDef.getName());
+        assertThat(tableReport.getAttributeElements(), is(attributeValues));
+        assertThat(tableReport.getMetricElements(), is(metricValues));
+
+        embeddedDashboard
+                .openTab(CHART_REPORT_TAB_INDEX)
+                .getReport(chartReportDef.getName(), ChartReport.class)
+                .openReportInfoViewPanel()
+                .downloadReportAsFormat(ExportFormat.PDF);
+
         try {
             verifyReportExport(ExportFormat.PDF, chartReportDef.getName(), EXPECTED_EXPORT_CHART_SIZE);
+
         } finally {
-            String newExportedReportFileName = chartReportDef.getName() + "_" + m.getName();
-            renameExportedFileName(chartReportDef.getName(), newExportedReportFileName, ExportFormat.PDF);
+            deleteIfExists(Paths.get(getExportFilePath(chartReportDef.getName(), ExportFormat.PDF)));
         }
 
-        embeddedDashboarWidgetWithoutIframe.openTab(HEADLINE_REPORT_TAB_INDEX);
-        assertHeadlineReport(headlineReportDef.getName(), headlineReportDescription, headlineReportValue);
+        OneNumberReport oneNumberReport =  embeddedDashboard.openTab(HEADLINE_REPORT_TAB_INDEX)
+                .getReport(headlineReportDef.getName(), OneNumberReport.class);
 
-        String exportedDashboardName =
-                embeddedDashboarWidgetWithoutIframe.downloadEmbeddedDashboard(OTHER_WIDGETS_TAB_INDEX);
+        assertEquals(oneNumberReport.getDescription(), headlineReportDescription);
+        assertEquals(oneNumberReport.getValue(), headlineReportValue);
+
+        String exportedDashboardName = embeddedDashboard.printDashboardTab(OTHER_WIDGETS_TAB_INDEX);
+
         try {
             verifyDashboardExport(exportedDashboardName, EXPECTED_EXPORT_DASHBOARD_SIZE);
+
         } finally {
-            String newExportedDashboardFileName = exportedDashboardName + "_" + m.getName();
-            renameExportedFileName(exportedDashboardName, newExportedDashboardFileName, ExportFormat.PDF);
+            deleteIfExists(Paths.get(getExportFilePath(exportedDashboardName, ExportFormat.PDF)));
         }
+
         checkRedBar(browser);
     }
 
-    @Test(dependsOnMethods = "createAdditionalProject")
-    public void configReportTitleVisibilityWithIframe() {
+    @Test(dependsOnMethods = "createAdditionalProject", dataProvider = "embeddedDashboard")
+    public void configReportTitleVisibility(boolean withIframe) {
         String dashboardName = "Config Report Title On Embedded Dashboard";
-        embedDashboardToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, dashboardName);
+        EmbeddedDashboard embeddedDashboard = null;
 
-        final TableReport report = embeddedDashboardWidget.openTabInFrame(TABULAR_REPORT_TAB_INDEX)
-            .editDashboardInFrame()
-            .getReportInFrame(tabularReportDef.getName(), TableReport.class);
+        if (withIframe) {
+            embeddedDashboard = embedDashboardToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, dashboardName);
+        } else {
+            embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
+        }
 
-        InFrameAction.Utils.doActionInFrame(embeddedDashboardWidget.getRoot(), (InFrameAction<?>) (() -> {
-            takeScreenshot(browser, "configReportTitleVisibilityWithIframe - report title is visible", getClass());
-            assertTrue(report.isReportTitleVisible());
+        TableReport tableReport = embeddedDashboard
+                .openTab(TABULAR_REPORT_TAB_INDEX)
+                .getReport(tabularReportDef.getName(), TableReport.class);
 
-            WidgetConfigPanel configPanel = WidgetConfigPanel.openConfigurationPanelFor(report.getRoot(), browser);
-            configPanel.getTab(Tab.STYLE, StyleConfigPanel.class).setTitleHidden();
-            sleepTightInSeconds(2);
-            configPanel.saveConfiguration();
-            takeScreenshot(browser, "configReportTitleVisibilityWithIframe - report title is invisible",
-                    getClass());
+        takeScreenshot(browser,
+                "embedded-dashboard-with-iframe-mode-: " + valueOf(withIframe) + "-report-title-is-visible", getClass());
+        assertTrue(tableReport.isReportTitleVisible(), "Report title is not visible");
 
-            WebElement saveButton = waitForElementVisible(className("s-btn-save"), browser);
-            saveButton.click();
-            waitForElementNotVisible(saveButton);
+        embeddedDashboard.editDashboard();
 
-            return 0;
-        }), browser);
+        setReportTitleVisibility(tableReport, false);
 
-        final TableReport report2 = embeddedDashboardWidget.
-                getReportInFrame(tabularReportDef.getName(), TableReport.class);
-
-        InFrameAction.Utils.doActionInFrame(embeddedDashboardWidget.getRoot(), (InFrameAction<?>) (() -> {
-            assertFalse(report2.isReportTitleVisible());
-            return 0;
-        }), browser);
-    }
-
-    @Test(dependsOnMethods = "createDashboardToShare")
-    public void configReportTitleVisibilityWithoutIframe() {
-        browser.get(embedUri);
-        waitForFragmentVisible(embeddedDashboarWidgetWithoutIframe).waitForEmbeddedDashboardLoaded();
-
-        TableReport report = embeddedDashboarWidgetWithoutIframe.openTab(TABULAR_REPORT_TAB_INDEX)
-            .editDashboard()
-            .getReport(tabularReportDef.getName(), TableReport.class);
-        takeScreenshot(browser, "configReportTitleVisibilityWithoutIframe - report title is visible", getClass());
-        assertTrue(report.isReportTitleVisible());
-
-        setReportTitleVisibility(report, true);
+        embeddedDashboard.saveDashboard();
 
         try {
-            report = embeddedDashboarWidgetWithoutIframe.getReport(tabularReportDef.getName(), TableReport.class);
-            takeScreenshot(browser, "configReportTitleVisibilityWithoutIframe - report title is invisible",
+            tableReport = embeddedDashboard.getReport(tabularReportDef.getName(), TableReport.class);
+
+            takeScreenshot(browser,
+                    "embedded-dashboard-with-iframe-mode-: " + valueOf(withIframe) + "-report-title-is-invisible",
                     getClass());
-            assertFalse(report.isReportTitleVisible());
+            assertFalse(tableReport.isReportTitleVisible(), "Report title is visible");
+
         } finally {
-            setReportTitleVisibility(embeddedDashboarWidgetWithoutIframe.editDashboard()
-                .getReport(tabularReportDef.getName(), TableReport.class), false);
+            embeddedDashboard.editDashboard();
+
+            setReportTitleVisibility(tableReport, true);
+
+            embeddedDashboard.saveDashboard();
         }
     }
 
@@ -278,110 +249,123 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         List<Float> drilledInReportMetricValues =
                 Lists.newArrayList(1980676.11F, 326592.22F, 466158.62F, 2773426.95F);
 
-        embedDashboardToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Drill On Embedded Dashboard");
-        embeddedDashboardWidget.drillOnAttributeInFrame(tabularReportDef.getName(), attributeValueToDrill);
+        EmbeddedDashboard embeddedDashboard =
+                embedDashboardToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Drill On Embedded Dashboard");
 
-        assertTrue(
-                CollectionUtils.isEqualCollection(drilledDownReportAttributeValues,
-                        embeddedDashboardWidget.getDrilledReportAttributesInFrame()),
-                "Incorrect drilled-down report attributes!");
-        assertTrue(
-                CollectionUtils.isEqualCollection(drilledDownReportMetricValues,
-                        embeddedDashboardWidget.getDrilledReportMetricsInFrame()),
-                "Incorrect drilled-down report metrics!");
+        embeddedDashboard
+                .getReport(tabularReportDef.getName(), TableReport.class)
+                .drillOnAttributeValue(attributeValueToDrill);
 
-        embeddedDashboardWidget.closeDrillDialogInFrame();
+        DashboardDrillDialog drillDialog = Graphene.createPageFragment(DashboardDrillDialog.class,
+                waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
 
-        embeddedDashboardWidget.drillOnMetricInFrame(tabularReportDef.getName(), metricValueToDrill);
-        assertTrue(
-                CollectionUtils.isEqualCollection(drilledInReportAttributeValues,
-                        embeddedDashboardWidget.getDrilledReportAttributesInFrame()),
-                "Incorrect drilled-in report attributes!");
-        assertTrue(
-                CollectionUtils.isEqualCollection(drilledInReportMetricValues,
-                        embeddedDashboardWidget.getDrilledReportMetricsInFrame()),
-                "Incorrect drilled-in report metrics!");
+        TableReport drilledTableReport = drillDialog.getReport(TableReport.class);
+
+        assertThat(drilledTableReport.getAttributeElements(), is(drilledDownReportAttributeValues));
+        assertThat(drilledTableReport.getMetricElements(), is(drilledDownReportMetricValues));
+
+        drillDialog.closeDialog();
+
+        embeddedDashboard
+                .getReport(tabularReportDef.getName(), TableReport.class)
+                .drillOnMetricValue(metricValueToDrill);
+
+        drillDialog = Graphene
+                .createPageFragment(DashboardDrillDialog.class, waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
+
+        drilledTableReport = drillDialog.getReport(TableReport.class);
+
+        assertThat(drilledTableReport.getAttributeElements(), is(drilledInReportAttributeValues));
+        assertThat(drilledTableReport.getMetricElements(), is(drilledInReportMetricValues));
     }
 
     @Test(dependsOnMethods = "createAdditionalProject")
     public void filterEmbeddedDashboardWithUrlParameter() {
         browser.get(sharedDashboardUrl);
 
-        DashboardEmbedDialog embedDialog = dashboardsPage.embedDashboard();
+        EmbedDashboardDialog embedDialog = dashboardsPage.openEmbedDashboardDialog();
         String[] filteredAttributeValues = {"2009", "2011"};
         List<Float> filteredMetricValues = Lists.newArrayList(8656468.20F, 60270072.20F);
         embedDialog.selectFilterAttribute("Year (Created)", filteredAttributeValues);
         String htmlEmbedCode = embedDialog.getEmbedCode();
         String embedUri = embedDialog.getPreviewURI();
 
-        embedDashboardToOtherProjectDashboard(htmlEmbedCode, additionalProjectId,
-                "Embedded Dashboard With Url Parameter");
-        assertTabularReportInFrame(tabularReportDef.getName(), Lists.newArrayList(filteredAttributeValues),
-                filteredMetricValues);
+        EmbeddedDashboard embeddedDashboard = embedDashboardToOtherProjectDashboard(htmlEmbedCode,
+                additionalProjectId, "Embedded Dashboard With Url Parameter");
 
-        browser.get(embedUri);
-        waitForFragmentVisible(embeddedDashboarWidgetWithoutIframe).waitForEmbeddedDashboardLoaded();
-        assertTabularReport(tabularReportDef.getName(), Lists.newArrayList(filteredAttributeValues),
-                filteredMetricValues);
+        TableReport tableReport = embeddedDashboard.getReport(tabularReportDef.getName(), TableReport.class);
+
+        assertThat(tableReport.getAttributeElements(), is(newArrayList(filteredAttributeValues)));
+        assertThat(tableReport.getMetricElements(), is(filteredMetricValues));
+
+        embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
+
+        tableReport = embeddedDashboard.getReport(tabularReportDef.getName(), TableReport.class);
+
+        assertThat(tableReport.getAttributeElements(), is(newArrayList(filteredAttributeValues)));
+        assertThat(tableReport.getMetricElements(), is(filteredMetricValues));
     }
 
     @Test(dependsOnMethods = "createAdditionalProject")
     public void embedOneTabDashboard() {
-        initDashboardsPage();
-        dashboardsPage.addNewDashboard("One Tab Dashboard");
-        dashboardsPage.editDashboard();
-        DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-        dashboardEditBar.addReportToDashboard(tabularReportDef.getName());
-        dashboardEditBar.saveDashboard();
+        initDashboardsPage()
+                .addNewDashboard("One Tab Dashboard")
+                .addReportToDashboard(tabularReportDef.getName())
+                .saveDashboard();
 
-        DashboardEmbedDialog dashboardEmbedDialog = dashboardsPage.embedDashboard();
+        EmbedDashboardDialog dashboardEmbedDialog = dashboardsPage.openEmbedDashboardDialog();
         String embedUri = dashboardEmbedDialog.getPreviewURI();
         String htmlEmbedCode = dashboardEmbedDialog.getEmbedCode();
 
-        embedDashboardToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Embed One Tab Dashboard");
-        assertFalse(embeddedDashboardWidget.isTabBarVisibleInFrame(),
-                "Tab bar still presents on embedded dashboard with iframe!");
+        EmbeddedDashboard embeddedDashboard =
+                embedDashboardToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Embed One Tab Dashboard");
 
-        browser.get(embedUri);
-        waitForFragmentVisible(embeddedDashboarWidgetWithoutIframe).waitForEmbeddedDashboardLoaded();
-        assertFalse(embeddedDashboarWidgetWithoutIframe.isTabBarVisible(),
-                "Tab bar still presents on embedded dashboard without iframe!");
+        assertFalse(embeddedDashboard.isTabBarVisible(), "Tab bar still presents on embedded dashboard with iframe!");
 
-        embedDashboardToOtherProjectDashboard(
+        embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
+
+        assertFalse(embeddedDashboard.isTabBarVisible(), "Tab bar still presents on embedded dashboard without iframe!");
+
+        embeddedDashboard = embedDashboardToOtherProjectDashboard(
                 htmlEmbedCode.replace("dashboard.html#", "dashboard.html#nochrome=true&"), additionalProjectId,
                 "Embed One Tab Dashboard without Print & Edit button");
-        assertFalse(embeddedDashboardWidget.isPrintButtonVisibleInFrame(), "Print button is still visible!");
-        assertFalse(embeddedDashboardWidget.isEditButtonVisibleInFrame(), "Edit button is still visible!");
+
+        assertFalse(embeddedDashboard.isPrintButtonVisible(), "Print button is still visible!");
+        assertFalse(embeddedDashboard.isEditButtonVisible(), "Edit button is still visible!");
     }
 
     @Test(dependsOnMethods = "createAdditionalProject")
     public void embeddedDashboardWithFilter() {
-        initDashboardsPage();
-        dashboardsPage.addNewDashboard("Dashboard with filter");
-        dashboardsPage.editDashboard();
-        DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-        dashboardEditBar.addReportToDashboard(tabularReportDef.getName());
-        dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, "Year (Created)");
-        dashboardEditBar.saveDashboard();
+        initDashboardsPage()
+                .addNewDashboard("Dashboard with filter")
+                .addReportToDashboard(tabularReportDef.getName())
+                .addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, "Year (Created)")
+                .saveDashboard();
 
-        DashboardEmbedDialog dashboardEmbedDialog = dashboardsPage.embedDashboard();
+        EmbedDashboardDialog dashboardEmbedDialog = dashboardsPage.openEmbedDashboardDialog();
         String embedUri = dashboardEmbedDialog.getPreviewURI();
         String htmlEmbedCode = dashboardEmbedDialog.getEmbedCode();
-
 
         String[] filteredAttributeValues = {"2009", "2011"};
         List<Float> filteredMetricValues = Lists.newArrayList(8656468.20F, 60270072.20F);
 
-        embedDashboardToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Embed One Tab Dashboard");
-        embeddedDashboardWidget.modifyFirstAttributeFilterInFrame(filteredAttributeValues);
-        assertTabularReportInFrame(tabularReportDef.getName(), Lists.newArrayList(filteredAttributeValues),
-                filteredMetricValues);
+        EmbeddedDashboard embeddedDashboard =
+                embedDashboardToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Embed One Tab Dashboard");
 
-        browser.get(embedUri);
-        waitForFragmentVisible(embeddedDashboarWidgetWithoutIframe).waitForEmbeddedDashboardLoaded();
-        embeddedDashboarWidgetWithoutIframe.modifyFirstAttributeFilter(filteredAttributeValues);
-        assertTabularReport(tabularReportDef.getName(), Lists.newArrayList(filteredAttributeValues),
-                filteredMetricValues);
+        embeddedDashboard.getFirstFilter().changeAttributeFilterValue(filteredAttributeValues);
+
+        TableReport tableReport = embeddedDashboard.getReport(tabularReportDef.getName(), TableReport.class);
+
+        assertThat(tableReport.getAttributeElements(), is(newArrayList(filteredAttributeValues)));
+        assertThat(tableReport.getMetricElements(), is(filteredMetricValues));
+
+        embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
+
+        embeddedDashboard.getFirstFilter().changeAttributeFilterValue(filteredAttributeValues);
+        tableReport = embeddedDashboard.getReport(tabularReportDef.getName(), TableReport.class);
+
+        assertThat(tableReport.getAttributeElements(), is(newArrayList(filteredAttributeValues)));
+        assertThat(tableReport.getMetricElements(), is(filteredMetricValues));
     }
 
     @Test(dependsOnMethods = "createAdditionalProject")
@@ -403,32 +387,31 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = "createAdditionalProject")
     public void openReportOnEmbeddedDashboard() {
-        embedDashboardToOtherProjectDashboard(htmlEmbedCode, additionalProjectId,
-                "Open report on embedded dashboard");
-        embeddedDashboardWidget.openTabularReportInFrame(tabularReportDef.getName())
-                .getReportPageOnEmbeddedDashboardInFrame();
-        assertTrue(
-                CollectionUtils.isEqualCollection(attributeValues,
-                        embeddedDashboardWidget.getAttributesOnReportPageInFrame()),
-                "Incorrect attribute values in embedded report with iframe!");
-        assertTrue(
-                CollectionUtils.isEqualCollection(metricValues,
-                        embeddedDashboardWidget.getMetricsOnReportPageInFrame()),
-                "Incorrect attribute values in embedded report with iframe!");
+        EmbeddedDashboard embeddedDashboard = embedDashboardToOtherProjectDashboard(htmlEmbedCode,
+                additionalProjectId, "Open report on embedded dashboard");
 
-        browser.get(embedUri);
-        waitForFragmentVisible(embeddedDashboarWidgetWithoutIframe).waitForEmbeddedDashboardLoaded();
-        embeddedDashboarWidgetWithoutIframe.openTabularReport(tabularReportDef.getName())
-                .getReportPageOnEmbeddedDashboard();
-        assertTrue(
-                CollectionUtils.isEqualCollection(attributeValues,
-                        embeddedDashboarWidgetWithoutIframe.getAttributesOnReportPage()),
-                "Incorrect attribute values in embedded report without iframe!");
-        assertTrue(
-                CollectionUtils.isEqualCollection(metricValues,
-                        embeddedDashboarWidgetWithoutIframe.getMetricsOnReportPage()),
-                "Incorrect attribute values in embedded report without iframe!");
+        embeddedDashboard.getReport(tabularReportDef.getName(), TableReport.class)
+                .openReportInfoViewPanel()
+                .clickViewReportButton();
 
+        TableReport tableReport = Graphene.createPageFragment(ReportPage.class,
+                waitForElementVisible(ReportPage.LOCATOR, browser))
+                .getTableReport();
+
+        assertThat(tableReport.getAttributeElements(), is(attributeValues));
+        assertThat(tableReport.getMetricElements(), is(metricValues));
+
+        embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
+
+        embeddedDashboard.getReport(tabularReportDef.getName(), TableReport.class)
+                .openReportInfoViewPanel()
+                .clickViewReportButton();
+
+        tableReport = Graphene.createPageFragment(ReportPage.class, waitForElementVisible(ReportPage.LOCATOR, browser))
+                .getTableReport();
+
+        assertThat(tableReport.getAttributeElements(), is(attributeValues));
+        assertThat(tableReport.getMetricElements(), is(metricValues));
     }
 
     @Test(dependsOnMethods = "createAdditionalProject")
@@ -438,135 +421,93 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
         String defaultScheduleSubject = EMBEDDED_DASHBOARD_NAME + " Dashboard";
 
-        embedDashboardToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Schedule on Embedded Dashboard");
-        embeddedDashboardWidget.openTabInFrame(CHART_REPORT_TAB_INDEX).openDashboardScheduleDialogInFrame();
-        assertEquals(embeddedDashboardWidget.getSelectedFrequencyInFrame(), "Daily",
-                "Incorrect default frequency!");
-        assertEquals(embeddedDashboardWidget.getSelectedTabToScheduleInFrame(), "Chart_report",
-                "Incorrect default tab!");
-        embeddedDashboardWidget.showCustomScheduleFormInFrame();
-        assertEquals(embeddedDashboardWidget.getCustomScheduleSubjectInFrame(), defaultScheduleSubject
-                + " - chart_report", "Incorrect default subject!");
-        String customScheduleSubject1 = defaultScheduleSubject + System.currentTimeMillis();
-        embeddedDashboardWidget.setCustomScheduleSubjectInFrame(customScheduleSubject1)
-                .setCustomRecipientsInFrame(Lists.newArrayList(testParams.getViewerUser()))
-                .saveDashboardScheduleInFrame();
+        EmbeddedDashboard embeddedDashboard =
+                embedDashboardToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Schedule on Embedded Dashboard");
+
+        DashboardScheduleDialog scheduleDialog = embeddedDashboard.openTab(CHART_REPORT_TAB_INDEX)
+                .showDashboardScheduleDialog();
+
+        assertEquals(scheduleDialog.getSelectedFrequency(), "Daily", "Incorrect default frequency!");
+        assertEquals(scheduleDialog.getSelectedTab(), "Chart_report", "Incorrect default tab!");
+
+        String scheduleSubject = scheduleDialog.showCustomForm().getCustomEmailSubject();
+        assertEquals(scheduleSubject, defaultScheduleSubject + " - chart_report", "Incorrect default subject!");
+
+        String customScheduleSubject = defaultScheduleSubject + System.currentTimeMillis();
+
+        scheduleDialog.setCustomEmailSubject(customScheduleSubject)
+                .setCustomRecipients(Lists.newArrayList(testParams.getViewerUser()))
+                .schedule();
 
         initEmailSchedulesPage();
-        assertTrue(emailSchedulesPage.isPrivateSchedulePresent(customScheduleSubject1));
-        WebElement schedule1 = emailSchedulesPage.getPrivateSchedule(customScheduleSubject1);
+        assertTrue(emailSchedulesPage.isPrivateSchedulePresent(customScheduleSubject));
+        WebElement schedule1 = emailSchedulesPage.getPrivateSchedule(customScheduleSubject);
         assertEquals(emailSchedulesPage.getBccEmailsOfPrivateSchedule(schedule1), testParams.getViewerUser());
 
-        browser.get(embedUri);
-        waitForFragmentVisible(embeddedDashboarWidgetWithoutIframe).waitForEmbeddedDashboardLoaded();
-        embeddedDashboarWidgetWithoutIframe.openTab(HEADLINE_REPORT_TAB_INDEX).openDashboardScheduleDialog();
-        assertEquals(embeddedDashboarWidgetWithoutIframe.getSelectedFrequency(), "Daily",
-                "Incorrect default frequency!");
-        assertEquals(embeddedDashboarWidgetWithoutIframe.getSelectedTabToSchedule(), "Headline_report",
-                "Incorrect default tab!");
-        embeddedDashboarWidgetWithoutIframe.showCustomScheduleForm();
-        assertEquals(embeddedDashboarWidgetWithoutIframe.getCustomScheduleSubject(), defaultScheduleSubject
-                + " - headline_report", "Incorrect default subject!");
-        String customScheduleSubject2 = defaultScheduleSubject + System.currentTimeMillis();
-        embeddedDashboarWidgetWithoutIframe.setCustomScheduleSubject(customScheduleSubject2)
-                .setCustomRecipients(Lists.newArrayList(testParams.getViewerUser())).saveDashboardSchedule();
+        embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
+
+        scheduleDialog = embeddedDashboard.openTab(HEADLINE_REPORT_TAB_INDEX)
+                .showDashboardScheduleDialog();
+
+        assertEquals(scheduleDialog.getSelectedFrequency(), "Daily", "Incorrect default frequency!");
+        assertEquals(scheduleDialog.getSelectedTab(), "Headline_report", "Incorrect default tab!");
+
+        scheduleSubject = scheduleDialog.showCustomForm().getCustomEmailSubject();
+        assertEquals(scheduleSubject, defaultScheduleSubject + " - headline_report", "Incorrect default subject!");
+
+        customScheduleSubject = defaultScheduleSubject + System.currentTimeMillis();
+
+        scheduleDialog.setCustomEmailSubject(customScheduleSubject)
+                .setCustomRecipients(Lists.newArrayList(testParams.getViewerUser()))
+                .schedule();
 
         initEmailSchedulesPage();
-        assertTrue(emailSchedulesPage.isPrivateSchedulePresent(customScheduleSubject2));
-        WebElement schedule2 = emailSchedulesPage.getPrivateSchedule(customScheduleSubject2);
+        assertTrue(emailSchedulesPage.isPrivateSchedulePresent(customScheduleSubject));
+        WebElement schedule2 = emailSchedulesPage.getPrivateSchedule(customScheduleSubject);
         assertEquals(emailSchedulesPage.getBccEmailsOfPrivateSchedule(schedule2), testParams.getViewerUser());
     }
 
-    @AfterClass
+    @AfterClass(alwaysRun = true)
     public void cleanUp() throws JSONException {
-        deleteProject(additionalProjectId);
+        ProjectRestUtils.deleteProject(getGoodDataClient(), additionalProjectId);
     }
 
-    private void assertHeadlineReportInFrame(String reportTitle, String expectedDescription, String expectedValue) {
-        assertEquals(embeddedDashboardWidget.getHeadlineReportDescriptionInFrame(reportTitle),
-                expectedDescription, "Incorrect headline description on embedded report!");
-        assertEquals(embeddedDashboardWidget.getHeadlineReportValueInFrame(reportTitle), expectedValue,
-                "Incorrect headline value on embedded report!");
-    }
-
-    private void assertHeadlineReport(String reportTitle, String expectedDescription, String expectedValue) {
-        assertEquals(embeddedDashboarWidgetWithoutIframe.getHeadlineReportDescription(reportTitle),
-                expectedDescription, "Incorrect headline description on embedded report!");
-        assertEquals(embeddedDashboarWidgetWithoutIframe.getHeadlineReportValue(reportTitle), expectedValue,
-                "Incorrect headline value on embedded report!");
-    }
-
-    private void assertTabularReportInFrame(String reportTitle, List<String> expectedAttributeValues,
-            List<Float> expectedMetricValues) {
-        assertTrue(
-                CollectionUtils.isEqualCollection(expectedAttributeValues,
-                        embeddedDashboardWidget.getTableReportAttributesInFrame(reportTitle)),
-                "Incorrect attribute values in embedded report without iframe!");
-        assertTrue(
-                CollectionUtils.isEqualCollection(expectedMetricValues,
-                        embeddedDashboardWidget.getTableReportMetricsInFrame(reportTitle)),
-                "Incorrect metric values in embedded report without iframe!");
-    }
-
-    private void assertTabularReport(String reportTitle, List<String> expectedAttributeValues,
-            List<Float> expectedMetricValues) {
-        waitForFragmentVisible(embeddedDashboarWidgetWithoutIframe);
-        assertTrue(
-                CollectionUtils.isEqualCollection(expectedAttributeValues,
-                        embeddedDashboarWidgetWithoutIframe.getTableReportAttributes(reportTitle)),
-                "Incorrect attribute values in embedded report without iframe!");
-        assertTrue(
-                CollectionUtils.isEqualCollection(expectedMetricValues,
-                        embeddedDashboarWidgetWithoutIframe.getTableReportMetrics(reportTitle)),
-                "Incorrect metric values in embedded report without iframe!");
-    }
-
-    private void embedDashboardToOtherProjectDashboard(String embedCode, String projectToShare,
+    private EmbeddedDashboard embedDashboardToOtherProjectDashboard(String embedCode, String projectToShare,
             String dashboardName) {
-        initProjectsPage();
         openUrl(PAGE_UI_PROJECT_PREFIX + projectToShare + DASHBOARD_PAGE_SUFFIX);
         waitForDashboardPageLoaded(browser);
-        waitForFragmentVisible(dashboardsPage);
-        dashboardsPage.addNewDashboard(dashboardName);
-        dashboardsPage.editDashboard();
-        DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-        dashboardEditBar.addWebContentToDashboard(embedCode);
-        dashboardsPage.getContent().resizeWidgetTopLeft(-300, 0);
-        dashboardsPage.getContent().resizeWidgetBottomRight(200, 600);
-        dashboardEditBar.saveDashboard();
-        Sleeper.sleepTightInSeconds(3);
-        browser.navigate().refresh();
-        waitForFragmentVisible(dashboardsPage);
-        waitForFragmentVisible(embeddedDashboardWidget);
+
+        EmbeddedWidget embeddedWidget = dashboardsPage
+                .addNewDashboard(dashboardName)
+                .addWebContentToDashboard(embedCode)
+                .getLastEmbeddedWidget()
+                .resizeFromTopLeftButton(-300, 0)
+                .resizeFromBottomRightButton(200, 600);
+
+        dashboardsPage.saveDashboard();
+        return embeddedWidget.getEmbeddedDashboard();
     }
 
-    private void setReportTitleVisibility(TableReport report, boolean isHidden) {
+    private EmbeddedDashboard initEmbeddedDashboardWithUri(String uri) {
+        browser.get(uri);
+        return Graphene.createPageFragment(EmbeddedDashboard.class, waitForElementVisible(EmbeddedDashboard.LOCATOR, browser));
+    }
+
+    private void setReportTitleVisibility(TableReport report, boolean visible) {
         WidgetConfigPanel configPanel = WidgetConfigPanel.openConfigurationPanelFor(report.getRoot(), browser);
         StyleConfigPanel stylePanel = configPanel.getTab(Tab.STYLE, StyleConfigPanel.class);
-        if (isHidden) {
-            stylePanel.setTitleHidden();
-        } else {
+
+        if (visible) {
             stylePanel.setTitleVisible();
+
+        } else {
+            stylePanel.setTitleHidden();
         }
-        sleepTightInSeconds(2);
+
         configPanel.saveConfiguration();
-        embeddedDashboarWidgetWithoutIframe.getDashboardsPage()
-            .getDashboardEditBar()
-            .saveDashboard();
     }
 
-    /**
-     * this method is used to rename the exported file name so that the next call will check the correct file
-     * @param oldName
-     * @param newName
-     * @param format
-     */
-    private void renameExportedFileName(String oldName, String newName, ExportFormat format) {
-        String fileURL = testParams.getDownloadFolder() + testParams.getFolderSeparator() + oldName + "."
-                + format.getName();
-        File export = new File(fileURL);
-        String newFileURL = testParams.getDownloadFolder() + testParams.getFolderSeparator() + newName + "."
-                + format.getName();
-        export.renameTo(new File(newFileURL));
+    private String getExportFilePath(String name, ExportFormat format) {
+        return testParams.getDownloadFolder() + testParams.getFolderSeparator() + name + "." + format.getName();
     }
 }

@@ -14,7 +14,9 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 
-public class DashboardEmbedDialog extends AbstractFragment {
+public class EmbedDashboardDialog extends AbstractFragment {
+
+    public static final By LOCATOR = By.className("c-embedDialog");
 
     @FindBy(xpath = "//div[contains(@class,'yui3-c-radiowidgetitem-content')]/label[text()='Auto']")
     private WebElement autoOption;

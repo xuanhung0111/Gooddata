@@ -9,7 +9,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
-public class OneNumberReport extends AbstractReport {
+public class OneNumberReport extends AbstractDashboardReport {
 
     @FindBy(className = "number")
     private WebElement number;

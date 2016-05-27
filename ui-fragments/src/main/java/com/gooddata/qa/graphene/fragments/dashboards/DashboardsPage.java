@@ -5,9 +5,10 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,16 +21,20 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
+import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.dashboard.PublishType;
+import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
 import com.gooddata.qa.graphene.fragments.dashboards.menu.DashboardMenu;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.EmbeddedWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
+import com.gooddata.qa.graphene.fragments.reports.report.AbstractReport;
 import com.gooddata.qa.utils.CssUtils;
 
 public class DashboardsPage extends AbstractFragment {
-    public static final String BY_EDIT_DASHBOARD_BAR = "//div[contains(@class,'s-dashboard-edit-bar')]";
+    protected static final By BY_DASHBOARD_EDIT_BAR = By.className("s-dashboard-edit-bar");
 
     private static final By SAVE_AS_DIALOG_LOCATOR = By.className("dashboardSettingsDialogView"); 
     private static final By BY_EXPORTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' and text()='Exporting…']");
@@ -40,6 +45,7 @@ public class DashboardsPage extends AbstractFragment {
     private static final By BY_TAB_DROPDOWN_COPY_TO_BUTTON = By.xpath("//li[contains(@class, 's-copy_to')]//a");
     private static final By BY_PERMISSION_DIALOG_LOCATOR = By.className("s-permissionSettingsDialog");
     private static final By BY_HIDDEN_TAB_BAR = By.cssSelector(".yui3-dashboardtabs-content.gdc-hidden");
+    private static final By BY_PRINT_PDF_BUTTON = By.className("s-printButton");
 
     @FindBy(xpath = "//div[contains(@class,'yui3-dashboardtabs-content')]")
     private DashboardTabs tabs;
@@ -53,17 +59,11 @@ public class DashboardsPage extends AbstractFragment {
     @FindBy(css = ".s-actionsButton")
     private WebElement editExportEmbedButton;
 
-    @FindBy(xpath = "//button[@title='Download PDF']")
-    private WebElement printPdfButton;
-
     @FindBy(xpath = "//button[@title='Add a new tab']")
     private WebElement addNewTabButton;
 
     @FindBy(xpath = "//div[contains(@class,'editTitleDialogView')]")
     private TabDialog newTabDialog;
-
-    @FindBy(xpath = BY_EDIT_DASHBOARD_BAR)
-    private DashboardEditBar editDashboardBar;
 
     @FindBy(xpath = "//div[contains(@class,'dashboardTitleEditBox')]/input")
     private WebElement newDashboardNameInput;
@@ -82,9 +82,6 @@ public class DashboardsPage extends AbstractFragment {
 
     @FindBy(css = ".s-lockIcon")
     private WebElement lockIcon;
-
-    @FindBy(xpath = "//div[@class='yui3-d-embeddialog-content']")
-    private DashboardEmbedDialog dashboardEmbedDialog;
 
     @FindBy(css = ".s-scheduleButton")
     private WebElement scheduleButton;
@@ -107,7 +104,7 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     public DashboardTabs getTabs() {
-        return tabs;
+        return waitForFragmentVisible(tabs);
     }
 
     public List<FilterWidget> getFilters() {
@@ -120,10 +117,6 @@ public class DashboardsPage extends AbstractFragment {
     
     public boolean isEmptyDashboard() {
         return getContent().isEmpty();
-    }
-
-    public DashboardEditBar getDashboardEditBar() {
-        return editDashboardBar;
     }
 
     public PermissionsDialog getPermissionsDialog() {
@@ -189,13 +182,15 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     public DashboardEditBar editDashboard() {
-        waitForDashboardPageLoaded(browser);
-
-        if (!isElementPresent(By.xpath(BY_EDIT_DASHBOARD_BAR), getRoot())) {
+        if (!isElementPresent(BY_DASHBOARD_EDIT_BAR, browser)) {
             openEditExportEmbedMenu().select("Edit");
         }
 
-        return waitForFragmentVisible(editDashboardBar);
+        return getDashboardEditBar();
+    }
+
+    public DashboardEditBar getDashboardEditBar() {
+        return Graphene.createPageFragment(DashboardEditBar.class, waitForElementVisible(BY_DASHBOARD_EDIT_BAR, browser));
     }
 
     public String exportDashboardTab(int tabIndex) {
@@ -212,34 +207,33 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     public String printDashboardTab(int tabIndex) {
-        tabs.openTab(tabIndex);
+        waitForFragmentVisible(tabs).openTab(tabIndex);
         waitForDashboardPageLoaded(browser);
-        String tabName = tabs.getTabLabel(tabIndex);
-        waitForDashboardPageLoaded(browser);
-        waitForElementVisible(printPdfButton).click();
+
+        waitForElementVisible(BY_PRINT_PDF_BUTTON, getRoot()).click();
         waitForElementVisible(BY_PRINTING_PANEL, browser);
-        sleepTightInSeconds(3);
         waitForElementNotPresent(BY_PRINTING_PANEL);
-        sleepTightInSeconds(3);
-        System.out.println("Dashboard " + tabName + " printed to Pdf");
-        return tabName;
+
+        return tabs.getTabLabel(tabIndex).replace(" ", "_");
     }
 
-    public WebElement getPrintButton() {
-        return waitForElementPresent(printPdfButton);
+    public boolean isPrintButtonVisible() {
+        return isElementVisible(BY_PRINT_PDF_BUTTON, getRoot());
     }
 
-    public DashboardEmbedDialog embedDashboard() {
-        waitForDashboardPageLoaded(browser);
+    public EmbedDashboardDialog openEmbedDashboardDialog() {
         openEditExportEmbedMenu().select("Embed");
-        waitForElementVisible(dashboardEmbedDialog.getRoot());
-        return dashboardEmbedDialog;
+
+        return Graphene.createPageFragment(EmbedDashboardDialog.class,
+                waitForElementVisible(EmbedDashboardDialog.LOCATOR, browser));
     }
 
-    public void addNewTab(String tabName) {
+    public DashboardsPage addNewTab(String tabName) {
         waitForElementVisible(addNewTabButton).click();
         waitForElementVisible(newTabDialog.getRoot());
         newTabDialog.createTab(tabName);
+
+        return this;
     }
 
     public void deleteDashboardTab(int tabIndex) {
@@ -253,8 +247,7 @@ public class DashboardsPage extends AbstractFragment {
             waitForElementVisible(dashboardTabDeleteConfirmButton).click();
             waitForElementNotPresent(dashboardTabDeleteDialog);
         }
-        editDashboardBar.saveDashboard();
-        waitForElementNotPresent(editDashboardBar.getRoot());
+        getDashboardEditBar().saveDashboard();
         waitForDashboardPageLoaded(browser);
     }
 
@@ -263,8 +256,7 @@ public class DashboardsPage extends AbstractFragment {
         editDashboard();
         tabs.selectDropDownMenu(tabIndex);
         waitForElementVisible(BY_TAB_DROPDOWN_MENU, browser).findElement(BY_TAB_DROPDOWN_DUPLICATE_BUTTON).click();
-        editDashboardBar.saveDashboard();
-        waitForElementNotPresent(editDashboardBar.getRoot());
+        getDashboardEditBar().saveDashboard();
         waitForDashboardPageLoaded(browser);
     }
 
@@ -278,8 +270,7 @@ public class DashboardsPage extends AbstractFragment {
         actions.click(waitForElementVisible(By.className("s-" + CssUtils.simplifyText(dashboardName)), browser))
             .perform();
         waitForElementVisible(By.className("s-btn-dismiss"), browser).click();
-        editDashboardBar.saveDashboard();
-        waitForElementNotPresent(editDashboardBar.getRoot());
+        getDashboardEditBar().saveDashboard();
         waitForDashboardPageLoaded(browser);
     }
 
@@ -291,13 +282,12 @@ public class DashboardsPage extends AbstractFragment {
         newDashboardNameInput.clear();
         newDashboardNameInput.sendKeys(dashboardName);
         newDashboardNameInput.sendKeys(Keys.ENTER);
-        editDashboardBar.saveDashboard();
+        getDashboardEditBar().saveDashboard();
         return this;
     }
 
     public void deleteDashboard() {
-        editDashboard();
-        editDashboardBar.deleteDashboard();
+        editDashboard().deleteDashboard();
     }
 
     public PermissionsDialog openPermissionsDialog() {
@@ -342,24 +332,6 @@ public class DashboardsPage extends AbstractFragment {
     public void saveAsDashboardAndEnableSavedViews(String dashboardName, PermissionType permissionType) {
         saveAsDashboard(dashboardName, true, permissionType);
     }
-    
-    private void saveAsDashboard(String dashboardName, boolean isSavedViews, PermissionType permissionType) {
-        SaveAsDialog saveAsDialog = openSaveAsDialog();
-        
-        saveAsDialog.saveAs(dashboardName, isSavedViews, permissionType);
-        waitForFragmentNotVisible(saveAsDialog);
-        
-        editDashboardBar.saveDashboard();
-        waitForElementNotPresent(editDashboardBar.getRoot());
-        waitForDashboardPageLoaded(browser);
-    }
-    
-    private SaveAsDialog openSaveAsDialog() {
-        waitForDashboardPageLoaded(browser);
-        openEditExportEmbedMenu().select("Save as...");
-        return Graphene.createPageFragment(SaveAsDialog.class, 
-                waitForElementVisible(SAVE_AS_DIALOG_LOCATOR, browser));
-    }
 
     public FilterWidget getFilterWidget(String condition) {
         return content.getFilterWidget(condition);
@@ -400,6 +372,49 @@ public class DashboardsPage extends AbstractFragment {
         return browser.findElements(BY_PERMISSION_DIALOG_LOCATOR).size() > 0 ;
     }
 
+    public DashboardsPage addReportToDashboard(String reportName) {
+        editDashboard().addReportToDashboard(reportName);
+        return this;
+    }
+
+    public DashboardsPage saveDashboard() {
+        getDashboardEditBar().saveDashboard();
+        return this;
+    }
+
+    public DashboardsPage addWebContentToDashboard(String content) {
+        editDashboard().addWebContentToDashboard(content);
+        return this;
+    }
+
+    public EmbeddedWidget getLastEmbeddedWidget() {
+        return getContent().getLastEmbeddedWidget();
+    }
+
+    public DashboardsPage addLineToDashboard() {
+        editDashboard().addLineToDashboard();
+        return this;
+    }
+
+    public DashboardsPage addWidgetToDashboard(WidgetTypes widgetType, String metricLabel) {
+        editDashboard().addWidgetToDashboard(widgetType, metricLabel);
+        return this;
+    }
+
+    public DashboardsPage openTab(int tabIndex) {
+        getTabs().openTab(tabIndex);
+        return this;
+    }
+
+    public DashboardsPage addListFilterToDashboard(DashFilterTypes type, String name) {
+        editDashboard().addListFilterToDashboard(type, name);
+        return this;
+    }
+
+    public <T extends AbstractReport> T getReport(String name, Class<T> clazz) {
+        return getContent().getReport(name, clazz);
+    }
+
     private SimpleMenu openEditExportEmbedMenu() {
         if (waitForElementPresent(editExportEmbedButton).getAttribute("class").contains("gdc-hidden")) {
             throw new RuntimeException("Embed menu is not visible");
@@ -424,5 +439,22 @@ public class DashboardsPage extends AbstractFragment {
                 waitForElementVisible(DashboardMenu.LOCATOR, browser));
         waitForElementVisible(menu.getRoot());
         return menu;
+    }
+
+    private void saveAsDashboard(String dashboardName, boolean isSavedViews, PermissionType permissionType) {
+        SaveAsDialog saveAsDialog = openSaveAsDialog();
+
+        saveAsDialog.saveAs(dashboardName, isSavedViews, permissionType);
+        waitForFragmentNotVisible(saveAsDialog);
+
+        getDashboardEditBar().saveDashboard();
+        waitForDashboardPageLoaded(browser);
+    }
+
+    private SaveAsDialog openSaveAsDialog() {
+        waitForDashboardPageLoaded(browser);
+        openEditExportEmbedMenu().select("Save as...");
+        return Graphene.createPageFragment(SaveAsDialog.class, 
+                waitForElementVisible(SAVE_AS_DIALOG_LOCATOR, browser));
     }
 }
