@@ -77,7 +77,7 @@ public class ReportPage extends AbstractFragment {
     @FindBy(className = "s-btn-hide_filters")
     private WebElement hideFilterButton;
 
-    @FindBy(xpath = "//div[@id='reportSaveButtonContainer']/button")
+    @FindBy(css = ".s-btn-create,.s-btn-save:not(.gdc-hidden),.s-btn-saved")
     private WebElement createReportButton;
 
     @FindBy(xpath = "//button[contains(@class, 'exportButton')]")
@@ -205,8 +205,12 @@ public class ReportPage extends AbstractFragment {
             e.click();
             //wait for metric details displayed in third column of SND dialog
             //or warning dialog of "You have reached the limit of metrics in report"
-            waitForElementVisible(cssSelector(".c-metricDetailViewButton,[name=reportEditorForm]"), browser);
+            waitForSndMetricDetail();
         });
+    }
+
+    public void waitForSndMetricDetail() {
+        waitForElementVisible(cssSelector(".c-metricDetailViewButton,[name=reportEditorForm]"), browser);
     }
 
     public ReportPage selectInapplicableMetric(String metric) {
@@ -925,8 +929,7 @@ public class ReportPage extends AbstractFragment {
     }
 
     private ReportPage searchMetric(final String metric) {
-        final WebElement filterInput = waitForElementVisible(xpath("//label[@class='sndMetricFilterLabel']/../input"),
-                browser);
+        final WebElement filterInput = waitForElementVisible(By.cssSelector(".gdc-input.metFilter"), browser);
 
         filterInput.clear();
         filterInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);

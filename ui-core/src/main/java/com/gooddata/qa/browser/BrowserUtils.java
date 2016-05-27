@@ -64,4 +64,8 @@ public class BrowserUtils {
         int height = (int) toolkit.getScreenSize().getHeight();
         browser.manage().window().setSize(new Dimension(width, height));
     }
+
+    public static void switchToMainWindow(WebDriver browser) {
+        browser.switchTo().defaultContent();
+    }
 }
