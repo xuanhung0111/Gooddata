@@ -14,7 +14,6 @@ import com.gooddata.qa.graphene.fragments.csvuploader.DataTypeSelect.ColumnType;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.disc.*;
@@ -347,7 +346,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
         assertEquals(tabs.getTabLabel(tabsCount), tabName, "New tab has invalid label");
         dashboardsPage.getDashboardEditBar().saveDashboard();
         waitForDashboardPageLoaded(browser);
-        waitForElementNotPresent(dashboardsPage.getDashboardEditBar().getRoot());
         assertEquals(tabs.getNumberOfTabs(), tabsCount + 1, "New tab is not present after Save");
         assertTrue(tabs.isTabSelected(tabsCount), "New tab is not selected after Save");
         assertEquals(tabs.getTabLabel(tabsCount), tabName, "New tab has invalid label after Save");
@@ -355,14 +353,10 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void addReportToNewDashboard(String reportName, String dashboardName) {
-        initDashboardsPage();
-        dashboardsPage.addNewDashboard(dashboardName);
-        DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-        dashboardsPage.editDashboard();
-        dashboardEditBar.addReportToDashboard(reportName);
-        // Need to sleep, if run too fast, saved dashboard will not contain the added report
-        sleepTightInSeconds(3);
-        dashboardEditBar.saveDashboard();
+        initDashboardsPage()
+                .addNewDashboard(dashboardName)
+                .addReportToDashboard(reportName)
+                .saveDashboard();
         checkRedBar(browser);
     }
 

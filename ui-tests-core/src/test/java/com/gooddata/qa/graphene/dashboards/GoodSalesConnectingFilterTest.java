@@ -95,7 +95,6 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
         makeCopyFromDashboard(TEST_DASHBOARD);
 
         try {
-            DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
             dashboardsPage.getTabs().openTab(0);
             dashboardsPage.getContent().getFilterWidget(simplifyText(STAGE_NAME))
                 .changeAttributeFilterValue("Negotiation");
@@ -120,7 +119,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
             dashboardsPage.getContent().getFilterWidget(simplifyText(STAGE_NAME)).changeSelectionToOneValue();
             dashboardsPage.getTabs().openTab(1);
             dashboardsPage.getContent().getFilterWidget(simplifyText(STAGE_NAME)).changeSelectionToOneValue();
-            dashboardEditBar.saveDashboard();
+            dashboardsPage.saveDashboard();
             dashboardsPage.getTabs().openTab(0);
             assertEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(STAGE_NAME)).getCurrentValue(),
                     "Interest");

@@ -98,8 +98,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
             browser.navigate().refresh();
             waitForDashboardPageLoaded(browser);
 
-            DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-            dashboardsPage.editDashboard();
+            DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
             WebElement savedViewDisabledNotification = dashboardEditBar.getSavedViewDisabledNotification();
             waitForElementNotVisible(savedViewDisabledNotification);
             dashboardEditBar.openDashboardSettingsDialog();
@@ -361,8 +360,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     public void savedViewFilterDoNotApplyOnTimeFilterAfterEditGranularityTest() {
         initDashboardsPage();
         dashboardsPage.selectDashboard(FIRST_DASHBOARD_NAME);
-        DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-        dashboardsPage.editDashboard();
+        DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
         DashboardEditFilter dashboardEditFilter = dashboardEditBar.getDashboardEditFilter();
         dashboardEditFilter.changeTypeOfTimeFilter("Day");
         dashboardEditBar.saveDashboard();
@@ -376,8 +374,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         try {
             initDashboardsPage();
             dashboardsPage.selectDashboard(FIRST_DASHBOARD_NAME);
-            DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-            dashboardsPage.editDashboard();
+            DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
             DashboardEditFilter dashboardEditFilter = dashboardEditBar.getDashboardEditFilter();
             dashboardEditFilter.deleteFilter("time");
             dashboardEditBar.saveDashboard();
@@ -396,8 +393,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     public void dashboardHasManyFiltersInManyTabsTest() {
         initDashboardsPage();
         dashboardsPage.selectDashboard(SECOND_DASHBOARD_NAME);
-        DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-        dashboardsPage.editDashboard();
+        DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
         dashboardsPage.addNewTab("second tab");
         dashboardEditBar.turnSavedViewOption(true);
         dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, "Firstname");

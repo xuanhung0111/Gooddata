@@ -2,14 +2,12 @@ package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static org.testng.Assert.assertEquals;
 
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 @Test(groups = {"GoodSalesDashboard"}, description = "Tests for GoodSales project (dashboards functionality) in GD platform")
@@ -46,11 +44,8 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"addNewEmptyTab"}, groups = {"dashboards-verification"})
     public void addNewNonEmptyTab() {
-        DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         addNewTabOnDashboard("Pipeline Analysis", "non-empty-tab", "GoodSales-new-non-empty-tab");
-        dashboardsPage.editDashboard();
-        dashboardEditBar.addLineToDashboard();
-        dashboardEditBar.saveDashboard();
+        dashboardsPage.addLineToDashboard().saveDashboard();
     }
 
     /**
@@ -89,8 +84,6 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
         String dashboardName = "test";
         dashboardsPage.addNewDashboard(dashboardName);
         waitForDashboardPageLoaded(browser);
-        waitForElementNotPresent(dashboardsPage.getDashboardEditBar().getRoot());
-        sleepTightInSeconds(5);
         checkRedBar(browser);
         assertEquals(dashboardsPage.getDashboardsCount(), 2, "New dashboard is not present");
         assertEquals(dashboardsPage.getDashboardName(), dashboardName, "New dashboard has invalid name");

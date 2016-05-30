@@ -58,8 +58,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
     @Test(dependsOnMethods = {"initialize"})
     public void verifyGeoLayersTest() {
         initDashboardsPage();
-        DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-        dashboardsPage.editDashboard();
+        DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
         dashboardsPage.addNewTab("tab");
         dashboardEditBar.verifyGeoLayersList("Sum of Amount", attributesList);
         dashboardEditBar.saveDashboard();
@@ -71,8 +70,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
         for (GeoAttributeLabels attributeLayer : GeoAttributeLabels.values()) {
             System.out.println("Verifying attribute " + attributeLayer + " ...");
             initDashboardsPage();
-            DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-            dashboardsPage.editDashboard();
+            DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
             dashboardsPage.addNewTab("tab");
             dashboardEditBar.addGeoChart(attributeLayer.metricName, attributeLayer.name);
             dashboardEditBar.saveDashboard();

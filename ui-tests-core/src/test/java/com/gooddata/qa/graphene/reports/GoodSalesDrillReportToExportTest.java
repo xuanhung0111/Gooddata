@@ -21,7 +21,6 @@ import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 
@@ -51,11 +50,10 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
     public void drillAcrossReportToExport() throws IOException, JSONException {
         try {
             addReportToNewDashboard(REPORT_NAME, TEST_DASHBOAD_NAME);
-            DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
             dashboardsPage.editDashboard();
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.addDrilling(Pair.of(Arrays.asList("Stage Name"), "Account"));
-            dashboardEditBar.saveDashboard();
+            dashboardsPage.saveDashboard();
             setDrillReportTargetAsExport(ExportFormat.CSV.getName());
             tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.drillOnAttributeValue();
@@ -80,11 +78,10 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
             checkRedBar(browser);
             
             addReportToNewDashboard(REPORT_NAME, TEST_DASHBOAD_NAME);
-            DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
             dashboardsPage.editDashboard();
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.addDrilling(Pair.of(Arrays.asList("Stage Name"), targetReportName), "Reports");
-            dashboardEditBar.saveDashboard();
+            dashboardsPage.saveDashboard();
             setDrillReportTargetAsExport(ExportFormat.EXCEL_XLSX.getName());
             tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.drillOnAttributeValue("Discovery");
@@ -103,7 +100,7 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
             tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.editDrilling(Pair.of(Arrays.asList("Stage Name"), targetReportName), 
                     Pair.of(Arrays.asList("Stage Name"), "Account"), "Attributes");
-            dashboardEditBar.saveDashboard();
+            dashboardsPage.saveDashboard();
             tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.drillOnAttributeValue("Risk Assessment");
             sleepTight(4000);
@@ -121,17 +118,16 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
     public void checkDrillToExportNotCached() throws JSONException, IOException {
         try {
             addReportToNewDashboard(REPORT_NAME, TEST_DASHBOAD_NAME);
-            DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
             dashboardsPage.editDashboard();
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.addDrilling(Pair.of(Arrays.asList("Stage Name"), "Account"));
-            dashboardEditBar.saveDashboard();
+            dashboardsPage.saveDashboard();
             setDrillReportTargetAsExport(ExportFormat.CSV.getName());
             dashboardsPage.editDashboard();
             tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.deleteDrilling(Arrays.asList("Stage Name"));
             tableReport.addDrilling(Pair.of(Arrays.asList("Stage Name"), "Account"));
-            dashboardEditBar.saveDashboard();
+            dashboardsPage.saveDashboard();
             drillReportToPopupDialog("Negotiation");
         } finally {
             dashboardsPage.deleteDashboard();
