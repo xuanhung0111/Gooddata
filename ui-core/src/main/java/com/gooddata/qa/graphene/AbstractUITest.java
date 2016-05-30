@@ -18,18 +18,19 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.disc.*;
+import com.gooddata.qa.graphene.fragments.i18n.LocalizationPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPageReact;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.graphene.fragments.manage.*;
-import com.gooddata.qa.graphene.fragments.manage.DatasetDetailPage;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.utils.mail.ImapClientAction;
 import com.google.common.base.Predicate;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.By;
@@ -72,6 +73,8 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     protected static final String CSV_UPLOADER_PROJECT_ROOT_TEMPLATE = "data/#/projects/%s";
     protected static final String DATA_UPLOAD_PAGE_URI_TEMPLATE = CSV_UPLOADER_PROJECT_ROOT_TEMPLATE + "/datasets";
+
+    private static final String LOCALIZATION_PAGE = "localization.html";
 
     /**
      * ----- UI fragmnets -----
@@ -655,6 +658,11 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public void initRegistrationPage() {
         openUrl(PAGE_REGISTRATION);
         waitForFragmentVisible(registrationPage);
+    }
+
+    public LocalizationPage initLocalizationPage() {
+        openUrl(LOCALIZATION_PAGE);
+        return LocalizationPage.getInstance(browser);
     }
 
     public <T> T doActionWithImapClient(ImapClientAction<T> action) {
