@@ -77,7 +77,8 @@ public class StackedChartsTest extends AbstractAdE2ETest {
         assertFalse(analysisPageReact.getAttributesBucket().isEmpty());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    // Unstable https://jira.intgdc.com/browse/CL-9774
+    // @Test(dependsOnGroups = {"init"})
     public void should_disappear_when_switched_to_table_via_result_too_large_link() {
         analysisPageReact.addStack(ACTIVITY_TYPE)
             .addAttribute(ACCOUNT)
