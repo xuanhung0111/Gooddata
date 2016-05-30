@@ -233,10 +233,8 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     public void computedAttributeVariableOnDashboard() {
         try {
             addReportToNewDashboard(CA_VARIABLE_REPORT_NAME, TEST_DASHBOAD_NAME);
-            dashboardsPage.editDashboard();
-            DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-            dashboardEditBar.addListFilterToDashboard(DashFilterTypes.PROMPT, VARIABLE_NAME);
-            dashboardEditBar.saveDashboard();
+            dashboardsPage.addListFilterToDashboard(DashFilterTypes.PROMPT, VARIABLE_NAME)
+                    .saveDashboard();
 
             browser.navigate().refresh();
             waitForDashboardPageLoaded(browser);

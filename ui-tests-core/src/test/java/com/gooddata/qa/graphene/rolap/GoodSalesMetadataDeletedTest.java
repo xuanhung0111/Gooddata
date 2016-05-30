@@ -561,8 +561,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         }
         dashboardsPage.addNewDashboard(DASHBOARD_NAME);
 
-        DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-        dashboardsPage.editDashboard();
+        DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
         dashboardEditBar.addGeoChart(metric, null);
         dashboardEditBar.saveDashboard();
     }
@@ -572,8 +571,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         initDashboardsPage();
         dashboardsPage.addNewDashboard(DASHBOARD_NAME);
 
-        DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-        dashboardsPage.editDashboard();
+        DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
         dashboardEditBar.addListFilterToDashboard(filterType, attribute);
         dashboardEditBar.turnSavedViewOption(true);
         sleepTightInSeconds(3);

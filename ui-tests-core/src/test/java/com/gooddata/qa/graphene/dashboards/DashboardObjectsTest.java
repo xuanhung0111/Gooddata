@@ -73,10 +73,9 @@ public class DashboardObjectsTest extends AbstractProjectTest {
                 REPORT_NAME);
 
         initDashboardsPage();
-        DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         String dashboardName = "Test";
         dashboardsPage.addNewDashboard(dashboardName);
-        dashboardsPage.editDashboard();
+        DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
         dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, "County");
         dashboardEditBar.addListFilterToDashboard(DashFilterTypes.PROMPT, this.variableName);
         dashboardEditBar.addTimeFilterToDashboard(0, String.format("%s ago", 
