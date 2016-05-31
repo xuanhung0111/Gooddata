@@ -39,6 +39,7 @@ public class TestParameters {
     // set this to what `host` is proxied to
     // (e.g. set hostProxy=staging3.intgdc.com if host is localhost:8443 and proxied to staging3)
     private String hostProxy;
+    private String languageCode;
 
     public TestParameters(Properties testVariables) {
         this.testVariables = testVariables;
@@ -68,6 +69,7 @@ public class TestParameters {
         reuseProject = Boolean.valueOf(loadProperty("project.reuse"));
         if (reuseProject) projectId = loadProperty("projectId");
         hostProxy = loadProperty("hostProxy");
+        languageCode = loadProperty("language");
     }
 
     /**
@@ -196,6 +198,10 @@ public class TestParameters {
 
     public String getHostProxy() {
         return this.hostProxy;
+    }
+
+    public String getLanguageCode() {
+        return languageCode;
     }
 
     /**

@@ -42,6 +42,7 @@
         <test.module>.</test.module>
         <targetFolder>${user.dir}${file.separator}${test.module}${file.separator}target</targetFolder>
         <browserDownloadFolder>${targetFolder}${file.separator}downloads</browserDownloadFolder>
+        <language>en-US</language>
         <csvFolder>${targetFolder}${file.separator}csv</csvFolder>
         <video.recording>false</video.recording>
 
@@ -305,6 +306,10 @@
                                             <property>
                                                 <name>browserDownloadFolder</name>
                                                 <value>${browserDownloadFolder}</value>
+                                            </property>
+                                            <property>
+                                                <name>language</name>
+                                                <value>${language}</value>
                                             </property>
                                             <property>
                                                 <name>csvFolder</name>
