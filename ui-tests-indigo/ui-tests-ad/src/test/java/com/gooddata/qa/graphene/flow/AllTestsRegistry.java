@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.flow;
 
 import com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerSanityTest;
+import com.gooddata.qa.graphene.indigo.analyze.GoodSalesAttributeBasedMetricTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesAttributeBucketTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesAttributeFilterTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesCatalogueTest;
@@ -29,6 +30,7 @@ public class AllTestsRegistry {
 
     public static void main(String[] args) throws Throwable {
         TestsRegistry.getInstance()
+            .register(GoodSalesAttributeBasedMetricTest.class)
             .register(GoodSalesAttributeBucketTest.class)
             .register(GoodSalesAttributeFilterTest.class)
             .register(GoodSalesCatalogueTest.class)

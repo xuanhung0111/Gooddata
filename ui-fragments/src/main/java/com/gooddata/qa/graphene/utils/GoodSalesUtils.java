@@ -45,6 +45,7 @@ public final class GoodSalesUtils {
     // attributes
     public static final String ATTR_PRODUCT = "Product";
     public static final String ATTR_STAGE_HISTORY = "Stage History";
+    public static final String ATTR_ACTIVITY = "Activity";
     public static final String ATTR_ACTIVITY_TYPE = "Activity Type";
     public static final String ATTR_STAGE_NAME = "Stage Name";
     public static final String ATTR_ACCOUNT = "Account";
