@@ -3,10 +3,12 @@ package com.gooddata.qa.graphene.utils;
 import static com.gooddata.qa.graphene.utils.WaitUtils.*;
 import static java.lang.String.format;
 import static org.testng.Assert.fail;
+
 import java.util.logging.Logger;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 
 public final class CheckUtils {
 
@@ -26,6 +28,12 @@ public final class CheckUtils {
     private CheckUtils() {
     }
 
+    public static void checkLocalization(WebDriver browser) {
+        if (browser.getPageSource().contains("Missing translation")) {
+            fail("MISSING TRANSLATION APPEARED");
+        }
+    }
+
     public static void checkRedBar(SearchContext searchContext) {
         if (ElementUtils.isElementPresent(BY_RED_BAR,searchContext)) {
             logRedBarMessageInfo(searchContext);
@@ -41,12 +49,12 @@ public final class CheckUtils {
     }
     
     public static void logRedBarMessageInfo(SearchContext searchContext){
-    	if(ElementUtils.isElementPresent(BY_ERROR_ID,searchContext)) {
-    		log.info("ErrorId APPEARED - " + searchContext.findElement(BY_ERROR_ID).getAttribute("value"));
+        if(ElementUtils.isElementPresent(BY_ERROR_ID,searchContext)) {
+            log.info("ErrorId APPEARED - " + searchContext.findElement(BY_ERROR_ID).getAttribute("value"));
         }
-        
+
         if(ElementUtils.isElementPresent(BY_ERROR_MESSAGE,searchContext)) {
-        	log.info("STATUS BAR INFO MESSAGE APPEARED - " + searchContext.findElement(BY_ERROR_MESSAGE).getAttribute("value"));
+            log.info("STATUS BAR INFO MESSAGE APPEARED - " + searchContext.findElement(BY_ERROR_MESSAGE).getAttribute("value"));
         }
     }
 
