@@ -25,6 +25,7 @@ import com.gooddata.qa.graphene.fragments.manage.*;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
+import com.gooddata.qa.utils.PdfUtils;
 import com.gooddata.qa.utils.mail.ImapClientAction;
 import com.google.common.base.Predicate;
 
@@ -408,7 +409,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
         return waitForFragmentVisible(reportPage);
     }
 
-    public void verifyDashboardExport(String dashboardName, long minimalSize) {
+    public void verifyDashboardExport(String dashboardName, String tabName, long minimalSize) {
         File pdfExport = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
                 + dashboardName.replaceAll(" ", "_") + ".pdf");
         System.out.println("pdfExport = " + pdfExport);
@@ -419,6 +420,8 @@ public class AbstractUITest extends AbstractGreyPageTest {
             .until(exportCompleted);
         long fileSize = pdfExport.length();
         System.out.println("File size: " + fileSize);
+
+        assertTrue(PdfUtils.getTextContentFrom(pdfExport).contains(tabName));
         assertTrue(fileSize > minimalSize, "Export is probably invalid, check the PDF manually! Current size is "
                 + fileSize + ", but minimum " + minimalSize + " was expected");
     }

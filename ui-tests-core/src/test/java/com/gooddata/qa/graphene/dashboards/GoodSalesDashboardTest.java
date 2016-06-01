@@ -35,7 +35,7 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"exportFirstDashboard"}, groups = {"dashboards-verification"})
     public void verifyExportedDashboardPDF() {
         if (!testParams.isClusterEnvironment()) return;
-        verifyDashboardExport(exportedDashboardName, expectedDashboardExportSize);
+        verifyDashboardExport(exportedDashboardName, "Outlook", expectedDashboardExportSize);
     }
 
     @Test(dependsOnMethods = {"verifyDashboardTabs"}, groups = {"dashboards-verification"})

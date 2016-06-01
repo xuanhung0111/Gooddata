@@ -189,7 +189,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         String exportedDashboardName = embeddedDashboard.printDashboardTab(OTHER_WIDGETS_TAB_INDEX);
 
         try {
-            verifyDashboardExport(exportedDashboardName, EXPECTED_EXPORT_DASHBOARD_SIZE);
+            verifyDashboardExport(exportedDashboardName, "other_widgets", EXPECTED_EXPORT_DASHBOARD_SIZE);
 
         } finally {
             deleteIfExists(Paths.get(getExportFilePath(exportedDashboardName, ExportFormat.PDF)));
