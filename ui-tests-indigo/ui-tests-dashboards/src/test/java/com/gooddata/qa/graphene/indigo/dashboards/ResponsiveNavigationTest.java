@@ -9,20 +9,45 @@ import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.List;
 
+import org.apache.http.ParseException;
 import org.json.JSONException;
+import org.openqa.selenium.TimeoutException;
 import org.testng.SkipException;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.indigo.HamburgerMenu;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"mobile"})
+    private String testUser = "";
+    private String testUserPassword = "";
+    private boolean isTestedOnBrowserStack = false;
+    
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"dashboardWidgetsInit"})
+    public void prepareUserForResponsiveNavigationTest() throws ParseException, IOException, JSONException {
+        String executionEnv = System.getProperty("test.execution.env");
+
+        isTestedOnBrowserStack = executionEnv != null && executionEnv.contains("browserstack-mobile");
+
+        testUser = generateEmail(testParams.getUser());
+        testUserPassword = testParams.getPassword();
+        
+        UserManagementRestUtils.createUser(getRestApiClient(), testUser, testUserPassword);
+        addUserToProject(testUser, UserRoles.ADMIN);
+
+        logout();
+        signInAtUI(testUser, testUserPassword);
+    }
+
+    @Test(dependsOnGroups = {"dashboardWidgetsInit"}, groups = {"mobile"})
     public void checkHamburgerMenuDisplayed() {
         if (!isDeviceSupportHamburgerMenu()) return;
 
@@ -34,7 +59,7 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
         indigoDashboardsPage.closeHamburgerMenu();
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"mobile"})
+    @Test(dependsOnGroups = {"dashboardWidgetsInit"}, groups = {"mobile"})
     public void checkHamburgerMenuItems() {
         if (!isDeviceSupportHamburgerMenu()) return;
 
@@ -46,16 +71,14 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
         pages.stream().forEach(page -> {
             log.info("Navigate to page: " + page);
 
-            initIndigoDashboardsPage()
-                .openHamburgerMenu()
-                .goToPage(page);
+            navigateToEachHamburgerMenuItem(page);
 
             takeScreenshot(browser, "checkHamburgerMenuItems-" + page, getClass());
             assertTrue(browser.getCurrentUrl().contains(testParams.getProjectId()));
         });
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"mobile"})
+    @Test(dependsOnGroups = {"dashboardWidgetsInit"}, groups = {"mobile"})
     public void checkLogout() throws JSONException {
         if (!isDeviceSupportHamburgerMenu()) return;
 
@@ -67,11 +90,11 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
             browser.get(currentUrl);
             waitForStringInUrl(ACCOUNT_PAGE);
         } finally {
-            signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
+            signInAtUI(testUser, testUserPassword);
         }
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"mobile"})
+    @Test(dependsOnGroups = {"dashboardWidgetsInit"}, groups = {"mobile"})
     public void checkLandingPage() throws JSONException {
         String executionEnv = System.getProperty("test.execution.env");
         if (executionEnv == null || !executionEnv.contains("browserstack-mobile")) {
@@ -90,21 +113,19 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
         for (String page : pages) {
             log.info("Navigate to page: " + page);
 
-            indigoDashboardsPage
-                .openHamburgerMenu()
-                .goToPage(page);
+            navigateToEachHamburgerMenuItem(page);
 
             logout();
-            signIn(false, UserRoles.ADMIN);
-
+            signInAtUI(testUser, testUserPassword);
             waitForFragmentVisible(indigoDashboardsPage)
                 .waitForDashboardLoad()
                 .waitForAllKpiWidgetsLoaded();
         }
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardWidgetsInit"}, groups = {"desktop"})
     public void checkHamburgerMenuNotPresentInDesktop() {
+        System.out.println();
         assertFalse(initIndigoDashboardsPage().isHamburgerMenuLinkPresent());
     }
 
@@ -117,11 +138,11 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
             openUrl(getIndigoDashboardsPageUri());
             waitForStringInUrl(ACCOUNT_PAGE);
         } finally {
-            signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
+            signInAtUI(testUser, testUserPassword);
         }
     }
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardWidgetsInit"}, groups = {"desktop"})
     public void accessDashboardsFromTopMenu() throws JSONException {
         initDashboardsPage();
         assertTrue(isElementPresent(className(ApplicationHeaderBar.KPIS_LINK_CLASS), browser));
@@ -136,6 +157,13 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
             .waitForAllKpiWidgetsLoaded();
     }
 
+    @AfterClass(alwaysRun = true)
+    public void tearDown() throws IOException, JSONException {
+        logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
+
+        UserManagementRestUtils.deleteUserByEmail(getRestApiClient(), testUser);
+    }
+
     private boolean isDeviceSupportHamburgerMenu() {
         if (!initIndigoDashboardsPage().isHamburgerMenuLinkPresent()) {
             log.warning("Hamburger menu is NOT DISPLAYED in this device. Please check it!");
@@ -143,5 +171,35 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
         }
 
         return true;
+    }
+
+    private void navigateToEachHamburgerMenuItem(String page) {
+        try {
+            initIndigoDashboardsPage()
+                .openHamburgerMenu()
+                .goToPage(page);
+        } catch (TimeoutException e) {
+            if (isTestedOnBrowserStack) {
+                switch(page) {
+                    case "Dashboards":
+                        if (browser.getCurrentUrl().contains("|projectDashboardPage")) {
+                            return;
+                        } 
+                    case "Analyze":
+                        if (browser.getCurrentUrl().contains("/reportId/edit")) {
+                            return;
+                        } 
+                    case "Reports":
+                        if (browser.getCurrentUrl().contains("|domainPage")) {
+                            return;
+                        } 
+                    case "Manage":
+                        if (browser.getCurrentUrl().contains("|dataPage|")) {
+                            return;
+                        } 
+                }
+            }
+            throw e;
+        }
     }
 }

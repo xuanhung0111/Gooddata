@@ -51,7 +51,7 @@ public class ProjectSwitchingTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void inviteUsersToProject() throws ParseException, IOException, JSONException {
-        newAdminUser = generateUniqueUserEmail(testParams.getUser());
+        newAdminUser = generateEmail(testParams.getUser());
         newAdminPassword = testParams.getPassword();
 
         newAdminUserUri = UserManagementRestUtils.createUser(getRestApiClient(), newAdminUser, newAdminPassword);
@@ -161,10 +161,6 @@ public class ProjectSwitchingTest extends AbstractProjectTest {
         logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
 
         UserManagementRestUtils.deleteUserByUri(getRestApiClient(), newAdminUserUri);
-    }
-
-    private String generateUniqueUserEmail(String email) {
-        return email.replace("@", "+" + UUID.randomUUID().toString().substring(0, 6) + "@");
     }
 
     private GoodData getNewAdminGoodDataClient() {
