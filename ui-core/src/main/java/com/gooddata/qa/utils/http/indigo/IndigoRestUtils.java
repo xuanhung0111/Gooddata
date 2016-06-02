@@ -340,4 +340,25 @@ public class IndigoRestUtils {
                     Dataset.class,
                     title(DATE_DATA_SET_CREATED));
     }
+
+    /**
+     * Get all created insight names in a specified project
+     * 
+     * @param restApiClient
+     * @param projectId
+     * @return a list of insight names
+     */
+    public static List<String> getAllInsightNames(final RestApiClient restApiClient, final String projectId)
+            throws JSONException, IOException {
+        final String query = "/gdc/md/" + projectId + "/query/visualizations";
+        final JSONArray entries = getJsonObject(restApiClient, query)
+                .getJSONObject("query")
+                .getJSONArray("entries");
+
+        final List<String> visualizations = new ArrayList<>();
+        for (int i = 0, n = entries.length(); i < n; i++) {
+            visualizations.add(entries.getJSONObject(i).getString("title"));
+        }
+        return visualizations;
+    }
 }

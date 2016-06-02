@@ -28,7 +28,7 @@ public class MainEditorReact extends AbstractFragment {
     private static final String CSS_EXPLORER_MESSAGE = ".adi-canvas-message h2";
     private static final String CSS_REPORT = ".adi-chart-container:not(.invisible)";
     private static final By BY_TABLE_REPORT = By.className("indigo-table-component-content");
-    private static final By BY_CHART_REPORT = By.className("highcharts-container");
+    private static final By BY_CHART_REPORT = By.className("adi-report-visualization");
     private static final By BY_REPORT_COMPUTING = By.className("adi-computing");
 
     public boolean isEmpty() {
