@@ -555,7 +555,7 @@ public class ReportPage extends AbstractFragment {
 
     public boolean hasUnsavedVersion() {
         openOptionsMenu().openSubMenu("Versions");
-        return getVersionsMenu().contains("Unsaved version");
+        return getVersionsMenu().contains("Unsaved Version");
     }
 
     public boolean tryCancelComputing() {
