@@ -6,6 +6,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoade
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,6 +47,16 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = {"initialize"})
+    public void showInfoForNoAvailableLayer() {
+        initDashboardsPage();
+        DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
+        dashboardsPage.addNewTab("no-layer");
+        dashboardEditBar.verifyGeoLayersList("Sum of Amount", emptyList());
+        dashboardEditBar.saveDashboard();
+        dashboardsPage.deleteDashboardTab(1);
+    }
+
+    @Test(dependsOnMethods = {"initialize"}, priority = 1)
     public void changeAttributeToGeoStateTest() {
         int i = 0;
         for (AttributeLabelTypes type : getGeoLabels()) {
@@ -55,7 +66,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initialize"})
+    @Test(dependsOnMethods = {"changeAttributeToGeoStateTest"})
     public void verifyGeoLayersTest() {
         initDashboardsPage();
         DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
@@ -65,7 +76,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
         dashboardsPage.deleteDashboardTab(1);
     }
 
-    @Test(dependsOnMethods = {"initialize"})
+    @Test(dependsOnMethods = {"changeAttributeToGeoStateTest"})
     public void verifyGeoChartTest() {
         for (GeoAttributeLabels attributeLayer : GeoAttributeLabels.values()) {
             System.out.println("Verifying attribute " + attributeLayer + " ...");

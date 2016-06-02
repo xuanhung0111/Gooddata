@@ -3,6 +3,9 @@ package com.gooddata.qa.graphene.fragments.dashboards;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static org.openqa.selenium.By.cssSelector;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +76,15 @@ public class DashboardAddWidgetPanel extends AbstractFragment {
     public void verifyLayersList(String metricLabel, List<String> layersList) {
         initWidget(WidgetTypes.GEO_CHART, metricLabel);
         waitForElementVisible(layers);
+
+        if (layersList.isEmpty()) {
+            WebElement noLayerElement = waitForElementVisible(cssSelector(".geo-list .no-attrs"), browser);
+            assertTrue(noLayerElement.getText().startsWith("No layers available for selected metric."));
+            assertEquals(noLayerElement.findElement(cssSelector("a[href]")).getAttribute("href"),
+                    "http://developer.gooddata.com/article/setting-up-data-for-geo-charts");
+            return;
+        }
+
         List<String> actualLayersList = getGeoLayersList();
         for (String layer : layersList) {
             int matchingLayer = 0;
