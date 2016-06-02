@@ -2,7 +2,9 @@ package com.gooddata.qa.graphene.login;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
+import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -11,6 +13,7 @@ import com.gooddata.qa.graphene.AbstractUITest;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.google.common.base.Predicate;
 
 @Test(groups = {"login"}, description = "Tests for basic login functionality in GD platform")
 public class LoginPageTest extends AbstractUITest {
@@ -73,6 +76,10 @@ public class LoginPageTest extends AbstractUITest {
             signIn(false, UserRoles.ADMIN);
 
             openUrl(PAGE_LOGIN);
+
+            Predicate<WebDriver> loginPageDisappeared = browser -> !browser.getCurrentUrl().contains(PAGE_LOGIN);
+            Graphene.waitGui().until(loginPageDisappeared);
+
             waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
 
         } finally {
