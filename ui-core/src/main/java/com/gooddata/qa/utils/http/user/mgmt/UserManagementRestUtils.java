@@ -159,6 +159,7 @@ public final class UserManagementRestUtils {
      */
     public static void deleteUserByEmail(final RestApiClient restApiClient, final String userEmail)
             throws ParseException, IOException, JSONException {
+        
         final JSONObject userProfile = getUserProfileByEmail(restApiClient, userEmail);
 
         if (Objects.nonNull(userProfile)) {
@@ -177,6 +178,10 @@ public final class UserManagementRestUtils {
      */
     public static JSONObject getUserProfileByEmail(final RestApiClient restApiClient, final String email)
             throws ParseException, IOException {
+        if (email == null || email.trim().equals("")) {
+            return null;
+        }
+
         final String userUri = DOMAIN_USER_LINK + "?login=" + email.replace("@", "%40");
 
         try {
