@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.className;
-import static org.openqa.selenium.By.cssSelector;
 
 import java.util.List;
 
@@ -17,7 +16,7 @@ public abstract class AbstractBucket extends AbstractFragment {
 
     private static final String EMPTY = "s-bucket-empty";
 
-    private static final By BY_BUCKET_INVITATION = cssSelector(".adi-bucket-invitation");
+    private static final By BY_BUCKET_INVITATION = className("s-bucket-dropzone");
     private static final By BY_STACK_WARNING = className("adi-stack-warn");
     protected static final By BY_HEADER = className("adi-bucket-item-header");
 
