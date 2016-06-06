@@ -129,7 +129,7 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
         assertFalse(initIndigoDashboardsPage().isHamburgerMenuLinkPresent());
     }
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardWidgetsInit"}, groups = {"desktop"})
     public void testNavigateToIndigoDashboardWithoutLogin() throws JSONException {
         try {
             initDashboardsPage();
