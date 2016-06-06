@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
+
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -31,8 +32,8 @@ public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
         projectTitle = "Recommendations-Without-Date-Dimension-E2E-Test";
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"setupProject"})
-    public void setupProject() throws JSONException, IOException, URISyntaxException {
+    @Override
+    public void prepareSetupProject() throws JSONException, IOException, URISyntaxException {
         if (testParams.isReuseProject()) {
             log.info("No need to setup data in reuse project.");
             return;
