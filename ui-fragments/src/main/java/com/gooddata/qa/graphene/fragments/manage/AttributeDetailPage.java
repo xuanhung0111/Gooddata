@@ -115,7 +115,7 @@ public class AttributeDetailPage extends AbstractFragment {
         waitForElementVisible(selectDrillAttributeButton).click();
         SelectItemPopupPanel popup = Graphene.createPageFragment(SelectItemPopupPanel.class,
                 waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser));
-        popup.searchAndSelectItem(attribute);
+        popup.searchAndSelectItem(attribute).submitPanel();
         waitForElementNotVisible(popup.getRoot());
         waitForElementVisible(By.cssSelector(".attr.option"), browser);
         waitForElementVisible(By.cssSelector(String.format("button.s-btn-%s",

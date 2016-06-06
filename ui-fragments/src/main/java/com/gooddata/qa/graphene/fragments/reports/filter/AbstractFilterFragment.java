@@ -32,7 +32,8 @@ public abstract class AbstractFilterFragment extends AbstractFragment {
     public void searchAndSelectItem(String item) {
         Graphene.createPageFragment(SelectItemPopupPanel.class,
                 waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser))
-                .searchAndSelectItem(item);
+                .searchAndSelectItem(item)
+                .submitPanel();
     }
 
     public abstract void addFilter(FilterItem filterItem);

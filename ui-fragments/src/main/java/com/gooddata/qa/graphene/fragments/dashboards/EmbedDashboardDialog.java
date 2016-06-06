@@ -65,7 +65,7 @@ public class EmbedDashboardDialog extends AbstractFragment {
             SelectItemPopupPanel panel =
                     Graphene.createPageFragment(SelectItemPopupPanel.class,
                             waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser));
-            panel.searchAndSelectItem(attributeName);
+            panel.searchAndSelectItem(attributeName).submitPanel();
             Optional<WebElement> attributeValueInput =
                     getRoot().findElements(ATTRIBUTE_VALUES_TEXT_BOX_LOCATOR).stream()
                             .filter((WebElement input) -> input.getAttribute("value").contains("_wildcard"))

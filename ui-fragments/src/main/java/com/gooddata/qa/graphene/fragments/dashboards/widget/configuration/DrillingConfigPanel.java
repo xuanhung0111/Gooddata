@@ -46,12 +46,12 @@ public class DrillingConfigPanel extends AbstractFragment {
                 browser.findElements(SelectItemPopupPanel.LOCATOR).get(1));
 
         for (String item : pairs.getLeft()) {
-            popupPanel.searchAndSelectItem(item);
+            popupPanel.searchAndSelectItem(item).submitPanel();
         }
         waitForElementVisible(selectAttributeReportButton).click();
         waitForElementVisible(popupPanel.getRoot());
         popupPanel.changeGroup(group);
-        popupPanel.searchAndSelectItem(pairs.getRight());
+        popupPanel.searchAndSelectItem(pairs.getRight()).submitPanel();
     }
 
     public void addDrilling(Pair<List<String>, String> pairs) {
@@ -75,7 +75,7 @@ public class DrillingConfigPanel extends AbstractFragment {
             waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser);
 
             for (String item : newDrilling.getLeft()) {
-                popupPanel.searchAndSelectItem(item);
+                popupPanel.searchAndSelectItem(item).submitPanel();
             }
         }
 
@@ -89,7 +89,7 @@ public class DrillingConfigPanel extends AbstractFragment {
                 waitForElementVisible(popupPanel.getRoot());
             }
             popupPanel.changeGroup(group);
-            popupPanel.searchAndSelectItem(newDrilling.getRight());
+            popupPanel.searchAndSelectItem(newDrilling.getRight()).submitPanel();
         }
     }
 
