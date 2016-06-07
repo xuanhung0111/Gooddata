@@ -80,7 +80,7 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
                 .withPhone(uniqueString)
                 .withCompany("Company ")
                 .withJobTitle("Title ")
-                .withIndustry("Tech");
+                .withIndustry("Government");
     }
 
     @Test(dependsOnGroups = {"createProject"})

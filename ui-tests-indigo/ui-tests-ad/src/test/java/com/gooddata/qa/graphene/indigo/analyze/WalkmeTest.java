@@ -70,7 +70,7 @@ public class WalkmeTest extends AbstractUITest {
                 .withPhone(registrationString)
                 .withCompany("Company " + registrationString)
                 .withJobTitle("Title " + registrationString)
-                .withIndustry("Tech"));
+                .withIndustry("Government"));
 
         waitForFragmentNotVisible(registrationPage);
         waitForDashboardPageLoaded(browser);
