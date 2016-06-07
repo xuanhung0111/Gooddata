@@ -12,17 +12,16 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 
-public class SpecialCasesTest extends AnalyticalDesignerAbstractTest {
+public class SpecialCasesTest extends AbstractAnalyseTest {
 
     private static final String MANY_COLUMNS_CSV_PATH = "/" + UPLOAD_CSV + "/many_columns.csv";
     private static final String MANY_CLOUMNS_DATASET = "Many Columns";
 
-    @BeforeClass(alwaysRun = true)
-    public void initProperties() {
-        super.initProperties();
-        projectTemplate = "";
-    }
+    private static final String PRODUCT = "Product";
+    private static final String ACCOUNT = "Account";
+    private static final String DEPARTMENT = "Department";
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {

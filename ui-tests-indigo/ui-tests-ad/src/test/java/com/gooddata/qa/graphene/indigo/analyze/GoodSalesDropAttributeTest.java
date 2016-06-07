@@ -16,8 +16,9 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricC
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 
-public class GoodSalesDropAttributeTest extends AnalyticalDesignerAbstractTest {
+public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
 
     private static final String PRIORITY = "Priority";
     private static final String REGION = "Region";

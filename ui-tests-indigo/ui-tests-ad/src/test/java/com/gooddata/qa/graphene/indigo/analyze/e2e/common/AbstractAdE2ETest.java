@@ -7,9 +7,9 @@ import org.testng.annotations.BeforeClass;
 
 import com.gooddata.md.Attribute;
 import com.gooddata.qa.graphene.common.StartPageContext;
-import com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerAbstractTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 
-public abstract class AbstractAdE2ETest extends AnalyticalDesignerAbstractTest {
+public abstract class AbstractAdE2ETest extends GoodSalesAbstractAnalyseTest {
 
     @BeforeClass(alwaysRun = true)
     public void speedUpTestRun() {

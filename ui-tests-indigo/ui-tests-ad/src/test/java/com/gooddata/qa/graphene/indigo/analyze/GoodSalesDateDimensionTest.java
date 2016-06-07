@@ -14,8 +14,9 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
+import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 
-public class GoodSalesDateDimensionTest extends AnalyticalDesignerAbstractTest {
+public class GoodSalesDateDimensionTest extends GoodSalesAbstractAnalyseTest {
 
     private static final String ACTIVITY = "Activity";
     private static final String CREATED = "Created";

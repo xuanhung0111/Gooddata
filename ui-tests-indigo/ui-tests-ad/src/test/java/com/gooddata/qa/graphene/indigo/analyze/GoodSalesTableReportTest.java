@@ -26,10 +26,11 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
+import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.google.common.collect.Lists;
 
-public class GoodSalesTableReportTest extends AnalyticalDesignerAbstractTest {
+public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {

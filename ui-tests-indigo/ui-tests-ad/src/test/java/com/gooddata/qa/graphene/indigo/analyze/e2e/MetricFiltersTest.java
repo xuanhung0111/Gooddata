@@ -36,8 +36,9 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
             .getFilterText(), ACTIVITY_TYPE + ": Email");
     }
 
-    // Disabled becaouse of this https://jira.intgdc.com/browse/AQE-1233?focusedCommentId=642059&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-642059
-    // @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"},
+            enabled = false,
+            description = "https://jira.intgdc.com/browse/AQE-1233?focusedCommentId=642059&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-642059")
     public void should_not_be_possible_to_filter_metric_by_unavailable_attribute() {
         List<String> attributes = analysisPageReact.addMetric(NUMBER_OF_LOST_OPPS)
             .getMetricsBucket()
