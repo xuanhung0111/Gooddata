@@ -84,7 +84,9 @@ public class WidgetConfigPanel extends AbstractFragment {
         FILTERS("Filters", "filterTab"),
         GROUP("Group", "filterTab"),
         ARRANGE("Arrange", "s-Arrange"),
-        STYLE("Style", "s-Style");
+        STYLE("Style", "s-Style"),
+        METRIC("Metric", "s-Metric"),
+        METRIC_STYLE("Style", "s-activeConfigTab");
 
         private final String tabName;
         private final String panelClassName;
