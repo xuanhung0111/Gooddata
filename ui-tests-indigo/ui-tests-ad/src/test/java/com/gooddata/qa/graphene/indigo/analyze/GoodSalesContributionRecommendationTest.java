@@ -14,8 +14,9 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricC
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 
-public class GoodSalesContributionRecommendationTest extends AnalyticalDesignerAbstractTest {
+public class GoodSalesContributionRecommendationTest extends GoodSalesAbstractAnalyseTest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {

@@ -23,8 +23,9 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricC
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 
-public class GoodSalesMetricBucketTest extends AnalyticalDesignerAbstractTest {
+public class GoodSalesMetricBucketTest extends GoodSalesAbstractAnalyseTest {
 
     private static final String EXPECTED = "Expected";
     private static final String REMAINING_QUOTA = "Remaining Quota";

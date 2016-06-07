@@ -21,10 +21,12 @@ import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
+
 import java.io.IOException;
 import java.lang.reflect.Method;
 
-public class GoodSalesMultipleDatasetsTest extends AnalyticalDesignerAbstractTest {
+public class GoodSalesMultipleDatasetsTest extends AbstractAnalyseTest {
 
     private static final String MAQL_PATH = "/quotes/quotes.maql";
     private static final String QUOTES_CSV_PATH = "/quotes/quotes.csv";
@@ -34,11 +36,7 @@ public class GoodSalesMultipleDatasetsTest extends AnalyticalDesignerAbstractTes
     private static final String PRODUCTION_DATASET = "Production data";
     private static final String PAYROLL_DATASET = "Payroll";
 
-    @BeforeClass(alwaysRun = true)
-    public void initProperties() {
-        super.initProperties();
-        projectTemplate = "";
-    }
+    private static final String AMOUNT = "Amount";
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {

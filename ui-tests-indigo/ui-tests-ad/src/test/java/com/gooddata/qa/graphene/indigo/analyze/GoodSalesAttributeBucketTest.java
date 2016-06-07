@@ -13,8 +13,9 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
+import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 
-public class GoodSalesAttributeBucketTest extends AnalyticalDesignerAbstractTest {
+public class GoodSalesAttributeBucketTest extends GoodSalesAbstractAnalyseTest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {

@@ -27,10 +27,11 @@ import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
-public class GoodSalesDateFilterTest extends AnalyticalDesignerAbstractTest {
+public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {

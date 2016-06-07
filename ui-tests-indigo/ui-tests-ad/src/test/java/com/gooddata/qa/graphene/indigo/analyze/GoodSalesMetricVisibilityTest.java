@@ -13,8 +13,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 
-public class GoodSalesMetricVisibilityTest extends AnalyticalDesignerAbstractTest {
+public class GoodSalesMetricVisibilityTest extends GoodSalesAbstractAnalyseTest {
 
     private static final String RATIO_METRIC = "Ratio metric";
 

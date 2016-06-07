@@ -30,9 +30,10 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.google.common.collect.Sets;
 
-public class GoodSalesCustomDateDimensionsTest extends AnalyticalDesignerAbstractTest {
+public class GoodSalesCustomDateDimensionsTest extends AbstractAnalyseTest {
 
     private static final String NUMBER = "Number";
     private static final String RETAIL_DATE = "Retaildate";
@@ -42,9 +43,7 @@ public class GoodSalesCustomDateDimensionsTest extends AnalyticalDesignerAbstrac
     private static final String FISCAL_DATASET_ID = "dataset.csv_fiscal_dimension_sample_test";
 
     @BeforeClass(alwaysRun = true)
-    public void initProperties() {
-        super.initProperties();
-        projectTemplate = "";
+    public void initialize() {
         projectTitle += "Custom-Date-Dimension-Test";
     }
 

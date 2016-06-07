@@ -23,8 +23,9 @@ import com.gooddata.md.Restriction;
 import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
+import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 
-public class GoodSalesCatalogueTest extends AnalyticalDesignerAbstractTest {
+public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
