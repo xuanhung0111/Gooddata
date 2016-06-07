@@ -24,8 +24,9 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricC
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 
-public class GoodSalesFactBasedMetricTest extends AnalyticalDesignerAbstractTest {
+public class GoodSalesFactBasedMetricTest extends GoodSalesAbstractAnalyseTest {
 
     private static final String SUM_OF_AMOUNT = "Sum of " + AMOUNT;
     private static final String DURATION = "Duration";

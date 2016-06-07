@@ -16,8 +16,9 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 
-public class GoodSalesMetricFilterTest extends AnalyticalDesignerAbstractTest {
+public class GoodSalesMetricFilterTest extends GoodSalesAbstractAnalyseTest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {

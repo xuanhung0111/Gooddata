@@ -46,11 +46,12 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.Recommen
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.TrendingRecommendation;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
+import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTest {
+public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest {
 
     private List<String> attributes;
     private List<String> metrics;

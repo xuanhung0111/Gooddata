@@ -23,10 +23,11 @@ import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
-public class GoodSalesProjectNavigationTest extends AnalyticalDesignerAbstractTest {
+public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest {
 
     private static final String UNIQUE_ID = UUID.randomUUID().toString().substring(0, 10);
     private static final String NEW_PROJECT_NAME = "New-project-navigation-" + UNIQUE_ID;

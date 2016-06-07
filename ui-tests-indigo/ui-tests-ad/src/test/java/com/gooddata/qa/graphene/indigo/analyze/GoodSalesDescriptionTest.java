@@ -14,8 +14,9 @@ import org.testng.annotations.Test;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.Fact;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
+import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 
-public class GoodSalesDescriptionTest extends AnalyticalDesignerAbstractTest {
+public class GoodSalesDescriptionTest extends GoodSalesAbstractAnalyseTest {
 
     private static final String ACTIVITY_DATE = "Activity (Date)";
 

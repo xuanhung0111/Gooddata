@@ -34,8 +34,9 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.Comparis
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
+import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 
-public class AnalyticalDesignerSanityTest extends AnalyticalDesignerAbstractTest {
+public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
 
     private static final String EXPECTED = "Expected";
     private static final String REMAINING_QUOTA = "Remaining Quota";
