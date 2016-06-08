@@ -5,16 +5,21 @@ import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
 import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.mail.Message;
 
+import org.apache.http.ParseException;
+import org.json.JSONException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.enums.GDEmails;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
@@ -28,7 +33,7 @@ public class NotificationTest extends AbstractCsvUploaderTest {
     private static final String MANAGE_DATASETS_PAGE_URL = "https://%s/#s=/gdc/projects/%s|dataPage|dataSets";
     private static final String PROJECT_PAGE_URL = "https://%s/#s=/gdc/projects/%s";
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void initProperties() {
         projectTitle = "Csv-uploader-notification-test-" + System.currentTimeMillis();
 
@@ -37,7 +42,15 @@ public class NotificationTest extends AbstractCsvUploaderTest {
         imapPassword = testParams.loadProperty("imap.password");
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnMethods = "createProject", groups = "precondition")
+    public void inviteUserToProject() throws ParseException, IOException, JSONException {
+        addUserToProject(imapUser, UserRoles.ADMIN);
+
+        logout();
+        signInAtGreyPages(imapUser, imapPassword);
+    }
+
+    @Test(dependsOnGroups = "precondition", groups = "csv")
     public void checkNotificationForSuccessfulUpload() {
         final String datasetName = uploadCsv(PAYROLL).getName();
 
@@ -46,23 +59,22 @@ public class NotificationTest extends AbstractCsvUploaderTest {
         checkSuccessfulNotification(getSuccessfulNotification(1), datasetName);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = "precondition", groups = "csv")
     public void checkNotificationForFailedUpload() {
         final String projectId = testParams.getProjectId();
-        String GoodSalesProjectID = "";
+
+        GoodData goodDataClient = getGoodDataClient(imapUser, imapPassword);
+
+        String goodSalesProjectId = ProjectRestUtils.createProject(goodDataClient, projectTitle,
+                GOODSALES_TEMPLATE, testParams.getAuthorizationToken(), testParams.getProjectDriver(),
+                testParams.getProjectEnvironment());
 
         try {
-            GoodSalesProjectID = ProjectRestUtils.createProject(getGoodDataClient(), projectTitle,
-                    GOODSALES_TEMPLATE, testParams.getAuthorizationToken(), testParams.getProjectDriver(),
-                    testParams.getProjectEnvironment());
+            testParams.setProjectId(goodSalesProjectId);
+            uploadCsv(PAYROLL);
 
-            testParams.setProjectId(GoodSalesProjectID);
-
-            try {
-                uploadCsv(PAYROLL);
-            } catch (RuntimeException e) {
-                assertEquals(e.getMessage(), "Uploading csv file is FAILED!");
-            }
+        } catch (RuntimeException e) {
+            assertEquals(e.getMessage(), "Uploading csv file is FAILED!");
 
             assertEquals(DatasetMessageBar.getInstance(browser).waitForErrorMessageBar().getText(),
                     format("Failed to add data from \"%s\" due to internal error. Check your email for "
@@ -71,16 +83,17 @@ public class NotificationTest extends AbstractCsvUploaderTest {
             takeScreenshot(browser, "Upload-csv-file-to-check-failed-notification-" + PAYROLL.getFileName(), getClass());
 
             checkFailureNotification(getFailedNotification(1));
+
         } finally {
             testParams.setProjectId(projectId);
 
-            if (!GoodSalesProjectID.isEmpty()) {
-                ProjectRestUtils.deleteProject(getGoodDataClient(), GoodSalesProjectID);
+            if (!goodSalesProjectId.isEmpty()) {
+                ProjectRestUtils.deleteProject(goodDataClient, goodSalesProjectId);
             }
         }
     }
 
-    @Test(dependsOnMethods = {"checkNotificationForSuccessfulUpload"})
+    @Test(dependsOnMethods = {"checkNotificationForSuccessfulUpload"}, groups = "csv")
     public void checkNotificationForSuccessfulUpdate() {
         final String datasetName = PAYROLL.getDatasetNameOfFirstUpload();
 

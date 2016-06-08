@@ -9,7 +9,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 
-public class SanityTest extends AbstractCsvUploaderTest {
+public class CsvUploaderSanityTest extends AbstractCsvUploaderTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkCsvUploadHappyPath() {
