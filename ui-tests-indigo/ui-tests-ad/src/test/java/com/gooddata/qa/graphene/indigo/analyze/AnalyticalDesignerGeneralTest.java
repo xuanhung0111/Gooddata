@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
@@ -14,9 +13,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -25,7 +22,6 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -46,7 +42,6 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.Recommen
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.TrendingRecommendation;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReportReact;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -437,54 +432,6 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
         assertTrue(filtersBucketReact.isDateFilterVisible());
         assertTrue(filtersBucketReact.getDateFilterText().endsWith(": Last 4 quarters"));
         assertTrue(analysisPageReact.getChartReport().getTrackersCount() >= 1);
-    }
-
-    @Test(dependsOnGroups = {"prepare"})
-    public void exportCustomDiscovery() {
-        initAnalysePage();
-
-        String metric = doSafetyMetricAction(
-                data -> analysisPageReact.addMetric(data).changeReportType(ReportType.TABLE),
-                "exportCustomDiscovery");
-        doSafetyAttributeAction(metric, analysisPageReact::addAttribute, "exportCustomDiscovery");
-
-        assertTrue(analysisPageReact.getPageHeader().isExportButtonEnabled());
-        TableReportReact analysisReport = analysisPageReact.getTableReport();
-        List<List<String>> analysisContent = analysisReport.getContent();
-
-        analysisPageReact.exportReport();
-        String currentWindowHandel = browser.getWindowHandle();
-        for (String handel : browser.getWindowHandles()) {
-            if (!handel.equals(currentWindowHandel))
-                browser.switchTo().window(handel);
-        }
-
-        com.gooddata.qa.graphene.fragments.reports.report.TableReport tableReport =
-                Graphene.createPageFragment(
-                        com.gooddata.qa.graphene.fragments.reports.report.TableReport.class,
-                        waitForElementVisible(By.id("gridContainerTab"), browser));
-
-        Iterator<String> attributes = tableReport.getAttributeElements().iterator();
-
-        sleepTightInSeconds(2); // wait for metric values is calculated and loaded
-        Iterator<String> metrics = tableReport.getRawMetricElements().iterator();
-
-        List<List<String>> content = new ArrayList<List<String>>();
-        while (attributes.hasNext() && metrics.hasNext()) {
-            content.add(asList(attributes.next(), metrics.next()));
-        }
-
-        // Just compare the first 10 lines if table data is big
-        if (content.size() >= 10) {
-            content = content.subList(0, 10);
-        }
-        if (analysisContent.size() >= 10) {
-            analysisContent = analysisContent.subList(0, 10);
-        }
-        assertEquals(content, analysisContent, "Content is not correct");
-
-        browser.close();
-        browser.switchTo().window(currentWindowHandel);
     }
 
     @Test(dependsOnGroups = {"prepare"})
