@@ -1,0 +1,20 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="GD_UI_Selenium_Tests">
+    <test name="data-of-other-users-tests">
+        <groups>
+            <run>
+                <include name="csv" />
+                <include name="createProject" />
+                <include name="projectInit" />
+                <include name="arquillian" />
+            </run>
+            <dependencies>
+                <group name="csv" depends-on="projectInit" />
+            </dependencies>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.csvuploader.DataOfOtherUsersTest" />
+        </classes>
+    </test>
+
+</suite>

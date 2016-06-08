@@ -26,19 +26,19 @@ import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadDialog;
 
 public class RefreshTest extends AbstractCsvUploaderTest {
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnMethods = {"createProject"}, groups = "precondition")
     public void checkCsvUploadHappyPath() {
         assertTrue(uploadCsv(PAYROLL)
             .getStatus()
             .matches(SUCCESSFUL_STATUS_MESSAGE_REGEX));
     }
 
-    @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
+    @Test(dependsOnGroups = "precondition", groups = "csv")
     public void checkCsvRefreshFromList() {
         updateCsv(PAYROLL_REFRESH, PAYROLL.getDatasetNameOfFirstUpload(), true);
     }
 
-    @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
+    @Test(dependsOnGroups = "precondition", groups = "csv")
     public void checkCsvRefreshFromDetail() {
         final Dataset dataset = initDataUploadPage()
                 .getMyDatasetsTable()
@@ -47,7 +47,7 @@ public class RefreshTest extends AbstractCsvUploaderTest {
         updateCsvInDetailPage(PAYROLL_REFRESH, dataset, true);
     }
 
-    @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
+    @Test(dependsOnGroups = "precondition", groups = "csv")
     public void checkSetHeaderHiddenWhenUpdate() {
         initDataUploadPage();
 
@@ -62,7 +62,7 @@ public class RefreshTest extends AbstractCsvUploaderTest {
         takeScreenshot(browser, "set-header-button-hidden-" + PAYROLL_REFRESH.getFileName(), getClass());
     }
 
-    @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
+    @Test(dependsOnGroups = "precondition", groups = "csv")
     public void checkCsvRefreshWithIncorrectMetadata() {
         final String badUpdateCsvFileName = "payroll.refresh.bad.csv";
 
@@ -87,7 +87,7 @@ public class RefreshTest extends AbstractCsvUploaderTest {
                         getDatasetId(PAYROLL.getDatasetNameOfFirstUpload())));
     }
 
-    @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
+    @Test(dependsOnGroups = "precondition", groups = "csv")
     public void checkCancelCsvRefresh() {
         final Dataset dataset = initDataUploadPage()
             .getMyDatasetsTable()
@@ -111,19 +111,19 @@ public class RefreshTest extends AbstractCsvUploaderTest {
         waitForFragmentVisible(datasetDetailPage);
     }
 
-    @Test(dependsOnMethods = {"checkCsvUploadHappyPath"}, alwaysRun = true)
-    public void addOtherAdminToProject() throws ParseException, IOException, JSONException {
-        addUserToProject(testParams.getAdminUser(), UserRoles.ADMIN);
-    }
+    @Test(dependsOnGroups = "precondition", groups = "csv")
+    public void checkAdminUpdateDataOfOthers() throws JSONException, ParseException, IOException {
+        final String newAdminUser = testParams.getEditorUser();
+        final String newAdminPassword = testParams.getEditorPassword();
 
-    @Test(dependsOnMethods = {"addOtherAdminToProject"})
-    public void checkAdminUpdateDataOfOthers() throws JSONException {
+        addUserToProject(newAdminUser, UserRoles.ADMIN);
+
         try {
             final String datasetName = PAYROLL.getDatasetNameOfFirstUpload();
             log.info("datasetName by owner: " + datasetName);
 
             logout();
-            signInAtGreyPages(testParams.getAdminUser(), testParams.getAdminPassword());
+            signInAtGreyPages(newAdminUser, newAdminPassword);
 
             final Dataset dataset = initDataUploadPage()
                     .getOthersDatasetsTable()
