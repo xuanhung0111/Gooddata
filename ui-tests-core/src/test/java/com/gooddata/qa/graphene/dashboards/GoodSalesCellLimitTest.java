@@ -1,6 +1,10 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_CREATED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_QUOTA;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertTrue;
@@ -22,11 +26,6 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
     private static final String TESTING_REPORT_TABLE = "Testing report table";
     private static final String TESTING_REPORT_CHART = "Testing report chart";
 
-    private static final String ACCOUNT = "Account";
-    private static final String DATE = "Date (Created)";
-    private static final String AMOUNT = "Amount";
-    private static final String QUOTA = "Quota";
-
     @BeforeClass
     public void setProjectTitle() {
         projectTitle = "GoodSales-" + TEST_CELL_LIMIT;
@@ -38,10 +37,10 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
         createReport(
                 new UiReportDefinition()
                     .withName(TESTING_REPORT_TABLE)
-                    .withWhats(AMOUNT, QUOTA)
+                    .withWhats(METRIC_AMOUNT, METRIC_QUOTA)
                     .withHows(
-                            new HowItem(ACCOUNT, HowItem.Position.LEFT),
-                            new HowItem(DATE, HowItem.Position.TOP)
+                            new HowItem(ATTR_ACCOUNT, HowItem.Position.LEFT),
+                            new HowItem(ATTR_DATE_CREATED, HowItem.Position.TOP)
                     ),
                 TESTING_REPORT_TABLE
         );
@@ -50,9 +49,9 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
         reportPage.initPage()
             .setReportName(TESTING_REPORT_CHART)
             .openWhatPanel()
-            .selectMetric(AMOUNT)
+            .selectMetric(METRIC_AMOUNT)
             .openHowPanel()
-            .selectAttribute(ACCOUNT)
+            .selectAttribute(ATTR_ACCOUNT)
             .doneSndPanel()
             .selectReportVisualisation(ReportTypes.LINE)
             .forceRenderChartReport()
@@ -70,8 +69,8 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
             assertTrue(report.isCellLimit());
             report.showAnyway();
 
-            assertTrue(isEqualCollection(asList(AMOUNT, QUOTA), report.getMetricsHeader()));
-            assertTrue(isEqualCollection(asList(ACCOUNT, DATE), report.getAttributesHeader()));
+            assertTrue(isEqualCollection(asList(METRIC_AMOUNT, METRIC_QUOTA), report.getMetricsHeader()));
+            assertTrue(isEqualCollection(asList(ATTR_ACCOUNT, ATTR_DATE_CREATED), report.getAttributesHeader()));
         } finally {
             dashboardsPage.deleteDashboard();
         }

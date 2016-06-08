@@ -1,6 +1,12 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_WON;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PERCENT_OF_GOAL;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static java.util.Arrays.asList;
@@ -62,9 +68,9 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
         final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
 
         cataloguePanel.filterCatalog(CatalogFilterType.MEASURES);
-        analysisPage.addMetric(AMOUNT);
+        analysisPage.addMetric(METRIC_AMOUNT);
         cataloguePanel.filterCatalog(CatalogFilterType.ATTRIBUTES);
-        analysisPage.addAttribute(STAGE_NAME)
+        analysisPage.addAttribute(ATTR_STAGE_NAME)
             .waitForReportComputing();
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
     }
@@ -90,15 +96,15 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void checkXssInMetricAttribute() {
-        String xssAttribute = "<button>" + IS_WON + "</button>";
-        String xssMetric = "<button>" + PERCENT_OF_GOAL + "</button>";
+        String xssAttribute = "<button>" + ATTR_IS_WON + "</button>";
+        String xssMetric = "<button>" + METRIC_PERCENT_OF_GOAL + "</button>";
 
         initAttributePage();
-        waitForFragmentVisible(attributePage).initAttribute(IS_WON);
+        waitForFragmentVisible(attributePage).initAttribute(ATTR_IS_WON);
         waitForFragmentVisible(attributeDetailPage).renameAttribute(xssAttribute);
 
         initMetricPage();
-        waitForFragmentVisible(metricPage).openMetricDetailPage(PERCENT_OF_GOAL);
+        waitForFragmentVisible(metricPage).openMetricDetailPage(METRIC_PERCENT_OF_GOAL);
         waitForFragmentVisible(metricDetailPage).renameMetric(xssMetric);
 
         try {
@@ -135,11 +141,11 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
         } finally {
             initAttributePage();
             waitForFragmentVisible(attributePage).initAttribute(xssAttribute);
-            waitForFragmentVisible(attributeDetailPage).renameAttribute(IS_WON);
+            waitForFragmentVisible(attributeDetailPage).renameAttribute(ATTR_IS_WON);
 
             initMetricPage();
             waitForFragmentVisible(metricPage).openMetricDetailPage(xssMetric);
-            waitForFragmentVisible(metricDetailPage).renameMetric(PERCENT_OF_GOAL);
+            waitForFragmentVisible(metricDetailPage).renameMetric(METRIC_PERCENT_OF_GOAL);
         }
     }
 
@@ -147,8 +153,8 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
     public void testHiddenUnrelatedObjects() {
         final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
 
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-            .addAttribute(ACTIVITY_TYPE);
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .addAttribute(ATTR_ACTIVITY_TYPE);
         assertTrue(cataloguePanel.search(""));
         assertThat(cataloguePanel.getUnrelatedItemsHiddenCount(), equalTo(48));
 
@@ -180,7 +186,7 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
         });
 
         analysisPage.getCataloguePanel().filterCatalog(CatalogFilterType.ALL);
-        analysisPage.addAttribute(ACTIVITY_TYPE);
+        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE);
         Stream.of(CatalogFilterType.values()).forEach(type -> {
             assertFalse(analysisPage.getCataloguePanel().filterCatalog(type).search("Am"));
             assertTrue(isElementPresent(ByJQuery.selector(

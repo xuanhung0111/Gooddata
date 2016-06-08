@@ -1,19 +1,21 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
-import com.gooddata.qa.graphene.enums.indigo.FieldType;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static org.openqa.selenium.By.cssSelector;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static org.openqa.selenium.By.cssSelector;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
 public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
 
@@ -46,7 +48,7 @@ public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"init"})
     public void trending_recommendation_should_not_be_visible() {
         assertFalse(analysisPageReact.getCataloguePanel().getFieldNamesInViewPort().contains(DATE));
-        analysisPageReact.addMetric(AMOUNT, FieldType.FACT)
+        analysisPageReact.addMetric(METRIC_AMOUNT, FieldType.FACT)
             .waitForReportComputing();
 //        enable with CL-9443
 //        assertTrue(isElementPresent(cssSelector(".s-recommendation-comparison"), browser));
@@ -55,7 +57,7 @@ public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void metric_with_period_recommendation_should_not_be_visible() {
-        analysisPageReact.addMetric(AMOUNT, FieldType.FACT)
+        analysisPageReact.addMetric(FACT_AMOUNT, FieldType.FACT)
             .addAttribute("id")
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-recommendation-contribution"), browser));

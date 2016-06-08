@@ -1,9 +1,10 @@
 package com.gooddata.qa.graphene.dashboards;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -35,8 +36,6 @@ import com.gooddata.qa.graphene.fragments.reports.report.TableReport.Sort;
 
 public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest {
 
-    private static final String AMOUNT = "Amount";
-
     private static final String REPORT = "Test report";
 
     private static final String TOP_5_OPEN_REPORT = "Top 5 Open (by $)";
@@ -58,7 +57,7 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
         String reportName = "Headline report";
         String headlineValue = "$116,625,456.54";
 
-        createReport(new UiReportDefinition().withName(reportName).withWhats(AMOUNT)
+        createReport(new UiReportDefinition().withName(reportName).withWhats(METRIC_AMOUNT)
                 .withType(ReportTypes.HEADLINE), reportName);
 
         initDashboardsPage();
@@ -72,7 +71,7 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
             dashboardEditBar.saveDashboard();
             takeScreenshot(browser, "headline report - description is visible", getClass());
 
-            OneNumberReport headlineReport = verifyHeadlineReport(headlineValue, AMOUNT);
+            OneNumberReport headlineReport = verifyHeadlineReport(headlineValue, METRIC_AMOUNT);
 
             dashboardsPage.editDashboard();
             headlineReport.focus()

@@ -1,6 +1,12 @@
 package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_MONTH_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static java.util.Arrays.asList;
@@ -26,13 +32,6 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
     private static final String ATTRIBUTE_REPORT_NAME = "Drill attribute report";
     private static final String METRIC_REPORT_NAME = "Drill metric report";
 
-    private static final String AMOUNT = "Amount";
-    private static final String ACCOUNT = "Account";
-    private static final String PRODUCT = "Product";
-    private static final String DEPARTMENT = "Department";
-    private static final String STAGE_NAME = "Stage Name";
-    private static final String MONTH_YEAR_SNAPSHOT = "Month/Year (Snapshot)";
-
     private static final String ATTRIBUTE_VALUE_TO_DRILL = "14 West";
     private static final String METRIC_VALUE_TO_DRILL = "$18,447,266.14";
 
@@ -43,37 +42,37 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
 
     @Test(dependsOnMethods = {"createProject"})
     public void drillDownAttributeElement() {
-        setDrillAttribute(ACCOUNT, PRODUCT);
+        setDrillAttribute(ATTR_ACCOUNT, ATTR_PRODUCT);
 
         UiReportDefinition rd = new UiReportDefinition().withName(ATTRIBUTE_REPORT_NAME)
-                .withWhats(AMOUNT, "Avg. " + AMOUNT).withHows(ACCOUNT);
+                .withWhats(METRIC_AMOUNT, "Avg. " + METRIC_AMOUNT).withHows(ATTR_ACCOUNT);
         createReport(rd, rd.getName());
         checkRedBar(browser);
 
         TableReport report = openTableReport(ATTRIBUTE_REPORT_NAME);
-        assertEquals(report.getAttributesHeader(), asList(ACCOUNT));
+        assertEquals(report.getAttributesHeader(), asList(ATTR_ACCOUNT));
         assertTrue(reportPage.getFilters().isEmpty());
 
         report = drillOnAttributeFromReport(report, ATTRIBUTE_VALUE_TO_DRILL);
-        assertEquals(report.getAttributesHeader(), asList(PRODUCT));
-        assertEquals(reportPage.getFilters(), asList(ACCOUNT + " is " + ATTRIBUTE_VALUE_TO_DRILL));
+        assertEquals(report.getAttributesHeader(), asList(ATTR_PRODUCT));
+        assertEquals(reportPage.getFilters(), asList(ATTR_ACCOUNT + " is " + ATTRIBUTE_VALUE_TO_DRILL));
 
         report = backToPreviousReport();
-        assertEquals(report.getAttributesHeader(), asList(ACCOUNT));
+        assertEquals(report.getAttributesHeader(), asList(ATTR_ACCOUNT));
         assertTrue(reportPage.getFilters().isEmpty());
     }
 
     @Test(dependsOnMethods = {"drillDownAttributeElement"})
     public void updateDrillDownInReport() {
-        setDrillAttribute(ACCOUNT, DEPARTMENT);
+        setDrillAttribute(ATTR_ACCOUNT, ATTR_DEPARTMENT);
 
         TableReport report = drillOnAttributeFromReport(openTableReport(ATTRIBUTE_REPORT_NAME),
                 ATTRIBUTE_VALUE_TO_DRILL);
-        assertEquals(report.getAttributesHeader(), asList(DEPARTMENT));
-        assertEquals(reportPage.getFilters(), asList(ACCOUNT + " is " + ATTRIBUTE_VALUE_TO_DRILL));
+        assertEquals(report.getAttributesHeader(), asList(ATTR_DEPARTMENT));
+        assertEquals(reportPage.getFilters(), asList(ATTR_ACCOUNT + " is " + ATTRIBUTE_VALUE_TO_DRILL));
 
         report = backToPreviousReport();
-        assertEquals(report.getAttributesHeader(), asList(ACCOUNT));
+        assertEquals(report.getAttributesHeader(), asList(ATTR_ACCOUNT));
         assertTrue(reportPage.getFilters().isEmpty());
     }
 
@@ -82,7 +81,7 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
         openTableReport(ATTRIBUTE_REPORT_NAME);
         assertTrue(isLinkAppearedWhenHoveringOn(getAttributeValueElement(ATTRIBUTE_VALUE_TO_DRILL)));
 
-        clearDrillAttribute(ACCOUNT);
+        clearDrillAttribute(ATTR_ACCOUNT);
 
         openTableReport(ATTRIBUTE_REPORT_NAME);
         assertFalse(isLinkAppearedWhenHoveringOn(getAttributeValueElement(ATTRIBUTE_VALUE_TO_DRILL)));
@@ -92,21 +91,21 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
     public void drillDownMetric() {
         initReportsPage();
         UiReportDefinition rd = new UiReportDefinition().withName(METRIC_REPORT_NAME)
-            .withWhats(new WhatItem(AMOUNT, ACCOUNT))
-            .withHows(STAGE_NAME);
+            .withWhats(new WhatItem(METRIC_AMOUNT, ATTR_ACCOUNT))
+            .withHows(ATTR_STAGE_NAME);
         createReport(rd, rd.getName());
         checkRedBar(browser);
 
         TableReport report = openTableReport(METRIC_REPORT_NAME);
-        assertEquals(report.getAttributesHeader(), asList(STAGE_NAME));
+        assertEquals(report.getAttributesHeader(), asList(ATTR_STAGE_NAME));
         assertTrue(reportPage.getFilters().isEmpty());
 
         report = drillOnMetricFromReport(report, METRIC_VALUE_TO_DRILL);
-        assertEquals(report.getAttributesHeader(), asList(ACCOUNT));
-        assertEquals(reportPage.getFilters(), asList(STAGE_NAME + " is Interest"));
+        assertEquals(report.getAttributesHeader(), asList(ATTR_ACCOUNT));
+        assertEquals(reportPage.getFilters(), asList(ATTR_STAGE_NAME + " is Interest"));
 
         report = backToPreviousReport();
-        assertEquals(report.getAttributesHeader(), asList(STAGE_NAME));
+        assertEquals(report.getAttributesHeader(), asList(ATTR_STAGE_NAME));
         assertTrue(reportPage.getFilters().isEmpty());
     }
 
@@ -116,7 +115,7 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
         assertTrue(isLinkAppearedWhenHoveringOn(getMetricElement(METRIC_VALUE_TO_DRILL)));
 
         reportPage.showConfiguration()
-            .removeDrillStepInConfigPanel(AMOUNT, ACCOUNT)
+            .removeDrillStepInConfigPanel(METRIC_AMOUNT, ATTR_ACCOUNT)
             .waitForReportExecutionProgress();
         assertFalse(isLinkAppearedWhenHoveringOn(getMetricElement(METRIC_VALUE_TO_DRILL)));
     }
@@ -128,13 +127,13 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
 
         initReportsPage();
         UiReportDefinition rd = new UiReportDefinition().withName(reportName)
-            .withWhats(AMOUNT)
-            .withHows(MONTH_YEAR_SNAPSHOT);
+            .withWhats(METRIC_AMOUNT)
+            .withHows(ATTR_MONTH_YEAR_SNAPSHOT);
         createReport(rd, rd.getName());
         checkRedBar(browser);
 
         openTableReport(reportName)
-            .changeAttributeDisplayLabelByRightClick(MONTH_YEAR_SNAPSHOT, "Number (1/2010) (Snapshot)");
+            .changeAttributeDisplayLabelByRightClick(ATTR_MONTH_YEAR_SNAPSHOT, "Number (1/2010) (Snapshot)");
         reportPage.waitForReportExecutionProgress()
             .clickSaveReport()
             .waitForReportSaved();
@@ -160,31 +159,31 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
         String attributeValueToDrill = "1000Bulbs.com";
         String metricValueToDrill = "$18,000.00";
 
-        setDrillAttribute(ACCOUNT, PRODUCT);
+        setDrillAttribute(ATTR_ACCOUNT, ATTR_PRODUCT);
 
         UiReportDefinition rd = new UiReportDefinition().withName(reportName)
-                .withWhats(new WhatItem(AMOUNT, DEPARTMENT)).withHows(ACCOUNT);
+                .withWhats(new WhatItem(METRIC_AMOUNT, ATTR_DEPARTMENT)).withHows(ATTR_ACCOUNT);
         createReport(rd, rd.getName());
         checkRedBar(browser);
 
-        deleteAttribute(DEPARTMENT);
-        deleteAttribute(PRODUCT);
+        deleteAttribute(ATTR_DEPARTMENT);
+        deleteAttribute(ATTR_PRODUCT);
 
         TableReport report = openTableReport(reportName);
-        assertEquals(report.getAttributesHeader(), asList(ACCOUNT));
+        assertEquals(report.getAttributesHeader(), asList(ATTR_ACCOUNT));
         assertTrue(reportPage.getFilters().isEmpty());
 
         report = drillOnAttributeFromReport(report, ATTRIBUTE_VALUE_TO_DRILL);
-        assertEquals(report.getAttributesHeader(), asList(PRODUCT));
-        assertEquals(reportPage.getFilters(), asList(ACCOUNT + " is " + ATTRIBUTE_VALUE_TO_DRILL));
+        assertEquals(report.getAttributesHeader(), asList(ATTR_PRODUCT));
+        assertEquals(reportPage.getFilters(), asList(ATTR_ACCOUNT + " is " + ATTRIBUTE_VALUE_TO_DRILL));
 
         report = backToPreviousReport();
-        assertEquals(report.getAttributesHeader(), asList(ACCOUNT));
+        assertEquals(report.getAttributesHeader(), asList(ATTR_ACCOUNT));
         assertTrue(reportPage.getFilters().isEmpty());
 
         report = drillOnMetricFromReport(report, metricValueToDrill);
-        assertEquals(report.getAttributesHeader(), asList(DEPARTMENT));
-        assertEquals(reportPage.getFilters(), asList(ACCOUNT + " is " + attributeValueToDrill));
+        assertEquals(report.getAttributesHeader(), asList(ATTR_DEPARTMENT));
+        assertEquals(reportPage.getFilters(), asList(ATTR_ACCOUNT + " is " + attributeValueToDrill));
         backToPreviousReport();
 
         initDashboardsPage();

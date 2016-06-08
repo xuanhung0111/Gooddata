@@ -2,6 +2,9 @@ package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static java.util.Arrays.asList;
@@ -44,10 +47,6 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
 
     private static final String REPORT_NAME = "Basic Filter";
     private static final String VARIABLE_NAME = "FVariable";
-
-    private static final String METRIC_AMOUNT = "Amount";
-    private static final String ATTR_STAGE_NAME = "Stage Name";
-    private static final String ATTR_YEAR = "Year (Snapshot)";
 
     private static final String NO_ATTRIBUTE_VALUE_MESSAGE = "No values selected for filtering."
             + " Select some values or cancel the filter.";
@@ -103,7 +102,7 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
         initReport(REPORT_NAME + System.currentTimeMillis()).openFilterPanel()
                 .clickAddFilter()
                 .openAttributeFilterFragment()
-                .searchAndSelectAttribute(ATTR_YEAR)
+                .searchAndSelectAttribute(ATTR_YEAR_SNAPSHOT)
                 .selectFloatingTime(Time.THIS_YEAR)
                 .apply();
         waitForAnalysisPageLoaded(browser);
@@ -111,7 +110,7 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
         reportPage.saveReport();
         checkRedBar(browser);
 
-        String filterName = ATTR_YEAR + " is " + Time.THIS_YEAR;
+        String filterName = ATTR_YEAR_SNAPSHOT + " is " + Time.THIS_YEAR;
         assertThat(reportPage.getFilters(), hasItem(filterName));
 
         reportPage.<AttributeFilterFragment> openExistingFilter(filterName, FilterFragment.ATTRIBUTE_FILTER)
@@ -120,7 +119,7 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
                 .apply();
         waitForReportLoaded();
 
-        filterName = String.format(ATTR_YEAR + " is the last %s years", String.valueOf(rangeNumber + 1));
+        filterName = String.format(ATTR_YEAR_SNAPSHOT + " is the last %s years", String.valueOf(rangeNumber + 1));
         assertThat(reportPage.getFilters(), hasItem(filterName));
 
         reportPage.saveReport();
@@ -170,7 +169,7 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = "createProject")
     public void checkFilterAppliedInOrder() {
         initReport(REPORT_NAME + System.currentTimeMillis())
-                .addFilter(FilterItem.Factory.createAttributeFilter(ATTR_YEAR, "2010"));
+                .addFilter(FilterItem.Factory.createAttributeFilter(ATTR_YEAR_SNAPSHOT, "2010"));
         waitForReportLoaded();
 
         String filterName = "Year (Snapshot) is 2010";
@@ -211,7 +210,7 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
 
         String amountMetricUri = mdService.getObjUri(project, Metric.class, title(METRIC_AMOUNT));
         Attribute stageName = mdService.getObj(project, Attribute.class, title(ATTR_STAGE_NAME));
-        Attribute year = mdService.getObj(project, Attribute.class, title(ATTR_YEAR));
+        Attribute year = mdService.getObj(project, Attribute.class, title(ATTR_YEAR_SNAPSHOT));
 
         ReportDefinition definition = GridReportDefinitionContent.create(
                 reportName,

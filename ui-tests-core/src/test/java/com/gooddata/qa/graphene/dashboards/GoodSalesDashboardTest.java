@@ -1,8 +1,9 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_PIPELINE_ANALYSIS;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static org.testng.Assert.assertEquals;
 
 import org.testng.annotations.Test;
@@ -25,7 +26,7 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
     public void exportFirstDashboard() {
         if (!testParams.isClusterEnvironment()) return;
         initDashboardsPage();
-        dashboardsPage.selectDashboard("Pipeline Analysis");
+        dashboardsPage.selectDashboard(DASH_PIPELINE_ANALYSIS);
         waitForDashboardPageLoaded(browser);
         exportedDashboardName = dashboardsPage.exportDashboardTab(0);
         checkRedBar(browser);
@@ -39,34 +40,14 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"verifyDashboardTabs"}, groups = {"dashboards-verification"})
     public void addNewEmptyTab() {
-        addNewTabOnDashboard("Pipeline Analysis", "empty-tab", "GoodSales-new-empty-tab");
+        addNewTabOnDashboard(DASH_PIPELINE_ANALYSIS, "empty-tab", "GoodSales-new-empty-tab");
     }
 
     @Test(dependsOnMethods = {"addNewEmptyTab"}, groups = {"dashboards-verification"})
     public void addNewNonEmptyTab() {
-        addNewTabOnDashboard("Pipeline Analysis", "non-empty-tab", "GoodSales-new-non-empty-tab");
+        addNewTabOnDashboard(DASH_PIPELINE_ANALYSIS, "non-empty-tab", "GoodSales-new-non-empty-tab");
         dashboardsPage.addLineToDashboard().saveDashboard();
     }
-
-    /**
-     * Temporarily disabled test for adding report on dashboard tab since there is a weird behavior
-     * - dialog for adding report and report itself is present, but webdriver can't use it since it's not visible (probably some css issue?)
-     *
-     * @Test(dependsOnMethods = {"addNewTab"}, groups = {"dashboards-verification"})
-     * public void addReportOnNewTab() {
-     * initDashboardsPage();
-     * dashboardsPage.selectDashboard("Pipeline Analysis");
-     * waitForDashboardPageLoaded();
-     * Thread.sleep(3000);
-     * dashboardsPage.getTabs().openTab(9);
-     * waitForDashboardPageLoaded();
-     * dashboardsPage.editDashboard();
-     * dashboardsPage.getDashboardEditBar().addReportToDashboard("Activities by Type");
-     * dashboardsPage.getDashboardEditBar().saveDashboard();
-     * waitForDashboardPageLoaded();
-     * Screenshots.takeScreenshot(browser, "GoodSales-new-tab-with-chart", this.getClass());
-     * }
-     */
 
     @Test(dependsOnMethods = {"addNewEmptyTab"}, groups = {"dashboards-verification"})
     public void deleteEmptyTab() {
@@ -118,7 +99,7 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 
     private void deleteTab(int offset) {
         initDashboardsPage();
-        dashboardsPage.selectDashboard("Pipeline Analysis");
+        dashboardsPage.selectDashboard(DASH_PIPELINE_ANALYSIS);
         waitForDashboardPageLoaded(browser);
         sleepTightInSeconds(5);
         int tabsCount = dashboardsPage.getTabs().getNumberOfTabs();

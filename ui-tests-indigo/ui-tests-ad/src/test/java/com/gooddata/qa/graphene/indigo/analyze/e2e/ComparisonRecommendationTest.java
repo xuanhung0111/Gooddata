@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
@@ -27,44 +29,44 @@ public class ComparisonRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_apply_first_attribute_and_hide_recommendation() {
-        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
         Graphene.createPageFragment(RecommendationContainer.class,
             waitForElementVisible(RecommendationContainer.LOCATOR, browser))
-            .<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).select(ACTIVITY_TYPE).apply();
+            .<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).select(ATTR_ACTIVITY_TYPE).apply();
         analysisPageReact.waitForReportComputing();
         assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison"), browser));
-        assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(ACTIVITY_TYPE));
+        assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_apply_first_attribute_and_show_other_recommendations() {
-        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
         Graphene.createPageFragment(RecommendationContainer.class,
             waitForElementVisible(RecommendationContainer.LOCATOR, browser))
-            .<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).select(ACTIVITY_TYPE).apply();
+            .<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).select(ATTR_ACTIVITY_TYPE).apply();
         analysisPageReact.waitForReportComputing();
         assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison"), browser));
-        assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(ACTIVITY_TYPE));
+        assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
         assertTrue(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
         assertTrue(isElementPresent(cssSelector(".s-recommendation-contribution"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_have_initial_value_selected_after_resetting_report() {
-        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
         String initialValue = getValueFrom(".s-recommendation-comparison .s-attribute-switch");
 
         Graphene.createPageFragment(RecommendationContainer.class,
             waitForElementVisible(RecommendationContainer.LOCATOR, browser))
-            .<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).select(ACTIVITY_TYPE);
+            .<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).select(ATTR_ACTIVITY_TYPE);
         String value = getValueFrom(".s-recommendation-comparison .s-attribute-switch");
 
         analysisPageReact.resetToBlankState();
 
-        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
         String resetValue = getValueFrom(".s-recommendation-comparison .s-attribute-switch");
         assertEquals(resetValue, initialValue);

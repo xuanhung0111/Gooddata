@@ -1,8 +1,18 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.md.Restriction.identifier;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_MONTH_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPP_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_QUARTER_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
@@ -49,17 +59,6 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
     private static final String REPORT_2 = "Report2";
     private static final String REPORT_3 = "Report3";
 
-    private static final String DEPARTMENT = "Department";
-    private static final String REGION = "Region";
-    private static final String OPP_SNAPSHOT = "Opp. Snapshot";
-    private static final String STAGE_NAME = "Stage Name";
-    private static final String ACCOUNT = "Account";
-    private static final String PRODUCT = "Product";
-    private static final String AMOUNT = "Amount";
-    private static final String YEAR_SNAPSHOT = "Year (Snapshot)";
-    private static final String QUARTER_YEAR_SNAPSHOT = "Quarter/Year (Snapshot)";
-    private static final String MONTH_YEAR_SNAPSHOT = "Month/Year (Snapshot)";
-
     private static final String ATTRIBUTE_TEST_DASHBOARD = "AttributeTestDashboard";
     private static final String DATE_TEST_DASHBOARD = "DateTestDashboard";
     private static final String TMP_DASHBOARD = "TmpDashboard";
@@ -87,7 +86,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
                         singletonList("metricGroup"),
                         asList(new AttributeInGrid(account.getDefaultDisplayForm().getUri()), new AttributeInGrid(
                                 stageName.getDefaultDisplayForm().getUri())), singletonList(new GridElement(
-                                amountMetricUri, AMOUNT)));
+                                amountMetricUri, METRIC_AMOUNT)));
         definition = mdService.createObj(project, definition);
         mdService.createObj(project, new Report(definition.getTitle(), definition));
 
@@ -98,16 +97,16 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
                         singletonList("metricGroup"),
                         asList(new AttributeInGrid(stageName.getDefaultDisplayForm().getUri()),
                                 new AttributeInGrid(product.getDefaultDisplayForm().getUri())),
-                        singletonList(new GridElement(amountMetricUri, AMOUNT)));
+                        singletonList(new GridElement(amountMetricUri, METRIC_AMOUNT)));
         definition = mdService.createObj(project, definition);
         mdService.createObj(project, new Report(definition.getTitle(), definition));
 
         // *** create report 3 ***
         initReportsPage();
-        UiReportDefinition rd = new UiReportDefinition().withName(REPORT_3).withWhats(AMOUNT).withHows(STAGE_NAME)
-                .withHows(new HowItem(YEAR_SNAPSHOT, Position.TOP),
-                        new HowItem(QUARTER_YEAR_SNAPSHOT, Position.TOP),
-                        new HowItem(MONTH_YEAR_SNAPSHOT, Position.TOP));
+        UiReportDefinition rd = new UiReportDefinition().withName(REPORT_3).withWhats(METRIC_AMOUNT).withHows(ATTR_STAGE_NAME)
+                .withHows(new HowItem(ATTR_YEAR_SNAPSHOT, Position.TOP),
+                        new HowItem(ATTR_QUARTER_YEAR_SNAPSHOT, Position.TOP),
+                        new HowItem(ATTR_MONTH_YEAR_SNAPSHOT, Position.TOP));
         createReport(rd, REPORT_3);
     }
 
@@ -122,11 +121,11 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
 
         addReportToDashboardAndMoveToRightPlace(REPORT_2, DashboardWidgetDirection.RIGHT);
 
-        addListAttributeFilterToDashboardAndMoveToRightPlace(ACCOUNT, DashboardWidgetDirection.UP);
+        addListAttributeFilterToDashboardAndMoveToRightPlace(ATTR_ACCOUNT, DashboardWidgetDirection.UP);
 
-        addListAttributeFilterToDashboardAndMoveToRightPlace(STAGE_NAME, DashboardWidgetDirection.MIDDLE);
+        addListAttributeFilterToDashboardAndMoveToRightPlace(ATTR_STAGE_NAME, DashboardWidgetDirection.MIDDLE);
 
-        addListAttributeFilterToDashboardAndMoveToRightPlace(PRODUCT, DashboardWidgetDirection.DOWN);
+        addListAttributeFilterToDashboardAndMoveToRightPlace(ATTR_PRODUCT, DashboardWidgetDirection.DOWN);
 
         dashboardEditBar.saveDashboard();
     }
@@ -141,12 +140,12 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
 
         addReportToDashboardAndMoveToRightPlace(REPORT_3, DashboardWidgetDirection.LEFT);
 
-        addListAttributeFilterToDashboardAndMoveToRightPlace(YEAR_SNAPSHOT, DashboardWidgetDirection.UP);
+        addListAttributeFilterToDashboardAndMoveToRightPlace(ATTR_YEAR_SNAPSHOT, DashboardWidgetDirection.UP);
 
-        addListAttributeFilterToDashboardAndMoveToRightPlace(QUARTER_YEAR_SNAPSHOT, 
+        addListAttributeFilterToDashboardAndMoveToRightPlace(ATTR_QUARTER_YEAR_SNAPSHOT, 
                 DashboardWidgetDirection.MIDDLE);
 
-        addListAttributeFilterToDashboardAndMoveToRightPlace(MONTH_YEAR_SNAPSHOT, DashboardWidgetDirection.DOWN);
+        addListAttributeFilterToDashboardAndMoveToRightPlace(ATTR_MONTH_YEAR_SNAPSHOT, DashboardWidgetDirection.DOWN);
 
         dashboardEditBar.saveDashboard();
     }
@@ -160,23 +159,23 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
             dashboardsPage.editDashboard();
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
 
-            addListAttributeFilterToDashboardAndMoveToRightPlace(PRODUCT, DashboardWidgetDirection.LEFT);
-            addListAttributeFilterToDashboardAndMoveToRightPlace(ACCOUNT, DashboardWidgetDirection.RIGHT);
-            addListAttributeFilterToDashboardAndMoveToRightPlace(REGION, DashboardWidgetDirection.UP);
-            addListAttributeFilterToDashboardAndMoveToRightPlace(DEPARTMENT, DashboardWidgetDirection.MIDDLE);
+            addListAttributeFilterToDashboardAndMoveToRightPlace(ATTR_PRODUCT, DashboardWidgetDirection.LEFT);
+            addListAttributeFilterToDashboardAndMoveToRightPlace(ATTR_ACCOUNT, DashboardWidgetDirection.RIGHT);
+            addListAttributeFilterToDashboardAndMoveToRightPlace(ATTR_REGION, DashboardWidgetDirection.UP);
+            addListAttributeFilterToDashboardAndMoveToRightPlace(ATTR_DEPARTMENT, DashboardWidgetDirection.MIDDLE);
 
-            dashboardEditBar.setParentsFilterUsingDataset(ACCOUNT, OPP_SNAPSHOT, PRODUCT);
-            dashboardEditBar.setParentsFilterUsingDataset(REGION, OPP_SNAPSHOT, ACCOUNT);
-            dashboardEditBar.setParentsFilter(DEPARTMENT, REGION);
+            dashboardEditBar.setParentsFilterUsingDataset(ATTR_ACCOUNT, ATTR_OPP_SNAPSHOT, ATTR_PRODUCT);
+            dashboardEditBar.setParentsFilterUsingDataset(ATTR_REGION, ATTR_OPP_SNAPSHOT, ATTR_ACCOUNT);
+            dashboardEditBar.setParentsFilter(ATTR_DEPARTMENT, ATTR_REGION);
 
             WidgetConfigPanel configPanel = dashboardEditBar.openGroupConfigPanel();
             configPanel.getTab(WidgetConfigPanel.Tab.GROUP, GroupConfigPanel.class)
-                .selectFilters(ACCOUNT, PRODUCT);
+                .selectFilters(ATTR_ACCOUNT, ATTR_PRODUCT);
             configPanel.saveConfiguration();
 
             configPanel = dashboardEditBar.openGroupConfigPanel();
             configPanel.getTab(WidgetConfigPanel.Tab.GROUP, GroupConfigPanel.class)
-                .selectFilters(REGION, DEPARTMENT);
+                .selectFilters(ATTR_REGION, ATTR_DEPARTMENT);
             configPanel.saveConfiguration();
             dashboardEditBar.saveDashboard();
 
@@ -185,10 +184,10 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
             WebElement groupBButton = waitForElementVisible(
                     By.cssSelector(".yui3-c-dashboardwidget.even .s-btn-apply"), browser);
             DashboardContent dashboardContent = dashboardsPage.getContent();
-            FilterWidget regionFilter = dashboardContent.getFilterWidget(simplifyText(REGION));
-            FilterWidget departmentFilter = dashboardContent.getFilterWidget(simplifyText(DEPARTMENT));
-            FilterWidget productFilter = dashboardContent.getFilterWidget(simplifyText(PRODUCT));
-            FilterWidget accountFilter = dashboardContent.getFilterWidget(simplifyText(ACCOUNT));
+            FilterWidget regionFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_REGION));
+            FilterWidget departmentFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_DEPARTMENT));
+            FilterWidget productFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_PRODUCT));
+            FilterWidget accountFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_ACCOUNT));
 
             regionFilter.changeAttributeFilterValue("East Coast");
             regionFilter.getRoot().click();
@@ -230,20 +229,20 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
         try {
             dashboardsPage.editDashboard();
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-            dashboardEditBar.setParentsFilterUsingDataset(STAGE_NAME, OPP_SNAPSHOT, ACCOUNT);
-            dashboardEditBar.setParentsFilterUsingDataset(PRODUCT, OPP_SNAPSHOT, STAGE_NAME);
+            dashboardEditBar.setParentsFilterUsingDataset(ATTR_STAGE_NAME, ATTR_OPP_SNAPSHOT, ATTR_ACCOUNT);
+            dashboardEditBar.setParentsFilterUsingDataset(ATTR_PRODUCT, ATTR_OPP_SNAPSHOT, ATTR_STAGE_NAME);
 
             WidgetConfigPanel configPanel = dashboardEditBar.openGroupConfigPanel();
             configPanel.getTab(WidgetConfigPanel.Tab.GROUP, GroupConfigPanel.class)
-                .selectFilters(ACCOUNT, STAGE_NAME, PRODUCT);
+                .selectFilters(ATTR_ACCOUNT, ATTR_STAGE_NAME, ATTR_PRODUCT);
             configPanel.saveConfiguration();
             dashboardEditBar.saveDashboard();
 
             WebElement groupButton = waitForElementVisible(By.cssSelector(".s-btn-apply"), browser);
             DashboardContent dashboardContent = dashboardsPage.getContent();
-            FilterWidget accountFilter = dashboardContent.getFilterWidget(simplifyText(ACCOUNT));
-            FilterWidget stageNameFilter = dashboardContent.getFilterWidget(simplifyText(STAGE_NAME));
-            FilterWidget productFilter = dashboardContent.getFilterWidget(simplifyText(PRODUCT));
+            FilterWidget accountFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_ACCOUNT));
+            FilterWidget stageNameFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_STAGE_NAME));
+            FilterWidget productFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_PRODUCT));
             accountFilter.changeAttributeFilterValue("123 Exteriors", "14 West");
             accountFilter.getRoot().click();
             assertFalse(groupButton.getAttribute("class").contains("disabled"));
@@ -292,14 +291,14 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
         try {
             dashboardsPage.editDashboard();
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-            dashboardEditBar.setParentsFilterUsingDataset(STAGE_NAME, OPP_SNAPSHOT, ACCOUNT);
-            dashboardEditBar.setParentsFilterUsingDataset(PRODUCT, OPP_SNAPSHOT, STAGE_NAME);
+            dashboardEditBar.setParentsFilterUsingDataset(ATTR_STAGE_NAME, ATTR_OPP_SNAPSHOT, ATTR_ACCOUNT);
+            dashboardEditBar.setParentsFilterUsingDataset(ATTR_PRODUCT, ATTR_OPP_SNAPSHOT, ATTR_STAGE_NAME);
             dashboardEditBar.saveDashboard();
 
             DashboardContent dashboardContent = dashboardsPage.getContent();
-            FilterWidget accountFilter = dashboardContent.getFilterWidget(simplifyText(ACCOUNT));
-            FilterWidget stageNameFilter = dashboardContent.getFilterWidget(simplifyText(STAGE_NAME));
-            FilterWidget productFilter = dashboardContent.getFilterWidget(simplifyText(PRODUCT));
+            FilterWidget accountFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_ACCOUNT));
+            FilterWidget stageNameFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_STAGE_NAME));
+            FilterWidget productFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_PRODUCT));
             accountFilter.changeAttributeFilterValue("123 Exteriors", "14 West");
 
             assertTrue(isEqualCollection(stageNameFilter.getAllAttributeValues(), asList("Closed Won",
@@ -328,16 +327,16 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
             dashboardsPage.editDashboard();
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
             DashboardContent dashboardContent = dashboardsPage.getContent();
-            FilterWidget accountFilter = dashboardContent.getFilterWidget(simplifyText(ACCOUNT));
-            FilterWidget stageNameFilter = dashboardContent.getFilterWidget(simplifyText(STAGE_NAME));
-            FilterWidget productFilter = dashboardContent.getFilterWidget(simplifyText(PRODUCT));
+            FilterWidget accountFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_ACCOUNT));
+            FilterWidget stageNameFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_STAGE_NAME));
+            FilterWidget productFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_PRODUCT));
 
             accountFilter.changeSelectionToOneValue();
             stageNameFilter.changeSelectionToOneValue();
             productFilter.changeSelectionToOneValue();
 
-            dashboardEditBar.setParentsFilterUsingDataset(STAGE_NAME, OPP_SNAPSHOT, ACCOUNT);
-            dashboardEditBar.setParentsFilterUsingDataset(PRODUCT, OPP_SNAPSHOT, STAGE_NAME);
+            dashboardEditBar.setParentsFilterUsingDataset(ATTR_STAGE_NAME, ATTR_OPP_SNAPSHOT, ATTR_ACCOUNT);
+            dashboardEditBar.setParentsFilterUsingDataset(ATTR_PRODUCT, ATTR_OPP_SNAPSHOT, ATTR_STAGE_NAME);
             dashboardEditBar.saveDashboard();
             sleepTightInSeconds(2);
 
@@ -359,14 +358,14 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
         try {
             dashboardsPage.editDashboard();
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-            dashboardEditBar.setParentsFilter(QUARTER_YEAR_SNAPSHOT, YEAR_SNAPSHOT);
-            dashboardEditBar.setParentsFilter(MONTH_YEAR_SNAPSHOT, QUARTER_YEAR_SNAPSHOT);
+            dashboardEditBar.setParentsFilter(ATTR_QUARTER_YEAR_SNAPSHOT, ATTR_YEAR_SNAPSHOT);
+            dashboardEditBar.setParentsFilter(ATTR_MONTH_YEAR_SNAPSHOT, ATTR_QUARTER_YEAR_SNAPSHOT);
             dashboardEditBar.saveDashboard();
 
             DashboardContent dashboardContent = dashboardsPage.getContent();
-            FilterWidget yearFilter = dashboardContent.getFilterWidget(simplifyText(YEAR_SNAPSHOT));
-            FilterWidget quarterFilter = dashboardContent.getFilterWidget(simplifyText(QUARTER_YEAR_SNAPSHOT));
-            FilterWidget monthFilter = dashboardContent.getFilterWidget(simplifyText(MONTH_YEAR_SNAPSHOT));
+            FilterWidget yearFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_YEAR_SNAPSHOT));
+            FilterWidget quarterFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_QUARTER_YEAR_SNAPSHOT));
+            FilterWidget monthFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_MONTH_YEAR_SNAPSHOT));
             yearFilter.changeAttributeFilterValue("1900");
 
             assertTrue(isEqualCollection(quarterFilter.getAllAttributeValues(), asList("Q1/1900", "Q2/1900",
@@ -395,14 +394,14 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
         try {
             dashboardsPage.editDashboard();
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-            dashboardEditBar.setParentsFilterUsingDataset(STAGE_NAME, OPP_SNAPSHOT, ACCOUNT);
-            dashboardEditBar.setParentsFilterUsingDataset(PRODUCT, OPP_SNAPSHOT, ACCOUNT);
+            dashboardEditBar.setParentsFilterUsingDataset(ATTR_STAGE_NAME, ATTR_OPP_SNAPSHOT, ATTR_ACCOUNT);
+            dashboardEditBar.setParentsFilterUsingDataset(ATTR_PRODUCT, ATTR_OPP_SNAPSHOT, ATTR_ACCOUNT);
             dashboardEditBar.saveDashboard();
 
             DashboardContent dashboardContent = dashboardsPage.getContent();
-            FilterWidget accountFilter = dashboardContent.getFilterWidget(simplifyText(ACCOUNT));
-            FilterWidget stageNameFilter = dashboardContent.getFilterWidget(simplifyText(STAGE_NAME));
-            FilterWidget productFilter = dashboardContent.getFilterWidget(simplifyText(PRODUCT));
+            FilterWidget accountFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_ACCOUNT));
+            FilterWidget stageNameFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_STAGE_NAME));
+            FilterWidget productFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_PRODUCT));
             accountFilter.changeAttributeFilterValue("123 Exteriors", "14 West");
 
             assertTrue(isEqualCollection(stageNameFilter.getAllAttributeValues(), asList("Closed Won",
@@ -431,14 +430,14 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
         try {
             dashboardsPage.editDashboard();
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-            dashboardEditBar.setParentsFilter(QUARTER_YEAR_SNAPSHOT, YEAR_SNAPSHOT);
-            dashboardEditBar.setParentsFilter(MONTH_YEAR_SNAPSHOT, YEAR_SNAPSHOT);
+            dashboardEditBar.setParentsFilter(ATTR_QUARTER_YEAR_SNAPSHOT, ATTR_YEAR_SNAPSHOT);
+            dashboardEditBar.setParentsFilter(ATTR_MONTH_YEAR_SNAPSHOT, ATTR_YEAR_SNAPSHOT);
             dashboardEditBar.saveDashboard();
 
             DashboardContent dashboardContent = dashboardsPage.getContent();
-            FilterWidget yearFilter = dashboardContent.getFilterWidget(simplifyText(YEAR_SNAPSHOT));
-            FilterWidget quarterFilter = dashboardContent.getFilterWidget(simplifyText(QUARTER_YEAR_SNAPSHOT));
-            FilterWidget monthFilter = dashboardContent.getFilterWidget(simplifyText(MONTH_YEAR_SNAPSHOT));
+            FilterWidget yearFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_YEAR_SNAPSHOT));
+            FilterWidget quarterFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_QUARTER_YEAR_SNAPSHOT));
+            FilterWidget monthFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_MONTH_YEAR_SNAPSHOT));
             yearFilter.changeAttributeFilterValue("1900");
 
             assertTrue(isEqualCollection(quarterFilter.getAllAttributeValues(), asList("Q1/1900", "Q2/1900",
@@ -471,13 +470,13 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
         try {
             dashboardsPage.editDashboard();
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-            dashboardEditBar.setParentsFilterUsingDataset(STAGE_NAME, OPP_SNAPSHOT, ACCOUNT);
+            dashboardEditBar.setParentsFilterUsingDataset(ATTR_STAGE_NAME, ATTR_OPP_SNAPSHOT, ATTR_ACCOUNT);
             dashboardEditBar.saveDashboard();
 
             DashboardContent dashboardContent = dashboardsPage.getContent();
-            FilterWidget accountFilter = dashboardContent.getFilterWidget(simplifyText(ACCOUNT));
-            FilterWidget stageNameFilter = dashboardContent.getFilterWidget(simplifyText(STAGE_NAME));
-            FilterWidget productFilter = dashboardContent.getFilterWidget(simplifyText(PRODUCT));
+            FilterWidget accountFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_ACCOUNT));
+            FilterWidget stageNameFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_STAGE_NAME));
+            FilterWidget productFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_PRODUCT));
             accountFilter.changeAttributeFilterValue("123 Exteriors", "14 West");
 
             assertTrue(isEqualCollection(stageNameFilter.getAllAttributeValues(), asList("Closed Won",
@@ -500,14 +499,14 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
         try {
             dashboardsPage.editDashboard();
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-            dashboardEditBar.setParentsFilterUsingDataset(STAGE_NAME, OPP_SNAPSHOT, ACCOUNT);
-            dashboardEditBar.setParentsFilterUsingDataset(PRODUCT, OPP_SNAPSHOT, ACCOUNT, STAGE_NAME);
+            dashboardEditBar.setParentsFilterUsingDataset(ATTR_STAGE_NAME, ATTR_OPP_SNAPSHOT, ATTR_ACCOUNT);
+            dashboardEditBar.setParentsFilterUsingDataset(ATTR_PRODUCT, ATTR_OPP_SNAPSHOT, ATTR_ACCOUNT, ATTR_STAGE_NAME);
             dashboardEditBar.saveDashboard();
 
             DashboardContent dashboardContent = dashboardsPage.getContent();
-            FilterWidget accountFilter = dashboardContent.getFilterWidget(simplifyText(ACCOUNT));
-            FilterWidget stageNameFilter = dashboardContent.getFilterWidget(simplifyText(STAGE_NAME));
-            FilterWidget productFilter = dashboardContent.getFilterWidget(simplifyText(PRODUCT));
+            FilterWidget accountFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_ACCOUNT));
+            FilterWidget stageNameFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_STAGE_NAME));
+            FilterWidget productFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_PRODUCT));
             accountFilter.changeAttributeFilterValue("123 Exteriors", "14 West");
 
             assertTrue(isEqualCollection(stageNameFilter.getAllAttributeValues(), asList("Closed Won",
@@ -537,33 +536,33 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
             DashboardContent dashboardContent = dashboardsPage.getContent();
             dashboardsPage.editDashboard();
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-            dashboardEditBar.setParentsFilterUsingDataset(STAGE_NAME, OPP_SNAPSHOT, ACCOUNT);
-            dashboardEditBar.setParentsFilterUsingDataset(PRODUCT, OPP_SNAPSHOT, STAGE_NAME);
+            dashboardEditBar.setParentsFilterUsingDataset(ATTR_STAGE_NAME, ATTR_OPP_SNAPSHOT, ATTR_ACCOUNT);
+            dashboardEditBar.setParentsFilterUsingDataset(ATTR_PRODUCT, ATTR_OPP_SNAPSHOT, ATTR_STAGE_NAME);
 
             dashboardsPage.addNewTab("Tab2");
-            accountFilter = addListAttributeFilterToDashboardAndMoveToRightPlace(ACCOUNT, 
+            accountFilter = addListAttributeFilterToDashboardAndMoveToRightPlace(ATTR_ACCOUNT, 
                     DashboardWidgetDirection.UP);
 
-            stageNameFilter = addListAttributeFilterToDashboardAndMoveToRightPlace(STAGE_NAME, 
+            stageNameFilter = addListAttributeFilterToDashboardAndMoveToRightPlace(ATTR_STAGE_NAME, 
                     DashboardWidgetDirection.MIDDLE);
 
-            productFilter = addListAttributeFilterToDashboardAndMoveToRightPlace(PRODUCT, 
+            productFilter = addListAttributeFilterToDashboardAndMoveToRightPlace(ATTR_PRODUCT, 
                     DashboardWidgetDirection.DOWN);
 
-            dashboardEditBar.setParentsFilterUsingDataset(STAGE_NAME, OPP_SNAPSHOT, ACCOUNT);
-            dashboardEditBar.setParentsFilterUsingDataset(PRODUCT, OPP_SNAPSHOT, STAGE_NAME);
+            dashboardEditBar.setParentsFilterUsingDataset(ATTR_STAGE_NAME, ATTR_OPP_SNAPSHOT, ATTR_ACCOUNT);
+            dashboardEditBar.setParentsFilterUsingDataset(ATTR_PRODUCT, ATTR_OPP_SNAPSHOT, ATTR_STAGE_NAME);
             dashboardEditBar.saveDashboard();
 
             dashboardsPage.getTabs().openTab(0);
-            stageNameFilter = dashboardContent.getFilterWidget(simplifyText(STAGE_NAME));
+            stageNameFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_STAGE_NAME));
             assertTrue(isEqualCollection(stageNameFilter.getAllAttributeValues(), asList("Closed Won",
                     "Closed Lost", "Interest", "Discovery", "Short List", "Risk Assessment", "Conviction",
                     "Negotiation")));
-            productFilter = dashboardContent.getFilterWidget(simplifyText(PRODUCT));
+            productFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_PRODUCT));
             assertTrue(isEqualCollection(productFilter.getAllAttributeValues(), asList("CompuSci", "Educationly",
                     "Explorer", "Grammar Plus", "PhoenixSoft", "WonderKid", "TouchAll")));
 
-            accountFilter = dashboardContent.getFilterWidget(simplifyText(ACCOUNT));
+            accountFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_ACCOUNT));
             accountFilter.changeAttributeFilterValue("123 Exteriors", "14 West");
 
             assertTrue(isEqualCollection(stageNameFilter.getAllAttributeValues(), asList("Closed Won",
@@ -572,13 +571,13 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
                     "Explorer", "Grammar Plus", "PhoenixSoft", "WonderKid")));
 
             dashboardsPage.getTabs().openTab(1);
-            stageNameFilter = dashboardContent.getFilterWidget(simplifyText(STAGE_NAME));
+            stageNameFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_STAGE_NAME));
             assertTrue(isEqualCollection(stageNameFilter.getAllAttributeValues(), asList("Closed Won",
                     "Closed Lost")));
-            productFilter = dashboardContent.getFilterWidget(simplifyText(PRODUCT));
+            productFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_PRODUCT));
             assertTrue(isEqualCollection(productFilter.getAllAttributeValues(), asList("CompuSci", "Educationly",
                     "Explorer", "Grammar Plus", "PhoenixSoft", "WonderKid")));
-            accountFilter = dashboardContent.getFilterWidget(simplifyText(ACCOUNT));
+            accountFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_ACCOUNT));
             assertEquals(accountFilter.getCurrentValue(), "123 Exteriors, 14 West");
         } finally {
             dashboardsPage.deleteDashboard();

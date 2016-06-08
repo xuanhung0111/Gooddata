@@ -1,5 +1,12 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON_OPPS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_QUOTA;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
@@ -25,18 +32,18 @@ public class GoodSalesChartLegendTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void checkShowPercentAndLegendColor() {
-        ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-            .addAttribute(ACTIVITY_TYPE)
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .addAttribute(ATTR_ACTIVITY_TYPE)
             .getChartReport();
 
         MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
-                .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+                .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration()
                 .showPercents();
         sleepTight(5000);
         assertTrue(report.getDataLabels().get(0).endsWith("%"));
 
-        analysisPage.addMetric(QUOTA);
+        analysisPage.addMetric(METRIC_QUOTA);
         assertFalse(metricConfiguration.isShowPercentEnabled());
         assertFalse(metricConfiguration.isShowPercentSelected());
 
@@ -46,7 +53,7 @@ public class GoodSalesChartLegendTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void dontShowLegendWhenOnlyOneMetric() {
-        ChartReport report = analysisPage.addMetric(AMOUNT).addAttribute(STAGE_NAME).waitForReportComputing()
+        ChartReport report = analysisPage.addMetric(METRIC_AMOUNT).addAttribute(ATTR_STAGE_NAME).waitForReportComputing()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 8);
         assertFalse(report.isLegendVisible());
@@ -60,7 +67,7 @@ public class GoodSalesChartLegendTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testLegendsInChartHasManyMetrics() {
-        ChartReport report = analysisPage.addMetric(AMOUNT).addMetric(NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPage.addMetric(METRIC_AMOUNT).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing().getChartReport();
         assertTrue(report.isLegendVisible());
         assertTrue(report.areLegendsHorizontal());
@@ -68,8 +75,8 @@ public class GoodSalesChartLegendTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testLegendsInStackBy() {
-        ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addAttribute(ACTIVITY_TYPE)
-                .addStack(DEPARTMENT).waitForReportComputing().getChartReport();
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE)
+                .addStack(ATTR_DEPARTMENT).waitForReportComputing().getChartReport();
         assertTrue(report.isLegendVisible());
         assertTrue(report.areLegendsVertical());
 
@@ -84,7 +91,7 @@ public class GoodSalesChartLegendTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void showLegendForStackedChartWithOneSeries() {
-        ChartReport report = analysisPage.addMetric(NUMBER_OF_WON_OPPS).addStack(STAGE_NAME)
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_WON_OPPS).addStack(ATTR_STAGE_NAME)
                 .waitForReportComputing().getChartReport();
         assertTrue(report.isLegendVisible());
         List<String> legends = report.getLegends();

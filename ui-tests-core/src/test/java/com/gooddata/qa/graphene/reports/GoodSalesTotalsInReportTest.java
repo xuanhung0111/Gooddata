@@ -1,6 +1,14 @@
 package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_MONTH_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPPORTUNITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PROBABILITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_QUARTER_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
@@ -34,14 +42,7 @@ import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 
 public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
 
-    private final static String PROBABILITY = "Probability";
-    private final static String AMOUNT = "Amount";
     private final static String SIMPLE_REPORT = "Simpe-Report";
-    private final static String YEAR_SNAPSHOT = "Year (Snapshot)";
-    private final static String QUARTER_YEAR_SNAPSHOT = "Quarter/Year (Snapshot)";
-    private final static String MONTH_YEAR_SNAPSHOT = "Month/Year (Snapshot)";
-    private final static String STAGE_NAME = "Stage Name";
-    private final static String OPPORTUNITY = "Opportunity";
     private final static String Q1_2011 = "Q1/2011";
     private final static String Q1_2012 = "Q1/2012";
     private final static String MAY_2011 = "May 2011";
@@ -55,7 +56,6 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
     private final static String BY_OPPORTUNITY = "by Opportunity";
     private final static String MULTIPLE_TOTALS_REPORT = "Adding-Multiple-Rollup-And-Median-Totals";
     private final static String SHORT_LIST = "Short List";
-    private final static String ACCOUNT = "Account";
     private final static String OF_ALL_COLUMNS = "of All Columns";
 
     @Test(dependsOnMethods = {"createProject"})
@@ -63,12 +63,12 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
         //create report on UI due to attribute order
         initReportCreation().createReport(new UiReportDefinition()
                 .withName(SIMPLE_REPORT)
-                .withWhats(AMOUNT)
-                .withWhats(PROBABILITY)
-                .withHows(new HowItem(YEAR_SNAPSHOT, Position.TOP))
-                .withHows(new HowItem(QUARTER_YEAR_SNAPSHOT, Position.TOP, Q1_2011, Q1_2012))
-                .withHows(new HowItem(STAGE_NAME, Position.LEFT))
-                .withHows(new HowItem(OPPORTUNITY, Position.LEFT, "Access Insurance Holdings > Explorer",
+                .withWhats(METRIC_AMOUNT)
+                .withWhats(METRIC_PROBABILITY)
+                .withHows(new HowItem(ATTR_YEAR_SNAPSHOT, Position.TOP))
+                .withHows(new HowItem(ATTR_QUARTER_YEAR_SNAPSHOT, Position.TOP, Q1_2011, Q1_2012))
+                .withHows(new HowItem(ATTR_STAGE_NAME, Position.LEFT))
+                .withHows(new HowItem(ATTR_OPPORTUNITY, Position.LEFT, "Access Insurance Holdings > Explorer",
                         "Access America Transport > Grammar Plus", "Access America Transport > Educationly",
                         "Access Information Management > PhoenixSoft")));
         takeScreenshot(browser, "simple-report", getClass());
@@ -157,7 +157,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
 
         //minimize number of metrics to avoid handling scroll bar
         final TableReport table = openReport(SIMPLE_REPORT)
-                .addFilter(FilterItem.Factory.createAttributeFilter(YEAR_SNAPSHOT, YEAR_2011))
+                .addFilter(FilterItem.Factory.createAttributeFilter(ATTR_YEAR_SNAPSHOT, YEAR_2011))
                 .waitForReportExecutionProgress()
                 .getTableReport();
 
@@ -217,29 +217,29 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
 
         final TableReport table = openReport(SIMPLE_REPORT).getTableReport();
 
-        table.openContextMenuFromCellValue(AMOUNT).aggregateTableData(AggregationType.SUM, OF_ALL_ROWS);
+        table.openContextMenuFromCellValue(METRIC_AMOUNT).aggregateTableData(AggregationType.SUM, OF_ALL_ROWS);
         //use List.equal() due to checking value order
         assertTrue(table.getTotalValues().equals(asList(66519.20f, 0.0f, 117164.00f, 0.0f)), "The total values are not correct");
 
-        table.openContextMenuFromCellValue(PROBABILITY).aggregateTableData(type, OF_ALL_ROWS);
+        table.openContextMenuFromCellValue(METRIC_PROBABILITY).aggregateTableData(type, OF_ALL_ROWS);
         takeScreenshot(browser, type.getType() + "-values-for-other-metric", getClass());
         //use List.equal() due to checking value order
         assertTrue(table.getTotalValues().equals(otherMetricTotalValues), type.getType() + " values are not correct");
 
-        table.openContextMenuFromCellValue(PROBABILITY).nonAggregateTableData(type, OF_ALL_ROWS);
+        table.openContextMenuFromCellValue(METRIC_PROBABILITY).nonAggregateTableData(type, OF_ALL_ROWS);
         assertTrue(isEqualCollection(table.getTotalValues(), asList(66519.20f, 0.0f, 117164.00f, 0.0f)),
                 type.getType() + " values have not been removed");
 
-        table.openContextMenuFromCellValue(AMOUNT).nonAggregateTableData(AggregationType.SUM, OF_ALL_ROWS);
+        table.openContextMenuFromCellValue(METRIC_AMOUNT).nonAggregateTableData(AggregationType.SUM, OF_ALL_ROWS);
         assertTrue(table.getTotalHeaders().isEmpty() && table.getTotalValues().isEmpty(),
                 "Total headers & values have not been removed");
 
-        table.openContextMenuFromCellValue(AMOUNT).aggregateTableData(type, OF_ALL_ROWS);
+        table.openContextMenuFromCellValue(METRIC_AMOUNT).aggregateTableData(type, OF_ALL_ROWS);
         takeScreenshot(browser, type.getType() + "-values-for-single-metric", getClass());
         //use List.equal() due to checking value order
         assertTrue(table.getTotalValues().equals(totalValues), type.getType() + " values are not correct");
 
-        table.openContextMenuFromCellValue(AMOUNT).nonAggregateTableData(type, OF_ALL_ROWS);
+        table.openContextMenuFromCellValue(METRIC_AMOUNT).nonAggregateTableData(type, OF_ALL_ROWS);
         assertTrue(table.getTotalHeaders().isEmpty() && table.getTotalValues().isEmpty(),
                 "Total headers & values have not been removed");
     }
@@ -319,15 +319,15 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
     public void createReportForAddingMultipleTotals() {
         initReportCreation().createReport(new UiReportDefinition()
                 .withName(MULTIPLE_TOTALS_REPORT)
-                .withWhats(AMOUNT)
-                .withWhats(PROBABILITY)
-                .withHows(new HowItem(STAGE_NAME, Position.LEFT))
-                .withHows(new HowItem(OPPORTUNITY, Position.LEFT,
+                .withWhats(METRIC_AMOUNT)
+                .withWhats(METRIC_PROBABILITY)
+                .withHows(new HowItem(ATTR_STAGE_NAME, Position.LEFT))
+                .withHows(new HowItem(ATTR_OPPORTUNITY, Position.LEFT,
                         "1000Bulbs.com > Educationly", "1000Bulbs.com > PhoenixSoft", "101 Financial > Educationly"))
-                .withHows(new HowItem(ACCOUNT, Position.LEFT))
-                .withHows(new HowItem(YEAR_SNAPSHOT, Position.TOP))
-                .withHows(new HowItem(QUARTER_YEAR_SNAPSHOT, Position.TOP))
-                .withHows(new HowItem(MONTH_YEAR_SNAPSHOT, Position.TOP, JAN_2011, MAY_2011)));
+                .withHows(new HowItem(ATTR_ACCOUNT, Position.LEFT))
+                .withHows(new HowItem(ATTR_YEAR_SNAPSHOT, Position.TOP))
+                .withHows(new HowItem(ATTR_QUARTER_YEAR_SNAPSHOT, Position.TOP))
+                .withHows(new HowItem(ATTR_MONTH_YEAR_SNAPSHOT, Position.TOP, JAN_2011, MAY_2011)));
     }
 
     @Test(dependsOnMethods = {"createReportForAddingMultipleTotals"})
@@ -350,11 +350,11 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
 
         //minimize number of metrics to 1 to avoid handling scroll bar
         reportPage.openWhatPanel()
-                .selectInapplicableMetric(PROBABILITY)
+                .selectInapplicableMetric(METRIC_PROBABILITY)
                 .doneSndPanel()
                 .waitForReportExecutionProgress()
                 .openFilterPanel()
-                .addFilter(FilterItem.Factory.createAttributeFilter(QUARTER_YEAR_SNAPSHOT, Q1_2011));
+                .addFilter(FilterItem.Factory.createAttributeFilter(ATTR_QUARTER_YEAR_SNAPSHOT, Q1_2011));
         reportPage.waitForReportExecutionProgress();
 
         table.openContextMenuFromCellValue(CLOSED_LOST).aggregateTableData(AggregationType.ROLLUP, OF_ALL_COLUMNS);
@@ -421,7 +421,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
         //minimize number of metrics to 1 to avoid handling scroll bar
         reportPage.exchangeColAndRowHeaders()
                 .openWhatPanel()
-                .selectInapplicableMetric(PROBABILITY)
+                .selectInapplicableMetric(METRIC_PROBABILITY)
                 .doneSndPanel()
                 .waitForReportExecutionProgress();
 

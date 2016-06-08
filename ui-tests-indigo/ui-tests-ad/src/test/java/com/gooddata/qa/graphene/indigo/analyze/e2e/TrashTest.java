@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -19,13 +21,13 @@ public class TrashTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_clear_all_items_by_dragging_them_to_the_trash() {
-        assertTrue(analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
-            .addAttribute(ACTIVITY_TYPE)
-            .removeMetric(NUMBER_OF_ACTIVITIES)
+        assertTrue(analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .addAttribute(ATTR_ACTIVITY_TYPE)
+            .removeMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .isEmpty());
 
-        assertTrue(analysisPageReact.removeAttribute(ACTIVITY_TYPE)
+        assertTrue(analysisPageReact.removeAttribute(ATTR_ACTIVITY_TYPE)
             .getAttributesBucket()
             .isEmpty());
 
@@ -34,16 +36,16 @@ public class TrashTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_be_possible_to_trash_item_by_throwing_it_anyplace_other_than_trash() {
-        assertTrue(analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
-            .addAttribute(ACTIVITY_TYPE)
+        assertTrue(analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .addAttribute(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing()
             .getPageHeader()
             .isResetButtonEnabled());
 
-        assertEquals(analysisPageReact.drag(analysisPageReact.getMetricsBucket().get(NUMBER_OF_ACTIVITIES),
+        assertEquals(analysisPageReact.drag(analysisPageReact.getMetricsBucket().get(METRIC_NUMBER_OF_ACTIVITIES),
                 analysisPageReact.getPageHeader().getResetButton())
             .getMetricsBucket()
-            .getItemNames(), asList(NUMBER_OF_ACTIVITIES));
+            .getItemNames(), asList(METRIC_NUMBER_OF_ACTIVITIES));
         assertTrue(analysisPageReact.getPageHeader().isResetButtonEnabled());
     }
 }

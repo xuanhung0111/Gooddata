@@ -1,5 +1,9 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_LOST_OPPS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPEN_OPPS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON_OPPS;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -28,7 +32,7 @@ public class CatalogueSearchTest extends AbstractAdE2ETest {
 
         panel.search("Opps.");
         assertTrue(panel.getFieldNamesInViewPort()
-                .containsAll(asList(NUMBER_OF_LOST_OPPS, NUMBER_OF_OPEN_OPPS, NUMBER_OF_WON_OPPS)));
+                .containsAll(asList(METRIC_NUMBER_OF_LOST_OPPS, METRIC_NUMBER_OF_OPEN_OPPS, METRIC_NUMBER_OF_WON_OPPS)));
 
         assertFalse(panel.search("Dada"));
     }
@@ -39,19 +43,19 @@ public class CatalogueSearchTest extends AbstractAdE2ETest {
 
         panel.search("opps.");
         assertTrue(panel.getFieldNamesInViewPort()
-                .containsAll(asList(NUMBER_OF_LOST_OPPS, NUMBER_OF_OPEN_OPPS, NUMBER_OF_WON_OPPS)));
+                .containsAll(asList(METRIC_NUMBER_OF_LOST_OPPS, METRIC_NUMBER_OF_OPEN_OPPS, METRIC_NUMBER_OF_WON_OPPS)));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_cancel_search() {
         CataloguePanelReact panel = analysisPageReact.getCataloguePanel();
 
-        panel.search(NUMBER_OF_LOST_OPPS);
-        assertFalse(panel.getFieldNamesInViewPort().contains(ACTIVITY_TYPE));
+        panel.search(METRIC_NUMBER_OF_LOST_OPPS);
+        assertFalse(panel.getFieldNamesInViewPort().contains(ATTR_ACTIVITY_TYPE));
 
         panel.clearInputText();
 
         // catalog contains all items again, including activity type
-        assertTrue(panel.getFieldNamesInViewPort().contains(ACTIVITY_TYPE));
+        assertTrue(panel.getFieldNamesInViewPort().contains(ATTR_ACTIVITY_TYPE));
     }
 }

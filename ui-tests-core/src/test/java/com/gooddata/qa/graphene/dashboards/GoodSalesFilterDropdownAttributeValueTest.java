@@ -1,6 +1,9 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.md.Restriction.identifier;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
@@ -69,10 +72,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
     private static final String REPORT_2 = "Report2";
     private static final String REPORT_3 = "Report3";
 
-    private static final String STAGE_NAME = "Stage Name";
     private static final String F_STAGE_NAME = "FStageName";
-    private static final String AMOUNT = "Amount";
-    private static final String YEAR_SNAPSHOT = "Year (Snapshot)";
 
     private static final String USE_AVAILABLE_DASHBOARD_1 = "UseAvailable1";
     private static final String USE_AVAILABLE_DASHBOARD_2 = "UseAvailable2";
@@ -97,7 +97,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
     public void createVariable() {
         initVariablePage();
 
-        variablePage.createVariable(new AttributeVariable(F_STAGE_NAME).withAttribute(STAGE_NAME)
+        variablePage.createVariable(new AttributeVariable(F_STAGE_NAME).withAttribute(ATTR_STAGE_NAME)
                 .withAttributeElements("Discovery", "Risk Assessment"));
     }
 
@@ -113,14 +113,14 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
         ReportDefinition definition = GridReportDefinitionContent.create(REPORT_1, singletonList("metricGroup"),
                 asList(new AttributeInGrid(stageName.getDefaultDisplayForm().getUri()),
                         new AttributeInGrid(yearSnapshotUri)), singletonList(new GridElement(amountMetricUri,
-                                AMOUNT)));
+                                METRIC_AMOUNT)));
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
         // *** create report 2 ***
         initReportsPage();
-        UiReportDefinition rd = new UiReportDefinition().withName(REPORT_2).withWhats(AMOUNT)
-                .withHows(STAGE_NAME).withHows(YEAR_SNAPSHOT);
+        UiReportDefinition rd = new UiReportDefinition().withName(REPORT_2).withWhats(METRIC_AMOUNT)
+                .withHows(ATTR_STAGE_NAME).withHows(ATTR_YEAR_SNAPSHOT);
         createReport(rd, REPORT_2);
         reportPage.addFilter(FilterItem.Factory.createPromptFilter(F_STAGE_NAME, "Discovery", "2010", "2011",
                 "2012", "Risk Assessment", "2010", "2011", "2012"));
@@ -138,8 +138,8 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
         WebElement report = dashboardsPage.getContent().getLatestReport(TableReport.class).getRoot();
         DashboardWidgetDirection.LEFT.moveElementToRightPlace(report);
 
-        dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, STAGE_NAME);
-        WebElement filter = dashboardsPage.getContent().getFilterWidget(simplifyText(STAGE_NAME)).getRoot();
+        dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME);
+        WebElement filter = dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME)).getRoot();
         filter.click();
         DashboardWidgetDirection.UP.moveElementToRightPlace(filter);
         dashboardEditBar.saveDashboard();
@@ -176,7 +176,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
         try {
             List<String> attributeValues = asList("Short List", "Risk Assessment", "Conviction");
 
-            FilterWidget filter = dashboardsPage.getContent().getFilterWidget(simplifyText(STAGE_NAME));
+            FilterWidget filter = dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME));
             AttributeFilterPanel filterPanel = filter.openPanel().getPanel(AttributeFilterPanel.class);
             assertTrue(isEqualCollection(filterPanel.getAllAtributeValues(), attributeValues));
 
@@ -238,13 +238,13 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
             WebElement report = dashboardsPage.getContent().getLatestReport(TableReport.class).getRoot();
             DashboardWidgetDirection.LEFT.moveElementToRightPlace(report);
 
-            dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, STAGE_NAME);
-            WebElement filter = dashboardsPage.getContent().getFilterWidget(simplifyText(STAGE_NAME)).getRoot();
+            dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME);
+            WebElement filter = dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME)).getRoot();
             filter.click();
             DashboardWidgetDirection.UP.moveElementToRightPlace(filter);
             dashboardEditBar.saveDashboard();
 
-            FilterWidget filterWidget = dashboardsPage.getContent().getFilterWidget(simplifyText(STAGE_NAME));
+            FilterWidget filterWidget = dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME));
             AttributeFilterPanel filterPanel = filterWidget.openPanel().getPanel(AttributeFilterPanel.class);
             assertTrue(isEqualCollection(filterPanel.getAllAtributeValues(),
                     asList("Short List", "Risk Assessment", "Conviction")),
@@ -263,7 +263,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
             DashboardContent dashboardContent = dashboardsPage.getContent();
 
-            FilterWidget stageNameFilter = dashboardContent.getFilterWidget(simplifyText(STAGE_NAME));
+            FilterWidget stageNameFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_STAGE_NAME));
             stageNameFilter.changeSelectionToOneValue();
 
             FilterWidget fStageNameFilter = dashboardContent.getFilterWidget(simplifyText(F_STAGE_NAME));
@@ -296,7 +296,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
             DashboardContent dashboardContent = dashboardsPage.getContent();
 
-            FilterWidget stageNameFilter = dashboardContent.getFilterWidget(simplifyText(STAGE_NAME));
+            FilterWidget stageNameFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_STAGE_NAME));
             stageNameFilter.changeSelectionToOneValue();
 
             FilterWidget fStageNameFilter = dashboardContent.getFilterWidget(simplifyText(F_STAGE_NAME));
@@ -335,7 +335,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
 
         try {
             DashboardContent dashboardContent = dashboardsPage.getContent();
-            FilterWidget stageNameFilter = dashboardContent.getFilterWidget(simplifyText(STAGE_NAME));
+            FilterWidget stageNameFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_STAGE_NAME));
             assertTrue(isEqualCollection(asList("Risk Assessment", "Conviction"), stageNameFilter.openPanel()
                     .getPanel(AttributeFilterPanel.class).getAllAtributeValues()),
                     "Attribute values of StageName filter are not correct!");

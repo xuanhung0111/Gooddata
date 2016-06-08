@@ -1,5 +1,8 @@
 package com.gooddata.qa.graphene.reports;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -48,10 +51,6 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
     private static final String WRONG_STATE_FILTER_MESSAGE = "Please confirm or cancel your changes in the"
             + " Slice and Dice dialog box before proceeding.";
 
-    private static final String NUMBER_OF_ACTIVITIES = "# of Activities";
-    private static final String ACTIVITY_TYPE = "Activity Type";
-    private static final String PRODUCT = "Product";
-
     private static final String REPORT_NOT_COMPUTABLE_MESSAGE =
             "Report not computable due to improper metric definition";
 
@@ -73,16 +72,16 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
 
         reportPage.initPage()
             .openWhatPanel()
-            .selectMetric(NUMBER_OF_ACTIVITIES)
+            .selectMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .openHowPanel();
         sleepTightInSeconds(1);
-        reportPage.selectAttribute(PRODUCT);
+        reportPage.selectAttribute(ATTR_PRODUCT);
 
         assertThat(getErrorMessage(), startsWith(INAPPLICABLE_ATTR_MESSAGE));
-        assertThat(reportPage.getTooltipMessageOfAttribute(PRODUCT), equalTo(
+        assertThat(reportPage.getTooltipMessageOfAttribute(ATTR_PRODUCT), equalTo(
                 "Product is unavailable due to the metric(s) in this report. Use Shift + click to override."));
 
-        String invalidDataReportMessage = reportPage.selectInapplicableAttribute(PRODUCT)
+        String invalidDataReportMessage = reportPage.selectInapplicableAttribute(ATTR_PRODUCT)
             .doneSndPanel()
             .getInvalidDataReportMessage();
 
@@ -95,7 +94,7 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
 
         reportPage.initPage()
             .openWhatPanel()
-            .selectMetric(NUMBER_OF_ACTIVITIES);
+            .selectMetric(METRIC_NUMBER_OF_ACTIVITIES);
         sleepTightInSeconds(1);
         reportPage.tryOpenFilterPanel();
 
@@ -110,9 +109,9 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
 
         reportPage.initPage()
             .openWhatPanel()
-            .selectMetric(NUMBER_OF_ACTIVITIES)
+            .selectMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .openHowPanel()
-            .selectAttribute(ACTIVITY_TYPE)
+            .selectAttribute(ATTR_ACTIVITY_TYPE)
             .doneSndPanel()
             .selectReportVisualisation(ReportTypes.TABLE)
             .clickSaveReport()
@@ -165,9 +164,9 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
         initReportCreation();
 
         reportPage.initPage()
-            .addFilter(FilterItem.Factory.createAttributeFilter(ACTIVITY_TYPE, "Email"))
+            .addFilter(FilterItem.Factory.createAttributeFilter(ATTR_ACTIVITY_TYPE, "Email"))
             .openHowPanel()
-            .selectAttribute(ACTIVITY_TYPE)
+            .selectAttribute(ATTR_ACTIVITY_TYPE)
             .doneSndPanel();
     }
 
@@ -177,13 +176,13 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
 
         assertThat(reportPage.initPage()
             .openHowPanel()
-            .selectAttribute(ACTIVITY_TYPE)
+            .selectAttribute(ATTR_ACTIVITY_TYPE)
             .doneSndPanel()
-            .addFilter(FilterItem.Factory.createAttributeFilter(ACTIVITY_TYPE, "Email"))
+            .addFilter(FilterItem.Factory.createAttributeFilter(ATTR_ACTIVITY_TYPE, "Email"))
             .getFilters().size(), equalTo(1));
 
         assertThat(reportPage.openHowPanel()
-            .deselectAttribute(ACTIVITY_TYPE)
+            .deselectAttribute(ATTR_ACTIVITY_TYPE)
             .doneSndPanel()
             .getFilters().size(), equalTo(1));
     }

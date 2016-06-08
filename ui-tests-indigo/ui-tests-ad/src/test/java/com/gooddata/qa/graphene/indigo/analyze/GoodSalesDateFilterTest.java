@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
@@ -59,8 +61,8 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
     public void switchingDateRangeNotComputeReport() {
         final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
-        ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-                .addAttribute(ACTIVITY_TYPE)
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addAttribute(ATTR_ACTIVITY_TYPE)
                 .addDateFilter()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 4);
@@ -82,8 +84,8 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
     public void allowFilterByRange() throws ParseException {
         final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
-        ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-                .addAttribute(ACTIVITY_TYPE)
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addAttribute(ATTR_ACTIVITY_TYPE)
                 .addDateFilter()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 4);
@@ -115,7 +117,7 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testDateInCategoryAndDateInFilter() {
-        assertTrue(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        assertTrue(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addDate()
                 .getChartReport()
                 .getTrackersCount() >= 1);
@@ -127,7 +129,7 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void switchBetweenPresetsAndDataRange() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addDate().getFilterBuckets().configDateFilter("Last 90 days");
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().getFilterBuckets().configDateFilter("Last 90 days");
         analysisPage.waitForReportComputing();
 
         WebElement dateFilter = analysisPage.getFilterBuckets().getFilter("Activity");
@@ -149,12 +151,12 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void showPercentAfterConfigDate() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                     .addDate()
                     .getFilterBuckets()
                     .configDateFilter("Last 90 days");
         analysisPage.getMetricsBucket()
-                    .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+                    .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                     .expandConfiguration()
                     .showPercents();
         analysisPage.waitForReportComputing();
@@ -178,13 +180,13 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void popAfterConfigDate() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                     .addDate()
                     .getFilterBuckets()
                     .configDateFilter("Last 90 days");
 
         analysisPage.getMetricsBucket()
-            .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
             .showPop();
 
@@ -197,7 +199,7 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
         ChartReport report = analysisPage.getChartReport();
 
         assertTrue(isEqualCollection(report.getLegends(),
-                asList(NUMBER_OF_ACTIVITIES + " - previous year", NUMBER_OF_ACTIVITIES)));
+                asList(METRIC_NUMBER_OF_ACTIVITIES + " - previous year", METRIC_NUMBER_OF_ACTIVITIES)));
         checkingOpenAsReport("popAfterConfigDate");
     }
 

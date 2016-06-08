@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_LOST_OPPS;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.tagName;
 import static org.testng.Assert.assertEquals;
@@ -18,8 +20,8 @@ public class ChartLegendTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void test_chart_legend_should_not_be_clickable() {
-        assertEquals(analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
-            .addMetric(NUMBER_OF_LOST_OPPS)
+        assertEquals(analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .addMetric(METRIC_NUMBER_OF_LOST_OPPS)
             .waitForReportComputing()
             .getChartReport()
             .getLegends()

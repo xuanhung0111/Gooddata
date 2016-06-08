@@ -1,5 +1,8 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -28,28 +31,28 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
     public void filterOnAttribute() {
         final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
-        ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-                .addAttribute(ACTIVITY_TYPE)
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 4);
-        assertEquals(filtersBucket.getFilterText(ACTIVITY_TYPE), ACTIVITY_TYPE + ": All");
+        assertEquals(filtersBucket.getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": All");
 
-        WebElement filter = filtersBucket.getFilter(ACTIVITY_TYPE);
+        WebElement filter = filtersBucket.getFilter(ATTR_ACTIVITY_TYPE);
         filter.click();
         AttributeFilterPickerPanel attributePanel = AttributeFilterPickerPanel.getInstance(browser);
         attributePanel.assertPanel();
         attributePanel.discard();
 
-        filtersBucket.configAttributeFilter(ACTIVITY_TYPE, "Email", "Web Meeting");
+        filtersBucket.configAttributeFilter(ATTR_ACTIVITY_TYPE, "Email", "Web Meeting");
         assertEquals(report.getTrackersCount(), 2);
-        assertEquals(filtersBucket.getFilterText(ACTIVITY_TYPE), ACTIVITY_TYPE + ": Email, Web Meeting\n(2)");
+        assertEquals(filtersBucket.getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": Email, Web Meeting\n(2)");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void addFilterNotHideRecommendation() {
-        assertEquals(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-                .addAttribute(ACTIVITY_TYPE)
+        assertEquals(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addAttribute(ATTR_ACTIVITY_TYPE)
                 .getChartReport()
                 .getTrackersCount(), 4);
         RecommendationContainer recommendationContainer =
@@ -59,7 +62,7 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
                 .isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        analysisPage.addFilter(DEPARTMENT);
+        analysisPage.addFilter(ATTR_DEPARTMENT);
         assertTrue(recommendationContainer
                 .isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
@@ -70,8 +73,8 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
     public void filterOnDateAndAttribute() {
         final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
-        ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-                .addAttribute(ACTIVITY_TYPE)
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addAttribute(ATTR_ACTIVITY_TYPE)
                 .addDateFilter()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 4);
@@ -87,14 +90,14 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
     public void addAttributeToFilterBucket() {
         final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
-        assertEquals(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-                .addAttribute(ACTIVITY_TYPE)
+        assertEquals(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addAttribute(ATTR_ACTIVITY_TYPE)
                 .getChartReport()
                 .getTrackersCount(), 4);
-        assertEquals(filtersBucket.getFilterText(ACTIVITY_TYPE), ACTIVITY_TYPE + ": All");
+        assertEquals(filtersBucket.getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": All");
 
-        analysisPage.addFilter(DEPARTMENT);
-        assertEquals(filtersBucket.getFilterText(DEPARTMENT), DEPARTMENT + ": All");
+        analysisPage.addFilter(ATTR_DEPARTMENT);
+        assertEquals(filtersBucket.getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ": All");
         checkingOpenAsReport("addAttributeToFilterBucket");
     }
 
@@ -102,27 +105,27 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
     public void testAttributeReplaceDate() {
         final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addDate();
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
         assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
         assertTrue(filtersBucket.isDateFilterVisible());
 
-        analysisPage.replaceAttribute(DATE, ACTIVITY_TYPE);
+        analysisPage.replaceAttribute(DATE, ATTR_ACTIVITY_TYPE);
         assertFalse(filtersBucket.isDateFilterVisible());
-        assertTrue(filtersBucket.isFilterVisible(ACTIVITY_TYPE));
+        assertTrue(filtersBucket.isFilterVisible(ATTR_ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void testReplaceAttribute() {
         final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addAttribute(ACTIVITY_TYPE);
-        assertTrue(filtersBucket.isFilterVisible(ACTIVITY_TYPE));
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE);
+        assertTrue(filtersBucket.isFilterVisible(ATTR_ACTIVITY_TYPE));
 
-        analysisPage.addStack(DEPARTMENT);
-        assertTrue(filtersBucket.isFilterVisible(DEPARTMENT));
+        analysisPage.addStack(ATTR_DEPARTMENT);
+        assertTrue(filtersBucket.isFilterVisible(ATTR_DEPARTMENT));
 
-        analysisPage.replaceAttribute(ACTIVITY_TYPE, "Region");
-        assertFalse(filtersBucket.isFilterVisible(ACTIVITY_TYPE));
+        analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, "Region");
+        assertFalse(filtersBucket.isFilterVisible(ATTR_ACTIVITY_TYPE));
         assertTrue(filtersBucket.isFilterVisible("Region"));
         checkingOpenAsReport("testReplaceAttribute");
     }

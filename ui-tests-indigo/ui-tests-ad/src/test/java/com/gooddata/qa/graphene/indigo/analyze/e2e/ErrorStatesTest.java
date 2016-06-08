@@ -2,6 +2,9 @@ package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertFalse;
@@ -23,11 +26,11 @@ public class ErrorStatesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_too_many_data_points_when_result_is_too_large__413() {
-        analysisPageReact.addAttribute(ACCOUNT)
+        analysisPageReact.addAttribute(ATTR_ACCOUNT)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-error-missing-metric"), browser));
 
-        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-error-too-many-data-points"), browser));
         assertFalse(analysisPageReact.getPageHeader().isExportButtonEnabled());
@@ -35,7 +38,7 @@ public class ErrorStatesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_missing_metric_error_even_when_there_are_too_many_data_points() {
-        analysisPageReact.addStack(ACTIVITY_TYPE)
+        analysisPageReact.addStack(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-error-missing-metric"), browser));
         assertFalse(analysisPageReact.getPageHeader().isExportButtonEnabled());
@@ -43,8 +46,8 @@ public class ErrorStatesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_too_many_data_points_when_chart_cannot_be_rendered_because_of_it() {
-        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
-            .addStack(ACCOUNT)
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .addStack(ATTR_ACCOUNT)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-error-too-many-data-points"), browser));
         assertFalse(analysisPageReact.getPageHeader().isExportButtonEnabled());
@@ -68,7 +71,7 @@ public class ErrorStatesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_missing_metric_when_configuration_does_not_contain_one() {
-        analysisPageReact.addAttribute(ACTIVITY_TYPE)
+        analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-error-missing-metric"), browser));
         assertFalse(analysisPageReact.getPageHeader().isExportButtonEnabled());
@@ -76,8 +79,8 @@ public class ErrorStatesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_invalid_configuration_error_when_execution_fails() {
-        analysisPageReact.addStack(ACCOUNT)
-            .addMetric(ACTIVITY_TYPE, FieldType.ATTRIBUTE)
+        analysisPageReact.addStack(ATTR_ACCOUNT)
+            .addMetric(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE)
             .waitForReportComputing();
 
         assertTrue(isElementPresent(cssSelector(".s-error-invalid-configuration"), browser));
@@ -86,8 +89,8 @@ public class ErrorStatesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_blank_message_after_reset_from_error_state() {
-        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
-            .addStack(ACCOUNT)
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .addStack(ATTR_ACCOUNT)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-error-too-many-data-points"), browser));
 

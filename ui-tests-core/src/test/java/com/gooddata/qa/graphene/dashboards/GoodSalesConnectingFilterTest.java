@@ -1,5 +1,8 @@
 package com.gooddata.qa.graphene.dashboards;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
@@ -32,10 +35,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
     private static final String REPORT_1 = "Report1";
     private static final String REPORT_2 = "Report2";
 
-    private static final String STAGE_NAME = "Stage Name";
     private static final String V_STAGE = "VStage";
-    private static final String AMOUNT = "Amount";
-    private static final String YEAR_SNAPSHOT = "Year (Snapshot)";
 
     private static final String TEST_DASHBOARD = "TestDashboard";
     private static final String TMP_DASHBOARD = "TmpDashboard";
@@ -54,7 +54,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
     public void createVariable() {
         initVariablePage();
 
-        variablePage.createVariable(new AttributeVariable(V_STAGE).withAttribute(STAGE_NAME));
+        variablePage.createVariable(new AttributeVariable(V_STAGE).withAttribute(ATTR_STAGE_NAME));
     }
 
     @Test(dependsOnMethods = {"createVariable"}, groups = {"init"})
@@ -62,13 +62,13 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
         // *** create report 1 ***
         initReportsPage();
         UiReportDefinition rd =
-                new UiReportDefinition().withName(REPORT_1).withWhats(AMOUNT).withHows(STAGE_NAME)
-                        .withHows(new HowItem(YEAR_SNAPSHOT, Position.TOP));
+                new UiReportDefinition().withName(REPORT_1).withWhats(METRIC_AMOUNT).withHows(ATTR_STAGE_NAME)
+                        .withHows(new HowItem(ATTR_YEAR_SNAPSHOT, Position.TOP));
         createReport(rd, REPORT_1);
 
         // *** create report 2 ***
         initReportsPage();
-        rd = new UiReportDefinition().withName(REPORT_2).withWhats(AMOUNT).withHows(STAGE_NAME);
+        rd = new UiReportDefinition().withName(REPORT_2).withWhats(METRIC_AMOUNT).withHows(ATTR_STAGE_NAME);
         createReport(rd, REPORT_2);
         reportPage.addFilter(FilterItem.Factory.createPromptFilter(V_STAGE, "Interest", "Discovery",
                 "Short List", "Risk Assessment", "Conviction", "Negotiation", "Closed Won", "Closed Lost"));
@@ -96,7 +96,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
 
         try {
             dashboardsPage.getTabs().openTab(0);
-            dashboardsPage.getContent().getFilterWidget(simplifyText(STAGE_NAME))
+            dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME))
                 .changeAttributeFilterValue("Negotiation");
 
             Sleeper.sleepTightInSeconds(3);
@@ -106,7 +106,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
                     dashboardsPage.getContent().getReport("Report2", TableReport.class).getAttributeElements()));
 
             dashboardsPage.getTabs().openTab(1);
-            assertEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(STAGE_NAME)).getCurrentValue(),
+            assertEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME)).getCurrentValue(),
                     "Negotiation");
             Sleeper.sleepTightInSeconds(3);
             assertTrue(isEqualCollection(asList("2011", "Negotiation"),
@@ -116,15 +116,15 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
 
             dashboardsPage.editDashboard();
             dashboardsPage.getTabs().openTab(0);
-            dashboardsPage.getContent().getFilterWidget(simplifyText(STAGE_NAME)).changeSelectionToOneValue();
+            dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME)).changeSelectionToOneValue();
             dashboardsPage.getTabs().openTab(1);
-            dashboardsPage.getContent().getFilterWidget(simplifyText(STAGE_NAME)).changeSelectionToOneValue();
+            dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME)).changeSelectionToOneValue();
             dashboardsPage.saveDashboard();
             dashboardsPage.getTabs().openTab(0);
-            assertEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(STAGE_NAME)).getCurrentValue(),
+            assertEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME)).getCurrentValue(),
                     "Interest");
             dashboardsPage.getTabs().openTab(1);
-            assertEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(STAGE_NAME)).getCurrentValue(),
+            assertEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME)).getCurrentValue(),
                     "Interest");
 
             dashboardsPage.getTabs().openTab(0);
@@ -152,14 +152,14 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
             dashboardsPage.editDashboard();
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
             dashboardsPage.getTabs().openTab(1);
-            dashboardsPage.getContent().getFilterWidget(simplifyText(STAGE_NAME)).changeSelectionToOneValue();
+            dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME)).changeSelectionToOneValue();
             dashboardEditBar.saveDashboard();
 
             dashboardsPage.getTabs().openTab(0);
-            dashboardsPage.getContent().getFilterWidget(simplifyText(STAGE_NAME))
+            dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME))
                 .changeAttributeFilterValue("Discovery");
             dashboardsPage.getTabs().openTab(1);
-            assertNotEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(STAGE_NAME))
+            assertNotEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME))
                     .getCurrentValue(), "Discovery");
 
             dashboardsPage.editDashboard();
@@ -192,7 +192,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
 
             dashboardsPage.duplicateDashboardTab(0);
             dashboardsPage.getTabs().openTab(0);
-            dashboardsPage.getContent().getFilterWidget(simplifyText(STAGE_NAME))
+            dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME))
                 .changeAttributeFilterValue("Negotiation");
 
             Sleeper.sleepTightInSeconds(3);
@@ -202,7 +202,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
                     dashboardsPage.getContent().getReport("Report2", TableReport.class).getAttributeElements()));
 
             dashboardsPage.getTabs().openTab(1);
-            assertEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(STAGE_NAME)).getCurrentValue(),
+            assertEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME)).getCurrentValue(),
                     "Negotiation");
             Sleeper.sleepTightInSeconds(3);
             assertTrue(isEqualCollection(asList("2011", "Negotiation"),
@@ -262,10 +262,10 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
 
             dashboardsPage.selectDashboard(DB2);
             dashboardsPage.getTabs().openTab(1);
-            dashboardsPage.getContent().getFilterWidget(simplifyText(STAGE_NAME))
+            dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME))
                 .changeAttributeFilterValue("Negotiation");
             dashboardsPage.getTabs().openTab(0);
-            assertEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(STAGE_NAME)).getCurrentValue(),
+            assertEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME)).getCurrentValue(),
                     "Negotiation");
 
             dashboardsPage.getContent().getFilterWidget(simplifyText(V_STAGE))
@@ -309,8 +309,8 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
         report = dashboardsPage.getContent().getLatestReport(TableReport.class).getRoot();
         DashboardWidgetDirection.RIGHT.moveElementToRightPlace(report);
 
-        dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, STAGE_NAME);
-        WebElement filter = dashboardsPage.getContent().getFilterWidget(simplifyText(STAGE_NAME)).getRoot();
+        dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME);
+        WebElement filter = dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME)).getRoot();
         filter.click();
         DashboardWidgetDirection.UP.moveElementToRightPlace(filter);
 

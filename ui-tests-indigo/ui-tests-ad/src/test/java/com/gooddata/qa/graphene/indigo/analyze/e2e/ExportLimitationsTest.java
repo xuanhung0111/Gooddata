@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static org.testng.Assert.assertFalse;
 
 import org.testng.annotations.BeforeClass;
@@ -16,10 +18,10 @@ public class ExportLimitationsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_disable_export_button_if_stacking_and_slicing_by_the_same_attribute() {
-        assertFalse(analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
+        assertFalse(analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             // Drag exactly the same attribute to the category and stack
-            .addAttribute(ACTIVITY_TYPE)
-            .addStack(ACTIVITY_TYPE)
+            .addAttribute(ATTR_ACTIVITY_TYPE)
+            .addStack(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing()
             .getPageHeader()
             .isExportButtonEnabled());
@@ -27,8 +29,8 @@ public class ExportLimitationsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_disable_export_if_the_same_metric_is_in_metric_bucket_twice() {
-        assertFalse(analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
-            .addMetric(NUMBER_OF_ACTIVITIES)
+        assertFalse(analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing()
             .getPageHeader()
             .isExportButtonEnabled());

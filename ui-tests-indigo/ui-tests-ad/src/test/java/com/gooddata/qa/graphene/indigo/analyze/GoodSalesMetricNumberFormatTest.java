@@ -2,6 +2,8 @@ package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_WON;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PERCENT_OF_GOAL;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
@@ -41,8 +43,8 @@ public class GoodSalesMetricNumberFormatTest extends GoodSalesAbstractAnalyseTes
 
     @Test(dependsOnGroups = {"init"}, groups = {"precondition"})
     public void prepareData() {
-        percentOfGoalUri = getMdService().getObjUri(getProject(), Metric.class, title(PERCENT_OF_GOAL));
-        oldPercentOfGoalMetricFormat = getMetricFormat(PERCENT_OF_GOAL);
+        percentOfGoalUri = getMdService().getObjUri(getProject(), Metric.class, title(METRIC_PERCENT_OF_GOAL));
+        oldPercentOfGoalMetricFormat = getMetricFormat(METRIC_PERCENT_OF_GOAL);
     }
 
     @DataProvider(name = "formattingProvider")
@@ -97,8 +99,8 @@ public class GoodSalesMetricNumberFormatTest extends GoodSalesAbstractAnalyseTes
         changeMetricFormat(getRestApiClient(), percentOfGoalUri, format.toString());
 
         try {
-            String dataLabel = analysisPage.addMetric(PERCENT_OF_GOAL)
-                    .addAttribute(IS_WON)
+            String dataLabel = analysisPage.addMetric(METRIC_PERCENT_OF_GOAL)
+                    .addAttribute(ATTR_IS_WON)
                     .waitForReportComputing()
                     .changeReportType(ReportType.BAR_CHART)
                     .waitForReportComputing()
@@ -126,14 +128,14 @@ public class GoodSalesMetricNumberFormatTest extends GoodSalesAbstractAnalyseTes
     }
 
     private void verifyFormatInAdReport(Formatter format, String expectedValue, boolean compareFormat) {
-        List<List<String>> tooltip = analysisPage.addMetric(PERCENT_OF_GOAL)
-            .addAttribute(IS_WON)
+        List<List<String>> tooltip = analysisPage.addMetric(METRIC_PERCENT_OF_GOAL)
+            .addAttribute(ATTR_IS_WON)
             .waitForReportComputing()
             .getChartReport()
             .getTooltipTextOnTrackerByIndex(0);
 
-        assertEquals(tooltip.get(0), asList(IS_WON, "true"));
-        assertEquals(tooltip.get(1).get(0), PERCENT_OF_GOAL);
+        assertEquals(tooltip.get(0), asList(ATTR_IS_WON, "true"));
+        assertEquals(tooltip.get(1).get(0), METRIC_PERCENT_OF_GOAL);
         if (compareFormat) {
             assertTrue(format.toString().contains(tooltip.get(1).get(1)));
         } else {

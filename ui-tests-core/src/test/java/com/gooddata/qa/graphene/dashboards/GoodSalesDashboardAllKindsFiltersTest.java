@@ -1,8 +1,11 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
@@ -48,10 +51,6 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     private static final String REPORT_1 = "Report 1";
     private static final String REPORT_2 = "Report 2";
 
-    private static final String STAGE_NAME = "Stage Name";
-    private static final String AMOUNT = "Amount";
-    private static final String YEAR_SNAPSHOT = "Year (Snapshot)";
-
     private static final String STAGE_NAME_FILTER = "stage_name";
 
     private String nVariableUri = "";
@@ -66,8 +65,8 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     @Test(dependsOnMethods = {"createProject"})
     public void createTestingReport() {
         initReportsPage();
-        createReport(new UiReportDefinition().withName(TESTING_REPORT).withWhats(AMOUNT).withHows(STAGE_NAME)
-                .withHows(new HowItem(YEAR_SNAPSHOT, Position.TOP)), TESTING_REPORT);
+        createReport(new UiReportDefinition().withName(TESTING_REPORT).withWhats(METRIC_AMOUNT).withHows(ATTR_STAGE_NAME)
+                .withHows(new HowItem(ATTR_YEAR_SNAPSHOT, Position.TOP)), TESTING_REPORT);
         checkRedBar(browser);
     }
 
@@ -75,7 +74,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     public void testSingleOptionAttributeFilter() {
         try {
             addReportToDashboard(TESTING_REPORT, DashboardWidgetDirection.LEFT);
-            addAttributeFilterToDashboard(STAGE_NAME, DashFilterTypes.ATTRIBUTE);
+            addAttributeFilterToDashboard(ATTR_STAGE_NAME, DashFilterTypes.ATTRIBUTE);
 
             dashboardsPage.editDashboard();
             FilterWidget filter = getFilterWidget(STAGE_NAME_FILTER);
@@ -99,14 +98,14 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     public void verifyFilterConnectedWithReport() {
         try {
             addReportToDashboard(TESTING_REPORT, DashboardWidgetDirection.LEFT);
-            addAttributeFilterToDashboard(STAGE_NAME, DashFilterTypes.ATTRIBUTE);
+            addAttributeFilterToDashboard(ATTR_STAGE_NAME, DashFilterTypes.ATTRIBUTE);
 
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
             assertTrue(isEqualCollection(report.openReportInfoViewPanel().getAllFilterNames(),
-                    singleton(STAGE_NAME)));
+                    singleton(ATTR_STAGE_NAME)));
 
             DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
-            assertTrue(isEqualCollection(report.getAllFilterNames(), singleton(STAGE_NAME)));
+            assertTrue(isEqualCollection(report.getAllFilterNames(), singleton(ATTR_STAGE_NAME)));
             dashboardEditBar.saveDashboard();
             assertTrue(getRowElementsFrom(report).size() > 1);
 
@@ -118,7 +117,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             assertTrue(getRowElementsFrom(report).size() == 1);
 
             dashboardsPage.editDashboard();
-            report.removeFilters(STAGE_NAME);
+            report.removeFilters(ATTR_STAGE_NAME);
             dashboardEditBar.saveDashboard();
 
             getFilterWidget(STAGE_NAME_FILTER).changeAttributeFilterValue("Short List");
@@ -209,7 +208,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     @Test(dependsOnMethods = {"createProject"})
     public void createVariables() {
         initVariablePage();
-        variablePage.createVariable(new AttributeVariable("FStageName").withAttribute(STAGE_NAME));
+        variablePage.createVariable(new AttributeVariable("FStageName").withAttribute(ATTR_STAGE_NAME));
         variablePage.createVariable(new AttributeVariable("FQuarter/Year")
                 .withAttribute("Quarter/Year (Snapshot)").withAttributeElements("Q1/2012", "Q2/2012", "Q3/2012",
                         "Q4/2012"));
@@ -220,8 +219,8 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     public void createReportsWithVariableFilter() {
         initReportsPage();
         UiReportDefinition rd =
-                new UiReportDefinition().withName(REPORT_1).withWhats(AMOUNT).withHows(STAGE_NAME)
-                        .withHows(new HowItem(YEAR_SNAPSHOT, HowItem.Position.TOP));
+                new UiReportDefinition().withName(REPORT_1).withWhats(METRIC_AMOUNT).withHows(ATTR_STAGE_NAME)
+                        .withHows(new HowItem(ATTR_YEAR_SNAPSHOT, HowItem.Position.TOP));
         createReport(rd, REPORT_1);
         reportPage.addFilter(FilterItem.Factory.createPromptFilter("FStageName", "2010", "2011", "2012",
                 "Interest", "Discovery", "Short List", "Risk Assessment", "Conviction", "Negotiation",
@@ -303,8 +302,8 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
                 expression.replace("${pid}", testParams.getProjectId()), "#,##0"));
 
         initReportsPage();
-        createReport(new UiReportDefinition().withName("Report 4").withWhats(AMOUNT, metric)
-                .withHows(YEAR_SNAPSHOT), "Report 4");
+        createReport(new UiReportDefinition().withName("Report 4").withWhats(METRIC_AMOUNT, metric)
+                .withHows(ATTR_YEAR_SNAPSHOT), "Report 4");
 
         try {
             addReportToDashboard("Report 4");
@@ -332,16 +331,16 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         createReport(
                 new UiReportDefinition()
                         .withName("Report 3")
-                        .withWhats(AMOUNT)
-                        .withHows(new HowItem(YEAR_SNAPSHOT, HowItem.Position.TOP),
-                                new HowItem(STAGE_NAME, "Short List")), "report 3");
+                        .withWhats(METRIC_AMOUNT)
+                        .withHows(new HowItem(ATTR_YEAR_SNAPSHOT, HowItem.Position.TOP),
+                                new HowItem(ATTR_STAGE_NAME, "Short List")), "report 3");
         checkRedBar(browser);
 
         try {
             addReportToDashboard("Report 3", DashboardWidgetDirection.LEFT);
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
             assertTrue(getRowElementsFrom(report).size() == 1);
-            addAttributeFilterToDashboard(STAGE_NAME, DashFilterTypes.ATTRIBUTE);
+            addAttributeFilterToDashboard(ATTR_STAGE_NAME, DashFilterTypes.ATTRIBUTE);
             assertTrue(getRowElementsFrom(report).size() > 1);
         } finally {
             dashboardsPage.deleteDashboard();
