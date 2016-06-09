@@ -1,5 +1,12 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
 import java.io.IOException;
 
 import org.apache.http.ParseException;
@@ -14,18 +21,13 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-
 public class EmptyErrorKpiValuesTest extends DashboardWithWidgetsTest {
 
     private Metric errorMetric;
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void createEmptyMetric() {
-        String amountUri = getMdService().getObjUri(getProject(), Metric.class, Restriction.title(AMOUNT));
+        String amountUri = getMdService().getObjUri(getProject(), Metric.class, Restriction.title(METRIC_AMOUNT));
         errorMetric = getMdService().createObj(getProject(), new Metric("ERROR",
                 "SELECT [" + amountUri + "] WHERE 2 = 1", "#,##0.00"));
     }
@@ -67,7 +69,7 @@ public class EmptyErrorKpiValuesTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"testEmptyMetricWithoutConditionalFormat"}, groups = {"desktop"})
     public void testInvalidKpiValue() throws ParseException, JSONException, IOException {
-        String accountUri = getMdService().getObjUri(getProject(), Attribute.class, Restriction.title(ACCOUNT));
+        String accountUri = getMdService().getObjUri(getProject(), Attribute.class, Restriction.title(ATTR_ACCOUNT));
         DashboardsRestUtils.changeMetricExpression(getRestApiClient(), errorMetric.getUri(),
                 "SELECT [" + accountUri + "] WHERE 2 = 1");
 

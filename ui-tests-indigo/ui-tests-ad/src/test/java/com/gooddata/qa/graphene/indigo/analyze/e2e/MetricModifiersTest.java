@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_QUOTA;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.testng.Assert.assertFalse;
 
@@ -21,7 +23,7 @@ public class MetricModifiersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_turned_off_when_second_metric_is_added() {
-        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate()
             .waitForReportComputing();
         Graphene.createPageFragment(RecommendationContainer.class,
@@ -29,9 +31,9 @@ public class MetricModifiersTest extends AbstractAdE2ETest {
             .<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).apply();
 
         assertFalse(analysisPageReact.waitForReportComputing()
-            .addMetric(QUOTA)
+            .addMetric(METRIC_QUOTA)
             .getMetricsBucket()
-            .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
             .isPopSelected());
     }

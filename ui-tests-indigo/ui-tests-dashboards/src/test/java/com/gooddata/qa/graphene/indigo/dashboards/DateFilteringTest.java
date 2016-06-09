@@ -3,9 +3,17 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.lang.String.format;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import org.json.JSONException;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Attribute;
@@ -14,14 +22,6 @@ import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.DateFilter;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
-
-import org.testng.annotations.DataProvider;
-
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static java.lang.String.format;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 public class DateFilteringTest extends DashboardWithWidgetsTest {
 
@@ -192,7 +192,7 @@ public class DateFilteringTest extends DashboardWithWidgetsTest {
 
     private String createAttributeFilterMetric() {
         String metricName = "Attribute Filter Metric";
-        String accountAttribute = getMdService().getObjUri(getProject(), Attribute.class, title(ACCOUNT));
+        String accountAttribute = getMdService().getObjUri(getProject(), Attribute.class, title(ATTR_ACCOUNT));
 
         createMetric(metricName, format("SELECT SUM([%s]) WHERE [%s] IN ([%s],[%s],[%s])",
                 getAmountAttributeUri(), accountAttribute, accountAttribute + "/elements?id=961040",
@@ -203,7 +203,7 @@ public class DateFilteringTest extends DashboardWithWidgetsTest {
     }
 
     private String getAmountAttributeUri() {
-        return getMdService().getObjUri(getProject(), Fact.class, title(AMOUNT));
+        return getMdService().getObjUri(getProject(), Fact.class, title(FACT_AMOUNT));
     }
 
     private String getYearSnapshotUri() {

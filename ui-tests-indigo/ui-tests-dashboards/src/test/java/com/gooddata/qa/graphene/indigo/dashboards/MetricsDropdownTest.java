@@ -1,16 +1,16 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.MetricSelect;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.MetricSelect;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
-
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.assertEquals;
 
 public class MetricsDropdownTest extends DashboardWithWidgetsTest {
 
@@ -53,7 +53,7 @@ public class MetricsDropdownTest extends DashboardWithWidgetsTest {
                 .clickAddWidget();
 
         MetricSelect ms = page.getConfigurationPanel()
-                .selectMetricByName(AMOUNT)
+                .selectMetricByName(METRIC_AMOUNT)
                 .getMetricSelect();
 
         ms.ensureDropdownOpen();

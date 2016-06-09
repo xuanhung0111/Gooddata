@@ -1,6 +1,10 @@
 package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPPORTUNITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -26,11 +30,6 @@ public class GoodSalesAdvanceRangeFilterReportTest extends GoodSalesAbstractTest
     private static final String REPORT_NAME = "Advance-numeric-range-filter";
     private static final String VARIABLE_NAME = "FVariable";
 
-    private static final String METRIC_AMOUNT = "Amount";
-    private static final String ATTR_OPPORTUNITY = "Opportunity";
-    private static final String ATTR_YEAR = "Year (Snapshot)";
-    private static final String ATTR_STAGE_NAME = "Stage Name";
-
     private static final String RANGE_FILTER_DESCRIPTION = "Opportunity where Amount is greater than or "
             + "equal to 19000";
 
@@ -45,7 +44,7 @@ public class GoodSalesAdvanceRangeFilterReportTest extends GoodSalesAbstractTest
                 .withName(REPORT_NAME)
                 .withWhats(METRIC_AMOUNT)
                 .withHows(ATTR_OPPORTUNITY)
-                .withHows(new HowItem(ATTR_YEAR, Position.TOP)),
+                .withHows(new HowItem(ATTR_YEAR_SNAPSHOT, Position.TOP)),
                 "Advance-numeric-range-filter-report");
     }
 
@@ -98,7 +97,7 @@ public class GoodSalesAdvanceRangeFilterReportTest extends GoodSalesAbstractTest
     public void addSubFilterByDateRange() {
         initReport()
                 .<RangeFilterFragment> openExistingFilter(RANGE_FILTER_DESCRIPTION, FilterFragment.RANGE_FILTER)
-                .addSubFilterByDateRange(ATTR_YEAR, Time.LAST_YEAR)
+                .addSubFilterByDateRange(ATTR_YEAR_SNAPSHOT, Time.LAST_YEAR)
                 .apply();
         waitForAnalysisPageLoaded(browser);
 

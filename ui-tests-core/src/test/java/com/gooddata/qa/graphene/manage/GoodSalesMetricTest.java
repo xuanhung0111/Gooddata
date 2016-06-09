@@ -3,6 +3,38 @@ package com.gooddata.qa.graphene.manage;
 import static com.gooddata.qa.graphene.entity.metric.CustomMetricUI.buildAttribute;
 import static com.gooddata.qa.graphene.entity.metric.CustomMetricUI.buildAttributeValue;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_DIMENSION_CLOSE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_DIMENSION_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_MONTH_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_QUARTER_YEAR_CLOSED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_QUARTER_YEAR_CREATED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_QUARTER_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_SNAPSHOT_EOP1;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_SNAPSHOT_EOP2;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_HISTORY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_CLOSE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_BEST_CASE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_DAYS_TO_CLOSE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_DURATION;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPEN_OPPS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPPORTUNITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON_OPPS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PROBABILITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_REMAINING_QUOTA;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_VELOCITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_WIN_RATE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_WON;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
@@ -65,42 +97,11 @@ import com.gooddata.report.ReportService;
         description = "Tests for GoodSales project (metric creation functionality) in GD platform")
 public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
-    private static final String DATE_DIMENSION_SNAPSHOT = "Date dimension (Snapshot)";
-    private static final String YEAR_SNAPSHOT = "Year (Snapshot)";
-    private static final String DATE_SNAPSHOT = "Date (Snapshot)";
-    private static final String QUARTER_YEAR_SNAPSHOT = "Quarter/Year (Snapshot)";
-    private static final String QUARTER_YEAR_CREATED = "Quarter/Year (Created)";
-    private static final String QUARTER_YEAR_CLOSED = "Quarter/Year (Closed)";
-    private static final String DATE_DIMENSION_CLOSE = "Date dimension (Closed)";
-    private static final String YEAR_CLOSE = "Year (Closed)";
-    private static final String MONTH_YEAR_SNAPSHOT = "Month/Year (Snapshot)";
     private static final String YEAR_2010 = "2010";
     private static final String YEAR_2011 = "2011";
     private static final String YEAR_2012 = "2012";
 
-    private static final String PRODUCT = "Product";
-    private static final String STAGE_NAME = "Stage Name";
-    private static final String AMOUNT = "Amount";
     private static final String STAGE = "Stage";
-    private static final String STAGE_HISTORY = "Stage History";
-    private static final String VELOCITY = "Velocity";
-    private static final String DURATION = "Duration";
-    private static final String PROBABILITY = "Probability";
-    private static final String DAYS_TO_CLOSE = "Days to Close";
-    private static final String WIN_RATE = "Win Rate";
-    private static final String REMAINING_QUOTA = "Remaining Quota";
-    private static final String BEST_CASE = "Best Case";
-    private static final String NUMBER_OF_OPEN_OPPS = "# of Open Opps.";
-    private static final String NUMBER_OF_WON_OPPS = "# of Won Opps.";
-    private static final String LOST = "Lost";
-    private static final String WON = "Won";
-    private static final String STATUS = "Status";
-    private static final String DEPARTMENT = "Department";
-    private static final String AVG_AMOUNT = "Avg. Amount";
-    private static final String SNAPSHOT_BOP = "_Snapshot [BOP]";
-    private static final String SNAPSHOT_EOP1 = "_Snapshot [EOP-1]";
-    private static final String SNAPSHOT_EOP2 = "_Snapshot [EOP-2]";
-    private static final String NUMBER_OF_OPPS = "# of Opportunities";
     private static final String NEGATIVE = "negative";
     private static final String NULL_METRIC = "null-metric";
 
@@ -135,34 +136,34 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     public void createShareMetric() {
         initMetricPage();
         String metricName = "Share % " + getCurrentDateString();
-        waitForFragmentVisible(metricPage).createShareMetric(metricName, AMOUNT, DATE_DIMENSION_SNAPSHOT,
-                YEAR_SNAPSHOT);
+        waitForFragmentVisible(metricPage).createShareMetric(metricName, METRIC_AMOUNT, ATTR_DATE_DIMENSION_SNAPSHOT,
+                ATTR_YEAR_SNAPSHOT);
 
         String expectedMaql =
-                "SELECT " + AMOUNT + " / (SELECT " + AMOUNT + " BY " + YEAR_SNAPSHOT + ", ALL OTHER WITHOUT PF)";
+                "SELECT " + METRIC_AMOUNT + " / (SELECT " + METRIC_AMOUNT + " BY " + ATTR_YEAR_SNAPSHOT + ", ALL OTHER WITHOUT PF)";
         assertTrue(metricPage.isMetricCreatedSuccessfully(metricName, expectedMaql,
                 DEFAULT_METRIC_NUMBER_FORMAT));
 
         List<Float> metricValues = asList(0.23f, 0.2f, 0.33f, 0.07f, 0.08f, 0.09f);
-        checkMetricValuesInReport(metricName, PRODUCT, metricValues, PRODUCT_VALUES);
+        checkMetricValuesInReport(metricName, ATTR_PRODUCT, metricValues, PRODUCT_VALUES);
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"different-granularity-logical-metric"})
     public void createDifferentMetricTest() {
         initMetricPage();
         String metricName = "Difference " + getCurrentDateString();
-        waitForFragmentVisible(metricPage).createDifferentMetric(metricName, AMOUNT,
-                DATE_DIMENSION_SNAPSHOT, YEAR_SNAPSHOT, YEAR_2010);
+        waitForFragmentVisible(metricPage).createDifferentMetric(metricName, METRIC_AMOUNT,
+                ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT, YEAR_2010);
 
         String expectedMaql =
-                "SELECT " + AMOUNT + " - (SELECT " + AMOUNT + " BY ALL " + YEAR_SNAPSHOT + " WHERE "
-                        + YEAR_SNAPSHOT + " IN (" + YEAR_2010 + ") WITHOUT PF)";
+                "SELECT " + METRIC_AMOUNT + " - (SELECT " + METRIC_AMOUNT + " BY ALL " + ATTR_YEAR_SNAPSHOT + " WHERE "
+                        + ATTR_YEAR_SNAPSHOT + " IN (" + YEAR_2010 + ") WITHOUT PF)";
         assertTrue(metricPage.isMetricCreatedSuccessfully(metricName, expectedMaql,
                 DEFAULT_METRIC_NUMBER_FORMAT));
 
         List<Float> metricValues =
                 asList(20171686.25f, 16271278.69f, 32627524.67f, 6273858.91f, 7532925.39f, 6825820.63f);
-        checkMetricValuesInReport(metricName, PRODUCT, metricValues, PRODUCT_VALUES);
+        checkMetricValuesInReport(metricName, ATTR_PRODUCT, metricValues, PRODUCT_VALUES);
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"filter-share-ratio-metric"})
@@ -170,9 +171,9 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         initMetricPage();
         String metricName = "Ratio " + getCurrentDateString();
         waitForFragmentVisible(metricPage)
-                .createRatioMetric(metricName, NUMBER_OF_WON_OPPS, NUMBER_OF_OPEN_OPPS);
+                .createRatioMetric(metricName, METRIC_NUMBER_OF_WON_OPPS, METRIC_NUMBER_OF_OPEN_OPPS);
 
-        String expectedMaql = "SELECT " + NUMBER_OF_WON_OPPS + " / " + NUMBER_OF_OPEN_OPPS;
+        String expectedMaql = "SELECT " + METRIC_NUMBER_OF_WON_OPPS + " / " + METRIC_NUMBER_OF_OPEN_OPPS;
         assertTrue(metricPage.isMetricCreatedSuccessfully(metricName, expectedMaql,
                 DEFAULT_METRIC_NUMBER_FORMAT));
 
@@ -183,8 +184,8 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     public void createAggregationMetricTest() {
         CustomMetricUI customMetricInfo = new CustomMetricUI()
             .withAttributes(
-                buildAttribute(STAGE, STAGE_NAME),
-                buildAttribute(STAGE_HISTORY, STAGE_HISTORY));
+                buildAttribute(STAGE, ATTR_STAGE_NAME),
+                buildAttribute(ATTR_STAGE_HISTORY, ATTR_STAGE_HISTORY));
 
         for (MetricTypes metric : MetricTypes.values()) {
             if (!metric.getType().equalsIgnoreCase(AGGREGATION)) {
@@ -195,28 +196,28 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
             customMetricInfo.withName(metric + " " + getCurrentDateString());
 
             if (metric.in(asList(MetricTypes.COVAR, MetricTypes.COVARP, MetricTypes.RSQ))) {
-                customMetricInfo.withFacts(VELOCITY, DURATION);
+                customMetricInfo.withFacts(METRIC_VELOCITY, METRIC_DURATION);
 
             } else if (metric.in(asList(MetricTypes.MAX, MetricTypes.RUNMAX))) {
-                customMetricInfo.withFacts(DAYS_TO_CLOSE);
+                customMetricInfo.withFacts(METRIC_DAYS_TO_CLOSE);
 
             } else if (metric.in(asList(MetricTypes.MIN, MetricTypes.RUNMIN))) {
-                customMetricInfo.withFacts(DURATION);
+                customMetricInfo.withFacts(METRIC_DURATION);
 
             } else if (metric== MetricTypes.FORECAST) {
-                customMetricInfo.withMetrics(AMOUNT);
+                customMetricInfo.withMetrics(METRIC_AMOUNT);
 
             } else {
-                customMetricInfo.withFacts(AMOUNT);
+                customMetricInfo.withFacts(METRIC_AMOUNT);
                 if (metric == MetricTypes.CORREL) {
-                    customMetricInfo.addMoreFacts(PROBABILITY);
+                    customMetricInfo.addMoreFacts(METRIC_PROBABILITY);
                 }
             }
 
             createCustomMetric(customMetricInfo, metric, AGGREGATION);
 
             if (metric.in(asList(MetricTypes.FORECAST, MetricTypes.AVG, MetricTypes.COUNT, MetricTypes.MEDIAN))) {
-                checkMetricValuesInReport(customMetricInfo.getName(), STAGE_NAME, getMetricValues(metric),
+                checkMetricValuesInReport(customMetricInfo.getName(), ATTR_STAGE_NAME, getMetricValues(metric),
                       STAGE_NAME_VALUES);
                 continue;
             }
@@ -228,13 +229,13 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
             if (metric.in(asList(MetricTypes.COVAR, MetricTypes.COVARP, MetricTypes.PERCENTILE,
                     MetricTypes.RSQ))) {
-                checkMetricValuesInReport(customMetricInfo.getName(), PRODUCT, getMetricValues(metric),
+                checkMetricValuesInReport(customMetricInfo.getName(), ATTR_PRODUCT, getMetricValues(metric),
                         PRODUCT_VALUES);
                 continue;
             }
 
             if (metric.in(asList(MetricTypes.MIN, MetricTypes.RUNMIN))) {
-                checkMetricValuesInReport( customMetricInfo.getName(), QUARTER_YEAR_CREATED,
+                checkMetricValuesInReport( customMetricInfo.getName(), ATTR_QUARTER_YEAR_CREATED,
                       getMetricValues(metric),
                       asList("Q1/2008", "Q2/2008", "Q3/2008", "Q4/2008", "Q1/2009", "Q2/2009",
                               "Q3/2009", "Q4/2009", "Q1/2010", "Q2/2010", "Q3/2010", "Q4/2010",
@@ -242,7 +243,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                 continue;
             }
 
-            checkMetricValuesInReport(customMetricInfo.getName(), QUARTER_YEAR_SNAPSHOT, getMetricValues(metric),
+            checkMetricValuesInReport(customMetricInfo.getName(), ATTR_QUARTER_YEAR_SNAPSHOT, getMetricValues(metric),
                   QUARTER_YEAR_VALUES);
         }
     }
@@ -260,33 +261,33 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
             customMetricInfo.withName(metric + " " + getCurrentDateString());
 
             if (metric == MetricTypes.EXP) {
-                customMetricInfo.withMetrics(WIN_RATE);
+                customMetricInfo.withMetrics(METRIC_WIN_RATE);
 
             } else if (metric == MetricTypes.SIGN) {
-                customMetricInfo.withMetrics(REMAINING_QUOTA);
+                customMetricInfo.withMetrics(METRIC_REMAINING_QUOTA);
 
             } else {
-                customMetricInfo.withMetrics(BEST_CASE);
+                customMetricInfo.withMetrics(METRIC_BEST_CASE);
                 if (metric == MetricTypes.SUBTRACTION) {
-                    customMetricInfo.addMoreMetrics(AMOUNT);
+                    customMetricInfo.addMoreMetrics(METRIC_AMOUNT);
                 }
             }
 
             createCustomMetric(customMetricInfo, metric, NUMERIC);
 
             if (metric == MetricTypes.IFNULL) {
-                checkMetricValuesInReport(customMetricInfo.getName(), STATUS, getMetricValues(metric),
-                        asList(LOST, "Open", WON));
+                checkMetricValuesInReport(customMetricInfo.getName(), ATTR_STATUS, getMetricValues(metric),
+                        asList(METRIC_LOST, "Open", METRIC_WON));
                 continue;
             }
 
             if (metric == MetricTypes.SIGN) {
-                checkMetricValuesInReport(customMetricInfo.getName(), QUARTER_YEAR_SNAPSHOT,
+                checkMetricValuesInReport(customMetricInfo.getName(), ATTR_QUARTER_YEAR_SNAPSHOT,
                         getMetricValues(metric), QUARTER_YEAR_VALUES);
                 continue;
             }
 
-            checkMetricValuesInReport(customMetricInfo.getName(), PRODUCT, getMetricValues(metric),
+            checkMetricValuesInReport(customMetricInfo.getName(), ATTR_PRODUCT, getMetricValues(metric),
                     PRODUCT_VALUES);
             
         }
@@ -306,31 +307,31 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
             if (metric.in(asList(MetricTypes.FOR_PREVIOUS, MetricTypes.FOR_NEXT_PERIOD,
                     MetricTypes.FOR_PREVIOUS_PERIOD))) {
-                customMetricInfo.withMetrics(NUMBER_OF_OPEN_OPPS)
-                    .withAttributes(buildAttribute(DATE_DIMENSION_CLOSE, YEAR_CLOSE));
+                customMetricInfo.withMetrics(METRIC_NUMBER_OF_OPEN_OPPS)
+                    .withAttributes(buildAttribute(ATTR_DATE_DIMENSION_CLOSE, ATTR_YEAR_CLOSE));
 
             } else if (metric == MetricTypes.WITHIN) {
-                customMetricInfo.withMetrics(AVG_AMOUNT)
-                .withAttributes(buildAttribute(DATE_DIMENSION_SNAPSHOT, YEAR_SNAPSHOT));
+                customMetricInfo.withMetrics(METRIC_AVG_AMOUNT)
+                .withAttributes(buildAttribute(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT));
 
             } else {
-                customMetricInfo.withMetrics(AMOUNT, NUMBER_OF_WON_OPPS)
-                    .withAttributes(buildAttribute(DATE_DIMENSION_SNAPSHOT, YEAR_SNAPSHOT));
+                customMetricInfo.withMetrics(METRIC_AMOUNT, METRIC_NUMBER_OF_WON_OPPS)
+                    .withAttributes(buildAttribute(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT));
                 if (metric.in(asList(MetricTypes.FOR_NEXT, MetricTypes.BY_ALL_EXCEPT))) {
-                    customMetricInfo.withMetrics(AMOUNT);
+                    customMetricInfo.withMetrics(METRIC_AMOUNT);
                 }
             }
 
             createCustomMetric(customMetricInfo, metric, GRANULARITY);
 
             if (metric.in(asList(MetricTypes.BY, MetricTypes.BY_ALL_EXCEPT, MetricTypes.WITHIN))) {
-                checkMetricValuesInReport(customMetricInfo.getName(), QUARTER_YEAR_SNAPSHOT,
+                checkMetricValuesInReport(customMetricInfo.getName(), ATTR_QUARTER_YEAR_SNAPSHOT,
                         getMetricValues(metric), QUARTER_YEAR_VALUES);
                 continue;
             }
 
             if (metric == MetricTypes.FOR_PREVIOUS) {
-                checkMetricValuesInReport(customMetricInfo.getName(), QUARTER_YEAR_CLOSED,
+                checkMetricValuesInReport(customMetricInfo.getName(), ATTR_QUARTER_YEAR_CLOSED,
                         getMetricValues(metric), asList("Q3/2011", "Q4/2011", "Q1/2012", "Q2/2012", "Q3/2012",
                                 "Q4/2012", "Q1/2013", "Q2/2013", "Q3/2013", "Q4/2013", "Q1/2014", "Q2/2014",
                                 "Q3/2014", "Q4/2014", "Q1/2015", "Q2/2015", "Q4/2015"));
@@ -338,7 +339,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
             }
 
             if (metric == MetricTypes.FOR_NEXT_PERIOD) {
-                checkMetricValuesInReport(customMetricInfo.getName(), QUARTER_YEAR_CLOSED,
+                checkMetricValuesInReport(customMetricInfo.getName(), ATTR_QUARTER_YEAR_CLOSED,
                         getMetricValues(metric), asList("Q2/2010", "Q3/2010", "Q4/2010", "Q1/2011", "Q2/2011",
                                 "Q3/2011", "Q4/2011", "Q1/2012", "Q2/2012", "Q3/2012", "Q4/2012", "Q1/2013",
                                 "Q2/2013", "Q3/2013", "Q4/2013", "Q1/2014", "Q3/2014"));
@@ -346,14 +347,14 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
             }
 
             if (metric == MetricTypes.FOR_PREVIOUS_PERIOD) {
-                checkMetricValuesInReport(customMetricInfo.getName(), QUARTER_YEAR_CLOSED,
+                checkMetricValuesInReport(customMetricInfo.getName(), ATTR_QUARTER_YEAR_CLOSED,
                         getMetricValues(metric), asList("Q4/2010", "Q1/2011", "Q2/2011", "Q3/2011", "Q4/2011",
                                 "Q1/2012", "Q2/2012", "Q3/2012", "Q4/2012", "Q1/2013", "Q2/2013", "Q3/2013",
                                 "Q4/2013", "Q1/2014", "Q2/2014", "Q3/2014", "Q1/2015"));
                 continue;
             }
 
-            checkMetricValuesInReport(customMetricInfo.getName(), PRODUCT, getMetricValues(metric),
+            checkMetricValuesInReport(customMetricInfo.getName(), ATTR_PRODUCT, getMetricValues(metric),
                     PRODUCT_VALUES);
         }
     }
@@ -369,42 +370,42 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
             initMetricPage();
             customMetricInfo.withName(metric + " " + getCurrentDateString())
-                .withAttributeValues(buildAttributeValue(DATE_DIMENSION_SNAPSHOT, YEAR_SNAPSHOT,
+                .withAttributeValues(buildAttributeValue(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT,
                         YEAR_2011))
-                .withAttributes(buildAttribute(DATE_DIMENSION_SNAPSHOT, YEAR_SNAPSHOT));
+                .withAttributes(buildAttribute(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT));
 
             if (metric == MetricTypes.CASE) {
-                customMetricInfo.withMetrics(LOST, WON, LOST, WON);
+                customMetricInfo.withMetrics(METRIC_LOST, METRIC_WON, METRIC_LOST, METRIC_WON);
 
             } else if (metric == MetricTypes.IF) {
-                customMetricInfo.withMetrics(PROBABILITY, AMOUNT, AMOUNT);
+                customMetricInfo.withMetrics(METRIC_PROBABILITY, METRIC_AMOUNT, METRIC_AMOUNT);
 
             } else {
-                customMetricInfo.withMetrics(NUMBER_OF_OPEN_OPPS);
+                customMetricInfo.withMetrics(METRIC_NUMBER_OF_OPEN_OPPS);
                 if (metric.in(asList(MetricTypes.AND, MetricTypes.OR))) {
                     customMetricInfo.addMoreAttributeValues(
-                            buildAttributeValue(DATE_DIMENSION_SNAPSHOT, MONTH_YEAR_SNAPSHOT,
+                            buildAttributeValue(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_MONTH_YEAR_SNAPSHOT,
                                     "May 2011"))
-                        .addMoreAttributes(buildAttribute(DATE_DIMENSION_SNAPSHOT, MONTH_YEAR_SNAPSHOT));
+                        .addMoreAttributes(buildAttribute(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_MONTH_YEAR_SNAPSHOT));
                 }
             }
 
             createCustomMetric(customMetricInfo, metric, LOGICAL);
 
             if (metric == MetricTypes.CASE) {
-                checkMetricValuesInReport(customMetricInfo.getName(), PRODUCT, getMetricValues(metric),
+                checkMetricValuesInReport(customMetricInfo.getName(), ATTR_PRODUCT, getMetricValues(metric),
                         asList("CompuSci", "Educationly", "Explorer", "Grammar Plus", "PhoenixSoft", "TouchAll",
                                 "WonderKid"));
                 continue;
             }
 
             if (metric == MetricTypes.IF) {
-                checkMetricValuesInReport(customMetricInfo.getName(), STAGE_NAME, getMetricValues(metric),
+                checkMetricValuesInReport(customMetricInfo.getName(), ATTR_STAGE_NAME, getMetricValues(metric),
                         STAGE_NAME_VALUES);
                 continue;
             }
 
-            checkMetricValuesInReport(customMetricInfo.getName(), PRODUCT, getMetricValues(metric),
+            checkMetricValuesInReport(customMetricInfo.getName(), ATTR_PRODUCT, getMetricValues(metric),
                     PRODUCT_VALUES);
         }
     }
@@ -420,68 +421,68 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
             initMetricPage();
             customMetricInfo.withName(metric + " " + getCurrentDateString())
-                .withAttributes(buildAttribute(DATE_DIMENSION_SNAPSHOT, YEAR_SNAPSHOT))
-                .withMetrics(NUMBER_OF_OPEN_OPPS);
+                .withAttributes(buildAttribute(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT))
+                .withMetrics(METRIC_NUMBER_OF_OPEN_OPPS);
 
             if (metric.in(asList(MetricTypes.LESS, MetricTypes.LESS_OR_EQUAL))) {
                 customMetricInfo.withAttributeValues(
-                        buildAttributeValue(DATE_DIMENSION_SNAPSHOT, YEAR_SNAPSHOT, YEAR_2011));
+                        buildAttributeValue(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT, YEAR_2011));
 
             } else if (metric.in(asList(MetricTypes.TOP, MetricTypes.BOTTOM))) {
-                customMetricInfo.addMoreMetrics(AMOUNT);
+                customMetricInfo.addMoreMetrics(METRIC_AMOUNT);
 
             } else if (metric == MetricTypes.BETWEEN) {
                 customMetricInfo.withAttributeValues(
-                        buildAttributeValue(DATE_DIMENSION_SNAPSHOT, YEAR_SNAPSHOT, YEAR_2010),
-                        buildAttributeValue(DATE_DIMENSION_SNAPSHOT, YEAR_SNAPSHOT, YEAR_2012));
+                        buildAttributeValue(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT, YEAR_2010),
+                        buildAttributeValue(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT, YEAR_2012));
 
             } else {
                 customMetricInfo.withAttributeValues(
-                        buildAttributeValue(DATE_DIMENSION_SNAPSHOT, YEAR_SNAPSHOT, YEAR_2010));
+                        buildAttributeValue(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT, YEAR_2010));
                 if (metric.in(asList(MetricTypes.NOT_BETWEEN, MetricTypes.IN, MetricTypes.NOT_IN))) {
                     customMetricInfo.addMoreAttributeValues(
-                            buildAttributeValue(DATE_DIMENSION_SNAPSHOT, YEAR_SNAPSHOT, YEAR_2011));
+                            buildAttributeValue(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT, YEAR_2011));
                 }
                 if (metric == MetricTypes.WITHOUT_PF) {
-                    customMetricInfo.addMoreMetrics(AMOUNT);
+                    customMetricInfo.addMoreMetrics(METRIC_AMOUNT);
                 }
             }
 
             createCustomMetric(customMetricInfo, metric, FILTER);
 
             if (metric.in(asList(MetricTypes.LESS, MetricTypes.EQUAL, MetricTypes.BOTTOM))) {
-                checkMetricValuesInReport(customMetricInfo.getName(), QUARTER_YEAR_SNAPSHOT,
+                checkMetricValuesInReport(customMetricInfo.getName(), ATTR_QUARTER_YEAR_SNAPSHOT,
                         getMetricValues(MetricTypes.EQUAL), asList("Q2/2010", "Q3/2010", "Q4/2010"));
                 continue;
             }
 
             if (metric.in(asList(MetricTypes.DOES_NOT_EQUAL, MetricTypes.GREATER))) {
-                checkMetricValuesInReport(customMetricInfo.getName(), QUARTER_YEAR_SNAPSHOT,
+                checkMetricValuesInReport(customMetricInfo.getName(), ATTR_QUARTER_YEAR_SNAPSHOT,
                         getMetricValues(MetricTypes.GREATER),
                         asList("Q1/2011", "Q2/2011", "Q3/2011", "Q4/2011", "Q1/2012", "Q2/2012"));
                 continue;
             }
 
             if (metric.in(asList(MetricTypes.GREATER_OR_EQUAL, MetricTypes.BETWEEN, MetricTypes.TOP))) {
-                checkMetricValuesInReport(customMetricInfo.getName(), QUARTER_YEAR_SNAPSHOT,
+                checkMetricValuesInReport(customMetricInfo.getName(), ATTR_QUARTER_YEAR_SNAPSHOT,
                         getMetricValues(MetricTypes.BETWEEN), QUARTER_YEAR_VALUES);
                 continue;
             }
 
             if (metric.in(asList(MetricTypes.LESS_OR_EQUAL, MetricTypes.IN))) {
-                checkMetricValuesInReport(customMetricInfo.getName(), QUARTER_YEAR_SNAPSHOT,
+                checkMetricValuesInReport(customMetricInfo.getName(), ATTR_QUARTER_YEAR_SNAPSHOT,
                         getMetricValues(MetricTypes.IN),
                         asList("Q2/2010", "Q3/2010", "Q4/2010", "Q1/2011", "Q2/2011", "Q3/2011", "Q4/2011"));
                 continue;
             }
 
             if (metric == MetricTypes.WITHOUT_PF) {
-                checkMetricValuesInReport(customMetricInfo.getName(), QUARTER_YEAR_SNAPSHOT,
+                checkMetricValuesInReport(customMetricInfo.getName(), ATTR_QUARTER_YEAR_SNAPSHOT,
                         getMetricValues(metric), asList("Q2/2012"));
                 continue;
             }
 
-            checkMetricValuesInReport(customMetricInfo.getName(), QUARTER_YEAR_SNAPSHOT,
+            checkMetricValuesInReport(customMetricInfo.getName(), ATTR_QUARTER_YEAR_SNAPSHOT,
                     getMetricValues(MetricTypes.NOT_IN), asList("Q1/2012", "Q2/2012"));
         }
     }
@@ -569,9 +570,9 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     @DataProvider(name = "greatestLeastProvider")
     public Object[][] greatestLeastProvider() {
         return new Object[][] {
-            {"GREATEST_LEAST_basic", asList(SNAPSHOT_BOP, SNAPSHOT_EOP1, SNAPSHOT_EOP2),
+            {"GREATEST_LEAST_basic", asList(METRIC_SNAPSHOT_BOP, ATTR_SNAPSHOT_EOP1, ATTR_SNAPSHOT_EOP2),
                     getResultInGreatestLeastBasic()},
-            {"GREATEST_LEAST_no_aggregation", asList(NUMBER_OF_OPPS, NUMBER_OF_OPEN_OPPS, NEGATIVE), asList(
+            {"GREATEST_LEAST_no_aggregation", asList(METRIC_NUMBER_OF_OPPORTUNITIES, METRIC_NUMBER_OF_OPEN_OPPS, NEGATIVE), asList(
                     asList("262", "262", "-38", "262", "-38"),
                     asList("247", "247", "-53", "247", "-53"),
                     asList("198", "198", "-102", "198", "-102"),
@@ -580,7 +581,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                     asList("78", "78", "-222", "78", "-222"),
                     asList("3311", null, null, null, null),
                     asList("1770", null, null, null, null))},
-            {"GREATEST_LEAST_null", asList(NUMBER_OF_OPEN_OPPS, NULL_METRIC, SNAPSHOT_BOP), asList(
+            {"GREATEST_LEAST_null", asList(METRIC_NUMBER_OF_OPEN_OPPS, NULL_METRIC, METRIC_SNAPSHOT_BOP), asList(
                     asList("262", "1", "40334", "40334", "1"),
                     asList("247", "1", "40334", "40334", "1"),
                     asList("198", "0", "40334", "40334", "0"),
@@ -595,14 +596,14 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"}, groups = {"non-UI-metric", "init-metrics"})
     public void createNegativeMetric() {
         String negativeMaql = "SELECT [" + getMdService().getObjUri(getProject(), Metric.class,
-                Restriction.title(NUMBER_OF_OPEN_OPPS)) + "] - 300";
+                Restriction.title(METRIC_NUMBER_OF_OPEN_OPPS)) + "] - 300";
         getMdService().createObj(getProject(), new Metric(NEGATIVE, negativeMaql, DEFAULT_METRIC_NUMBER_FORMAT));
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"non-UI-metric", "init-metrics"})
     public void createMetricHasNullValue() {
         String nullMaql = "SELECT CASE WHEN [" + getMdService().getObjUri(getProject(), Metric.class,
-                Restriction.title(NUMBER_OF_OPEN_OPPS)) + "] > 200 THEN 1 END";
+                Restriction.title(METRIC_NUMBER_OF_OPEN_OPPS)) + "] > 200 THEN 1 END";
         String ifNullMaql = "SELECT IFNULL((" + nullMaql+ "),0)";
         getMdService().createObj(getProject(), new Metric(NULL_METRIC, ifNullMaql, DEFAULT_METRIC_NUMBER_FORMAT));
     }
@@ -611,8 +612,8 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
             dataProvider = "greatestLeastProvider")
     public void testGreatestAndLeastFunction(String reportName, List<String> metrics,
             List<List<String>> expectedResult) throws IOException {
-        List<Metric> greatestLeastMetrics = createGreatestAndLeastMetric(STAGE_NAME, metrics);
-        Attribute attrObj = getMdService().getObj(getProject(), Attribute.class, Restriction.title(STAGE_NAME));
+        List<Metric> greatestLeastMetrics = createGreatestAndLeastMetric(ATTR_STAGE_NAME, metrics);
+        Attribute attrObj = getMdService().getObj(getProject(), Attribute.class, Restriction.title(ATTR_STAGE_NAME));
 
         List<GridElement> gridElements = metrics.stream()
             .map(title -> getMdService().getObj(getProject(), Metric.class, Restriction.title(title)))
@@ -643,10 +644,10 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"non-UI-metric"})
     public void testRollingWindowMetrics() throws ParseException, JSONException, IOException {
-        Metric amount = getMdService().getObj(getProject(), Metric.class, Restriction.title(AMOUNT));
-        String yearUri = getMdService().getObjUri(getProject(), Attribute.class, Restriction.title(YEAR_SNAPSHOT));
-        Attribute date = getMdService().getObj(getProject(), Attribute.class, Restriction.title(DATE_SNAPSHOT));
-        Attribute monthYear = getMdService().getObj(getProject(), Attribute.class, Restriction.title(MONTH_YEAR_SNAPSHOT));
+        Metric amount = getMdService().getObj(getProject(), Metric.class, Restriction.title(METRIC_AMOUNT));
+        String yearUri = getMdService().getObjUri(getProject(), Attribute.class, Restriction.title(ATTR_YEAR_SNAPSHOT));
+        Attribute date = getMdService().getObj(getProject(), Attribute.class, Restriction.title(ATTR_DATE_SNAPSHOT));
+        Attribute monthYear = getMdService().getObj(getProject(), Attribute.class, Restriction.title(ATTR_MONTH_YEAR_SNAPSHOT));
 
         Metric m1 = getMdService().createObj(getProject(), new Metric("M1",
                 "SELECT RUNSUM( [" + amount.getUri() + "] ) ROWS BETWEEN 5 PRECEDING AND CURRENT ROW",
@@ -713,7 +714,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"non-UI-metric"})
     public void createTimeMacrosMetrics() {
-        Attribute product = getMdService().getObj(getProject(), Attribute.class, Restriction.title(PRODUCT));
+        Attribute product = getMdService().getObj(getProject(), Attribute.class, Restriction.title(ATTR_PRODUCT));
 
         for (MetricTypes metric : asList(MetricTypes.THIS, MetricTypes.PREVIOUS, MetricTypes.NEXT)) {
             checkMetricValuesInReport(createMetricByGoodDataClient(metric), product,
@@ -726,30 +727,30 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         List<Float> withPFExceptValues = getMetricValues(MetricTypes.WITH_PF_EXCEPT);
         List<Float> withoutPFExceptValues = getMetricValues(MetricTypes.WITHOUT_PF_EXCEPT);
         List<String> attributeValues = asList("2010", "2011", "2012");
-        Attribute year = getMdService().getObj(getProject(), Attribute.class, Restriction.title(YEAR_SNAPSHOT));
+        Attribute year = getMdService().getObj(getProject(), Attribute.class, Restriction.title(ATTR_YEAR_SNAPSHOT));
 
         checkMetricValuesInReport(createMetricByGoodDataClient(MetricTypes.WITH_PF_EXCEPT),
                 year, withPFExceptValues, attributeValues);
         addFilterAndCheckReport(attributeValues, withPFExceptValues,
-                PRODUCT, "CompuSci", "Educationly", "Explorer");
+                ATTR_PRODUCT, "CompuSci", "Educationly", "Explorer");
         addFilterAndCheckReport(attributeValues, withPFExceptValues, 
-                STAGE_NAME, "Interest", "Discovery", "Short List");
+                ATTR_STAGE_NAME, "Interest", "Discovery", "Short List");
         addFilterAndCheckReport(attributeValues, asList(1.7967886E7f, 6.2103956E7f, 8.0406328E7f),
-                DEPARTMENT, "Direct Sales");
+                ATTR_DEPARTMENT, "Direct Sales");
 
         checkMetricValuesInReport(createMetricByGoodDataClient(MetricTypes.WITHOUT_PF_EXCEPT),
                 year, withoutPFExceptValues, attributeValues);
-        addFilterAndCheckReport(attributeValues, withoutPFExceptValues, DEPARTMENT, "Direct Sales");
+        addFilterAndCheckReport(attributeValues, withoutPFExceptValues, ATTR_DEPARTMENT, "Direct Sales");
         addFilterAndCheckReport(attributeValues, asList(1.3019884E7f, 4.7406964E7f, 6.5819096E7f),
-                PRODUCT, "CompuSci", "Explorer");
+                ATTR_PRODUCT, "CompuSci", "Explorer");
         addFilterAndCheckReport(attributeValues, asList(883466.2f, 1.6477721E7f, 1.7635596E7f),
-                STAGE_NAME, "Interest", "Discovery");
+                ATTR_STAGE_NAME, "Interest", "Discovery");
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"aggregation-metric"})
     public void checkGreyedOutAndNonGreyedOutAttributes() {
         CustomMetricUI customMetricInfo = new CustomMetricUI().withName("SUM-Amount")
-                .withFacts(AMOUNT);
+                .withFacts(FACT_AMOUNT);
         initMetricPage();
         createCustomMetric(customMetricInfo, MetricTypes.SUM, AGGREGATION);
 
@@ -759,15 +760,15 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
             .selectMetric(customMetricInfo.getName())
             .openHowPanel();
 
-        asList("Activity Type", "Date (Activity)", "Date (Timeline)", STAGE_HISTORY).stream()
+        asList("Activity Type", "Date (Activity)", "Date (Timeline)", ATTR_STAGE_HISTORY).stream()
             .forEach(attribute -> {
                 assertTrue(reportPage.searchAttribute(attribute)
                     .isGreyedOutAttribute(attribute),
                     format("Attribue %s is not unreachable", attribute));
             });
 
-        asList("Account", "Date (Created)", "Opp. Snapshot", "Opportunity", DEPARTMENT, PRODUCT, STAGE_NAME,
-                YEAR_CLOSE, MONTH_YEAR_SNAPSHOT).stream()
+        asList("Account", "Date (Created)", "Opp. Snapshot", "Opportunity", ATTR_DEPARTMENT, ATTR_PRODUCT, ATTR_STAGE_NAME,
+                ATTR_YEAR_CLOSE, ATTR_MONTH_YEAR_SNAPSHOT).stream()
                 .forEach(attribute -> {
                     assertFalse(reportPage.searchAttribute(attribute)
                             .isGreyedOutAttribute(attribute),
@@ -780,16 +781,16 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"}, groups = {"aggregation-metric"})
     public void checkDrillDownDefine() {
         initAttributePage();
-        attributePage.initAttribute(STAGE_NAME);
-        attributeDetailPage.setDrillToAttribute(DEPARTMENT);
+        attributePage.initAttribute(ATTR_STAGE_NAME);
+        attributeDetailPage.setDrillToAttribute(ATTR_DEPARTMENT);
 
         String metricName = "RUNSUM-Amount";
-        CustomMetricUI customMetricInfo = new CustomMetricUI().withName(metricName).withFacts(AMOUNT);
+        CustomMetricUI customMetricInfo = new CustomMetricUI().withName(metricName).withFacts(FACT_AMOUNT);
         initMetricPage();
         createCustomMetric(customMetricInfo, MetricTypes.RUNSUM, AGGREGATION);
 
         UiReportDefinition reportDefinition = new UiReportDefinition().withName("Report-" + metricName)
-                .withWhats(metricName).withHows(STAGE_NAME);
+                .withWhats(metricName).withHows(ATTR_STAGE_NAME);
         createReport(reportDefinition, "screenshot-" + "report_" + customMetricInfo.getName());
         reportPage.getTableReport().drillOnAttributeValue("Short List");
         Sleeper.sleepTight(1000); // Wait for drill report is present
@@ -809,11 +810,11 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"}, groups = {"filter-share-ratio-metric"})
     public void createInvalidMetric() {
         CustomMetricUI customMetricInfo = new CustomMetricUI().withName("WRONG METRIC WITH BETWEEN")
-                .withMetrics(NUMBER_OF_OPEN_OPPS)
-                .withAttributes(buildAttribute(DATE_DIMENSION_SNAPSHOT, YEAR_SNAPSHOT))
+                .withMetrics(METRIC_NUMBER_OF_OPEN_OPPS)
+                .withAttributes(buildAttribute(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT))
                 .withAttributeValues(
-                        buildAttributeValue(DATE_DIMENSION_SNAPSHOT, YEAR_SNAPSHOT, YEAR_2012),
-                        buildAttributeValue(DATE_DIMENSION_SNAPSHOT, YEAR_SNAPSHOT, YEAR_2010));
+                        buildAttributeValue(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT, YEAR_2012),
+                        buildAttributeValue(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT, YEAR_2010));
         initMetricPage();
         createCustomMetric(customMetricInfo, MetricTypes.BETWEEN, FILTER);
 
@@ -865,14 +866,14 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         }
         reportDefinition.withWhats(metricName);
         if (metricName.contains("IFNULL")) {
-            reportDefinition.withWhats(AMOUNT);
+            reportDefinition.withWhats(METRIC_AMOUNT);
         }
         reportDefinition.withName("report_" + metricName);
 
         createReport(reportDefinition, "screenshot-" + "report_" + metricName);
 
         if (metricName.contains("WITHOUT_PF")) {
-            reportPage.addFilter(FilterItem.Factory.createAttributeFilter(MONTH_YEAR_SNAPSHOT, "Apr 2012"))
+            reportPage.addFilter(FilterItem.Factory.createAttributeFilter(ATTR_MONTH_YEAR_SNAPSHOT, "Apr 2012"))
                     .saveReport();
         }
         List<Float> metricValuesinGrid = reportPage.getTableReport().getMetricElements();
@@ -888,7 +889,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     }
 
     private Metric createMetricByGoodDataClient(MetricTypes metricType) {
-        String amountUri = "[" + getMdService().getObjUri(getProject(), Metric.class, Restriction.title(AMOUNT)) + "]";
+        String amountUri = "[" + getMdService().getObjUri(getProject(), Metric.class, Restriction.title(METRIC_AMOUNT)) + "]";
         String dateClosedUri =
                 "[" + getMdService().getObjUri(getProject(), Attribute.class, Restriction.title("Date (Closed)")) + "]";
         String dateSnapshotUri = 
@@ -896,8 +897,8 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         String dateCreatedUri = 
                 "[" + getMdService().getObjUri(getProject(), Attribute.class, Restriction.title("Date (Snapshot)")) + "]";
         String stageNameUri =
-                "[" + getMdService().getObjUri(getProject(), Attribute.class, Restriction.title(STAGE_NAME)) + "]";
-        String productUri = "[" + getMdService().getObjUri(getProject(), Attribute.class, Restriction.title(PRODUCT)) + "]";
+                "[" + getMdService().getObjUri(getProject(), Attribute.class, Restriction.title(ATTR_STAGE_NAME)) + "]";
+        String productUri = "[" + getMdService().getObjUri(getProject(), Attribute.class, Restriction.title(ATTR_PRODUCT)) + "]";
 
         String metric = "__metric__";
         String attribute = "__attr__";

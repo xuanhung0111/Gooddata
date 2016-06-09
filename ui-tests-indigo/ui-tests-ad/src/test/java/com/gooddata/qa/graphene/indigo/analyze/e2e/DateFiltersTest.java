@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.lang.String.format;
 import static org.openqa.selenium.By.cssSelector;
@@ -67,7 +68,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_reflect_selection_changes() {
-        assertEquals(analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
+        assertEquals(analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDateFilter()
             .getFilterBuckets()
             .getDateFilterText(), "Activity: All time");
@@ -103,7 +104,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_reset_filters_on_all_time() {
-        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDateFilter()
             .getFilterBuckets()
             .configDateFilter("All time");

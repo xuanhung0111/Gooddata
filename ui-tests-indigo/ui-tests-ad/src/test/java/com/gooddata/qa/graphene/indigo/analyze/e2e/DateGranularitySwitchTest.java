@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertTrue;
 
@@ -36,7 +37,7 @@ public class DateGranularitySwitchTest extends AbstractAdE2ETest {
         analysisPageReact.getAttributesBucket()
             .changeGranularity("Month");
         analysisPageReact.resetToBlankState()
-            .addMetric(NUMBER_OF_ACTIVITIES)
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate()
             .waitForReportComputing();
 
@@ -47,7 +48,7 @@ public class DateGranularitySwitchTest extends AbstractAdE2ETest {
     private void beforeEach() {
         // D&D the first metric/attribute to configuration
         analysisPageReact.changeReportType(ReportType.COLUMN_CHART)
-            .addMetric(NUMBER_OF_ACTIVITIES)
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate();
     }
 }

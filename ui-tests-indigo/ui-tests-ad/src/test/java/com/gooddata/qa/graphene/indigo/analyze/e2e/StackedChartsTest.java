@@ -1,6 +1,11 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_LOST_OPPS;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
 import static org.openqa.selenium.By.className;
@@ -24,9 +29,9 @@ public class StackedChartsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_put_stack_by_attribute_into_color_series() {
-        assertEquals(analysisPageReact.addStack(ACTIVITY_TYPE)
-            .addAttribute(DEPARTMENT)
-            .addMetric(NUMBER_OF_ACTIVITIES)
+        assertEquals(analysisPageReact.addStack(ATTR_ACTIVITY_TYPE)
+            .addAttribute(ATTR_DEPARTMENT)
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing()
             .getChartReport()
             .getLegends(), asList("Email", "In Person Meeting", "Phone Call", "Web Meeting"));
@@ -34,9 +39,9 @@ public class StackedChartsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_totals_for_stacked_columns() {
-        analysisPageReact.addStack(ACTIVITY_TYPE)
-            .addAttribute(DEPARTMENT)
-            .addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addStack(ATTR_ACTIVITY_TYPE)
+            .addAttribute(ATTR_DEPARTMENT)
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
 
         assertEquals(browser.findElements(cssSelector(".highcharts-stack-labels text")).size(), 2);
@@ -44,9 +49,9 @@ public class StackedChartsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_display_stack_warn_msg_when_there_is_something_in_stack_by_bucket() {
-        assertFalse(analysisPageReact.addStack(ACTIVITY_TYPE)
-            .addAttribute(DEPARTMENT)
-            .addMetric(NUMBER_OF_ACTIVITIES)
+        assertFalse(analysisPageReact.addStack(ATTR_ACTIVITY_TYPE)
+            .addAttribute(ATTR_DEPARTMENT)
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getWarningMessage()
             .isEmpty());
@@ -54,9 +59,9 @@ public class StackedChartsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_display_stack_warn_msg_if_there_is_more_than_1_metrics() {
-        assertFalse(analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
-            .addMetric(NUMBER_OF_LOST_OPPS)
-            .addAttribute(ACCOUNT)
+        assertFalse(analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .addMetric(METRIC_NUMBER_OF_LOST_OPPS)
+            .addAttribute(ATTR_ACCOUNT)
             .getStacksBucket()
             .getWarningMessage()
             .isEmpty());
@@ -64,9 +69,9 @@ public class StackedChartsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_disappear_when_visualization_is_switched_to_table_and_should_be_empty_when_going_back() {
-        analysisPageReact.addStack(ACTIVITY_TYPE)
-            .addAttribute(DEPARTMENT)
-            .addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addStack(ATTR_ACTIVITY_TYPE)
+            .addAttribute(ATTR_DEPARTMENT)
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .changeReportType(ReportType.TABLE);
 
         assertFalse(isElementPresent(className(StacksBucket.CSS_CLASS), browser));
@@ -80,9 +85,9 @@ public class StackedChartsTest extends AbstractAdE2ETest {
     // Unstable https://jira.intgdc.com/browse/CL-9774
     // @Test(dependsOnGroups = {"init"})
     public void should_disappear_when_switched_to_table_via_result_too_large_link() {
-        analysisPageReact.addStack(ACTIVITY_TYPE)
-            .addAttribute(ACCOUNT)
-            .addMetric(NUMBER_OF_ACTIVITIES);
+        analysisPageReact.addStack(ATTR_ACTIVITY_TYPE)
+            .addAttribute(ATTR_ACCOUNT)
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES);
 
         waitForElementVisible(cssSelector(".s-error-too-many-data-points .s-switch-to-table"), browser).click();
 

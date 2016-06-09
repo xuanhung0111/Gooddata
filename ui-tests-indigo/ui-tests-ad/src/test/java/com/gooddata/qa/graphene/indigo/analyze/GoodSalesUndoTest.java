@@ -1,5 +1,9 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Arrays.asList;
@@ -36,40 +40,40 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testAfterAddMetric() {
-        ReportState baseState = ReportState.getCurrentState(analysisPage.addMetric(NUMBER_OF_ACTIVITIES));
+        ReportState baseState = ReportState.getCurrentState(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES));
 
         checkUndoRedoForEmptyState(true);
         checkUndoRedoForReport(baseState, false);
 
-        analysisPage.addMetric(AMOUNT);
+        analysisPage.addMetric(METRIC_AMOUNT);
         checkUndoRedoForReport(baseState, true);
     }
 
     @Test(dependsOnGroups = {"init"})
     public void testAfterAddAtribute() {
-        analysisPage.addAttribute(ACTIVITY_TYPE);
+        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE);
 
         checkUndoRedoForEmptyState(true);
 
         analysisPage.redo();
-        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ACTIVITY_TYPE));
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void testAfterRemoveMetricAndAttribute() {
-        ReportState baseState = ReportState.getCurrentState(analysisPage.addMetric(NUMBER_OF_ACTIVITIES));
+        ReportState baseState = ReportState.getCurrentState(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES));
 
-        analysisPage.removeMetric(NUMBER_OF_ACTIVITIES);
-        assertFalse(analysisPage.getMetricsBucket().getItemNames().contains(NUMBER_OF_ACTIVITIES));
+        analysisPage.removeMetric(METRIC_NUMBER_OF_ACTIVITIES);
+        assertFalse(analysisPage.getMetricsBucket().getItemNames().contains(METRIC_NUMBER_OF_ACTIVITIES));
 
         checkUndoRedoForReport(baseState, true);
         checkUndoRedoForEmptyState(false);
 
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-            .addAttribute(ACTIVITY_TYPE);
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .addAttribute(ATTR_ACTIVITY_TYPE);
         ReportState baseStateWithAttribute = ReportState.getCurrentState(analysisPage);
 
-        analysisPage.removeAttribute(ACTIVITY_TYPE);
+        analysisPage.removeAttribute(ATTR_ACTIVITY_TYPE);
 
         checkUndoRedoForReport(baseStateWithAttribute, true);
         checkUndoRedoForReport(baseState, false);
@@ -79,7 +83,7 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
     public void testAfterChangeDateDimensionOnBucket() {
         final AttributesBucket categoriesBucket = analysisPage.getAttributesBucket();
 
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addDate().undo();
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().undo();
         assertTrue(categoriesBucket.isEmpty());
         analysisPage.redo();
         assertFalse(categoriesBucket.isEmpty());
@@ -96,7 +100,7 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
     public void testAfterChangeDateDimensionInFilter() {
         final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addDateFilter().undo();
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDateFilter().undo();
         assertFalse(filtersBucket.isFilterVisible(ACTIVITY));
 
         analysisPage.redo();
@@ -122,26 +126,26 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
         int actionsCount = 0;
         final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
-        analysisPage.addAttribute(ACTIVITY_TYPE); actionsCount++;
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES); actionsCount++;
-        analysisPage.addFilter(DEPARTMENT); actionsCount++;
+        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE); actionsCount++;
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES); actionsCount++;
+        analysisPage.addFilter(ATTR_DEPARTMENT); actionsCount++;
 
         analysisPage.undo();
-        assertFalse(filtersBucket.isFilterVisible(DEPARTMENT));
+        assertFalse(filtersBucket.isFilterVisible(ATTR_DEPARTMENT));
 
         analysisPage.redo();
-        assertTrue(filtersBucket.isFilterVisible(DEPARTMENT));
+        assertTrue(filtersBucket.isFilterVisible(ATTR_DEPARTMENT));
 
-        analysisPage.removeFilter(DEPARTMENT);
+        analysisPage.removeFilter(ATTR_DEPARTMENT);
         actionsCount++;
-        assertFalse(filtersBucket.isFilterVisible(DEPARTMENT));
+        assertFalse(filtersBucket.isFilterVisible(ATTR_DEPARTMENT));
         takeScreenshot(browser, "Indigo_remove_filter", this.getClass());
 
         analysisPage.undo();
-        assertTrue(filtersBucket.isFilterVisible(DEPARTMENT));
+        assertTrue(filtersBucket.isFilterVisible(ATTR_DEPARTMENT));
 
         analysisPage.redo();
-        assertFalse(filtersBucket.isFilterVisible(DEPARTMENT));
+        assertFalse(filtersBucket.isFilterVisible(ATTR_DEPARTMENT));
 
         AnalysisPageHeader pageHeader = analysisPage.getPageHeader();
         // Check that the undo must go back to the start of his session
@@ -168,24 +172,24 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testAfterReset() {
-        ReportState baseState = ReportState.getCurrentState(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-                .addAttribute(ACTIVITY_TYPE));
+        ReportState baseState = ReportState.getCurrentState(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addAttribute(ATTR_ACTIVITY_TYPE));
         analysisPage.resetToBlankState();
         checkUndoRedoForReport(baseState, true);
     }
 
     @Test(dependsOnGroups = {"init"})
     public void testUndoNotApplicableOnNonActiveSession() {
-        ReportState baseState = ReportState.getCurrentState(analysisPage.addMetric(NUMBER_OF_ACTIVITIES));
-        analysisPage.addAttribute(ACTIVITY_TYPE);
+        ReportState baseState = ReportState.getCurrentState(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES));
+        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE);
 
         final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
-        cataloguePanel.search(DEPARTMENT);
-        assertEquals(cataloguePanel.getFieldNamesInViewPort(), asList(DEPARTMENT));
+        cataloguePanel.search(ATTR_DEPARTMENT);
+        assertEquals(cataloguePanel.getFieldNamesInViewPort(), asList(ATTR_DEPARTMENT));
         checkUndoRedoForReport(baseState, true);
-        assertEquals(cataloguePanel.getFieldNamesInViewPort(), asList(DEPARTMENT));
+        assertEquals(cataloguePanel.getFieldNamesInViewPort(), asList(ATTR_DEPARTMENT));
 
-        analysisPage.addAttribute(ACTIVITY_TYPE).exportReport();
+        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).exportReport();
         checkUndoRedoForReport(baseState, true);
     }
 

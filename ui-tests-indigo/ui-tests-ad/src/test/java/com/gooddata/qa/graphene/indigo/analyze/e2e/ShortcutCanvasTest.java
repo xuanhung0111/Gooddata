@@ -1,6 +1,9 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static java.util.Arrays.asList;
 import static org.openqa.selenium.By.cssSelector;
@@ -22,13 +25,13 @@ public class ShortcutCanvasTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_replace_attribute_when_user_drops_it_on_canvas_shortcut() {
-        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
-            .addAttribute(ACTIVITY_TYPE)
-            .drag(analysisPageReact.getCataloguePanel().searchAndGet(DEPARTMENT, FieldType.ATTRIBUTE),
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .addAttribute(ATTR_ACTIVITY_TYPE)
+            .drag(analysisPageReact.getCataloguePanel().searchAndGet(ATTR_DEPARTMENT, FieldType.ATTRIBUTE),
                     () -> waitForElementPresent(cssSelector(".s-shortcut-metric-attribute"), browser))
             .waitForReportComputing();
 
         assertTrue(isElementPresent(cssSelector(".adi-components .s-id-metricvalues"), browser));
-        assertEquals(analysisPageReact.getAttributesBucket().getItemNames(), asList(DEPARTMENT));
+        assertEquals(analysisPageReact.getAttributesBucket().getItemNames(), asList(ATTR_DEPARTMENT));
     }
 }

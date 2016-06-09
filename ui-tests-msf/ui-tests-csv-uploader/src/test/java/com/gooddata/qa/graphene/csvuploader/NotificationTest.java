@@ -22,6 +22,7 @@ import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
+import com.gooddata.qa.graphene.utils.GoodSalesUtils;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.google.common.collect.Iterables;
@@ -66,7 +67,7 @@ public class NotificationTest extends AbstractCsvUploaderTest {
         GoodData goodDataClient = getGoodDataClient(imapUser, imapPassword);
 
         String goodSalesProjectId = ProjectRestUtils.createProject(goodDataClient, projectTitle,
-                GOODSALES_TEMPLATE, testParams.getAuthorizationToken(), testParams.getProjectDriver(),
+                GoodSalesUtils.GOODSALES_TEMPLATE, testParams.getAuthorizationToken(), testParams.getProjectDriver(),
                 testParams.getProjectEnvironment());
 
         try {

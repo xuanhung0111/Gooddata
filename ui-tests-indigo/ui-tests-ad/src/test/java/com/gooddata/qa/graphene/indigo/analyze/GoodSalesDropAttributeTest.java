@@ -1,6 +1,9 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -30,11 +33,11 @@ public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void dropAttributeToReportHaveOneMetric() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addAttribute(ACTIVITY_TYPE).waitForReportComputing();
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing();
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 4);
 
-        analysisPage.addStack(DEPARTMENT);
+        analysisPage.addStack(ATTR_DEPARTMENT);
         analysisPage.waitForReportComputing();
         assertEquals(report.getTrackersCount(), 8);
     }
@@ -43,10 +46,10 @@ public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
     public void dropThirdAttributeToBucket() {
         dropAttributeToReportHaveOneMetric();
 
-        analysisPage.replaceAttribute(ACTIVITY_TYPE, PRIORITY);
+        analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, PRIORITY);
         Collection<String> addedAttributes = analysisPage.getAttributesBucket().getItemNames();
         assertTrue(addedAttributes.contains(PRIORITY));
-        assertFalse(addedAttributes.contains(ACTIVITY_TYPE));
+        assertFalse(addedAttributes.contains(ATTR_ACTIVITY_TYPE));
 
         analysisPage.replaceStack(REGION);
         assertEquals(analysisPage.getStacksBucket().getAttributeName(), REGION);
@@ -57,9 +60,9 @@ public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
     public void removeAttributeOnXBucket() {
         dropAttributeToReportHaveOneMetric();
 
-        analysisPage.removeAttribute(ACTIVITY_TYPE);
+        analysisPage.removeAttribute(ATTR_ACTIVITY_TYPE);
         Collection<String> addedAttributes = analysisPage.getAttributesBucket().getItemNames();
-        assertFalse(addedAttributes.contains(ACTIVITY_TYPE));
+        assertFalse(addedAttributes.contains(ATTR_ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -67,20 +70,20 @@ public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
         dropAttributeToReportHaveOneMetric();
 
         MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
-                .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+                .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
         assertFalse(metricConfiguration.isShowPercentEnabled());
         assertFalse(metricConfiguration.isPopEnabled());
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
 
         analysisPage.resetToBlankState();
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES);
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES);
         metricConfiguration.expandConfiguration();
         assertFalse(metricConfiguration.isShowPercentEnabled());
         assertFalse(metricConfiguration.isPopEnabled());
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() > 0);
 
-        analysisPage.addStack(DEPARTMENT);
+        analysisPage.addStack(ATTR_DEPARTMENT);
         analysisPage.waitForReportComputing();
         assertFalse(metricConfiguration.isShowPercentEnabled());
         assertFalse(metricConfiguration.isPopEnabled());
@@ -91,8 +94,8 @@ public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
     @Test(dependsOnGroups = {"init"})
     public void applyAttributeFiltersInReport() {
         dropAttributeToReportHaveOneMetric();
-        analysisPage.getFilterBuckets().configAttributeFilter(ACTIVITY_TYPE, "Email", "Phone Call")
-            .configAttributeFilter(DEPARTMENT, "Inside Sales");
+        analysisPage.getFilterBuckets().configAttributeFilter(ATTR_ACTIVITY_TYPE, "Email", "Phone Call")
+            .configAttributeFilter(ATTR_DEPARTMENT, "Inside Sales");
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 2);
         checkingOpenAsReport("applyAttributeFiltersInReport");
@@ -104,10 +107,10 @@ public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
         final StacksBucket stacksBucket = analysisPage.getStacksBucket();
 
         analysisPage.changeReportType(ReportType.BAR_CHART);
-        assertEquals(stacksBucket.getAttributeName(), DEPARTMENT);
+        assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
 
         analysisPage.changeReportType(ReportType.LINE_CHART);
-        assertEquals(stacksBucket.getAttributeName(), DEPARTMENT);
+        assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
 
         analysisPage.changeReportType(ReportType.TABLE);
         assertFalse(isElementPresent(className(StacksBucket.CSS_CLASS), browser));
@@ -121,13 +124,13 @@ public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
         analysisPage.undo();
         assertTrue(stacksBucket.isEmpty());
         analysisPage.redo();
-        assertEquals(stacksBucket.getAttributeName(), DEPARTMENT);
+        assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
 
         analysisPage.replaceStack(REGION);
         assertEquals(stacksBucket.getAttributeName(), REGION);
 
         analysisPage.undo();
-        assertEquals(stacksBucket.getAttributeName(), DEPARTMENT);
+        assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
 
         analysisPage.undo();
         assertTrue(stacksBucket.isEmpty());

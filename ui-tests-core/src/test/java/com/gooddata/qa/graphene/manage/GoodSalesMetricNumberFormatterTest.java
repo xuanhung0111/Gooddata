@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.manage;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
@@ -24,8 +25,6 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 
 public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
 
-    private static final String NUMBER_OF_ACTIVITIES = "# of Activities";
-
     private static final By METRIC_DETAIL_FORMAT_LOCATOR = By.cssSelector(".c-metricDetailFormat .formatter");
 
     @BeforeClass
@@ -36,7 +35,7 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"})
     public void testNumberFormatEditor() {
         initMetricPage();
-        waitForFragmentVisible(metricPage).openMetricDetailPage(NUMBER_OF_ACTIVITIES);
+        waitForFragmentVisible(metricPage).openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES);
         // don't know why get text of metric format in metric detail page return #,##0 instead of #,##0.00
         assertTrue(Formatter.DEFAULT.toString().startsWith(waitForFragmentVisible(metricDetailPage)
                 .changeMetricFormatButDiscard(Formatter.BARS)
@@ -51,7 +50,7 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
 
             reportPage.initPage()
                 .openWhatPanel()
-                .selectMetric(NUMBER_OF_ACTIVITIES);
+                .selectMetric(METRIC_NUMBER_OF_ACTIVITIES);
             assertEquals(waitForElementVisible(METRIC_DETAIL_FORMAT_LOCATOR, browser)
                     .getText(), Formatter.BARS.toString());
 
@@ -76,7 +75,7 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
             initReportPage();
             TableReport report = reportPage.initPage()
                     .openWhatPanel()
-                    .selectMetric(NUMBER_OF_ACTIVITIES)
+                    .selectMetric(METRIC_NUMBER_OF_ACTIVITIES)
                     .doneSndPanel()
                     .selectReportVisualisation(ReportTypes.TABLE)
                     .getTableReport();
@@ -132,7 +131,7 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
             initReportPage();
             reportPage.initPage()
                 .openWhatPanel()
-                .selectMetric(NUMBER_OF_ACTIVITIES);
+                .selectMetric(METRIC_NUMBER_OF_ACTIVITIES);
 
             WebElement editFormat = waitForElementVisible(METRIC_DETAIL_FORMAT_LOCATOR, browser);
             editFormat.click();
@@ -163,7 +162,7 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
     private void resetMetricFormat() {
         initProjectsPage();
         initMetricPage();
-        waitForFragmentVisible(metricPage).openMetricDetailPage(NUMBER_OF_ACTIVITIES);
+        waitForFragmentVisible(metricPage).openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES);
         assertEquals(waitForFragmentVisible(metricDetailPage).changeMetricFormat(Formatter.DEFAULT)
                 .getMetricFormat(), Formatter.DEFAULT.toString());
     }

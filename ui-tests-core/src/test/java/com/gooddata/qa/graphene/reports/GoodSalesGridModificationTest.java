@@ -1,6 +1,14 @@
 package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPPORTUNITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PROBABILITY;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -46,18 +54,11 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
     private final static String PROBABILITY_METRIC = "Probability-Metric";
     private final static String SIMPLE_REPORT = "Simple-Report";
     private final static String REPORT_WITHOUT_METRIC = "Report-Without-Metric";
-    private final static String AMOUNT = "Amount";
-    private final static String PROBABILITY = "Probability";
-    private final static String STATUS = "Status";
     private final static String INTEREST = "Interest";
-    private final static String STAGE_NAME = "Stage Name";
     private final static String STAGE = "Stage";
     private final static String ADD_NEW_ATTRIBUTE = "Add New Attribute";
-    private final static String OPPORTUNITY = "Opportunity";
-    private final static String ACCOUNT = "Account";
     private final static String SFDC_URL = "SFDC URL";
     private final static String METRIC_FORMAT = "#,##0.00";
-    private final static String REGION = "Region";
 
     private final static String REPORT_NOT_COMPUTABLE_MESSAGE = "Report not computable due to improper metric definition";
     private final static String DISPLAY_LABEL = "http://www.google.com";
@@ -65,16 +66,16 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createProject"})
     public void setupProject() {
         final String stageNameUri = getMdService()
-                .getObj(getProject(), Attribute.class, title(STAGE_NAME))
+                .getObj(getProject(), Attribute.class, title(ATTR_STAGE_NAME))
                 .getDefaultDisplayForm()
                 .getUri();
 
         final String amountUri = getMdService()
-                .getObj(getProject(), Fact.class, title(AMOUNT))
+                .getObj(getProject(), Fact.class, title(FACT_AMOUNT))
                 .getUri();
 
         final String probabilityUri = getMdService()
-                .getObj(getProject(), Fact.class, title(PROBABILITY))
+                .getObj(getProject(), Fact.class, title(METRIC_PROBABILITY))
                 .getUri();
 
         final String amountMetricUri = getMdService()
@@ -90,8 +91,8 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
 
         ReportDefinition definition = GridReportDefinitionContent.create(SIMPLE_REPORT, singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(stageNameUri)),
-                asList(new GridElement(amountMetricUri, AMOUNT),
-                        new GridElement(probabilityMetric.getUri(), PROBABILITY)));
+                asList(new GridElement(amountMetricUri, METRIC_AMOUNT),
+                        new GridElement(probabilityMetric.getUri(), METRIC_PROBABILITY)));
 
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
@@ -122,12 +123,12 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
                 .openContextMenuFromCellValue(INTEREST)
                 .selectItem("Break Down \"" + INTEREST + "\"");
 
-        reportPage.selectAttribute(STATUS).doneSndPanel();
+        reportPage.selectAttribute(ATTR_STATUS).doneSndPanel();
 
         takeScreenshot(browser, "drill-on-grid-menu", getClass());
-        assertTrue(reportPage.getTableReport().getAttributesHeader().contains(STATUS),
+        assertTrue(reportPage.getTableReport().getAttributesHeader().contains(ATTR_STATUS),
                 "Status attribute has not been added");
-        assertTrue(reportPage.openFilterPanel().getFilterElement(STAGE_NAME + " is " + INTEREST).isDisplayed(),
+        assertTrue(reportPage.openFilterPanel().getFilterElement(ATTR_STAGE_NAME + " is " + INTEREST).isDisplayed(),
                 "The filter has not been added");
     }
 
@@ -152,8 +153,8 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
                 .selectItem(ADD_NEW_ATTRIBUTE);
 
         takeScreenshot(browser, "adding-attribute", getClass());
-        reportPage.selectFolderLocation(STAGE).selectAttribute(STATUS).doneSndPanel().waitForReportExecutionProgress();
-        assertTrue(reportPage.getTableReport().getAttributesHeader().contains(STATUS),
+        reportPage.selectFolderLocation(STAGE).selectAttribute(ATTR_STATUS).doneSndPanel().waitForReportExecutionProgress();
+        assertTrue(reportPage.getTableReport().getAttributesHeader().contains(ATTR_STATUS),
                 "Status attribute has not been added");
         
     }
@@ -162,11 +163,11 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
     public void manipulateWithOnlyAttributeReport() {
         initReportCreation().createReport(new UiReportDefinition()
                 .withName(REPORT_WITHOUT_METRIC)
-                .withHows(STAGE_NAME));
+                .withHows(ATTR_STAGE_NAME));
 
         assertFalse(
                 openReport(REPORT_WITHOUT_METRIC).getTableReport()
-                        .openContextMenuFromCellValue(STAGE_NAME)
+                        .openContextMenuFromCellValue(ATTR_STAGE_NAME)
                         .getGroupNames().contains("Totals"),
                 "Totals group is displayed");
     }
@@ -174,16 +175,16 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createProject"})
     public void drillAttributeToHyperlinkLabel() {
         final String hyperlinkReport = "Hyperlink-report";
-        assertTrue(initAttributePage().initAttribute(OPPORTUNITY).isDrillToExternalPage(),
+        assertTrue(initAttributePage().initAttribute(ATTR_OPPORTUNITY).isDrillToExternalPage(),
                 "The attribute is not linked to external page");
 
         attributeDetailPage.clearDrillingSetting().setDrillToExternalPage();
 
         initReportCreation().createReport(new UiReportDefinition()
                 .withName(hyperlinkReport)
-                .withWhats(AMOUNT)
-                .withHows(OPPORTUNITY)
-                .withFilters(FilterItem.Factory.createAttributeFilter(OPPORTUNITY,
+                .withWhats(METRIC_AMOUNT)
+                .withHows(ATTR_OPPORTUNITY)
+                .withFilters(FilterItem.Factory.createAttributeFilter(ATTR_OPPORTUNITY,
                         "1000Bulbs.com > Educationly", "1000Bulbs.com > PhoenixSoft",
                         "101 Financial > Educationly")));
 
@@ -197,7 +198,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
         checkExternalPageUrl(currentWindow);
 
         reportPage.openHowPanel()
-                .selectAttribute(OPPORTUNITY)
+                .selectAttribute(ATTR_OPPORTUNITY)
                 .changeDisplayLabel(SFDC_URL)
                 .doneSndPanel()
                 .waitForReportExecutionProgress();
@@ -209,20 +210,20 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
         checkExternalPageUrl(currentWindow);
         reportPage.saveReport();
 
-        initAttributePage().initAttribute(OPPORTUNITY).clearDrillingSetting().setDrillToAttribute(ACCOUNT);
+        initAttributePage().initAttribute(ATTR_OPPORTUNITY).clearDrillingSetting().setDrillToAttribute(ATTR_ACCOUNT);
 
         openReport(hyperlinkReport);
         table.drillOnAttributeValue();
         reportPage.waitForReportExecutionProgress();
 
-        assertTrue(table.getAttributesHeader().contains(ACCOUNT), "The expected attribute is not displayed");
+        assertTrue(table.getAttributesHeader().contains(ATTR_ACCOUNT), "The expected attribute is not displayed");
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void editHeadlineReport() throws ParseException, JSONException, IOException {
         final String headlineReport = "Headline-Report";
         final String metricName = "Simple-Metric";
-        final String amountUri = getMdService().getObj(getProject(), Fact.class, title(AMOUNT)).getUri();
+        final String amountUri = getMdService().getObj(getProject(), Fact.class, title(FACT_AMOUNT)).getUri();
 
         final String simpleMetricUri = getMdService()
                 .createObj(getProject(),
@@ -231,7 +232,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
 
         initReportCreation().createReport(new UiReportDefinition()
                 .withName(headlineReport)
-                .withWhats(new WhatItem(metricName, REGION))
+                .withWhats(new WhatItem(metricName, ATTR_REGION))
                 .withType(ReportTypes.HEADLINE));
 
         reportPage.getHeadlineReport().focus();
@@ -240,14 +241,14 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
                         reportPage.waitForReportExecutionProgress()
                                 .getTableReport()
                                 .getAttributesHeader(),
-                        singletonList(REGION)),
+                        singletonList(ATTR_REGION)),
                 "The expected attribute is not displayed");
         browser.navigate().back();
         reportPage.waitForReportExecutionProgress();
 
         assertNotNull(
                 openReport(headlineReport).openHowPanel()
-                        .selectAttribute(REGION)
+                        .selectAttribute(ATTR_REGION)
                         .doneSndPanel()
                         .waitForReportExecutionProgress()
                         .getTableReport(),

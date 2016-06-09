@@ -1,5 +1,8 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -32,7 +35,7 @@ public class GoodSalesShortcutRecommendationTest extends GoodSalesAbstractAnalys
     @Test(dependsOnGroups = {"init"})
     public void testColumnChartShortcut() {
         WebElement metric = analysisPage.getCataloguePanel()
-                .searchAndGet(NUMBER_OF_ACTIVITIES, FieldType.METRIC);
+                .searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC);
 
         Supplier<WebElement> recommendation = () ->
             waitForElementPresent(ShortcutPanel.AS_A_COLUMN_CHART.getLocator(), browser);
@@ -50,7 +53,7 @@ public class GoodSalesShortcutRecommendationTest extends GoodSalesAbstractAnalys
         analysisPage.changeReportType(ReportType.BAR_CHART);
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
 
-        analysisPage.addAttribute(ACTIVITY_TYPE);
+        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE);
         assertThat(report.getTrackersCount(), equalTo(4));
         checkingOpenAsReport("dragMetricToColumnChartShortcutPanel");
     }
@@ -58,7 +61,7 @@ public class GoodSalesShortcutRecommendationTest extends GoodSalesAbstractAnalys
     @Test(dependsOnGroups = {"init"})
     public void testTrendShortcut() {
         WebElement metric = analysisPage.getCataloguePanel()
-                .searchAndGet(NUMBER_OF_ACTIVITIES, FieldType.METRIC);
+                .searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC);
 
         Supplier<WebElement> trendRecommendation = () ->
             waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
@@ -79,7 +82,7 @@ public class GoodSalesShortcutRecommendationTest extends GoodSalesAbstractAnalys
     @Test(dependsOnGroups = {"init"})
     public void displayWhenDraggingFirstMetric() {
         WebElement metric = analysisPage.getCataloguePanel()
-                .searchAndGet(NUMBER_OF_ACTIVITIES, FieldType.METRIC);
+                .searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC);
 
         Supplier<WebElement> trendRecommendation = () ->
             waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
@@ -97,7 +100,7 @@ public class GoodSalesShortcutRecommendationTest extends GoodSalesAbstractAnalys
     @Test(dependsOnGroups = {"init"})
     public void createSimpleMetricFromFactUsingShortcut() {
         WebElement fact = analysisPage.getCataloguePanel()
-                .searchAndGet(AMOUNT, FieldType.FACT);
+                .searchAndGet(FACT_AMOUNT, FieldType.FACT);
 
         Supplier<WebElement> recommendation = () ->
             waitForElementPresent(ShortcutPanel.AS_A_COLUMN_CHART.getLocator(), browser);
@@ -105,10 +108,10 @@ public class GoodSalesShortcutRecommendationTest extends GoodSalesAbstractAnalys
         assertEquals(analysisPage.drag(fact, recommendation)
                 .waitForReportComputing()
                 .getMetricsBucket()
-                .getMetricConfiguration("Sum of " + AMOUNT)
+                .getMetricConfiguration("Sum of " + FACT_AMOUNT)
                 .expandConfiguration()
                 .getAggregation(), "Sum");
-        assertEquals(analysisPage.getChartReport().getYaxisTitle(), "Sum of " + AMOUNT);
+        assertEquals(analysisPage.getChartReport().getYaxisTitle(), "Sum of " + FACT_AMOUNT);
 
         analysisPage.resetToBlankState();
 

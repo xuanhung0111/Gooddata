@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -29,7 +31,7 @@ public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalys
     public void testOverrideDateFilter() {
         final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDateFilter();
         assertEquals(filtersBucket.getFilterText("Activity"), "Activity: All time");
         filtersBucket.configDateFilter("Last 12 months");
@@ -47,10 +49,10 @@ public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalys
 
     @Test(dependsOnGroups = {"init"})
     public void applyParameter() {
-        ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .getChartReport();
         final MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
-                .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+                .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
 
         assertEquals(report.getTrackersCount(), 1);
@@ -77,14 +79,14 @@ public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalys
 
     @Test(dependsOnGroups = {"init"})
     public void displayInColumnChartWithOnlyMetric() {
-        ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES).getChartReport();
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
 
-        analysisPage.addFilter(ACTIVITY_TYPE);
+        analysisPage.addFilter(ATTR_ACTIVITY_TYPE);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
 
         analysisPage.changeReportType(ReportType.BAR_CHART);
@@ -93,7 +95,7 @@ public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalys
         analysisPage.changeReportType(ReportType.COLUMN_CHART);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
 
-        analysisPage.addAttribute(ACTIVITY_TYPE);
+        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE);
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         checkingOpenAsReport("displayInColumnChartWithOnlyMetric");
     }

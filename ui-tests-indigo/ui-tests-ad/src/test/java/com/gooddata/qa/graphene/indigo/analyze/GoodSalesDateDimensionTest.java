@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
@@ -30,7 +31,7 @@ public class GoodSalesDateDimensionTest extends GoodSalesAbstractAnalyseTest {
     public void applyOnFilter() {
         final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addMetric("_Snapshot [BOP]")
             .addDateFilter();
         assertEquals(filtersBucket.getFilterText(ACTIVITY), ACTIVITY + ": All time");
@@ -54,7 +55,7 @@ public class GoodSalesDateDimensionTest extends GoodSalesAbstractAnalyseTest {
     public void applyOnBucket() {
         final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addDate();
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
         assertEquals(filtersBucket.getFilterText(ACTIVITY), ACTIVITY + ": All time");
 
         analysisPage.getAttributesBucket().changeGranularity("Month");
@@ -74,7 +75,7 @@ public class GoodSalesDateDimensionTest extends GoodSalesAbstractAnalyseTest {
     public void applyOnBothFilterAndBucket() {
         final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addDateFilter();
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDateFilter();
         assertEquals(filtersBucket.getFilterText(ACTIVITY), ACTIVITY + ": All time");
 
         filtersBucket.changeDateDimension(ACTIVITY, CREATED);

@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_DROPS_BELOW;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
@@ -23,7 +24,7 @@ import com.gooddata.qa.utils.http.RestUtils;
 public class KpiAlertTest extends DashboardWithWidgetsTest {
 
     private static final KpiConfiguration kpiConfig = new KpiConfiguration.Builder()
-        .metric(AMOUNT)
+        .metric(METRIC_AMOUNT)
         .dataSet(DATE_CREATED)
         .build();
 
