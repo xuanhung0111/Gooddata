@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
 import static org.openqa.selenium.By.cssSelector;
@@ -25,51 +26,51 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_drop_fact_on_the_metrics_bucket() {
-        analysisPageReact.addMetric(AMOUNT, FieldType.FACT)
+        analysisPageReact.addMetric(FACT_AMOUNT, FieldType.FACT)
             .getMetricsBucket()
-            .getMetricConfiguration("Sum of " + AMOUNT)
+            .getMetricConfiguration("Sum of " + FACT_AMOUNT)
             .expandConfiguration();
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_remove_created_metric() {
-        analysisPageReact.addMetric(AMOUNT, FieldType.FACT)
+        analysisPageReact.addMetric(FACT_AMOUNT, FieldType.FACT)
             .getMetricsBucket()
-            .getMetricConfiguration("Sum of " + AMOUNT)
+            .getMetricConfiguration("Sum of " + FACT_AMOUNT)
             .expandConfiguration();
 
-        assertTrue(analysisPageReact.removeMetric("Sum of " + AMOUNT)
+        assertTrue(analysisPageReact.removeMetric("Sum of " + FACT_AMOUNT)
             .getMetricsBucket()
             .isEmpty());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_change_aggregation_function() {
-        MetricConfiguration configuration = analysisPageReact.addMetric(AMOUNT, FieldType.FACT)
+        MetricConfiguration configuration = analysisPageReact.addMetric(FACT_AMOUNT, FieldType.FACT)
             .waitForReportComputing()
             .getMetricsBucket()
-            .getMetricConfiguration("Sum of " + AMOUNT)
+            .getMetricConfiguration("Sum of " + FACT_AMOUNT)
             .expandConfiguration();
 
         expectAggregationSelected("SUM", "opportunitysnapshot_amount");
-        expectAggregationAxisLabel("Sum of " + AMOUNT);
+        expectAggregationAxisLabel("Sum of " + FACT_AMOUNT);
 
         configuration.changeAggregation("Average");
         expectAggregationSelected("AVG", "opportunitysnapshot_amount");
-        expectAggregationAxisLabel("Avg " + AMOUNT);
-        expectBucketItemTitle("Avg " + AMOUNT);
+        expectAggregationAxisLabel("Avg " + FACT_AMOUNT);
+        expectBucketItemTitle("Avg " + FACT_AMOUNT);
 
         configuration.changeAggregation("Maximum");
         expectAggregationSelected("MAX", "opportunitysnapshot_amount");
-        expectAggregationAxisLabel("Max " + AMOUNT);
-        expectBucketItemTitle("Max " + AMOUNT);
+        expectAggregationAxisLabel("Max " + FACT_AMOUNT);
+        expectBucketItemTitle("Max " + FACT_AMOUNT);
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_drop_the_same_fact_multiple_times() {
-        assertEquals(analysisPageReact.addMetric(AMOUNT, FieldType.FACT)
-            .addMetric(AMOUNT, FieldType.FACT)
-            .addMetric(AMOUNT, FieldType.FACT)
+        assertEquals(analysisPageReact.addMetric(FACT_AMOUNT, FieldType.FACT)
+            .addMetric(FACT_AMOUNT, FieldType.FACT)
+            .addMetric(FACT_AMOUNT, FieldType.FACT)
             .getMetricsBucket()
             .getItemNames()
             .size(), 3);
@@ -77,34 +78,34 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_allow_to_have_two_different_metrics_from_one_fact() {
-        analysisPageReact.addMetric(AMOUNT, FieldType.FACT)
+        analysisPageReact.addMetric(FACT_AMOUNT, FieldType.FACT)
             .getMetricsBucket()
-            .getMetricConfiguration("Sum of " + AMOUNT)
+            .getMetricConfiguration("Sum of " + FACT_AMOUNT)
             .expandConfiguration()
             .changeAggregation("Maximum");
 
-        analysisPageReact.addMetric(AMOUNT, FieldType.FACT)
+        analysisPageReact.addMetric(FACT_AMOUNT, FieldType.FACT)
             .getMetricsBucket()
-            .getMetricConfiguration("Sum of " + AMOUNT)
+            .getMetricConfiguration("Sum of " + FACT_AMOUNT)
             .expandConfiguration()
             .changeAggregation("Minimum");
 
         assertEquals(analysisPageReact.waitForReportComputing()
             .getChartReport()
-            .getLegends(), asList("Max " + AMOUNT, "Min " + AMOUNT));
+            .getLegends(), asList("Max " + FACT_AMOUNT, "Min " + FACT_AMOUNT));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_undo_aggregation_change() {
-        analysisPageReact.addMetric(AMOUNT, FieldType.FACT)
+        analysisPageReact.addMetric(FACT_AMOUNT, FieldType.FACT)
             .getMetricsBucket()
-            .getMetricConfiguration("Sum of " + AMOUNT)
+            .getMetricConfiguration("Sum of " + FACT_AMOUNT)
             .expandConfiguration()
             .changeAggregation("Maximum");
 
         analysisPageReact.undo()
             .getMetricsBucket()
-            .getMetricConfiguration("Sum of " + AMOUNT)
+            .getMetricConfiguration("Sum of " + FACT_AMOUNT)
             .expandConfiguration();
         expectAggregationSelected("SUM", "opportunitysnapshot_amount");
 
@@ -114,14 +115,14 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
             .isEmpty());
 
         analysisPageReact.getMetricsBucket()
-            .getMetricConfiguration("Sum of " + AMOUNT)
+            .getMetricConfiguration("Sum of " + FACT_AMOUNT)
             .expandConfiguration();
         expectAggregationSelected("SUM", "opportunitysnapshot_amount");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_fact_based_metric_via_single_metric_shortcut() {
-        assertEquals(analysisPageReact.drag(analysisPageReact.getCataloguePanel().searchAndGet(AMOUNT, FieldType.FACT),
+        assertEquals(analysisPageReact.drag(analysisPageReact.getCataloguePanel().searchAndGet(FACT_AMOUNT, FieldType.FACT),
                 () -> waitForElementVisible(cssSelector(".s-recommendation-metric-canvas"), browser))
             .waitForReportComputing()
             .getMetricsBucket()
@@ -131,7 +132,7 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_fact_based_metric_via_trending_shortcut() {
-        assertEquals(analysisPageReact.drag(analysisPageReact.getCataloguePanel().searchAndGet(AMOUNT, FieldType.FACT),
+        assertEquals(analysisPageReact.drag(analysisPageReact.getCataloguePanel().searchAndGet(FACT_AMOUNT, FieldType.FACT),
                 () -> waitForElementVisible(cssSelector(".s-recommendation-metric-over-time-canvas"), browser))
             .waitForReportComputing()
             .getMetricsBucket()

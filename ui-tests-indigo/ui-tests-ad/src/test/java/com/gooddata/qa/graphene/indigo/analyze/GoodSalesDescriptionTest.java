@@ -1,6 +1,10 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -46,9 +50,9 @@ public class GoodSalesDescriptionTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"}, dataProvider = "metricProvider")
     public void testMetricWithIdentifier(String name, String maql, String identifier) {
-        String factAmountUri = getMdService().getObjUri(getProject(), Fact.class, title(AMOUNT));
+        String factAmountUri = getMdService().getObjUri(getProject(), Fact.class, title(FACT_AMOUNT));
 
-        String accountAttributeUri = getMdService().getObjUri(getProject(), Attribute.class, title(ACCOUNT));
+        String accountAttributeUri = getMdService().getObjUri(getProject(), Attribute.class, title(ATTR_ACCOUNT));
         String accountValueUri1 = accountAttributeUri + "/elements?id=958075";
         String accountValueUri2 = accountAttributeUri + "/elements?id=958077";
 
@@ -76,40 +80,40 @@ public class GoodSalesDescriptionTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void exploreAttribute() {
-        StringBuilder expected = new StringBuilder(DEPARTMENT).append("\n")
+        StringBuilder expected = new StringBuilder(ATTR_DEPARTMENT).append("\n")
                 .append("Field Type\n")
                 .append("Attribute\n")
                 .append("Values\n")
                 .append("Direct Sales\n")
                 .append("Inside Sales\n");
-        assertEquals(analysisPage.getCataloguePanel().getAttributeDescription(DEPARTMENT), expected.toString());
+        assertEquals(analysisPage.getCataloguePanel().getAttributeDescription(ATTR_DEPARTMENT), expected.toString());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void exploreMetric() {
-        StringBuilder expected = new StringBuilder(NUMBER_OF_ACTIVITIES).append("\n")
+        StringBuilder expected = new StringBuilder(METRIC_NUMBER_OF_ACTIVITIES).append("\n")
                 .append("Field Type\n")
                 .append("Calculated Measure\n")
                 .append("Defined As\n")
                 .append("SELECT COUNT(Activity)\n");
-        assertEquals(analysisPage.getCataloguePanel().getMetricDescription(NUMBER_OF_ACTIVITIES), expected.toString());
+        assertEquals(analysisPage.getCataloguePanel().getMetricDescription(METRIC_NUMBER_OF_ACTIVITIES), expected.toString());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void exploreAttributeInMetricFilter() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES);
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES);
         final MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
-                .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+                .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
         assertTrue(metricConfiguration.canAddAnotherFilter());
 
-        StringBuilder expected = new StringBuilder(DEPARTMENT).append("\n")
+        StringBuilder expected = new StringBuilder(ATTR_DEPARTMENT).append("\n")
                 .append("Field Type\n")
                 .append("Attribute\n")
                 .append("Values\n")
                 .append("Direct Sales\n")
                 .append("Inside Sales\n");
-        assertEquals(metricConfiguration.getAttributeDescription(DEPARTMENT),
+        assertEquals(metricConfiguration.getAttributeDescription(ATTR_DEPARTMENT),
                 expected.toString());
     }
 

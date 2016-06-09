@@ -1,6 +1,12 @@
 package com.gooddata.qa.graphene.aqe;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_MONTH_YEAR_CREATED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_PIPELINE_ANALYSIS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
@@ -34,36 +40,20 @@ import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 @Test(groups = {"GoodSalesValidElements"}, description = "Tests for GoodSales project relates to ValidElements resource")
 public class ValidElementsResourceTest extends GoodSalesAbstractTest {
 
-    private String departmentAttr;
-    private String productAttr;
-    private String monthYearCreatedAttr;
-    private List<String> allDepartmentValues;
-    private List<String> allProductValues;
-
     @BeforeClass
     public void setProjectTitle() {
         projectTitle = "GoodSales-test-valid-elements-resource";
-    }
-
-    @Test(dependsOnMethods = {"createProject"})
-    public void initialize() throws JSONException {
-        monthYearCreatedAttr = "Month/Year (Created)";
-        departmentAttr = "Department";
-        productAttr = "Product";
-        allDepartmentValues = asList("Direct Sales", "Inside Sales");
-        allProductValues = asList("CompuSci", "Educationly", "Explorer", "Grammar Plus", "PhoenixSoft",
-                "TouchAll", "WonderKid");
     }
 
     /*
      * This test is to cover the following bug: "AQE-1028 - Get 500 Internal Error when creating
      * filtered variable with some attribute elements
      */
-    @Test(dependsOnMethods = {"initialize"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkForFilteredVariable() {
         initVariablePage();
         variablePage.createVariable(new AttributeVariable("Test variable" + System.currentTimeMillis())
-            .withAttribute(monthYearCreatedAttr)
+            .withAttribute(ATTR_MONTH_YEAR_CREATED)
             .withAttributeElements("Jan 2010", "Feb 2010", "Mar 2010"));
     }
 
@@ -71,7 +61,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
      * This test is to cover the following bug:
      * "AQE-1029 - Cascading filter: get 400 bad request when opening list value of child filter"
      */
-    @Test(dependsOnMethods = {"initialize"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkForCascadingFilter() {
         List<String> filteredValuesProduct =
                 asList("CompuSci", "Educationly", "Explorer", "Grammar Plus", "PhoenixSoft", "WonderKid");
@@ -81,21 +71,22 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
             dashboardsPage.editDashboard();
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
 
-            dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, departmentAttr);
-            dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, productAttr);
+            dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_DEPARTMENT);
+            dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
             dashboardEditBar.saveDashboard();
 
-            FilterWidget departmentFilter = getFilterWidget(departmentAttr);
-            FilterWidget productFilter = getFilterWidget(productAttr);
+            FilterWidget departmentFilter = getFilterWidget(ATTR_DEPARTMENT);
+            FilterWidget productFilter = getFilterWidget(ATTR_PRODUCT);
 
-            assertTrue(CollectionUtils.isEqualCollection(allDepartmentValues,
+            assertTrue(CollectionUtils.isEqualCollection(asList("Direct Sales", "Inside Sales"),
                     departmentFilter.getAllAttributeValues()), "List of filter elements is not properly.");
-            assertTrue(CollectionUtils.isEqualCollection(allProductValues,
+            assertTrue(CollectionUtils.isEqualCollection(
+                    asList("CompuSci", "Educationly", "Explorer", "Grammar Plus", "PhoenixSoft", "TouchAll", "WonderKid"),
                     productFilter.getAllAttributeValues()), "List of filter elements is not properly.");
 
             dashboardsPage.editDashboard();
             sleepTightInSeconds(5);
-            dashboardEditBar.setParentsFilter(productAttr, departmentAttr);// parentFilteName is Department
+            dashboardEditBar.setParentsFilter(ATTR_PRODUCT, ATTR_DEPARTMENT);// parentFilteName is Department
             dashboardEditBar.saveDashboard();
 
             departmentFilter.changeAttributeFilterValue("Direct Sales");
@@ -110,7 +101,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
      * This test is to cover the following bug:
      * "AQE-1030 - Get 400 bad request when filtering by Date"
      */
-    @Test(dependsOnMethods = {"initialize"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkTimeFilter() {
         String top5OpenByMoneyReport = "Top 5 Open (by $)";
         String top5WonByMoneyReport = "Top 5 Won (by $)";
@@ -145,14 +136,14 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
      * This test is to cover the following bug:
      * "AQE-1031 - Get 500 internal server error when going to dashboard content variable status"
      */
-    @Test(dependsOnMethods = {"initialize"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkVariableFilterDashboard() throws ParseException, IOException, JSONException {
         String top5OpenByMoney = "Top 5 Open (by $)";
         UserManagementRestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), testParams.getEditorUser(),
                 UserRoles.ADMIN);
 
         initDashboardsPage();
-        dashboardsPage.selectDashboard("Pipeline Analysis");
+        dashboardsPage.selectDashboard(DASH_PIPELINE_ANALYSIS);
         dashboardsPage.getTabs().openTab(1);
 
         dashboardsPage.editDashboard();
@@ -162,7 +153,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
 
         signInAsDifferentUser(UserRoles.EDITOR);
         openDashboardTab(1);
-        assertTrue(CollectionUtils.isEqualCollection(getFilterWidget("Status").getAllAttributeValues(),
+        assertTrue(CollectionUtils.isEqualCollection(getFilterWidget(ATTR_STATUS).getAllAttributeValues(),
                 asList("Open")), "Variable filter is applied incorrecly");
         getFilterWidget("Close Quarter").changeTimeFilterByEnterFromAndToDate("10/01/2014", "12/31/2014");
         sleepTightInSeconds(5);
@@ -180,21 +171,21 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
     }
 
     // This test is to cover the bug "AQE-1033 - Get 400 bad request when adding filter into report"
-    @Test(dependsOnMethods = {"initialize"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkListElementsInReportFilter() {
         initReportsPage();
         createReport(new UiReportDefinition().withType(ReportTypes.TABLE)
                                            .withName("CheckListElementsReport")
                                            .withWhats("Amount")
-                                           .withHows(new HowItem(productAttr, Position.LEFT))
-                                           .withHows(new HowItem(departmentAttr, Position.TOP)),
+                                           .withHows(new HowItem(ATTR_PRODUCT, Position.LEFT))
+                                           .withHows(new HowItem(ATTR_DEPARTMENT, Position.TOP)),
                                            "CheckListElementsInReport");
 
-        reportPage.addFilter(FilterItem.Factory.createAttributeFilter(productAttr,
+        reportPage.addFilter(FilterItem.Factory.createAttributeFilter(ATTR_PRODUCT,
                 "CompuSci", "Educationly", "Explorer", "WonderKid"));
         checkRedBar(browser);
 
-        reportPage.addFilter(FilterItem.Factory.createAttributeFilter(departmentAttr, "Direct Sales"));
+        reportPage.addFilter(FilterItem.Factory.createAttributeFilter(ATTR_DEPARTMENT, "Direct Sales"));
         Screenshots.takeScreenshot(browser, "AQE-Check list elements in report filter", this.getClass());
         checkRedBar(browser);
 
@@ -211,15 +202,15 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
      * This test is to cover the bug
      * "AQE-1034 - Get 500 Internal Server Error when loading list element of attribute in analysis page"
      */
-    @Test(dependsOnMethods = {"initialize"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkListElementsInChartReportFilter() {
         initReportsPage();
         createReport(new UiReportDefinition().withType(ReportTypes.FUNNEL)
                                            .withName("CheckListElementsInChartReport")
-                                           .withWhats("Amount")
-                                           .withHows("Department"), "CheckListElementsInChartReport");
+                                           .withWhats(METRIC_AMOUNT)
+                                           .withHows(ATTR_DEPARTMENT), "CheckListElementsInChartReport");
 
-        reportPage.addFilter(FilterItem.Factory.createAttributeFilter(productAttr, "CompuSci",
+        reportPage.addFilter(FilterItem.Factory.createAttributeFilter(ATTR_PRODUCT, "CompuSci",
                 "Educationly", "Explorer", "WonderKid"));
         Screenshots.takeScreenshot(browser, "AQE-Check list elements in chart report filter",
                 this.getClass());
@@ -241,7 +232,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
     private void openDashboardTab(int tabindex) {
         initDashboardsPage();
         browser.navigate().refresh();
-        dashboardsPage.selectDashboard("Pipeline Analysis");
+        dashboardsPage.selectDashboard(DASH_PIPELINE_ANALYSIS);
         dashboardsPage.getTabs().openTab(tabindex);
     }
 

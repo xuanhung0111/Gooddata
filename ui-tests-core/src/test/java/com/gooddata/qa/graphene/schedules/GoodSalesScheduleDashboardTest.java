@@ -5,6 +5,8 @@ package com.gooddata.qa.graphene.schedules;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
 import static com.gooddata.qa.graphene.utils.CheckUtils.logRedBarMessageInfo;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_WATERFALL_ANALYSIS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_WHATS_CHANGED;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -38,8 +40,8 @@ import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
-import com.gooddata.qa.graphene.fragments.dashboards.EmbedDashboardDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
+import com.gooddata.qa.graphene.fragments.dashboards.EmbedDashboardDialog;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
@@ -63,7 +65,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     private final String CUSTOM_SUBJECT = "Extremely useful subject";
     private final String CUSTOM_MESSAGE = "Extremely useful message";
     private final List<String> CUSTOM_RECIPIENTS = asList("bear+1@gooddata.com", "bear+2@gooddata.com");
-    private final List<String> SCHEDULED_TABS = asList("Waterfall Analysis", "What's Changed");
+    private final List<String> SCHEDULED_TABS = asList(DASH_TAB_WATERFALL_ANALYSIS, DASH_TAB_WHATS_CHANGED);
     private final String SCHEDULE_INFO = "^This dashboard will be sent daily at 12:30 AM .* to %s "
             + "and 2 other recipients as a PDF attachment.$";
     private DateTimeZone tz = DateTimeZone.getDefault();

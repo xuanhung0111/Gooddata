@@ -1,8 +1,19 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_OUTLOOK;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForStringMissingInUrl;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+
+import java.util.Arrays;
 
 import org.json.JSONException;
+import org.openqa.selenium.By;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -14,27 +25,15 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.SplashScreen;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForStringMissingInUrl;
-
-import java.util.Arrays;
-
-import org.openqa.selenium.By;
-
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-
 public class SplashScreenTest extends DashboardsTest {
 
     private static final String SPLASH_SCREEN_MOBILE_MESSAGE = "To set up a KPI dashboard, head to your desktop and make your browser window wider.";
 
     private static final KpiConfiguration kpi = new KpiConfiguration.Builder()
-        .metric(AMOUNT)
+        .metric(METRIC_AMOUNT)
         .dataSet(DATE_CREATED)
         .comparison(Kpi.ComparisonType.NO_COMPARISON.toString())
-        .drillTo(DRILL_TO_OUTLOOK)
+        .drillTo(DASH_TAB_OUTLOOK)
         .build();
 
     @BeforeClass(alwaysRun = true)

@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
@@ -32,7 +33,6 @@ import com.gooddata.qa.graphene.enums.report.ExportFormat;
 
 public class GoodSalesReportStatisticsTest extends GoodSalesAbstractTest {
 
-    final static String AMOUNT = "Amount";
     final static String SALES_REP = "Sales Rep";
     final static String SIMPLE_REPORT = "Simple-Report";
 
@@ -41,14 +41,14 @@ public class GoodSalesReportStatisticsTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createProject"})
     public void createSimpleReport() {
         final String amountUri = getMdService()
-                .getObjUri(getProject(), Metric.class, title(AMOUNT));
+                .getObjUri(getProject(), Metric.class, title(METRIC_AMOUNT));
 
         final String saleRepUri = getMdService()
                 .getObj(getProject(), Attribute.class, title(SALES_REP)).getDefaultDisplayForm().getUri();
 
         ReportDefinition definition = GridReportDefinitionContent.create(SIMPLE_REPORT, singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(saleRepUri)),
-                singletonList(new GridElement(amountUri, AMOUNT)));
+                singletonList(new GridElement(amountUri, METRIC_AMOUNT)));
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
     }
@@ -62,7 +62,7 @@ public class GoodSalesReportStatisticsTest extends GoodSalesAbstractTest {
                 && reportPage.getReportStatistic().indexOf("1 Filters") > 0, "Report statistics is not updated");
 
         reportPage.showMoreReportInfo();
-        checkUsedDataLink(AMOUNT, DataType.METRIC);
+        checkUsedDataLink(METRIC_AMOUNT, DataType.METRIC);
         checkUsedDataLink(SALES_REP, DataType.ATTRIBUTE);
     }
 

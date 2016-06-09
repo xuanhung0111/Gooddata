@@ -1,8 +1,15 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.lang.String.format;
+import static java.lang.String.join;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.testng.Assert.assertEquals;
 
 import org.json.JSONException;
 import org.testng.annotations.Test;
@@ -16,13 +23,9 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFiltersPane
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static java.lang.String.format;
-import static java.lang.String.join;
-import static org.testng.Assert.assertEquals;
-
 public class AttributeFilteringTest extends DashboardWithWidgetsTest {
+
+    private static final String STAT_REGION = "stat_region";
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop", "mobile"})
     public void setupAttributeFiltersFeatureFlag() throws JSONException {
@@ -39,7 +42,7 @@ public class AttributeFilteringTest extends DashboardWithWidgetsTest {
 
         assertEquals(attributeFiltersPanel.getAttributeFilters().size(), 2);
         assertEquals(attributeFiltersPanel.getAttributeFilter(STAT_REGION).getSelection(), "All");
-        assertEquals(attributeFiltersPanel.getAttributeFilter(ACCOUNT).getSelection(), "All");
+        assertEquals(attributeFiltersPanel.getAttributeFilter(ATTR_ACCOUNT).getSelection(), "All");
     }
 
     @Test(dependsOnMethods = {"setupAttributeFiltersFeatureFlag"}, groups = {"desktop", "mobile"})
@@ -57,7 +60,7 @@ public class AttributeFilteringTest extends DashboardWithWidgetsTest {
             .clearAllCheckedValues()
             .selectByNames(attributeFilterWestCoast);
 
-        attributeFiltersPanel.getAttributeFilter(ACCOUNT)
+        attributeFiltersPanel.getAttributeFilter(ATTR_ACCOUNT)
             .clearAllCheckedValues()
             .selectByNames(attributeFilterSourceConsulting, attributeFilterAgileThought, attributeFilterVideo,
                     attributeFilterShoppingCart);
@@ -67,10 +70,10 @@ public class AttributeFilteringTest extends DashboardWithWidgetsTest {
         assertEquals(attributeFiltersPanel.getAttributeFilters().size(), 2);
         assertEquals(attributeFiltersPanel.getAttributeFilter(STAT_REGION).getSelection(),
                 attributeFilterWestCoast);
-        assertEquals(attributeFiltersPanel.getAttributeFilter(ACCOUNT).getSelectedItems(), join(", ",
+        assertEquals(attributeFiltersPanel.getAttributeFilter(ATTR_ACCOUNT).getSelectedItems(), join(", ",
                 attributeFilterSourceConsulting, attributeFilterVideo, attributeFilterShoppingCart,
                 attributeFilterAgileThought));
-        assertEquals(attributeFiltersPanel.getAttributeFilter(ACCOUNT).getSelectedItemsCount(), "(4)");
+        assertEquals(attributeFiltersPanel.getAttributeFilter(ATTR_ACCOUNT).getSelectedItemsCount(), "(4)");
     }
 
     @Test(dependsOnMethods = {"setupAttributeFiltersFeatureFlag"}, groups = "desktop")
@@ -95,9 +98,9 @@ public class AttributeFilteringTest extends DashboardWithWidgetsTest {
             takeScreenshot(browser, "testFilterBySuggestedAttributes-account-all", getClass());
             assertThat(indigoDashboardsPage.getKpiByHeadline(accountFilterMetricName).getValue(),
                     equalTo("12,318,347"));
-            assertThat(attributeFiltersPanel.getAttributeFilter(ACCOUNT).getSelectedItems(), equalTo("All"));
+            assertThat(attributeFiltersPanel.getAttributeFilter(ATTR_ACCOUNT).getSelectedItems(), equalTo("All"));
 
-            attributeFiltersPanel.getAttributeFilter(ACCOUNT)
+            attributeFiltersPanel.getAttributeFilter(ATTR_ACCOUNT)
                 .clearAllCheckedValues()
                 .selectByNames(attribute14West, attribute123Exteriors);
 
@@ -105,10 +108,10 @@ public class AttributeFilteringTest extends DashboardWithWidgetsTest {
             takeScreenshot(browser, "testFilterBySuggestedAttributes-account-westAndExteriors", getClass());
             assertThat(indigoDashboardsPage.getKpiByHeadline(accountFilterMetricName).getValue(),
                     equalTo("9,258,347"));
-            assertThat(attributeFiltersPanel.getAttributeFilter(ACCOUNT).getSelectedItems(),
+            assertThat(attributeFiltersPanel.getAttributeFilter(ATTR_ACCOUNT).getSelectedItems(),
                     equalTo(join(", ", attribute123Exteriors, attribute14West)));
 
-            attributeFiltersPanel.getAttributeFilter(ACCOUNT)
+            attributeFiltersPanel.getAttributeFilter(ATTR_ACCOUNT)
                 .clearAllCheckedValues()
                 .selectByNames(attribute14West);
 
@@ -116,13 +119,13 @@ public class AttributeFilteringTest extends DashboardWithWidgetsTest {
             takeScreenshot(browser, "testFilterBySuggestedAttributes-account-west", getClass());
             assertThat(indigoDashboardsPage.getKpiByHeadline(accountFilterMetricName).getValue(),
                     equalTo("8,264,747"));
-            assertThat(attributeFiltersPanel.getAttributeFilter(ACCOUNT).getSelectedItems(),
+            assertThat(attributeFiltersPanel.getAttributeFilter(ATTR_ACCOUNT).getSelectedItems(),
                     equalTo(attribute14West));
 
             initIndigoDashboardsPageWithWidgets();
 
             takeScreenshot(browser, "testFilterBySuggestedAttributes-refresh", getClass());
-            assertThat(attributeFiltersPanel.getAttributeFilter(ACCOUNT).getSelectedItems(), equalTo("All"));
+            assertThat(attributeFiltersPanel.getAttributeFilter(ATTR_ACCOUNT).getSelectedItems(), equalTo("All"));
         } finally {
             teardownKpi();
         }
@@ -134,8 +137,8 @@ public class AttributeFilteringTest extends DashboardWithWidgetsTest {
         String elementFinancialId = "/elements?id=958077";
 
         String accountFilterMetricName = "Account filter metric";
-        String amountUri = getMdService().getObjUri(getProject(), Fact.class, title(AMOUNT));
-        String accountUri = getMdService().getObjUri(getProject(), Attribute.class, title(ACCOUNT));
+        String amountUri = getMdService().getObjUri(getProject(), Fact.class, title(FACT_AMOUNT));
+        String accountUri = getMdService().getObjUri(getProject(), Attribute.class, title(ATTR_ACCOUNT));
         String expression = format("SELECT SUM([%s]) WHERE [%s] IN ([%s],[%s],[%s])",
                 amountUri, accountUri, accountUri + elementExteriorsId,
                 accountUri + element14WestId, accountUri + elementFinancialId);

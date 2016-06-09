@@ -1,5 +1,10 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_LOST_OPPS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -22,99 +27,99 @@ public class AvailableItemsTest extends AbstractAdE2ETest {
     public void should_hide_unavailable_attributes_when_metric_is_added() {
         CataloguePanelReact panel = analysisPageReact.getCataloguePanel();
 
-        assertTrue(panel.getFieldNamesInViewPort().contains(ACTIVITY_TYPE));
-        analysisPageReact.addMetric(NUMBER_OF_LOST_OPPS).waitForReportComputing();
-        assertFalse(panel.clearInputText().getFieldNamesInViewPort().contains(ACTIVITY_TYPE));
+        assertTrue(panel.getFieldNamesInViewPort().contains(ATTR_ACTIVITY_TYPE));
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_LOST_OPPS).waitForReportComputing();
+        assertFalse(panel.clearInputText().getFieldNamesInViewPort().contains(ATTR_ACTIVITY_TYPE));
 
-        analysisPageReact.removeMetric(NUMBER_OF_LOST_OPPS).waitForReportComputing();
-        assertTrue(panel.getFieldNamesInViewPort().contains(ACTIVITY_TYPE));
+        analysisPageReact.removeMetric(METRIC_NUMBER_OF_LOST_OPPS).waitForReportComputing();
+        assertTrue(panel.getFieldNamesInViewPort().contains(ATTR_ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_unavailable_metrics_when_attribute_is_in_categories() {
         CataloguePanelReact panel = analysisPageReact.getCataloguePanel();
 
-        assertTrue(panel.getFieldNamesInViewPort().contains(NUMBER_OF_LOST_OPPS));
-        analysisPageReact.addAttribute(ACTIVITY_TYPE);
-        assertFalse(panel.clearInputText().getFieldNamesInViewPort().contains(NUMBER_OF_LOST_OPPS));
+        assertTrue(panel.getFieldNamesInViewPort().contains(METRIC_NUMBER_OF_LOST_OPPS));
+        analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE);
+        assertFalse(panel.clearInputText().getFieldNamesInViewPort().contains(METRIC_NUMBER_OF_LOST_OPPS));
 
-        analysisPageReact.removeAttribute(ACTIVITY_TYPE);
-        assertTrue(panel.getFieldNamesInViewPort().contains(NUMBER_OF_LOST_OPPS));
+        analysisPageReact.removeAttribute(ATTR_ACTIVITY_TYPE);
+        assertTrue(panel.getFieldNamesInViewPort().contains(METRIC_NUMBER_OF_LOST_OPPS));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_unavailable_metrics_when_attribute_is_in_stacks() {
         CataloguePanelReact panel = analysisPageReact.getCataloguePanel();
 
-        assertTrue(panel.getFieldNamesInViewPort().contains(NUMBER_OF_LOST_OPPS));
-        analysisPageReact.addStack(ACTIVITY_TYPE);
-        assertFalse(panel.clearInputText().getFieldNamesInViewPort().contains(NUMBER_OF_LOST_OPPS));
+        assertTrue(panel.getFieldNamesInViewPort().contains(METRIC_NUMBER_OF_LOST_OPPS));
+        analysisPageReact.addStack(ATTR_ACTIVITY_TYPE);
+        assertFalse(panel.clearInputText().getFieldNamesInViewPort().contains(METRIC_NUMBER_OF_LOST_OPPS));
 
         analysisPageReact.removeStack();
-        assertTrue(panel.getFieldNamesInViewPort().contains(NUMBER_OF_LOST_OPPS));
+        assertTrue(panel.getFieldNamesInViewPort().contains(METRIC_NUMBER_OF_LOST_OPPS));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_unavailable_facts() {
         CataloguePanelReact panel = analysisPageReact.getCataloguePanel();
 
-        assertTrue(panel.getFieldNamesInViewPort().contains(AMOUNT));
-        analysisPageReact.addStack(ACTIVITY_TYPE);
-        assertFalse(panel.clearInputText().getFieldNamesInViewPort().contains(AMOUNT));
+        assertTrue(panel.getFieldNamesInViewPort().contains(METRIC_AMOUNT));
+        analysisPageReact.addStack(ATTR_ACTIVITY_TYPE);
+        assertFalse(panel.clearInputText().getFieldNamesInViewPort().contains(METRIC_AMOUNT));
 
         analysisPageReact.removeStack();
-        assertTrue(panel.getFieldNamesInViewPort().contains(AMOUNT));
+        assertTrue(panel.getFieldNamesInViewPort().contains(METRIC_AMOUNT));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_all_items_on_reset() {
-        CataloguePanelReact panel = analysisPageReact.addStack(ACTIVITY_TYPE)
-            .addMetric(NUMBER_OF_ACTIVITIES)
+        CataloguePanelReact panel = analysisPageReact.addStack(ATTR_ACTIVITY_TYPE)
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getCataloguePanel()
             .filterCatalog(CatalogFilterType.ATTRIBUTES);
 
-        assertFalse(panel.getFieldNamesInViewPort().contains(PRODUCT));
+        assertFalse(panel.getFieldNamesInViewPort().contains(ATTR_PRODUCT));
         assertFalse(panel.filterCatalog(CatalogFilterType.MEASURES)
                 .getFieldNamesInViewPort()
-                .contains(NUMBER_OF_LOST_OPPS));
+                .contains(METRIC_NUMBER_OF_LOST_OPPS));
 
         analysisPageReact.resetToBlankState();
         assertTrue(panel.filterCatalog(CatalogFilterType.ATTRIBUTES)
                 .getFieldNamesInViewPort()
-                .contains(PRODUCT));
+                .contains(ATTR_PRODUCT));
         assertTrue(panel.filterCatalog(CatalogFilterType.MEASURES)
                 .getFieldNamesInViewPort()
-                .contains(NUMBER_OF_LOST_OPPS));
+                .contains(METRIC_NUMBER_OF_LOST_OPPS));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_metric_after_undo() {
-        CataloguePanelReact panel = analysisPageReact.addAttribute(ACTIVITY_TYPE).getCataloguePanel().clearInputText();
-        assertFalse(panel.getFieldNamesInViewPort().contains(NUMBER_OF_LOST_OPPS));
+        CataloguePanelReact panel = analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE).getCataloguePanel().clearInputText();
+        assertFalse(panel.getFieldNamesInViewPort().contains(METRIC_NUMBER_OF_LOST_OPPS));
 
         analysisPageReact.resetToBlankState();
-        assertTrue(panel.getFieldNamesInViewPort().contains(NUMBER_OF_LOST_OPPS));
+        assertTrue(panel.getFieldNamesInViewPort().contains(METRIC_NUMBER_OF_LOST_OPPS));
 
         analysisPageReact.undo();
-        assertFalse(panel.getFieldNamesInViewPort().contains(NUMBER_OF_LOST_OPPS));
+        assertFalse(panel.getFieldNamesInViewPort().contains(METRIC_NUMBER_OF_LOST_OPPS));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_attribute_after_undo() {
-        CataloguePanelReact panel = analysisPageReact.addMetric(NUMBER_OF_LOST_OPPS).getCataloguePanel().clearInputText();
-        assertFalse(panel.getFieldNamesInViewPort().contains(ACTIVITY_TYPE));
+        CataloguePanelReact panel = analysisPageReact.addMetric(METRIC_NUMBER_OF_LOST_OPPS).getCataloguePanel().clearInputText();
+        assertFalse(panel.getFieldNamesInViewPort().contains(ATTR_ACTIVITY_TYPE));
 
         analysisPageReact.resetToBlankState();
-        assertTrue(panel.getFieldNamesInViewPort().contains(ACTIVITY_TYPE));
+        assertTrue(panel.getFieldNamesInViewPort().contains(ATTR_ACTIVITY_TYPE));
 
         analysisPageReact.undo();
-        assertFalse(panel.getFieldNamesInViewPort().contains(ACTIVITY_TYPE));
+        assertFalse(panel.getFieldNamesInViewPort().contains(ATTR_ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_special_message_if_only_unavailable_items_matched() {
-        CataloguePanelReact panel = analysisPageReact.addMetric(NUMBER_OF_LOST_OPPS).getCataloguePanel();
-        assertFalse(panel.search(ACTIVITY_TYPE));
+        CataloguePanelReact panel = analysisPageReact.addMetric(METRIC_NUMBER_OF_LOST_OPPS).getCataloguePanel();
+        assertFalse(panel.search(ATTR_ACTIVITY_TYPE));
         assertEquals(panel.getUnrelatedItemsHiddenCount(), 1);
     }
 }

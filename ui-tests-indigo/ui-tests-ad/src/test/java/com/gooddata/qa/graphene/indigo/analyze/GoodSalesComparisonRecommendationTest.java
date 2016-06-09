@@ -1,5 +1,9 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -29,8 +33,8 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
 
     @Test(dependsOnGroups = {"init"})
     public void testOverrideDateFilter() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-            .addAttribute(ACTIVITY_TYPE)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .addAttribute(ATTR_ACTIVITY_TYPE)
             .addDateFilter()
             .getFilterBuckets()
             .configDateFilter("Last year");
@@ -52,13 +56,13 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
         assertTrue(report.getTrackersCount() >= 1);
         List<String> legends = report.getLegends();
         assertEquals(legends.size(), 2);
-        assertEquals(legends, asList(NUMBER_OF_ACTIVITIES + " - previous year", NUMBER_OF_ACTIVITIES));
+        assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES + " - previous year", METRIC_NUMBER_OF_ACTIVITIES));
         checkingOpenAsReport("testOverrideDateFilter");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void testSimpleComparison() {
-        ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES).getChartReport();
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -67,15 +71,15 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
 
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
-        comparisonRecommendation.select(ACTIVITY_TYPE).apply();
-        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ACTIVITY_TYPE));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText(ACTIVITY_TYPE), ACTIVITY_TYPE + ": All");
+        comparisonRecommendation.select(ATTR_ACTIVITY_TYPE).apply();
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
+        assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": All");
         assertEquals(report.getTrackersCount(), 4);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        analysisPage.replaceAttribute(ACTIVITY_TYPE, DEPARTMENT);
-        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DEPARTMENT));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText(DEPARTMENT), DEPARTMENT + ": All");
+        analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT);
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ATTR_DEPARTMENT));
+        assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ": All");
         assertEquals(report.getTrackersCount(), 2);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
         checkingOpenAsReport("testSimpleComparison");
@@ -85,7 +89,7 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
     public void testComparisonAndPoPAttribute() {
         final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
-        ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES).getChartReport();
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -94,10 +98,10 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
 
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
-        comparisonRecommendation.select(ACTIVITY_TYPE).apply();
+        comparisonRecommendation.select(ATTR_ACTIVITY_TYPE).apply();
         analysisPage.waitForReportComputing();
-        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ACTIVITY_TYPE));
-        assertEquals(filtersBucket.getFilterText(ACTIVITY_TYPE), ACTIVITY_TYPE + ": All");
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
+        assertEquals(filtersBucket.getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": All");
         assertEquals(report.getTrackersCount(), 4);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
@@ -114,20 +118,20 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
         assertTrue(report.getTrackersCount() >= 1);
         List<String> legends = report.getLegends();
         assertEquals(legends.size(), 2);
-        assertEquals(legends, asList(NUMBER_OF_ACTIVITIES + " - previous year", NUMBER_OF_ACTIVITIES));
+        assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES + " - previous year", METRIC_NUMBER_OF_ACTIVITIES));
 
-        analysisPage.replaceAttribute(ACTIVITY_TYPE, DEPARTMENT);
-        assertEquals(filtersBucket.getFilterText(DEPARTMENT), DEPARTMENT + ": All");
+        analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT);
+        assertEquals(filtersBucket.getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ": All");
         assertTrue(report.getTrackersCount() >= 1);
         legends = report.getLegends();
         assertEquals(legends.size(), 2);
-        assertEquals(legends, asList(NUMBER_OF_ACTIVITIES + " - previous year", NUMBER_OF_ACTIVITIES));
+        assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES + " - previous year", METRIC_NUMBER_OF_ACTIVITIES));
         checkingOpenAsReport("testComparisonAndPoPAttribute");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void testSimplePoP() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate();
         assertTrue(analysisPage.getFilterBuckets()
                 .isFilterVisible("Activity"));
@@ -143,19 +147,19 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
         assertTrue(report.getTrackersCount() >= 1);
         List<String> legends = report.getLegends();
         assertEquals(legends.size(), 2);
-        assertEquals(legends, asList(NUMBER_OF_ACTIVITIES + " - previous year", NUMBER_OF_ACTIVITIES));
+        assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES + " - previous year", METRIC_NUMBER_OF_ACTIVITIES));
 
-        analysisPage.addMetric(SNAPSHOT_BOP);
+        analysisPage.addMetric(METRIC_SNAPSHOT_BOP);
         assertTrue(report.getTrackersCount() >= 1);
         legends = report.getLegends();
         assertEquals(legends.size(), 2);
-        assertEquals(legends, asList(NUMBER_OF_ACTIVITIES, SNAPSHOT_BOP));
+        assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_SNAPSHOT_BOP));
         checkingOpenAsReport("testSimplePoP");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void testAnotherApproachToShowPoP() {
-        ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES).getChartReport();
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,

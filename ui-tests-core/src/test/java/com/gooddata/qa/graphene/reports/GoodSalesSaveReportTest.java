@@ -1,12 +1,16 @@
 package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkBlueBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_WON;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForReportsPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -35,11 +39,6 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
     private static final String TOTAL_LOST = "Total Lost [hl]";
     private static final String TOTAL_WON = "Total Won [hl]";
 
-    private static final String NUMBER_OF_ACTIVITIES = "# of Activities";
-    private static final String ACTIVITY_TYPE = "Activity Type";
-    private static final String IS_WON = "Is Won?";
-    private static final String ACCOUNT = "Account";
-
     private static final String UNSORTED = "Unsorted";
     private static final String ALL = "All";
 
@@ -57,7 +56,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void createReport() {
-        createReport(new UiReportDefinition().withName(VERSION_REPORT).withWhats(NUMBER_OF_ACTIVITIES),
+        createReport(new UiReportDefinition().withName(VERSION_REPORT).withWhats(METRIC_NUMBER_OF_ACTIVITIES),
                 "openUpToDateReport");
     }
 
@@ -67,7 +66,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         waitForFragmentVisible(reportsPage).getReportsList().openReport(VERSION_REPORT);
         reportPage.initPage()
             .openHowPanel()
-            .selectAttribute(ACTIVITY_TYPE)
+            .selectAttribute(ATTR_ACTIVITY_TYPE)
             .doneSndPanel();
         int versionsCount = waitForReportLoading().saveReport().getVersionsCount();
         takeScreenshot(browser, "workWithOldVersion - get versions", getClass());
@@ -103,7 +102,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         reportsPage.startCreateReport();
         reportPage.initPage()
             .openWhatPanel()
-            .selectMetric(NUMBER_OF_ACTIVITIES)
+            .selectMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .doneSndPanel();
         waitForReportLoading();
 
@@ -126,7 +125,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         reportsPage.startCreateReport();
         reportPage.initPage()
             .openWhatPanel()
-            .selectMetric(NUMBER_OF_ACTIVITIES)
+            .selectMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .doneSndPanel();
         waitForReportLoading();
 
@@ -142,7 +141,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         waitForAnalysisPageLoaded(browser);
         int versionCount = waitForFragmentVisible(reportPage).getVersionsCount();
         reportPage.openHowPanel()
-            .selectAttribute(ACCOUNT)
+            .selectAttribute(ATTR_ACCOUNT)
             .doneSndPanel();
         waitForReportLoading();
 
@@ -167,7 +166,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         reportPage.initPage()
             .setReportName(reportName)
             .openWhatPanel()
-            .selectMetric(NUMBER_OF_ACTIVITIES)
+            .selectMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .doneSndPanel();
         waitForReportLoading();
 
@@ -192,7 +191,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         waitForAnalysisPageLoaded(browser);
         int versionCount = waitForFragmentVisible(reportPage).getVersionsCount();
         reportPage.openHowPanel()
-            .selectAttribute(ACCOUNT)
+            .selectAttribute(ATTR_ACCOUNT)
             .doneSndPanel();
         waitForReportLoading();
 
@@ -213,7 +212,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         reportPage.initPage()
             .setReportName("R1")
             .openWhatPanel()
-            .selectMetric(NUMBER_OF_ACTIVITIES)
+            .selectMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .doneSndPanel();
 
         if (tryCancelReportComputing()) {
@@ -271,7 +270,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         reportsPage.getReportsList().openReport(TOTAL_LOST);
         waitForAnalysisPageLoaded(browser);
         waitForFragmentVisible(reportPage).openHowPanel()
-            .selectAttribute(IS_WON)
+            .selectAttribute(ATTR_IS_WON)
             .doneSndPanel();
         waitForReportLoading();
         reportPage.clickSaveReport().confirmSaveReport().waitForReportSaved();
@@ -285,7 +284,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         reportsPage.getReportsList().openReport(QTD_GOAL);
         waitForAnalysisPageLoaded(browser);
         waitForFragmentVisible(reportPage).openHowPanel()
-            .selectAttribute(IS_WON)
+            .selectAttribute(ATTR_IS_WON)
             .doneSndPanel();
         waitForReportLoading();
         reportPage.saveAsReport();
@@ -304,7 +303,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         reportsPage.getReportsList().openReport(TOTAL_WON);
         waitForAnalysisPageLoaded(browser);
         waitForFragmentVisible(reportPage).openHowPanel()
-            .selectAttribute(IS_WON)
+            .selectAttribute(ATTR_IS_WON)
             .doneSndPanel();
         waitForReportLoading();
         reportPage.clickSaveReport().cancelSaveReport();

@@ -1,16 +1,19 @@
 package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.GOODSALES_TEMPLATE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-import static java.util.Objects.isNull;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.CoreMatchers.is;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
+import static java.util.Objects.isNull;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.List;
@@ -48,8 +51,6 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
     private static final long MINIMUM_EMBEDDED_CHART_REPORT_CSV_SIZE = 100L;
     private final static String EMBEDDED_REPORT_TITLE = "Embedded Report";
     private final static String ADDITIONAL_PROJECT_TITLE = "GoodSales-project-to-share-report";
-    private final static String ATTRIBUTE_NAME = "Status";
-    private final static String METRIC_NAME = "Amount";
 
     private GoodData editorGoodDataClient;
 
@@ -68,7 +69,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createProject"})
     public void createReportToShare() {
         createReport(new UiReportDefinition().withName(EMBEDDED_REPORT_TITLE)
-                .withHows(ATTRIBUTE_NAME).withWhats(METRIC_NAME), "Report-To-Share");
+                .withHows(ATTR_STATUS).withWhats(METRIC_AMOUNT), "Report-To-Share");
         reportPage.setReportVisible();
         reportUrl = browser.getCurrentUrl();
 
@@ -131,10 +132,10 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
         TableReport tableReport = embeddedReportContainer.getTableReport();
 
-        assertThat(tableReport.getAttributesHeader(), is(newArrayList(ATTRIBUTE_NAME)));
+        assertThat(tableReport.getAttributesHeader(), is(newArrayList(ATTR_STATUS)));
         assertThat(tableReport.getAttributeElements(), is(attributeValues));
 
-        assertThat(tableReport.getMetricsHeader(), is(newHashSet(METRIC_NAME)));
+        assertThat(tableReport.getMetricsHeader(), is(newHashSet(METRIC_AMOUNT)));
         assertThat(tableReport.getMetricElements(), is(metricValues));
     }
 
@@ -248,9 +249,9 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         reportPage.initPage()
             .setReportName(reportTitle)
             .openWhatPanel()
-            .selectMetric(METRIC_NAME)
+            .selectMetric(METRIC_AMOUNT)
             .openHowPanel()
-            .selectAttribute(ATTRIBUTE_NAME)
+            .selectAttribute(ATTR_STATUS)
             .doneSndPanel();
 
         WebElement unsavedReportWarning = reportPage.embedUnsavedReport();

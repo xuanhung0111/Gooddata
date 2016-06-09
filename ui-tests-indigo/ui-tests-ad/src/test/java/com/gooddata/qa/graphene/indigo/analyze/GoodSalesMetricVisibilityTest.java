@@ -1,5 +1,8 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPEN_OPPS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON_OPPS;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -33,17 +36,17 @@ public class GoodSalesMetricVisibilityTest extends GoodSalesAbstractAnalyseTest 
     public void createPrivateMetric() {
         assertTrue(deleteMetric(RATIO_METRIC));
         initMetricPage();
-        waitForFragmentVisible(metricPage).createRatioMetric(RATIO_METRIC, NUMBER_OF_WON_OPPS,
-                NUMBER_OF_OPEN_OPPS);
+        waitForFragmentVisible(metricPage).createRatioMetric(RATIO_METRIC, METRIC_NUMBER_OF_WON_OPPS,
+                METRIC_NUMBER_OF_OPEN_OPPS);
 
-        String expectedMaql = "SELECT " + NUMBER_OF_WON_OPPS + " / " + NUMBER_OF_OPEN_OPPS;
+        String expectedMaql = "SELECT " + METRIC_NUMBER_OF_WON_OPPS + " / " + METRIC_NUMBER_OF_OPEN_OPPS;
         assertTrue(metricPage.isMetricCreatedSuccessfully(RATIO_METRIC, expectedMaql, "#,##0.00"));
     }
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"test"})
     public void testPrivateMetric() {
         assertEquals(analysisPage.addMetric(RATIO_METRIC)
-                .addAttribute(DEPARTMENT)
+                .addAttribute(ATTR_DEPARTMENT)
                 .waitForReportComputing()
                 .getChartReport()
                 .getTrackersCount(), 2);

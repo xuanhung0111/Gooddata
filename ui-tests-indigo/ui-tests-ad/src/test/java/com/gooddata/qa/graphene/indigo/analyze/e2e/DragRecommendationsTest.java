@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertFalse;
@@ -22,7 +23,7 @@ public class DragRecommendationsTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"init"})
     public void should_render_column_chart_after_a_metric_is_dragged_to_main_recommendation() {
         // D&D the first metric to the initial metric recommendation
-        analysisPageReact.drag(analysisPageReact.getCataloguePanel().searchAndGet(NUMBER_OF_ACTIVITIES, FieldType.METRIC),
+        analysisPageReact.drag(analysisPageReact.getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC),
                 () -> waitForElementVisible(cssSelector(".s-recommendation-metric-canvas"), browser))
                 .waitForReportComputing();
 
@@ -35,12 +36,12 @@ public class DragRecommendationsTest extends AbstractAdE2ETest {
     public void should_render_date_sliced_metric_column_chart_after_a_metric_is_dragged_to_the_overtime_recommendation() {
         String quarterYearActivityLabel = ".s-id-" + getAttributeDisplayFormIdentifier("Quarter/Year (Activity)", "Short");
         // D&D the first metric to the metric overtime recommendation
-        analysisPageReact.drag(analysisPageReact.getCataloguePanel().searchAndGet(NUMBER_OF_ACTIVITIES, FieldType.METRIC),
+        analysisPageReact.drag(analysisPageReact.getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC),
                 () -> waitForElementVisible(cssSelector(".s-recommendation-metric-over-time-canvas"), browser))
                 .waitForReportComputing();
 
         // Check bucket items
-        assertTrue(analysisPageReact.getMetricsBucket().getItemNames().contains(NUMBER_OF_ACTIVITIES));
+        assertTrue(analysisPageReact.getMetricsBucket().getItemNames().contains(METRIC_NUMBER_OF_ACTIVITIES));
         assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(DATE));
 
         // should get a column sliced by the Quarter attribute on the X axis

@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
@@ -115,15 +117,15 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
         selectedKpi.setHeadline("");
 
         waitForFragmentVisible(indigoDashboardsPage).getConfigurationPanel()
-            .selectMetricByName(AMOUNT)
+            .selectMetricByName(METRIC_AMOUNT)
             .selectDataSetByName(DATE_CREATED);
 
         String metricHeadline = selectedKpi.getHeadline();
 
-        assertEquals(metricHeadline, AMOUNT);
+        assertEquals(metricHeadline, METRIC_AMOUNT);
 
         indigoDashboardsPage.getConfigurationPanel()
-            .selectMetricByName(LOST)
+            .selectMetricByName(METRIC_LOST)
             .selectDataSetByName(DATE_CREATED);
         assertNotEquals(selectedKpi.getHeadline(), metricHeadline);
     }
@@ -135,7 +137,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
             .selectKpi(0);
 
         waitForFragmentVisible(indigoDashboardsPage).getConfigurationPanel()
-            .selectMetricByName(AMOUNT)
+            .selectMetricByName(METRIC_AMOUNT)
             .selectDataSetByName(DATE_CREATED);
 
         selectedKpi.setHeadline(TEST_HEADLINE);
@@ -144,7 +146,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
         assertEquals(metricHeadline, TEST_HEADLINE);
 
         indigoDashboardsPage.getConfigurationPanel()
-            .selectMetricByName(AMOUNT)
+            .selectMetricByName(METRIC_AMOUNT)
             .selectDataSetByName(DATE_CREATED);
 
         assertEquals(selectedKpi.getHeadline(), TEST_HEADLINE);
@@ -161,7 +163,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
         waitForFragmentVisible(indigoDashboardsPage)
             .switchToEditMode()
             .addWidget(new KpiConfiguration.Builder()
-                .metric(AMOUNT)
+                .metric(METRIC_AMOUNT)
                 .dataSet(DATE_CREATED)
                 .build())
             .saveEditModeWithKpis();
@@ -206,7 +208,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
         waitForFragmentVisible(indigoDashboardsPage)
             .switchToEditMode()
             .addWidget(new KpiConfiguration.Builder()
-                .metric(AMOUNT)
+                .metric(METRIC_AMOUNT)
                 .dataSet(DATE_CREATED)
                 .build())
             .cancelEditMode()

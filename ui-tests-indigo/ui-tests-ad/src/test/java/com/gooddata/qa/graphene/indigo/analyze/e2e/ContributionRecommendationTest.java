@@ -1,19 +1,22 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
-import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.SeeingPercentsRecommendation;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.openqa.selenium.By.cssSelector;
+import static org.openqa.selenium.By.tagName;
+import static org.testng.Assert.assertFalse;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static org.openqa.selenium.By.cssSelector;
-import static org.openqa.selenium.By.tagName;
-import static org.testng.Assert.assertFalse;
+import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.SeeingPercentsRecommendation;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
 public class ContributionRecommendationTest extends AbstractAdE2ETest {
 
@@ -24,8 +27,8 @@ public class ContributionRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_apply_in_percent_recommendation() {
-        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
-            .addAttribute(ACTIVITY_TYPE)
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .addAttribute(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing();
 
         Graphene.createPageFragment(RecommendationContainer.class,
@@ -40,7 +43,7 @@ public class ContributionRecommendationTest extends AbstractAdE2ETest {
             .stream()
             .map(e -> e.findElement(tagName("tspan")))
             .map(WebElement::getText)
-            .filter(text -> ("% " + NUMBER_OF_ACTIVITIES).equals(text))
+            .filter(text -> ("% " + METRIC_NUMBER_OF_ACTIVITIES).equals(text))
             .findFirst()
             .get();
 

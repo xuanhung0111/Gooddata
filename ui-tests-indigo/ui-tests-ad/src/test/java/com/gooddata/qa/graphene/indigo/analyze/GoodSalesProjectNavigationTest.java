@@ -1,13 +1,16 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.GOODSALES_TEMPLATE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.util.Objects.isNull;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
-import static java.util.Objects.isNull;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -225,8 +228,8 @@ public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest
 
             createReport(new UiReportDefinition()
                     .withName("Report")
-                    .withWhats(AMOUNT)
-                    .withHows(STAGE_NAME),
+                    .withWhats(METRIC_AMOUNT)
+                    .withHows(ATTR_STAGE_NAME),
                     "Create Report");
 
             initProjectsAndUsersPage();

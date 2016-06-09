@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
@@ -28,7 +30,7 @@ import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTe
 
 public class GoodSalesFactBasedMetricTest extends GoodSalesAbstractAnalyseTest {
 
-    private static final String SUM_OF_AMOUNT = "Sum of " + AMOUNT;
+    private static final String SUM_OF_AMOUNT = "Sum of " + METRIC_AMOUNT;
     private static final String DURATION = "Duration";
     private static final String ACTIVITY_DATE = "Activity (Date)";
 
@@ -41,7 +43,7 @@ public class GoodSalesFactBasedMetricTest extends GoodSalesAbstractAnalyseTest {
     public void createSimpleMetricFromFact() {
         final MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
 
-        assertEquals(analysisPage.addMetric(AMOUNT, FieldType.FACT)
+        assertEquals(analysisPage.addMetric(METRIC_AMOUNT, FieldType.FACT)
                 .getMetricsBucket()
                 .getMetricConfiguration(SUM_OF_AMOUNT)
                 .expandConfiguration()
@@ -60,7 +62,7 @@ public class GoodSalesFactBasedMetricTest extends GoodSalesAbstractAnalyseTest {
         analysisPage.redo();
         assertFalse(metricsBucket.isEmpty());
 
-        analysisPage.addAttribute(STAGE_NAME).waitForReportComputing();
+        analysisPage.addAttribute(ATTR_STAGE_NAME).waitForReportComputing();
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getYaxisTitle(), SUM_OF_AMOUNT);
         checkingOpenAsReport("createSimpleMetricFromFact");
@@ -68,7 +70,7 @@ public class GoodSalesFactBasedMetricTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testMetricAggregations() {
-        MetricConfiguration metricConfiguration = analysisPage.addMetric(AMOUNT, FieldType.FACT)
+        MetricConfiguration metricConfiguration = analysisPage.addMetric(METRIC_AMOUNT, FieldType.FACT)
             .getMetricsBucket()
             .getMetricConfiguration(SUM_OF_AMOUNT)
             .expandConfiguration();
@@ -90,11 +92,11 @@ public class GoodSalesFactBasedMetricTest extends GoodSalesAbstractAnalyseTest {
         for (Map.Entry<String, String> entry: aggregations.entrySet()) {
             metricConfiguration.changeAggregation(entry.getKey());
             analysisPage.waitForReportComputing();
-            metricFromAmountTitle = entry.getValue() + AMOUNT;
+            metricFromAmountTitle = entry.getValue() + METRIC_AMOUNT;
             assertEquals(analysisPage.getChartReport().getYaxisTitle(), metricFromAmountTitle);
         }
 
-        assertEquals(analysisPage.addMetric(AMOUNT, FieldType.FACT)
+        assertEquals(analysisPage.addMetric(METRIC_AMOUNT, FieldType.FACT)
                 .getMetricsBucket()
                 .getMetricConfiguration(SUM_OF_AMOUNT)
                 .expandConfiguration()
@@ -117,10 +119,10 @@ public class GoodSalesFactBasedMetricTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"}, description = "https://jira.intgdc.com/browse/CL-7777")
     public void testAggregationFunctionList() {
-        analysisPage.addMetric(AMOUNT, FieldType.FACT);
+        analysisPage.addMetric(METRIC_AMOUNT, FieldType.FACT);
 
         assertEquals(analysisPage.getMetricsBucket()
-                .getMetricConfiguration("Sum of " + AMOUNT)
+                .getMetricConfiguration("Sum of " + METRIC_AMOUNT)
                 .expandConfiguration()
                 .getAllAggregations(),
             asList("Sum", "Average", "Minimum", "Maximum", "Median", "Running sum"));
@@ -181,12 +183,12 @@ public class GoodSalesFactBasedMetricTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testMetricFromFact() {
-        String sumOfAmount = "Sum of " + AMOUNT;
+        String sumOfAmount = "Sum of " + METRIC_AMOUNT;
         String sumOfDuration = "Sum of " + DURATION;
-        String averageAmount = "Avg " + AMOUNT;
+        String averageAmount = "Avg " + METRIC_AMOUNT;
         String runningSumOfDuration = "Runsum of " + DURATION;
 
-        analysisPage.addMetric(AMOUNT, FieldType.FACT);
+        analysisPage.addMetric(METRIC_AMOUNT, FieldType.FACT);
         MetricConfiguration amountConfiguration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration(sumOfAmount);
         assertTrue(amountConfiguration.isConfigurationCollapsed());

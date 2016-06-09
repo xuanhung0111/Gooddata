@@ -1,5 +1,17 @@
 package com.gooddata.qa.graphene;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_AND_MORE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.GOODSALES_TEMPLATE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_LEADERBOARDS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_OUTLOOK;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_PIPELINE_ANALYSIS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_QUARTERLY_TRENDS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_SALES_VELOCITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_SEASONALITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_WATERFALL_ANALYSIS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_WHATS_CHANGED;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,12 +25,11 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
     public void initProperties() {
         projectTitle = "GoodSales-test";
         projectTemplate = GOODSALES_TEMPLATE;
-        projectCreateCheckIterations = 60; // 5 minutes
 
         expectedGoodSalesDashboardsAndTabs = new HashMap<String, String[]>();
-        expectedGoodSalesDashboardsAndTabs.put("Pipeline Analysis", new String[]{
-                "Outlook", "What's Changed", "Waterfall Analysis", "Leaderboards", "Activities",
-                "Sales Velocity", "Quarterly Trends", "Seasonality", "...and more"
+        expectedGoodSalesDashboardsAndTabs.put(DASH_PIPELINE_ANALYSIS, new String[]{
+                DASH_TAB_OUTLOOK, DASH_TAB_WHATS_CHANGED, DASH_TAB_WATERFALL_ANALYSIS, DASH_TAB_LEADERBOARDS, DASH_TAB_ACTIVITIES, DASH_TAB_SALES_VELOCITY,
+                DASH_TAB_QUARTERLY_TRENDS, DASH_TAB_SEASONALITY, DASH_TAB_AND_MORE
         });
     }
 }

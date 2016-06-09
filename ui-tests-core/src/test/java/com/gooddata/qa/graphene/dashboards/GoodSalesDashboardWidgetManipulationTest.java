@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.dashboards;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -26,7 +27,6 @@ import com.gooddata.qa.graphene.fragments.reports.report.ChartReport;
 
 public class GoodSalesDashboardWidgetManipulationTest extends GoodSalesAbstractTest {
 
-    private static final String STAGE_NAME = "Stage Name";
     private static final String ACTIVITIES_BY_TYPE_REPORT = "Activities by Type";
 
     @BeforeClass
@@ -54,8 +54,8 @@ public class GoodSalesDashboardWidgetManipulationTest extends GoodSalesAbstractT
         assertThat(reportZIndex, equalTo(2));
         configPanel.discardConfiguration();
 
-        dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, STAGE_NAME);
-        FilterWidget stageNameFilter = dashboardsPage.getContent().getFilterWidget(simplifyText(STAGE_NAME));
+        dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME);
+        FilterWidget stageNameFilter = dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME));
         WebElement stageNameRootElement = stageNameFilter.getRoot();
 
         configPanel = WidgetConfigPanel.openConfigurationPanelFor(stageNameRootElement, browser);

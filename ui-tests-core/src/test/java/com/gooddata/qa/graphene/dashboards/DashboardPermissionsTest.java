@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.qa.graphene.fragments.dashboards.PermissionsDialog.ALERT_INFOBOX_CSS_SELECTOR;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_PIPELINE_ANALYSIS;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
@@ -57,7 +58,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"admin-tests", "sanity"}, priority = 0)
     public void checkBackToTheOnlyOneVisibileDashboard() throws IOException, JSONException {
         try {
-            selectDashboard("Pipeline Analysis");
+            selectDashboard(DASH_PIPELINE_ANALYSIS);
             publishDashboard(false);
             String dashboardUrl = browser.getCurrentUrl();
 
@@ -74,7 +75,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
             String dashboardName = dashboardsPage.getDashboardName();
             // the dashboard name in this case will contains a redundant character in the end
             // check the code of getDashboardName for more details.
-            assertEquals(dashboardName.substring(0, dashboardName.length() - 1), "Pipeline Analysis");
+            assertEquals(dashboardName.substring(0, dashboardName.length() - 1), DASH_PIPELINE_ANALYSIS);
 
             selectDashboard("Only one dashboard of Editor");
         } finally {

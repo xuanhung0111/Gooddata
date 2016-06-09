@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.cssSelector;
@@ -25,7 +27,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
     public void should_reset_search_results_after_closing() {
         beforeEach();
 
-        WebElement filter = analysisPageReact.getFilterBuckets().getFilter(ACTIVITY_TYPE);
+        WebElement filter = analysisPageReact.getFilterBuckets().getFilter(ATTR_ACTIVITY_TYPE);
         filter.click();
 
         AttributeFilterPickerPanel panel = AttributeFilterPickerPanel.getInstance(browser);
@@ -46,11 +48,11 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
     public void should_be_possible_to_add_and_remove_attribute_from_filters_bucket() {
         beforeEach();
 
-        analysisPageReact.getFilterBuckets().getFilter(ACTIVITY_TYPE);
+        analysisPageReact.getFilterBuckets().getFilter(ATTR_ACTIVITY_TYPE);
 
         // try to drag a duplicate attribute filter
-        assertTrue(analysisPageReact.addFilter(ACTIVITY_TYPE)
-            .removeFilter(ACTIVITY_TYPE)
+        assertTrue(analysisPageReact.addFilter(ATTR_ACTIVITY_TYPE)
+            .removeFilter(ATTR_ACTIVITY_TYPE)
             .getFilterBuckets()
             .isEmpty());
     }
@@ -59,8 +61,8 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
     public void should_not_allow_moving_other_buckets_items_to_filters_bucket() {
         beforeEach();
 
-        assertTrue(analysisPageReact.addAttribute(ACTIVITY_TYPE)
-            .removeFilter(ACTIVITY_TYPE)
+        assertTrue(analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE)
+            .removeFilter(ATTR_ACTIVITY_TYPE)
             .getFilterBuckets()
             .isEmpty());
 
@@ -101,7 +103,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
         AttributeFilterPickerPanel panel = beforeEachDisablingApplyButton();
         panel.select("Email");
 
-        analysisPageReact.getFilterBuckets().getFilter(ACTIVITY_TYPE).click();
+        analysisPageReact.getFilterBuckets().getFilter(ATTR_ACTIVITY_TYPE).click();
         panel.getClearButton().click();
         panel.searchForText("Email");
         assertTrue(panel.getApplyButton()
@@ -120,7 +122,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
                 .contains("disabled"));
 
         panel.getApplyButton().click();
-        assertEquals(analysisPageReact.getFilterBuckets().getFilterText(ACTIVITY_TYPE), ACTIVITY_TYPE + ": Email");
+        assertEquals(analysisPageReact.getFilterBuckets().getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": Email");
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {"disabling-Apply-button"})
@@ -128,7 +130,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
         AttributeFilterPickerPanel panel = beforeEachDisablingApplyButton();
         panel.select("Email", "In Person Meeting");
 
-        analysisPageReact.getFilterBuckets().getFilter(ACTIVITY_TYPE).click();
+        analysisPageReact.getFilterBuckets().getFilter(ATTR_ACTIVITY_TYPE).click();
         panel.getClearButton().click();
         panel.searchForText("Email");
         panel.searchForText("In Person Meeting");
@@ -138,15 +140,15 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
     }
 
     private void beforeEach() {
-        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
-            .addFilter(ACTIVITY_TYPE)
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .addFilter(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing();
     }
 
     private AttributeFilterPickerPanel beforeEachDisablingApplyButton() {
         beforeEach();
 
-        analysisPageReact.getFilterBuckets().getFilter(ACTIVITY_TYPE).click();
+        analysisPageReact.getFilterBuckets().getFilter(ATTR_ACTIVITY_TYPE).click();
         return AttributeFilterPickerPanel.getInstance(browser);
     }
 }

@@ -2,9 +2,15 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import org.json.JSONException;
 import org.testng.ITestContext;
@@ -16,15 +22,10 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
 public class EditModeTest extends DashboardWithWidgetsTest {
 
     private static final KpiConfiguration kpiConfig = new KpiConfiguration.Builder()
-        .metric(AMOUNT)
+        .metric(METRIC_AMOUNT)
         .dataSet(DATE_CREATED)
         .build();
 
@@ -186,7 +187,7 @@ public class EditModeTest extends DashboardWithWidgetsTest {
 
             waitForFragmentVisible(indigoDashboardsPage)
                     .getConfigurationPanel()
-                    .selectMetricByName(NUMBER_OF_ACTIVITIES);
+                    .selectMetricByName(METRIC_NUMBER_OF_ACTIVITIES);
 
             indigoDashboardsPage
                     .waitForAllKpiWidgetContentLoaded()
@@ -205,7 +206,7 @@ public class EditModeTest extends DashboardWithWidgetsTest {
             waitForFragmentVisible(indigoDashboardsPage)
                     .getConfigurationPanel()
                     .waitForAlertEditWarning();
-            assertEquals(kpi.getHeadline(), NUMBER_OF_ACTIVITIES);
+            assertEquals(kpi.getHeadline(), METRIC_NUMBER_OF_ACTIVITIES);
 
         } finally {
             teardownKpi();

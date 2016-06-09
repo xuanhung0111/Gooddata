@@ -1,18 +1,22 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.GOODSALES_TEMPLATE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_CREATED;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.lang.String.valueOf;
 import static java.nio.file.Files.deleteIfExists;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static com.google.common.collect.Lists.newArrayList;
-import static java.lang.String.valueOf;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.CoreMatchers.is;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -81,13 +85,13 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     public void setUpData() {
         projectTitle = "GoodSales-embedded-dashboard-test";
         tabularReportDef =
-                new UiReportDefinition().withName("tabular_report").withWhats(new WhatItem("Amount", "Status"))
-                        .withHows("Year (Created)");
+                new UiReportDefinition().withName("tabular_report").withWhats(new WhatItem(METRIC_AMOUNT, ATTR_STATUS))
+                        .withHows(ATTR_YEAR_CREATED);
         chartReportDef =
-                new UiReportDefinition().withName("chart_report").withWhats("Amount").withHows("Year (Created)")
+                new UiReportDefinition().withName("chart_report").withWhats(METRIC_AMOUNT).withHows(ATTR_YEAR_CREATED)
                         .withType(ReportTypes.BAR);
         headlineReportDef =
-                new UiReportDefinition().withName("headline_report").withWhats("Amount")
+                new UiReportDefinition().withName("headline_report").withWhats(METRIC_AMOUNT)
                         .withType(ReportTypes.HEADLINE);
     }
 
@@ -116,8 +120,8 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
                 .addNewTab("other_widgets")
                 .addLineToDashboard()
                 .addWebContentToDashboard("https://www.gooddata.com")
-                .addWidgetToDashboard(WidgetTypes.KEY_METRIC, "Amount")
-                .addWidgetToDashboard(WidgetTypes.GEO_CHART, "Amount")
+                .addWidgetToDashboard(WidgetTypes.KEY_METRIC, METRIC_AMOUNT)
+                .addWidgetToDashboard(WidgetTypes.GEO_CHART, METRIC_AMOUNT)
                 .saveDashboard();
 
         sharedDashboardUrl = browser.getCurrentUrl();
@@ -286,7 +290,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         EmbedDashboardDialog embedDialog = dashboardsPage.openEmbedDashboardDialog();
         String[] filteredAttributeValues = {"2009", "2011"};
         List<Float> filteredMetricValues = Lists.newArrayList(8656468.20F, 60270072.20F);
-        embedDialog.selectFilterAttribute("Year (Created)", filteredAttributeValues);
+        embedDialog.selectFilterAttribute(ATTR_YEAR_CREATED, filteredAttributeValues);
         String htmlEmbedCode = embedDialog.getEmbedCode();
         String embedUri = embedDialog.getPreviewURI();
 
@@ -339,7 +343,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         initDashboardsPage()
                 .addNewDashboard("Dashboard with filter")
                 .addReportToDashboard(tabularReportDef.getName())
-                .addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, "Year (Created)")
+                .addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_YEAR_CREATED)
                 .saveDashboard();
 
         EmbedDashboardDialog dashboardEmbedDialog = dashboardsPage.openEmbedDashboardDialog();

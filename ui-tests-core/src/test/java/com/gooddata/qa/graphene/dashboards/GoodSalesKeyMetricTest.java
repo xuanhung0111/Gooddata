@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -46,10 +48,8 @@ import com.google.common.collect.Iterables;
 
 public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
 
-    private static final String ATTR_PRODUCT = "Product";
     private static final String VARIABLE_NAME = "F_" + ATTR_PRODUCT;
 
-    private static final String AMOUNT = "Amount";
     private static final String METRIC_VARIABLE = "Metric_Variable";
     private static final String COUNT_OF_PRODUCT = "# " + ATTR_PRODUCT;
 
@@ -71,7 +71,7 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
         createMetric(COUNT_OF_PRODUCT, format("SELECT COUNT([%s])", productUri), "#,##0");
 
         createMetric(METRIC_VARIABLE, format("SELECT [%s] WHERE [%s]", getMdService().getObjUri(getProject(),
-                Metric.class, title(AMOUNT)), variableUri), "#,##0");
+                Metric.class, title(METRIC_AMOUNT)), variableUri), "#,##0");
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -103,7 +103,7 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
         WidgetConfigPanel widgetConfigPanel = Graphene.createPageFragment(WidgetConfigPanel.class,
                 waitForElementVisible(WidgetConfigPanel.LOCATOR, browser));
         MetricConfigPanel metricConfigPanel = widgetConfigPanel.getTab(Tab.METRIC, MetricConfigPanel.class);
-        metricConfigPanel.selectMetric(AMOUNT, "Created");
+        metricConfigPanel.selectMetric(METRIC_AMOUNT, "Created");
         assertTrue(waitForFragmentVisible(metricConfigPanel).isWhenDropdownVisibled());
         assertFalse(waitForFragmentVisible(metricConfigPanel).isWhenDropdownEnabled());
         assertTrue(waitForFragmentVisible(metricConfigPanel).isLinkExternalFilterVisible());
