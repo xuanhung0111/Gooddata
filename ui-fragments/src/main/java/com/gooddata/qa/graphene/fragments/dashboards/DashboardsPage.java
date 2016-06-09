@@ -136,13 +136,14 @@ public class DashboardsPage extends AbstractFragment {
         return name;
     }
 
-    public void selectDashboard(String dashboardName) {
+    public DashboardsPage selectDashboard(String dashboardName) {
         if (getDashboardName().contains(dashboardName)) {
             log.info("Dashboard '" + dashboardName + "'already selected");
-            return;
+            return this;
         }
 
         openDashboardMenu().selectDashboardByName(dashboardName);
+        return this;
     }
 
     public void selectDashboard(int dashboardIndex) {

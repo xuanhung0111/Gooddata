@@ -100,7 +100,7 @@ public class DashboardEditBar extends AbstractFragment {
 
     public DashboardEditBar addReportToDashboard(String reportName) {
         int widgetCountBefore = listDashboardWidgets.size();
-        waitForElementVisible(reportMenuButton).click();
+        clickReportMenuButton();
         waitForElementVisible(reportPicker.getRoot());
         reportPicker.searchAndSelectItem(reportName);
         Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1,
@@ -223,6 +223,11 @@ public class DashboardEditBar extends AbstractFragment {
         waitForElementVisible(actionsMenu).click();
         waitForElementVisible(deleteButton).click();
         waitForElementVisible(deleteDashboardDialogButton).click();
+    }
+
+    public DashboardEditBar clickReportMenuButton() {
+        waitForElementVisible(reportMenuButton).click();
+        return this;
     }
 
     /**
