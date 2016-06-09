@@ -27,6 +27,8 @@ import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 
 public class ReportsPage extends AbstractFragment {
 
+    public static final By LOCATOR = By.id("p-domainPage");
+
     private static final By BY_ADD_FOLDER_INPUT = By.cssSelector("#newDomain input");
     private static final By BY_ADD_FOLDER_SUBMIT_BUTTON = By.cssSelector("#newDomain button.s-newSpaceButton");
     private static final By BY_TAG_CLOUD = By.cssSelector(".c-spaceCloud[style^='display: block'] .bd");
@@ -78,7 +80,7 @@ public class ReportsPage extends AbstractFragment {
         waitForElementVisible(createReportButton).click();
     }
 
-    public void addNewFolder(String folderName) {
+    public ReportsPage addNewFolder(String folderName) {
         int currentFoldersCount = customFolders.getNumberOfFolders();
 
         waitForElementVisible(addFolderButton).click();
@@ -91,6 +93,8 @@ public class ReportsPage extends AbstractFragment {
                 "Number of folders is not increased");
         assertTrue(customFolders.getAllFolderNames().contains(folderName),
                 "New folder name is not present in list");
+
+        return this;
     }
 
     public String getSelectedFolderName() {
@@ -121,12 +125,15 @@ public class ReportsPage extends AbstractFragment {
         checkGreenBar(browser);
     }
 
-    public void moveReportsToFolder(String folder, String... reports) {
+    public ReportsPage moveReportsToFolder(String folder, String... reports) {
         waitForFragmentVisible(reportsList).selectReports(reports);
         waitForElementVisible(moveReportButton).click();
-        waitForElementVisible(By.className("ipeEditor"), browser).sendKeys(folder);
+
+        waitForElementVisible(By.cssSelector(".c-ipeEditor:not([style*='display: none']) input"), browser).sendKeys(folder);
         waitForElementVisible(By.className("s-ipeSaveButton"), browser).click();
         checkGreenBar(browser);
+
+        return this;
     }
 
     public ReportsPage moveReportsToFolderByDragDrop(String folderName, String reportName) {
@@ -179,6 +186,19 @@ public class ReportsPage extends AbstractFragment {
         return getFolderElement(folderName).getAttribute("class").contains("active");
     }
 
+    public PersonalInfo getReportOwnerInfoFrom(String reportName) {
+        return waitForFragmentVisible(reportsList).getReportOwnerInfoFrom(reportName);
+    }
+
+    public UserProfilePage openReportOwnerProfilePageFrom(String reportName) {
+        return waitForFragmentVisible(reportsList).openReportOwnerProfilePageFrom(reportName);
+    }
+
+    public ReportsPage openCustomFolder(String folderName) {
+        getCustomFolders().openFolder(folderName);
+        return this;
+    }
+
     private WebElement getFolderElement(String folderName) {
         Optional<WebElement> folder = waitForFragmentVisible(defaultFolders)
                 .getFolderWebElement(folderName);
@@ -187,13 +207,5 @@ public class ReportsPage extends AbstractFragment {
                     .getFolderWebElement(folderName);
         }
         return folder.orElseThrow(() -> new NoSuchElementException("Cannot find folder: " + folderName));
-    }
-
-    public PersonalInfo getReportOwnerInfoFrom(String reportName) {
-        return waitForFragmentVisible(reportsList).getReportOwnerInfoFrom(reportName);
-    }
-
-    public UserProfilePage openReportOwnerProfilePageFrom(String reportName) {
-        return waitForFragmentVisible(reportsList).openReportOwnerProfilePageFrom(reportName);
     }
 }

@@ -21,6 +21,8 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class MetricEditorDialog extends AbstractFragment {
 
+    private static final By BY_SAVE_BUTTON = By.cssSelector("button.save:not([style^='display: none'])");
+
     @FindBy(css = ".metricEditor > div:not([style^='display: none']) input.text.metricName")
     private WebElement metricInput;
 
@@ -49,7 +51,7 @@ public class MetricEditorDialog extends AbstractFragment {
     private static final String METRIC_LINK_LOCATOR = "${metricType}";
     private static final String METRIC_TEMPLATE_TAB_LOCATOR = "//ul[@role='tablist']//em[text()='${tab}']";
 
-    public static final By LOCATOR = By.className("standaloneEditor");
+    public static final By LOCATOR = By.className("s-metricEditor");
 
     private static final String SELECTION_LOCATOR = "//a[contains(@class,'%s') and text()='...']";
     private static final By ATTRIBUTE_SELECTION_LOCATOR = By.xpath(format(SELECTION_LOCATOR, "attributes"));
@@ -145,6 +147,17 @@ public class MetricEditorDialog extends AbstractFragment {
         enterMetricNameAndSubmit(metricUI.getName());
     }
 
+    public MetricEditorDialog enterMetricName(String name) {
+        waitForElementVisible(metricInput).clear();
+        metricInput.sendKeys(name);
+
+        return this;
+    }
+
+    public void save() {
+        waitForElementVisible(BY_SAVE_BUTTON, getRoot()).click();
+    }
+
     private void selectAttributes(CustomMetricUI metricUI) {
         Pair<String, String> attributeInfo;
         for (String attribute : metricUI.getAttributes()) {
@@ -218,8 +231,10 @@ public class MetricEditorDialog extends AbstractFragment {
     }
 
     private void enterMetricNameAndSubmit(String name) {
-        waitForElementVisible(metricInput).clear();
-        metricInput.sendKeys(name);
+        enterMetricName(name).submit();
+    }
+
+    private void submit() {
         waitForElementVisible(addButton).click();
     }
 }
