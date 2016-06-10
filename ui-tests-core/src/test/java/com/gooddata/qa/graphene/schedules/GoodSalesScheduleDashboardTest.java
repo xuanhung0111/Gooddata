@@ -338,8 +338,10 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         String userB = "qa+test+schedule+b@gooddata.com";
         String scheduleUserA = "Schedule with deleted bcc email";
         String scheduleUserB = "Schedule with deleted author";
-        String userAUri = UserManagementRestUtils.createUser(getRestApiClient(), userA, testParams.getPassword());
-        String userBUri = UserManagementRestUtils.createUser(getRestApiClient(), userB, testParams.getPassword());
+        String userAUri = UserManagementRestUtils.createUser(getRestApiClient(), testParams.getUserDomain(), userA,
+                testParams.getPassword());
+        String userBUri = UserManagementRestUtils.createUser(getRestApiClient(), testParams.getUserDomain(), userB,
+                testParams.getPassword());
 
         try {
             String userUri = getGoodDataClient().getAccountService().getCurrent().getUri();

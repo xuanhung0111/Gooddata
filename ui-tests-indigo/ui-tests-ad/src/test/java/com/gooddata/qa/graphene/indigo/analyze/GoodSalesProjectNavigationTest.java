@@ -56,7 +56,8 @@ public class GoodSalesProjectNavigationTest extends AnalyticalDesignerAbstractTe
         newAdminUser = generateEmail(testParams.getUser());
         newAdminPassword = testParams.getPassword();
 
-        newAdminUserUri = UserManagementRestUtils.createUser(getRestApiClient(), newAdminUser, newAdminPassword);
+        newAdminUserUri = UserManagementRestUtils.createUser(getRestApiClient(), testParams.getUserDomain(),
+                newAdminUser, newAdminPassword);
 
         embededDashboardUser = testParams.getEditorUser();
         embededDashboardUserPassword = testParams.getEditorPassword();
