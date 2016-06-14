@@ -165,7 +165,7 @@ public class CataloguePanelReact extends AbstractFragment {
             waitForCollectionIsNotEmpty(items);
             return true;
         }
-        WebElement noItem = browser.findElement(BY_NO_ITEMS).findElement(By.cssSelector("p:first-child"));
+        WebElement noItem = browser.findElement(BY_NO_ITEMS).findElement(By.cssSelector(".s-not-matching-message"));
         assertEquals(noItem.getText().trim(), "No data matching\n\"" + item + "\"");
         return false;
     }
