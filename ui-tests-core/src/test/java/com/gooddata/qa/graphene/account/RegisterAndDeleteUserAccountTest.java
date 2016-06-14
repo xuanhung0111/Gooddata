@@ -82,7 +82,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
                 .withPhone(registrationString)
                 .withCompany("Company " + registrationString)
                 .withJobTitle("Title " + registrationString)
-                .withIndustry("Tech");
+                .withIndustry("Government");
 
         imapHost = testParams.loadProperty("imap.host");
         imapUser = REGISTRATION_USER;

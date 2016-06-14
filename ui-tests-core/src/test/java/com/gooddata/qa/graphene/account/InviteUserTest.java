@@ -62,7 +62,7 @@ public class InviteUserTest extends AbstractProjectTest {
                 .withPhone(uniqueString)
                 .withCompany("Company " + uniqueString)
                 .withJobTitle("Title " + uniqueString)
-                .withIndustry("Tech");
+                .withIndustry("Government");
     }
 
     @Test(dependsOnGroups = {"createProject"})

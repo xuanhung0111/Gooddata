@@ -80,7 +80,7 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
                 .withPhone(registrationString)
                 .withCompany("Company " + registrationString)
                 .withJobTitle("Title " + registrationString)
-                .withIndustry("Tech");
+                .withIndustry("Government");
     }
 
     @Test(dependsOnMethods = "initData")
