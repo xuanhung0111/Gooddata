@@ -12,7 +12,6 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -30,7 +29,6 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksB
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.VisualizationReportTypePicker;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
-import com.google.common.base.Predicate;
 
 public class AnalysisPage extends AbstractFragment {
 
@@ -90,20 +88,7 @@ public class AnalysisPage extends AbstractFragment {
     public AnalysisPage drag(WebElement source, WebElement target) {
         startDrag(source);
         try {
-            // In some specific cases, the target to be dropped is not in viewport,
-            // so the selenium script when dragging and dropping element to
-            // the target will have a risk that it cannot drop to the right position of target element
-            // and element will not be droppable.
-            // The solution is move element continuously until the target element is in viewport and droppable.
-            Predicate<WebDriver> droppable = browser -> {
-                getActions().moveToElement(waitForElementPresent(target)).perform();
-
-                String elementAttribute = target.getAttribute("class");
-                return elementAttribute.contains("adi-droppable-hover") || elementAttribute.contains("is-active");
-            };
-
-            Graphene.waitGui().until(droppable);
-
+            getActions().moveToElement(waitForElementPresent(target)).perform();
         } finally {
             getActions().release().perform();
         }
