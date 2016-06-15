@@ -18,6 +18,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
+import com.gooddata.qa.utils.browser.BrowserUtils;
+
 public final class ElementUtils {
 
     public static final By BY_BUBBLE_CONTENT = By.cssSelector(".bubble-content .content");
@@ -40,6 +42,14 @@ public final class ElementUtils {
         if (!isElementPresent(locatorKey, context)) return false;
 
         return context.findElement(locatorKey).isDisplayed();
+    }
+
+    public static boolean isElementVisible(WebElement element) {
+        return element.isDisplayed();
+    }
+
+    public static void scrollElementIntoView(WebElement element, WebDriver browser) {
+        BrowserUtils.runScript(browser, "arguments[0].scrollIntoView(true);", element);
     }
 
     /**

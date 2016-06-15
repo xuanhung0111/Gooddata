@@ -1,8 +1,11 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 
 import java.util.List;
 
@@ -206,7 +209,22 @@ public class IndigoDashboardsPage extends AbstractFragment {
     }
 
     public Kpi getKpiByIndex(int index) {
-        return kpis.get(index);
+        final Kpi kpi = waitForCollectionIsNotEmpty(kpis).get(index);
+
+        // Indigo DashBoard can load only one Kpi on mobile screen, and the others will present in DOM
+        // and just visible when scrolling down, so the Kpi we need to work with may not be visible and interact.
+        // And selenium script cannot do anything when an element is not visible.
+        // In this stage, java script will be good solution when it can scroll to an element
+        // although the element just present and not visible.
+
+        // And the way java script makes element visible is not like when doing manual,
+        // it just scroll and calculate until it think the element visible.
+        // So in reality view, the element may show full or just a small part of it.
+        if (!isElementVisible(kpi.getRoot())) {
+            scrollElementIntoView(kpi.getRoot(), browser);
+        }
+
+        return waitForFragmentVisible(kpi);
     }
 
     public String getKpiTitle(int index) {
