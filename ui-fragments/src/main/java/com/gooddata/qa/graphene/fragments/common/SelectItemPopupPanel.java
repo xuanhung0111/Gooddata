@@ -1,18 +1,19 @@
 package com.gooddata.qa.graphene.fragments.common;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsEmpty;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -48,39 +49,25 @@ public class SelectItemPopupPanel extends AbstractFragment {
     })
     private List<WebElement> items;
 
-    public void searchItem(String searchText) {
-        waitForElementVisible(this.getRoot());
-
-        waitForElementVisible(searchInput).clear();
-        searchInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
-        waitForCollectionIsEmpty(items);
-
-        // Sometimes clear() does nothing, so using hot keys instead
-        searchInput.sendKeys(Keys.BACK_SPACE);
-        searchInput.sendKeys(Keys.chord(Keys.CONTROL, "a"));
-        searchInput.sendKeys(Keys.DELETE);
-
-        searchInput.sendKeys(searchText);
-        waitForCollectionIsNotEmpty(items);
-    }
-
-    public void selectItem(String item) {
-        selectItem(item, true);
-    }
-
-    public void selectEmbedItem(String item) {
-        selectItem(item, false);
-    }
-
     public SelectItemPopupPanel searchAndSelectItem(String item) {
-        searchItem(item);
+        final Optional<WebElement> itemElement = findItemFrom(item, getItemListInDefaultStage());
+
+        if (!itemElement.isPresent() || !itemElement.get().isDisplayed()) {
+            searchItem(item);
+        }
+
         selectItem(item);
         return this;
     }
 
-    public void searchAndSelectEmbedItem(String item) {
-        searchItem(item);
-        selectEmbedItem(item);
+    public SelectItemPopupPanel searchAndSelectItems(Collection<String> items) {
+        items.stream().forEach(this::searchAndSelectItem);
+        return this;
+    }
+
+    public void submitPanel() {
+        waitForElementVisible(addButton).click();
+        waitForPanelNotVisible();
     }
 
     public void changeGroup(String group) {
@@ -98,49 +85,45 @@ public class SelectItemPopupPanel extends AbstractFragment {
         });
     }
 
-    public void submitPanel() {
-        waitForElementVisible(addButton).click();
-        waitForPanelNotVisible();
-    }
-
-    public SelectItemPopupPanel searchAndSelectItems(Collection<String> items) {
-        items.stream().forEach(this::searchAndSelectEmbedItem);
-        return this;
-    }
-
     public List<String> getItems() {
         return getElementTexts(items);
     }
 
-    private void selectCheckboxItem(String item) {
-        By label = By.cssSelector("label");
-        for (WebElement e : items) {
-            if (!item.equals(e.findElement(label).getText().trim()))
-                continue;
-            e.findElement(By.cssSelector("input")).click();
-            return;
-        }
-        throw new IllegalArgumentException(String.format("Item '%s' is not found!", item));
+    // Just use this action when the expected item not visible in list
+    private SelectItemPopupPanel searchItem(final String searchText) {
+        final int currentItems = waitForCollectionIsNotEmpty(items).size();
+
+        waitForElementVisible(searchInput).clear();
+        searchInput.sendKeys(searchText);
+
+        // After searching, the item list will change stage from full list --> empty --> list contains items 
+        // with search pattern.
+        // If using waitForCollectionIsNotEmpty() like normal way, there has a risk that code run too fast,
+        // it catches the item list at stage 1, then the next action to get or select item 
+        // will fail with IndexOutOfBoundException thrown because the list changes to empty stage
+
+        // In this case, we should wait until the items displayed and less than the full list.
+        // There still has a risk in this approach when the list contains only items with the same search pattern.
+        // This makes the list after search is same as before (Just a special case and never happen in reality)
+        Predicate<WebDriver> itemFound = browser -> waitForCollectionIsNotEmpty(items).size() < currentItems;
+        Graphene.waitGui().until(itemFound);
+
+        return this;
     }
 
-    private void selectTextItem(String item) {
-        for (WebElement e : items) {
-            if (!item.equals(e.getText().trim()))
-                continue;
-            e.click();
-            return;
-        }
-        throw new IllegalArgumentException(String.format("Item '%s' is not found!", item));
-    }
+    private SelectItemPopupPanel selectItem(final String item) {
+        final WebElement itemElement = findItemFrom(item, items).get();
+        final By byCheckbox = By.tagName("input");
 
-    private boolean isCheckboxItem() {
-        waitForCollectionIsNotEmpty(items);
-        try {
-            items.get(0).findElement(By.cssSelector("input"));
-            return true;
-        } catch (NoSuchElementException e) {
-            return false;
+        if (!isElementPresent(byCheckbox, itemElement)) {
+            itemElement.click();
+            return this;
         }
+
+        final WebElement checkbox = waitForElementVisible(itemElement.findElement(byCheckbox));
+
+        if (!checkbox.isSelected()) checkbox.click();
+        return this;
     }
 
     private void waitForPanelNotVisible() {
@@ -158,15 +141,26 @@ public class SelectItemPopupPanel extends AbstractFragment {
         }
     }
 
-    private void selectItem(String item, boolean isNotEmbed) {
-        if (isCheckboxItem()) {
-            selectCheckboxItem(item);
-        } else {
-            selectTextItem(item);
-        }
+    private Optional<WebElement> findItemFrom(final String item, final Collection<WebElement> collection) {
+        return waitForCollectionIsNotEmpty(collection)
+                .stream()
+                .filter(e -> item.equals(e.findElement(By.cssSelector("label,.label")).getText()))
+                .findFirst();
+    }
 
-        if (isNotEmbed) {
-            submitPanel();
-        }
+    private List<WebElement> getItemListInDefaultStage() {
+        if (waitForElementVisible(searchInput).getAttribute("value").trim().isEmpty())
+            return waitForCollectionIsNotEmpty(items);
+
+        searchInput.clear();
+        searchInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
+        waitForCollectionIsEmpty(items);
+
+        // Sometimes clear() does nothing, so using hot keys instead
+        searchInput.sendKeys(Keys.BACK_SPACE);
+        searchInput.sendKeys(Keys.chord(Keys.CONTROL, "a"));
+        searchInput.sendKeys(Keys.DELETE);
+
+        return waitForCollectionIsNotEmpty(items);
     }
 }

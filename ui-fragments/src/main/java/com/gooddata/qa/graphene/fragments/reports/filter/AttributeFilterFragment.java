@@ -84,7 +84,7 @@ public class AttributeFilterFragment extends AbstractFilterFragment {
     }
 
     public AttributeFilterFragment searchAndSelectAttributeValue(String value) {
-        waitForFragmentVisible(valuesPanel).searchAndSelectEmbedItem(value);
+        waitForFragmentVisible(valuesPanel).searchAndSelectItem(value);
         return this;
     }
 

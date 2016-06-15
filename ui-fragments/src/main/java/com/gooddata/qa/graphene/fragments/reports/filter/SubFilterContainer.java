@@ -35,7 +35,7 @@ public class SubFilterContainer extends AbstractFragment {
         SelectItemPopupPanel panel = Graphene.createPageFragment(SelectItemPopupPanel.class,
                 waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser));
 
-        panel.searchAndSelectItem(attribute);
+        panel.searchAndSelectItem(attribute).submitPanel();
 
         // After selecting attribute, the pop-up panel is still displayed.
         // In this case, we could continue to wait for it visible then select more attribute values.
@@ -76,6 +76,7 @@ public class SubFilterContainer extends AbstractFragment {
     private void searchAndSelectItem(String item) {
         Graphene.createPageFragment(SelectItemPopupPanel.class,
                 waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser))
-                .searchAndSelectItem(item);
+                .searchAndSelectItem(item)
+                .submitPanel();
     }
 }

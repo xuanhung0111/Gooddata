@@ -142,7 +142,7 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
             .selectAttribute("Date (Snapshot)");
 
         waitForElementVisible(cssSelector(".s-btn-filter_this_attribute"), browser).click();
-        waitForElementVisible(cssSelector(".switchLabel ~ .hyperlinkOn a"), browser).click();
+        waitForElementVisible(cssSelector(".guidedNavigation .hyperlinkOn:not(.hidden) a"), browser).click();
     }
 
     @Test(dependsOnMethods = {"createProject"})

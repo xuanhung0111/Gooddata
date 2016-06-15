@@ -36,14 +36,14 @@ public class MetricConfigPanel extends AbstractFragment {
 
         Graphene.createPageFragment(SelectItemPopupPanel.class,
                 browser.findElements(SelectItemPopupPanel.LOCATOR).get(1))
-                .searchAndSelectEmbedItem(metric);
+                .searchAndSelectItem(metric);
 
         if (dateDimension.length == 0) return;
         waitForElementVisible(dateDimensionSelect).click();
         Graphene.waitGui().until(popupDisplayed);
         Graphene.createPageFragment(SelectItemPopupPanel.class,
                 browser.findElements(SelectItemPopupPanel.LOCATOR).get(1))
-                .searchAndSelectEmbedItem(dateDimension[0]);
+                .searchAndSelectItem(dateDimension[0]);
     }
 
     public boolean isWhenDropdownVisibled() {

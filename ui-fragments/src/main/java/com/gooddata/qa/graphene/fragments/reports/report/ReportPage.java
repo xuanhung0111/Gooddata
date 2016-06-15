@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter.REP
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_BLUE_BAR;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
@@ -210,7 +211,11 @@ public class ReportPage extends AbstractFragment {
     }
 
     public void waitForSndMetricDetail() {
-        waitForElementVisible(cssSelector(".c-metricDetailViewButton,[name=reportEditorForm]"), browser);
+        Predicate<WebDriver> sndMetricDetailVisible = browser ->
+                isElementVisible(By.className("c-metricDetailViewButton"), browser)
+                || isElementVisible(By.className("t-reportEditorMessage"), browser);
+
+        Graphene.waitGui().until(sndMetricDetailVisible);
     }
 
     public ReportPage selectInapplicableMetric(String metric) {
@@ -588,7 +593,7 @@ public class ReportPage extends AbstractFragment {
         waitForElementVisible(cssSelector(".c-metricDetailDrillStep button"), browser).click();
         WebElement popupElement = waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser);
         SelectItemPopupPanel popupPanel = Graphene.createPageFragment(SelectItemPopupPanel.class, popupElement);
-        popupPanel.searchAndSelectItem(attribute);
+        popupPanel.searchAndSelectItem(attribute).submitPanel();
         return this;
     }
 
@@ -865,7 +870,7 @@ public class ReportPage extends AbstractFragment {
         waitForElementVisible(cssSelector(".s-btn-filter_this_attribute"), browser).click();
         SelectItemPopupPanel panel = Graphene.createPageFragment(SelectItemPopupPanel.class,
                 waitForElementVisible(cssSelector(".c-attributeElementsFilterEditor"), browser));
-        values.stream().forEach(panel::searchAndSelectEmbedItem);
+        values.stream().forEach(panel::searchAndSelectItem);
         return this;
     }
 
