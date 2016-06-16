@@ -21,7 +21,7 @@ public class PRCheckerTestFlow {
             .register(StackedChartsTest.class)
             .register(ResetButtonTest.class)
             .register("testng-ad-e2e-metrics-test.xml")
-//            .register("testng-ad-e2e-visualization-test.xml") too complex test suite, one of the last to run
+            .register("testng-ad-e2e-visualization-test.xml")
             .register("testng-ad-e2e-recommendation-test.xml")
             .register("testng-ad-e2e-catalogue-test.xml")
 //            .register("testng-ad-e2e-date-test.xml")

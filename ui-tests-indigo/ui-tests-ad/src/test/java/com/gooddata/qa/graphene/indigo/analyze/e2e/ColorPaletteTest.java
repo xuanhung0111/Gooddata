@@ -10,7 +10,6 @@ import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.testng.annotations.BeforeClass;
@@ -71,7 +70,7 @@ public class ColorPaletteTest extends AbstractAdE2ETest {
             .getChartReport()
             .getLegends(), expectedLegend);
 
-        expectElementAttributes(".highcharts-legend-item path", LEGEND_COLOR_ATTRIBUTE, legendColors);
+        expectElementAttributes(".highcharts-legend-item [fill^='rgb']", LEGEND_COLOR_ATTRIBUTE, legendColors);
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -91,7 +90,7 @@ public class ColorPaletteTest extends AbstractAdE2ETest {
             .getChartReport()
             .getLegends(), expectedLegend);
 
-        expectElementAttributes(".highcharts-legend-item path", LEGEND_COLOR_ATTRIBUTE, legendColors);
+        expectElementAttributes(".highcharts-legend-item [fill^='rgb']", LEGEND_COLOR_ATTRIBUTE, legendColors);
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -109,12 +108,7 @@ public class ColorPaletteTest extends AbstractAdE2ETest {
             .waitForReportComputing()
             .getChartReport()
             .getLegends(), expectedLegend);
-        expectElementAttributes(".highcharts-legend-item path", LEGEND_COLOR_ATTRIBUTE, legendColors);
-
-        // For bar chart, highcharts has series in DOM bottom-up, so check that
-        // if we reverse series and check what"s in DOM, it matches
-        Collections.reverse(legendColors);
-        expectElementAttributes(".highcharts-series rect", LEGEND_COLOR_ATTRIBUTE, legendColors);
+        expectElementAttributes(".highcharts-legend-item [fill^='rgb']", LEGEND_COLOR_ATTRIBUTE, legendColors);
     }
 
     private void expectElementAttributes(String elementCssLocators, String attribute, List<String> values) {
