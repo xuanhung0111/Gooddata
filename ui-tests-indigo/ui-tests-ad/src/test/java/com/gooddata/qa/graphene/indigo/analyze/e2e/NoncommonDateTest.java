@@ -46,7 +46,7 @@ public class NoncommonDateTest extends AbstractAdE2ETest {
             .getDateFilter();
 
         dateFilter.click();
-        assertTrue(isElementPresent(cssSelector(".s-filter-date-dimension-switch:not(.disabled)"), browser));
+        assertTrue(isElementPresent(cssSelector(".s-filter-date-date-dataset-switch:not(.disabled)"), browser));
         dateFilter.click();
 
         analysisPageReact.addDate();
@@ -54,7 +54,7 @@ public class NoncommonDateTest extends AbstractAdE2ETest {
 
         // date dimension picker in select is now disabled
         dateFilter.click();
-        assertTrue(isElementPresent(cssSelector(".s-filter-date-dimension-switch[disabled]"), browser));
+        assertTrue(isElementPresent(cssSelector(".s-filter-date-date-dataset-switch[disabled]"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})

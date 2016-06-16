@@ -24,7 +24,7 @@ public class PRCheckerTestFlow {
             .register("testng-ad-e2e-visualization-test.xml")
             .register("testng-ad-e2e-recommendation-test.xml")
             .register("testng-ad-e2e-catalogue-test.xml")
-//            .register("testng-ad-e2e-date-test.xml")
+            .register("testng-ad-e2e-date-test.xml")
             .toTextFile();
     }
 }
