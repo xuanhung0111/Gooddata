@@ -19,12 +19,6 @@
         </classes>
     </test>
 
-    <test name="shortcut-canvas" enabled="true">
-        <classes>
-            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.ShortcutCanvasTest" />
-        </classes>
-    </test>
-
     <test name="trash" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.TrashTest" />
