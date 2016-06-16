@@ -1,6 +1,14 @@
 package com.gooddata.qa.utils.http.project;
 
+import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
+
+import java.util.function.Supplier;
+
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
 
 import com.gooddata.GoodData;
 import com.gooddata.project.Environment;
@@ -9,14 +17,35 @@ import com.gooddata.project.ProjectDriver;
 import com.gooddata.project.ProjectFeatureFlag;
 import com.gooddata.project.ProjectService;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.utils.http.RestApiClient;
 
 /**
  * REST utilities for project task
  */
 public final class ProjectRestUtils {
 
+    private static final String PROJECT_LINK = "/gdc/projects/%s";
+
     private ProjectRestUtils() {
     }
+
+    private static final Supplier<String> UPDATE_PROJECT_TITLE_BODY = () -> {
+        try {
+            return new JSONObject() {{
+                put("project", new JSONObject() {{
+                    put("content", new JSONObject() {{
+                        put("guidedNavigation", "1");
+                        put("environment", "${environment}");
+                    }});
+                    put("meta", new JSONObject() {{
+                        put("title", "${title}");
+                    }});
+                }});
+            }}.toString();
+        } catch (JSONException e) {
+            throw new IllegalStateException("There is an exception during json object initialization! ", e);
+        }
+    };
 
     /**
      * Create blank project
@@ -52,6 +81,16 @@ public final class ProjectRestUtils {
         project.setEnvironment(environment);
 
         return goodData.getProjectService().createProject(project).get().getId();
+    }
+
+    public static void updateProjectTitle(final RestApiClient restApiClient, final Project project,
+            final String newProjectTitle) {
+        final String uri = String.format(PROJECT_LINK, project.getId());
+        final String content = UPDATE_PROJECT_TITLE_BODY.get()
+                .replace("${title}", newProjectTitle)
+                .replace("${environment}", project.getEnvironment());
+
+        executeRequest(restApiClient, restApiClient.newPostMethod(uri, content), HttpStatus.NO_CONTENT);
     }
 
     /**
