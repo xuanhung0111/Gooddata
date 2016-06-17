@@ -73,4 +73,7 @@ public final class GoodSalesUtils {
     public static final String FACT_AMOUNT = "Amount";
     public static final String FACT_ACTIVITY_DATE = "Activity (Date)";
     public static final String FACT_DURATION = "Duration";
+
+    // reports
+    public static final String REPORT_ACTIVITIES_BY_TYPE = "Activities by Type";
 }

@@ -42,6 +42,10 @@ public class WidgetConfigPanel extends AbstractFragment {
                 waitForElementVisible(LOCATOR, searchContext));
     }
 
+    public List<WebElement> getTabs() {
+        return waitForCollectionIsNotEmpty(tabs);
+    }
+
     public <T extends AbstractFragment> T getTab(final Tab tab, Class<T> clazz) {
         waitForCollectionIsNotEmpty(tabs);
         WebElement tabElement = Iterables.find(tabs, new Predicate<WebElement>() {
