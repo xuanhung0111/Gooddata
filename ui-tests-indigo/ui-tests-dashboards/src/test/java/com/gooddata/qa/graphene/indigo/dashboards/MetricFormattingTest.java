@@ -103,6 +103,7 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
                 .waitForAllKpiWidgetContentLoaded()
                 .getLastKpi();
 
+            takeScreenshot(browser, "xss-in-metric-name", getClass());
             assertEquals(lastKpi.getHeadline(), xssMetricName);
 
             if (Boolean.parseBoolean(context.getCurrentXmlTest().getParameter("isMobileRunning"))) return;
@@ -112,6 +113,8 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
                 .selectLastKpi();
 
             selectedKpi.setHeadline(xssHeadline);
+
+            takeScreenshot(browser, "change-headline-with-xss-name", getClass());
             assertEquals(selectedKpi.getHeadline(), xssHeadline);
 
         } finally {
@@ -146,6 +149,7 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
                 .waitForAllKpiWidgetContentLoaded()
                 .getLastKpi();
 
+            takeScreenshot(browser, "xss-in-metric-format", getClass());
             assertEquals(lastKpi.getValue(), "<button>1.00</button>");
 
         } finally {
