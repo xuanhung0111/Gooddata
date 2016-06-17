@@ -53,8 +53,7 @@ public class AttributesBucketReact extends AbstractBucket {
 
     public WebElement get(final String name) {
         return items.stream()
-                .map(e -> e.findElement(BY_HEADER))
-                .filter(e -> name.equals(e.getText()))
+                .filter(e -> name.equals(e.findElement(BY_HEADER).getText()))
                 .findFirst()
                 .orElseThrow(() -> new NoSuchElementException("Cannot find attribute: " + name));
     }
