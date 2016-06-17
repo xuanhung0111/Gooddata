@@ -32,8 +32,8 @@ public class FiltersBucketReact extends AbstractBucket {
     public FiltersBucketReact configDateFilter(String period) {
         WebElement filter = getDateFilter();
         filter.click();
-        Graphene.createPageFragment(DateFilterPickerPanel.class,
-                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser)).select(period);
+        Graphene.createPageFragment(DateFilterPickerPanelReact.class,
+                waitForElementVisible(DateFilterPickerPanelReact.LOCATOR, browser)).select(period);
         assertTrue(getFilterTextHelper(filter).endsWith(": " + period));
         return this;
     }
@@ -98,8 +98,8 @@ public class FiltersBucketReact extends AbstractBucket {
     public List<String> getDateFilterOptions() {
         WebElement filter = getDateFilter();
         filter.click();
-        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
-                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+        DateFilterPickerPanelReact panel = Graphene.createPageFragment(DateFilterPickerPanelReact.class,
+                waitForElementVisible(DateFilterPickerPanelReact.LOCATOR, browser));
         List<String> ret = panel.getPeriods();
         filter.click();
         waitForFragmentNotVisible(panel);
@@ -140,10 +140,10 @@ public class FiltersBucketReact extends AbstractBucket {
         throw new UnsupportedOperationException();
     }
 
-    private DateFilterPickerPanel openDatePanelOfFilter(WebElement filter) {
+    private DateFilterPickerPanelReact openDatePanelOfFilter(WebElement filter) {
         filter.click();
-        return Graphene.createPageFragment(DateFilterPickerPanel.class,
-                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+        return Graphene.createPageFragment(DateFilterPickerPanelReact.class,
+                waitForElementVisible(DateFilterPickerPanelReact.LOCATOR, browser));
     }
 
     private String getFilterTextHelper(WebElement filter) {

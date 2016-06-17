@@ -7,12 +7,6 @@
         </classes>
     </test>
 
-    <test name="date-granularity-switch" enabled="true">
-        <classes>
-            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.DateGranularitySwitchTest" />
-        </classes>
-    </test>
-
     <test name="noncommon-date" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.NoncommonDateTest" />
