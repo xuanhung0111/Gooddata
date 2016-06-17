@@ -30,8 +30,5 @@ public class CoupaInstanceFragment extends AbstractGreyPagesFragment {
         waitForElementVisible(this.apiUrl).sendKeys(apiUrl);
         waitForElementVisible(this.apiKey).sendKeys(apiKey);
         Graphene.guardHttp(createCoupaInstanceButton).click();
-        JSONObject json = loadJSON();
-        Assert.assertEquals(json.getJSONObject("coupaInstance").getString("apiUrl"), apiUrl);
-        System.out.println("Coupa instance with apiURL: " + apiUrl + "was created");
     }
 }
