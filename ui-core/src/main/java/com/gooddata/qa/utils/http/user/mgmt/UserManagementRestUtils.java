@@ -34,7 +34,7 @@ public final class UserManagementRestUtils {
 
     private static final String USER_PROFILE_LINK = "/gdc/account/profile/";
     private static final String GROUPS_URI = "/gdc/internal/usergroups";
-    private static final String DOMAIN_USER_LINK = "/gdc/account/domains/default/users";
+    private static final String DOMAIN_USER_LINK = "/gdc/account/domains/%s/users";
     private static final String USER_GROUP_MODIFY_MEMBERS_LINK = "/gdc/userGroups/%s/modifyMembers";
     private static final String USERS_LINK = "/gdc/projects/%s/users";
     private static final String ROLE_LINK = "/gdc/projects/%s/roles/%s";
@@ -125,9 +125,10 @@ public final class UserManagementRestUtils {
      * @param password
      * @return new user uri or return existing uri if this user does exist in the system
      */
-    public static String createUser(final RestApiClient restApiClient, final String username,
-            final String password) throws ParseException, JSONException, IOException {
-        final Optional<JSONObject> userProfile = Optional.ofNullable(getUserProfileByEmail(restApiClient, username));
+    public static String createUser(final RestApiClient restApiClient, final String userDomain,
+            final String username, final String password) throws ParseException, JSONException, IOException {
+        final Optional<JSONObject> userProfile = 
+                Optional.ofNullable(getUserProfileByEmail(restApiClient, userDomain, username));
         if (userProfile.isPresent()) {
             log.info("the user " + username + " does exist in the server already. "
                     + "Please check deletion process to avoid this case");
@@ -137,8 +138,8 @@ public final class UserManagementRestUtils {
         final String contentBody = CREATE_USER_CONTENT_BODY.get()
                 .replace("${userEmail}", username)
                 .replace("${userPassword}", password);
-        return getJsonObject(restApiClient, restApiClient.newPostMethod(DOMAIN_USER_LINK, contentBody),
-                HttpStatus.CREATED).getString("uri");
+        return getJsonObject(restApiClient, restApiClient.newPostMethod(format(DOMAIN_USER_LINK, userDomain),
+                contentBody), HttpStatus.CREATED).getString("uri");
     }
 
     /**
@@ -157,10 +158,10 @@ public final class UserManagementRestUtils {
      * @param restApiClient
      * @param userEmail
      */
-    public static void deleteUserByEmail(final RestApiClient restApiClient, final String userEmail)
-            throws ParseException, IOException, JSONException {
+    public static void deleteUserByEmail(final RestApiClient restApiClient, final String userDomain,
+            final String userEmail) throws ParseException, IOException, JSONException {
         
-        final JSONObject userProfile = getUserProfileByEmail(restApiClient, userEmail);
+        final JSONObject userProfile = getUserProfileByEmail(restApiClient, userDomain, userEmail);
 
         if (Objects.nonNull(userProfile)) {
             final String userProfileUri = userProfile.getJSONObject("links").getString("self");
@@ -176,13 +177,13 @@ public final class UserManagementRestUtils {
      * @param email
      * @return user profile in json object format
      */
-    public static JSONObject getUserProfileByEmail(final RestApiClient restApiClient, final String email)
-            throws ParseException, IOException {
+    public static JSONObject getUserProfileByEmail(final RestApiClient restApiClient, final String userDomain,
+            final String email) throws ParseException, IOException {
         if (email == null || email.trim().equals("")) {
             return null;
         }
 
-        final String userUri = DOMAIN_USER_LINK + "?login=" + email.replace("@", "%40");
+        final String userUri = format(DOMAIN_USER_LINK, userDomain) + "?login=" + email.replace("@", "%40");
 
         try {
             return getJsonObject(restApiClient, userUri).getJSONObject("accountSettings")

@@ -188,7 +188,8 @@ public class SplashScreenTest extends DashboardsTest {
             openUrl(getIndigoDashboardsPageUri());
 
             // check that we are not on dashboards page
-            waitForElementVisible(By.className("s-displayed"), browser);
+            // instead of that, viewer user should have been switch to OLD dashboard page
+            waitForElementVisible(By.className("s-displayed"), browser, 300);
             waitForStringMissingInUrl("/dashboards");
 
         } finally {

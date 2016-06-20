@@ -57,7 +57,7 @@ public class WalkmeTest extends AbstractUITest {
 
     @Test(groups = PROJECT_INIT_GROUP)
     public void registerNewUser() throws ParseException, JSONException, IOException {
-        deleteUserByEmail(getRestApiClient(), REGISTRATION_USER);
+        deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), REGISTRATION_USER);
 
         initRegistrationPage();
 
@@ -107,7 +107,7 @@ public class WalkmeTest extends AbstractUITest {
 
     @AfterClass(alwaysRun = true)
     public void tearDown() throws ParseException, JSONException, IOException {
-        deleteUserByEmail(getRestApiClient(), REGISTRATION_USER);
+        deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), REGISTRATION_USER);
     }
 
     private String getProjectId(String name) {

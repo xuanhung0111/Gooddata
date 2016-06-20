@@ -41,7 +41,8 @@ public class ProjectSwitchTest extends AbstractCsvUploaderTest {
         newAdminUser = generateEmail(testParams.getUser());
         newAdminPassword = testParams.getPassword();
 
-        newAdminUserUri = UserManagementRestUtils.createUser(getRestApiClient(), newAdminUser, newAdminPassword);
+        newAdminUserUri = UserManagementRestUtils.createUser(getRestApiClient(), testParams.getUserDomain(),
+                newAdminUser, newAdminPassword);
 
         addUserToProject(newAdminUser, UserRoles.ADMIN);
 

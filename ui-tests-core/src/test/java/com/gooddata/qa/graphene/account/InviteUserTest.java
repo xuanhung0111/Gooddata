@@ -130,7 +130,7 @@ public class InviteUserTest extends AbstractProjectTest {
 
             ++expectedMessageCount;
         } finally {
-            UserManagementRestUtils.deleteUserByEmail(getRestApiClient(), nonRegistedUser);
+            UserManagementRestUtils.deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), nonRegistedUser);
         }
     }
 

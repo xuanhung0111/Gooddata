@@ -157,7 +157,8 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
     }
 
     private String addImapUserToProject(String email, String password) throws ParseException, IOException, JSONException {
-        String userUri = UserManagementRestUtils.createUser(getRestApiClient(), email, password);
+        String userUri = UserManagementRestUtils.createUser(getRestApiClient(), testParams.getUserDomain(), email,
+                password);
         UserManagementRestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(),
                 email, UserRoles.ADMIN);
 

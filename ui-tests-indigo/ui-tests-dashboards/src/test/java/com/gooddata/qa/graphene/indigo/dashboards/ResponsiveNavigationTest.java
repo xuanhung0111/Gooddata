@@ -40,7 +40,8 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
         testUser = generateEmail(testParams.getUser());
         testUserPassword = testParams.getPassword();
         
-        UserManagementRestUtils.createUser(getRestApiClient(), testUser, testUserPassword);
+        UserManagementRestUtils.createUser(getRestApiClient(), testParams.getUserDomain(),
+                testUser, testUserPassword);
         addUserToProject(testUser, UserRoles.ADMIN);
 
         logout();
@@ -161,7 +162,7 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
     public void tearDown() throws IOException, JSONException {
         logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
 
-        UserManagementRestUtils.deleteUserByEmail(getRestApiClient(), testUser);
+        UserManagementRestUtils.deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), testUser);
     }
 
     private boolean isDeviceSupportHamburgerMenu() {

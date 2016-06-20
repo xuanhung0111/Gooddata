@@ -47,7 +47,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
     public void checkOverviewPageShowAfterLogoutAndSignIn() throws ParseException, JSONException, IOException {
         String newUser = generateEmail(testParams.getUser());
 
-        UserManagementRestUtils.createUser(getRestApiClient(), newUser, testParams.getPassword());
+        UserManagementRestUtils.createUser(getRestApiClient(), testParams.getUserDomain(), newUser, testParams.getPassword());
         addUserToProject(newUser, UserRoles.ADMIN);
 
         try {
@@ -64,7 +64,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
 
         } finally {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
-            UserManagementRestUtils.deleteUserByEmail(getRestApiClient(), newUser);
+            UserManagementRestUtils.deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), newUser);
         }
     }
 

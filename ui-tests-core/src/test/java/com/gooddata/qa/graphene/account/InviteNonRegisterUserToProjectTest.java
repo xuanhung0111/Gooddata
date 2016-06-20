@@ -156,7 +156,8 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
 
     private void deleteUserIfExist(RestApiClient restApiClient, String userEmail)
             throws ParseException, JSONException, IOException {
-        JSONObject userProfile = UserManagementRestUtils.getUserProfileByEmail(restApiClient, userEmail);
+        JSONObject userProfile = UserManagementRestUtils.getUserProfileByEmail(restApiClient, testParams.getUserDomain(),
+                userEmail);
         if (Objects.nonNull(userProfile)) {
             String userProfileUri = userProfile.getJSONObject("links").getString("self");
             UserManagementRestUtils.deleteUserByUri(restApiClient, userProfileUri);
