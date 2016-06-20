@@ -8,7 +8,7 @@
     <packaging>pom</packaging>
 
     <name>GoodData UI tests with Graphene (using TestNG)</name>
-    <url>https://confluence.intgdc.com/display/Quality/Graphene+UI+Tests</url>
+    <url>https://confluence.intgdc.com/display/plat/Graphene+UI+Test</url>
 
     <modules>
         <module>ui-fragments</module>
@@ -43,6 +43,7 @@
         <targetFolder>${user.dir}${file.separator}${test.module}${file.separator}target</targetFolder>
         <browserDownloadFolder>${targetFolder}${file.separator}downloads</browserDownloadFolder>
         <language>en-US</language>
+        <user.domain>default</user.domain>
         <csvFolder>${targetFolder}${file.separator}csv</csvFolder>
         <video.recording>false</video.recording>
 
@@ -382,6 +383,10 @@
                                             <property>
                                                 <name>browserstack.build</name>
                                                 <value>${browserstack.build}</value>
+                                            </property>
+                                            <property>
+                                                <name>user.domain</name>
+                                                <value>${user.domain}</value>
                                             </property>
                                         </systemProperties>
                                     </configuration>

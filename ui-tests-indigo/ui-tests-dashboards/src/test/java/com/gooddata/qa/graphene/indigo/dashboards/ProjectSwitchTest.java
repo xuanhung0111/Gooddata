@@ -56,9 +56,10 @@ public class ProjectSwitchTest  extends DashboardWithWidgetsTest {
         embededDashboardUser = generateUniqueUserEmail(testParams.getUser());
         embededDashboardUserPassword = testParams.getPassword();
 
-        newAdminUserUri = UserManagementRestUtils.createUser(getRestApiClient(), newAdminUser, newAdminPassword);
-        embededDashboardUserUri = UserManagementRestUtils.createUser(
-                getRestApiClient(),embededDashboardUser, embededDashboardUserPassword);
+        newAdminUserUri = UserManagementRestUtils.createUser(getRestApiClient(), testParams.getUserDomain(),
+                newAdminUser, newAdminPassword);
+        embededDashboardUserUri = UserManagementRestUtils.createUser(getRestApiClient(),
+                testParams.getUserDomain(), embededDashboardUser, embededDashboardUserPassword);
 
         addUserToProject(newAdminUser, UserRoles.ADMIN);
         addUserToProject(embededDashboardUser, UserRoles.DASHBOARD_ONLY);

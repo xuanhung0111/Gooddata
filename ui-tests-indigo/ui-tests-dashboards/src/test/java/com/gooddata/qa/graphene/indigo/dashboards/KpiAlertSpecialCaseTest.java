@@ -304,7 +304,7 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
     public void removeUserAfterSettingAlert() throws JSONException, IOException {
         String newImapUser = generateEmail(imapUser);
 
-        UserManagementRestUtils.createUser(getRestApiClient(), newImapUser, imapPassword);
+        UserManagementRestUtils.createUser(getRestApiClient(), testParams.getUserDomain(), newImapUser, imapPassword);
         addUserToProject(newImapUser, UserRoles.ADMIN);
 
         String kpiName = generateUniqueName();
@@ -320,7 +320,7 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
 
             logoutAndLoginAs(imapUser, imapPassword);
 
-            deleteUserByEmail(getRestApiClient(), newImapUser);
+            deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), newImapUser);
 
             updateCsvDataset(DATASET_NAME, csvFilePath);
 
@@ -330,7 +330,7 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
         } finally {
             logoutAndLoginAs(imapUser, imapPassword);
 
-            deleteUserByEmail(getRestApiClient(), newImapUser);
+            deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), newImapUser);
 
             getMdService().removeObjByUri(indigoDashboardUri);
         }

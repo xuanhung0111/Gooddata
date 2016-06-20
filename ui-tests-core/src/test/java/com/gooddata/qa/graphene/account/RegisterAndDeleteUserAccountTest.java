@@ -97,7 +97,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
      */
     @Test(groups = PROJECT_INIT_GROUP)
     public void checkWalkme() throws ParseException, JSONException, IOException {
-        deleteUserByEmail(getRestApiClient(), REGISTRATION_USER);
+        deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), REGISTRATION_USER);
 
         initRegistrationPage();
         registrationPage.registerNewUser(registrationForm);
@@ -159,7 +159,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     @Test(groups = PROJECT_INIT_GROUP)
     public void loginAsUnverifiedUserAfterRegistering()
             throws ParseException, JSONException, IOException, MessagingException {
-        deleteUserByEmail(getRestApiClient(), REGISTRATION_USER);
+        deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), REGISTRATION_USER);
 
         initRegistrationPage();
 
@@ -213,7 +213,11 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
     @Test(groups = {PROJECT_INIT_GROUP, "sanity"})
     public void registerNewUser() throws MessagingException, IOException, ParseException, JSONException {
-        deleteUserByEmail(getRestApiClient(), REGISTRATION_USER);
+        if (!testParams.isClusterEnvironment() || testParams.isProductionEnvironment()) {
+            log.warning("Register New User is not tested on PI or Production environment");
+            return;
+        }
+        deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), REGISTRATION_USER);
 
         initRegistrationPage();
 
@@ -309,7 +313,8 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
     @AfterClass(alwaysRun = true)
     public void tearDown() throws ParseException, JSONException, IOException {
-        deleteUserByEmail(getRestApiClient(), REGISTRATION_USER);
+        if (!testParams.isClusterEnvironment() || testParams.isProductionEnvironment()) return;
+        deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), REGISTRATION_USER);
     }
 
     private void openProject(String projectName) {
