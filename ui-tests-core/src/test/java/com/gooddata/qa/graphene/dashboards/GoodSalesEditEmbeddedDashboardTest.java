@@ -69,7 +69,8 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
         newAdminUser = generateEmail(testParams.getUser());
         newAdminPassword = testParams.getPassword();
 
-        UserManagementRestUtils.createUser(getRestApiClient(), newAdminUser, newAdminPassword);
+        UserManagementRestUtils.createUser(getRestApiClient(), testParams.getUserDomain(),
+                newAdminUser, newAdminPassword);
         addUserToProject(newAdminUser, UserRoles.ADMIN);
 
         logout();
@@ -276,7 +277,7 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
     public void tearDown() throws JSONException, ParseException, IOException {
         logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
 
-        UserManagementRestUtils.deleteUserByEmail(getRestApiClient(), newAdminUser);
+        UserManagementRestUtils.deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), newAdminUser);
     }
 
     private EmbeddedDashboard initEmbeddedDashboard(String dashboardName) {
