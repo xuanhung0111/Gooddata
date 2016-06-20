@@ -90,16 +90,20 @@ public class AnalysisPage extends AbstractFragment {
     public AnalysisPage drag(WebElement source, WebElement target) {
         startDrag(source);
         try {
+            if (!waitForElementVisible(target).getAttribute("class").contains("adi-droppable-active")) {
+                getActions().moveToElement(target).perform();
+                return this;
+            }
+
             // In some specific cases, the target to be dropped is not in viewport,
             // so the selenium script when dragging and dropping element to
             // the target will have a risk that it cannot drop to the right position of target element
             // and element will not be droppable.
             // The solution is move element continuously until the target element is in viewport and droppable.
             Predicate<WebDriver> droppable = browser -> {
-                getActions().moveToElement(waitForElementPresent(target)).perform();
+                getActions().moveToElement(target).perform();
 
-                String elementAttribute = target.getAttribute("class");
-                return elementAttribute.contains("adi-droppable-hover") || elementAttribute.contains("is-active");
+                return target.getAttribute("class").contains("adi-droppable-hover");
             };
 
             Graphene.waitGui().until(droppable);
@@ -186,7 +190,7 @@ public class AnalysisPage extends AbstractFragment {
     }
 
     public AnalysisPage removeAttribute(String attr) {
-        return drag(getAttributesBucket().get(attr),
+        return drag(getAttributesBucket().get(attr).findElement(By.className("adi-bucket-item-header")),
                 () -> waitForElementPresent(BY_TRASH_PANEL, browser));
     }
 
