@@ -92,7 +92,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     public void initData() throws JSONException, IOException {
         userManagementAdmin = generateEmail(testParams.getUser());
         userManagementPassword = testParams.getPassword();
-        createUser(getRestApiClient(), userManagementAdmin, userManagementPassword);
+        createUser(getRestApiClient(), testParams.getUserDomain(), userManagementAdmin, userManagementPassword);
 
         domainAdminUser = testParams.getUser();
         editorUser = testParams.getEditorUser();
@@ -602,7 +602,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
 
     @AfterClass
     public void deleteAccount() throws ParseException, IOException, JSONException {
-        deleteUserByEmail(getRestApiClient(), userManagementAdmin);
+        deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), userManagementAdmin);
     }
 
     private void checkEditorCannotAccessUserGroupsLinkInDashboardPage(PermissionsDialog permissionsDialog) {

@@ -157,7 +157,8 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
 
             ++expectedMessageCount;
         } finally {
-            UserManagementRestUtils.deleteUserByEmail(getRestApiClient(), nonRegistedUser);
+            UserManagementRestUtils.deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(),
+                    nonRegistedUser);
         }
     }
 
@@ -215,7 +216,7 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
     }
 
     private boolean isUserUsingMuf(String mufUri, String userEmail) throws JSONException, IOException {
-        final JSONObject userProfile = getUserProfileByEmail(restApiClient, userEmail);
+        final JSONObject userProfile = getUserProfileByEmail(restApiClient, testParams.getUserDomain(), userEmail);
         if(Objects.isNull(userProfile))
             return false;
         final String userProfileUri = userProfile.getJSONObject("links").getString("self");

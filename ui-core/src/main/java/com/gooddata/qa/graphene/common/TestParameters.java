@@ -34,6 +34,7 @@ public class TestParameters {
     private int extendedTimeoutMultiple;
     private String folderSeparator;
     private boolean reuseProject = false;
+    private String userDomain;
     // set this to what `host` is proxied to
     // (e.g. set hostProxy=staging3.intgdc.com if host is localhost:8443 and proxied to staging3)
     private String hostProxy;
@@ -66,6 +67,7 @@ public class TestParameters {
         if (reuseProject) projectId = loadProperty("projectId");
         hostProxy = loadProperty("hostProxy");
         languageCode = loadProperty("language");
+        userDomain = loadProperty("user.domain");
     }
 
     /**
@@ -192,13 +194,23 @@ public class TestParameters {
         return languageCode;
     }
 
+    public String getUserDomain() {
+        return userDomain;
+    }
     /**
      * Some test cases should be executed only on cluster.
      * E.g.
      * * Kpi alert evaluation via Sendrid (3rd party) - dependency on 3rd party system
      */
     public boolean isClusterEnvironment() {
-        return Stream.of(".*secure.*\\.gooddata\\.com", "staging.*\\.intgdc\\.com", "perf\\.getgooddata\\.com", ".*\\.eu\\.gooddata\\.com")
+        return Stream.of("ponies\\.intgdc\\.com", "zebroids\\.intgdc\\.com", "donkeys\\.intgdc\\.com",
+                "whitelabeled\\.intgdc\\.com", ".*secure.*\\.gooddata\\.com", "staging.*\\.intgdc\\.com",
+                "perf\\.getgooddata\\.com", ".*\\.eu\\.gooddata\\.com")
+                .anyMatch(this.host::matches);
+    }
+
+    public boolean isProductionEnvironment() {
+        return Stream.of("whitelabeled\\.intgdc\\.com", ".*secure.*\\.gooddata\\.com", ".*\\.eu\\.gooddata\\.com")
                 .anyMatch(this.host::matches);
     }
 }

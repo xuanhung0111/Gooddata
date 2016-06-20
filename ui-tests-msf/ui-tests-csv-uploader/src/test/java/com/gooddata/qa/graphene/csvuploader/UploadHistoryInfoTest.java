@@ -112,7 +112,8 @@ public class UploadHistoryInfoTest extends AbstractCsvUploaderTest {
     }
 
     private String getFullNameOf(String userEmail) throws ParseException, IOException, JSONException {
-        JSONObject userInfo = UserManagementRestUtils.getUserProfileByEmail(getRestApiClient(), userEmail);
+        JSONObject userInfo = UserManagementRestUtils.getUserProfileByEmail(getRestApiClient(), testParams.getUserDomain(),
+                userEmail);
         return userInfo.getString("firstName") + " " + userInfo.getString("lastName");
     }
 }
