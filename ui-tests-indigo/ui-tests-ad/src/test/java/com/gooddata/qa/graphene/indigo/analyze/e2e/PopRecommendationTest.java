@@ -51,7 +51,7 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
                 ".adi-chart-container .highcharts-legend-item tspan"), browser).getText(),
                 containsString("# of Activities - previous year"));
         assertTrue(isElementPresent(cssSelector(
-                ".adi-chart-container .highcharts-series [fill=\"rgb(00,131,255)\"]"), browser));
+                ".adi-chart-container .highcharts-series [fill=\"rgb(20,178,226)\"]"), browser));
 
         assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
     }
@@ -93,7 +93,7 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
                 ".adi-chart-container .highcharts-legend-item tspan"), browser).getText(),
                 containsString(METRIC_NUMBER_OF_ACTIVITIES + " - previous year"));
         assertTrue(isElementPresent(cssSelector(
-                ".adi-chart-container .highcharts-series [fill=\"rgb(00,131,255)\"]"), browser));
+                ".adi-chart-container .highcharts-series [fill=\"rgb(20,178,226)\"]"), browser));
 
         assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-with-period"), browser));
     }
