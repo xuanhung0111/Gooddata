@@ -107,6 +107,11 @@ public abstract class AbstractProjectTest extends AbstractUITest {
             Screenshots.takeScreenshot(browser, projectTitle + "-created", this.getClass());
         }
 
+        projectTitle = testParams.getProjectId().substring(0, 6) + "-" + projectTitle;
+
+        ProjectRestUtils.updateProjectTitle(getRestApiClient(), getProject(), projectTitle);
+        log.info("Project title: " + projectTitle);
+
         if (addUsersWithOtherRoles) addUsersWithOtherRolesToProject();
     }
 
