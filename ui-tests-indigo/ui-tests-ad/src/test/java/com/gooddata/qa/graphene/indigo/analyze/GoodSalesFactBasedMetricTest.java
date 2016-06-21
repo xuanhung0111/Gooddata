@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_ACTIVITY_DATE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_DURATION;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
@@ -30,9 +32,8 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReac
 
 public class GoodSalesFactBasedMetricTest extends GoodSalesAbstractAnalyseTest {
 
-    private static final String SUM_OF_AMOUNT = "Sum of " + METRIC_AMOUNT;
-    private static final String DURATION = "Duration";
-    private static final String ACTIVITY_DATE = "Activity (Date)";
+    private static final String SUM_OF_AMOUNT = "Sum of " + FACT_AMOUNT;
+    private static final String SUM_OF_ACTIVITY_DATE = "Sum of " + FACT_ACTIVITY_DATE;
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -43,7 +44,7 @@ public class GoodSalesFactBasedMetricTest extends GoodSalesAbstractAnalyseTest {
     public void createSimpleMetricFromFact() {
         final MetricsBucket metricsBucket = analysisPageReact.getMetricsBucket();
 
-        assertEquals(analysisPageReact.addMetric(METRIC_AMOUNT, FieldType.FACT)
+        assertEquals(analysisPageReact.addMetric(FACT_AMOUNT, FieldType.FACT)
                 .getMetricsBucket()
                 .getMetricConfiguration(SUM_OF_AMOUNT)
                 .expandConfiguration()
@@ -70,13 +71,13 @@ public class GoodSalesFactBasedMetricTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testMetricAggregations() {
-        MetricConfiguration metricConfiguration = analysisPageReact.addMetric(METRIC_AMOUNT, FieldType.FACT)
+        MetricConfiguration metricConfiguration = analysisPageReact.addMetric(FACT_ACTIVITY_DATE, FieldType.FACT)
             .getMetricsBucket()
-            .getMetricConfiguration(SUM_OF_AMOUNT)
+            .getMetricConfiguration(SUM_OF_ACTIVITY_DATE)
             .expandConfiguration();
         assertEquals(metricConfiguration.getAggregation(), "Sum");
         ChartReportReact report = analysisPageReact.waitForReportComputing().getChartReport();
-        assertEquals(report.getYaxisTitle(), SUM_OF_AMOUNT);
+        assertEquals(report.getYaxisTitle(), SUM_OF_ACTIVITY_DATE);
 
         assertTrue(isEqualCollection(metricConfiguration.getAllAggregations(),
                 asList("Sum", "Minimum", "Maximum", "Average", "Running sum", "Median")));
@@ -87,18 +88,18 @@ public class GoodSalesFactBasedMetricTest extends GoodSalesAbstractAnalyseTest {
         aggregations.put("Average", "Avg ");
         aggregations.put("Running sum", "Runsum of ");
         aggregations.put("Median", "Median ");
-        String metricFromAmountTitle = SUM_OF_AMOUNT;
+        String metricFromAmountTitle = SUM_OF_ACTIVITY_DATE;
 
         for (Map.Entry<String, String> entry: aggregations.entrySet()) {
             metricConfiguration.changeAggregation(entry.getKey());
             analysisPageReact.waitForReportComputing();
-            metricFromAmountTitle = entry.getValue() + METRIC_AMOUNT;
+            metricFromAmountTitle = entry.getValue() + FACT_ACTIVITY_DATE;
             assertEquals(analysisPageReact.getChartReport().getYaxisTitle(), metricFromAmountTitle);
         }
 
-        assertEquals(analysisPageReact.addMetric(METRIC_AMOUNT, FieldType.FACT)
+        assertEquals(analysisPageReact.addMetric(FACT_ACTIVITY_DATE, FieldType.FACT)
                 .getMetricsBucket()
-                .getMetricConfiguration(SUM_OF_AMOUNT)
+                .getMetricConfiguration(SUM_OF_ACTIVITY_DATE)
                 .expandConfiguration()
                 .getAggregation(), "Sum");
         assertTrue(analysisPageReact.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
@@ -119,10 +120,10 @@ public class GoodSalesFactBasedMetricTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"}, description = "https://jira.intgdc.com/browse/CL-7777")
     public void testAggregationFunctionList() {
-        analysisPageReact.addMetric(METRIC_AMOUNT, FieldType.FACT);
+        analysisPageReact.addMetric(FACT_AMOUNT, FieldType.FACT);
 
         assertEquals(analysisPageReact.getMetricsBucket()
-                .getMetricConfiguration("Sum of " + METRIC_AMOUNT)
+                .getMetricConfiguration("Sum of " + FACT_AMOUNT)
                 .expandConfiguration()
                 .getAllAggregations(),
             asList("Sum", "Average", "Minimum", "Maximum", "Median", "Running sum"));
@@ -141,9 +142,9 @@ public class GoodSalesFactBasedMetricTest extends GoodSalesAbstractAnalyseTest {
     @Test(dependsOnGroups = {"init"}, dataProvider = "factMetricCombination")
     public void shouldNotCreateDuplicateMetricFromFact(boolean pop, boolean percent) {
         MetricConfiguration configuration = analysisPageReact.addDate()
-            .addMetric(ACTIVITY_DATE, FieldType.FACT)
+            .addMetric(FACT_ACTIVITY_DATE, FieldType.FACT)
             .getMetricsBucket()
-            .getMetricConfiguration("Sum of " + ACTIVITY_DATE)
+            .getMetricConfiguration("Sum of " + FACT_ACTIVITY_DATE)
             .expandConfiguration();
 
         if (pop) configuration.showPop();
@@ -153,7 +154,7 @@ public class GoodSalesFactBasedMetricTest extends GoodSalesAbstractAnalyseTest {
         // class="s-bucket-item s-id-dt_activity_activity_generated_sum_9b39e371f6bc8e93b15843c6794f6968 ..."
         // and identifier will be dt_activity_activity_generated_sum_9b39e371f6bc8e93b15843c6794f6968
         final String identifier = Stream.of(analysisPageReact.getMetricsBucket()
-            .get((percent ? "% " : "") + "Sum of " + ACTIVITY_DATE)
+            .get((percent ? "% " : "") + "Sum of " + FACT_ACTIVITY_DATE)
             .getAttribute("class")
             .split(" "))
             .filter(e -> e.startsWith("s-id-"))
@@ -161,34 +162,34 @@ public class GoodSalesFactBasedMetricTest extends GoodSalesAbstractAnalyseTest {
             .get()
             .split("-")[2];
 
-        configuration = analysisPageReact.removeMetric((percent ? "% " : "") + "Sum of " + ACTIVITY_DATE)
-            .addMetric(ACTIVITY_DATE, FieldType.FACT)
+        configuration = analysisPageReact.removeMetric((percent ? "% " : "") + "Sum of " + FACT_ACTIVITY_DATE)
+            .addMetric(FACT_ACTIVITY_DATE, FieldType.FACT)
             .getMetricsBucket()
-            .getMetricConfiguration("Sum of " + ACTIVITY_DATE)
+            .getMetricConfiguration("Sum of " + FACT_ACTIVITY_DATE)
             .expandConfiguration();
 
         if (pop) configuration.showPop();
         if (percent) configuration.showPercents();
 
         assertTrue(analysisPageReact.getMetricsBucket()
-            .get((percent ? "% " : "") + "Sum of " + ACTIVITY_DATE)
+            .get((percent ? "% " : "") + "Sum of " + FACT_ACTIVITY_DATE)
             .getAttribute("class")
             .contains(identifier));
 
         if (!pop && !percent) {
-            analysisPageReact.addMetric(ACTIVITY_DATE, FieldType.FACT);
+            analysisPageReact.addMetric(FACT_ACTIVITY_DATE, FieldType.FACT);
             assertEquals(browser.findElements(className("s-id-" + identifier)).size(), 2);
         }
     }
 
     @Test(dependsOnGroups = {"init"})
     public void testMetricFromFact() {
-        String sumOfAmount = "Sum of " + METRIC_AMOUNT;
-        String sumOfDuration = "Sum of " + DURATION;
-        String averageAmount = "Avg " + METRIC_AMOUNT;
-        String runningSumOfDuration = "Runsum of " + DURATION;
+        String sumOfAmount = "Sum of " + FACT_AMOUNT;
+        String sumOfDuration = "Sum of " + FACT_DURATION;
+        String averageAmount = "Avg " + FACT_AMOUNT;
+        String runningSumOfDuration = "Runsum of " + FACT_DURATION;
 
-        analysisPageReact.addMetric(METRIC_AMOUNT, FieldType.FACT);
+        analysisPageReact.addMetric(FACT_AMOUNT, FieldType.FACT);
         MetricConfiguration amountConfiguration = analysisPageReact.getMetricsBucket()
                 .getMetricConfiguration(sumOfAmount);
         assertTrue(amountConfiguration.isConfigurationCollapsed());
@@ -196,7 +197,7 @@ public class GoodSalesFactBasedMetricTest extends GoodSalesAbstractAnalyseTest {
         amountConfiguration.expandConfiguration().changeAggregation("Average");
         assertTrue(isEqualCollection(analysisPageReact.getMetricsBucket().getItemNames(), singleton(averageAmount)));
 
-        analysisPageReact.addMetric(DURATION, FieldType.FACT);
+        analysisPageReact.addMetric(FACT_DURATION, FieldType.FACT);
         MetricConfiguration durationConfiguration = analysisPageReact.getMetricsBucket()
                 .getMetricConfiguration(sumOfDuration);
         assertTrue(durationConfiguration.isConfigurationCollapsed());

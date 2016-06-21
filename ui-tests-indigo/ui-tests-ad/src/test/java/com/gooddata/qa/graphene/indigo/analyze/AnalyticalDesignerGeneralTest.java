@@ -84,8 +84,6 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"init"}, groups = {"prepare"})
     public void loadMetrics() {
-        initAnalysePage();
-
         metrics = getMdService().find(getProject(), Metric.class)
             .stream()
             .map(Entry::getTitle)
@@ -103,8 +101,6 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"prepare"})
     public void testCustomDiscovery() {
-        initAnalysePage();
-
         String metric = doSafetyMetricAction(analysisPageReact::addMetric, "testCustomDiscovery");
         ChartReportReact report = analysisPageReact.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
@@ -126,7 +122,6 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
     @Test(dependsOnGroups = {"prepare"})
     public void testWithAttribute() {
         String attribute = getRandomAttribute();
-        initAnalysePage();
 
         assertEquals(analysisPageReact.addAttribute(attribute).getExplorerMessage(), "Now select a measure to display");
 
@@ -145,8 +140,6 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"prepare"})
     public void dragMetricToColumnChartShortcutPanel() {
-        initAnalysePage();
-
         final Supplier<WebElement> recommendation = () ->
             waitForElementPresent(ShortcutPanel.AS_A_COLUMN_CHART.getLocator(), browser);
 
@@ -175,8 +168,6 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"prepare"})
     public void dragMetricToTrendShortcutPanel() {
-        initAnalysePage();
-
         final Supplier<WebElement> recommendation = () ->
             waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
 
@@ -202,8 +193,6 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"prepare"})
     public void testSimpleContribution() {
-        initAnalysePage();
-
         String metric = doSafetyMetricAction(analysisPageReact::addMetric, "testSimpleContribution");
         final String attribute = doSafetyAttributeAction(metric, analysisPageReact::addAttribute, "testSimpleContribution");
 
@@ -234,8 +223,6 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"prepare"})
     public void testAnotherApproachToShowContribution() {
-        initAnalysePage();
-
         String metric = doSafetyMetricAction(analysisPageReact::addMetric, "testAnotherApproachToShowContribution");
         ChartReportReact report = analysisPageReact.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
@@ -280,8 +267,6 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"prepare"})
     public void testSimpleComparison() {
-        initAnalysePage();
-
         String metric = doSafetyMetricAction(analysisPageReact::addMetric, "testSimpleComparison");
         ChartReportReact report = analysisPageReact.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
@@ -332,7 +317,6 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
         List<String> badMetrics = Lists.newArrayList();
         String metric;
 
-        initAnalysePage();
         final AttributesBucketReact categoriesBucket = analysisPageReact.getAttributesBucket();
         final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
 
@@ -387,8 +371,6 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"prepare"})
     public void displayInColumnChartWithOnlyMetric() {
-        initAnalysePage();
-
         String metric = doSafetyMetricAction(analysisPageReact::addMetric, "displayInColumnChartWithOnlyMetric");
         ChartReportReact report = analysisPageReact.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
@@ -414,7 +396,6 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"prepare"})
     public void displayWhenDraggingFirstMetric() {
-        initAnalysePage();
         final AttributesBucketReact categoriesBucket = analysisPageReact.getAttributesBucket();
         final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
 
@@ -436,8 +417,6 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"prepare"})
     public void exportVisualizationWithOneAttributeInChart() {
-        initAnalysePage();
-
         assertEquals(analysisPageReact.addAttribute(getRandomAttribute()).getExplorerMessage(),
                 "Now select a measure to display");
         assertFalse(analysisPageReact.getPageHeader().isExportButtonEnabled());
@@ -445,7 +424,6 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"prepare"})
     public void filterOnDateAttribute() {
-        initAnalysePage();
         final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         String metric = doSafetyMetricAction(
@@ -463,8 +441,6 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"prepare"})
     public void testDateInCategoryAndDateInFilter() {
-        initAnalysePage();
-
         doSafetyMetricAction(
                 data -> analysisPageReact.addMetric(data).addDate(),
                 "testDateInCategoryAndDateInFilter");
@@ -476,7 +452,6 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"prepare"})
     public void trendingRecommendationOverrideDateFilter() {
-        initAnalysePage();
         final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         String metric = doSafetyMetricAction(
@@ -512,7 +487,6 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"prepare"})
     public void dragAndDropAttributeToFilterBucket() {
-        initAnalysePage();
         final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         String metric = doSafetyMetricAction(analysisPageReact::addMetric, "dragAndDropAttributeToFilterBucket");
@@ -530,8 +504,6 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"prepare"})
     public void addFilterDoesNotHideRecommendation() {
-        initAnalysePage();
-
         String metric = doSafetyMetricAction(analysisPageReact::addMetric, "addFilterDoesNotHideRecommendation");
         doSafetyAttributeAction(metric, analysisPageReact::addAttribute, "addFilterDoesNotHideRecommendation");
 
@@ -551,7 +523,6 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"prepare"})
     public void testSimplePoP() {
-        initAnalysePage();
         final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         final String metric1 = doSafetyMetricAction(
@@ -577,7 +548,6 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"prepare"})
     public void testAnotherApproachToShowPoP() {
-        initAnalysePage();
         final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         doSafetyMetricAction(analysisPageReact::addMetric, "testAnotherApproachToShowPoP");
@@ -603,7 +573,6 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"prepare"})
     public void compararisonRecommendationOverrideDateFilter() {
-        initAnalysePage();
         final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         String metric = doSafetyMetricAction(

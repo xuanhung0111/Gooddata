@@ -50,6 +50,7 @@ public class GoodSalesCustomDateDimensionsTest extends AbstractAnalyseTest {
     @Override
     public void initStartPage() {
         startPageContext = new StartPageContext() {
+
             @Override
             public void waitForStartPageLoaded() {
                 waitForFragmentVisible(analysisPageReact);
@@ -59,8 +60,7 @@ public class GoodSalesCustomDateDimensionsTest extends AbstractAnalyseTest {
             public String getStartPage() {
                 //load fiscal data set as default 
                 //because FF is only refreshed when url is different from previous one
-                return PAGE_UI_ANALYSE_PREFIX.replace("analyze", "analyze-new") + testParams.getProjectId()
-                        + "/reportId/edit?dataset=" + FISCAL_DATASET_ID;
+                return PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/reportId/edit?dataset=" + FISCAL_DATASET_ID;
             }
         };
     }

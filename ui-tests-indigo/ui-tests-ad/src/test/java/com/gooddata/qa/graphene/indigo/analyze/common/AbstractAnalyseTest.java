@@ -36,8 +36,7 @@ public abstract class AbstractAnalyseTest extends AbstractProjectTest {
 
             @Override
             public String getStartPage() {
-                return PAGE_UI_ANALYSE_PREFIX.replace("analyze", "analyze-new") +
-                        testParams.getProjectId() + "/reportId/edit";
+                return PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/reportId/edit";
             }
         };
     }

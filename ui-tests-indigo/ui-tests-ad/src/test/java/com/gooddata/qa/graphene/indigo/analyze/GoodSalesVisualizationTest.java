@@ -67,8 +67,6 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testWithAttribute() {
-        initAnalysePage();
-
         assertEquals(analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE)
                 .getExplorerMessage(), "Now select a measure to display");
 
@@ -86,8 +84,6 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testResetFunction() {
-        initAnalysePage();
-
         ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).getChartReport();
         assertThat(report.getTrackersCount(), equalTo(1));
         RecommendationContainer recommendationContainer =
@@ -107,7 +103,6 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void disableExportForUnexportableVisualization() {
-        initAnalysePage();
         final AnalysisPageHeaderReact pageHeader = analysisPageReact.getPageHeader();
         ChartReportReact report = analysisPageReact.addMetric(METRIC_AMOUNT).getChartReport();
         assertEquals(report.getTrackersCount(), 1);
@@ -125,7 +120,6 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void resetSpecialReports() {
-        initAnalysePage();
         analysisPageReact.resetToBlankState();
 
         analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACCOUNT).waitForReportComputing();
@@ -136,7 +130,6 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"}, description = "https://jira.intgdc.com/browse/CL-6401")
     public void gridlinesShouldBeCheckedWhenExportBarChart() {
-        initAnalysePage();
         analysisPageReact.addMetric(METRIC_AMOUNT)
                 .addAttribute(ATTR_STAGE_NAME)
                 .changeReportType(ReportType.BAR_CHART)
@@ -189,8 +182,6 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void exportCustomDiscovery() {
-        initAnalysePage();
-
         assertTrue(analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .changeReportType(ReportType.TABLE)
@@ -239,8 +230,6 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void exportVisualizationWithOneAttributeInChart() {
-        initAnalysePage();
-
         assertEquals(analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE).getExplorerMessage(),
                 "Now select a measure to display");
         assertFalse(analysisPageReact.getPageHeader().isExportButtonEnabled());
@@ -248,7 +237,6 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void switchReportHasOneMetricManyAttributes() {
-        initAnalysePage();
         analysisPageReact.changeReportType(ReportType.TABLE)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
@@ -273,7 +261,6 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void switchReportHasManyMetricsManyAttributes() {
-        initAnalysePage();
         analysisPageReact.changeReportType(ReportType.TABLE)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
@@ -298,7 +285,6 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void switchReportWithDateAttributes() {
-        initAnalysePage();
         final StacksBucket stacksBucket = analysisPageReact.getStacksBucket();
         final AttributesBucketReact categoriesBucket = analysisPageReact.getAttributesBucket();
 
@@ -361,8 +347,6 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void addStackByIfMoreThanOneMetricInReport() {
-        initAnalysePage();
-
         analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addMetric("Best Case").addAttribute("Region");
 
         final StacksBucket stacksBucket = analysisPageReact.getStacksBucket();
@@ -372,14 +356,12 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void addSecondMetricIfAttributeInStackBy() {
-        initAnalysePage();
         analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE).addStack(ATTR_DEPARTMENT);
         assertEquals(analysisPageReact.getMetricsBucket().getWarningMessage(), "TO ADD ADDITIONAL MEASURE, REMOVE FROM STACK BY");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void createChartReportWithMoreThan3Metrics() {
-        initAnalysePage();
         List<String> legends = analysisPageReact.addMetric(METRIC_NUMBER_OF_LOST_OPPS)
                 .addMetric(METRIC_NUMBER_OF_OPEN_OPPS)
                 .addMetric(METRIC_NUMBER_OF_OPPORTUNITIES)

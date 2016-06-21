@@ -34,7 +34,7 @@ public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest
 
     private static final String UNIQUE_ID = UUID.randomUUID().toString().substring(0, 10);
     private static final String NEW_PROJECT_NAME = "New-project-navigation-" + UNIQUE_ID;
-    private static final String ANALYZE_PAGE_URL = "analyze-new";
+    private static final String ANALYZE_PAGE_URL = "analyze";
 
     private String newAdminUser;
     private String newAdminPassword;

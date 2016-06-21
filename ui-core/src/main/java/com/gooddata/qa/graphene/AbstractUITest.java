@@ -7,7 +7,6 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.account.AccountPage;
 import com.gooddata.qa.graphene.fragments.account.LostPasswordPage;
 import com.gooddata.qa.graphene.fragments.account.RegistrationPage;
-import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataTypeSelect.ColumnType;
@@ -18,7 +17,6 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.disc.*;
 import com.gooddata.qa.graphene.fragments.i18n.LocalizationPage;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPageReact;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
@@ -56,7 +54,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     protected static final By BY_IFRAME = By.tagName("iframe");
     private static final By BY_SCHEDULES_LOADING = By.cssSelector(".loader");
 
-    protected static final String PAGE_UI_ANALYSE_PREFIX = "analyze-old/#/";
+    protected static final String PAGE_UI_ANALYSE_PREFIX = "analyze/#/";
     protected static final String PAGE_UI_PROJECT_PREFIX = "#s=/gdc/projects/";
     protected static final String ACCOUNT_PAGE = "account.html";
     protected static final String PAGE_LOGIN = ACCOUNT_PAGE + "#/login";
@@ -547,8 +545,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void initAnalysePage() {
-        openUrl(PAGE_UI_ANALYSE_PREFIX.replace("analyze", "analyze-new") + testParams.getProjectId()
-                + "/reportId/edit");
+        openUrl(PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/reportId/edit");
         waitForFragmentVisible(analysisPageReact);
     }
 
