@@ -21,29 +21,29 @@ import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 public class ColorPaletteTest extends AbstractAdE2ETest {
 
     private static final List<String> COLOR_PALETTE = asList(
-            "rgb(00,131,255)",
-            "rgb(00,192,142)",
-            "rgb(241,35,61)",
-            "rgb(239,134,00)",
-            "rgb(188,90,178)",
+            "rgb(20,178,226)",
+            "rgb(0,193,141)",
+            "rgb(229,77,66)",
+            "rgb(241,134,0)",
+            "rgb(171,85,163)",
 
-            "rgb(250,205,8)",
-            "rgb(148,161,173)",
-            "rgb(93,188,255)",
-            "rgb(216,141,206)",
-            "rgb(242,115,115)",
+            "rgb(250,218,35)",
+            "rgb(148,161,174)",
+            "rgb(107,191,216)",
+            "rgb(181,136,177)",
+            "rgb(238,135,128)",
 
-            "rgb(254,178,92)",
-            "rgb(137,216,187)",
-            "rgb(0,107,184)",
-            "rgb(0,131,96)",
-            "rgb(173,11,33)",
+            "rgb(241,171,84)",
+            "rgb(133,209,188)",
+            "rgb(41,117,170)",
+            "rgb(4,140,103)",
+            "rgb(181,60,51)",
 
-            "rgb(177,100,0)",
-            "rgb(133,54,125)",
-            "rgb(194,229,255)",
-            "rgb(201,238,225)",
-            "rgb(250,208,211)"
+            "rgb(163,101,46)",
+            "rgb(140,57,132)",
+            "rgb(136,219,244)",
+            "rgb(189,234,222)",
+            "rgb(239,197,194)"
     );
 
     private static final String LEGEND_COLOR_ATTRIBUTE = "fill";
