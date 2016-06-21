@@ -532,7 +532,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
 
     private void getMessagesFromInbox(ImapClient imapClient) throws MessagingException {
         for (String title : messages.keySet()) {
-            messages.put(title, waitForMessages(imapClient, GDEmails.NOREPLY, title, 1));
+            messages.put(title, waitForMessages(imapClient, GDEmails.NOREPLY, title));
         }
     }
 
