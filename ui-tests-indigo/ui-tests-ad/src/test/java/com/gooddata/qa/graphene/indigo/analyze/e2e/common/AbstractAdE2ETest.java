@@ -27,8 +27,7 @@ public abstract class AbstractAdE2ETest extends GoodSalesAbstractAnalyseTest {
 
             @Override
             public String getStartPage() {
-                return PAGE_UI_ANALYSE_PREFIX.replace("analyze-old", "analyze") +
-                        testParams.getProjectId() + "/reportId/edit";
+                return PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/reportId/edit";
             }
         };
     }

@@ -18,11 +18,11 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucketReact;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
 
 public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnalyseTest {
 
@@ -33,12 +33,12 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
 
     @Test(dependsOnGroups = {"init"})
     public void testOverrideDateFilter() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addDateFilter()
             .getFilterBuckets()
             .configDateFilter("Last year");
-        ChartReport report = analysisPage.getChartReport();
+        ChartReportReact report = analysisPageReact.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -46,10 +46,10 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select("This month").apply();
-        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity: This month");
-        analysisPage.waitForReportComputing();
-        if (analysisPage.isExplorerMessageVisible()) {
-            log.info("Error message: " + analysisPage.getExplorerMessage());
+        assertEquals(analysisPageReact.getFilterBuckets().getFilterText("Activity"), "Activity: This month");
+        analysisPageReact.waitForReportComputing();
+        if (analysisPageReact.isExplorerMessageVisible()) {
+            log.info("Error message: " + analysisPageReact.getExplorerMessage());
             log.info("Stop testing because of no data in [This month]");
             return;
         }
@@ -62,7 +62,7 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
 
     @Test(dependsOnGroups = {"init"})
     public void testSimpleComparison() {
-        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).getChartReport();
+        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -72,14 +72,14 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select(ATTR_ACTIVITY_TYPE).apply();
-        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": All");
+        assertTrue(analysisPageReact.waitForReportComputing().getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
+        assertEquals(analysisPageReact.getFilterBuckets().getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": All");
         assertEquals(report.getTrackersCount(), 4);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT);
-        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ATTR_DEPARTMENT));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ": All");
+        analysisPageReact.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing();
+        assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(ATTR_DEPARTMENT));
+        assertEquals(analysisPageReact.getFilterBuckets().getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ": All");
         assertEquals(report.getTrackersCount(), 2);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
         checkingOpenAsReport("testSimpleComparison");
@@ -87,9 +87,9 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
 
     @Test(dependsOnGroups = {"init"})
     public void testComparisonAndPoPAttribute() {
-        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
+        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
 
-        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).getChartReport();
+        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -99,19 +99,19 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select(ATTR_ACTIVITY_TYPE).apply();
-        analysisPage.waitForReportComputing();
-        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
-        assertEquals(filtersBucket.getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": All");
+        analysisPageReact.waitForReportComputing();
+        assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
+        assertEquals(filtersBucketReact.getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": All");
         assertEquals(report.getTrackersCount(), 4);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
         comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select("This month").apply();
-        analysisPage.waitForReportComputing();
-        assertEquals(filtersBucket.getFilterText("Activity"), "Activity: This month");
-        if (analysisPage.isExplorerMessageVisible()) {
-            log.info("Error message: " + analysisPage.getExplorerMessage());
+        analysisPageReact.waitForReportComputing();
+        assertEquals(filtersBucketReact.getFilterText("Activity"), "Activity: This month");
+        if (analysisPageReact.isExplorerMessageVisible()) {
+            log.info("Error message: " + analysisPageReact.getExplorerMessage());
             log.info("Stop testing because of no data in [This month]");
             return;
         }
@@ -120,8 +120,8 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
         assertEquals(legends.size(), 2);
         assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES + " - previous year", METRIC_NUMBER_OF_ACTIVITIES));
 
-        analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT);
-        assertEquals(filtersBucket.getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ": All");
+        analysisPageReact.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT);
+        assertEquals(filtersBucketReact.getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ": All");
         assertTrue(report.getTrackersCount() >= 1);
         legends = report.getLegends();
         assertEquals(legends.size(), 2);
@@ -131,25 +131,25 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
 
     @Test(dependsOnGroups = {"init"})
     public void testSimplePoP() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate();
-        assertTrue(analysisPage.getFilterBuckets()
+        assertTrue(analysisPageReact.getFilterBuckets()
                 .isFilterVisible("Activity"));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity: All time");
-        ChartReport report = analysisPage.getChartReport();
+        assertEquals(analysisPageReact.getFilterBuckets().getFilterText("Activity"), "Activity: All time");
+        ChartReportReact report = analysisPageReact.getChartReport();
         assertThat(report.getTrackersCount(), equalTo(6));
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
         recommendationContainer.getRecommendation(RecommendationStep.COMPARE).apply();
-        analysisPage.waitForReportComputing();
+        analysisPageReact.waitForReportComputing();
         assertTrue(report.getTrackersCount() >= 1);
         List<String> legends = report.getLegends();
         assertEquals(legends.size(), 2);
         assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES + " - previous year", METRIC_NUMBER_OF_ACTIVITIES));
 
-        analysisPage.addMetric(METRIC_SNAPSHOT_BOP);
+        analysisPageReact.addMetric(METRIC_SNAPSHOT_BOP).waitForReportComputing();
         assertTrue(report.getTrackersCount() >= 1);
         legends = report.getLegends();
         assertEquals(legends.size(), 2);
@@ -159,7 +159,7 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
 
     @Test(dependsOnGroups = {"init"})
     public void testAnotherApproachToShowPoP() {
-        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).getChartReport();
+        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -167,9 +167,9 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();
 
-        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
-        assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity: Last 4 quarters");
+        assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(DATE));
+        assertTrue(analysisPageReact.getFilterBuckets().isFilterVisible("Activity"));
+        assertEquals(analysisPageReact.getFilterBuckets().getFilterText("Activity"), "Activity: Last 4 quarters");
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
         checkingOpenAsReport("testAnotherApproachToShowPoP");
     }

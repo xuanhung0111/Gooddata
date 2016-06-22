@@ -16,7 +16,7 @@ public enum ReportType {
 
         @Override
         public String getStackByMessage() {
-            return "TO SEGMENT BY, A VISUALIZATION CAN HAVE ONLY ONE MEASURE";
+            return "TO SEGMENT BY, AN INSIGHT CAN HAVE ONLY ONE MEASURE";
         }
     },
 
@@ -37,7 +37,7 @@ public enum ReportType {
     }
 
     public String getStackByMessage() {
-        return "TO STACK BY, A VISUALIZATION CAN HAVE ONLY ONE MEASURE";
+        return "TO STACK BY, AN INSIGHT CAN HAVE ONLY ONE MEASURE";
     }
 
     @Override

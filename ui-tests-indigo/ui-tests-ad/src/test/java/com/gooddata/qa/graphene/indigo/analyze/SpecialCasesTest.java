@@ -36,15 +36,15 @@ public class SpecialCasesTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testAttributeLimitationInTableReport() {
-        analysisPage.getCataloguePanel().changeDataset(MANY_CLOUMNS_DATASET)
+        analysisPageReact.getCataloguePanel().changeDataset(MANY_CLOUMNS_DATASET)
             .filterCatalog(CatalogFilterType.ATTRIBUTES);
-        analysisPage.changeReportType(ReportType.TABLE);
+        analysisPageReact.changeReportType(ReportType.TABLE);
         Stream.of(ACCOUNT, DEPARTMENT, "Forecast Category", "Is Active", "Is Closed", "Is Won",
                 "Opportunity", PRODUCT, "Region", "Stag 1", "Stag 2", "Stag 3", "Stag 4", "Stag 5",
                 "Stag 6", "Stag 7", "Stag 8", "Stag 9", "Stage Name", "Status")
-                .forEach(analysisPage::addAttribute);
+                .forEach(analysisPageReact::addAttribute);
         takeScreenshot(browser, "testAttributeLimitationInTableReport-finishAdding20Attributes", getClass());
 
-        assertEquals(analysisPage.getAttributesBucket().getItemNames().size(), 20);
+        assertEquals(analysisPageReact.getAttributesBucket().getItemNames().size(), 20);
     }
 }
