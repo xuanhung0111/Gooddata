@@ -84,10 +84,10 @@ public class DashboardsPage extends AbstractFragment {
     private WebElement lockIcon;
 
     @FindBy(css = ".s-scheduleButton")
-    private WebElement scheduleButton;
+    protected WebElement scheduleButton;
 
     @FindBy(xpath = "//div[contains(@class,'s-mailScheduleDialog')]")
-    private DashboardScheduleDialog scheduleDialog;
+    protected DashboardScheduleDialog scheduleDialog;
 
     /**
      * Fragment represents link for saved view dialog on dashboard
