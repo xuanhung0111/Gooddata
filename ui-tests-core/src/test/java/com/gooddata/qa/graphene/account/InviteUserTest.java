@@ -52,8 +52,6 @@ public class InviteUserTest extends AbstractProjectTest {
         imapPassword = testParams.loadProperty("imap.password");
         imapUser = testParams.loadProperty("imap.user");
 
-        invitationSubject = projectTitle + "-" + testParams.getProjectDriver().name() + " Invitation";
-
         registrationForm = new RegistrationForm()
                 .withFirstName("FirstName " + uniqueString)
                 .withLastName("LastName " + uniqueString)
@@ -67,6 +65,7 @@ public class InviteUserTest extends AbstractProjectTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void getExpectedMessage() {
+        invitationSubject = projectTitle + " Invitation";
         expectedMessageCount = doActionWithImapClient(imapClient ->
                 imapClient.getMessagesCount(GDEmails.INVITATION, invitationSubject));
     }
