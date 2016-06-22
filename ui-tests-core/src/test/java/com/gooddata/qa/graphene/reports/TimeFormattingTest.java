@@ -5,10 +5,12 @@ import static com.gooddata.qa.graphene.enums.ResourceDirectory.UPLOAD_CSV;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Stream;
 
 import jxl.Sheet;
 import jxl.Workbook;
@@ -21,6 +23,7 @@ import com.gooddata.md.Fact;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
+import com.gooddata.qa.utils.PdfUtils;
 import com.gooddata.qa.utils.io.ResourceUtils;
 import com.google.common.collect.Lists;
 
@@ -72,6 +75,8 @@ public class TimeFormattingTest extends AbstractProjectTest {
 
         verifyExcelFile(new File(testParams.getDownloadFolder(),
                 reportPage.exportReport(ExportFormat.EXCEL_XLS) + ".xls"), timeFormatExpected, timeExpected);
+        verifyPdfFile(new File(testParams.getDownloadFolder(),
+                reportPage.exportReport(ExportFormat.PDF) + ".pdf"), timeFormatExpected, timeExpected);
     }
 
     private void verifyExcelFile(File excelFile, List<String> formatExpected, List<String> expected)
@@ -90,5 +95,11 @@ public class TimeFormattingTest extends AbstractProjectTest {
             actual.add(sheet.getCell(2, i).getContents());
         }
         assertEquals(actual, expected);
+    }
+
+    private void verifyPdfFile(File pdfFile, List<String> formatExpected, List<String> expected) {
+        final String pdfContent = PdfUtils.getTextContentFrom(pdfFile);
+        assertTrue(Stream.concat(formatExpected.stream(), expected.stream())
+            .allMatch(text -> pdfContent.contains(text)));
     }
 }

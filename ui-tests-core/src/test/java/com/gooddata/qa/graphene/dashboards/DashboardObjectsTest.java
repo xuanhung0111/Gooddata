@@ -98,7 +98,7 @@ public class DashboardObjectsTest extends AbstractProjectTest {
     public void printDashboardTest() {
         initDashboardsPage();
         String exportedDashboardName = dashboardsPage.printDashboardTab(0);
-        verifyDashboardExport(exportedDashboardName.replace(" ", "_"), expectedDashboardExportSize);
+        verifyDashboardExport(exportedDashboardName.replace(" ", "_"), "First Tab", expectedDashboardExportSize);
         checkRedBar(browser);
     }
 }
