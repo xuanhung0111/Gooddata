@@ -27,9 +27,9 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucketReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
@@ -42,7 +42,7 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void checkDefaultValueInDateRange() {
-        analysisPage.addDateFilter()
+        analysisPageReact.addDateFilter()
             .getFilterBuckets()
             .getFilter("Activity").click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
@@ -59,40 +59,40 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void switchingDateRangeNotComputeReport() {
-        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
+        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
 
-        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .addDateFilter()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 4);
-        assertEquals(filtersBucket.getFilterText("Activity"), "Activity: All time");
+        assertEquals(filtersBucketReact.getFilterText("Activity"), "Activity: All time");
 
-        WebElement dateFilter = filtersBucket.getFilter("Activity");
+        WebElement dateFilter = filtersBucketReact.getFilter("Activity");
         dateFilter.click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
         panel.changeToDateRangeSection();
-        assertFalse(analysisPage.isReportComputing());
+        assertFalse(analysisPageReact.isReportComputing());
         panel.changeToPresetsSection();
-        assertFalse(analysisPage.isReportComputing());
+        assertFalse(analysisPageReact.isReportComputing());
         dateFilter.click();
         waitForFragmentNotVisible(panel);
     }
 
     @Test(dependsOnGroups = {"init"})
     public void allowFilterByRange() throws ParseException {
-        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
+        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
 
-        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .addDateFilter()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 4);
-        assertEquals(filtersBucket.getFilterText("Activity"), "Activity: All time");
+        assertEquals(filtersBucketReact.getFilterText("Activity"), "Activity: All time");
 
-        filtersBucket.configDateFilterByRangeButNotApply("01/12/2014", "01/12/2015");
-        analysisPage.exportReport();
+        filtersBucketReact.configDateFilterByRangeButNotApply("01/12/2014", "01/12/2015");
+        analysisPageReact.exportReport();
         BrowserUtils.switchToLastTab(browser);
         waitForFragmentVisible(reportPage);
         takeScreenshot(browser, "allowDateFilterByRange-emptyFilters", getClass());
@@ -100,10 +100,10 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
         browser.close();
         BrowserUtils.switchToFirstTab(browser);
 
-        filtersBucket.configDateFilter("01/12/2014", "01/12/2015");
-        analysisPage.waitForReportComputing();
+        filtersBucketReact.configDateFilter("01/12/2014", "01/12/2015");
+        analysisPageReact.waitForReportComputing();
         assertEquals(report.getTrackersCount(), 4);
-        analysisPage.exportReport();
+        analysisPageReact.exportReport();
         BrowserUtils.switchToLastTab(browser);
         waitForFragmentVisible(reportPage);
         List<String> filters = reportPage.getFilters();
@@ -117,58 +117,58 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testDateInCategoryAndDateInFilter() {
-        assertTrue(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        assertTrue(analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addDate()
                 .getChartReport()
                 .getTrackersCount() >= 1);
-        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity: All time");
-        assertEquals(analysisPage.getAttributesBucket().getAllGranularities(),
+        assertEquals(analysisPageReact.getFilterBuckets().getFilterText("Activity"), "Activity: All time");
+        assertEquals(analysisPageReact.getAttributesBucket().getAllGranularities(),
                 Arrays.asList("Day", "Week (Sun-Sat)", "Month", "Quarter", "Year"));
         checkingOpenAsReport("testDateInCategoryAndDateInFilter");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void switchBetweenPresetsAndDataRange() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().getFilterBuckets().configDateFilter("Last 90 days");
-        analysisPage.waitForReportComputing();
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().getFilterBuckets().configDateFilter("Last 90 days");
+        analysisPageReact.waitForReportComputing();
 
-        WebElement dateFilter = analysisPage.getFilterBuckets().getFilter("Activity");
+        WebElement dateFilter = analysisPageReact.getFilterBuckets().getFilter("Activity");
         dateFilter.click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
         panel.changeToDateRangeSection();
-        assertFalse(analysisPage.isReportComputing());
+        assertFalse(analysisPageReact.isReportComputing());
         panel.configTimeFilter("01/14/2015", "04/13/2015");
-        analysisPage.waitForReportComputing();
+        analysisPageReact.waitForReportComputing();
 
         dateFilter.click();
         panel.changeToPresetsSection();
-        assertFalse(analysisPage.isReportComputing());
+        assertFalse(analysisPageReact.isReportComputing());
         panel.select("This month");
-        analysisPage.waitForReportComputing();
+        analysisPageReact.waitForReportComputing();
         checkingOpenAsReport("switchBetweenPresetsAndDataRange");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void showPercentAfterConfigDate() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                     .addDate()
                     .getFilterBuckets()
                     .configDateFilter("Last 90 days");
-        analysisPage.getMetricsBucket()
+        analysisPageReact.getMetricsBucket()
                     .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                     .expandConfiguration()
                     .showPercents();
-        analysisPage.waitForReportComputing();
+        analysisPageReact.waitForReportComputing();
         // wait for data labels rendered
         sleepTight(2000);
 
-        if (analysisPage.isExplorerMessageVisible()) {
-            log.info("Visual cannot be rendered! Message: " + analysisPage.getExplorerMessage());
+        if (analysisPageReact.isExplorerMessageVisible()) {
+            log.info("Visual cannot be rendered! Message: " + analysisPageReact.getExplorerMessage());
             return;
         }
 
-        ChartReport report = analysisPage.getChartReport();
+        ChartReportReact report = analysisPageReact.getChartReport();
         assertTrue(Iterables.all(report.getDataLabels(), new Predicate<String>() {
             @Override
             public boolean apply(String input) {
@@ -180,23 +180,23 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void popAfterConfigDate() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                     .addDate()
                     .getFilterBuckets()
                     .configDateFilter("Last 90 days");
 
-        analysisPage.getMetricsBucket()
+        analysisPageReact.getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
             .showPop();
 
-        analysisPage.waitForReportComputing();
-        if (analysisPage.isExplorerMessageVisible()) {
-            log.info("Visual cannot be rendered! Message: " + analysisPage.getExplorerMessage());
+        analysisPageReact.waitForReportComputing();
+        if (analysisPageReact.isExplorerMessageVisible()) {
+            log.info("Visual cannot be rendered! Message: " + analysisPageReact.getExplorerMessage());
             return;
         }
 
-        ChartReport report = analysisPage.getChartReport();
+        ChartReportReact report = analysisPageReact.getChartReport();
 
         assertTrue(isEqualCollection(report.getLegends(),
                 asList(METRIC_NUMBER_OF_ACTIVITIES + " - previous year", METRIC_NUMBER_OF_ACTIVITIES)));

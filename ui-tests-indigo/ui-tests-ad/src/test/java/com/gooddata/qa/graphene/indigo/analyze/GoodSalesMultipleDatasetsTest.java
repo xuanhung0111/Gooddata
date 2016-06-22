@@ -18,11 +18,11 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanelReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucketReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
@@ -62,7 +62,7 @@ public class GoodSalesMultipleDatasetsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void analyzeReportOnProductionData() {
-        ChartReport report = analysisPage.addMetric("Close Price", FieldType.FACT)
+        ChartReportReact report = analysisPageReact.addMetric("Close Price", FieldType.FACT)
                 .addDate()
                 .addStack("Industry")
                 .waitForReportComputing()
@@ -70,19 +70,19 @@ public class GoodSalesMultipleDatasetsTest extends AbstractAnalyseTest {
         takeScreenshot(browser, "analyzeReportOnProductionData", getClass());
         assertThat(report.getTrackersCount(), greaterThanOrEqualTo(1));
 
-        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
-        filtersBucket.configAttributeFilter("Industry", "Apparel Stores", "Consumer Services");
-        analysisPage.waitForReportComputing();
+        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
+        filtersBucketReact.configAttributeFilter("Industry", "Apparel Stores", "Consumer Services");
+        analysisPageReact.waitForReportComputing();
         assertThat(report.getTrackersCount(), greaterThanOrEqualTo(1));
         takeScreenshot(browser, "analyzeReportOnProductionData - apply attribute filter", getClass());
-        assertEquals(filtersBucket.getFilterText("Industry"), "Industry: Apparel Stores, Consumer Services\n(2)");
+        assertEquals(filtersBucketReact.getFilterText("Industry"), "Industry: Apparel Stores, Consumer Services\n(2)");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void analyzeReportOnPayrollData() {
-        analysisPage.getCataloguePanel().changeDataset(PAYROLL_DATASET);
+        analysisPageReact.getCataloguePanel().changeDataset(PAYROLL_DATASET);
 
-        ChartReport report = analysisPage.addMetric(AMOUNT, FieldType.FACT)
+        ChartReportReact report = analysisPageReact.addMetric(AMOUNT, FieldType.FACT)
             .addDate()
             .addStack("County")
             .waitForReportComputing()
@@ -90,17 +90,17 @@ public class GoodSalesMultipleDatasetsTest extends AbstractAnalyseTest {
         takeScreenshot(browser, "analyzeReportOnPayrollData", getClass());
         assertThat(report.getTrackersCount(), greaterThanOrEqualTo(1));
 
-        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
-        filtersBucket.configAttributeFilter("County", "Austin", "Clover");
-        analysisPage.waitForReportComputing();
+        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
+        filtersBucketReact.configAttributeFilter("County", "Austin", "Clover");
+        analysisPageReact.waitForReportComputing();
         assertThat(report.getTrackersCount(), greaterThanOrEqualTo(1));
         takeScreenshot(browser, "analyzeReportOnPayrollData - apply attribute filter", getClass());
-        assertEquals(filtersBucket.getFilterText("County"), "County: Austin, Clover");
+        assertEquals(filtersBucketReact.getFilterText("County"), "County: Austin, Clover");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void searchDataAfterSelectDataset() {
-        final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
+        final CataloguePanelReact cataloguePanel = analysisPageReact.getCataloguePanel();
 
         assertFalse(cataloguePanel.changeDataset(PRODUCTION_DATASET)
             .search(AMOUNT));

@@ -20,8 +20,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
 
 public class GoodSalesMetricFilterTest extends GoodSalesAbstractAnalyseTest {
 
@@ -39,13 +39,13 @@ public class GoodSalesMetricFilterTest extends GoodSalesAbstractAnalyseTest {
     @Test(dependsOnGroups = {"init"})
     public void replaceAttributeFilterByNewOne() {
         addFilterToMetric();
-        final MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
+        final MetricConfiguration metricConfiguration = analysisPageReact.getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES);
 
         assertTrue(metricConfiguration.removeFilter().canAddAnotherFilter());
 
         metricConfiguration.addFilter(ATTR_DEPARTMENT, "Inside Sales");
-        ChartReport report = analysisPage.waitForReportComputing().getChartReport();
+        ChartReportReact report = analysisPageReact.waitForReportComputing().getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         assertEquals(report.getYaxisTitle(), format("%s (%s: Inside Sales)",
                 METRIC_NUMBER_OF_ACTIVITIES, ATTR_DEPARTMENT));
@@ -53,29 +53,29 @@ public class GoodSalesMetricFilterTest extends GoodSalesAbstractAnalyseTest {
                 format("%s: Inside Sales", ATTR_DEPARTMENT));
         assertFalse(metricConfiguration.canAddAnotherFilter());
 
-        analysisPage.undo()
+        analysisPageReact.undo()
             .waitForReportComputing();
         metricConfiguration.expandConfiguration();
         assertFalse(metricConfiguration.canAddAnotherFilter());
 
-        analysisPage.redo()
+        analysisPageReact.redo()
             .waitForReportComputing();
         metricConfiguration.expandConfiguration();
         assertFalse(metricConfiguration.canAddAnotherFilter());
-        analysisPage.waitForReportComputing();
+        analysisPageReact.waitForReportComputing();
         checkingOpenAsReport("replaceAttributeFilterByNewOne");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void replaceMetricHasAttributeFilter() {
         addFilterToMetric();
-        analysisPage.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT)
+        analysisPageReact.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT)
             .waitForReportComputing();
-        assertTrue(analysisPage.getMetricsBucket()
+        assertTrue(analysisPageReact.getMetricsBucket()
                 .getMetricConfiguration(METRIC_AMOUNT)
                 .expandConfiguration()
                 .canAddAnotherFilter());
-        ChartReport report = analysisPage.getChartReport();
+        ChartReportReact report = analysisPageReact.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         assertEquals(report.getYaxisTitle(), METRIC_AMOUNT);
         checkingOpenAsReport("replaceMetricHasAttributeFilter");
@@ -83,19 +83,19 @@ public class GoodSalesMetricFilterTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void addAttributeFilterForMultipleMetrics() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
             .addFilter(ATTR_DEPARTMENT, "Direct Sales");
 
-        analysisPage.addMetric(METRIC_AMOUNT)
+        analysisPageReact.addMetric(METRIC_AMOUNT)
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_AMOUNT)
             .expandConfiguration()
             .addFilter(ATTR_DEPARTMENT, "Inside Sales");
 
-        ChartReport report = analysisPage.waitForReportComputing()
+        ChartReportReact report = analysisPageReact.waitForReportComputing()
             .getChartReport();
 
         assertEquals(report.getTrackersCount(), 2);
@@ -107,13 +107,13 @@ public class GoodSalesMetricFilterTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void searchOnlyAttributeElement() {
-        MetricConfiguration metricConfiguration = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        MetricConfiguration metricConfiguration = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
             .addFilterBySelectOnly(ATTR_ACTIVITY_TYPE, "Email");
 
-        ChartReport report = analysisPage.waitForReportComputing().getChartReport();
+        ChartReportReact report = analysisPageReact.waitForReportComputing().getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         assertEquals(report.getYaxisTitle(), format("%s (%s: Email)", METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE));
         assertEquals(metricConfiguration.getFilterText(), format("%s: Email", ATTR_ACTIVITY_TYPE));
@@ -123,20 +123,20 @@ public class GoodSalesMetricFilterTest extends GoodSalesAbstractAnalyseTest {
     public void checkReportWhenFilterContainManyCharacters() {
         String unselectedValue = "14 West";
 
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
             .addFilterWithLargeNumberValues(ATTR_ACCOUNT, unselectedValue);
-        analysisPage.waitForReportComputing();
+        analysisPageReact.waitForReportComputing();
 
         takeScreenshot(browser, "checkReportWhenFilterContainManyCharacters", getClass());
-        ChartReport report = analysisPage.getChartReport();
+        ChartReportReact report = analysisPageReact.getChartReport();
         assertThat(report.getYaxisTitle(), not(containsString("14 West")));
     }
 
     private void addFilterToMetric() {
-        MetricConfiguration metricConfiguration = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        MetricConfiguration metricConfiguration = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
@@ -144,7 +144,7 @@ public class GoodSalesMetricFilterTest extends GoodSalesAbstractAnalyseTest {
         assertTrue(metricConfiguration.canAddAnotherFilter());
 
         metricConfiguration.addFilter(ATTR_ACTIVITY_TYPE, "Email", "Phone Call", "Web Meeting");
-        ChartReport report = analysisPage.waitForReportComputing().getChartReport();
+        ChartReportReact report = analysisPageReact.waitForReportComputing().getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         assertEquals(report.getYaxisTitle(), format("%s (%s: Email, Phone Call, Web Meeting)",
                 METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE));
