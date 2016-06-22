@@ -52,4 +52,12 @@ public class EmbeddedDashboard extends DashboardsPage {
 
         return getDashboardEditBar();
     }
+
+    @Override
+    public DashboardScheduleDialog showDashboardScheduleDialog() {
+        waitForDashboardLoaded(browser);
+        waitForElementVisible(scheduleButton).click();
+        waitForElementVisible(scheduleDialog.getRoot());
+        return scheduleDialog;
+    }
 }
