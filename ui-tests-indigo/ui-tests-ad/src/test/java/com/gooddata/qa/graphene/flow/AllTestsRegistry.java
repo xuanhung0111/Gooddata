@@ -20,6 +20,7 @@ import com.gooddata.qa.graphene.indigo.analyze.GoodSalesMultipleDatasetsTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesShortcutRecommendationTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesTableReportTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesTrendingRecommendationTest;
+import com.gooddata.qa.graphene.indigo.analyze.GoodSalesUndoRedoSavedInsightTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesUndoTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesVisualizationTest;
 import com.gooddata.qa.graphene.indigo.analyze.SpecialCasesTest;
@@ -52,10 +53,12 @@ public class AllTestsRegistry {
             .register(GoodSalesTableReportTest.class)
             .register(GoodSalesTrendingRecommendationTest.class)
             .register(GoodSalesUndoTest.class)
+            .register(GoodSalesUndoRedoSavedInsightTest.class)
 //           .register(WalkmeTest.class) CL-9704: Walkme is not available on new AD
             .register(AnalyticalDesignerSanityTest.class)
             .register("testng-ad-permissions-MetricVisibility.xml")
             .register("testng-ad-permissions-ProjectNavigation.xml")
+            .register("testng-ad-permissions-InsightTest.xml")
             .register("testng-ad-ChartLabelFormat.xml")
             .register("testng-ad-MetricNumberFormat.xml")
             .toTextFile();

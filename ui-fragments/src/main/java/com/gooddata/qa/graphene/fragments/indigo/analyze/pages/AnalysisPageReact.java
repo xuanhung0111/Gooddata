@@ -220,11 +220,12 @@ public class AnalysisPageReact extends AbstractFragment {
     }
 
     public boolean isBlankState() {
-        return getFilterBuckets().isEmpty() &&
-            getMetricsBucket().isEmpty() &&
-            getAttributesBucket().isEmpty() &&
-            getStacksBucket().isEmpty() &&
-            getMainEditor().isEmpty();
+        return getFilterBuckets().isEmpty() 
+                && getMetricsBucket().isEmpty() 
+                && getAttributesBucket().isEmpty()
+                && getStacksBucket().isEmpty() 
+                && getMainEditor().isEmpty() 
+                && getPageHeader().isBlankState();
     }
 
     public AnalysisPageReact exportReport() {
@@ -302,6 +303,31 @@ public class AnalysisPageReact extends AbstractFragment {
                 waitForElementVisible(By.className("gd-header"), browser))
                 .switchProject(name);
 
+        return this;
+    }
+
+    public AnalysisPageReact openInsight(final String insight) {
+        getPageHeader().expandInsightSelection().openInsight(insight);
+        return this;
+    }
+
+    public AnalysisPageReact saveInsight() {
+        getPageHeader().saveInsight();
+        return this;
+    }
+
+    public AnalysisPageReact saveInsight(final String insight) {
+        getPageHeader().saveInsight(insight);
+        return this;
+    }
+
+    public AnalysisPageReact saveInsightAs(final String insight) {
+        getPageHeader().saveInsightAs(insight);
+        return this;
+    }
+
+    public AnalysisPageReact setInsightTitle(final String title) {
+        getPageHeader().setInsightTitle(title);
         return this;
     }
 }

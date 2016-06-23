@@ -547,9 +547,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     }
 
-    public void initAnalysePage() {
+    public AnalysisPageReact initAnalysePage() {
         openUrl(PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/reportId/edit");
-        waitForFragmentVisible(analysisPageReact);
+        return waitForFragmentVisible(analysisPageReact);
     }
 
     public void initAccountPage() {
