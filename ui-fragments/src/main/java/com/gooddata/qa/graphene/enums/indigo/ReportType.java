@@ -40,6 +40,10 @@ public enum ReportType {
         return "TO STACK BY, AN INSIGHT CAN HAVE ONLY ONE MEASURE";
     }
 
+    public String getLabel() {
+        return label;
+    }
+
     @Override
     public String toString() {
         return WordUtils.capitalize(label) + (this == TABLE ? "" : " chart");

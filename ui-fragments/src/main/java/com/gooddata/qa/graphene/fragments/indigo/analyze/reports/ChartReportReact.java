@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -104,6 +105,14 @@ public class ChartReportReact extends AbstractFragment {
             return Collections.emptyList();
 
         return getLabels(axisLabels);
+    }
+
+    public String getChartType() {
+        return Stream.of(getRoot().getAttribute("class").split("\\s+"))
+                .filter(e -> e.contains("s-visualization-"))
+                .map(e -> e.replace("s-visualization-", ""))
+                .findFirst()
+                .get();
     }
 
     private List<String[]> getTransformValueFormLegend() {

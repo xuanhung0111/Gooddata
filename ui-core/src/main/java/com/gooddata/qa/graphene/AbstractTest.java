@@ -87,7 +87,7 @@ public abstract class AbstractTest extends Arquillian {
 
     @BeforeMethod(alwaysRun = true)
     public void loadPlatformPageBeforeTestMethod(Method m) {
-        if (Arrays.asList(m.getAnnotation(Test.class).groups()).contains(PROJECT_INIT_GROUP)){
+        if (Arrays.asList(m.getAnnotation(Test.class).groups()).contains(PROJECT_INIT_GROUP)) {
             return;
         }
         openUrl(startPageContext.getStartPage());
