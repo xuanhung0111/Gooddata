@@ -22,6 +22,7 @@ import com.gooddata.qa.graphene.indigo.analyze.GoodSalesTrendingRecommendationTe
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesUndoRedoSavedInsightTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesUndoTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesVisualizationTest;
+import com.gooddata.qa.graphene.indigo.analyze.NonProductionDatasetInsightTest;
 import com.gooddata.qa.graphene.indigo.analyze.SpecialCasesTest;
 //import com.gooddata.qa.graphene.indigo.analyze.WalkmeTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
@@ -54,6 +55,7 @@ public class AllTestsRegistry {
             .register(GoodSalesUndoRedoSavedInsightTest.class)
 //           .register(WalkmeTest.class) CL-9704: Walkme is not available on new AD
             .register(AnalyticalDesignerSanityTest.class)
+            .register(NonProductionDatasetInsightTest.class)
             .register("testng-ad-permissions-MetricVisibility.xml")
             .register("testng-ad-permissions-ProjectNavigation.xml")
             .register("testng-ad-permissions-InsightTest.xml")
