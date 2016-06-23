@@ -2,82 +2,32 @@
 <suite name="GD_UI_Selenium_Tests">
 
     <test name="drill-report" enabled="true">
-        <groups>
-            <run>
-                <include name="i18n" />
-                <include name="precondition" />
-                <include name="createProject" />
-                <include name="projectInit" />
-                <include name="arquillian" />
-            </run>
-            <dependencies>
-                <group name="createProject" depends-on="projectInit" />
-                <group name="precondition" depends-on="createProject" />
-                <group name="i18n" depends-on="precondition" />
-            </dependencies>
-        </groups>
         <classes>
             <class name="com.gooddata.qa.graphene.i18n.EmbeddedDashboardDrillReportLocalizationTest" />
         </classes>
     </test>
 
     <test name="general-checking" enabled="true">
-        <groups>
-            <run>
-                <include name="i18n" />
-                <include name="precondition" />
-                <include name="createProject" />
-                <include name="projectInit" />
-                <include name="arquillian" />
-            </run>
-            <dependencies>
-                <group name="createProject" depends-on="projectInit" />
-                <group name="precondition" depends-on="createProject" />
-                <group name="i18n" depends-on="precondition" />
-            </dependencies>
-        </groups>
         <classes>
             <class name="com.gooddata.qa.graphene.i18n.EmbeddedDashboardLocalizationTest" />
         </classes>
     </test>
 
     <test name="saved-view" enabled="true">
-        <groups>
-            <run>
-                <include name="i18n" />
-                <include name="precondition" />
-                <include name="createProject" />
-                <include name="projectInit" />
-                <include name="arquillian" />
-            </run>
-            <dependencies>
-                <group name="createProject" depends-on="projectInit" />
-                <group name="precondition" depends-on="createProject" />
-                <group name="i18n" depends-on="precondition" />
-            </dependencies>
-        </groups>
         <classes>
             <class name="com.gooddata.qa.graphene.i18n.EmbeddedDashboardSavedViewLocalizationTest" />
         </classes>
     </test>
 
     <test name="dashboard-widget" enabled="true">
-        <groups>
-            <run>
-                <include name="i18n" />
-                <include name="precondition" />
-                <include name="createProject" />
-                <include name="projectInit" />
-                <include name="arquillian" />
-            </run>
-            <dependencies>
-                <group name="createProject" depends-on="projectInit" />
-                <group name="precondition" depends-on="createProject" />
-                <group name="i18n" depends-on="precondition" />
-            </dependencies>
-        </groups>
         <classes>
             <class name="com.gooddata.qa.graphene.i18n.EmbeddedDashboardWidgetSettingLocalizationTest" />
+        </classes>
+    </test>
+
+    <test name="manage-page" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.i18n.EmbeddedDashboardManagePageLocalizationTest" />
         </classes>
     </test>
 

@@ -26,7 +26,7 @@ public class EmbeddedDashboardDrillReportLocalizationTest extends GoodSalesAbstr
         projectTitle = "GoodSales-embeded-dashboard-saved-view-localization-test";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"precondition"})
+    @Test(dependsOnMethods = {"createAndUsingTestUser"}, groups = {"precondition"})
     public void createDrillReport() {
         initReportsPage();
         UiReportDefinition reportDefinition = new UiReportDefinition()

@@ -19,7 +19,7 @@ public class EmbeddedDashboardSavedViewLocalizationTest extends GoodSalesAbstrac
         projectTitle = "GoodSales-embeded-dashboard-saved-view-localization-test";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"precondition"})
+    @Test(dependsOnMethods = {"createAndUsingTestUser"}, groups = {"precondition"})
     public void initEmbeddedDashboardUri() {
         initDashboardsPage()
             .addNewDashboard(DASHBOARD_NAME);

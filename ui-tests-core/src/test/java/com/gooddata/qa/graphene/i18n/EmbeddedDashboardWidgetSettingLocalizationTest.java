@@ -31,7 +31,7 @@ public class EmbeddedDashboardWidgetSettingLocalizationTest extends GoodSalesAbs
         projectTitle = "GoodSales-embeded-dashboard-widget-setting-localization-test";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"precondition"})
+    @Test(dependsOnMethods = {"createAndUsingTestUser"}, groups = {"precondition"})
     public void initEmbeddedDashboardUri() {
         initDashboardsPage()
             .addNewDashboard(DASHBOARD_NAME);
