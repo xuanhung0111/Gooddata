@@ -111,7 +111,7 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
         analysisPageReact.addAttribute(ATTR_STAGE_NAME).waitForReportComputing();
         assertEquals(report.getTrackersCount(), 8);
 
-        analysisPageReact.addStack(ATTR_STAGE_NAME);
+        analysisPageReact.addStack(ATTR_STAGE_NAME).waitForReportComputing();
         assertEquals(report.getTrackersCount(), 8);
 
         assertFalse(pageHeader.isExportButtonEnabled());
