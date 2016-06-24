@@ -20,6 +20,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.*;
+import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -216,6 +217,11 @@ public class CataloguePanelReact extends AbstractFragment {
             .filter(e -> e.getAttribute("class").contains(type.toString()))
             .findFirst()
             .get();
+    }
+
+    public boolean isDatasetApplied(final String dataset) {
+        waitForItemLoaded();
+        return waitForElementVisible(className("data-source-picker"), browser).getText().equals(dataset);
     }
 
     private void waitForItemLoaded() {
