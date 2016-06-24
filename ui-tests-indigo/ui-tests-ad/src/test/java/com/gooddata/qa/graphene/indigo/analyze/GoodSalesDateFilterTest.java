@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
@@ -30,6 +31,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFil
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucketReact;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
+import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
@@ -201,6 +203,26 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
         assertTrue(isEqualCollection(report.getLegends(),
                 asList(METRIC_NUMBER_OF_ACTIVITIES + " - previous year", METRIC_NUMBER_OF_ACTIVITIES)));
         checkingOpenAsReport("popAfterConfigDate");
+    }
+
+    @Test(dependsOnGroups = {"init"}, description = "CL-9807: Problems with export of date filters")
+    public void exportDateFilter() {
+        final String dateFilterValue = "Last 4 quarters";
+        analysisPageReact.addDateFilter()
+                .getFilterBuckets()
+                .configDateFilter(dateFilterValue);
+        analysisPageReact.exportReport();
+        BrowserUtils.switchToLastTab(browser);
+        try {
+            waitForAnalysisPageLoaded(browser);
+            final ReportFilter reportFilter = reportPage.openFilterPanel();
+            takeScreenshot(browser, "export-date-filter", getClass());
+            assertTrue(reportFilter.getFilterElement("Quarter/Year (Activity) is the last 4 quarters").isDisplayed(),
+                    dateFilterValue + " filter is not displayed");
+            browser.close();
+        } finally {
+            BrowserUtils.switchToFirstTab(browser);
+        }
     }
 
     private String getTimeString(Calendar date) {
