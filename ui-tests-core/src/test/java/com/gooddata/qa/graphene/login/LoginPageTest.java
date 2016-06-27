@@ -1,16 +1,17 @@
 package com.gooddata.qa.graphene.login;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.testng.Assert.assertTrue;
 
 import org.json.JSONException;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractUITest;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 @Test(groups = {"login"}, description = "Tests for basic login functionality in GD platform")
@@ -34,38 +35,34 @@ public class LoginPageTest extends AbstractUITest {
 
     @Test
     public void gd_Login_001_LoginPanel() {
-        waitForElementVisible(loginFragment.getRoot());
-        Assert.assertTrue(loginFragment.allLoginElementsAvailable(), "Login panel with valid elements is available");
+        assertTrue(LoginFragment.getInstance(browser).allLoginElementsAvailable(),
+                "Login panel with valid elements is available");
     }
 
     @Test
     public void gd_Login_002_SignInAndSignOut() throws JSONException {
-        waitForElementVisible(loginFragment.getRoot());
+        LoginFragment.waitForPageLoaded(browser);
         signIn(false, UserRoles.ADMIN);
         logout();
-        waitForElementVisible(loginFragment.getRoot());
         Screenshots.takeScreenshot(browser, "logout-ui", this.getClass());
     }
 
     @Test
     public void gd_Login_003_SignInWithEmptyPassword() {
-        waitForElementVisible(loginFragment.getRoot());
-        loginFragment.login(testParams.getUser(), "", false);
-        loginFragment.checkPasswordInvalid();
+        LoginFragment.getInstance(browser).login(testParams.getUser(), "", false);
+        LoginFragment.getInstance(browser).checkPasswordInvalid();
     }
 
     @Test
     public void gd_Login_004_SignInWithInvalidPassword() {
-        waitForElementVisible(loginFragment.getRoot());
-        loginFragment.login(testParams.getUser(), "abcdefgh", false);
-        loginFragment.checkInvalidLogin();
+        LoginFragment.getInstance(browser).login(testParams.getUser(), "abcdefgh", false);
+        LoginFragment.getInstance(browser).checkInvalidLogin();
     }
 
     @Test
     public void gd_Login_005_SignInWithInvalidEmail() {
-        waitForElementVisible(loginFragment.getRoot());
-        loginFragment.login("email_invalid_format", "abcdefgh", false);
-        loginFragment.checkEmailInvalid();
+        LoginFragment.getInstance(browser).login("email_invalid_format", "abcdefgh", false);
+        LoginFragment.getInstance(browser).checkEmailInvalid();
     }
 
     @Test

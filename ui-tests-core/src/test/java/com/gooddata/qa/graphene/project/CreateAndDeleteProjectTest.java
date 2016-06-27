@@ -66,8 +66,8 @@ public class CreateAndDeleteProjectTest extends AbstractProjectTest {
     @Test(dependsOnMethods = {"renameProjectByOwner"})
     public void renameProjectByInvitedAdminUser() throws ParseException, IOException, JSONException {
         addUserToProject(invitedAdminUser, UserRoles.ADMIN);
-        logout();
-        loginFragment.login(invitedAdminUser, invitedAdminUserPassword, true);
+        logout()
+            .login(invitedAdminUser, invitedAdminUserPassword, true);
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
 
         initProjectsPage();

@@ -16,6 +16,7 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.google.common.collect.Iterables;
 
@@ -75,8 +76,9 @@ public class LostPasswordPage extends AbstractFragment {
         return waitForElementVisible(ERROR_MESSAGE_LOCATOR, browser).getText();
     }
 
-    public void backToLoginPage() {
+    public LoginFragment backToLoginPage() {
         waitForElementVisible(backToLoginLink).click();
+        return LoginFragment.getInstance(browser);
     }
 
     private String getResetPasswordLink(ImapClient imapClient, int expectedMessageCount)

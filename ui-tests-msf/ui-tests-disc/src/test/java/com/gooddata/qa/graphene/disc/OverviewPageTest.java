@@ -25,6 +25,7 @@ import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 public class OverviewPageTest extends AbstractOverviewProjectsTest {
@@ -325,7 +326,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
     private void logoutInDiscPage() {
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser).click();
         waitForElementVisible(BY_LOGOUT_LINK, browser).click();
-        waitForFragmentVisible(loginFragment);
+        LoginFragment.waitForPageLoaded(browser);
     }
 
     private void prepareDataForScheduledProject(OverviewProjectDetails overviewProject) {

@@ -25,6 +25,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.account.ChangePasswordDialog;
 import com.gooddata.qa.graphene.fragments.account.PersonalInfoDialog;
 import com.gooddata.qa.graphene.fragments.account.RegionalNumberFormattingDialog;
+import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 
 public class UserAccountSettingTest extends AbstractUITest {
 
@@ -168,24 +169,20 @@ public class UserAccountSettingTest extends AbstractUITest {
             assertTrue(changePasswordDialog.areAllInputsFilled());
 
             changePasswordDialog.discardChange();
-            logout();
-            waitForElementVisible(loginFragment.getRoot());
+            logout()
+                .login(user, NEW_PASSWORD, false);
+            LoginFragment.getInstance(browser).checkInvalidLogin();
 
-            loginFragment.login(user, NEW_PASSWORD, false);
-            loginFragment.checkInvalidLogin();
-
-            loginFragment.login(user, oldPassword, true);
+            LoginFragment.getInstance(browser).login(user, oldPassword, true);
             waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
 
             changePassword(oldPassword, NEW_PASSWORD);
 
-            logout();
-            waitForElementVisible(loginFragment.getRoot());
+            logout()
+                .login(user, oldPassword, false);
+            LoginFragment.getInstance(browser).checkInvalidLogin();
 
-            loginFragment.login(user, oldPassword, false);
-            loginFragment.checkInvalidLogin();
-
-            loginFragment.login(user, NEW_PASSWORD, true);
+            LoginFragment.getInstance(browser).login(user, NEW_PASSWORD, true);
             waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
 
         } catch(Exception e) {

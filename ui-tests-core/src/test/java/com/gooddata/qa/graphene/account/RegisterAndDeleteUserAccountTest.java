@@ -29,6 +29,7 @@ import com.gooddata.qa.graphene.AbstractUITest;
 import com.gooddata.qa.graphene.entity.account.RegistrationForm;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.account.InviteUserDialog;
+import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 
 public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
@@ -126,10 +127,8 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     public void selectLoginLink() {
         initRegistrationPage();
 
-        registrationPage.selectLoginLink();
-        waitForElementVisible(loginFragment.getRoot());
-
-        loginFragment.openRegistrationPage();
+        registrationPage.selectLoginLink()
+            .openRegistrationPage();
         waitForElementVisible(registrationPage.getRoot());
     }
 
@@ -187,15 +186,14 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         assertEquals(userProfilePage.getUserRole(), "", "Unverified admin should not show role");
         takeScreenshot(browser, "Unverified user has no role", this.getClass());
 
-        logout();
-        loginFragment.login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, false);
+        logout()
+            .login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, false);
         assertEquals(getPageErrorMessage(), NOT_FULLY_ACTIVATED_MESSAGE);
 
         openUrl(activationLink);
-        waitForElementVisible(loginFragment.getRoot());
-        assertEquals(loginFragment.getNotificationMessage(), ACTIVATION_SUCCESS_MESSAGE);
+        assertEquals(LoginFragment.getInstance(browser).getNotificationMessage(), ACTIVATION_SUCCESS_MESSAGE);
 
-        loginFragment.login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
+        LoginFragment.getInstance(browser).login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
         waitForDashboardPageLoaded(browser);
 
         initProjectsAndUsersPage();
@@ -229,13 +227,13 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         waitForDashboardPageLoaded(browser);
 
         openUrl(activationLink);
-        waitForElementVisible(loginFragment.getRoot());
+        LoginFragment.waitForPageLoaded(browser);
 
         takeScreenshot(browser, "register user successfully", this.getClass());
-        assertEquals(loginFragment.getNotificationMessage(), ACTIVATION_SUCCESS_MESSAGE);
+        assertEquals(LoginFragment.getInstance(browser).getNotificationMessage(), ACTIVATION_SUCCESS_MESSAGE);
 
         try {
-            loginFragment.login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
+            LoginFragment.getInstance(browser).login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
             waitForDashboardPageLoaded(browser);
 
             openProject(DEMO_PROJECT);
@@ -248,10 +246,9 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     @Test(groups = PROJECT_INIT_GROUP, dependsOnMethods = {"registerNewUser"})
     public void openAtivationLinkAfterRegistration() {
         openUrl(activationLink);
-        waitForElementVisible(loginFragment.getRoot());
-        assertEquals(loginFragment.getNotificationMessage(), ALREADY_ACTIVATED_MESSAGE);
+        assertEquals(LoginFragment.getInstance(browser).getNotificationMessage(), ALREADY_ACTIVATED_MESSAGE);
 
-        loginFragment.login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
+        LoginFragment.getInstance(browser).login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
     }
 
@@ -300,16 +297,15 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         initAccountPage();
 
         accountPage.tryDeleteAccountButDiscard();
-        logout();
-        loginFragment.login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
+        logout()
+            .login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
 
         initAccountPage();
         accountPage.deleteAccount();
-        waitForElementVisible(loginFragment.getRoot());
 
-        loginFragment.login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, false);
-        loginFragment.checkInvalidLogin();
+        LoginFragment.getInstance(browser).login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, false);
+        LoginFragment.getInstance(browser).checkInvalidLogin();
     }
 
     @AfterClass(alwaysRun = true)

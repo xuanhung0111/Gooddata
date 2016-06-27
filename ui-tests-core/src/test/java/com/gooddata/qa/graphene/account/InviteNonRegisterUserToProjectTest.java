@@ -34,6 +34,7 @@ import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.account.RegistrationForm;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.account.RegistrationPage;
+import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
@@ -127,10 +128,9 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
 
         logout();
         openUrl(invitationLink);
-        waitForElementVisible(loginFragment.getRoot());
-        assertEquals(loginFragment.getNotificationMessage(), JOINED_PROJECT_SUCCESS_MESSAGE);
+        assertEquals(LoginFragment.getInstance(browser).getNotificationMessage(), JOINED_PROJECT_SUCCESS_MESSAGE);
 
-        loginFragment.login(INVITATION_USER, INVITATION_USER_PASSWORD, true);
+        LoginFragment.getInstance(browser).login(INVITATION_USER, INVITATION_USER_PASSWORD, true);
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
 
         RestApiClient restApiClientInvitedUser = getRestApiClient(INVITATION_USER, INVITATION_USER_PASSWORD);
