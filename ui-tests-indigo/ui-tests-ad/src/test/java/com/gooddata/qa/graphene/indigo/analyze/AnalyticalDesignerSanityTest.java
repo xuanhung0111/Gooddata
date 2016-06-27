@@ -62,7 +62,10 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
         assertEquals(analysisPageReact.changeReportType(ReportType.LINE_CHART)
                 .getExplorerMessage(), "Now select a measure to display");
 
-        TableReportReact report = analysisPageReact.changeReportType(ReportType.TABLE).getTableReport();
+        TableReportReact report = analysisPageReact
+                .changeReportType(ReportType.TABLE)
+                .waitForReportComputing()
+                .getTableReport();
         assertThat(report.getHeaders().stream().map(String::toLowerCase).collect(toList()),
                 equalTo(asList(ATTR_ACTIVITY_TYPE.toLowerCase())));
         checkingOpenAsReport("testWithAttribute");
@@ -77,7 +80,7 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
             waitForElementPresent(ShortcutPanel.AS_A_COLUMN_CHART.getLocator(), browser);
 
         ChartReportReact report = analysisPageReact.drag(metric, recommendation)
-                    .getChartReport();
+                    .waitForReportComputing().getChartReport();
 
         assertThat(report.getTrackersCount(), equalTo(1));
         RecommendationContainer recommendationContainer =
@@ -98,8 +101,8 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
     public void testSimpleContribution() {
         ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
+                .waitForReportComputing()
                 .getChartReport();
-        analysisPageReact.waitForReportComputing();
         assertEquals(report.getTrackersCount(), 4);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -107,7 +110,7 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
         assertTrue(recommendationContainer
                 .isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_PERCENTS).apply();
-        assertTrue(analysisPageReact.isReportTypeSelected(ReportType.BAR_CHART));
+        assertTrue(analysisPageReact.waitForReportComputing().isReportTypeSelected(ReportType.BAR_CHART));
         assertEquals(report.getTrackersCount(), 4);
 
         MetricConfiguration metricConfiguration = analysisPageReact.getMetricsBucket()
@@ -116,9 +119,8 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
         assertTrue(metricConfiguration.isShowPercentEnabled());
         assertTrue(metricConfiguration.isShowPercentSelected());
 
-        analysisPageReact.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT);
-        assertTrue(analysisPageReact.isReportTypeSelected(ReportType.BAR_CHART));
-        analysisPageReact.waitForReportComputing();
+        assertTrue(analysisPageReact.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing()
+                .isReportTypeSelected(ReportType.BAR_CHART));
         assertEquals(report.getTrackersCount(), 2);
         assertTrue(metricConfiguration.isShowPercentEnabled());
         assertTrue(metricConfiguration.isShowPercentSelected());
@@ -126,7 +128,10 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
     }
     @Test(dependsOnGroups = {"init"})
     public void testSimpleComparison() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).getChartReport();
+        ChartReportReact report = analysisPageReact
+                .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .waitForReportComputing()
+                .getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -136,12 +141,13 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select(ATTR_ACTIVITY_TYPE).apply();
-        assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
+        assertTrue(analysisPageReact.waitForReportComputing().getAttributesBucket().getItemNames()
+                .contains(ATTR_ACTIVITY_TYPE));
         assertEquals(analysisPageReact.getFilterBuckets().getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": All");
         assertEquals(report.getTrackersCount(), 4);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        analysisPageReact.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT);
+        analysisPageReact.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing();
         assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(ATTR_DEPARTMENT));
         assertEquals(analysisPageReact.getFilterBuckets().getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ": All");
         assertEquals(report.getTrackersCount(), 2);
@@ -220,23 +226,25 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
     public void filterOnDateAttribute() {
         final FiltersBucketReact filtersBucket = analysisPageReact.getFilterBuckets();
 
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .addDateFilter()
-                .getChartReport();
-        assertEquals(report.getTrackersCount(), 4);
+                .waitForReportComputing();
+        assertEquals(analysisPageReact.getChartReport().getTrackersCount(), 4);
         assertEquals(filtersBucket.getFilterText("Activity"), "Activity: All time");
 
-        assertEquals(filtersBucket.configDateFilter("This year")
-                .getFilterText("Activity"), "Activity: This year");
-        assertTrue(report.getTrackersCount() >= 1);
+        filtersBucket.configDateFilter("This year");
+        analysisPageReact.waitForReportComputing();
+        assertEquals(filtersBucket.getFilterText("Activity"), "Activity: This year");
+        assertTrue(analysisPageReact.getChartReport().getTrackersCount() >= 1);
         checkingOpenAsReport("filterOnDateAttribute");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void testSimplePoP() {
         analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-            .addDate();
+            .addDate()
+            .waitForReportComputing();
         assertTrue(analysisPageReact.getFilterBuckets()
                 .isFilterVisible("Activity"));
         assertEquals(analysisPageReact.getFilterBuckets().getFilterText("Activity"), "Activity: All time");
@@ -265,33 +273,33 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
     public void replaceMetricByNewOne() {
         final MetricsBucket metricsBucket = analysisPageReact.getMetricsBucket();
 
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES);
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
         assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(METRIC_NUMBER_OF_ACTIVITIES)));
 
-        analysisPageReact.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT);
+        analysisPageReact.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT).waitForReportComputing();
         assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(METRIC_AMOUNT)));
 
-        analysisPageReact.changeReportType(ReportType.BAR_CHART);
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES);
+        analysisPageReact.changeReportType(ReportType.BAR_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .waitForReportComputing();
         assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT)));
 
-        analysisPageReact.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, EXPECTED);
+        analysisPageReact.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, EXPECTED).waitForReportComputing();
         assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(EXPECTED, METRIC_AMOUNT)));
 
-        analysisPageReact.changeReportType(ReportType.TABLE);
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES);
+        analysisPageReact.changeReportType(ReportType.TABLE).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .waitForReportComputing();
         assertTrue(isEqualCollection(metricsBucket.getItemNames(),
                 asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT, EXPECTED)));
 
-        analysisPageReact.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, REMAINING_QUOTA);
+        analysisPageReact.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, REMAINING_QUOTA).waitForReportComputing();
         assertTrue(isEqualCollection(metricsBucket.getItemNames(),
                 asList(REMAINING_QUOTA, METRIC_AMOUNT, EXPECTED)));
 
-        analysisPageReact.undo();
+        analysisPageReact.undo().waitForReportComputing();
         assertTrue(isEqualCollection(metricsBucket.getItemNames(),
                 asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT, EXPECTED)));
 
-        analysisPageReact.redo();
+        analysisPageReact.redo().waitForReportComputing();
         assertTrue(isEqualCollection(metricsBucket.getItemNames(),
                 asList(REMAINING_QUOTA, METRIC_AMOUNT, EXPECTED)));
         checkingOpenAsReport("replaceMetricByNewOne");
@@ -299,12 +307,10 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void dropAttributeToReportHaveOneMetric() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing();
-        ChartReportReact report = analysisPageReact.getChartReport();
-        assertEquals(report.getTrackersCount(), 4);
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE);
+        assertEquals(analysisPageReact.waitForReportComputing().getChartReport().getTrackersCount(), 4);
 
         analysisPageReact.addStack(ATTR_DEPARTMENT);
-        analysisPageReact.waitForReportComputing();
-        assertEquals(report.getTrackersCount(), 8);
+        assertEquals(analysisPageReact.waitForReportComputing().getChartReport().getTrackersCount(), 8);
     }
 }
