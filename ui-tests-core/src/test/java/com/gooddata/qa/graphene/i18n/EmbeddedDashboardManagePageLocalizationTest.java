@@ -1,15 +1,18 @@
 package com.gooddata.qa.graphene.i18n;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkLocalization;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_ACTIVITIES_BY_TYPE;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class EmbeddedDashboardLocalizationTest extends GoodSalesAbstractLocalizationTest {
+import com.gooddata.qa.graphene.fragments.reports.report.EmbeddedReportPage;
+
+public class EmbeddedDashboardManagePageLocalizationTest extends GoodSalesAbstractLocalizationTest {
 
     @BeforeClass(alwaysRun = true)
     public void setProjectTitle() {
-        projectTitle = "GoodSales-embeded-dashboard-localization-test";
+        projectTitle = "GoodSales-embeded-dashboard-manage-page-localization-test";
     }
 
     @Test(dependsOnMethods = {"createAndUsingTestUser"}, groups = {"precondition"})
@@ -21,37 +24,44 @@ public class EmbeddedDashboardLocalizationTest extends GoodSalesAbstractLocaliza
     }
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"i18n"})
-    public void checkDashboardPage() {
-        initEmbeddedDashboard();
+    public void checkMoveDialog() {
+        initEmbeddedDashboard()
+            .openEmbeddedReportsPage()
+            .selectReportsAndOpenMoveDialog(REPORT_ACTIVITIES_BY_TYPE);
         checkLocalization(browser);
     }
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"i18n"})
-    public void checkDashboardSettingsDialog() {
+    public void checkDeleteDialog() {
         initEmbeddedDashboard()
-            .editDashboard()
-            .openDashboardSettingsDialog();
+            .openEmbeddedReportsPage()
+            .selectReportsAndOpenDeleteDialog(REPORT_ACTIVITIES_BY_TYPE);
         checkLocalization(browser);
     }
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"i18n"})
-    public void checkDashboardScheduleDialog() {
+    public void checkPermissionDialog() {
         initEmbeddedDashboard()
-            .showDashboardScheduleDialog();
+            .openEmbeddedReportsPage()
+            .selectReportsAndOpenPermissionDialog(REPORT_ACTIVITIES_BY_TYPE);
         checkLocalization(browser);
     }
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"i18n"})
-    public void checkManagePage() {
+    public void checkFolderDialog() {
         initEmbeddedDashboard()
-            .openEmbeddedReportsPage();
+            .openEmbeddedReportsPage()
+            .clickAddFolderButton();
         checkLocalization(browser);
     }
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"i18n"})
-    public void checkReportPage() {
+    public void checkOpenExistingReport() {
         initEmbeddedDashboard()
-            .openEmbeddedReportPage();
+            .openEmbeddedReportsPage()
+            .getReportsList()
+            .openReport(REPORT_ACTIVITIES_BY_TYPE);
+        EmbeddedReportPage.waitForPageLoaded(browser);
         checkLocalization(browser);
     }
 }

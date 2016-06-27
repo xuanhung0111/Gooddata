@@ -61,6 +61,9 @@ public class ReportsPage extends AbstractFragment {
     @FindBy(className = "s-btn-delete___")
     private WebElement deleteReportButton;
 
+    @FindBy(className = "s-btn-permissions___")
+    private WebElement permissionButton;
+
     @FindBy(className = "s-group_by")
     private Select groupBy;
 
@@ -78,6 +81,11 @@ public class ReportsPage extends AbstractFragment {
 
     public void startCreateReport() {
         waitForElementVisible(createReportButton).click();
+    }
+
+    public ReportsPage clickAddFolderButton() {
+        waitForElementVisible(addFolderButton).click();
+        return this;
     }
 
     public ReportsPage addNewFolder(String folderName) {
@@ -114,9 +122,13 @@ public class ReportsPage extends AbstractFragment {
         return !waitForElementPresent(reportsList.getRoot()).isDisplayed();
     }
 
-    public void tryDeleteReports(String... reports) {
+    public void selectReportsAndOpenDeleteDialog(String... reports) {
         waitForFragmentVisible(reportsList).selectReports(reports);
         waitForElementVisible(deleteReportButton).click();
+    }
+
+    public void tryDeleteReports(String... reports) {
+        selectReportsAndOpenDeleteDialog(reports);
         waitForElementVisible(By.className("s-btn-delete"), browser).click();
     }
 
@@ -125,9 +137,18 @@ public class ReportsPage extends AbstractFragment {
         checkGreenBar(browser);
     }
 
-    public ReportsPage moveReportsToFolder(String folder, String... reports) {
+    public void selectReportsAndOpenPermissionDialog(String... reports) {
+        waitForFragmentVisible(reportsList).selectReports(reports);
+        waitForElementVisible(permissionButton).click();
+    }
+
+    public void selectReportsAndOpenMoveDialog(String... reports) {
         waitForFragmentVisible(reportsList).selectReports(reports);
         waitForElementVisible(moveReportButton).click();
+    }
+
+    public ReportsPage moveReportsToFolder(String folder, String... reports) {
+        selectReportsAndOpenMoveDialog(reports);
 
         waitForElementVisible(By.cssSelector(".c-ipeEditor:not([style*='display: none']) input"), browser).sendKeys(folder);
         waitForElementVisible(By.className("s-ipeSaveButton"), browser).click();
