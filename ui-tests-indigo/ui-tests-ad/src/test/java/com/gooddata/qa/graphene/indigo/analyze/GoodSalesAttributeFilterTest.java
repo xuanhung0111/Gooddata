@@ -2,8 +2,10 @@ package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -15,6 +17,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributeFilterPickerPanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucketReact;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucketReact;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
@@ -128,5 +131,23 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
         assertFalse(filtersBucketReact.isFilterVisible(ATTR_ACTIVITY_TYPE));
         assertTrue(filtersBucketReact.isFilterVisible("Region"));
         checkingOpenAsReport("testReplaceAttribute");
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void checkRelatedDateShownCorrectly() {
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
+
+        AttributesBucketReact attributesBucket = analysisPageReact.getAttributesBucket();
+
+        takeScreenshot(browser, "Related-date-shows-correctly-with-metric-activity", getClass());
+        assertEquals(attributesBucket.getSelectedDimensionSwitch(), "Activity");
+        assertEquals(attributesBucket.getSelectedGranularity(), "Year");
+
+        analysisPageReact.removeMetric(METRIC_NUMBER_OF_ACTIVITIES).removeAttribute(DATE);
+        analysisPageReact.addMetric(METRIC_AMOUNT).addDate();
+
+        takeScreenshot(browser, "Relate-date-shows-correctly-with-metric-amount", getClass());
+        assertEquals(attributesBucket.getSelectedDimensionSwitch(), "Closed");
+        assertEquals(attributesBucket.getSelectedGranularity(), "Year");
     }
 }
