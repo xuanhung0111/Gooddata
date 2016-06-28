@@ -114,6 +114,7 @@ public class TableTest extends AbstractAdE2ETest {
         beforeOrderingTable();
 
         analysisPageReact.getTableReport().sortBaseOnHeader(ATTR_ACTIVITY_TYPE);
+        analysisPageReact.waitForReportComputing();
 
         assertEquals(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim(), "Web Meeting");
         assertEquals(waitForElementVisible(cssSelector(".s-cell-1-0"), browser).getText().trim(), "Phone Call");
@@ -124,6 +125,7 @@ public class TableTest extends AbstractAdE2ETest {
         beforeOrderingTable();
 
         analysisPageReact.getTableReport().sortBaseOnHeader(METRIC_NUMBER_OF_ACTIVITIES);
+        analysisPageReact.waitForReportComputing();
 
         List<Integer> values = newArrayList();
         IntStream.rangeClosed(0, 3).forEach(i -> values.add(unformatNumber(
@@ -160,7 +162,9 @@ public class TableTest extends AbstractAdE2ETest {
         beforeOrderingTable();
 
         analysisPageReact.getTableReport().sortBaseOnHeader(ATTR_ACTIVITY_TYPE);
+        analysisPageReact.waitForReportComputing();
         analysisPageReact.getTableReport().sortBaseOnHeader(ATTR_ACTIVITY_TYPE);
+        analysisPageReact.waitForReportComputing();
 
         assertEquals(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim(), "Email");
         assertEquals(waitForElementVisible(cssSelector(".s-cell-1-0"), browser).getText().trim(), "In Person Meeting");
@@ -171,7 +175,9 @@ public class TableTest extends AbstractAdE2ETest {
         beforeOrderingTable();
 
         analysisPageReact.getTableReport().sortBaseOnHeader(METRIC_NUMBER_OF_ACTIVITIES);
+        analysisPageReact.waitForReportComputing();
         analysisPageReact.getTableReport().sortBaseOnHeader(ATTR_ACTIVITY_TYPE);
+        analysisPageReact.waitForReportComputing();
 
         assertEquals(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim(), "Email");
         assertEquals(waitForElementVisible(cssSelector(".s-cell-1-0"), browser).getText().trim(), "In Person Meeting");
@@ -182,9 +188,10 @@ public class TableTest extends AbstractAdE2ETest {
         beforeOrderingTable();
 
         analysisPageReact.getTableReport().sortBaseOnHeader(ATTR_ACTIVITY_TYPE);
+        analysisPageReact.waitForReportComputing();
         analysisPageReact.getTableReport().sortBaseOnHeader(ATTR_ACTIVITY_TYPE);
 
-        analysisPageReact.undo();
+        analysisPageReact.waitForReportComputing().undo();
 
         assertEquals(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim(), "Web Meeting");
         assertEquals(waitForElementVisible(cssSelector(".s-cell-1-0"), browser).getText().trim(), "Phone Call");
