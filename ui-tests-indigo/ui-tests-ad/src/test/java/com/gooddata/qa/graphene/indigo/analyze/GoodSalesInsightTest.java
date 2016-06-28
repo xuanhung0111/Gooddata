@@ -186,8 +186,8 @@ public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
 
         //make sure data is cleared before opening insight
         assertTrue(analysisPageReact.resetToBlankState().isBlankState());
-        assertEquals(analysisPageReact.openInsight(insight).getChartReport().getChartType(), type.getLabel(),
-                "The expected chart type is not displayed");
+        assertEquals(analysisPageReact.openInsight(insight).waitForReportComputing().getChartReport().getChartType(),
+                type.getLabel(), "The expected chart type is not displayed");
         assertEquals(analysisPageReact.getChartReport().getTrackersCount(), expectedTrackersCount,
                 "Chart content is not correct");
     }
@@ -363,12 +363,14 @@ public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
                 "The workspace is not blank");
         assertEquals(
                 analysisPageReact.openInsight(insight)
+                        .waitForReportComputing()
                         .getChartReport()
                         .getTrackersCount(),
                 expectedTrackersCount);
 
         //check original insight is not affected by save as
-        assertEquals(analysisPageReact.openInsight(INSIGHT_TEST).getChartReport().getTrackersCount(), 4);
+        assertEquals(analysisPageReact.openInsight(INSIGHT_TEST).waitForReportComputing().getChartReport()
+                .getTrackersCount(), 4);
     }
 
     @Test(dependsOnMethods = { "testSaveInsight" })

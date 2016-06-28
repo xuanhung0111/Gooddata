@@ -30,8 +30,8 @@ public class GoodSalesContributionRecommendationTest extends GoodSalesAbstractAn
     public void testSimpleContribution() {
         ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
+                .waitForReportComputing()
                 .getChartReport();
-        analysisPageReact.waitForReportComputing();
         assertEquals(report.getTrackersCount(), 4);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -39,7 +39,7 @@ public class GoodSalesContributionRecommendationTest extends GoodSalesAbstractAn
         assertTrue(recommendationContainer
                 .isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_PERCENTS).apply();
-        assertTrue(analysisPageReact.isReportTypeSelected(ReportType.BAR_CHART));
+        assertTrue(analysisPageReact.waitForReportComputing().isReportTypeSelected(ReportType.BAR_CHART));
         assertEquals(report.getTrackersCount(), 4);
 
         MetricConfiguration metricConfiguration = analysisPageReact.getMetricsBucket()
@@ -48,7 +48,7 @@ public class GoodSalesContributionRecommendationTest extends GoodSalesAbstractAn
         assertTrue(metricConfiguration.isShowPercentEnabled());
         assertTrue(metricConfiguration.isShowPercentSelected());
 
-        analysisPageReact.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT);
+        analysisPageReact.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing();
         assertTrue(analysisPageReact.isReportTypeSelected(ReportType.BAR_CHART));
         assertEquals(report.getTrackersCount(), 2);
         assertTrue(metricConfiguration.isShowPercentEnabled());
@@ -58,7 +58,9 @@ public class GoodSalesContributionRecommendationTest extends GoodSalesAbstractAn
 
     @Test(dependsOnGroups = {"init"})
     public void testAnotherApproachToShowContribution() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).getChartReport();
+        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .waitForReportComputing()
+                .getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -68,6 +70,7 @@ public class GoodSalesContributionRecommendationTest extends GoodSalesAbstractAn
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select(ATTR_ACTIVITY_TYPE).apply();
+        analysisPageReact.waitForReportComputing();
         assertTrue(recommendationContainer
                 .isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
         checkingOpenAsReport("testAnotherApproachToShowContribution");

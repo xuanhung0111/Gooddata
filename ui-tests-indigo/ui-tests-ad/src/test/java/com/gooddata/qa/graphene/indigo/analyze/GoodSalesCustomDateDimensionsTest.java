@@ -75,7 +75,7 @@ public class GoodSalesCustomDateDimensionsTest extends AbstractAnalyseTest {
     public void datePresetsAppliedInReport() {
         final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
 
-        analysisPageReact.addMetric(NUMBER, FieldType.FACT).addDate();
+        analysisPageReact.addMetric(NUMBER, FieldType.FACT).addDate().waitForReportComputing();
 
         assertTrue(filtersBucketReact.isDateFilterVisible());
         assertEquals(filtersBucketReact.getDateFilterText(), RETAIL_DATE + ": All time");
@@ -108,7 +108,7 @@ public class GoodSalesCustomDateDimensionsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void applyRecommendation() {
-        analysisPageReact.addMetric(NUMBER, FieldType.FACT);
+        analysisPageReact.addMetric(NUMBER, FieldType.FACT).waitForReportComputing();
 
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,

@@ -33,7 +33,8 @@ public class GoodSalesDateDimensionTest extends GoodSalesAbstractAnalyseTest {
 
         analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addMetric("_Snapshot [BOP]")
-            .addDateFilter();
+            .addDateFilter()
+            .waitForReportComputing();
         assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ": All time");
         assertEquals(analysisPageReact.getChartReport().getTrackersCount(), 2);
 

@@ -35,13 +35,14 @@ public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalys
             .addDateFilter();
         assertEquals(FiltersBucketReact.getFilterText("Activity"), "Activity: All time");
         FiltersBucketReact.configDateFilter("Last 12 months");
-        ChartReportReact report = analysisPageReact.getChartReport();
+        ChartReportReact report = analysisPageReact.waitForReportComputing().getChartReport();
         assertEquals(report.getTrackersCount(), 1);
 
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();
+        analysisPageReact.waitForReportComputing();
         assertEquals(FiltersBucketReact.getFilterText("Activity"), "Activity: Last 4 quarters");
         assertTrue(report.getTrackersCount() >= 1);
         checkingOpenAsReport("testOverrideDateFilter");
@@ -50,7 +51,7 @@ public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalys
     @Test(dependsOnGroups = {"init"})
     public void applyParameter() {
         ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                .getChartReport();
+                .waitForReportComputing().getChartReport();
         final MetricConfiguration metricConfiguration = analysisPageReact.getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
@@ -79,23 +80,24 @@ public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalys
 
     @Test(dependsOnGroups = {"init"})
     public void displayInColumnChartWithOnlyMetric() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).getChartReport();
+        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .waitForReportComputing().getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
 
-        analysisPageReact.addFilter(ATTR_ACTIVITY_TYPE);
+        analysisPageReact.addFilter(ATTR_ACTIVITY_TYPE).waitForReportComputing();
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
 
-        analysisPageReact.changeReportType(ReportType.BAR_CHART);
+        analysisPageReact.changeReportType(ReportType.BAR_CHART).waitForReportComputing();
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
 
-        analysisPageReact.changeReportType(ReportType.COLUMN_CHART);
+        analysisPageReact.changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
 
-        analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE);
+        analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing();
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         checkingOpenAsReport("displayInColumnChartWithOnlyMetric");
     }

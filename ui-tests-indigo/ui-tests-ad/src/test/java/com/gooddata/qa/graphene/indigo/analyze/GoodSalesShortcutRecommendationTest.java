@@ -41,7 +41,7 @@ public class GoodSalesShortcutRecommendationTest extends GoodSalesAbstractAnalys
             waitForElementPresent(ShortcutPanel.AS_A_COLUMN_CHART.getLocator(), browser);
 
         ChartReportReact report = analysisPageReact.drag(metric, recommendation)
-                    .getChartReport();
+                .waitForReportComputing().getChartReport();
 
         assertThat(report.getTrackersCount(), equalTo(1));
         RecommendationContainer recommendationContainer =
@@ -50,7 +50,7 @@ public class GoodSalesShortcutRecommendationTest extends GoodSalesAbstractAnalys
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        analysisPageReact.changeReportType(ReportType.BAR_CHART);
+        analysisPageReact.changeReportType(ReportType.BAR_CHART).waitForReportComputing();
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
 
         analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing();
@@ -67,7 +67,7 @@ public class GoodSalesShortcutRecommendationTest extends GoodSalesAbstractAnalys
             waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
 
         ChartReportReact report = analysisPageReact.drag(metric, trendRecommendation)
-                .getChartReport();
+                .waitForReportComputing().getChartReport();
 
         assertTrue(report.getTrackersCount() >= 1);
         assertTrue(analysisPageReact.getFilterBuckets().isFilterVisible("Activity"));
