@@ -316,17 +316,19 @@ public class ReportPage extends AbstractFragment {
         return waitForElementVisible(CUSTOM_METRIC_FORMAT_LOCATOR, browser).getText();
     }
 
-    public ReportPage changeNumberFormat(Formatter format) {
+    public MetricFormatterDialog openMetricFormatterDialogFromConfiguration() {
         waitForElementVisible(CUSTOM_METRIC_FORMAT_LOCATOR, browser).click();
-        Graphene.createPageFragment(MetricFormatterDialog.class,
-                waitForElementVisible(MetricFormatterDialog.LOCATOR, browser)).changeFormat(format);
+        return Graphene.createPageFragment(MetricFormatterDialog.class,
+                waitForElementVisible(MetricFormatterDialog.LOCATOR, browser));
+    }
+
+    public ReportPage changeNumberFormat(Formatter format) {
+        openMetricFormatterDialogFromConfiguration().changeFormat(format);
         return this;
     }
 
     public ReportPage changeNumberFormatButDiscard(Formatter format) {
-        waitForElementVisible(CUSTOM_METRIC_FORMAT_LOCATOR, browser).click();
-        Graphene.createPageFragment(MetricFormatterDialog.class,
-                waitForElementVisible(MetricFormatterDialog.LOCATOR, browser)).changeFormatButDiscard(format);
+        openMetricFormatterDialogFromConfiguration().changeFormatButDiscard(format);
         return this;
     }
 
@@ -874,8 +876,16 @@ public class ReportPage extends AbstractFragment {
         return this;
     }
 
-    private void initSimpleMetric(SimpleMetricTypes metricOperation, String metricOnFact) {
+    public void clickAddNewSimpleMetric() {
         waitForElementVisible(xpath("//button[contains(@class,'sndCreateMetric')]"), browser).click();
+    }
+
+    public void clickAddAdvanceMetric() {
+        waitForElementVisible(className("sndCreateAdvancedMetric"), browser).click();
+    }
+
+    private void initSimpleMetric(SimpleMetricTypes metricOperation, String metricOnFact) {
+        clickAddNewSimpleMetric();
         new Select(waitForElementVisible(xpath("//select[contains(@class,'s-sme-fnSelect')]"), browser))
             .selectByVisibleText(metricOperation.name());
 
@@ -885,7 +895,7 @@ public class ReportPage extends AbstractFragment {
         operation.selectByVisibleText(metricOnFact);
     }
 
-    private SimpleMenu openOptionsMenu() {
+    public SimpleMenu openOptionsMenu() {
         waitForElementVisible(optionsButton).click();
         SimpleMenu menu = Graphene.createPageFragment(SimpleMenu.class,
                 waitForElementVisible(SimpleMenu.LOCATOR, browser));

@@ -22,6 +22,8 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 public class MetricEditorDialog extends AbstractFragment {
 
     private static final By BY_SAVE_BUTTON = By.cssSelector("button.save:not([style^='display: none'])");
+    private static final By BY_BACK_BUTTON = By.cssSelector(".button.back:not([style^='display: none'])");
+    private static final By BY_CANCEL_BUTTON = By.cssSelector(".button.cancel:not([style^='display: none'])");
 
     @FindBy(css = ".metricEditor > div:not([style^='display: none']) input.text.metricName")
     private WebElement metricInput;
@@ -62,8 +64,24 @@ public class MetricEditorDialog extends AbstractFragment {
     
     private static final String WEIRD_STRING_TO_CLEAR_ALL_ITEMS = "!@#$%^";
 
-    public void createShareMetric(String metricName, String usedMetric, String attrFolder, String attr) {
+    public void clickShareMetricLink() {
         waitForElementVisible(By.cssSelector("div.shareTemplate"), browser).click();
+    }
+
+    public void clickDifferentMetricLink() {
+        waitForElementVisible(By.cssSelector("div.differenceTemplate"), browser).click();
+    }
+
+    public void clickRatioMetricLink() {
+        waitForElementVisible(By.cssSelector("div.ratioTemplate"), browser).click();
+    }
+
+    public void clickCustomMetricLink() {
+        waitForElementVisible(By.cssSelector("div.customMetric"), browser).click();
+    }
+
+    public void createShareMetric(String metricName, String usedMetric, String attrFolder, String attr) {
+        clickShareMetricLink();
         selectElement(usedMetric);
         selectElement(attrFolder);
         selectElement(attr);
@@ -72,7 +90,7 @@ public class MetricEditorDialog extends AbstractFragment {
 
     public void createDifferentMetric(String metricName, String usedMetric, String attrFolder, String attr,
             String attrValue) {
-        waitForElementVisible(By.cssSelector("div.differenceTemplate"), browser).click();
+        clickDifferentMetricLink();
         selectElement(usedMetric);
         selectElement(attrFolder);
         selectElement(attr);
@@ -81,7 +99,7 @@ public class MetricEditorDialog extends AbstractFragment {
     }
 
     public void createRatioMetric(String metricName, String usedMetric1, String usedMetric2) {
-        waitForElementVisible(By.cssSelector("div.ratioTemplate"), browser).click();
+        clickRatioMetricLink();
         selectElement(usedMetric1);
         selectElement(usedMetric2);
         enterMetricNameAndSubmit(metricName);
@@ -158,6 +176,14 @@ public class MetricEditorDialog extends AbstractFragment {
         waitForElementVisible(BY_SAVE_BUTTON, getRoot()).click();
     }
 
+    public void back() {
+        waitForElementVisible(BY_BACK_BUTTON, getRoot()).click();
+    }
+
+    public void cancel() {
+        waitForElementVisible(BY_CANCEL_BUTTON, getRoot()).click();
+    }
+
     private void selectAttributes(CustomMetricUI metricUI) {
         Pair<String, String> attributeInfo;
         for (String attribute : metricUI.getAttributes()) {
@@ -223,7 +249,7 @@ public class MetricEditorDialog extends AbstractFragment {
     }
 
     private void createTemplateMetricTab(MetricTypes metric) {
-        waitForElementVisible(By.cssSelector("div.customMetric"), browser).click();
+        clickCustomMetricLink();
         waitForElementVisible(maqlEditor);
         waitForElementVisible(By.xpath(METRIC_TEMPLATE_TAB_LOCATOR.replace("${tab}", metric.getType())), browser).click();
         waitForElementVisible(By.linkText(METRIC_LINK_LOCATOR.replace("${metricType}", metric.getLabel())),

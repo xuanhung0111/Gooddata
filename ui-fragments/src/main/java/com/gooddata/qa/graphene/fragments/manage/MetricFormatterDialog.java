@@ -62,7 +62,7 @@ public class MetricFormatterDialog extends AbstractFragment {
         waitForFragmentNotVisible(this);
     }
 
-    private void discard() {
+    public void discard() {
         waitForElementVisible(cancelButton).click();
         waitForFragmentNotVisible(this);
     }
