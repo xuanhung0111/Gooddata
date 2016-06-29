@@ -27,7 +27,7 @@
 
     <test name="manage-page" enabled="true">
         <classes>
-            <class name="com.gooddata.qa.graphene.i18n.EmbeddedDashboardManagePageLocalizationTest" />
+            <class name="com.gooddata.qa.graphene.i18n.EmbeddedDashboardReportsPageLocalizationTest" />
         </classes>
     </test>
 
