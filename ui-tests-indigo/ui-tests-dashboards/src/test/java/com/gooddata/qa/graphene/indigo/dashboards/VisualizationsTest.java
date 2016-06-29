@@ -81,9 +81,10 @@ public class VisualizationsTest extends DashboardWithWidgetsTest {
                 .get(0);
 
         String fromSelector = "." + VisualizationsList.MAIN_CLASS + ".s-" + VISUALIZATION_TITLE;
-        String toSelector = ".dash-item-0 .dropzone." + DASH_WIDGET_PREV_DROPZONE_CLASS;
+        String toSelector = ".dash-item-0";
+        String dropSelector = ".dash-item-0 .dropzone." + DASH_WIDGET_PREV_DROPZONE_CLASS;
 
-        DragAndDropUtils.dragAndDrop(browser, fromSelector, toSelector);
+        DragAndDropUtils.dragAndDropWithCustomBackend(browser, fromSelector, toSelector, dropSelector);
 
         waitForFragmentVisible(indigoDashboardsPage).leaveEditMode();
 
