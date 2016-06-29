@@ -20,11 +20,6 @@
         <module>ui-tests-tools</module>
         <module>ui-tests-msf</module>
         <module>ui-tests-indigo</module>
-        <!--
-        Module for support of browserstack for Drone, will be removed and switched to regular dependency when the artifact is officially released
-        Content is taken and updated from https://github.com/MatousJobanek/arquillian-drone-browserstack-webdriver
-        -->
-        <module>arquillian-drone-browserstack-webdriver</module>
     </modules>
 
     <properties>
@@ -129,6 +124,12 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>${version.org.testng}</version>
+        </dependency>
+
+        <!-- Arquillian browserstack -->
+        <dependency>
+            <groupId>org.jboss.arquillian.extension</groupId>
+            <artifactId>arquillian-drone-browserstack-extension</artifactId>
         </dependency>
 
         <!-- Arquillian TestNG Standalone -->
