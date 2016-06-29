@@ -48,6 +48,7 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
         attributePanel.discard();
 
         filtersBucketReact.configAttributeFilter(ATTR_ACTIVITY_TYPE, "Email", "Web Meeting");
+        analysisPageReact.waitForReportComputing();
         assertEquals(report.getTrackersCount(), 2);
         assertEquals(filtersBucketReact.getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": Email, Web Meeting\n(2)");
     }
@@ -56,6 +57,7 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
     public void addFilterNotHideRecommendation() {
         assertEquals(analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
+                .waitForReportComputing()
                 .getChartReport()
                 .getTrackersCount(), 4);
         RecommendationContainer recommendationContainer =
@@ -65,7 +67,7 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
                 .isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        analysisPageReact.addFilter(ATTR_DEPARTMENT);
+        analysisPageReact.addFilter(ATTR_DEPARTMENT).waitForReportComputing();
         assertTrue(recommendationContainer
                 .isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
@@ -79,12 +81,14 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
         ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .addDateFilter()
+                .waitForReportComputing()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 4);
         assertEquals(filtersBucketReact.getFilterText("Activity"), "Activity: All time");
 
         assertEquals(filtersBucketReact.configDateFilter("This year")
                 .getFilterText("Activity"), "Activity: This year");
+        analysisPageReact.waitForReportComputing();
         assertTrue(report.getTrackersCount() >= 1);
         checkingOpenAsReport("filterOnDateAndAttribute");
     }
@@ -95,6 +99,7 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
 
         assertEquals(analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
+                .waitForReportComputing()
                 .getChartReport()
                 .getTrackersCount(), 4);
         assertEquals(filtersBucketReact.getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": All");

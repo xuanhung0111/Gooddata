@@ -66,6 +66,7 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
         ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .addDateFilter()
+                .waitForReportComputing()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 4);
         assertEquals(filtersBucketReact.getFilterText("Activity"), "Activity: All time");
@@ -89,6 +90,7 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
         ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .addDateFilter()
+                .waitForReportComputing()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 4);
         assertEquals(filtersBucketReact.getFilterText("Activity"), "Activity: All time");
@@ -121,6 +123,7 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
     public void testDateInCategoryAndDateInFilter() {
         assertTrue(analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addDate()
+                .waitForReportComputing()
                 .getChartReport()
                 .getTrackersCount() >= 1);
         assertEquals(analysisPageReact.getFilterBuckets().getFilterText("Activity"), "Activity: All time");

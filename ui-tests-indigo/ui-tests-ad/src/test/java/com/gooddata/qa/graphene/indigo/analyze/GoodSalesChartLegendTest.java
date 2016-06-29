@@ -34,6 +34,7 @@ public class GoodSalesChartLegendTest extends GoodSalesAbstractAnalyseTest {
     public void checkShowPercentAndLegendColor() {
         ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
+            .waitForReportComputing()
             .getChartReport();
 
         MetricConfiguration metricConfiguration = analysisPageReact.getMetricsBucket()
@@ -43,7 +44,7 @@ public class GoodSalesChartLegendTest extends GoodSalesAbstractAnalyseTest {
         sleepTight(5000);
         assertTrue(report.getDataLabels().get(0).endsWith("%"));
 
-        analysisPageReact.addMetric(METRIC_QUOTA);
+        analysisPageReact.addMetric(METRIC_QUOTA).waitForReportComputing();
         assertFalse(metricConfiguration.isShowPercentEnabled());
         assertFalse(metricConfiguration.isShowPercentSelected());
 
@@ -53,15 +54,17 @@ public class GoodSalesChartLegendTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void dontShowLegendWhenOnlyOneMetric() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_AMOUNT).addAttribute(ATTR_STAGE_NAME).waitForReportComputing()
+        ChartReportReact report = analysisPageReact.addMetric(METRIC_AMOUNT)
+                .addAttribute(ATTR_STAGE_NAME)
+                .waitForReportComputing()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 8);
         assertFalse(report.isLegendVisible());
 
-        analysisPageReact.changeReportType(ReportType.BAR_CHART);
+        analysisPageReact.changeReportType(ReportType.BAR_CHART).waitForReportComputing();
         assertFalse(report.isLegendVisible());
 
-        analysisPageReact.changeReportType(ReportType.LINE_CHART);
+        analysisPageReact.changeReportType(ReportType.LINE_CHART).waitForReportComputing();
         assertFalse(report.isLegendVisible());
     }
 
@@ -91,8 +94,10 @@ public class GoodSalesChartLegendTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void showLegendForStackedChartWithOneSeries() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_WON_OPPS).addStack(ATTR_STAGE_NAME)
-                .waitForReportComputing().getChartReport();
+        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_WON_OPPS)
+                .addStack(ATTR_STAGE_NAME)
+                .waitForReportComputing()
+                .getChartReport();
         assertTrue(report.isLegendVisible());
         List<String> legends = report.getLegends();
         assertEquals(legends.size(), 1);

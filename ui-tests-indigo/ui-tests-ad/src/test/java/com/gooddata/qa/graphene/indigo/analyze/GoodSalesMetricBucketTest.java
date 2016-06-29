@@ -45,6 +45,7 @@ public class GoodSalesMetricBucketTest extends GoodSalesAbstractAnalyseTest {
     public void checkSeriesStateTransitions() {
         ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addDate()
+                .waitForReportComputing()
                 .getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
 

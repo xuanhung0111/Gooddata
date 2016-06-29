@@ -33,7 +33,9 @@ public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void dropAttributeToReportHaveOneMetric() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing();
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addAttribute(ATTR_ACTIVITY_TYPE)
+                .waitForReportComputing();
         ChartReportReact report = analysisPageReact.getChartReport();
         assertEquals(report.getTrackersCount(), 4);
 
@@ -77,7 +79,7 @@ public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
 
         analysisPageReact.resetToBlankState();
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES);
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
         metricConfiguration.expandConfiguration();
         assertFalse(metricConfiguration.isShowPercentEnabled());
         assertFalse(metricConfiguration.isPopEnabled());
@@ -96,7 +98,7 @@ public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
         dropAttributeToReportHaveOneMetric();
         analysisPageReact.getFilterBuckets().configAttributeFilter(ATTR_ACTIVITY_TYPE, "Email", "Phone Call")
             .configAttributeFilter(ATTR_DEPARTMENT, "Inside Sales");
-        ChartReportReact report = analysisPageReact.getChartReport();
+        ChartReportReact report = analysisPageReact.waitForReportComputing().getChartReport();
         assertEquals(report.getTrackersCount(), 2);
         checkingOpenAsReport("applyAttributeFiltersInReport");
     }

@@ -84,6 +84,7 @@ public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
                 .addMetric(METRIC_SNAPSHOT_BOP)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .changeReportType(ReportType.TABLE)
+                .waitForReportComputing()
                 .getTableReport();
         sleepTight(3000);
         List<List<String>> analysisContent = report.getContent();

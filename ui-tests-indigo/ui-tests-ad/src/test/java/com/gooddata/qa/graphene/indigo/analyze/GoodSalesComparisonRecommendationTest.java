@@ -38,7 +38,7 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
             .addDateFilter()
             .getFilterBuckets()
             .configDateFilter("Last year");
-        ChartReportReact report = analysisPageReact.getChartReport();
+        ChartReportReact report = analysisPageReact.waitForReportComputing().getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -62,7 +62,9 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
 
     @Test(dependsOnGroups = {"init"})
     public void testSimpleComparison() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).getChartReport();
+        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .waitForReportComputing()
+                .getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -89,7 +91,9 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
     public void testComparisonAndPoPAttribute() {
         final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
 
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).getChartReport();
+        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .waitForReportComputing()
+                .getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -120,7 +124,7 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
         assertEquals(legends.size(), 2);
         assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES + " - previous year", METRIC_NUMBER_OF_ACTIVITIES));
 
-        analysisPageReact.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT);
+        analysisPageReact.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing();
         assertEquals(filtersBucketReact.getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ": All");
         assertTrue(report.getTrackersCount() >= 1);
         legends = report.getLegends();
@@ -131,8 +135,7 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
 
     @Test(dependsOnGroups = {"init"})
     public void testSimplePoP() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-            .addDate();
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().waitForReportComputing();
         assertTrue(analysisPageReact.getFilterBuckets()
                 .isFilterVisible("Activity"));
         assertEquals(analysisPageReact.getFilterBuckets().getFilterText("Activity"), "Activity: All time");
@@ -159,13 +162,16 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
 
     @Test(dependsOnGroups = {"init"})
     public void testAnotherApproachToShowPoP() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).getChartReport();
+        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .waitForReportComputing()
+                .getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();
+        analysisPageReact.waitForReportComputing();
 
         assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(DATE));
         assertTrue(analysisPageReact.getFilterBuckets().isFilterVisible("Activity"));
