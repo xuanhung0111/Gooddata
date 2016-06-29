@@ -110,7 +110,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        analysisPageReact.changeReportType(ReportType.BAR_CHART);
+        analysisPageReact.changeReportType(ReportType.BAR_CHART).waitForReportComputing();
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
 
         doSafetyAttributeAction(metric, analysisPageReact::addAttribute, "testCustomDiscovery");
@@ -158,7 +158,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        analysisPageReact.changeReportType(ReportType.BAR_CHART);
+        analysisPageReact.changeReportType(ReportType.BAR_CHART).waitForReportComputing();
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
 
         doSafetyAttributeAction(metric, analysisPageReact::addAttribute, "dragMetricToColumnChartShortcutPanel");
@@ -204,7 +204,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_PERCENTS).apply();
-        assertTrue(analysisPageReact.isReportTypeSelected(ReportType.BAR_CHART));
+        assertTrue(analysisPageReact.waitForReportComputing().isReportTypeSelected(ReportType.BAR_CHART));
         assertEquals(report.getTrackersCount(), oldTrackersCount);
 
         MetricConfiguration metricConfiguration = analysisPageReact.getMetricsBucket()
@@ -237,7 +237,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
         final CataloguePanelReact cataloguePanel = analysisPageReact.getCataloguePanel();
         String attribute;
         while (true) {
-            attribute = getRandomeAttributeFromMetric(metric);
+            attribute = getRandomAttributeFromMetric(metric);
             if (!cataloguePanel.search(attribute) || !cataloguePanel.isDataApplicable(attribute)) {
                 Screenshots.takeScreenshot(browser,
                         "[Inapplicable attribute] testAnotherApproachToShowContribution", this.getClass());
@@ -261,6 +261,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
         waitForFragmentVisible(comparisonRecommendation);
         comparisonRecommendation.select(attribute).apply();
+        analysisPageReact.waitForReportComputing();
 
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
     }
@@ -383,10 +384,10 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
 
-        analysisPageReact.changeReportType(ReportType.BAR_CHART);
+        analysisPageReact.changeReportType(ReportType.BAR_CHART).waitForReportComputing();
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
 
-        analysisPageReact.changeReportType(ReportType.COLUMN_CHART);
+        analysisPageReact.changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
 
         doSafetyAttributeAction(metric, analysisPageReact::addAttribute, "displayInColumnChartWithOnlyMetric");
@@ -538,6 +539,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
         recommendationContainer.getRecommendation(RecommendationStep.COMPARE).apply();
+        analysisPageReact.waitForReportComputing();
         assertTrue(report.getTrackersCount() >= 1);
         List<String> legends = report.getLegends();
         assertEquals(legends.size(), 2);
@@ -559,7 +561,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();
 
-        assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(DATE));
+        assertTrue(analysisPageReact.waitForReportComputing().getAttributesBucket().getItemNames().contains(DATE));
         assertTrue(filtersBucketReact.isDateFilterVisible());
         assertTrue(filtersBucketReact.getDateFilterText().endsWith(": Last 4 quarters"));
 
@@ -642,7 +644,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
         return attribute;
     }
 
-    private String getRandomeAttributeFromMetric(String metric) {
+    private String getRandomAttributeFromMetric(String metric) {
         String attribute = getRandomAttribute();
         while (containsInCache(metric, attribute)) {
             attribute = getRandomAttribute();
@@ -722,7 +724,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
         CataloguePanelReact cataloguePanel = analysisPageReact.getCataloguePanel();
         String attribute;
         while (true) {
-            attribute = getRandomeAttributeFromMetric(metric);
+            attribute = getRandomAttributeFromMetric(metric);
 
             if (cataloguePanel.search(attribute) && cataloguePanel.isDataApplicable(attribute)) {
                 action.accept(attribute);

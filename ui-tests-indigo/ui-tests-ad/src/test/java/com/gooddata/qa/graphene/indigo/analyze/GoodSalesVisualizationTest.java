@@ -76,7 +76,8 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
         assertEquals(analysisPageReact.changeReportType(ReportType.LINE_CHART)
                 .getExplorerMessage(), "Now select a measure to display");
 
-        TableReportReact report = analysisPageReact.changeReportType(ReportType.TABLE).getTableReport();
+        TableReportReact report = analysisPageReact.changeReportType(ReportType.TABLE)
+                .waitForReportComputing().getTableReport();
         assertThat(report.getHeaders().stream().map(String::toLowerCase).collect(toList()),
                 equalTo(asList(ATTR_ACTIVITY_TYPE.toLowerCase())));
         checkingOpenAsReport("testWithAttribute");
@@ -84,7 +85,8 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testResetFunction() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).getChartReport();
+        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .waitForReportComputing().getChartReport();
         assertThat(report.getTrackersCount(), equalTo(1));
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -92,7 +94,7 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        analysisPageReact.changeReportType(ReportType.BAR_CHART);
+        analysisPageReact.changeReportType(ReportType.BAR_CHART).waitForReportComputing();
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
 
         analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing();
@@ -104,7 +106,8 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
     @Test(dependsOnGroups = {"init"})
     public void disableExportForUnexportableVisualization() {
         final AnalysisPageHeaderReact pageHeader = analysisPageReact.getPageHeader();
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_AMOUNT).getChartReport();
+        ChartReportReact report = analysisPageReact.addMetric(METRIC_AMOUNT)
+                .waitForReportComputing().getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         assertTrue(pageHeader.isExportButtonEnabled());
 
@@ -187,7 +190,7 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
                 .changeReportType(ReportType.TABLE)
                 .getPageHeader()
                 .isExportButtonEnabled());
-        TableReportReact analysisReport = analysisPageReact.getTableReport();
+        TableReportReact analysisReport = analysisPageReact.waitForReportComputing().getTableReport();
         List<List<String>> analysisContent = analysisReport.getContent();
         Iterator<String> analysisHeaders = analysisReport.getHeaders().iterator();
 
