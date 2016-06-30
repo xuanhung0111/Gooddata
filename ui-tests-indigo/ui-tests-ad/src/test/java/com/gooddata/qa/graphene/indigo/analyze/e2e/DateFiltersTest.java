@@ -5,13 +5,13 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
 import java.text.ParseException;
 import java.util.Calendar;
 
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.Select;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -44,7 +44,8 @@ public class DateFiltersTest extends AbstractAdE2ETest {
             .getDateFilter()
             .click();
 
-        assertEquals(getValueFrom(".s-filter-date-date-dataset-switch"), "created.dataset.dt");
+        takeScreenshot(browser, "Selected-date-filter-applied", getClass());
+        assertEquals(getValueFrom(".s-filter-date-date-dataset-switch"), "Created");
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -61,7 +62,9 @@ public class DateFiltersTest extends AbstractAdE2ETest {
         analysisPageReact.addDateFilter()
             .getFilterBuckets()
             .changeDateDimension("Activity", "Created");
-        assertEquals(getValueFrom(".s-filter-date-date-dataset-switch"), "created.dataset.dt");
+
+        takeScreenshot(browser, "Date-filter-applied-on-filter-buckets", getClass());
+        assertEquals(getValueFrom(".s-filter-date-date-dataset-switch"), "Created");
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -110,9 +113,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
     }
 
     private String getValueFrom(String locator) {
-        return new Select(waitForElementVisible(cssSelector(locator), browser))
-            .getFirstSelectedOption()
-            .getAttribute("value");
+        return waitForElementVisible(cssSelector(locator), browser).getText();
     }
 
     private void fillInDateRange(String cssLocator, String date) {

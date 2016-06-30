@@ -7,17 +7,15 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible
 
 import java.util.List;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.Select;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
 
 public class DateFilterPickerPanelReact extends AbstractFragment {
-
-    @FindBy(css = DIMENSION_SWITCH_LOCATOR)
-    private Select dimensionSwitch;
 
     // presets and date range sections are just small parts. No need to separate more fragments now.
 
@@ -45,8 +43,6 @@ public class DateFilterPickerPanelReact extends AbstractFragment {
 
     public static final By LOCATOR = By.className("adi-date-filter-picker");
 
-    private static final String DIMENSION_SWITCH_LOCATOR = ".s-filter-date-date-dataset-switch"; 
-
     public void select(final String period) {
         waitForCollectionIsNotEmpty(periods).stream()
             .filter(e -> period.equals(e.getText()))
@@ -58,10 +54,6 @@ public class DateFilterPickerPanelReact extends AbstractFragment {
 
     public List<String> getPeriods() {
         return getElementTexts(waitForCollectionIsNotEmpty(periods));
-    }
-
-    public List<String> getDimensionSwitchs() {
-        return getElementTexts(waitForElementVisible(dimensionSwitch).getOptions());
     }
 
     /**
@@ -97,15 +89,11 @@ public class DateFilterPickerPanelReact extends AbstractFragment {
     }
 
     public void changeDateDimension(String switchDimension) {
-        waitForElementVisible(this.dimensionSwitch).selectByVisibleText(switchDimension);
-    }
-
-    public boolean isDimensionSwitcherEnabled() {
-        return waitForElementVisible(By.cssSelector(DIMENSION_SWITCH_LOCATOR), getRoot()).isEnabled();
+        getDateDatasetSelect().selectByName(switchDimension);
     }
 
     public String getSelectedDimensionSwitch() {
-        return waitForElementVisible(dimensionSwitch).getFirstSelectedOption().getText();
+        return getDateDatasetSelect().getRoot().getText();
     }
 
     private void configTimeFilterByRangeHelper(String from, String to, boolean apply) {
@@ -118,5 +106,10 @@ public class DateFilterPickerPanelReact extends AbstractFragment {
 
         waitForElementVisible(apply ? applyButton : cancelButton).click();
         waitForFragmentNotVisible(this);
+    }
+
+    private DateDimensionSelect getDateDatasetSelect() {
+        return Graphene.createPageFragment(DateDimensionSelect.class,
+                waitForElementVisible(By.className("adi-date-dataset-select-dropdown"), browser));
     }
 }

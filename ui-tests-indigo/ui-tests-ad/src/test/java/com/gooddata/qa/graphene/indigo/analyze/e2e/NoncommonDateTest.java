@@ -7,6 +7,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertFalse;
 
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
@@ -46,15 +47,15 @@ public class NoncommonDateTest extends AbstractAdE2ETest {
             .getDateFilter();
 
         dateFilter.click();
-        assertTrue(isElementPresent(cssSelector(".s-filter-date-date-dataset-switch:not(.disabled)"), browser));
+        assertFalse(isElementPresent(cssSelector(".adi-date-dataset-select-dropdown button.disabled"), browser));
         dateFilter.click();
 
         analysisPageReact.addDate();
-        assertTrue(isElementPresent(cssSelector(".s-date-dataset-switch:not(.disabled)"), browser));
+        assertFalse(isElementPresent(cssSelector(".s-date-dataset-switch button.disabled"), browser));
 
         // date dimension picker in select is now disabled
         dateFilter.click();
-        assertTrue(isElementPresent(cssSelector(".s-filter-date-date-dataset-switch[disabled]"), browser));
+        assertTrue(isElementPresent(cssSelector(".adi-date-dataset-select-dropdown button.disabled"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})

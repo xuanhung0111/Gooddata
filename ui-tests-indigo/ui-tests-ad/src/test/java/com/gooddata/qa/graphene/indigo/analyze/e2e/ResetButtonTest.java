@@ -4,12 +4,11 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
-import org.openqa.selenium.support.ui.Select;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -65,7 +64,8 @@ public class ResetButtonTest extends AbstractAdE2ETest {
 
         analysisPageReact.resetToBlankState()
             .addDate();
-        assertEquals(new Select(waitForElementVisible(cssSelector(".s-date-dataset-switch"), browser))
-            .getFirstSelectedOption().getAttribute("value"), "activity.dataset.dt");
+
+        takeScreenshot(browser, "Date-dimension-reset", getClass());
+        assertEquals(analysisPageReact.getAttributesBucket().getSelectedDimensionSwitch(), "Activity");
     }
 }
