@@ -88,10 +88,11 @@ public class DragWidgetsTest extends DashboardsGeneralTest {
     private void dragWidgets(int fromIndex, int toIndex, String dropzoneType) {
         String from = format(WIDGET_SELECTOR_FORMATTER, fromIndex);
 
-        String to = format(WIDGET_SELECTOR_FORMATTER, toIndex) + ' ' +
+        String to = format(WIDGET_SELECTOR_FORMATTER, toIndex);
+        String drop = format(WIDGET_SELECTOR_FORMATTER, toIndex) + ' ' +
                 format(WIDGET_DROPZONE_FORMATTER, dropzoneType);
 
-        DragAndDropUtils.dragAndDrop(browser, from, to);
+        DragAndDropUtils.dragAndDropWithCustomBackend(browser, from, to, drop);
     }
 
     private int getSourceKpiIndexAfterDragDropTo(int index, String dropzone) {

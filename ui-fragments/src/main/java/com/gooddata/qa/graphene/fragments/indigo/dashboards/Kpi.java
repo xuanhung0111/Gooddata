@@ -42,13 +42,13 @@ public class Kpi extends Widget {
     @FindBy(className = KPI_ALERT_BUTTON_CLASS)
     private WebElement alertButton;
 
-    @FindBy(css = ".kpi-headline > h3")
+    @FindBy(css = ".item-headline > h3")
     private WebElement headline;
 
-    @FindBy(css = ".kpi-headline > h3 .gd-editable-label")
+    @FindBy(css = ".item-headline > h3 .gd-editable-label")
     private WebElement headlineInplaceEdit;
 
-    @FindBy(css = ".kpi-headline > h3 textarea")
+    @FindBy(css = ".item-headline > h3 textarea")
     private WebElement headlineTextarea;
 
     @FindBy(className = "kpi-value")
