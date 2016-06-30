@@ -23,7 +23,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPageReact
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeaderReact;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucketReact;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanelReact;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanelReact;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucketReact;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
@@ -111,8 +111,8 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
 
         analysisPageReact.undo();
         filter.click();
-        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
-              waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+        DateFilterPickerPanelReact panel = Graphene.createPageFragment(DateFilterPickerPanelReact.class,
+              waitForElementVisible(DateFilterPickerPanelReact.LOCATOR, browser));
         assertEquals(panel.getSelectedDimensionSwitch(), ACTIVITY);
 
         analysisPageReact.redo();
