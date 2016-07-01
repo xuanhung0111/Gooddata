@@ -144,19 +144,21 @@ public class ProjectSwitchTest  extends DashboardWithWidgetsTest {
     @Test(dependsOnMethods = {"prepareUserForSwitchingTest"}, groups = {"desktop", "mobile"})
     public void switchProjectWithEmbededDashboardUser() throws JSONException, ParseException, IOException {
         GoodData goodDataClient = getGoodDataClient(embededDashboardUser, embededDashboardUserPassword);
-
-        logout();
-        signInAtUI(embededDashboardUser, embededDashboardUserPassword);
-
-        String newProjectId = ProjectRestUtils.createBlankProject(goodDataClient, NEW_PROJECT_NAME,
-                testParams.getAuthorizationToken(), testParams.getProjectDriver(),
-                testParams.getProjectEnvironment());
+        String newProjectId = "";
 
         try {
+            newProjectId = ProjectRestUtils.createBlankProject(goodDataClient, NEW_PROJECT_NAME,
+                    testParams.getAuthorizationToken(), testParams.getProjectDriver(),
+                    testParams.getProjectEnvironment());
+
             ProjectRestUtils.setFeatureFlagInProject(goodDataClient, newProjectId,
                     ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
 
+            logout();
+            signInAtUI(embededDashboardUser, embededDashboardUserPassword);
+
             testParams.setProjectId(newProjectId);
+
             initIndigoDashboardsPage().switchProject(projectTitle);
             waitForProjectsPageLoaded(browser);
 
@@ -169,7 +171,9 @@ public class ProjectSwitchTest  extends DashboardWithWidgetsTest {
             logout();
             signInAtUI(newAdminUser, newAdminPassword);
 
-            ProjectRestUtils.deleteProject(goodDataClient, newProjectId);
+            if(!newProjectId.isEmpty()) {
+                ProjectRestUtils.deleteProject(goodDataClient, newProjectId);
+            }
         }
     }
 
