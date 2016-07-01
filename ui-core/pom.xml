@@ -15,11 +15,6 @@
             <artifactId>ui-fragments</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.jboss.arquillian.extension</groupId>
-            <artifactId>arquillian-drone-browserstack-webdriver</artifactId>
-            <version>1.0-alpha-1-gd</version>
-        </dependency>
     </dependencies>
 
     <profiles>

@@ -1,16 +1,16 @@
 package com.gooddata.qa.browser;
 
-import org.arquillian.drone.browserstack.webdriver.BrowserStackDriver;
+import java.awt.Toolkit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
+import org.arquillian.drone.browserstack.extension.webdriver.BrowserStackDriver;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
-
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
 
 public class BrowserUtils {
     public static List<String> getWindowHandles(WebDriver browser) {

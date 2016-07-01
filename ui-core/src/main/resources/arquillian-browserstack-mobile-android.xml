@@ -7,7 +7,7 @@
     <extension qualifier="webdriver">
         <property name="browser">browserstack</property>
         <property name="username">${browserstack.username:xxx}</property>
-        <property name="automate.key">${browserstack.automate.key:xxx}</property>
+        <property name="access.key">${browserstack.automate.key:xxx}</property>
         <property name="browserName">${browserstack.mobile.browserName:android}</property>
         <property name="platform">${browserstack.mobile.platform:ANDROID}</property>
         <property name="device">${browserstack.mobile.device:Samsung Galaxy S5}</property>
