@@ -6,6 +6,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 import static com.gooddata.qa.utils.mail.ImapUtils.getLastEmail;
+import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -77,6 +78,7 @@ public class InviteUserTest extends AbstractProjectTest {
         final String invitationLink = inviteUsers(invitationSubject, UserRoles.ADMIN,
                 INVITATION_MESSAGE, imapUser);
 
+        dismissStatusBarMessage();
         projectAndUsersPage.openInvitedUserTab();
         checkResendAndCancelInvitationAvailable(imapUser);
 
@@ -140,6 +142,7 @@ public class InviteUserTest extends AbstractProjectTest {
         loginAndOpenProjectAndUserPage();
 
         projectAndUsersPage.openInviteUserDialog().inviteUsers(UserRoles.EDITOR, INVITATION_MESSAGE, nonRegistedUser);
+        dismissStatusBarMessage();
 
         ++expectedMessageCount;
 
@@ -176,6 +179,7 @@ public class InviteUserTest extends AbstractProjectTest {
                 imapClient, GDEmails.INVITATION, invitationSubject, expectedMessageCount + 2));
         assertTrue(invitations.size() == expectedMessageCount + 2, "There are less than 2 new invitations in inbox");
 
+        dismissStatusBarMessage();
         projectAndUsersPage.openInvitedUserTab();
         checkResendAndCancelInvitationAvailable(nonRegistedUserA);
         checkResendAndCancelInvitationAvailable(nonRegistedUserB);
@@ -185,7 +189,7 @@ public class InviteUserTest extends AbstractProjectTest {
 
     private String inviteUsers(String emailSubject, UserRoles role, String message, String... emails) {
         return doActionWithImapClient((imapClient) ->
-            projectAndUsersPage.inviteUsers(imapClient, invitationSubject, UserRoles.ADMIN, INVITATION_MESSAGE, emails));
+            projectAndUsersPage.inviteUsers(imapClient, invitationSubject, role, INVITATION_MESSAGE, emails));
     }
 
     private void loginAndOpenProjectAndUserPage() throws JSONException {
@@ -198,4 +202,7 @@ public class InviteUserTest extends AbstractProjectTest {
                 .isCancelInvitationAvailable(userEmail),"Resend and Cancel invitation are not displayed");
     }
 
+    private void dismissStatusBarMessage() {
+        waitForElementVisible(className("s-statusbar-dismiss"), browser).click();
+    }
 }

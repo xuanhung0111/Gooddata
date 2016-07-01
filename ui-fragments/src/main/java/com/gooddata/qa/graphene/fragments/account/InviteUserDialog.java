@@ -80,14 +80,13 @@ public class InviteUserDialog extends AbstractFragment {
         return this;
     }
 
-    public InviteUserDialog inviteUsers(UserRoles role, String message, String... emails) {
+    public void inviteUsers(UserRoles role, String message, String... emails) {
         if (emails.length == 0) {
             throw new IllegalArgumentException("Must provide at least 1 email.");
         }
 
         enterEmails(emails).selectRole(role).enterMessage(message);
         waitForElementVisible(inviteButton).click();
-        return this;
     }
 
     public Select getInvitationRole() {
