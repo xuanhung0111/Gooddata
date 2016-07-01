@@ -13,7 +13,7 @@ import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanelReact;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucketReact;
 
@@ -40,8 +40,8 @@ public class GoodSalesDateDimensionTest extends GoodSalesAbstractAnalyseTest {
 
         WebElement filter = filtersBucketReact.getFilter(ACTIVITY);
         filter.click();
-        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
-                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+        DateFilterPickerPanelReact panel = Graphene.createPageFragment(DateFilterPickerPanelReact.class,
+                waitForElementVisible(DateFilterPickerPanelReact.LOCATOR, browser));
         assertTrue(isEqualCollection(panel.getDimensionSwitchs(), asList(ACTIVITY, CREATED)));
 
         panel.select("This year");
@@ -84,8 +84,8 @@ public class GoodSalesDateDimensionTest extends GoodSalesAbstractAnalyseTest {
         analysisPageReact.addDate();
         WebElement filter = filtersBucketReact.getFilter(CREATED);
         filter.click();
-        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
-              waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+        DateFilterPickerPanelReact panel = Graphene.createPageFragment(DateFilterPickerPanelReact.class,
+              waitForElementVisible(DateFilterPickerPanelReact.LOCATOR, browser));
         assertFalse(panel.isDimensionSwitcherEnabled());
 
         analysisPageReact.getAttributesBucket().changeDateDimension(ACTIVITY);

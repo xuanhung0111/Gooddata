@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmp
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -56,6 +57,10 @@ public class DateFilterPickerPanelReact extends AbstractFragment {
         return getElementTexts(waitForCollectionIsNotEmpty(periods));
     }
 
+    public Collection<String> getDimensionSwitchs() {
+        return getDateDatasetSelect().getValues();
+    }
+
     /**
      * @param from format MM/DD/YYYY
      * @param to   format MM/DD/YYYY
@@ -90,6 +95,10 @@ public class DateFilterPickerPanelReact extends AbstractFragment {
 
     public void changeDateDimension(String switchDimension) {
         getDateDatasetSelect().selectByName(switchDimension);
+    }
+
+    public boolean isDimensionSwitcherEnabled() {
+        return getDateDatasetSelect().isEnabled();
     }
 
     public String getSelectedDimensionSwitch() {
