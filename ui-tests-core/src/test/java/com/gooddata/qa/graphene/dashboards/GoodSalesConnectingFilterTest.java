@@ -100,6 +100,8 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
                 .changeAttributeFilterValue("Negotiation");
 
             Sleeper.sleepTightInSeconds(3);
+            assertNotEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(V_STAGE)).getCurrentValue(),
+                    "Negotiation");
             assertTrue(isEqualCollection(asList("2011", "Negotiation"),
                     dashboardsPage.getContent().getReport("Report1", TableReport.class).getAttributeElements()));
             assertTrue(isEqualCollection(singleton("Negotiation"),
@@ -130,6 +132,11 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
             dashboardsPage.getTabs().openTab(0);
             dashboardsPage.getContent().getFilterWidget(simplifyText(V_STAGE))
                 .changeAttributeFilterValue("Conviction");
+
+            Sleeper.sleepTightInSeconds(3);
+            assertNotEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME)).getCurrentValue(),
+                    "Conviction");
+
             dashboardsPage.getTabs().openTab(1);
             assertEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(V_STAGE)).getCurrentValue(),
                     "Conviction");
