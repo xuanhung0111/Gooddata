@@ -3,18 +3,19 @@ package com.gooddata.qa.utils.http.project;
 import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
 
 import java.util.function.Supplier;
+import java.util.stream.StreamSupport;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.methods.HttpRequestBase;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
 import com.gooddata.GoodData;
+import com.gooddata.featureflag.FeatureFlagService;
+import com.gooddata.featureflag.ProjectFeatureFlag;
 import com.gooddata.project.Environment;
 import com.gooddata.project.Project;
 import com.gooddata.project.ProjectDriver;
-import com.gooddata.project.ProjectFeatureFlag;
 import com.gooddata.project.ProjectService;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.utils.http.RestApiClient;
@@ -114,18 +115,18 @@ public final class ProjectRestUtils {
      */
     public static void setFeatureFlagInProject(final GoodData goodData, final String projectId,
             final ProjectFeatureFlags featureFlag, final boolean enabled) {
-        final ProjectService service = goodData.getProjectService();
-        final Project project = service.getProjectById(projectId);
+        final FeatureFlagService service = goodData.getFeatureFlagService();
+        final Project project = goodData.getProjectService().getProjectById(projectId);
 
         final ProjectFeatureFlag flag;
-        if (service.listFeatureFlags(project).stream()
-                .anyMatch(e -> e.getName().equals(featureFlag.getFlagName()))) {
-            flag = service.getFeatureFlag(service.getProjectById(projectId), featureFlag.getFlagName());
+        if (StreamSupport.stream(service.listProjectFeatureFlags(project).spliterator(), false)
+            .anyMatch(e -> e.getName().equals(featureFlag.getFlagName()))) {
+            flag = service.getProjectFeatureFlag(project, featureFlag.getFlagName());
         } else {
-            flag = service.createFeatureFlag(project, new ProjectFeatureFlag(featureFlag.getFlagName(), false));
+            flag = service.createProjectFeatureFlag(project, new ProjectFeatureFlag(featureFlag.getFlagName(), false));
         }
 
         flag.setEnabled(enabled);
-        service.updateFeatureFlag(flag);
+        service.updateProjectFeatureFlag(flag);
     }
 }
