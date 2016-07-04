@@ -452,17 +452,17 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
             assertEquals(getDisabledItemDescription(fact), DISABLED_FACT_DESCRIPTION);
             assertEquals(getDisabledItemDescription(date), DISABLED_DATE_DESCRIPTION);
 
-            fact = getItemFromSpecificDropdown(dataPreviewPage, FACT, ColumnType.DATE);
-
-            takeScreenshot(browser, "Date dropdown menu", getClass());
-            assertTrue(isItemDisable(fact), "Fact item in dropdown is not disabled");
-
             fact = getItemFromSpecificDropdown(dataPreviewPage, FACT, ColumnType.FACT);
             date = getItemFromSpecificDropdown(dataPreviewPage, DATE, ColumnType.FACT);
 
             takeScreenshot(browser, "Fact dropdown menu", getClass());
             assertTrue(isItemDisable(date), "Date item in dropdown is not disabled");
             assertEquals(getItemInfo(fact), FACT_INFO);
+
+            fact = getItemFromSpecificDropdown(dataPreviewPage, FACT, ColumnType.DATE);
+
+            takeScreenshot(browser, "Date dropdown menu", getClass());
+            assertTrue(isItemDisable(fact), "Fact item in dropdown is not disabled");
 
         } finally {
             Files.deleteIfExists(Paths.get(csvFile.getFilePath()));
