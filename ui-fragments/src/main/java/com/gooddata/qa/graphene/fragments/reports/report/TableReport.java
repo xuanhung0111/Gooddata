@@ -28,6 +28,7 @@ import org.openqa.selenium.support.FindBy;
 import org.testng.collections.Sets;
 
 import com.gooddata.qa.graphene.fragments.reports.filter.ContextMenu;
+import com.gooddata.qa.utils.browser.BrowserUtils;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -368,7 +369,7 @@ public class TableReport extends AbstractDashboardReport {
             .findFirst()
             .orElseThrow(() -> new NoSuchElementException("Cannot find attribute header: " + attribute));
 
-        new Actions(browser).contextClick(header).perform();
+        BrowserUtils.contextClick(browser, header);
         waitForElementVisible(cssSelector("#ctxMenu .s-" + simplifyText(label) +" > a"), browser).click();
     }
 
