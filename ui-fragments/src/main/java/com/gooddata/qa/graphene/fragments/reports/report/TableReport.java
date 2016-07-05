@@ -384,12 +384,10 @@ public class TableReport extends AbstractDashboardReport {
     }
 
     public ContextMenu openContextMenuFromCellValue(final String cellValue) {
-        getActions()
-            .contextClick(
-                    browser.findElements(By.cssSelector(".containerBody .gridTabPlate .gridTile div.cell"))
-                        .stream()
-                        .filter(e -> e.getText().equals(cellValue)).findFirst().get())
-            .perform();
+        BrowserUtils.contextClick(browser,
+                browser.findElements(By.cssSelector(".containerBody .gridTabPlate .gridTile div.cell"))
+                    .stream()
+                    .filter(e -> e.getText().equals(cellValue)).findFirst().get());
 
         return Graphene.createPageFragment(ContextMenu.class, waitForElementVisible(By.id("ctxMenu"), browser));
     }

@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
@@ -51,7 +52,7 @@ public class ReportsList extends AbstractFragment {
      * @param i - report index
      */
     public void openReport(int i) {
-        getReportWebElement(i).findElement(BY_REPORT_LABEL).click();
+        getReportWebElement(i).findElement(BY_REPORT_LABEL).sendKeys(Keys.ENTER);
     }
 
     /**
