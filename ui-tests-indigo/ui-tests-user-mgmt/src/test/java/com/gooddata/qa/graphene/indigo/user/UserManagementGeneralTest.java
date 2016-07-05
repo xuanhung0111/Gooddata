@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.user;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.createUser;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.deleteUserByEmail;
@@ -35,6 +36,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.AddGranteesDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.PermissionsDialog;
 import com.gooddata.qa.graphene.fragments.indigo.user.DeleteGroupDialog;
 import com.gooddata.qa.graphene.fragments.indigo.user.GroupDialog;
+import com.gooddata.qa.graphene.fragments.indigo.user.UserInvitationDialog;
 import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
 import com.gooddata.qa.graphene.utils.Sleeper;
 import com.gooddata.qa.utils.http.RestApiClient;
@@ -374,8 +376,11 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     public void checkUserCannotChangeRoleOfPendingUser() {
         initDashboardsPage();
         initUserManagementPage();
-        userManagementPage.openInviteUserDialog()
-            .invitePeople(UserRoles.ADMIN, "Invite new admin user", INVITED_EMAIL);
+
+        UserInvitationDialog dialog = userManagementPage.openInviteUserDialog();
+        dialog.invitePeople(UserRoles.ADMIN, "Invite new admin user", INVITED_EMAIL);
+        waitForFragmentNotVisible(dialog);
+
         assertFalse(userManagementPage.filterUserState(UserStates.INVITED)
                 .selectUsers(INVITED_EMAIL)
                 .isChangeRoleButtonPresent());
@@ -626,8 +631,11 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     private void checkInvitedEmail(String email, String expectedMessage) {
         initDashboardsPage();
         initUserManagementPage();
-        userManagementPage.openInviteUserDialog().invitePeople(UserRoles.ADMIN, "Invite new admin user", email);
-        assertEquals(userManagementPage.openInviteUserDialog().getErrorMessage(), expectedMessage);
+
+        UserInvitationDialog dialog = userManagementPage.openInviteUserDialog();
+        dialog.invitePeople(UserRoles.ADMIN, "Invite new admin user", email);
+        assertEquals(dialog.getErrorMessage(), expectedMessage);
+        dialog.cancelInvitation();
     }
 
     private void activeEmailUser(String mailTitle) throws IOException, MessagingException {

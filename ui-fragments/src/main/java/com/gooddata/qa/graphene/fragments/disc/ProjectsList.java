@@ -8,6 +8,7 @@ import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertNotNull;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -109,7 +110,7 @@ public class ProjectsList extends AbstractTable {
     }
 
     public void clickOnDeployProcessButton() {
-        waitForElementVisible(deployProcessButton).click();
+        waitForElementVisible(deployProcessButton).sendKeys(Keys.ENTER);
     }
 
     public WebElement getDeployProcessButton() {
