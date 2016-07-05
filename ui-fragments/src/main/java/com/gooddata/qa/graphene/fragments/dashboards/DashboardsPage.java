@@ -9,14 +9,18 @@ import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static org.openqa.selenium.By.cssSelector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
@@ -32,6 +36,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.EmbeddedWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.reports.report.AbstractReport;
 import com.gooddata.qa.utils.CssUtils;
+import com.google.common.base.Predicate;
 
 public class DashboardsPage extends AbstractFragment {
     protected static final By BY_DASHBOARD_EDIT_BAR = By.className("s-dashboard-edit-bar");
@@ -302,6 +307,20 @@ public class DashboardsPage extends AbstractFragment {
 
         dialog.publish(listed ? PublishType.EVERYONE_CAN_ACCESS : PublishType.SPECIFIC_USERS_CAN_ACCESS);
         dialog.submit();
+
+        if (listed) {
+            Predicate<WebDriver> notificationPanelShowUp =
+                    b -> isElementVisible(cssSelector(".listedConfirmationBubble button"), browser);
+
+            try {
+                Graphene.waitGui().withTimeout(5, TimeUnit.SECONDS).until(notificationPanelShowUp);
+
+                // turn off notification panel when dashboard is visible to everyone
+                waitForElementVisible(cssSelector(".listedConfirmationBubble button"), browser).click();
+            } catch (TimeoutException e) {
+                // do nothing
+            }
+        }
     }
 
     public void lockDashboard(boolean lock) {

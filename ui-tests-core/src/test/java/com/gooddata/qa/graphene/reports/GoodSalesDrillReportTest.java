@@ -133,6 +133,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             assertSetEquals(tableReport.getMetricsHeader(), Sets.newHashSet("Amount", "Avg. Amount"),
                     "Metric headers are not correct!");
             assertTrue(tableReport.isRollupTotalVisible());
+            drillDialog.closeDialog();
         } finally {
             dashboardsPage.deleteDashboard();
         }
@@ -176,6 +177,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             sleepTight(4000);
             verifyReportExport(ExportFormat.PDF_PORTRAIT, "2010", 30000L);
             checkRedBar(browser);
+            drillDialog.closeDialog();
         } finally {
             dashboardsPage.deleteDashboard();
         }

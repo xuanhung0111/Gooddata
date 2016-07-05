@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -42,7 +43,7 @@ public class ObjectsTable extends AbstractTable {
             WebElement row = waitForElementVisible(rows.get(i));
             WebElement link = row.findElement(BY_OBJECT_LINK);
             if (link.getText().equals(objectName)) {
-                link.click();
+                link.sendKeys(Keys.ENTER);
                 waitForElementVisible(BY_OBJECT_DETAIL_PAGE, browser);
                 return true;
             }
@@ -74,7 +75,7 @@ public class ObjectsTable extends AbstractTable {
         for (String objectName : objectTitles) {
             for (int i = 0; i < tableRows.size(); i++) {
                 if (tableRows.get(i).findElement(BY_ROW_TITLE).getText().equals(objectName)) {
-                    tableRows.get(i).findElement(ObjectsTable.BY_ROW_CHECKBOX).click();
+                    tableRows.get(i).findElement(ObjectsTable.BY_ROW_CHECKBOX).sendKeys(Keys.SPACE);
                     waitForElementVisible(tableRows.get(i).findElement(
                             ObjectsTable.BY_ROW_CHECKBOX_IS_CHECKED));
                     assertTrue(tableRows.get(i).findElement(ObjectsTable.BY_ROW_CHECKBOX)

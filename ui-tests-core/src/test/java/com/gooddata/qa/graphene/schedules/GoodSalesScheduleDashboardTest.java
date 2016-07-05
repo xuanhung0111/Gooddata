@@ -12,6 +12,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForSchedulesPageLoaded;
 import static java.util.Arrays.asList;
+import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -405,6 +406,8 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         if(!dashboardScheduleDialog.schedule()) {
             assertEquals(dashboardScheduleDialog.getErrorMessage(), error);
             dashboardScheduleDialog.cancelSchedule();
+        } else {
+            waitForElementVisible(cssSelector("#status .box-success button"), browser).click();
         }
     }
 
@@ -416,6 +419,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         initDashboardsPage();
         DashboardScheduleDialog dashboardScheduleDialog = dashboardsPage.showDashboardScheduleDialog();
         dashboardScheduleDialog.schedule();
+        waitForElementVisible(cssSelector("#status .box-success button"), browser).click();
     }
 
     private String getScheduleUri(String scheduleTitle) throws JSONException, IOException {

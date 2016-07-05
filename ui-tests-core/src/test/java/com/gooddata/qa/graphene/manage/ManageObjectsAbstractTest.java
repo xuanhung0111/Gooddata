@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 
@@ -104,7 +105,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
 
     protected String moveObjectsBySelectFolderName(ObjectTypes objectType,
                                                    String targetFolderIndex, List<String> objectsList) {
-        dataPage.getMoveObjectsButton().click();
+        dataPage.getMoveObjectsButton().sendKeys(Keys.ENTER);
         waitForElementVisible(dataPage.getMoveObjectsDialog());
         String targetFolderName = waitForElementVisible(dataPage.getTargetFolder(targetFolderIndex))
                 .getText();
@@ -123,7 +124,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
 
     protected void moveObjectsByTypeFolderName(ObjectTypes objectType, String targetFolder,
                                                List<String> objectsList) {
-        dataPage.getMoveObjectsButton().click();
+        dataPage.getMoveObjectsButton().sendKeys(Keys.ENTER);
         waitForElementVisible(dataPage.getMoveObjectsDialog());
         dataPage.getMoveObjectsDialogInput().sendKeys(targetFolder);
         dataPage.getMoveObjectsDialogConfirmButton().click();
@@ -165,7 +166,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
 
     protected void checkDeleteConfirmDialog(ObjectTypes objectType, ObjectsTable objectsTable,
                                             List<String> deletedObjects) {
-        dataPage.getDeleteObjectsButton().click();
+        dataPage.getDeleteObjectsButton().sendKeys(Keys.ENTER);
         waitForElementVisible(dataPage.getDeleteConfirmDialog());
         String deleteConfirmDialogTitle = String.format("Delete %s(s)", objectType.getName());
         String deleteConfirmDialogMessage = String.format(
