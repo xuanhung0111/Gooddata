@@ -289,6 +289,18 @@ public class DashboardsPage extends AbstractFragment {
         newDashboardNameInput.sendKeys(dashboardName);
         newDashboardNameInput.sendKeys(Keys.ENTER);
         getDashboardEditBar().saveDashboard();
+
+        Predicate<WebDriver> notificationPanelShowUp =
+                driver -> isElementVisible(cssSelector(".unlistedBubble .ss-delete"), driver);
+
+        try {
+            Graphene.waitGui().withTimeout(5, TimeUnit.SECONDS).until(notificationPanelShowUp);
+
+            // turn off notification when creating private dashboard
+            waitForElementVisible(cssSelector(".unlistedBubble .ss-delete"), browser).click();
+        } catch (TimeoutException e) {
+            // do nothing
+        }
         return this;
     }
 
