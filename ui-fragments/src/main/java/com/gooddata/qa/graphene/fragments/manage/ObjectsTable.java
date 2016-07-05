@@ -75,7 +75,7 @@ public class ObjectsTable extends AbstractTable {
         for (String objectName : objectTitles) {
             for (int i = 0; i < tableRows.size(); i++) {
                 if (tableRows.get(i).findElement(BY_ROW_TITLE).getText().equals(objectName)) {
-                    tableRows.get(i).findElement(ObjectsTable.BY_ROW_CHECKBOX).click();
+                    tableRows.get(i).findElement(ObjectsTable.BY_ROW_CHECKBOX).sendKeys(Keys.SPACE);
                     waitForElementVisible(tableRows.get(i).findElement(
                             ObjectsTable.BY_ROW_CHECKBOX_IS_CHECKED));
                     assertTrue(tableRows.get(i).findElement(ObjectsTable.BY_ROW_CHECKBOX)

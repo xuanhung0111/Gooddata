@@ -153,6 +153,7 @@ public class ReportsPage extends AbstractFragment {
         waitForElementVisible(By.cssSelector(".c-ipeEditor:not([style*='display: none']) input"), browser).sendKeys(folder);
         waitForElementVisible(By.className("s-ipeSaveButton"), browser).click();
         checkGreenBar(browser);
+        waitForElementVisible(By.cssSelector("#status .box-success button"), browser).click();
 
         return this;
     }
