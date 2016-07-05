@@ -19,6 +19,7 @@ import java.io.IOException;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
+import org.openqa.selenium.Keys;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -141,8 +142,8 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
             .openHowPanel()
             .selectAttribute("Date (Snapshot)");
 
-        waitForElementVisible(cssSelector(".s-btn-filter_this_attribute"), browser).click();
-        waitForElementVisible(cssSelector(".guidedNavigation .hyperlinkOn:not(.hidden) a"), browser).click();
+        waitForElementVisible(cssSelector(".s-btn-filter_this_attribute"), browser).sendKeys(Keys.ENTER);
+        waitForElementVisible(cssSelector(".guidedNavigation .hyperlinkOn:not(.hidden) a"), browser).sendKeys(Keys.ENTER);
     }
 
     @Test(dependsOnMethods = {"createProject"})
