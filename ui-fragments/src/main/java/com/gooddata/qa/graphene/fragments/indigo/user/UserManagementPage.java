@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -27,7 +28,7 @@ public class UserManagementPage extends AbstractFragment {
     @FindBy(css = ".users-titlebar-title > h2")
     private WebElement userTitleBar;
 
-    @FindBy(className = "rename-group-link")
+    @FindBy(xpath = "//a[./*[contains(@class,'rename-group-link')]]")
     private WebElement renameGroupLink;
 
     @FindBy(className = "s-btn-invite_people")
@@ -97,7 +98,7 @@ public class UserManagementPage extends AbstractFragment {
     }
 
     public GroupDialog openGroupDialog(GroupDialog.State state) {
-        waitForElementVisible(state == GroupDialog.State.CREATE ? createGroupButton : renameGroupLink).click();
+        waitForElementVisible(state == GroupDialog.State.CREATE ? createGroupButton : renameGroupLink).sendKeys(Keys.ENTER);
         return Graphene.createPageFragment(GroupDialog.class,
                 waitForElementVisible(GroupDialog.LOCATOR, browser));
     }
