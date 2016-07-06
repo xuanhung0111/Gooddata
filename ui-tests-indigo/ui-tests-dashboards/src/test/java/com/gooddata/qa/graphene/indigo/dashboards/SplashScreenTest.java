@@ -94,7 +94,7 @@ public class SplashScreenTest extends DashboardsTest {
                 .startEditingWidgets();
         indigoDashboardsPage
                 .addWidget(kpi)
-                .saveEditModeWithKpis();
+                .saveEditModeWithWidgets();
 
         takeScreenshot(browser, "checkCreateNewKpiDashboardRemoveAndCreateAgain", getClass());
 

@@ -101,7 +101,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
         String uniqueHeadline = generateUniqueHeadlineTitle();
         selectedKpi.setHeadline(uniqueHeadline);
 
-        waitForFragmentVisible(indigoDashboardsPage).saveEditModeWithKpis();
+        waitForFragmentVisible(indigoDashboardsPage).saveEditModeWithWidgets();
 
         assertEquals(selectedKpi.getHeadline(), uniqueHeadline);
 
@@ -166,7 +166,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
                 .metric(METRIC_AMOUNT)
                 .dataSet(DATE_CREATED)
                 .build())
-            .saveEditModeWithKpis();
+            .saveEditModeWithWidgets();
 
         assertEquals(kpisCountAfterAdd, indigoDashboardsPage.getKpisCount());
         assertEquals(kpisCountAfterAdd, initIndigoDashboardsPageWithWidgets().getKpisCount());
@@ -177,7 +177,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
             .waitForDialog()
             .submitClick();
 
-        indigoDashboardsPage.saveEditModeWithKpis();
+        indigoDashboardsPage.saveEditModeWithWidgets();
 
         assertEquals(kpisCount, initIndigoDashboardsPageWithWidgets().getKpisCount());
     }
@@ -271,7 +271,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
                 .metric(deletedMetric)
                 .dataSet(DATE_ACTIVITY)
                 .build())
-            .saveEditModeWithKpis();
+            .saveEditModeWithWidgets();
 
         initMetricPage();
         waitForFragmentVisible(metricPage).openMetricDetailPage(deletedMetric);
@@ -288,7 +288,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
         indigoDashboardsPage.clickLastKpiDeleteButton()
             .waitForDialog()
             .submitClick();
-        indigoDashboardsPage.saveEditModeWithKpis();
+        indigoDashboardsPage.saveEditModeWithWidgets();
         takeScreenshot(browser, "Dashboards after deleting bad Kpi", getClass());
     }
 

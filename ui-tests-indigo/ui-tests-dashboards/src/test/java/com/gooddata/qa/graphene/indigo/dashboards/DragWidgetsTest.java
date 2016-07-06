@@ -74,7 +74,7 @@ public class DragWidgetsTest extends DashboardsGeneralTest {
                 .getHeadline();
 
         dragWidgets(fromIndex, toIndex, dropzone);
-        indigoDashboardsPage.saveEditModeWithKpis();
+        indigoDashboardsPage.saveEditModeWithWidgets();
 
         takeScreenshot(browser, screenshotName, getClass());
 
