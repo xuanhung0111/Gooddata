@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -699,7 +700,7 @@ public class ScheduleDetail extends ScheduleForm {
     }
 
     public void saveEditedScheduleTitle() {
-        waitForElementVisible(saveScheduleTitleButton).click();
+        waitForElementVisible(saveScheduleTitleButton).sendKeys(Keys.ENTER);
         waitForElementVisible(scheduleTitleInput).click();
     }
 

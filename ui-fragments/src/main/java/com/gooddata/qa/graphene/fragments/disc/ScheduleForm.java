@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static org.testng.Assert.assertEquals;
 
 import java.util.Calendar;
@@ -115,6 +116,11 @@ public class ScheduleForm extends AbstractFragment {
         } else {
             waitForElementVisible(BY_CANCEL_BUTTON, browser).click();
         }
+    }
+
+    public void clickOnCancelLink() {
+        waitForElementVisible(BY_CANCEL_BUTTON, browser).click();
+        waitForFragmentNotVisible(this);
     }
 
     public boolean isScheduleNameErrorShown() {
