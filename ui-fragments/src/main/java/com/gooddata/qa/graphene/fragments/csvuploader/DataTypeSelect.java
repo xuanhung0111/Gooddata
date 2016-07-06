@@ -50,11 +50,12 @@ public class DataTypeSelect extends AbstractReactDropDown {
         }
 
         ensureDropdownOpen();
-        try {
-            return getElement(format("[data-reactid*='%s']", type.getValue()));
-        } finally {
-            ensureDropdownClosed();
-        }
+        return getElement(format("[data-reactid*='%s']", type.getValue()));
+    }
+
+    @Override
+    protected boolean isDropdownOpen() {
+        return getDropdownButton().getAttribute("class").contains("is-dropdown-open");
     }
 
     public String getTypeSelection() {
