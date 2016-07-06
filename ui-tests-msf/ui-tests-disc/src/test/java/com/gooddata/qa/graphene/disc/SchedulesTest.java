@@ -919,6 +919,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
             runSuccessfulTriggerSchedule(triggerScheduleBuilder.getScheduleUrl());
             waitForAutoRunDependentSchedule(dependentScheduleBuilder);
             assertFailedExecution(dependentScheduleBuilder.getExecutable());
+            scheduleDetail.clickOnCloseScheduleButton();
         } finally {
             cleanProcessesInWorkingProject();
         }
@@ -965,6 +966,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
             scheduleForm.selectCronType(ScheduleCronTimes.AFTER);
             assertTrue(scheduleForm.isCorrectTriggerScheduleList(Arrays.asList(scheduleBuilder)),
                     "Incorrect trigger schedule list!");
+            scheduleForm.clickOnCancelLink();
         } finally {
             cleanProcessesInWorkingProject();
         }
