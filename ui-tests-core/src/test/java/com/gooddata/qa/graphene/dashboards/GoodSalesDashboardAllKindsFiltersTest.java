@@ -146,6 +146,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
                     singleton("Date dimension (Snapshot)")));
             assertTrue(report.getRoot().findElement(By.cssSelector("div[title='2012']")).isDisplayed());
             assertTrue(report.getRoot().findElements(By.cssSelector("div[title='2011']")).isEmpty());
+            report.closeReportInfoViewPanel();
 
             FilterWidget filter = getFilterWidget("filter-time");
             filter.changeTimeFilterValueByClickInTimeLine("2011");
