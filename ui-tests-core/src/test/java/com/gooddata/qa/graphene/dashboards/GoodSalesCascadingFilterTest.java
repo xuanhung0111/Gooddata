@@ -249,8 +249,10 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
 
             assertTrue(isEqualCollection(stageNameFilter.getAllAttributeValues(), asList("Closed Won",
                     "Closed Lost")));
+            stageNameFilter.getRoot().click();
             assertTrue(isEqualCollection(productFilter.getAllAttributeValues(), asList("CompuSci", "Educationly",
                     "Explorer", "Grammar Plus", "PhoenixSoft", "WonderKid")));
+            productFilter.getRoot().click();
 
             stageNameFilter.changeAttributeFilterValue("Closed Won");
             stageNameFilter.getRoot().click();
@@ -583,7 +585,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
             dashboardsPage.deleteDashboard();
         }
     }
-    
+
     private WebElement addReportToDashboardAndMoveToRightPlace(String reportName, 
             DashboardWidgetDirection dashboardWidgetDirection) {
         dashboardsPage.getDashboardEditBar().addReportToDashboard(reportName);
@@ -591,7 +593,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
         dashboardWidgetDirection.moveElementToRightPlace(report);
         return report;
     }
-    
+
     private FilterWidget addListAttributeFilterToDashboardAndMoveToRightPlace(String attributeName,
             DashboardWidgetDirection dashboardWidgetDirection) {
         dashboardsPage.getDashboardEditBar().addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, attributeName);
