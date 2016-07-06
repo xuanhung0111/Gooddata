@@ -136,6 +136,7 @@ public class InsightSelectionPanel extends AbstractFragment {
         }
 
         public void delete() {
+            getActions().moveToElement(getRoot()).perform();
             waitForElementVisible(deleteIcon).click();
             SaveInsightDialog.getInstance(browser).clickSubmitButton();
         }

@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -50,6 +51,6 @@ public class FilterPanel extends AbstractFragment {
         if (applyButton.getAttribute("class").contains("gdc-hidden")) {
             return;
         }
-        waitForElementVisible(applyButton).click();
+        waitForElementVisible(applyButton).sendKeys(Keys.ENTER);
     }
 }
