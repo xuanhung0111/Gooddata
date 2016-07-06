@@ -30,7 +30,7 @@ public class FilterWidget extends AbstractFragment {
 
     public FilterWidget openPanel() {
         if (!isOpen()) {
-            button.click();
+            waitForElementVisible(button).click();
         }
         return this;
     }
@@ -56,7 +56,7 @@ public class FilterWidget extends AbstractFragment {
     public List<String> getAllAttributeValues() {
         openPanel();
         return getPanel(AttributeFilterPanel.class).getAllAtributeValues();
-    }    
+    }
 
     public void changeTimeFilterValueByClickInTimeLine(String dataRange) {
         openPanel();
