@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
@@ -211,5 +212,14 @@ public final class WaitUtils {
     public static void waitForStringMissingInUrl(final String url) {
         Predicate<WebDriver> missingString = driver -> !driver.getCurrentUrl().contains(url);
         Graphene.waitGui().until(missingString);
+    }
+
+    public static void waitForExportReport(final File destination, final long minimalSize) {
+        System.out.println("waiting for export " + destination.getName());
+
+        Predicate<WebDriver> isExportCompleted = browser -> destination.length() >= minimalSize;
+        Graphene.waitGui().pollingEvery(5, TimeUnit.SECONDS)
+                .withTimeout(5, TimeUnit.MINUTES)
+                .until(isExportCompleted);
     }
 }

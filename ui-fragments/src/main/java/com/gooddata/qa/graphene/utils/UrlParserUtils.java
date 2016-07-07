@@ -2,10 +2,13 @@ package com.gooddata.qa.graphene.utils;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForStringInUrl;
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 
 import java.util.stream.Stream;
 
 import org.openqa.selenium.WebDriver;
+
+import com.google.common.collect.Iterables;
 
 public class UrlParserUtils {
     public static void replaceInUrl(WebDriver browser, String target, String replacement) {
@@ -28,5 +31,9 @@ public class UrlParserUtils {
                 .findFirst()
                 .get();
         
+    }
+
+    public static String getObjId(final String currentUrl) {
+        return Iterables.getLast(asList(getObjdUri(currentUrl).split("/")));
     }
 }

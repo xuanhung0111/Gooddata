@@ -27,6 +27,7 @@ public final class GoodSalesUtils {
     public static final String METRIC_NUMBER_OF_OPEN_OPPS = "# of Open Opps.";
     public static final String METRIC_NUMBER_OF_OPPORTUNITIES = "# of Opportunities";
     public static final String METRIC_NUMBER_OF_WON_OPPS = "# of Won Opps.";
+    public static final String METRIC_NUMBER_OF_WON = "# of Won";
     public static final String METRIC_SNAPSHOT_BOP = "_Snapshot [BOP]";
     public static final String METRIC_PERCENT_OF_GOAL = "% of Goal";
     public static final String METRIC_QUOTA = "Quota";
@@ -41,6 +42,8 @@ public final class GoodSalesUtils {
     public static final String METRIC_BEST_CASE = "Best Case";
     public static final String METRIC_WON = "Won";
     public static final String METRIC_AVG_AMOUNT = "Avg. Amount";
+    public static final String METRIC_PRODUCTIVE_REPS = "Productive Reps";
+    
 
     // attributes
     public static final String ATTR_PRODUCT = "Product";
@@ -77,4 +80,7 @@ public final class GoodSalesUtils {
 
     // reports
     public static final String REPORT_ACTIVITIES_BY_TYPE = "Activities by Type";
+
+    // variables
+    public static final String VARIABLE_STATUS = "Status";
 }
