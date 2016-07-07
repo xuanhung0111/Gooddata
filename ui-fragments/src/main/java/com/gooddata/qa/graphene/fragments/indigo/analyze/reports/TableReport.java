@@ -18,7 +18,7 @@ import static org.openqa.selenium.By.tagName;
 /**
  * finding by span instead of BY_LINK in sortBaseOnHeader()
  */
-public class TableReportReact extends AbstractFragment {
+public class TableReport extends AbstractFragment {
 
     @FindBy(css = ".public_fixedDataTable_header ." + CELL_CONTENT)
     private List<WebElement> headers;
@@ -53,7 +53,7 @@ public class TableReportReact extends AbstractFragment {
             .orElse("");
     }
 
-    public TableReportReact sortBaseOnHeader(final String name) {
+    public TableReport sortBaseOnHeader(final String name) {
         waitForCollectionIsNotEmpty(headers).stream()
             .filter(e -> name.equalsIgnoreCase(e.getText()))
             .map(e -> e.findElement(By.tagName("span")))

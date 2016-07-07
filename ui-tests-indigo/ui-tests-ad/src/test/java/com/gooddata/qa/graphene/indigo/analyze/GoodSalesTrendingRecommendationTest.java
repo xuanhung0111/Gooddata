@@ -13,12 +13,12 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucketReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.TrendingRecommendation;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
 public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalyseTest {
 
@@ -29,13 +29,13 @@ public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalys
 
     @Test(dependsOnGroups = {"init"})
     public void testOverrideDateFilter() {
-        final FiltersBucketReact FiltersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket FiltersBucketReact = analysisPageReact.getFilterBuckets();
 
         analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDateFilter();
         assertEquals(FiltersBucketReact.getFilterText("Activity"), "Activity: All time");
         FiltersBucketReact.configDateFilter("Last 12 months");
-        ChartReportReact report = analysisPageReact.waitForReportComputing().getChartReport();
+        ChartReport report = analysisPageReact.waitForReportComputing().getChartReport();
         assertEquals(report.getTrackersCount(), 1);
 
         RecommendationContainer recommendationContainer =
@@ -50,7 +50,7 @@ public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalys
 
     @Test(dependsOnGroups = {"init"})
     public void applyParameter() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing().getChartReport();
         final MetricConfiguration metricConfiguration = analysisPageReact.getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
@@ -80,7 +80,7 @@ public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalys
 
     @Test(dependsOnGroups = {"init"})
     public void displayInColumnChartWithOnlyMetric() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing().getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =

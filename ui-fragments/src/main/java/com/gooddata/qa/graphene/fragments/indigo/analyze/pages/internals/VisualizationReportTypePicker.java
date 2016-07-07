@@ -12,7 +12,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 /**
  * button is hidden in DOM, find it when setReportType in order to click it properly
  */
-public class VisualizationReportTypePickerReact extends AbstractFragment {
+public class VisualizationReportTypePicker extends AbstractFragment {
 
     public void setReportType(final ReportType type) {
         if (isSelected(type))

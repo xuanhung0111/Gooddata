@@ -26,7 +26,7 @@ import static org.testng.Assert.assertEquals;
 /**
  * search() method needs to sleep tight for 1 sec in order to work.
  */
-public class CataloguePanelReact extends AbstractFragment {
+public class CataloguePanel extends AbstractFragment {
 
     @FindBy(className = "searchfield-input")
     private WebElement searchInput;
@@ -69,7 +69,7 @@ public class CataloguePanelReact extends AbstractFragment {
         return Integer.parseInt(unrelatedItemsHiddenMessage.split(" ")[0]);
     }
 
-    public CataloguePanelReact filterCatalog(CatalogFilterType type) {
+    public CataloguePanel filterCatalog(CatalogFilterType type) {
         WebElement filter;
         switch(type) {
             case ALL:
@@ -171,7 +171,7 @@ public class CataloguePanelReact extends AbstractFragment {
         return false;
     }
 
-    public CataloguePanelReact clearInputText() {
+    public CataloguePanel clearInputText() {
         if (isElementPresent(BY_CLEAR_SEARCH_FIELD, getRoot())) {
             WebElement clearIcon = waitForElementVisible(BY_CLEAR_SEARCH_FIELD, getRoot());
             clearIcon.click();
@@ -202,7 +202,7 @@ public class CataloguePanelReact extends AbstractFragment {
         return true;
     }
 
-    public CataloguePanelReact changeDataset(String dataset) {
+    public CataloguePanel changeDataset(String dataset) {
         waitForElementVisible(datasetPicker).click();
         Graphene.createPageFragment(DatasourceDropDown.class,
                 waitForElementVisible(BY_DATASOURCE_DROPDOWN, browser)).select(dataset);

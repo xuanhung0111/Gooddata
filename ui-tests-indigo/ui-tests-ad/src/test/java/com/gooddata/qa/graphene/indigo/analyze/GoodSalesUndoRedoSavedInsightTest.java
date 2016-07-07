@@ -17,7 +17,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeaderReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 
 public class GoodSalesUndoRedoSavedInsightTest extends GoodSalesAbstractAnalyseTest {
@@ -134,7 +134,7 @@ public class GoodSalesUndoRedoSavedInsightTest extends GoodSalesAbstractAnalyseT
     }
 
     private void checkUndoRedoAfterSaveInsight(final String expectedPreviousTitle) throws JSONException, IOException {
-        final AnalysisPageHeaderReact header = analysisPageReact.getPageHeader();
+        final AnalysisPageHeader header = analysisPageReact.getPageHeader();
         final String savedTitle = header.getInsightTitle();
         final int numberOfInsights = getAllInsightNames(getRestApiClient(), testParams.getProjectId()).size();
         

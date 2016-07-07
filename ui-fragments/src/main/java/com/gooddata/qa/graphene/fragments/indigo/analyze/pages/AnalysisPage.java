@@ -5,8 +5,8 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.*;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import com.google.common.base.Predicate;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -26,37 +26,37 @@ import static org.testng.Assert.assertTrue;
 /**
  * many React fragments used
  */
-public class AnalysisPageReact extends AbstractFragment {
+public class AnalysisPage extends AbstractFragment {
 
     @FindBy(className = "adi-editor-header")
-    private AnalysisPageHeaderReact pageHeader;
+    private AnalysisPageHeader pageHeader;
 
     @FindBy(className = "s-catalogue")
-    private CataloguePanelReact cataloguePanel;
+    private CataloguePanel cataloguePanel;
 
     @FindBy(className = "adi-editor-main")
-    private MainEditorReact mainEditor;
+    private MainEditor mainEditor;
 
     @FindBy(className = "s-visualization-picker")
-    private VisualizationReportTypePickerReact reportTypePicker;
+    private VisualizationReportTypePicker reportTypePicker;
 
     @FindBy(className = "s-bucket-metrics")
     private MetricsBucket metricsBucket;
 
     @FindBy(className = "s-bucket-categories")
-    private AttributesBucketReact attributesBucket;
+    private AttributesBucket attributesBucket;
 
     @FindBy(className = StacksBucket.CSS_CLASS)
     private StacksBucket stacksBucket;
 
     @FindBy(className = "s-bucket-filters")
-    private FiltersBucketReact filterBuckets;
+    private FiltersBucket filterBuckets;
 
     public static final String MAIN_CLASS = "adi-editor";
 
     private static final By BY_TRASH_PANEL = className("s-trash");
 
-    public AnalysisPageReact startDrag(WebElement source) {
+    public AnalysisPage startDrag(WebElement source) {
         WebElement editor = waitForElementVisible(getRoot());
 
         Point location = editor.getLocation();
@@ -66,12 +66,12 @@ public class AnalysisPageReact extends AbstractFragment {
         return this;
     }
 
-    public AnalysisPageReact stopDrag(Point offset) {
+    public AnalysisPage stopDrag(Point offset) {
         getActions().moveByOffset(offset.x, offset.y).release().perform();
         return this;
     }
 
-    public AnalysisPageReact drag(WebElement source, Supplier<WebElement> target) {
+    public AnalysisPage drag(WebElement source, Supplier<WebElement> target) {
         startDrag(source);
         try {
             getActions().moveToElement(target.get()).perform();
@@ -81,7 +81,7 @@ public class AnalysisPageReact extends AbstractFragment {
         return this;
     }
 
-    public AnalysisPageReact drag(WebElement source, WebElement target) {
+    public AnalysisPage drag(WebElement source, WebElement target) {
         startDrag(source);
         try {
             if (!waitForElementVisible(target).getAttribute("class").contains("adi-droppable-active")) {
@@ -108,103 +108,103 @@ public class AnalysisPageReact extends AbstractFragment {
         return this;
     }
 
-    public AnalysisPageReact addMetric(String metric) {
+    public AnalysisPage addMetric(String metric) {
         return addMetric(metric, FieldType.METRIC);
     }
 
-    public AnalysisPageReact addMetric(String data, FieldType type) {
+    public AnalysisPage addMetric(String data, FieldType type) {
         WebElement source = getCataloguePanel().searchAndGet(data, type);
         WebElement target = getMetricsBucket().getInvitation();
         return drag(source, target);
     }
 
-    public AnalysisPageReact addAttribute(String attribute) {
+    public AnalysisPage addAttribute(String attribute) {
         WebElement source = getCataloguePanel().searchAndGet(attribute, FieldType.ATTRIBUTE);
         WebElement target = getAttributesBucket().getInvitation();
         return drag(source, target);
     }
 
-    public AnalysisPageReact addDate() {
+    public AnalysisPage addDate() {
         WebElement source = getCataloguePanel().getDate();
         WebElement target = getAttributesBucket().getInvitation();
         return drag(source, target);
     }
 
-    public AnalysisPageReact addStack(String attribute) {
+    public AnalysisPage addStack(String attribute) {
         WebElement source = getCataloguePanel().searchAndGet(attribute, FieldType.ATTRIBUTE);
         WebElement target = getStacksBucket().getInvitation();
         return drag(source, target);
     }
 
-    public AnalysisPageReact addFilter(String attribute) {
+    public AnalysisPage addFilter(String attribute) {
         WebElement source = getCataloguePanel().searchAndGet(attribute, FieldType.ATTRIBUTE);
         WebElement target = getFilterBuckets().getInvitation();
         return drag(source, target);
     }
 
-    public AnalysisPageReact addDateFilter() {
+    public AnalysisPage addDateFilter() {
         WebElement source = getCataloguePanel().getDate();
         WebElement target = getFilterBuckets().getInvitation();
         return drag(source, target);
     }
 
-    public AnalysisPageReact replaceMetric(String oldMetric, String newMetric) {
+    public AnalysisPage replaceMetric(String oldMetric, String newMetric) {
         WebElement source = getCataloguePanel().searchAndGet(newMetric, FieldType.METRIC);
         WebElement target = getMetricsBucket().get(oldMetric);
         return drag(source, target);
     }
 
-    public AnalysisPageReact replaceAttribute(String oldAttr, String newAttr) {
+    public AnalysisPage replaceAttribute(String oldAttr, String newAttr) {
         WebElement source = getCataloguePanel().searchAndGet(newAttr, FieldType.ATTRIBUTE);
         WebElement target = getAttributesBucket().get(oldAttr);
         return drag(source, target);
     }
 
-    public AnalysisPageReact replaceAttributeWithDate(String oldAttr) {
+    public AnalysisPage replaceAttributeWithDate(String oldAttr) {
         WebElement source = getCataloguePanel().getDate();
         WebElement target = getAttributesBucket().get(oldAttr);
         return drag(source, target);
     }
 
-    public AnalysisPageReact replaceAttribute(String attr) {
+    public AnalysisPage replaceAttribute(String attr) {
         WebElement source = getCataloguePanel().searchAndGet(attr, FieldType.ATTRIBUTE);
         WebElement target = getAttributesBucket().getFirst();
         return drag(source, target);
     }
 
-    public AnalysisPageReact replaceStack(String attr) {
+    public AnalysisPage replaceStack(String attr) {
         WebElement source = getCataloguePanel().searchAndGet(attr, FieldType.ATTRIBUTE);
         WebElement target = getStacksBucket().get();
         return drag(source, target);
     }
 
-    public AnalysisPageReact removeMetric(String metric) {
+    public AnalysisPage removeMetric(String metric) {
         WebElement header = getMetricsBucket().get(metric).findElement(By.className("s-bucket-item-header"));
         return drag(header ,
                 () -> waitForElementPresent(BY_TRASH_PANEL, browser));
     }
 
-    public AnalysisPageReact removeAttribute(String attr) {
+    public AnalysisPage removeAttribute(String attr) {
         return drag(getAttributesBucket().get(attr).findElement(By.className("adi-bucket-item-header")),
                 () -> waitForElementPresent(BY_TRASH_PANEL, browser));
     }
 
-    public AnalysisPageReact removeFilter(String attr) {
+    public AnalysisPage removeFilter(String attr) {
         return drag(getFilterBuckets().getFilter(attr),
                 () -> waitForElementPresent(BY_TRASH_PANEL, browser));
     }
 
-    public AnalysisPageReact removeDateFilter() {
+    public AnalysisPage removeDateFilter() {
         return drag(getFilterBuckets().getDateFilter(),
                 () -> waitForElementPresent(BY_TRASH_PANEL, browser));
     }
 
-    public AnalysisPageReact removeStack() {
+    public AnalysisPage removeStack() {
         return drag(getStacksBucket().get(),
                 () -> waitForElementPresent(BY_TRASH_PANEL, browser));
     }
 
-    public AnalysisPageReact changeReportType(ReportType type) {
+    public AnalysisPage changeReportType(ReportType type) {
         waitForFragmentVisible(reportTypePicker).setReportType(type);
         return this;
     }
@@ -213,7 +213,7 @@ public class AnalysisPageReact extends AbstractFragment {
         return waitForFragmentVisible(reportTypePicker).isSelected(type);
     }
 
-    public AnalysisPageReact resetToBlankState() {
+    public AnalysisPage resetToBlankState() {
         getPageHeader().resetToBlankState();
         assertTrue(isBlankState());
         return this;
@@ -228,7 +228,7 @@ public class AnalysisPageReact extends AbstractFragment {
                 && getPageHeader().isBlankState();
     }
 
-    public AnalysisPageReact exportReport() {
+    public AnalysisPage exportReport() {
         getPageHeader().exportReport();
         return this;
     }
@@ -241,7 +241,7 @@ public class AnalysisPageReact extends AbstractFragment {
         return getMainEditor().isExplorerMessageVisible();
     }
 
-    public AnalysisPageReact waitForReportComputing() {
+    public AnalysisPage waitForReportComputing() {
         getMainEditor().waitForReportComputing();
         return this;
     }
@@ -250,25 +250,25 @@ public class AnalysisPageReact extends AbstractFragment {
         return getMainEditor().isReportComputing();
     }
 
-    public AnalysisPageReact undo() {
+    public AnalysisPage undo() {
         getPageHeader().undo();
         return this;
     }
 
-    public AnalysisPageReact redo() {
+    public AnalysisPage redo() {
         getPageHeader().redo();
         return this;
     }
 
-    public TableReportReact getTableReport() {
+    public TableReport getTableReport() {
         return getMainEditor().getTableReport();
     }
 
-    public ChartReportReact getChartReport() {
+    public ChartReport getChartReport() {
         return getMainEditor().getChartReport();
     }
 
-    public CataloguePanelReact getCataloguePanel() {
+    public CataloguePanel getCataloguePanel() {
         return waitForFragmentVisible(cataloguePanel);
     }
 
@@ -276,7 +276,7 @@ public class AnalysisPageReact extends AbstractFragment {
         return waitForFragmentVisible(metricsBucket);
     }
 
-    public AttributesBucketReact getAttributesBucket() {
+    public AttributesBucket getAttributesBucket() {
         return waitForFragmentVisible(attributesBucket);
     }
 
@@ -284,19 +284,19 @@ public class AnalysisPageReact extends AbstractFragment {
         return waitForFragmentVisible(stacksBucket);
     }
 
-    public FiltersBucketReact getFilterBuckets() {
+    public FiltersBucket getFilterBuckets() {
         return waitForFragmentVisible(filterBuckets);
     }
 
-    public MainEditorReact getMainEditor() {
+    public MainEditor getMainEditor() {
         return waitForFragmentVisible(mainEditor);
     }
 
-    public AnalysisPageHeaderReact getPageHeader() {
+    public AnalysisPageHeader getPageHeader() {
         return waitForFragmentVisible(pageHeader);
     }
 
-    public AnalysisPageReact switchProject(String name) {
+    public AnalysisPage switchProject(String name) {
         log.info("Switching to project: " + name);
 
         Graphene.createPageFragment(Header.class,
@@ -306,27 +306,27 @@ public class AnalysisPageReact extends AbstractFragment {
         return this;
     }
 
-    public AnalysisPageReact openInsight(final String insight) {
+    public AnalysisPage openInsight(final String insight) {
         getPageHeader().expandInsightSelection().openInsight(insight);
         return this;
     }
 
-    public AnalysisPageReact saveInsight() {
+    public AnalysisPage saveInsight() {
         getPageHeader().saveInsight();
         return this;
     }
 
-    public AnalysisPageReact saveInsight(final String insight) {
+    public AnalysisPage saveInsight(final String insight) {
         getPageHeader().saveInsight(insight);
         return this;
     }
 
-    public AnalysisPageReact saveInsightAs(final String insight) {
+    public AnalysisPage saveInsightAs(final String insight) {
         getPageHeader().saveInsightAs(insight);
         return this;
     }
 
-    public AnalysisPageReact setInsightTitle(final String title) {
+    public AnalysisPage setInsightTitle(final String title) {
         getPageHeader().setInsightTitle(title);
         return this;
     }

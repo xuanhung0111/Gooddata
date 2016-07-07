@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -20,7 +20,7 @@ import static org.openqa.selenium.By.cssSelector;
  * switchable-visualization-component renamed to highcharts-container
  * TableReportReact fragment is used instead of TableReport
  */
-public class MainEditorReact extends AbstractFragment {
+public class MainEditor extends AbstractFragment {
 
     @FindBy(css = CSS_EXPLORER_MESSAGE)
     private WebElement explorerMessage;
@@ -35,13 +35,13 @@ public class MainEditorReact extends AbstractFragment {
         return !isElementPresent(cssSelector(CSS_REPORT), browser);
     }
 
-    public TableReportReact getTableReport() {
-        return Graphene.createPageFragment(TableReportReact.class,
+    public TableReport getTableReport() {
+        return Graphene.createPageFragment(TableReport.class,
                 waitForElementVisible(BY_TABLE_REPORT, browser));
     }
 
-    public ChartReportReact getChartReport() {
-        return Graphene.createPageFragment(ChartReportReact.class,
+    public ChartReport getChartReport() {
+        return Graphene.createPageFragment(ChartReport.class,
                 waitForElementVisible(BY_CHART_REPORT, browser));
     }
 

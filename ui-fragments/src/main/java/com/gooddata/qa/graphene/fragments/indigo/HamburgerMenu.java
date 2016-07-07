@@ -18,7 +18,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPageReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 
 public class HamburgerMenu extends AbstractFragment {
@@ -61,7 +61,7 @@ public class HamburgerMenu extends AbstractFragment {
                 waitForDashboardPageLoaded(browser);
                 return;
             case "Analyze":
-                waitForElementVisible(className(AnalysisPageReact.MAIN_CLASS), browser);
+                waitForElementVisible(className(AnalysisPage.MAIN_CLASS), browser);
                 return;
             case "Reports":
                 waitForReportsPageLoaded(browser);

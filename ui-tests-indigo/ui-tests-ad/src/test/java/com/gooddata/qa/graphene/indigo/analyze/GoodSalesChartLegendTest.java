@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
 public class GoodSalesChartLegendTest extends GoodSalesAbstractAnalyseTest {
 
@@ -32,7 +32,7 @@ public class GoodSalesChartLegendTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void checkShowPercentAndLegendColor() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing()
             .getChartReport();
@@ -54,7 +54,7 @@ public class GoodSalesChartLegendTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void dontShowLegendWhenOnlyOneMetric() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_AMOUNT)
+        ChartReport report = analysisPageReact.addMetric(METRIC_AMOUNT)
                 .addAttribute(ATTR_STAGE_NAME)
                 .waitForReportComputing()
                 .getChartReport();
@@ -70,7 +70,7 @@ public class GoodSalesChartLegendTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testLegendsInChartHasManyMetrics() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_AMOUNT).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPageReact.addMetric(METRIC_AMOUNT).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing().getChartReport();
         assertTrue(report.isLegendVisible());
         assertTrue(report.areLegendsHorizontal());
@@ -78,7 +78,7 @@ public class GoodSalesChartLegendTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testLegendsInStackBy() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE)
+        ChartReport report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE)
                 .addStack(ATTR_DEPARTMENT).waitForReportComputing().getChartReport();
         assertTrue(report.isLegendVisible());
         assertTrue(report.areLegendsVertical());
@@ -94,7 +94,7 @@ public class GoodSalesChartLegendTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void showLegendForStackedChartWithOneSeries() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_WON_OPPS)
+        ChartReport report = analysisPageReact.addMetric(METRIC_NUMBER_OF_WON_OPPS)
                 .addStack(ATTR_STAGE_NAME)
                 .waitForReportComputing()
                 .getChartReport();

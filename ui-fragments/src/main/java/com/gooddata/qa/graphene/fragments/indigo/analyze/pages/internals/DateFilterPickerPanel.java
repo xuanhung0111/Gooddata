@@ -16,7 +16,7 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
 
-public class DateFilterPickerPanelReact extends AbstractFragment {
+public class DateFilterPickerPanel extends AbstractFragment {
 
     // presets and date range sections are just small parts. No need to separate more fragments now.
 

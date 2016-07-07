@@ -33,15 +33,15 @@ import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucketReact;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanelReact;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucketReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.TrendingRecommendation;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -102,7 +102,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
     @Test(dependsOnGroups = {"prepare"})
     public void testCustomDiscovery() {
         String metric = doSafetyMetricAction(analysisPageReact::addMetric, "testCustomDiscovery");
-        ChartReportReact report = analysisPageReact.getChartReport();
+        ChartReport report = analysisPageReact.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -150,7 +150,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
             },
             "dragMetricToColumnChartShortcutPanel");
 
-        ChartReportReact report = analysisPageReact.getChartReport();
+        ChartReport report = analysisPageReact.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -178,10 +178,10 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
             },
             "dragMetricToTrendShortcutPanel");
 
-        ChartReportReact report = analysisPageReact.getChartReport();
+        ChartReport report = analysisPageReact.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
 
-        FiltersBucketReact FiltersBucketReact = analysisPageReact.getFilterBuckets();
+        FiltersBucket FiltersBucketReact = analysisPageReact.getFilterBuckets();
         assertTrue(FiltersBucketReact.isDateFilterVisible());
         assertTrue(FiltersBucketReact.getDateFilterText().endsWith(": Last 4 quarters"));
 
@@ -196,7 +196,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
         String metric = doSafetyMetricAction(analysisPageReact::addMetric, "testSimpleContribution");
         final String attribute = doSafetyAttributeAction(metric, analysisPageReact::addAttribute, "testSimpleContribution");
 
-        final ChartReportReact report = analysisPageReact.getChartReport();
+        final ChartReport report = analysisPageReact.getChartReport();
         int oldTrackersCount = report.getTrackersCount();
         assertTrue(oldTrackersCount >= 1);
         RecommendationContainer recommendationContainer =
@@ -224,7 +224,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
     @Test(dependsOnGroups = {"prepare"})
     public void testAnotherApproachToShowContribution() {
         String metric = doSafetyMetricAction(analysisPageReact::addMetric, "testAnotherApproachToShowContribution");
-        ChartReportReact report = analysisPageReact.getChartReport();
+        ChartReport report = analysisPageReact.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -234,7 +234,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
         final ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
 
-        final CataloguePanelReact cataloguePanel = analysisPageReact.getCataloguePanel();
+        final CataloguePanel cataloguePanel = analysisPageReact.getCataloguePanel();
         String attribute;
         while (true) {
             attribute = getRandomAttributeFromMetric(metric);
@@ -269,7 +269,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
     @Test(dependsOnGroups = {"prepare"})
     public void testSimpleComparison() {
         String metric = doSafetyMetricAction(analysisPageReact::addMetric, "testSimpleComparison");
-        ChartReportReact report = analysisPageReact.getChartReport();
+        ChartReport report = analysisPageReact.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -318,8 +318,8 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
         List<String> badMetrics = Lists.newArrayList();
         String metric;
 
-        final AttributesBucketReact categoriesBucket = analysisPageReact.getAttributesBucket();
-        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final AttributesBucket categoriesBucket = analysisPageReact.getAttributesBucket();
+        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         while (true) {
             if (badMetrics.size() >= 3) {
@@ -335,7 +335,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
                 analysisPageReact.resetToBlankState();
             }
 
-            ChartReportReact report = analysisPageReact.getChartReport();
+            ChartReport report = analysisPageReact.getChartReport();
             assertEquals(report.getTrackersCount(), 1);
             RecommendationContainer recommendationContainer =
                     Graphene.createPageFragment(RecommendationContainer.class,
@@ -373,7 +373,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
     @Test(dependsOnGroups = {"prepare"})
     public void displayInColumnChartWithOnlyMetric() {
         String metric = doSafetyMetricAction(analysisPageReact::addMetric, "displayInColumnChartWithOnlyMetric");
-        ChartReportReact report = analysisPageReact.getChartReport();
+        ChartReport report = analysisPageReact.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -397,8 +397,8 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"prepare"})
     public void displayWhenDraggingFirstMetric() {
-        final AttributesBucketReact categoriesBucket = analysisPageReact.getAttributesBucket();
-        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final AttributesBucket categoriesBucket = analysisPageReact.getAttributesBucket();
+        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         final Supplier<WebElement> recommendation = () ->
             waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
@@ -425,14 +425,14 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"prepare"})
     public void filterOnDateAttribute() {
-        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         String metric = doSafetyMetricAction(
                 data -> analysisPageReact.addMetric(data).addDateFilter(),
                 "filterOnDateAttribute");
         doSafetyAttributeAction(metric, analysisPageReact::addAttribute, "filterOnDateAttribute");
 
-        ChartReportReact report = analysisPageReact.getChartReport();
+        ChartReport report = analysisPageReact.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
         assertTrue(filtersBucketReact.getDateFilterText().endsWith(": All time"));
 
@@ -453,7 +453,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"prepare"})
     public void trendingRecommendationOverrideDateFilter() {
-        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         String metric = doSafetyMetricAction(
                 data -> analysisPageReact.addMetric(data).addDateFilter(),
@@ -488,13 +488,13 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"prepare"})
     public void dragAndDropAttributeToFilterBucket() {
-        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         String metric = doSafetyMetricAction(analysisPageReact::addMetric, "dragAndDropAttributeToFilterBucket");
         String attribute = doSafetyAttributeAction(metric, analysisPageReact::addAttribute,
                 "dragAndDropAttributeToFilterBucket");
 
-        ChartReportReact report = analysisPageReact.getChartReport();
+        ChartReport report = analysisPageReact.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
         assertEquals(filtersBucketReact.getFilterText(attribute), attribute + ": All");
 
@@ -508,7 +508,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
         String metric = doSafetyMetricAction(analysisPageReact::addMetric, "addFilterDoesNotHideRecommendation");
         doSafetyAttributeAction(metric, analysisPageReact::addAttribute, "addFilterDoesNotHideRecommendation");
 
-        ChartReportReact report = analysisPageReact.getChartReport();
+        ChartReport report = analysisPageReact.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -524,7 +524,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"prepare"})
     public void testSimplePoP() {
-        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         final String metric1 = doSafetyMetricAction(
                 data -> analysisPageReact.addMetric(data).addDate(),
@@ -532,7 +532,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
         assertTrue(filtersBucketReact.isDateFilterVisible());
         assertTrue(filtersBucketReact.getDateFilterText().endsWith(": All time"));
-        ChartReportReact report = analysisPageReact.getChartReport();
+        ChartReport report = analysisPageReact.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -550,10 +550,10 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"prepare"})
     public void testAnotherApproachToShowPoP() {
-        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         doSafetyMetricAction(analysisPageReact::addMetric, "testAnotherApproachToShowPoP");
-        ChartReportReact report = analysisPageReact.getChartReport();
+        ChartReport report = analysisPageReact.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -575,7 +575,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     @Test(dependsOnGroups = {"prepare"})
     public void compararisonRecommendationOverrideDateFilter() {
-        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         String metric = doSafetyMetricAction(
                 data -> analysisPageReact.addMetric(data).addDateFilter(),
@@ -617,7 +617,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
             return;
         }
 
-        ChartReportReact report = analysisPageReact.getChartReport();
+        ChartReport report = analysisPageReact.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
         List<String> legends = report.getLegends();
         assertEquals(legends.size(), 2);
@@ -721,7 +721,7 @@ public class AnalyticalDesignerGeneralTest extends GoodSalesAbstractAnalyseTest 
 
     private String doSafetyAttributeAction(String metric, Consumer<String> action, Consumer<String> failedAction,
             String screenshot) {
-        CataloguePanelReact cataloguePanel = analysisPageReact.getCataloguePanel();
+        CataloguePanel cataloguePanel = analysisPageReact.getCataloguePanel();
         String attribute;
         while (true) {
             attribute = getRandomAttributeFromMetric(metric);

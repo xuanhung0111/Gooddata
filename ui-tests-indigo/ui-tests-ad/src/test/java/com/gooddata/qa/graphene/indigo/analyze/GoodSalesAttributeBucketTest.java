@@ -13,8 +13,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucketReact;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucketReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 
@@ -27,8 +27,8 @@ public class GoodSalesAttributeBucketTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void replaceAttributeByNewOne() {
-        final AttributesBucketReact categoriesBucket = analysisPageReact.getAttributesBucket();
-        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final AttributesBucket categoriesBucket = analysisPageReact.getAttributesBucket();
+        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
         final StacksBucket stacksBucket = analysisPageReact.getStacksBucket();
 
         analysisPageReact.addAttribute(ATTR_STAGE_NAME);
@@ -68,7 +68,7 @@ public class GoodSalesAttributeBucketTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void switchAttributesBetweenAxisAndStackBy() {
-        final AttributesBucketReact categoriesBucket = analysisPageReact.getAttributesBucket();
+        final AttributesBucket categoriesBucket = analysisPageReact.getAttributesBucket();
         final StacksBucket stacksBucket = analysisPageReact.getStacksBucket();
 
         analysisPageReact.addAttribute(ATTR_STAGE_NAME).addStack(ATTR_DEPARTMENT);

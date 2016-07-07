@@ -18,7 +18,7 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
-public class ChartReportReact extends AbstractFragment {
+public class ChartReport extends AbstractFragment {
 
     @FindBy(css = ".highcharts-series *")
     private List<WebElement> trackers;

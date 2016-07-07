@@ -22,7 +22,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.dialog.SaveInsightDialo
 /**
  * resetButton now has s-clear css class
  */
-public class AnalysisPageHeaderReact extends AbstractFragment {
+public class AnalysisPageHeader extends AbstractFragment {
 
     @FindBy(className = "s-clear")
     private WebElement resetButton;
@@ -67,12 +67,12 @@ public class AnalysisPageHeaderReact extends AbstractFragment {
         return !isElementDisabled(waitForElementVisible(exportToReportButton));
     }
 
-    public AnalysisPageHeaderReact undo() {
+    public AnalysisPageHeader undo() {
         waitForElementVisible(undoButton).click();
         return this;
     }
 
-    public AnalysisPageHeaderReact redo() {
+    public AnalysisPageHeader redo() {
         waitForElementVisible(redoButton).click();
         return this;
     }
@@ -126,7 +126,7 @@ public class AnalysisPageHeaderReact extends AbstractFragment {
         return getInsightSelectionPanel().waitForLoading();
     }
 
-    public AnalysisPageHeaderReact setInsightTitle(final String title) {
+    public AnalysisPageHeader setInsightTitle(final String title) {
         waitForElementVisible(insightTitle).click();
         final WebElement textArea = waitForElementVisible(insightTitle.findElement(tagName("textarea"))); 
         textArea.sendKeys(title, Keys.ENTER); //make sure the title is applied

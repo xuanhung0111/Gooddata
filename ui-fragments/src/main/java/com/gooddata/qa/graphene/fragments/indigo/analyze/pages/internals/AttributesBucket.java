@@ -16,7 +16,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
 /**
  * s-date-dimension-switch renamed to s-date-dataset-switch
  */
-public class AttributesBucketReact extends AbstractBucket {
+public class AttributesBucket extends AbstractBucket {
 
     private static final By BY_DATE_DATASET_SELECT = By.className("adi-date-dataset-switch");
     private static final By BY_DATE_GRANULARITY_SELECT = By.className("adi-date-granularity-switch");
