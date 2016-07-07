@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.fragments.login;
 
-import static com.gooddata.qa.graphene.fragments.account.LostPasswordPage.LOST_PASSWORD_PAGE_CLASS_NAME;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
@@ -87,8 +86,7 @@ public class LoginFragment extends AbstractFragment {
 
     public LostPasswordPage openLostPasswordPage() {
         waitForElementVisible(forgotPasswordLink).click();
-        return Graphene.createPageFragment(LostPasswordPage.class,
-                waitForElementVisible(By.className(LOST_PASSWORD_PAGE_CLASS_NAME), browser));
+        return LostPasswordPage.getInstance(browser);
     }
 
     public void openRegistrationPage() {

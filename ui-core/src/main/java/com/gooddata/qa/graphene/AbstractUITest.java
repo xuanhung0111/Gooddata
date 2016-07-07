@@ -150,9 +150,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(id = "accountSettingsMenu")
     protected AccountPage accountPage;
 
-    @FindBy(className = LostPasswordPage.LOST_PASSWORD_PAGE_CLASS_NAME)
-    protected LostPasswordPage lostPasswordPage;
-
     @FindBy(css = ".s-registrationPage")
     protected RegistrationPage registrationPage;
 
@@ -632,9 +629,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForFragmentVisible(discProjectsList);
     }
 
-    public void initLostPasswordPage() {
+    public LostPasswordPage initLostPasswordPage() {
         openUrl(PAGE_LOST_PASSWORD);
-        waitForFragmentVisible(lostPasswordPage);
+        return LostPasswordPage.getInstance(browser);
     }
 
     public void initRegistrationPage() {

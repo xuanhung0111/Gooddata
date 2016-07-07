@@ -14,7 +14,6 @@ import java.util.List;
 import javax.mail.MessagingException;
 
 import org.apache.http.ParseException;
-import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.testng.annotations.Test;
@@ -72,30 +71,29 @@ public class ResetPasswordTest extends AbstractUITest {
 
     @Test(dependsOnMethods = {"init"}, groups = {PROJECT_INIT_GROUP})
     public void resetPasswordWithInvalidEmail() {
-        initLostPasswordPage();
-
-        lostPasswordPage.resetPassword(INVALID_EMAIL, false);
-        assertEquals(lostPasswordPage.getErrorMessage(), INVALID_EMAIL_MESSAGE);
+        assertEquals(initLostPasswordPage()
+            .resetPassword(INVALID_EMAIL, false)
+            .getErrorMessage(), INVALID_EMAIL_MESSAGE);
         takeScreenshot(browser, "Invalid email error message", this.getClass());
 
-        lostPasswordPage.resetPassword(NON_REGISTERED_EMAIL, true);
-        assertEquals(lostPasswordPage.getPageLocalMessage(), PASSWORD_PAGE_LOCAL_MESSAGE);
+        LostPasswordPage.getInstance(browser)
+            .resetPassword(NON_REGISTERED_EMAIL, true);
+        assertEquals(LostPasswordPage.getPageLocalMessage(browser), PASSWORD_PAGE_LOCAL_MESSAGE);
         takeScreenshot(browser, "Reset password with non-registered email", this.getClass());
 
-        initLostPasswordPage();
-        lostPasswordPage.backToLoginPage();
+        initLostPasswordPage()
+            .backToLoginPage();
     }
 
     @Test(dependsOnMethods = {"resetPasswordWithInvalidEmail"}, groups = {PROJECT_INIT_GROUP})
     public void resetWithValidAndInvalidPassword() throws MessagingException, IOException, JSONException {
-        LostPasswordPage lostPasswordPage = LoginFragment.getInstance(browser).openLostPasswordPage();
-
-        String resetPasswordLink = lostPasswordPage.resetPassword(imapClient, user);
-        assertEquals(lostPasswordPage.getPageLocalMessage(), PASSWORD_PAGE_LOCAL_MESSAGE);
+        String resetPasswordLink = LoginFragment.getInstance(browser)
+                .openLostPasswordPage()
+                .resetPassword(imapClient, user);
+        assertEquals(LostPasswordPage.getPageLocalMessage(browser), PASSWORD_PAGE_LOCAL_MESSAGE);
 
         openUrl(resetPasswordLink);
-        LostPasswordPage resetPasswordPage = Graphene.createPageFragment(LostPasswordPage.class,
-                waitForElementVisible(RESET_PASSWORD_PAGE_LOCATOR, browser));
+        LostPasswordPage resetPasswordPage = LostPasswordPage.getInstance(RESET_PASSWORD_PAGE_LOCATOR, browser);
 
         resetPasswordPage.setNewPassword("aaaaa");
         assertEquals(resetPasswordPage.getErrorMessage(), SHORT_PASSWORD_ERROR_MESSAGE);
