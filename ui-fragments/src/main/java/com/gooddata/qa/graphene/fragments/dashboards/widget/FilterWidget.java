@@ -58,9 +58,11 @@ public class FilterWidget extends AbstractFragment {
         return getPanel(AttributeFilterPanel.class).getAllAtributeValues();
     }
 
-    public void changeTimeFilterValueByClickInTimeLine(String dataRange) {
+    public FilterWidget changeTimeFilterValueByClickInTimeLine(String dataRange) {
         openPanel();
-        getPanel(TimeFilterPanel.class).changeValueByClickInTimeLine(dataRange);
+        getPanel(TimeFilterPanel.class).selectTimeLine(dataRange).submit();
+
+        return this;
     }
 
     public void changeTimeFilterByEnterFromAndToDate(String startTime, String endTime) {
@@ -68,9 +70,11 @@ public class FilterWidget extends AbstractFragment {
         getPanel(TimeFilterPanel.class).changeValueByEnterFromDateAndToDate(startTime, endTime);
     }
 
-    public void changeAttributeFilterValue(String... values) {
+    public FilterWidget changeAttributeFilterValue(String... values) {
         openPanel();
         getPanel(AttributeFilterPanel.class).changeValues(values);
+
+        return this;
     }
 
     public void changeAttributeFilterValueInSingleMode(String value) {

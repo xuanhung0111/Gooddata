@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.fragments.dashboards;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.util.List;
@@ -18,7 +19,9 @@ import com.gooddata.qa.graphene.enums.dashboard.TextObject;
 import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.DropDown;
+import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 
 public class DashboardEditBar extends AbstractFragment {
 
@@ -163,6 +166,16 @@ public class DashboardEditBar extends AbstractFragment {
                 "Widget wasn't added");
     }
 
+    public void addTimeFilterToDashboard(String dateDimension, DateGranularity dateGranularity, String timeLine) {
+        if (dateGranularity == DateGranularity.DAY) {
+            throw new UnsupportedOperationException(
+                    "Date granularity type: " + dateGranularity + " is not supported");
+        }
+
+        openFilterMenu().select("Date");
+        waitForFragmentVisible(dashboardFilter).addTimeFilter(dateDimension, dateGranularity, timeLine);
+    }
+
     public WidgetConfigPanel openGroupConfigPanel() {
         waitForElementVisible(addFilterMenu).click();
         waitForElementVisible(groupFilter).click();
@@ -264,5 +277,10 @@ public class DashboardEditBar extends AbstractFragment {
 
     public int getDashboardWidgetsCount() {
         return listDashboardWidgets.size();
+    }
+
+    private SimpleMenu openFilterMenu() {
+        waitForElementVisible(addFilterMenu).click();
+        return Graphene.createPageFragment(SimpleMenu.class, waitForElementVisible(SimpleMenu.LOCATOR, browser));
     }
 }

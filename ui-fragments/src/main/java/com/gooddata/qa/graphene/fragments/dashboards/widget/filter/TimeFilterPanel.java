@@ -1,13 +1,20 @@
 package com.gooddata.qa.graphene.fragments.dashboards.widget.filter;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 
-import org.openqa.selenium.By;
+import java.util.List;
+
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 public class TimeFilterPanel extends FilterPanel {
+
+    @FindBy(css = ".s-granularity span")
+    private List<WebElement> dateGranularitys;
+
+    @FindBy(css = ".timeline .timelineitem")
+    private List<WebElement> timeLineItems;
 
     @FindBy(css = "div.fromInput input.input")
     private WebElement filterTimeFromInput;
@@ -18,12 +25,12 @@ public class TimeFilterPanel extends FilterPanel {
     @FindBy(css = "div.fromInput label.label")
     private WebElement fromLabel;
 
-    private static final String TIME_LINE_LOCATOR = "//div[text()='${time}']";
+    public TimeFilterPanel selectDateGranularity(final DateGranularity dateGranularity) {
+        return selectTimeFilter(dateGranularitys, dateGranularity.toString());
+    }
 
-    public void changeValueByClickInTimeLine(String dataRange) {
-        waitForElementVisible(By.xpath(TIME_LINE_LOCATOR.replace("${time}", dataRange)), browser).click();
-        submit();
-        waitForElementNotVisible(this.getRoot());
+    public TimeFilterPanel selectTimeLine(final String timeLine) {
+        return selectTimeFilter(timeLineItems, timeLine);
     }
 
     public void changeValueByEnterFromDateAndToDate(String startTime, String endTime) {
@@ -34,5 +41,24 @@ public class TimeFilterPanel extends FilterPanel {
         filterTimeToInput.sendKeys(endTime);
         filterTimeToInput.click();
         submit();
+    }
+
+    private TimeFilterPanel selectTimeFilter(final List<WebElement> timeFilters, final String time) {
+        waitForCollectionIsNotEmpty(timeFilters)
+                .stream()
+                .filter(e -> time.equalsIgnoreCase(e.getText()))
+                .findFirst()
+                .get()
+                .click();
+
+        return this;
+    }
+
+    public enum DateGranularity {
+        YEAR,
+        QUARTER,
+        MONTH,
+        WEEK,
+        DAY;
     }
 }

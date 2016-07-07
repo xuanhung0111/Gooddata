@@ -34,6 +34,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType
 import com.gooddata.qa.graphene.fragments.dashboards.menu.DashboardMenu;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.EmbeddedWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 import com.gooddata.qa.graphene.fragments.reports.report.AbstractReport;
 import com.gooddata.qa.utils.CssUtils;
 import com.google.common.base.Predicate;
@@ -235,6 +236,8 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     public DashboardsPage addNewTab(String tabName) {
+        editDashboard();
+
         waitForElementVisible(addNewTabButton).click();
         waitForElementVisible(newTabDialog.getRoot());
         newTabDialog.createTab(tabName);
@@ -257,13 +260,15 @@ public class DashboardsPage extends AbstractFragment {
         waitForDashboardPageLoaded(browser);
     }
 
-    public void duplicateDashboardTab(int tabIndex) {
+    public DashboardsPage duplicateDashboardTab(int tabIndex) {
         tabs.openTab(tabIndex);
         editDashboard();
         tabs.selectDropDownMenu(tabIndex);
         waitForElementVisible(BY_TAB_DROPDOWN_MENU, browser).findElement(BY_TAB_DROPDOWN_DUPLICATE_BUTTON).click();
         getDashboardEditBar().saveDashboard();
         waitForDashboardPageLoaded(browser);
+
+        return this;
     }
 
     public void copyDashboardTab(int tabIndex, String dashboardName) {
@@ -369,6 +374,10 @@ public class DashboardsPage extends AbstractFragment {
         return content.getFilterWidget(condition);
     }
 
+    public FilterWidget getFilterWidgetByName(String name) {
+        return getContent().getFilterWidgetByName(name);
+    }
+
     public FilterWidget getFirstFilter() {
         return content.getFirstFilter();
     }
@@ -440,6 +449,17 @@ public class DashboardsPage extends AbstractFragment {
 
     public DashboardsPage addListFilterToDashboard(DashFilterTypes type, String name) {
         editDashboard().addListFilterToDashboard(type, name);
+        return this;
+    }
+
+    public DashboardsPage addTimeFilterToDashboard(String dateDimension, DateGranularity dateGranularity,
+            String timeLine) {
+        editDashboard().addTimeFilterToDashboard(dateDimension, dateGranularity, timeLine);
+        return this;
+    }
+
+    public DashboardsPage turnSavedViewOption(boolean on) {
+        editDashboard().turnSavedViewOption(on);
         return this;
     }
 
