@@ -20,6 +20,7 @@ import org.openqa.selenium.support.ui.Select;
 import com.gooddata.qa.graphene.entity.account.RegistrationForm;
 import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.google.common.collect.Iterables;
 
@@ -140,8 +141,9 @@ public class RegistrationPage extends AbstractFragment {
         return isInputError(captchaInput);
     }
 
-    public void selectLoginLink() {
+    public LoginFragment selectLoginLink() {
         waitForElementVisible(loginLink).click();
+        return LoginFragment.getInstance(browser);
     }
 
     public boolean isEmailFieldEditable() {

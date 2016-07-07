@@ -78,9 +78,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
      * ----- UI fragmnets -----
      */
 
-    @FindBy(css = ".s-loginPage.s-ready")
-    protected LoginFragment loginFragment;
-
     @FindBy(id = "root")
     protected DashboardsPage dashboardsPage;
 
@@ -243,19 +240,19 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public void signInAtUI(String username, String password) {
         if (!browser.getCurrentUrl().contains(ACCOUNT_PAGE)) {
             openUrl(PAGE_LOGIN);
-            waitForElementVisible(loginFragment.getRoot());
         }
-        loginFragment.login(username, password, true);
+        LoginFragment.getInstance(browser).login(username, password, true);
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
         takeScreenshot(browser, "login-ui", this.getClass());
         System.out.println("Successful login with user: " + username);
     }
 
-    public void logout() {
+    public LoginFragment logout() {
         openUrl(PAGE_PROJECTS);
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser).click();
         waitForElementVisible(BY_LOGOUT_LINK, browser).click();
         waitForElementNotPresent(BY_LOGGED_USER_BUTTON);
+        return LoginFragment.getInstance(browser);
     }
 
     public void logoutAndLoginAs(boolean greyPages, UserRoles userRole) throws JSONException {
