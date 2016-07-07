@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
+import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_DROPS_BELOW;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.changeMetricExpression;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
@@ -22,6 +23,7 @@ import java.util.UUID;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Attribute;
@@ -48,6 +50,9 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
 
     private String numberFactUri;
     private String dateDatasetUri;
+
+    private String firstNameAttributeUri;
+    private String firstNameValueUri;
 
     private String sumOfNumberMetricUri;
 
@@ -83,6 +88,18 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
         dateDatasetUri = getMdService().getObjUri(getProject(), Dataset.class,
                 identifier("date.dataset.dt"));
 
+        final Attribute firstNameAttribute =
+                getMdService().getObj(getProject(), Attribute.class, identifier("attr.csv_user.firstname"));
+
+        firstNameAttributeUri = firstNameAttribute.getUri();
+
+        firstNameValueUri = getMdService().getAttributeElements(firstNameAttribute)
+                .stream()
+                .filter(e -> "Khoa".equals(e.getTitle()))
+                .findFirst()
+                .get()
+                .getUri();
+
         String maqlExpression = format("SELECT SUM([%s])", numberFactUri);
 
         sumOfNumberMetricUri = getMdService()
@@ -90,23 +107,40 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
                 .getUri();
     }
 
-    @Test(dependsOnGroups = "precondition", groups = "desktop")
-    public void checkAlertWithSpecialMetricExpression() throws JSONException, IOException {
-        String yearAttributeUri = getMdService().getObjUri(getProject(), Attribute.class, identifier("date.year"));
+    @DataProvider(name = "metricProvider")
+    public Object[][] getMetricProvider() {
+        final String uniqueString = UUID.randomUUID().toString().substring(0, 6);
 
-        String maqlExpression = format("SELECT SUM([%s]) WHERE [%s] = this", numberFactUri, yearAttributeUri);
+        final String yearAttributeUri = getMdService().getObjUri(getProject(), Attribute.class, identifier("date.year"));
 
-        Metric metric = getMdService().createObj(getProject(),
-                new Metric(generateUniqueName(), maqlExpression, "#,##0"));
+        final String timeMacroExpression = format("SELECT SUM([%s]) WHERE [%s] = this", numberFactUri, yearAttributeUri);
 
-        String kpiName = metric.getTitle();
-        String kpiUri = createKpi(kpiName, metric.getUri());
+        final String shareExpression = format("SELECT [%s] / (SELECT [%s] BY [%s], ALL OTHER WITHOUT PF)",
+                sumOfNumberMetricUri, sumOfNumberMetricUri, firstNameAttributeUri);
 
-        String indigoDashboardUri = createAnalyticalDashboard(
+        final String differenceExpression = format("SELECT [%s] - (SELECT [%s] BY ALL [%s] WHERE [%s] IN ([%s]) WITHOUT PF)",
+                sumOfNumberMetricUri, sumOfNumberMetricUri, firstNameAttributeUri, firstNameAttributeUri, firstNameValueUri);
+
+        final String ratioExpression = format("SELECT [%s] / [%s]", sumOfNumberMetricUri, sumOfNumberMetricUri);
+
+        return new Object[][] {
+            {createMetric("timeMacroMetric-" + uniqueString, timeMacroExpression, "#,##0")},
+            {createMetric("shareMetric-" + uniqueString, shareExpression, "#,##0")},
+            {createMetric("differenceMetric-" + uniqueString, differenceExpression, "#,##0")},
+            {createMetric("ratioMetric-" + uniqueString, ratioExpression, "#,##0")}
+        };
+    }
+
+    @Test(dependsOnGroups = "precondition", groups = "desktop", dataProvider = "metricProvider")
+    public void checkAlertWithSpecialMetricExpression(Metric metric) throws JSONException, IOException {
+        final String kpiName = metric.getTitle();
+        final String kpiUri = createKpi(kpiName, metric.getUri());
+
+        final String indigoDashboardUri = createAnalyticalDashboard(
                 getRestApiClient(), testParams.getProjectId(), singletonList(kpiUri));
 
         try {
-            setAlertForKpi(kpiName, TRIGGERED_WHEN_GOES_ABOVE, "10");
+            setAlertForKpi(kpiName, TRIGGERED_WHEN_DROPS_BELOW, "20");
 
             updateCsvDataset(DATASET_NAME, csvFilePath);
 
@@ -135,11 +169,8 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
         try {
             setAlertForKpi(kpiName, TRIGGERED_WHEN_GOES_ABOVE, "10");
 
-            String firstNameAttributeUri = getMdService().getObjUri(getProject(), Attribute.class, title("Firstname"));
-            String firstNameValueUri = firstNameAttributeUri + "/elements?id=2";
-
-            String newMaqlExpression = format(
-                    "SELECT SUM([%s]) WHERE [%s] = [%s]", numberFactUri, firstNameAttributeUri, firstNameValueUri);
+            String newMaqlExpression = format("SELECT SUM([%s]) WHERE [%s] = [%s]",
+                    numberFactUri, firstNameAttributeUri, firstNameValueUri);
 
             changeMetricExpression(getRestApiClient(), sumOfNumberMetricUri, newMaqlExpression);
 
