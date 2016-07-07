@@ -27,7 +27,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.browser.BrowserUtils;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanelReact;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucketReact;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
@@ -47,8 +47,8 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
         analysisPageReact.addDateFilter()
             .getFilterBuckets()
             .getFilter("Activity").click();
-        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
-                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+        DateFilterPickerPanelReact panel = Graphene.createPageFragment(DateFilterPickerPanelReact.class,
+                waitForElementVisible(DateFilterPickerPanelReact.LOCATOR, browser));
 
         panel.changeToDateRangeSection();
 
@@ -73,8 +73,8 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
 
         WebElement dateFilter = filtersBucketReact.getFilter("Activity");
         dateFilter.click();
-        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
-                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+        DateFilterPickerPanelReact panel = Graphene.createPageFragment(DateFilterPickerPanelReact.class,
+                waitForElementVisible(DateFilterPickerPanelReact.LOCATOR, browser));
         panel.changeToDateRangeSection();
         assertFalse(analysisPageReact.isReportComputing());
         panel.changeToPresetsSection();
@@ -139,8 +139,8 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
 
         WebElement dateFilter = analysisPageReact.getFilterBuckets().getFilter("Activity");
         dateFilter.click();
-        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
-                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+        DateFilterPickerPanelReact panel = Graphene.createPageFragment(DateFilterPickerPanelReact.class,
+                waitForElementVisible(DateFilterPickerPanelReact.LOCATOR, browser));
         panel.changeToDateRangeSection();
         assertFalse(analysisPageReact.isReportComputing());
         panel.configTimeFilter("01/14/2015", "04/13/2015");
