@@ -3,7 +3,10 @@ package com.gooddata.qa.graphene.fragments.account;
 import static com.gooddata.qa.graphene.fragments.account.LostPasswordPage.ERROR_MESSAGE_LOCATOR;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
+import static org.openqa.selenium.By.className;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -12,7 +15,9 @@ import java.util.Objects;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -27,7 +32,6 @@ import com.google.common.collect.Iterables;
 public class RegistrationPage extends AbstractFragment {
 
     private static final String CAPTCHA_SECRITY_CODE = "WA-587";
-    private static final By SYSTEM_LOADING_MESSAGE_LOCATOR = By.cssSelector(".s-registration-isCreatingProject");
     private static final String CAPTCHA_INPUT_CLASS_NAME = ".captcha-input input";
     private static final String REGISTRATION_EMAIL_SUBJECT = "Activate Your GoodData Account";
 
@@ -67,6 +71,16 @@ public class RegistrationPage extends AbstractFragment {
     @FindBy(css = "a[href*='login']")
     private WebElement loginLink;
 
+    private static RegistrationPage instance;
+
+    public static final RegistrationPage getInstance(SearchContext context) {
+        if (instance == null) {
+            instance = Graphene.createPageFragment(RegistrationPage.class,
+                    waitForElementVisible(className("s-registrationPage"), context));
+        }
+        return waitForFragmentVisible(instance);
+    }
+
     public RegistrationPage fillInRegistrationForm(RegistrationForm registrationForm) {
         String captchaSecurityCode = CAPTCHA_SECRITY_CODE;
         String emailValue = registrationForm.getEmail();
@@ -90,19 +104,19 @@ public class RegistrationPage extends AbstractFragment {
                 .enterData(captchaInput, captchaSecurityCode);
     }
 
-    public String registerNewUser(ImapClient imapClient, RegistrationForm registrationForm)
+    public String registerNewUserSuccessfully(ImapClient imapClient, RegistrationForm registrationForm)
             throws MessagingException, IOException {
         int messageCount = imapClient.getMessagesCount(GDEmails.REGISTRATION, REGISTRATION_EMAIL_SUBJECT);
 
-        registerNewUser(registrationForm);
-        waitForElementVisible(SYSTEM_LOADING_MESSAGE_LOCATOR, browser);
+        registerNewUserSuccessfully(registrationForm);
 
         return getActivationLink(imapClient, messageCount + 1);
     }
 
-    public void registerNewUser(RegistrationForm registrationForm) {
+    public void registerNewUserSuccessfully(RegistrationForm registrationForm) {
         fillInRegistrationForm(registrationForm).agreeRegistrationLicense()
                 .submitForm();
+        waitForFragmentNotVisible(this);
     }
 
     public RegistrationPage enterEmail(String userEmail) {

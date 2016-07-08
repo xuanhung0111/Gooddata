@@ -123,7 +123,7 @@ public class InviteUserTest extends AbstractProjectTest {
                     waitForElementVisible(INVITATION_PAGE_LOCATOR, browser));
             assertFalse(invitationPage.isCaptchaFieldPresent(), "The security code is displayed");
 
-            invitationPage.registerNewUser(registrationForm);
+            invitationPage.registerNewUserSuccessfully(registrationForm);
             waitForDashboardPageLoaded(browser);
             assertTrue(browser.getCurrentUrl().contains(testParams.getProjectId()),
                     nonRegistedUser + " has not been created or invited sucessfully");

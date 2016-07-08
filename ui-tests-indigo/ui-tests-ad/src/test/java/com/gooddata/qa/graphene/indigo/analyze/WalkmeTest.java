@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.testng.Assert.assertEquals;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.deleteUserByEmail;
@@ -59,10 +58,8 @@ public class WalkmeTest extends AbstractUITest {
     public void registerNewUser() throws ParseException, JSONException, IOException {
         deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), REGISTRATION_USER);
 
-        initRegistrationPage();
-
         String registrationString = String.valueOf(System.currentTimeMillis());
-        registrationPage.registerNewUser(new RegistrationForm()
+        initRegistrationPage().registerNewUserSuccessfully(new RegistrationForm()
                 .withFirstName("FirstName " + registrationString)
                 .withLastName("LastName " + registrationString)
                 .withEmail(REGISTRATION_USER)
@@ -72,7 +69,6 @@ public class WalkmeTest extends AbstractUITest {
                 .withJobTitle("Title " + registrationString)
                 .withIndustry("Government"));
 
-        waitForFragmentNotVisible(registrationPage);
         waitForDashboardPageLoaded(browser);
     }
 

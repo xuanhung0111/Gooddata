@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.i18n;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkLocalization;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 
 import org.json.JSONException;
 import org.testng.annotations.AfterClass;
@@ -48,7 +47,6 @@ public class LocalizationTest extends AbstractUITest {
     @Test(dependsOnGroups = {"precondition"}, groups = {"entry-point"})
     public void verifyRegistrationPage() {
         LoginFragment.getInstance(browser).openRegistrationPage();
-        waitForFragmentVisible(registrationPage);
         checkLocalization(browser);
     }
 
