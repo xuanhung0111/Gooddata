@@ -145,7 +145,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
             dashboardsPage.getContent().getFilterWidget("filter-time")
                 .changeTimeFilterValueByClickInTimeLine("2015");
             dashboardsPage.getTabs().openTab(1);
-            assertNotEquals(dashboardsPage.getContent().getFilterWidget("filter-time").getCurrentValue(), "2015");
+            assertEquals(dashboardsPage.getContent().getFilterWidget("filter-time").getCurrentValue(), "2015");
         } finally {
             dashboardsPage.deleteDashboard();
         }
@@ -239,7 +239,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
             assertTrue(dashboardsPage.getContent().getReport("Report2", TableReport.class).isNoData());
 
             dashboardsPage.getTabs().openTab(1);
-            assertNotEquals(dashboardsPage.getContent().getFilterWidget("filter-time").getCurrentValue(), "2013");
+            assertEquals(dashboardsPage.getContent().getFilterWidget("filter-time").getCurrentValue(), "2013");
         } finally {
             dashboardsPage.deleteDashboard();
         }
