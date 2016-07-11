@@ -133,6 +133,8 @@ public class ReportPage extends AbstractFragment {
     private static final By METRIC_AXIS_CONFIGURATION_CONTENT_LOCATOR = By
             .cssSelector("div.yui3-c-metricaxisconfiguration-content:not(.gdc-hidden)");
 
+    private static final By SND_DIALOG_LOADING = By.cssSelector("form.sndFooterForm > .progress.s-loading");
+
     public ReportPage initPage() {
         waitForAnalysisPageLoaded(browser);
         waitForFragmentVisible(this);
@@ -260,7 +262,7 @@ public class ReportPage extends AbstractFragment {
         // so need a short time to wait in case like this
         sleepTightInSeconds(2);
 
-        waitForElementNotPresent(By.cssSelector("form.sndFooterForm > .progress.is-loading"));
+        waitForElementNotPresent(SND_DIALOG_LOADING);
         waitForElementVisible(By.cssSelector("form.sndFooterForm > button.s-btn-done:not([disabled])"), browser).click();
 
         Predicate<WebDriver> predicate = input -> !waitForElementVisible(filterButton)
@@ -868,7 +870,7 @@ public class ReportPage extends AbstractFragment {
         if (values.isEmpty()) {
             return this;
         }
-
+        waitForElementNotPresent(cssSelector(".busyMask[style='display: block;]"));
         waitForElementVisible(cssSelector(".s-btn-filter_this_attribute"), browser).click();
         SelectItemPopupPanel panel = Graphene.createPageFragment(SelectItemPopupPanel.class,
                 waitForElementVisible(cssSelector(".c-attributeElementsFilterEditor"), browser));
