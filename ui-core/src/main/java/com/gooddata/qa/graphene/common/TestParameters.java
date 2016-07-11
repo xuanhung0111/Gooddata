@@ -213,4 +213,9 @@ public class TestParameters {
         return Stream.of("whitelabeled\\.intgdc\\.com", ".*secure.*\\.gooddata\\.com", ".*\\.eu\\.gooddata\\.com")
                 .anyMatch(this.host::matches);
     }
+
+    public boolean isPerformanceEnvironment() {
+        return Stream.of("perf\\.getgooddata\\.com")
+                .anyMatch(this.host::matches);
+    }
 }
