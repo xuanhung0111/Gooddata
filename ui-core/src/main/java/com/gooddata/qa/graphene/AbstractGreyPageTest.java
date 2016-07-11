@@ -244,7 +244,7 @@ public class AbstractGreyPageTest extends AbstractTest {
         System.out.println("imageFileName = " + imageFileName);
         long fileSize = imageFileName.length();
         System.out.println("File size: " + fileSize);
-        assertTrue(fileSize == expectedSize, "LDM is probably invalid, check the LDM image manually! Current size is " + fileSize + ", but" + expectedSize + "in size was expected");
+        assertTrue(fileSize == expectedSize, "LDM is probably invalid, check the LDM image manually! Current size is " + fileSize + ", but " + expectedSize + " in size was expected");
     }
 
     protected void addUsersWithOtherRolesToProject() throws ParseException, IOException, JSONException {
