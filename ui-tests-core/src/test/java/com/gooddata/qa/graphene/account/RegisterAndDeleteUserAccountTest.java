@@ -212,7 +212,8 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
     @Test(groups = {PROJECT_INIT_GROUP, "sanity"})
     public void registerNewUser() throws MessagingException, IOException, ParseException, JSONException {
-        if (!testParams.isClusterEnvironment() || testParams.isProductionEnvironment()) {
+        if (!testParams.isClusterEnvironment() || testParams.isProductionEnvironment() ||
+                testParams.isPerformanceEnvironment()) {
             log.warning("Register New User is not tested on PI or Production environment");
             return;
         }
@@ -310,7 +311,8 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
     @AfterClass(alwaysRun = true)
     public void tearDown() throws ParseException, JSONException, IOException {
-        if (!testParams.isClusterEnvironment() || testParams.isProductionEnvironment()) return;
+        if (!testParams.isClusterEnvironment() || testParams.isProductionEnvironment() ||
+                testParams.isPerformanceEnvironment()) return;
         deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), REGISTRATION_USER);
     }
 
