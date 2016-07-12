@@ -146,7 +146,7 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
             final RegistrationPage invitationPage = Graphene.createPageFragment(RegistrationPage.class,
                     waitForElementVisible(INVITATION_PAGE_LOCATOR, browser));
 
-            invitationPage.registerNewUser(registrationForm);
+            invitationPage.registerNewUserSuccessfully(registrationForm);
             waitForDashboardPageLoaded(browser);
 
             createSimpleReport();

@@ -5,7 +5,6 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.checkGreenBar;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -100,7 +99,7 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
         assertFalse(invitationPage.isEmailFieldEditable(), "Email is editable");
         assertFalse(invitationPage.isCaptchaFieldPresent(), "Captcha field is present");
 
-        invitationPage.registerNewUser(registrationForm);
+        invitationPage.registerNewUserSuccessfully(registrationForm);
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
         assertThat(browser.getCurrentUrl(), containsString(testParams.getProjectId()));
     }
@@ -110,9 +109,8 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
             throws ParseException, JSONException, IOException, MessagingException {
         deleteUserIfExist(getRestApiClient(), INVITATION_USER);
 
-        initRegistrationPage();
-        registrationPage.registerNewUser(registrationForm);
-        waitForFragmentNotVisible(registrationPage);
+        initRegistrationPage()
+            .registerNewUserSuccessfully(registrationForm);
 
         waitForWalkmeAndTurnOff();
         assertEquals(waitForElementVisible(BY_LOGGED_USER_BUTTON, browser).getText(),

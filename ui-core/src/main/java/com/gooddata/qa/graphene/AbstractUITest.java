@@ -150,9 +150,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(id = "accountSettingsMenu")
     protected AccountPage accountPage;
 
-    @FindBy(css = ".s-registrationPage")
-    protected RegistrationPage registrationPage;
-
     /**
      * ----- DISC fragments -----
      */
@@ -634,9 +631,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
         return LostPasswordPage.getInstance(browser);
     }
 
-    public void initRegistrationPage() {
+    public RegistrationPage initRegistrationPage() {
         openUrl(PAGE_REGISTRATION);
-        waitForFragmentVisible(registrationPage);
+        return RegistrationPage.getInstance(browser);
     }
 
     public LocalizationPage initLocalizationPage() {

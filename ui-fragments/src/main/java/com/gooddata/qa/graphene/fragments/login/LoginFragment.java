@@ -13,6 +13,7 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.account.LostPasswordPage;
+import com.gooddata.qa.graphene.fragments.account.RegistrationPage;
 
 public class LoginFragment extends AbstractFragment {
 
@@ -89,8 +90,9 @@ public class LoginFragment extends AbstractFragment {
         return LostPasswordPage.getInstance(browser);
     }
 
-    public void openRegistrationPage() {
+    public RegistrationPage openRegistrationPage() {
         waitForElementVisible(registrationLink).click();
+        return RegistrationPage.getInstance(browser);
     }
 
     public String getNotificationMessage() {
