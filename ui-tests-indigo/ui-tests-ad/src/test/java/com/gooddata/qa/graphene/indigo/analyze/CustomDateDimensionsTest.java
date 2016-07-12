@@ -33,7 +33,7 @@ import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
 import com.google.common.collect.Sets;
 
-public class GoodSalesCustomDateDimensionsTest extends AbstractAnalyseTest {
+public class CustomDateDimensionsTest extends AbstractAnalyseTest {
 
     private static final String NUMBER = "Number";
     private static final String RETAIL_DATE = "Retaildate";
