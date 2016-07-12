@@ -26,6 +26,9 @@ public class MetricModifiersTest extends AbstractAdE2ETest {
         analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate()
             .waitForReportComputing();
+
+        analysisPageReact.getFilterBuckets().configDateFilter("This year");
+
         Graphene.createPageFragment(RecommendationContainer.class,
             waitForElementVisible(RecommendationContainer.LOCATOR, browser))
             .<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).apply();
