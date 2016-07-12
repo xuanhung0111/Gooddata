@@ -60,7 +60,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     @FindBy(css = ".s-btn-delete")
     private WebElement btnDelete;
 
-    private static final String COMPUTED_ATTRIBUTE_NAME = "Sales Rep Ranking";
+    private static final String COMPUTED_ATTRIBUTE_NAME = "A Sales Rep Ranking";
     private static final String REPORT_NAME = "Computed Attribute Report";
     private static final String CA_VARIABLE_REPORT_NAME = "Computed Attribute Report with Variable";
     private static final String TEST_DASHBOAD_NAME = "Test computed attribute";
@@ -144,7 +144,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         sleepTight(4000);
         Screenshots.takeScreenshot(browser, "project-model", this.getClass());
 
-        verifyLDMModelProject(32393);
+        verifyLDMModelProject(32473);
     }
 
     @Test(dependsOnMethods = {"createComputedAttributeTest"}, priority = 2)

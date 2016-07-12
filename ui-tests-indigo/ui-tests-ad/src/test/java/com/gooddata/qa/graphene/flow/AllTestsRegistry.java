@@ -8,7 +8,7 @@ import com.gooddata.qa.graphene.indigo.analyze.GoodSalesCatalogueTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesChartLegendTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesComparisonRecommendationTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesContributionRecommendationTest;
-import com.gooddata.qa.graphene.indigo.analyze.GoodSalesCustomDateDimensionsTest;
+import com.gooddata.qa.graphene.indigo.analyze.CustomDateDimensionsTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesDateDimensionTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesDateFilterTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesDescriptionTest;
@@ -16,7 +16,7 @@ import com.gooddata.qa.graphene.indigo.analyze.GoodSalesDropAttributeTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesFactBasedMetricTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesMetricBucketTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesMetricFilterTest;
-import com.gooddata.qa.graphene.indigo.analyze.GoodSalesMultipleDatasetsTest;
+import com.gooddata.qa.graphene.indigo.analyze.MultipleDatasetsTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesShortcutRecommendationTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesTableReportTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesTrendingRecommendationTest;
@@ -39,7 +39,7 @@ public class AllTestsRegistry {
             .register(GoodSalesChartLegendTest.class)
             .register(GoodSalesComparisonRecommendationTest.class)
             .register(GoodSalesContributionRecommendationTest.class)
-            .register(GoodSalesCustomDateDimensionsTest.class)
+            .register(CustomDateDimensionsTest.class)
             .register(GoodSalesDateDimensionTest.class)
             .register(GoodSalesDateFilterTest.class)
             .register(GoodSalesDescriptionTest.class)
@@ -48,7 +48,7 @@ public class AllTestsRegistry {
             .register(GoodSalesFactBasedMetricTest.class)
             .register(GoodSalesMetricBucketTest.class)
             .register(GoodSalesMetricFilterTest.class)
-            .register(GoodSalesMultipleDatasetsTest.class)
+            .register(MultipleDatasetsTest.class)
             .register(GoodSalesShortcutRecommendationTest.class)
             .register(SpecialCasesTest.class)
             .register(GoodSalesTableReportTest.class)
