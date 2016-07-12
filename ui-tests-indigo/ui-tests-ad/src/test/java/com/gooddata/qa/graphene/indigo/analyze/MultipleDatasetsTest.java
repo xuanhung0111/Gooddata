@@ -26,7 +26,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReac
 import java.io.IOException;
 import java.lang.reflect.Method;
 
-public class GoodSalesMultipleDatasetsTest extends AbstractAnalyseTest {
+public class MultipleDatasetsTest extends AbstractAnalyseTest {
 
     private static final String MAQL_PATH = "/quotes/quotes.maql";
     private static final String QUOTES_CSV_PATH = "/quotes/quotes.csv";
