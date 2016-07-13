@@ -17,14 +17,14 @@ public class AbstractDashboardReport extends AbstractReport {
     @FindBy(css = ".c-report-too-big p")
     protected WebElement reportTooBig;
 
-    @FindBy(css = "button.s-btn-show_anyway_br__may_crash_browser_")
+    @FindBy(css = "button.s-btn-show_anyway")
     protected WebElement showAnywayBtn;
 
     public static final By DRILL_REPORT_LOCATOR = By.cssSelector(".c-drillDialog-report");
 
     private static final String CELL_LIMIT = "Report too large to display.";
     
-    private static final String SHOW_ANYWAY = "Show anyway\n(may crash browser)";
+    private static final String SHOW_ANYWAY = "Show anyway";
 
     public void addDrilling(Pair<List<String>, String> pairs, String group) {
         WidgetConfigPanel configPanel = WidgetConfigPanel.openConfigurationPanelFor(getRoot(), browser);
