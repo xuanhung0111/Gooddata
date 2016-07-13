@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
@@ -11,6 +12,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
+import java.text.ParseException;
 import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -134,14 +136,18 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void testSimplePoP() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().waitForReportComputing();
-        assertTrue(analysisPageReact.getFilterBuckets()
-                .isFilterVisible("Activity"));
-        assertEquals(analysisPageReact.getFilterBuckets().getFilterText("Activity"), "Activity: All time");
-        ChartReportReact report = analysisPageReact.getChartReport();
-        assertThat(report.getTrackersCount(), equalTo(6));
-        RecommendationContainer recommendationContainer =
+    public void testSimplePoP() throws ParseException {
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addDate()
+                .getFilterBuckets()
+                .configDateFilter("01/01/2012", "12/31/2012");
+
+        assertTrue(analysisPageReact.getFilterBuckets().isFilterVisible(ATTR_ACTIVITY));
+        assertEquals(analysisPageReact.getFilterBuckets().getFilterText(ATTR_ACTIVITY),
+                "Activity: Jan 1, 2012 - Dec 31, 2012");
+        ChartReportReact report = analysisPageReact.waitForReportComputing().getChartReport();
+        assertThat(report.getTrackersCount(), equalTo(1));
+        RecommendationContainer recommendationContainer = 
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
