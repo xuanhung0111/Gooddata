@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -154,8 +155,14 @@ public class Kpi extends Widget {
     }
 
     public Kpi hoverAndClickKpiAlertButton() {
-        Actions action = new Actions(browser);
-        action.moveToElement(value).moveToElement(alertButton).click().build().perform();
+        // In case after edit Indigo dashboard and save, there should have a piece of time to wait for 
+        // Kpi until its position is fixed on dashboard.
+        // And in that time, any actions like hover may not work properly because the Kpi is still running.
+        // Consider this is a work around to wait until the Kpi's position is fixed on dashboard.
+        sleepTightInSeconds(3);
+        // TODO: Find a way to fix this issue that described in https://jira.intgdc.com/browse/CL-10042
+
+        getActions().moveToElement(value).moveToElement(alertButton).click().build().perform();
 
         return this;
     }
