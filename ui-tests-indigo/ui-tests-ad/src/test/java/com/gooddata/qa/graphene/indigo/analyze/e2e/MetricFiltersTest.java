@@ -144,7 +144,7 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
                 waitForElementVisible(MetricConfiguration.BY_ATTRIBUTE_FILTER_PICKER, browser));
 
         panel.clear()
-            .selectItems("Email")
+            .selectItems("Email", "Phone Call")
             .apply();
         assertTrue(isElementPresent(cssSelector(labelCount), browser));
 
