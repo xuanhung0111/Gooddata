@@ -79,10 +79,6 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
 
         assertTrue(filtersBucketReact.isDateFilterVisible());
         assertEquals(filtersBucketReact.getDateFilterText(), RETAIL_DATE + ": All time");
-        RecommendationContainer recommendationContainer =
-                Graphene.createPageFragment(RecommendationContainer.class,
-                        waitForElementVisible(RecommendationContainer.LOCATOR, browser));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
         for (String period : Sets.newHashSet(filtersBucketReact.getDateFilterOptions())) {
             System.out.println(format("Try with time period [%s]", period));

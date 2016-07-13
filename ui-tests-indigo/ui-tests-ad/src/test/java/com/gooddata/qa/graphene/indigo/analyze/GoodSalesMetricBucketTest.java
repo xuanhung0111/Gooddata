@@ -54,10 +54,6 @@ public class GoodSalesMetricBucketTest extends GoodSalesAbstractAnalyseTest {
                 .expandConfiguration();
         assertTrue(metricConfiguration.isPopEnabled());
         assertTrue(metricConfiguration.isShowPercentEnabled());
-        RecommendationContainer recommendationContainer =
-                Graphene.createPageFragment(RecommendationContainer.class,
-                        waitForElementVisible(RecommendationContainer.LOCATOR, browser));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
         analysisPageReact.addMetric(METRIC_QUOTA).waitForReportComputing();
         sleepTight(3000);
@@ -65,7 +61,6 @@ public class GoodSalesMetricBucketTest extends GoodSalesAbstractAnalyseTest {
         assertFalse(metricConfiguration.isPopEnabled());
         assertFalse(metricConfiguration.isShowPercentEnabled());
         assertEquals(report.getLegends(), asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_QUOTA));
-        assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
         assertEquals(analysisPageReact.getMetricsBucket().getItemNames(), asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_QUOTA));
 
         analysisPageReact.addMetric(METRIC_SNAPSHOT_BOP).waitForReportComputing();
