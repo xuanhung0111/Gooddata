@@ -9,6 +9,7 @@ import static org.testng.Assert.assertEquals;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.gooddata.project.ProjectValidationResults;
 import org.json.JSONException;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
@@ -23,6 +24,8 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
+import static org.testng.Assert.assertFalse;
+
 import com.gooddata.qa.utils.http.rolap.RolapRestUtils;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -131,7 +134,9 @@ public abstract class AbstractProjectTest extends AbstractUITest {
                         + " or running in IE, Android and Safari");
                 return;
             }
-            assertEquals(validateProject(), "OK");
+            final ProjectValidationResults results = validateProject();
+            assertFalse(results.isError(), "Validation contains no errors");
+            assertFalse(results.isFatalError(), "Validation contains no fatal errors");
         } else {
             System.out.println("Validations were skipped at this test class...");
         }
