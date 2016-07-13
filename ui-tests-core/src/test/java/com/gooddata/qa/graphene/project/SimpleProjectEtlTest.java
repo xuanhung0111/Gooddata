@@ -13,11 +13,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.zip.CRC32;
 
+import com.gooddata.GoodDataException;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.openqa.selenium.TimeoutException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -123,8 +123,9 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
         createProject();
         importProject(exportToken, statusPollingCheckIterations);
         try {
+            // this runs validation, but results are ignored
             validateProject();
-        } catch (TimeoutException e) {
+        } catch (GoodDataException e) {
             validationTimeoutOK = false;
             e.printStackTrace();
         }

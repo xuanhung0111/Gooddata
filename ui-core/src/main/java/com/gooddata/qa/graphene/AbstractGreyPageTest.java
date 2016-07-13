@@ -26,7 +26,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.project.ProjectDriver;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.greypages.account.AccountLoginFragment;
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceFragment;
@@ -41,7 +40,6 @@ import com.gooddata.qa.graphene.fragments.greypages.md.maintenance.imp.PartialIm
 import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectElementsFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.query.attributes.QueryAttributesFragment;
-import com.gooddata.qa.graphene.fragments.greypages.md.validate.ValidateFragment;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.model.ModelRestUtils;
@@ -73,9 +71,6 @@ public class AbstractGreyPageTest extends AbstractTest {
 
     @FindBy(tagName = "form")
     protected ProjectFragment gpProject;
-
-    @FindBy(tagName = "form")
-    protected ValidateFragment validateFragment;
 
     @FindBy(className = "param")
     protected GdcFragment gdcFragment;
@@ -123,18 +118,6 @@ public class AbstractGreyPageTest extends AbstractTest {
         waitForElementPresent(gpLoginFragment.getRoot());
         gpLoginFragment.login(username, password);
         Screenshots.takeScreenshot(browser, "login-gp", this.getClass());
-    }
-
-    public String validateProject() throws JSONException {
-        refreshToken();
-        openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/validate");
-        waitForElementPresent(validateFragment.getRoot());
-        int timeout = testParams.getProjectDriver() == ProjectDriver.VERTICA ?
-                testParams.getExtendedTimeout() : testParams.getDefaultTimeout();
-        String statusReturning = validateFragment.validate(timeout);
-        Screenshots.takeScreenshot(browser, testParams.getProjectId() + "-validation", this.getClass());
-        System.out.println("Validation result: " + statusReturning);
-        return statusReturning;
     }
 
     public void postMAQL(String maql, int statusPollingCheckIterations) throws JSONException {
