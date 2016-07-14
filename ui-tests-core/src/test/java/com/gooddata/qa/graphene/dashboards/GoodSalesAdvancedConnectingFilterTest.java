@@ -22,8 +22,8 @@ import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.HowItem;
 import com.gooddata.qa.graphene.entity.report.HowItem.Position;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
@@ -415,7 +415,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         initDashboardsPage()
                 .addNewDashboard(generateDashboard())
                 .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR, THIS)
-                .addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
 
         moveElementToRightPlace(getDateCreatedFilter().getRoot(), DashboardWidgetDirection.LEFT);
         dashboardsPage.saveDashboard();
@@ -448,14 +448,14 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         initDashboardsPage()
                 .addNewDashboard(generateDashboard())
                 .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR, THIS)
-                .addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
 
         moveElementToRightPlace(getDateCreatedFilter().getRoot(), DashboardWidgetDirection.RIGHT);
 
         dashboardsPage
                 .addNewTab(DASHBOARD_TAB)
                 .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR, THIS)
-                .addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
 
         moveElementToRightPlace(getDateCreatedFilter().getRoot(), DashboardWidgetDirection.LEFT);
         dashboardsPage.saveDashboard();
@@ -475,7 +475,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
                 .addNewDashboard(generateDashboard())
                 .addReportToDashboard(REPORT)
                 .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR, THIS)
-                .addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
 
         moveElementToRightPlace(getReport().getRoot(), DashboardWidgetDirection.LEFT);
         moveElementToRightPlace(getDateCreatedFilter().getRoot(), DashboardWidgetDirection.RIGHT);
@@ -510,7 +510,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
                 .addNewDashboard(generateDashboard())
                 .addReportToDashboard(REPORT)
                 .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR, THIS)
-                .addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
 
         moveElementToRightPlace(getReport().getRoot(), DashboardWidgetDirection.LEFT);
         moveElementToRightPlace(getDateCreatedFilter().getRoot(), DashboardWidgetDirection.RIGHT);
@@ -519,7 +519,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
                 .addNewTab(DASHBOARD_TAB)
                 .addReportToDashboard(REPORT)
                 .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR, THIS)
-                .addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
 
         moveElementToRightPlace(getReport().getRoot(), DashboardWidgetDirection.LEFT);
         moveElementToRightPlace(getDateCreatedFilter().getRoot(), DashboardWidgetDirection.RIGHT);
@@ -544,7 +544,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
                 .addNewDashboard(generateDashboard())
                 .addReportToDashboard(REPORT)
                 .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR, THIS)
-                .addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
 
         moveElementToRightPlace(getReport().getRoot(), DashboardWidgetDirection.LEFT);
         moveElementToRightPlace(getDateCreatedFilter().getRoot(), DashboardWidgetDirection.RIGHT);
@@ -553,7 +553,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
                 .addNewTab(DASHBOARD_TAB)
                 .addReportToDashboard(REPORT)
                 .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR, THIS)
-                .addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_DEPARTMENT);
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_DEPARTMENT);
 
         moveElementToRightPlace(getReport().getRoot(), DashboardWidgetDirection.LEFT);
         moveElementToRightPlace(getDateCreatedFilter().getRoot(), DashboardWidgetDirection.RIGHT);
@@ -578,7 +578,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
                 .addNewDashboard(generateDashboard())
                 .addReportToDashboard(REPORT)
                 .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR, THIS)
-                .addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
 
         moveElementToRightPlace(getReport().getRoot(), DashboardWidgetDirection.LEFT);
         moveElementToRightPlace(getDateCreatedFilter().getRoot(), DashboardWidgetDirection.RIGHT);
@@ -587,7 +587,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
                 .addNewTab(DASHBOARD_TAB)
                 .addReportToDashboard(REPORT)
                 .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR, THIS)
-                .addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
 
         moveElementToRightPlace(getReport().getRoot(), DashboardWidgetDirection.LEFT);
         moveElementToRightPlace(getDateCreatedFilter().getRoot(), DashboardWidgetDirection.RIGHT);

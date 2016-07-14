@@ -330,8 +330,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
         sleepTightInSeconds(3);
         DashboardTabs tabs = dashboardsPage.getTabs();
         int tabsCount = tabs.getNumberOfTabs();
-        dashboardsPage.editDashboard();
-        waitForDashboardPageLoaded(browser);
         dashboardsPage.addNewTab(tabName);
         checkRedBar(browser);
         assertEquals(tabs.getNumberOfTabs(), tabsCount + 1, "New tab is not present");

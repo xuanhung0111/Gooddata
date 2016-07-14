@@ -377,12 +377,10 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
     }
 
     private void addNewTabInNewDashboard(String newDashboard, String newTab) {
-        initDashboardsPage();
-        dashboardsPage.addNewDashboard(newDashboard);
-        dashboardsPage.editDashboard();
-        waitForDashboardPageLoaded(browser);
-        dashboardsPage.addNewTab(newTab);
+        initDashboardsPage()
+                .addNewDashboard(newDashboard)
+                .addNewTab(newTab);
         checkRedBar(browser);
-        dashboardsPage.getDashboardEditBar().saveDashboard();
+        dashboardsPage.saveDashboard();
     }
 }

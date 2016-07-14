@@ -6,7 +6,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
 
@@ -47,7 +47,7 @@ public class EmbeddedDashboardSavedViewLocalizationTest extends GoodSalesAbstrac
         checkLocalization(browser);
 
         dashboard.editDashboard()
-            .addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_ACCOUNT)
+            .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_ACCOUNT)
             .saveDashboard();
 
         dashboard.getFirstFilter()

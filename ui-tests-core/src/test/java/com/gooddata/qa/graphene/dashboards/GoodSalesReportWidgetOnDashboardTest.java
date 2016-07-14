@@ -23,10 +23,10 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.NumericVariable;
-import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.StyleConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel.Tab;
@@ -179,8 +179,9 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
             int dashboardWidgetsCount = dashboardEditBar.getDashboardWidgetsCount();
 
-            dashboardEditBar.addReportToDashboard(TOP_5_OPEN_REPORT);
-            dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, "Account");
+            dashboardEditBar
+                    .addReportToDashboard(TOP_5_OPEN_REPORT)
+                    .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, "Account");
             assertEquals(dashboardEditBar.getDashboardWidgetsCount(), dashboardWidgetsCount + 2);
             dashboardEditBar.saveDashboard();
             takeScreenshot(browser, "deleteWidgetsByHotKey - before deleting", getClass());

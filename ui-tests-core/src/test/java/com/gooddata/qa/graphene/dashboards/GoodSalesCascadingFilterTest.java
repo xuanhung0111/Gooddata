@@ -41,10 +41,10 @@ import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.HowItem;
 import com.gooddata.qa.graphene.entity.report.HowItem.Position;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardContent;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.GroupConfigPanel;
@@ -596,7 +596,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
 
     private FilterWidget addListAttributeFilterToDashboardAndMoveToRightPlace(String attributeName,
             DashboardWidgetDirection dashboardWidgetDirection) {
-        dashboardsPage.getDashboardEditBar().addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, attributeName);
+        dashboardsPage.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, attributeName);
         FilterWidget filterWidget = dashboardsPage.getContent().getFilterWidget(simplifyText(attributeName));
         WebElement filter = filterWidget.getRoot();
         filter.click();

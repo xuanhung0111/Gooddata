@@ -4,7 +4,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import java.util.List;
 
-import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -64,8 +63,7 @@ public class ReportInfoViewPanel extends AbstractFragment {
     public void downloadReportAsFormat(ExportFormat format) {
         waitForElementVisible(downloadAsButton).click();
 
-        Graphene.createPageFragment(SimpleMenu.class, waitForElementVisible(SimpleMenu.LOCATOR, browser))
-                .select(format.getLabel());
+        SimpleMenu.getInstance(browser).select(format.getLabel());
     }
 
     private List<String> getAllFilterOrMetricNames(List<WebElement> filtersOrMetrics) {

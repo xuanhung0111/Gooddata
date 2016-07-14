@@ -24,9 +24,9 @@ import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.HowItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.report.WhatItem;
-import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.ReportInfoViewPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.google.common.collect.Sets;
@@ -353,7 +353,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
         try {
             addReportToNewDashboard("Drill-Activity", TEST_DASHBOAD_NAME);
 
-            dashboardsPage.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, "Activity")
+            dashboardsPage.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, "Activity")
                     .saveDashboard();
 
             browser.navigate().refresh();

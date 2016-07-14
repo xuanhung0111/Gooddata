@@ -25,11 +25,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.dashboard.PublishType;
 import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
 import com.gooddata.qa.graphene.fragments.dashboards.menu.DashboardMenu;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.EmbeddedWidget;
@@ -447,8 +447,8 @@ public class DashboardsPage extends AbstractFragment {
         return this;
     }
 
-    public DashboardsPage addListFilterToDashboard(DashFilterTypes type, String name) {
-        editDashboard().addListFilterToDashboard(type, name);
+    public DashboardsPage addAttributeFilterToDashboard(DashAttributeFilterTypes type, String name) {
+        editDashboard().addAttributeFilterToDashboard(type, name);
         return this;
     }
 
@@ -472,11 +472,8 @@ public class DashboardsPage extends AbstractFragment {
             throw new RuntimeException("Embed menu is not visible");
         }
         editExportEmbedButton.click();
-        SimpleMenu menu = Graphene.createPageFragment(SimpleMenu.class,
-                waitForElementVisible(SimpleMenu.LOCATOR, browser));
-        waitForElementVisible(menu.getRoot());
 
-        return menu;
+        return SimpleMenu.getInstance(browser);
     }
 
     private DashboardMenu openDashboardMenu() {
@@ -486,11 +483,9 @@ public class DashboardsPage extends AbstractFragment {
                     + "That means project just has only one dashboard!");
             return null;
         }
+
         dashboardSwitcherButton.click();
-        DashboardMenu menu = Graphene.createPageFragment(DashboardMenu.class,
-                waitForElementVisible(DashboardMenu.LOCATOR, browser));
-        waitForElementVisible(menu.getRoot());
-        return menu;
+        return DashboardMenu.getInstance(browser);
     }
 
     private void saveAsDashboard(String dashboardName, boolean isSavedViews, PermissionType permissionType) {

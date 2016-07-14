@@ -15,9 +15,9 @@ import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardAddWidgetPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.ChartReport;
@@ -96,7 +96,7 @@ public class EmbeddedDashboardWidgetSettingLocalizationTest extends GoodSalesAbs
     public void checkDashboardAttributeFilterSetting() {
         EmbeddedDashboard dashboard = initEmbeddedDashboard();
         dashboard.editDashboard()
-            .addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_ACCOUNT);
+            .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_ACCOUNT);
 
         WebElement elem = dashboard.getContent().getFirstFilter().getRoot();
         checkLocalizationThroughTabs(WidgetConfigPanel.openConfigurationPanelFor(elem, browser).getTabs());
@@ -106,7 +106,7 @@ public class EmbeddedDashboardWidgetSettingLocalizationTest extends GoodSalesAbs
     public void checkDashboardVariableFilterSetting() {
         EmbeddedDashboard dashboard = initEmbeddedDashboard();
         dashboard.editDashboard()
-            .addListFilterToDashboard(DashFilterTypes.PROMPT, ATTR_STATUS);
+            .addAttributeFilterToDashboard(DashAttributeFilterTypes.PROMPT, ATTR_STATUS);
 
         WebElement elem = dashboard.getContent().getFirstFilter().getRoot();
         checkLocalizationThroughTabs(WidgetConfigPanel.openConfigurationPanelFor(elem, browser).getTabs());
