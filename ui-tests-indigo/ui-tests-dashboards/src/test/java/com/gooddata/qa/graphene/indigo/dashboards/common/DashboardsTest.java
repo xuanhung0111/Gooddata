@@ -35,7 +35,7 @@ public abstract class DashboardsTest extends DashboardsGeneralTest {
 
         waitForFragmentVisible(indigoDashboardsPage).waitForDashboardLoad();
         configs.forEach(config -> indigoDashboardsPage.addWidget(config));
-        indigoDashboardsPage.saveEditModeWithKpis();
+        indigoDashboardsPage.saveEditModeWithWidgets();
     }
 
     protected void teardownKpiWithDashboardDelete() {

@@ -212,7 +212,7 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
 
             cp.selectDrillToByName(DASH_TAB_WHATS_CHANGED);
 
-            indigoDashboardsPage.saveEditModeWithKpis()
+            indigoDashboardsPage.saveEditModeWithWidgets()
                 .getLastKpi()
                 .clickKpiValue();
             waitForDashboardPageLoaded(browser);

@@ -48,7 +48,7 @@ public class PartialExportDashboardsTest extends AbstractProjectTest {
                 .comparison(Kpi.ComparisonType.NO_COMPARISON.toString())
                 .drillTo("Sales Forecast")
                 .build())
-            .saveEditModeWithKpis();
+            .saveEditModeWithWidgets();
     }
 
     @Test(dependsOnMethods = {"setupFeatureFlag"}, groups = {"desktop"})

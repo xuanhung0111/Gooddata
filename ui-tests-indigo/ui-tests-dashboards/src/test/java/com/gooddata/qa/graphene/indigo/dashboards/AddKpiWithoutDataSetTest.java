@@ -60,7 +60,7 @@ public class AddKpiWithoutDataSetTest extends AbstractProjectTest {
                 .selectMetricByName(METRIC_NOT_CONNECT_WITH_DATA_SET)
                 .isDataSetEnabled());
 
-        indigoDashboardsPage.saveEditModeWithKpis();
+        indigoDashboardsPage.saveEditModeWithWidgets();
 
         takeScreenshot(browser, "add-kpi-not-connect-with-data-set", getClass());
     }
@@ -87,7 +87,7 @@ public class AddKpiWithoutDataSetTest extends AbstractProjectTest {
             .selectMetricByName(METRIC_CONNECT_WITH_DATA_SET)
             .selectDataSetByName(DATA_SET);
 
-        indigoDashboardsPage.saveEditModeWithKpis();
+        indigoDashboardsPage.saveEditModeWithWidgets();
         takeScreenshot(browser, "update-kpi-connect-with-data-set", getClass());
     }
 }

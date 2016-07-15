@@ -62,7 +62,7 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
 
         assertTrue(justAddedKpi.hasPopSection());
 
-        Kpi lastKpi = indigoDashboardsPage.saveEditModeWithKpis().getLastKpi();
+        Kpi lastKpi = indigoDashboardsPage.saveEditModeWithWidgets().getLastKpi();
 
         takeScreenshot(browser, "checkNewlyAddedKpiHasPopSection", getClass());
         assertTrue(lastKpi.hasPopSection());
@@ -74,7 +74,7 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
             .submitClick();
 
         indigoDashboardsPage
-            .saveEditModeWithKpis();
+            .saveEditModeWithWidgets();
     }
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
@@ -91,7 +91,7 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
         assertFalse(kpi.hasPopSection());
 
         waitForFragmentVisible(indigoDashboardsPage)
-            .saveEditModeWithKpis();
+            .saveEditModeWithWidgets();
 
         Kpi lastKpi = indigoDashboardsPage.getLastKpi();
 
@@ -105,7 +105,7 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
             .submitClick();
 
         indigoDashboardsPage
-            .saveEditModeWithKpis();
+            .saveEditModeWithWidgets();
     }
 
     @DataProvider(name = "popProvider")
@@ -130,7 +130,7 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
                 .dataSet(DATE_CREATED)
                 .comparison(comparisonType.toString())
                 .build())
-            .saveEditModeWithKpis();
+            .saveEditModeWithWidgets();
 
         Kpi kpi = waitForFragmentVisible(indigoDashboardsPage).getLastKpi();
 
@@ -147,6 +147,6 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
             .submitClick();
 
         indigoDashboardsPage
-            .saveEditModeWithKpis();
+            .saveEditModeWithWidgets();
     }
 }

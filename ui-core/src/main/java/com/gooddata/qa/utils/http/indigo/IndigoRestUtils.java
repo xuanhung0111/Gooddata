@@ -350,15 +350,48 @@ public class IndigoRestUtils {
      */
     public static List<String> getAllInsightNames(final RestApiClient restApiClient, final String projectId)
             throws JSONException, IOException {
-        final String query = "/gdc/md/" + projectId + "/query/visualizations";
-        final JSONArray entries = getJsonObject(restApiClient, query)
-                .getJSONObject("query")
-                .getJSONArray("entries");
-
-        final List<String> visualizations = new ArrayList<>();
-        for (int i = 0, n = entries.length(); i < n; i++) {
-            visualizations.add(entries.getJSONObject(i).getString("title"));
+        final JSONArray objects = getAllInsightObjects(restApiClient, projectId);
+        final List<String> insights = new ArrayList<>();
+        for (int i = 0, n = objects.length(); i < n; i++) {
+            insights.add(objects.getJSONObject(i).getString("title"));
         }
-        return visualizations;
+
+        return insights;
+    }
+
+    /**
+     * Get insight uri by a specified name
+     * 
+     * @param insight
+     * @param restApiClient
+     * @param projectId
+     * @return
+     * @throws JSONException
+     * @throws IOException
+     */
+    public static String getInsightUri(final String insight, final RestApiClient restApiClient, final String projectId)
+            throws JSONException, IOException {
+        final JSONArray objects = getAllInsightObjects(restApiClient, projectId);
+        for (int i = 0, n = objects.length(); i < n; i++) {
+            if(insight.equals(objects.getJSONObject(i).getString("title")))
+                return objects.getJSONObject(i).getString("link");
+        }
+        throw new RuntimeException("There is no insight named " + insight);
+    }
+
+    /**
+     * Delete a dashboard by its uri
+     * 
+     * @param restApiClient
+     * @param dashboardUri
+     */
+    public static void deleteAnalyticalDashboard(final RestApiClient restApiClient, final String dashboardUri) {
+        executeRequest(restApiClient, restApiClient.newDeleteMethod(dashboardUri), HttpStatus.NO_CONTENT);
+    }
+
+    private static JSONArray getAllInsightObjects(final RestApiClient restApiClient, final String projectId)
+            throws JSONException, IOException {
+        final String query = "/gdc/md/" + projectId + "/query/visualizations";
+        return getJsonObject(restApiClient, query).getJSONObject("query").getJSONArray("entries");
     }
 }

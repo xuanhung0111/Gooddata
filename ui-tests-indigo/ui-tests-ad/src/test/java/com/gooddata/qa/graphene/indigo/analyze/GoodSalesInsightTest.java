@@ -23,9 +23,9 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.dialog.SaveInsightDialog;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.InsightSelectionPanel;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.InsightSelectionPanel.FilterType;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisInsightSelectionPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.FilterType;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
@@ -246,7 +246,7 @@ public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
         assertFalse(getAllInsightNames(getRestApiClient(), testParams.getProjectId()).contains(insight),
                 insight + " exists before saving");
         analysisPageReact.saveInsight(insight);
-        final InsightSelectionPanel insightSelectionPanel = analysisPageReact
+        final AnalysisInsightSelectionPanel insightSelectionPanel = analysisPageReact
                 .getPageHeader()
                 .expandInsightSelection();
         insightSelectionPanel.switchFilter(FilterType.BY_ME).searchInsight(insight);
@@ -280,7 +280,7 @@ public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnMethods = {"testInsightListWithCreatedByMeFilter", "testEditorCanSaveInsight"})
     public void testInsightListWithAllFilter() {
-        final InsightSelectionPanel insightSelectionPanel = analysisPageReact
+        final AnalysisInsightSelectionPanel insightSelectionPanel = analysisPageReact
                     .getPageHeader()
                     .expandInsightSelection();
         insightSelectionPanel.switchFilter(FilterType.ALL).searchInsight("Insight-List-Test-With-Filter");

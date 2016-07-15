@@ -8,6 +8,7 @@ import com.gooddata.qa.graphene.indigo.dashboards.KpiAlertTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ManipulateWidgetsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.MetricsDropdownTest;
 import com.gooddata.qa.graphene.indigo.dashboards.PartialExportDashboardsTest;
+import com.gooddata.qa.graphene.indigo.dashboards.ReorderInsightTest;
 import com.gooddata.qa.graphene.indigo.dashboards.VisualizationsTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
@@ -24,6 +25,7 @@ public class AllTestsRegistry {
                 .register(AddKpiWithoutDataSetTest.class)
                 .register(MetricsDropdownTest.class)
                 .register(VisualizationsTest.class)
+                .register(ReorderInsightTest.class)
                 .register("testng-desktop-AttributeFiltering.xml")
                 .register("testng-desktop-DateFiltering.xml")
                 .register("testng-desktop-permissions-EditMode.xml")
@@ -49,6 +51,7 @@ public class AllTestsRegistry {
                 .register("testng-mobile-SplashScreen.xml")
                 .register("testng-mobile-KpiPopChangeValueExceedLimit.xml")
                 .register("testng-mobile-ProjectSwitch.xml")
+                .register("testng-desktop-permissions-InsightOnDashboard.xml")
                 .toTextFile();
     }
 }

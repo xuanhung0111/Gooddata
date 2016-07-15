@@ -18,7 +18,7 @@ public abstract class DashboardWithWidgetsTest extends DashboardsTest {
         initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
             .addWidget(config)
-            .saveEditModeWithKpis();
+            .saveEditModeWithWidgets();
     }
 
     protected void teardownKpi() {
@@ -32,7 +32,7 @@ public abstract class DashboardWithWidgetsTest extends DashboardsTest {
             .submitClick();
 
         indigoDashboardsPage
-            .saveEditModeWithKpis();
+            .saveEditModeWithWidgets();
     }
 
     @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"dashboardWidgetsInit"})
