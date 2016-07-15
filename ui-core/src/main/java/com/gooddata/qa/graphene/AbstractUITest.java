@@ -32,6 +32,7 @@ import com.google.common.base.Predicate;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
@@ -41,10 +42,12 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.*;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
+import static org.openqa.selenium.By.className;
 import static org.testng.Assert.*;
 
 public class AbstractUITest extends AbstractGreyPageTest {
@@ -587,6 +590,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     public IndigoDashboardsPage initIndigoDashboardsPage() {
         openUrl(getIndigoDashboardsPageUri());
+        waitForIndigoDashboardLoading();
         waitForFragmentVisible(indigoDashboardsPage);
 
         return indigoDashboardsPage;
@@ -643,5 +647,17 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     public <T> T doActionWithImapClient(ImapClientAction<T> action) {
         return ImapClientAction.Utils.doActionWithImapClient(imapHost, imapUser, imapPassword, action);
+    }
+
+    private void waitForIndigoDashboardLoading() {
+        final By loadingLabel = className(".gd-loading-equalizer");
+        try {
+            Predicate<WebDriver> isLoadingLabelPresent = browser -> isElementPresent(loadingLabel, browser);
+            Graphene.waitGui().withTimeout(2, TimeUnit.SECONDS).until(isLoadingLabelPresent);
+        } catch (TimeoutException e) {
+            //do nothing
+        }
+
+        waitForElementNotPresent(loadingLabel);
     }
 }

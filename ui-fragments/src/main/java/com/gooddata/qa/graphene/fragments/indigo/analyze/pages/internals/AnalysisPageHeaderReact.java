@@ -114,14 +114,15 @@ public class AnalysisPageHeaderReact extends AbstractFragment {
         return isElementPresent(className(SAVE_AS_CLASS), browser);
     }
 
-    public InsightSelectionPanel getInsightSelectionPanel() {
-        return InsightSelectionPanel.getInstance(browser);
+    public AnalysisInsightSelectionPanel getInsightSelectionPanel() {
+        return AnalysisInsightSelectionPanel.getInstance(browser);
     }
 
-    public InsightSelectionPanel expandInsightSelection() {
+    public AnalysisInsightSelectionPanel expandInsightSelection() {
         if (!isInsightSelectionExpanded()) {
             openButton.click();
         }
+
         return getInsightSelectionPanel().waitForLoading();
     }
 

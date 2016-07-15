@@ -117,7 +117,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
                     .waitForDashboardLoad()
                     .addWidget(kpi)
                     .selectDateFilterByName(DATE_FILTER_ALL_TIME)
-                    .saveEditModeWithKpis()
+                    .saveEditModeWithWidgets()
                     .getKpiByHeadline(metricName)
                     .openAlertDialog()
                     .selectTriggeredWhen(TRIGGERED_WHEN_GOES_ABOVE)

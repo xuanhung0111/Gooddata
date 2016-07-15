@@ -1,11 +1,16 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
+import static com.gooddata.qa.browser.DragAndDropUtils.dragAndDropWithCustomBackend;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.utils.CssUtils.convertCSSClassTojQuerySelector;
 
 import java.util.List;
 
@@ -19,11 +24,9 @@ import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.HamburgerMenu;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Widget.DropZone;
 import com.gooddata.qa.graphene.utils.Sleeper;
 import com.google.common.collect.Iterables;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 public class IndigoDashboardsPage extends AbstractFragment {
 
@@ -109,10 +112,11 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
-    public IndigoDashboardsPage saveEditModeWithKpis() {
+    public IndigoDashboardsPage saveEditModeWithWidgets() {
         waitForElementVisible(enabledSaveButton).click();
         waitForElementVisible(editButton);
         waitForAllKpiWidgetContentLoaded();
+        waitForAllInsightWidgetContentLoaded();
 
         return this;
     }
@@ -132,7 +136,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     // if save is disabled, use cancel. But leave edit mode in any case
     public IndigoDashboardsPage leaveEditMode() {
         if (isSaveEnabled()) {
-            return saveEditModeWithKpis();
+            return saveEditModeWithWidgets();
         }
 
         return cancelEditMode();
@@ -254,6 +258,11 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
+    public IndigoDashboardsPage waitForAllInsightWidgetsLoaded() {
+        waitForElementNotPresent(Visualization.IS_WIDGET_LOADING);
+        return this;
+    }
+
     public IndigoDashboardsPage waitForAnyKpiWidgetContentLoading() {
         int KPI_INITIATE_LOAD_TIMEOUT_SECONDS = 2;
         // wait until the loading is initiated. If not, assume kpi widget
@@ -269,6 +278,12 @@ public class IndigoDashboardsPage extends AbstractFragment {
         waitForAllKpiWidgetsLoaded();
         waitForElementNotPresent(Kpi.IS_CONTENT_LOADING);
 
+        return this;
+    }
+
+    public IndigoDashboardsPage waitForAllInsightWidgetContentLoaded() {
+        waitForAllInsightWidgetsLoaded();
+        waitForElementNotPresent(Visualization.IS_CONTENT_LOADING);
         return this;
     }
 
@@ -398,5 +413,23 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public boolean isVisualizationsListPresent() {
         return isElementPresent(By.className(VISUALIZATIONS_LIST_CLASS_NAME), this.getRoot());
+    }
+
+    public IndigoInsightSelectionPanel getInsightSelectionPanel() {
+        return IndigoInsightSelectionPanel.getInstance(browser);
+    }
+
+    public IndigoDashboardsPage addInsightToLastPosition(final String insight) {
+        getInsightSelectionPanel().addInsightToLastPosition(insight);
+        return this;
+    }
+
+    public IndigoDashboardsPage reoderWidget(final Widget source, final Widget target, DropZone dropZone) {
+        final String sourceCssSelector = convertCSSClassTojQuerySelector(source.getRoot().getAttribute("class"));
+        final String targetCssSelector = convertCSSClassTojQuerySelector(target.getRoot().getAttribute("class"));
+        final String dropZoneCssSelector = targetCssSelector + " " + dropZone.getCss();
+
+        dragAndDropWithCustomBackend(browser, sourceCssSelector, targetCssSelector, dropZoneCssSelector);
+        return this;
     }
 }

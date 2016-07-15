@@ -61,7 +61,7 @@ public class DatasetDetailPage extends AbstractFragment {
             return;
         }
 
-        final Predicate<WebDriver> progressFinished = b -> message.getAttribute("class").contains("progress");
+        final Predicate<WebDriver> progressFinished = b -> !message.getAttribute("class").contains("progress");
         Graphene.waitGui().until(progressFinished);
     }
 

@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
+package com.gooddata.qa.graphene.fragments.indigo.insight;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
@@ -12,7 +12,6 @@ import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -21,17 +20,16 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.dialog.SaveInsightDialog;
 import com.google.common.base.Predicate;
 
-public class InsightSelectionPanel extends AbstractFragment {
+@SuppressWarnings("unchecked")
+public abstract class AbstractInsightSelectionPanel extends AbstractFragment {
 
-    private static final By NO_DATA_LOCATOR = className("gd-no-data");
-    private static final By CLEAR_ICON_LOCATOR = className("icon-clear");
-    private static final By SEARCH_TEXTBOX_LOCATOR = className("searchfield-input");
-    private static final By ROOT_LOCATOR = className("open-visualizations");
+    @FindBy(className = "searchfield-input")
+    private WebElement searchTextBox;
 
-    public static InsightSelectionPanel getInstance(SearchContext searchContext) {
-        return Graphene.createPageFragment(InsightSelectionPanel.class,
-                waitForElementVisible(ROOT_LOCATOR, searchContext));
-    }
+    protected static final By NO_DATA_LOCATOR = className("gd-no-data");
+    protected static final By CLEAR_ICON_LOCATOR = className("icon-clear");
+    protected static final By SEARCH_TEXTBOX_LOCATOR = className("searchfield-input");
+
     public List<InsightItem> getInsightItems() {
         waitForLoading();
         return getRoot().findElements(className("gd-visualizations-list-item")).stream()
@@ -52,16 +50,9 @@ public class InsightSelectionPanel extends AbstractFragment {
             return false;
 
         clearInputText();
-        waitForElementVisible(getRoot().findElement(SEARCH_TEXTBOX_LOCATOR))
-                .sendKeys(insight);
+        waitForElementVisible(searchTextBox).sendKeys(insight);
 
         return !isEmpty();
-    }
-
-    public void openInsight(final String insight) {
-        if (!getRoot().isDisplayed())
-            throw new RuntimeException("The insight selection panel is collapsed");
-        getInsightItem(insight).open();
     }
 
     public boolean isEmpty() {
@@ -69,31 +60,45 @@ public class InsightSelectionPanel extends AbstractFragment {
         return isElementVisible(NO_DATA_LOCATOR, getRoot());
     }
 
-    public InsightSelectionPanel switchFilter(FilterType type) {
+    public <T extends AbstractInsightSelectionPanel> T switchFilter(FilterType type) {
         getFilterElement(type).click();
         waitForLoading();
-        return this;
+        return (T) this;
     }
 
     public boolean isFilterActive(FilterType type) {
         return getFilterElement(type).getAttribute("class").contains("is-active");
     }
 
-    public InsightSelectionPanel clearInputText() {
+    public <T extends AbstractInsightSelectionPanel> T clearInputText() {
         if (isElementPresent(CLEAR_ICON_LOCATOR, getRoot())) {
             WebElement clearIcon = getRoot().findElement(CLEAR_ICON_LOCATOR);
             waitForElementVisible(clearIcon).click();
             waitForElementNotVisible(clearIcon);
             waitForLoading();
         }
-        return this;
+        return (T) this;
     }
 
-    public InsightSelectionPanel waitForLoading() {
+    
+    public <T extends AbstractInsightSelectionPanel> T waitForLoading() {
         Predicate<WebDriver> isDataLoaded = browser ->
                 !isElementPresent(cssSelector(".gd-spinner.large"), getRoot());
         Graphene.waitGui().until(isDataLoaded);
-        return this;
+        return (T) this;
+    }
+
+    public boolean isFilterVisible(FilterType type) {
+        return isElementVisible(getFilterElement(type));
+    }
+
+    public boolean isSearchTextBoxEmpty() {
+        return waitForElementVisible(searchTextBox).getText().isEmpty();
+    }
+
+    public <T extends AbstractInsightSelectionPanel> T waitForInsightListVisible() {
+        waitForElementVisible(className("gd-infinite-list"), getRoot());
+        return (T) this;
     }
 
     private WebElement getFilterElement(FilterType type) {

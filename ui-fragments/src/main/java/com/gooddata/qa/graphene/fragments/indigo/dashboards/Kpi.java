@@ -43,9 +43,6 @@ public class Kpi extends Widget {
     @FindBy(className = KPI_ALERT_BUTTON_CLASS)
     private WebElement alertButton;
 
-    @FindBy(css = ".item-headline > h3")
-    private WebElement headline;
-
     @FindBy(css = ".item-headline > h3 .gd-editable-label")
     private WebElement headlineInplaceEdit;
 
@@ -63,10 +60,6 @@ public class Kpi extends Widget {
 
     @FindBy(className = KPI_CONTENT_CLASS)
     private WebElement content;
-
-    public String getHeadline() {
-        return waitForElementVisible(headline).getText();
-    }
 
     public void clearHeadline() {
         waitForElementVisible(headlineInplaceEdit).click();
