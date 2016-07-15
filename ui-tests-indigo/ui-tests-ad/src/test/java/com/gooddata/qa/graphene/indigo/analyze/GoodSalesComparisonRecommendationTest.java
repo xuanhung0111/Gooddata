@@ -1,15 +1,18 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.text.ParseException;
@@ -184,5 +187,24 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
         assertEquals(analysisPageReact.getFilterBuckets().getFilterText("Activity"), "Activity: Last 4 quarters");
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
         checkingOpenAsReport("testAnotherApproachToShowPoP");
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void testRecommendationDisplayingWithDateFilter() throws ParseException {
+        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().waitForReportComputing();
+        takeScreenshot(browser, "No-Recommendation-Displaying-With-All-Time-Filter", getClass());
+        assertFalse(isElementPresent(RecommendationContainer.LOCATOR, browser),
+                "Compare Recommendation step is displayed");
+
+        analysisPageReact.getFilterBuckets().configDateFilter("01/01/2010", "12/31/2010");
+        analysisPageReact.waitForReportComputing();
+
+        RecommendationContainer recommendationContainer =
+                Graphene.createPageFragment(RecommendationContainer.class,
+                        waitForElementVisible(RecommendationContainer.LOCATOR, browser));
+
+        takeScreenshot(browser, "Recommendation-Displaying-With-Edited-Date-Filter", getClass());
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE),
+                "Compare Recommendation step is not displayed");
     }
 }
