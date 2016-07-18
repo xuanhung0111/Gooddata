@@ -37,7 +37,7 @@ public final class RestUtils {
     public static void executeRequest(final RestApiClient restApiClient, final HttpRequestBase request,
             final HttpStatus expectedStatusCode) {
         try {
-            final HttpResponse response = restApiClient.execute(request, expectedStatusCode, "Invalid status code");
+            final HttpResponse response = restApiClient.execute(request, expectedStatusCode);
             EntityUtils.consumeQuietly(response.getEntity());
         } finally {
             request.releaseConnection();
@@ -77,7 +77,7 @@ public final class RestUtils {
         setupRequest.accept(request);
 
         try {
-            final HttpResponse response = restApiClient.execute(request, expectedStatusCode, "Invalid status code");
+            final HttpResponse response = restApiClient.execute(request, expectedStatusCode);
             final HttpEntity entity = response.getEntity();
 
             final String ret = isNull(entity) ? "" : EntityUtils.toString(entity);
