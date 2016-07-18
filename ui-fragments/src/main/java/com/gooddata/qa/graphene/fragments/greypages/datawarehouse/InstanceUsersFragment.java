@@ -7,6 +7,7 @@ import static org.testng.Assert.assertEquals;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -45,6 +46,7 @@ public class InstanceUsersFragment extends AbstractDatawarehouseFragment {
         if (poll) {
             waitForUserAdded(10);
             waitForElementPresent(BY_GP_LINK, browser).click();
+            waitForElementPresent(By.cssSelector("legend"), browser);
         }
     }
 
