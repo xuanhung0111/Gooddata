@@ -23,11 +23,11 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucketReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
 public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnalyseTest {
 
@@ -43,7 +43,7 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
             .addDateFilter()
             .getFilterBuckets()
             .configDateFilter("Last year");
-        ChartReportReact report = analysisPageReact.waitForReportComputing().getChartReport();
+        ChartReport report = analysisPageReact.waitForReportComputing().getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -67,7 +67,7 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
 
     @Test(dependsOnGroups = {"init"})
     public void testSimpleComparison() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 1);
@@ -94,9 +94,9 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
 
     @Test(dependsOnGroups = {"init"})
     public void testComparisonAndPoPAttribute() {
-        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
 
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 1);
@@ -148,7 +148,7 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
         assertTrue(analysisPageReact.getFilterBuckets().isFilterVisible(ATTR_ACTIVITY));
         assertEquals(analysisPageReact.getFilterBuckets().getFilterText(ATTR_ACTIVITY),
                 "Activity: Jan 1, 2012 - Dec 31, 2012");
-        ChartReportReact report = analysisPageReact.waitForReportComputing().getChartReport();
+        ChartReport report = analysisPageReact.waitForReportComputing().getChartReport();
         assertThat(report.getTrackersCount(), equalTo(1));
         RecommendationContainer recommendationContainer = 
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -171,7 +171,7 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
 
     @Test(dependsOnGroups = {"init"})
     public void testAnotherApproachToShowPoP() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 1);

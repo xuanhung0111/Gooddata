@@ -19,14 +19,14 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPageReact;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeaderReact;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucketReact;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanelReact;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanelReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucketReact;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
 public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
 
@@ -81,7 +81,7 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testAfterChangeDateDimensionOnBucket() {
-        final AttributesBucketReact categoriesBucket = analysisPageReact.getAttributesBucket();
+        final AttributesBucket categoriesBucket = analysisPageReact.getAttributesBucket();
 
         analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().undo();
         assertTrue(categoriesBucket.isEmpty());
@@ -98,7 +98,7 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testAfterChangeDateDimensionInFilter() {
-        final FiltersBucketReact FiltersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket FiltersBucketReact = analysisPageReact.getFilterBuckets();
 
         analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDateFilter().undo();
         assertFalse(FiltersBucketReact.isFilterVisible(ACTIVITY));
@@ -111,8 +111,8 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
 
         analysisPageReact.undo();
         filter.click();
-        DateFilterPickerPanelReact panel = Graphene.createPageFragment(DateFilterPickerPanelReact.class,
-              waitForElementVisible(DateFilterPickerPanelReact.LOCATOR, browser));
+        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
+              waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
         assertEquals(panel.getSelectedDimensionSwitch(), ACTIVITY);
 
         analysisPageReact.redo();
@@ -124,7 +124,7 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
     @Test(dependsOnGroups = {"init"})
     public void testAfterAddFilter() {
         int actionsCount = 0;
-        final FiltersBucketReact FiltersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket FiltersBucketReact = analysisPageReact.getFilterBuckets();
 
         analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE); actionsCount++;
         analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES); actionsCount++;
@@ -147,7 +147,7 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
         analysisPageReact.redo();
         assertFalse(FiltersBucketReact.isFilterVisible(ATTR_DEPARTMENT));
 
-        AnalysisPageHeaderReact pageHeader = analysisPageReact.getPageHeader();
+        AnalysisPageHeader pageHeader = analysisPageReact.getPageHeader();
         // Check that the undo must go back to the start of his session
         assertTrue(pageHeader.isUndoButtonEnabled());
         assertFalse(pageHeader.isRedoButtonEnabled());
@@ -183,7 +183,7 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
         ReportState baseState = ReportState.getCurrentState(analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES));
         analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE);
 
-        final CataloguePanelReact cataloguePanel = analysisPageReact.getCataloguePanel();
+        final CataloguePanel cataloguePanel = analysisPageReact.getCataloguePanel();
         cataloguePanel.search(ATTR_DEPARTMENT);
         assertEquals(cataloguePanel.getFieldNamesInViewPort(), asList(ATTR_DEPARTMENT));
         checkUndoRedoForReport(baseState, true);
@@ -216,7 +216,7 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
       }
 
     private static class ReportState {
-        private AnalysisPageReact analysisPage;
+        private AnalysisPage analysisPage;
 
         private int reportTrackerCount;
         private List<String> addedAttributes;
@@ -224,17 +224,17 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
         private List<String> reportDataLables;
         private List<String> reportAxisLables;
 
-        public static ReportState getCurrentState(AnalysisPageReact analysisPage) {
+        public static ReportState getCurrentState(AnalysisPage analysisPage) {
             return new ReportState(analysisPage).saveCurrentState();
         }
 
-        private ReportState(AnalysisPageReact analysisPage) {
+        private ReportState(AnalysisPage analysisPage) {
             this.analysisPage = analysisPage;
         }
 
         private ReportState saveCurrentState() {
             analysisPage.waitForReportComputing();
-            ChartReportReact report = analysisPage.getChartReport();
+            ChartReport report = analysisPage.getChartReport();
 
             reportTrackerCount = report.getTrackersCount();
             addedMetrics = analysisPage.getMetricsBucket().getItemNames();

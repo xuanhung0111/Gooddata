@@ -3,45 +3,46 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
+import java.util.Collection;
 import java.util.List;
 
+import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.Select;
 
+import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
+
+/**
+ * s-date-dimension-switch renamed to s-date-dataset-switch
+ */
 public class AttributesBucket extends AbstractBucket {
 
-    @FindBy(className = "s-date-granularity-switch")
-    private Select granularity;
-
-    @FindBy(className = "s-date-dimension-switch")
-    private Select dimensionSwitch;
+    private static final By BY_DATE_DATASET_SELECT = By.className("adi-date-dataset-switch");
+    private static final By BY_DATE_GRANULARITY_SELECT = By.className("adi-date-granularity-switch");
 
     public List<String> getItemNames() {
         return getElementTexts(items, e -> e.findElement(BY_HEADER));
     }
 
     public void changeGranularity(String time) {
-        waitForElementVisible(granularity).selectByVisibleText(time);
+        getDateGranularitySelect().selectByName(time);
     }
 
     public String getSelectedGranularity() {
-        return waitForElementVisible(granularity).getFirstSelectedOption().getText();
+        return getDateGranularitySelect().getRoot().getText();
     }
 
-    public List<String> getAllGranularities() {
-        return getElementTexts(waitForElementVisible(granularity).getOptions());
+    public Collection<String> getAllGranularities() {
+        return getDateGranularitySelect().getValues();
     }
 
     public String getSelectedDimensionSwitch() {
-        waitForElementVisible(dimensionSwitch);
-        return dimensionSwitch.getFirstSelectedOption().getText();
+        return getDateDatasetSelect().getRoot().getText();
     }
 
     public void changeDateDimension(String switchDimension) {
-        waitForElementVisible(this.dimensionSwitch);
-        this.dimensionSwitch.selectByVisibleText(switchDimension);
+        getDateDatasetSelect().selectByName(switchDimension);
     }
 
     public WebElement getFirst() {
@@ -58,5 +59,15 @@ public class AttributesBucket extends AbstractBucket {
     @Override
     public String getWarningMessage() {
         throw new UnsupportedOperationException();
+    }
+
+    private DateDimensionSelect getDateDatasetSelect() {
+        return Graphene.createPageFragment(DateDimensionSelect.class,
+                waitForElementVisible(BY_DATE_DATASET_SELECT, browser));
+    }
+
+    private DateDimensionSelect getDateGranularitySelect() {
+        return Graphene.createPageFragment(DateDimensionSelect.class,
+                waitForElementVisible(BY_DATE_GRANULARITY_SELECT, browser));
     }
 }

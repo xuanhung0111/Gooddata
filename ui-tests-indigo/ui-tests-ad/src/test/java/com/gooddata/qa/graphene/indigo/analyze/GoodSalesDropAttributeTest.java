@@ -19,7 +19,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricC
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
 public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
 
@@ -36,7 +36,7 @@ public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
         analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing();
-        ChartReportReact report = analysisPageReact.getChartReport();
+        ChartReport report = analysisPageReact.getChartReport();
         assertEquals(report.getTrackersCount(), 4);
 
         analysisPageReact.addStack(ATTR_DEPARTMENT);
@@ -98,7 +98,7 @@ public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
         dropAttributeToReportHaveOneMetric();
         analysisPageReact.getFilterBuckets().configAttributeFilter(ATTR_ACTIVITY_TYPE, "Email", "Phone Call")
             .configAttributeFilter(ATTR_DEPARTMENT, "Inside Sales");
-        ChartReportReact report = analysisPageReact.waitForReportComputing().getChartReport();
+        ChartReport report = analysisPageReact.waitForReportComputing().getChartReport();
         assertEquals(report.getTrackersCount(), 2);
         checkingOpenAsReport("applyAttributeFiltersInReport");
     }

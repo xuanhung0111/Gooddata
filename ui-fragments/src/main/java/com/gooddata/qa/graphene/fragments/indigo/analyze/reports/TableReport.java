@@ -1,20 +1,23 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.reports;
 
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+
+import java.util.List;
+import java.util.Objects;
+
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.tagName;
 
-import java.util.List;
-import java.util.Objects;
-
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-
+/**
+ * finding by span instead of BY_LINK in sortBaseOnHeader()
+ */
 public class TableReport extends AbstractFragment {
 
     @FindBy(css = ".public_fixedDataTable_header ." + CELL_CONTENT)
@@ -53,7 +56,7 @@ public class TableReport extends AbstractFragment {
     public TableReport sortBaseOnHeader(final String name) {
         waitForCollectionIsNotEmpty(headers).stream()
             .filter(e -> name.equalsIgnoreCase(e.getText()))
-            .map(e -> e.findElement(BY_LINK))
+            .map(e -> e.findElement(By.tagName("span")))
             .findFirst()
             .orElseThrow(() -> new NoSuchElementException("Cannot find table header: " + name))
             .click();

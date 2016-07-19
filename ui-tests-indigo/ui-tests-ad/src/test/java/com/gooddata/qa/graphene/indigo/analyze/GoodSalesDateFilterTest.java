@@ -29,8 +29,8 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucketReact;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -61,9 +61,9 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void switchingDateRangeNotComputeReport() {
-        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
 
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .addDateFilter()
                 .waitForReportComputing()
@@ -85,9 +85,9 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void allowFilterByRange() throws ParseException {
-        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
 
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .addDateFilter()
                 .waitForReportComputing()
@@ -173,7 +173,7 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
             return;
         }
 
-        ChartReportReact report = analysisPageReact.getChartReport();
+        ChartReport report = analysisPageReact.getChartReport();
         assertTrue(Iterables.all(report.getDataLabels(), new Predicate<String>() {
             @Override
             public boolean apply(String input) {
@@ -201,7 +201,7 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
             return;
         }
 
-        ChartReportReact report = analysisPageReact.getChartReport();
+        ChartReport report = analysisPageReact.getChartReport();
 
         assertTrue(isEqualCollection(report.getLegends(),
                 asList(METRIC_NUMBER_OF_ACTIVITIES + " - previous year", METRIC_NUMBER_OF_ACTIVITIES)));

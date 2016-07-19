@@ -29,7 +29,7 @@ import com.gooddata.md.Restriction;
 import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanelReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
 
 public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
 
@@ -40,7 +40,7 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testFilteringFieldsInCatalog() {
-        final CataloguePanelReact cataloguePanel = analysisPageReact.getCataloguePanel();
+        final CataloguePanel cataloguePanel = analysisPageReact.getCataloguePanel();
 
         cataloguePanel.filterCatalog(CatalogFilterType.MEASURES)
             .search("am");
@@ -65,7 +65,7 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testCreateReportWithFieldsInCatalogFilter() {
-        final CataloguePanelReact cataloguePanel = analysisPageReact.getCataloguePanel();
+        final CataloguePanel cataloguePanel = analysisPageReact.getCataloguePanel();
 
         cataloguePanel.filterCatalog(CatalogFilterType.MEASURES);
         analysisPageReact.addMetric(METRIC_AMOUNT);
@@ -109,7 +109,7 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
 
         try {
             initAnalysePage();
-            final CataloguePanelReact cataloguePanel = analysisPageReact.getCataloguePanel();
+            final CataloguePanel cataloguePanel = analysisPageReact.getCataloguePanel();
 
             assertFalse(cataloguePanel.search("<button> test XSS </button>"));
             assertFalse(cataloguePanel.search("<script> alert('test'); </script>"));
@@ -151,7 +151,7 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testHiddenUnrelatedObjects() {
-        final CataloguePanelReact cataloguePanel = analysisPageReact.getCataloguePanel();
+        final CataloguePanel cataloguePanel = analysisPageReact.getCataloguePanel();
 
         analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE);

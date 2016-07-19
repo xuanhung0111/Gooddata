@@ -35,14 +35,14 @@ import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucketReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 
 public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
 
@@ -65,7 +65,7 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
         assertEquals(analysisPageReact.changeReportType(ReportType.LINE_CHART)
                 .getExplorerMessage(), "Now select a measure to display");
 
-        TableReportReact report = analysisPageReact
+        TableReport report = analysisPageReact
                 .changeReportType(ReportType.TABLE)
                 .waitForReportComputing()
                 .getTableReport();
@@ -82,7 +82,7 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
         Supplier<WebElement> recommendation = () ->
             waitForElementPresent(ShortcutPanel.AS_A_COLUMN_CHART.getLocator(), browser);
 
-        ChartReportReact report = analysisPageReact.drag(metric, recommendation)
+        ChartReport report = analysisPageReact.drag(metric, recommendation)
                     .waitForReportComputing().getChartReport();
 
         assertThat(report.getTrackersCount(), equalTo(1));
@@ -102,7 +102,7 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testSimpleContribution() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .getChartReport();
@@ -131,7 +131,7 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
     }
     @Test(dependsOnGroups = {"init"})
     public void testSimpleComparison() {
-        ChartReportReact report = analysisPageReact
+        ChartReport report = analysisPageReact
                 .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing()
                 .getChartReport();
@@ -184,7 +184,7 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
                 .waitForReportComputing()
                 .getPageHeader()
                 .isExportButtonEnabled());
-        TableReportReact analysisReport = analysisPageReact.getTableReport();
+        TableReport analysisReport = analysisPageReact.getTableReport();
         List<List<String>> analysisContent = analysisReport.getContent();
         Iterator<String> analysisHeaders = analysisReport.getHeaders().iterator();
 
@@ -227,7 +227,7 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void filterOnDateAttribute() {
-        final FiltersBucketReact filtersBucket = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucket = analysisPageReact.getFilterBuckets();
 
         analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -254,7 +254,7 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
                 .isFilterVisible(ATTR_ACTIVITY));
         assertEquals(analysisPageReact.getFilterBuckets().getFilterText(ATTR_ACTIVITY),
                 "Activity: Jan 1, 2012 - Dec 31, 2012");
-        ChartReportReact report = analysisPageReact.waitForReportComputing().getChartReport();
+        ChartReport report = analysisPageReact.waitForReportComputing().getChartReport();
         assertThat(report.getTrackersCount(), equalTo(1));
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,

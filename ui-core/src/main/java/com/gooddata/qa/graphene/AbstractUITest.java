@@ -17,7 +17,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.disc.*;
 import com.gooddata.qa.graphene.fragments.i18n.LocalizationPage;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPageReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
@@ -192,8 +192,8 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(css = ".ait-overview-projects-fragment")
     protected OverviewProjects discOverviewProjects;
 
-    @FindBy(className = AnalysisPageReact.MAIN_CLASS)
-    protected AnalysisPageReact analysisPageReact;
+    @FindBy(className = AnalysisPage.MAIN_CLASS)
+    protected AnalysisPage analysisPageReact;
 
     @FindBy(css = ".ember-application .main")
     protected UserManagementPage userManagementPage;
@@ -541,7 +541,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     }
 
-    public AnalysisPageReact initAnalysePage() {
+    public AnalysisPage initAnalysePage() {
         openUrl(PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/reportId/edit");
         return waitForFragmentVisible(analysisPageReact);
     }

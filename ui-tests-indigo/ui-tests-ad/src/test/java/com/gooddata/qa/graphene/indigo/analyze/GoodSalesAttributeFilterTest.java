@@ -17,11 +17,11 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributeFilterPickerPanel;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucketReact;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucketReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
 public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
 
@@ -32,9 +32,9 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void filterOnAttribute() {
-        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
 
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .getChartReport();
@@ -76,9 +76,9 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void filterOnDateAndAttribute() {
-        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
 
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .addDateFilter()
                 .waitForReportComputing()
@@ -95,7 +95,7 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void addAttributeToFilterBucket() {
-        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         assertEquals(analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -111,7 +111,7 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testAttributeReplaceDate() {
-        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
         assertTrue(analysisPageReact.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
@@ -124,7 +124,7 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testReplaceAttribute() {
-        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE);
         assertTrue(filtersBucketReact.isFilterVisible(ATTR_ACTIVITY_TYPE));
@@ -142,7 +142,7 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
     public void checkRelatedDateShownCorrectly() {
         analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
 
-        AttributesBucketReact attributesBucket = analysisPageReact.getAttributesBucket();
+        AttributesBucket attributesBucket = analysisPageReact.getAttributesBucket();
 
         takeScreenshot(browser, "Related-date-shows-correctly-with-metric-activity", getClass());
         assertEquals(attributesBucket.getSelectedDimensionSwitch(), "Activity");
