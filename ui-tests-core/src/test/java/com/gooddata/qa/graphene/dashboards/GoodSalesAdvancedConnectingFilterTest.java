@@ -29,7 +29,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 
-public class GoodsalesAdvanceConnectingFilterTest extends GoodSalesAbstractTest {
+public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest {
 
     private static final String DASHBOARD_TAB = "New tab";
     private static final String REPORT = "Report-" + System.currentTimeMillis();
