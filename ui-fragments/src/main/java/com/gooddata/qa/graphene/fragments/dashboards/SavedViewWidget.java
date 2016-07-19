@@ -91,6 +91,15 @@ public class SavedViewWidget extends AbstractFragment{
         saveCurrentView(name, true, excludeFilters);
     }
 
+    public String getCurrentSavedView() {
+        return waitForElementVisible(this.getRoot()).getText();
+    }
+
+    public SavedViewWidget selectSavedView(String savedView) {
+        getSavedViewPopupMenu().selectSavedView(savedView);
+        return this;
+    }
+
     /**
      * Fragment represents 'Save active view' dialog.
      * That dialog is opened when save new saved view, rename a saved view

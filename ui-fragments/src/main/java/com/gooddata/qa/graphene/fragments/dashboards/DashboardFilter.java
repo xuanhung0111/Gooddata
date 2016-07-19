@@ -12,9 +12,12 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.FilterPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 
-public class DashboardFilter extends AbstractFragment {
+public class DashboardFilter extends SelectItemPopupPanel {
 
     @FindBy(xpath = "//div[contains(@class, 'attributes sliding')]/div[@class='input']/div/input")
     private WebElement attributeSearchInput;
@@ -86,5 +89,15 @@ public class DashboardFilter extends AbstractFragment {
         waitForElementVisible(By.xpath(timeLineLocator.replace("${time}", dataRange)), browser).click();
         waitForElementVisible(addTimeButton).click();
         sleepTightInSeconds(2);
+    }
+
+    public void addTimeFilter(String dateDimension, DateGranularity dateGranularity, String timeLine) {
+        searchAndSelectItem(dateDimension);
+        waitForElementVisible(nextButton).click();
+
+        FilterPanel.getPanel(TimeFilterPanel.class, browser)
+                .selectDateGranularity(dateGranularity)
+                .selectTimeLine(timeLine)
+                .submit();
     }
 }

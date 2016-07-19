@@ -45,7 +45,7 @@ public class SelectItemPopupPanel extends AbstractFragment {
 
     @FindBys({
         @FindBy(css = ".overlayPlugin-plugged>:not(.gdc-hidden),.afp-list"),
-        @FindBy(css = "div.es_body:not(.hidden):not(.gdc-hidden)")
+        @FindBy(css = "div.es_body:not(.hidden):not(.gdc-hidden),.gdc-list .yui3-c-label"),
     })
     private List<WebElement> items;
 
