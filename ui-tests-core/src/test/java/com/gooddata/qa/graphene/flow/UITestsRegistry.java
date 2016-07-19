@@ -12,6 +12,7 @@ import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardAllKindsFiltersTest
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesFilterDropdownAttributeValueTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesFilterGroupTest;
+import com.gooddata.qa.graphene.dashboards.GoodSalesAdvancedConnectingFilterTest;
 import com.gooddata.qa.graphene.filters.DashboardFilterVisualTest;
 import com.gooddata.qa.graphene.i18n.LocalizationTest;
 import com.gooddata.qa.graphene.project.SimpleProjectEtlTest;
@@ -45,7 +46,8 @@ public class UITestsRegistry {
                     GoodSalesConnectingFilterTest.class,
                     GoodSalesFilterGroupTest.class,
                     DashboardFilterVisualTest.class,
-                    DashboardSavedFiltersTest.class
+                    DashboardSavedFiltersTest.class,
+                    GoodSalesAdvancedConnectingFilterTest.class
                 ));
             }
         }

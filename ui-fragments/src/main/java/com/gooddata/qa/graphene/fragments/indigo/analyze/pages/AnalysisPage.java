@@ -1,12 +1,13 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static org.openqa.selenium.By.className;
-import static org.testng.Assert.assertTrue;
-
-import java.util.function.Supplier;
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.indigo.Header;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.*;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
+import com.google.common.base.Predicate;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -16,22 +17,15 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.enums.indigo.FieldType;
-import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.indigo.Header;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MainEditor;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.VisualizationReportTypePicker;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
-import com.google.common.base.Predicate;
+import java.util.function.Supplier;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.*;
+import static org.openqa.selenium.By.className;
+import static org.testng.Assert.assertTrue;
+
+/**
+ * many React fragments used
+ */
 public class AnalysisPage extends AbstractFragment {
 
     @FindBy(className = "adi-editor-header")
@@ -60,7 +54,7 @@ public class AnalysisPage extends AbstractFragment {
 
     public static final String MAIN_CLASS = "adi-editor";
 
-    private static final By BY_TRASH_PANEL = className("adi-trash-panel");
+    private static final By BY_TRASH_PANEL = className("s-trash");
 
     public AnalysisPage startDrag(WebElement source) {
         WebElement editor = waitForElementVisible(getRoot());
@@ -185,7 +179,8 @@ public class AnalysisPage extends AbstractFragment {
     }
 
     public AnalysisPage removeMetric(String metric) {
-        return drag(getMetricsBucket().get(metric),
+        WebElement header = getMetricsBucket().get(metric).findElement(By.className("s-bucket-item-header"));
+        return drag(header ,
                 () -> waitForElementPresent(BY_TRASH_PANEL, browser));
     }
 
@@ -225,11 +220,12 @@ public class AnalysisPage extends AbstractFragment {
     }
 
     public boolean isBlankState() {
-        return getFilterBuckets().isEmpty() &&
-            getMetricsBucket().isEmpty() &&
-            getAttributesBucket().isEmpty() &&
-            getStacksBucket().isEmpty() &&
-            getMainEditor().isEmpty();
+        return getFilterBuckets().isEmpty() 
+                && getMetricsBucket().isEmpty() 
+                && getAttributesBucket().isEmpty()
+                && getStacksBucket().isEmpty() 
+                && getMainEditor().isEmpty() 
+                && getPageHeader().isBlankState();
     }
 
     public AnalysisPage exportReport() {
@@ -307,6 +303,31 @@ public class AnalysisPage extends AbstractFragment {
                 waitForElementVisible(By.className("gd-header"), browser))
                 .switchProject(name);
 
+        return this;
+    }
+
+    public AnalysisPage openInsight(final String insight) {
+        getPageHeader().expandInsightSelection().openInsight(insight);
+        return this;
+    }
+
+    public AnalysisPage saveInsight() {
+        getPageHeader().saveInsight();
+        return this;
+    }
+
+    public AnalysisPage saveInsight(final String insight) {
+        getPageHeader().saveInsight(insight);
+        return this;
+    }
+
+    public AnalysisPage saveInsightAs(final String insight) {
+        getPageHeader().saveInsightAs(insight);
+        return this;
+    }
+
+    public AnalysisPage setInsightTitle(final String title) {
+        getPageHeader().setInsightTitle(title);
         return this;
     }
 }

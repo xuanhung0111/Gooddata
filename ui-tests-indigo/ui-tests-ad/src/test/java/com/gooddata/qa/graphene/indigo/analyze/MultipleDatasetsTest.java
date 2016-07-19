@@ -20,9 +20,9 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanelReact;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucketReact;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
@@ -62,7 +62,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void analyzeReportOnProductionData() {
-        ChartReportReact report = analysisPageReact.addMetric("Close Price", FieldType.FACT)
+        ChartReport report = analysisPageReact.addMetric("Close Price", FieldType.FACT)
                 .addDate()
                 .addStack("Industry")
                 .waitForReportComputing()
@@ -70,7 +70,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
         takeScreenshot(browser, "analyzeReportOnProductionData", getClass());
         assertThat(report.getTrackersCount(), greaterThanOrEqualTo(1));
 
-        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
         filtersBucketReact.configAttributeFilter("Industry", "Apparel Stores", "Consumer Services");
         analysisPageReact.waitForReportComputing();
         assertThat(report.getTrackersCount(), greaterThanOrEqualTo(1));
@@ -82,7 +82,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
     public void analyzeReportOnPayrollData() {
         analysisPageReact.getCataloguePanel().changeDataset(PAYROLL_DATASET);
 
-        ChartReportReact report = analysisPageReact.addMetric(AMOUNT, FieldType.FACT)
+        ChartReport report = analysisPageReact.addMetric(AMOUNT, FieldType.FACT)
             .addDate()
             .addStack("County")
             .waitForReportComputing()
@@ -90,7 +90,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
         takeScreenshot(browser, "analyzeReportOnPayrollData", getClass());
         assertThat(report.getTrackersCount(), greaterThanOrEqualTo(1));
 
-        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
         filtersBucketReact.configAttributeFilter("County", "Austin", "Clover");
         analysisPageReact.waitForReportComputing();
         assertThat(report.getTrackersCount(), greaterThanOrEqualTo(1));
@@ -100,7 +100,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void searchDataAfterSelectDataset() {
-        final CataloguePanelReact cataloguePanel = analysisPageReact.getCataloguePanel();
+        final CataloguePanel cataloguePanel = analysisPageReact.getCataloguePanel();
 
         assertFalse(cataloguePanel.changeDataset(PRODUCTION_DATASET)
             .search(AMOUNT));

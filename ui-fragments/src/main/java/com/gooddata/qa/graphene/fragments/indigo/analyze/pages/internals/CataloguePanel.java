@@ -1,16 +1,10 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
-import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsEmpty;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static org.testng.Assert.assertEquals;
-
-import java.util.Collection;
-import java.util.List;
-
+import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.description.DescriptionPanel;
+import com.google.common.base.Predicate;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -19,12 +13,19 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
-import com.gooddata.qa.graphene.enums.indigo.FieldType;
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.description.DescriptionPanel;
-import com.google.common.base.Predicate;
+import java.util.Collection;
+import java.util.List;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.*;
+import static org.openqa.selenium.By.className;
+import static org.testng.Assert.assertEquals;
+
+/**
+ * search() method needs to sleep tight for 1 sec in order to work.
+ */
 public class CataloguePanel extends AbstractFragment {
 
     @FindBy(className = "searchfield-input")
@@ -159,11 +160,13 @@ public class CataloguePanel extends AbstractFragment {
         searchInput.sendKeys(item);
         waitForItemLoaded();
 
+        sleepTightInSeconds(1);
+
         if (!isElementPresent(BY_NO_ITEMS, browser)) {
             waitForCollectionIsNotEmpty(items);
             return true;
         }
-        WebElement noItem = browser.findElement(BY_NO_ITEMS).findElement(By.cssSelector("p:first-child"));
+        WebElement noItem = browser.findElement(BY_NO_ITEMS).findElement(By.cssSelector(".s-not-matching-message"));
         assertEquals(noItem.getText().trim(), "No data matching\n\"" + item + "\"");
         return false;
     }
@@ -214,6 +217,11 @@ public class CataloguePanel extends AbstractFragment {
             .filter(e -> e.getAttribute("class").contains(type.toString()))
             .findFirst()
             .get();
+    }
+
+    public boolean isDatasetApplied(final String dataset) {
+        waitForItemLoaded();
+        return waitForElementVisible(className("data-source-picker"), browser).getText().equals(dataset);
     }
 
     private void waitForItemLoaded() {

@@ -36,7 +36,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.google.common.collect.Lists;
 
@@ -79,7 +79,7 @@ public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void checkReportContentWhenAdd3Metrics1Attribute() {
-        TableReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        TableReport report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addMetric(METRIC_QUOTA)
                 .addMetric(METRIC_SNAPSHOT_BOP)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -196,7 +196,7 @@ public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
         try {
             initAnalysePage();
 
-            com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReportReact tableReport =
+            com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport tableReport =
                     analysisPageReact.changeReportType(ReportType.TABLE)
                         .addMetric(METRIC_NUMBER_OF_ACTIVITIES).getTableReport();
             assertEquals(tableReport.getFormatFromValue(), "color: rgb(255, 0, 0);");
@@ -227,7 +227,7 @@ public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
         return content;
     }
 
-    private List<List<String>> sortReportBaseOnHeader(TableReportReact report, String name) {
+    private List<List<String>> sortReportBaseOnHeader(TableReport report, String name) {
         report.sortBaseOnHeader(name);
         analysisPageReact.waitForReportComputing();
         return report.getContent();

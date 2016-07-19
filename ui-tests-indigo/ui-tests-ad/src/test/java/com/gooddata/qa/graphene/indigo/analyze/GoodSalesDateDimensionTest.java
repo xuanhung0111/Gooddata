@@ -13,9 +13,9 @@ import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanelReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucketReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 
 public class GoodSalesDateDimensionTest extends GoodSalesAbstractAnalyseTest {
 
@@ -29,7 +29,7 @@ public class GoodSalesDateDimensionTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void applyOnFilter() {
-        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addMetric("_Snapshot [BOP]")
@@ -40,8 +40,8 @@ public class GoodSalesDateDimensionTest extends GoodSalesAbstractAnalyseTest {
 
         WebElement filter = filtersBucketReact.getFilter(ACTIVITY);
         filter.click();
-        DateFilterPickerPanelReact panel = Graphene.createPageFragment(DateFilterPickerPanelReact.class,
-                waitForElementVisible(DateFilterPickerPanelReact.LOCATOR, browser));
+        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
+                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
         assertTrue(isEqualCollection(panel.getDimensionSwitchs(), asList(ACTIVITY, CREATED)));
 
         panel.select("This year");
@@ -53,7 +53,7 @@ public class GoodSalesDateDimensionTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void applyOnBucket() {
-        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
         assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ": All time");
@@ -73,7 +73,7 @@ public class GoodSalesDateDimensionTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void applyOnBothFilterAndBucket() {
-        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDateFilter();
         assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ": All time");
@@ -84,8 +84,8 @@ public class GoodSalesDateDimensionTest extends GoodSalesAbstractAnalyseTest {
         analysisPageReact.addDate();
         WebElement filter = filtersBucketReact.getFilter(CREATED);
         filter.click();
-        DateFilterPickerPanelReact panel = Graphene.createPageFragment(DateFilterPickerPanelReact.class,
-              waitForElementVisible(DateFilterPickerPanelReact.LOCATOR, browser));
+        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
+              waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
         assertFalse(panel.isDimensionSwitcherEnabled());
 
         analysisPageReact.getAttributesBucket().changeDateDimension(ACTIVITY);

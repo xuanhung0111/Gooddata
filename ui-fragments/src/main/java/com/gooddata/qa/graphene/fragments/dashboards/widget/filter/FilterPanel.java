@@ -14,14 +14,14 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class FilterPanel extends AbstractFragment {
 
-    @FindBy(className = "s-btn-apply")
+    @FindBy(css = ".s-btn-apply,.s-btn-add")
     private WebElement applyButton;
 
     @FindBy(className = "s-btn-cancel")
     private WebElement cancelButton;
 
     private static final By ATTRIBUTE_PANEL_LOCATOR = By.className("yui3-listfilterpanel");
-    private static final By TIME_PANEL_LOCATOR = By.className("yui3-c-tabtimefilterpanel");
+    private static final By TIME_PANEL_LOCATOR = By.cssSelector(".yui3-c-tabtimefilterbase:not(.gdc-hidden)");
 
     public static FilterPanel getInstance(WebDriver browser) {
         if (!browser.findElements(ATTRIBUTE_PANEL_LOCATOR).isEmpty()) {

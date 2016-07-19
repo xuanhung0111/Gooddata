@@ -28,7 +28,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricC
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
 public class GoodSalesFactBasedMetricTest extends GoodSalesAbstractAnalyseTest {
 
@@ -64,7 +64,7 @@ public class GoodSalesFactBasedMetricTest extends GoodSalesAbstractAnalyseTest {
         assertFalse(metricsBucket.isEmpty());
 
         analysisPageReact.addAttribute(ATTR_STAGE_NAME).waitForReportComputing();
-        ChartReportReact report = analysisPageReact.getChartReport();
+        ChartReport report = analysisPageReact.getChartReport();
         assertEquals(report.getYaxisTitle(), SUM_OF_AMOUNT);
         checkingOpenAsReport("createSimpleMetricFromFact");
     }
@@ -76,7 +76,7 @@ public class GoodSalesFactBasedMetricTest extends GoodSalesAbstractAnalyseTest {
             .getMetricConfiguration(SUM_OF_ACTIVITY_DATE)
             .expandConfiguration();
         assertEquals(metricConfiguration.getAggregation(), "Sum");
-        ChartReportReact report = analysisPageReact.waitForReportComputing().getChartReport();
+        ChartReport report = analysisPageReact.waitForReportComputing().getChartReport();
         assertEquals(report.getYaxisTitle(), SUM_OF_ACTIVITY_DATE);
 
         assertTrue(isEqualCollection(metricConfiguration.getAllAggregations(),

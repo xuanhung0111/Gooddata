@@ -27,10 +27,10 @@ import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucketReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.google.common.collect.Sets;
 
 public class CustomDateDimensionsTest extends AbstractAnalyseTest {
@@ -73,7 +73,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void datePresetsAppliedInReport() {
-        final FiltersBucketReact filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
 
         analysisPageReact.addMetric(NUMBER, FieldType.FACT).addDate().waitForReportComputing();
 
@@ -139,7 +139,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testPopAndPercentOnCustomDate() {
-        ChartReportReact report = analysisPageReact.addMetric(NUMBER, FieldType.FACT)
+        ChartReport report = analysisPageReact.addMetric(NUMBER, FieldType.FACT)
             .addDate()
             .waitForReportComputing()
             .getChartReport();

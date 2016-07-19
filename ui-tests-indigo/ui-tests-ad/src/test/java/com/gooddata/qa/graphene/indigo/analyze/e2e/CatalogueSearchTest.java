@@ -11,7 +11,7 @@ import static org.testng.Assert.assertTrue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanelReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
 public class CatalogueSearchTest extends AbstractAdE2ETest {
@@ -28,7 +28,7 @@ public class CatalogueSearchTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_only_matched_items() {
-        CataloguePanelReact panel = analysisPageReact.getCataloguePanel();
+        CataloguePanel panel = analysisPageReact.getCataloguePanel();
 
         panel.search("Opps.");
         assertTrue(panel.getFieldNamesInViewPort()
@@ -39,7 +39,7 @@ public class CatalogueSearchTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_case_insensitive() {
-        CataloguePanelReact panel = analysisPageReact.getCataloguePanel();
+        CataloguePanel panel = analysisPageReact.getCataloguePanel();
 
         panel.search("opps.");
         assertTrue(panel.getFieldNamesInViewPort()
@@ -48,7 +48,7 @@ public class CatalogueSearchTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_cancel_search() {
-        CataloguePanelReact panel = analysisPageReact.getCataloguePanel();
+        CataloguePanel panel = analysisPageReact.getCataloguePanel();
 
         panel.search(METRIC_NUMBER_OF_LOST_OPPS);
         assertFalse(panel.getFieldNamesInViewPort().contains(ATTR_ACTIVITY_TYPE));

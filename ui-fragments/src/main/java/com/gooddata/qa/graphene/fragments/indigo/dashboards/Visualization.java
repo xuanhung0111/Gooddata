@@ -5,7 +5,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.*;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
 public class Visualization extends Widget {
     public static final String MAIN_SELECTOR = ".dash-item.type-visualization";
@@ -17,8 +17,8 @@ public class Visualization extends Widget {
     public static final By IS_WIDGET_LOADING = By.cssSelector(MAIN_SELECTOR + " ." + WIDGET_LOADING_CLASS);
     public static final By IS_CONTENT_LOADING = By.cssSelector(MAIN_SELECTOR + " ." + CONTENT_LOADING_CLASS);
 
-    public ChartReportReact getChartReport() {
-        return Graphene.createPageFragment(ChartReportReact.class,
+    public ChartReport getChartReport() {
+        return Graphene.createPageFragment(ChartReport.class,
                 waitForElementVisible(BY_CHART_REPORT, browser));
     }
 }

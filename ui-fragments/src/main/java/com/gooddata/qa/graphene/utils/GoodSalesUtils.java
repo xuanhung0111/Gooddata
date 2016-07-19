@@ -83,4 +83,11 @@ public final class GoodSalesUtils {
 
     // variables
     public static final String VARIABLE_STATUS = "Status";
+
+    // date dimensions
+    public static final String DATE_DIMENSION_CREATED = "Date dimension (Created)";
+    public static final String DATE_DIMENSION_CLOSED = "Date dimension (Closed)";
+    public static final String DATE_DIMENSION_SNAPSHOT = "Date dimension (Snapshot)";
+    public static final String DATE_DIMENSION_ACTIVITY = "Date dimension (Activity)";
+    public static final String DATE_DIMENSION_TIMELINE = "Date dimension (Timeline)";
 }

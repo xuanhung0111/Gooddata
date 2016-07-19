@@ -23,7 +23,7 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
 public class GoodSalesShortcutRecommendationTest extends GoodSalesAbstractAnalyseTest {
 
@@ -40,7 +40,7 @@ public class GoodSalesShortcutRecommendationTest extends GoodSalesAbstractAnalys
         Supplier<WebElement> recommendation = () ->
             waitForElementPresent(ShortcutPanel.AS_A_COLUMN_CHART.getLocator(), browser);
 
-        ChartReportReact report = analysisPageReact.drag(metric, recommendation)
+        ChartReport report = analysisPageReact.drag(metric, recommendation)
                 .waitForReportComputing().getChartReport();
 
         assertThat(report.getTrackersCount(), equalTo(1));
@@ -66,7 +66,7 @@ public class GoodSalesShortcutRecommendationTest extends GoodSalesAbstractAnalys
         Supplier<WebElement> trendRecommendation = () ->
             waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
 
-        ChartReportReact report = analysisPageReact.drag(metric, trendRecommendation)
+        ChartReport report = analysisPageReact.drag(metric, trendRecommendation)
                 .waitForReportComputing().getChartReport();
 
         assertTrue(report.getTrackersCount() >= 1);

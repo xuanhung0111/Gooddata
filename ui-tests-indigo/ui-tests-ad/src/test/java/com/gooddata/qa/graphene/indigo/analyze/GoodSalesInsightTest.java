@@ -24,7 +24,7 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.dialog.SaveInsightDialog;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisInsightSelectionPanel;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.FilterType;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
@@ -151,7 +151,7 @@ public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnMethods = { "testSaveInsight" })
     public void testOpenInsight() {
-        final ChartReportReact chart = analysisPageReact
+        final ChartReport chart = analysisPageReact
                 .openInsight(INSIGHT_TEST)
                 .waitForReportComputing()
                 .getChartReport();

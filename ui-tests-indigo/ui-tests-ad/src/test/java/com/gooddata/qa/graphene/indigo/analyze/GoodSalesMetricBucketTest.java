@@ -8,7 +8,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACT
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_QUOTA;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.openqa.selenium.By.className;
@@ -18,18 +17,15 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.Arrays;
 
-import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
-import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
 public class GoodSalesMetricBucketTest extends GoodSalesAbstractAnalyseTest {
 
@@ -43,7 +39,7 @@ public class GoodSalesMetricBucketTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void checkSeriesStateTransitions() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addDate()
                 .waitForReportComputing()
                 .getChartReport();
@@ -159,7 +155,7 @@ public class GoodSalesMetricBucketTest extends GoodSalesAbstractAnalyseTest {
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
-        ChartReportReact report = analysisPageReact.getChartReport();
+        ChartReport report = analysisPageReact.getChartReport();
         assertEquals(report.getTrackersCount(), 4);
         assertTrue(metricConfiguration.isShowPercentEnabled());
 

@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -42,10 +43,6 @@ public class ChartReport extends AbstractFragment {
             return "";
         }
         return yAxisTitle.get(0).getText();
-    }
-
-    private List<String> getLabels(Collection<WebElement> labels) {
-        return getElementTexts(waitForCollectionIsNotEmpty(labels));
     }
 
     public int getTrackersCount() {
@@ -93,7 +90,7 @@ public class ChartReport extends AbstractFragment {
 
     public List<String> getLegendColors() {
         return waitForCollectionIsNotEmpty(legends).stream()
-            .map(e -> e.findElement(By.cssSelector("path")))
+            .map(e -> e.findElement(By.tagName("rect")))
             .map(e -> e.getCssValue("fill"))
             .collect(toList());
     }
@@ -108,6 +105,14 @@ public class ChartReport extends AbstractFragment {
             return Collections.emptyList();
 
         return getLabels(axisLabels);
+    }
+
+    public String getChartType() {
+        return Stream.of(getRoot().getAttribute("class").split("\\s+"))
+                .filter(e -> e.contains("s-visualization-"))
+                .map(e -> e.replace("s-visualization-", ""))
+                .findFirst()
+                .get();
     }
 
     private List<String[]> getTransformValueFormLegend() {
@@ -136,5 +141,9 @@ public class ChartReport extends AbstractFragment {
 
     private boolean isLineChart() {
         return getRoot().getAttribute("class").contains("visualization-line");
+    }
+
+    private List<String> getLabels(Collection<WebElement> labels) {
+        return getElementTexts(waitForCollectionIsNotEmpty(labels));
     }
 }

@@ -45,13 +45,13 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeaderReact;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucketReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 
 public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
@@ -76,7 +76,7 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
         assertEquals(analysisPageReact.changeReportType(ReportType.LINE_CHART)
                 .getExplorerMessage(), "Now select a measure to display");
 
-        TableReportReact report = analysisPageReact.changeReportType(ReportType.TABLE)
+        TableReport report = analysisPageReact.changeReportType(ReportType.TABLE)
                 .waitForReportComputing().getTableReport();
         assertThat(report.getHeaders().stream().map(String::toLowerCase).collect(toList()),
                 equalTo(asList(ATTR_ACTIVITY_TYPE.toLowerCase())));
@@ -85,7 +85,7 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testResetFunction() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing().getChartReport();
         assertThat(report.getTrackersCount(), equalTo(1));
         RecommendationContainer recommendationContainer =
@@ -105,8 +105,8 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void disableExportForUnexportableVisualization() {
-        final AnalysisPageHeaderReact pageHeader = analysisPageReact.getPageHeader();
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_AMOUNT)
+        final AnalysisPageHeader pageHeader = analysisPageReact.getPageHeader();
+        ChartReport report = analysisPageReact.addMetric(METRIC_AMOUNT)
                 .waitForReportComputing().getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         assertTrue(pageHeader.isExportButtonEnabled());
@@ -172,7 +172,7 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
                   .addAttribute(ATTR_IS_WON)
                   .addStack(ATTR_IS_WON)
                   .waitForReportComputing();
-            ChartReportReact report = analysisPageReact.getChartReport();
+            ChartReport report = analysisPageReact.getChartReport();
             assertTrue(report.getTrackersCount() >= 1);
             assertEquals(report.getLegends(), asList("true"));
 
@@ -190,7 +190,7 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
                 .changeReportType(ReportType.TABLE)
                 .getPageHeader()
                 .isExportButtonEnabled());
-        TableReportReact analysisReport = analysisPageReact.waitForReportComputing().getTableReport();
+        TableReport analysisReport = analysisPageReact.waitForReportComputing().getTableReport();
         List<List<String>> analysisContent = analysisReport.getContent();
         Iterator<String> analysisHeaders = analysisReport.getHeaders().iterator();
 
@@ -289,7 +289,7 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
     @Test(dependsOnGroups = {"init"})
     public void switchReportWithDateAttributes() {
         final StacksBucket stacksBucket = analysisPageReact.getStacksBucket();
-        final AttributesBucketReact categoriesBucket = analysisPageReact.getAttributesBucket();
+        final AttributesBucket categoriesBucket = analysisPageReact.getAttributesBucket();
 
         analysisPageReact.changeReportType(ReportType.TABLE)
             .addDate()

@@ -1,27 +1,25 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotEquals;
-import static org.testng.Assert.assertTrue;
-
-import java.text.ParseException;
-import java.util.List;
-import java.util.NoSuchElementException;
-
+import com.google.common.base.Predicate;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.google.common.base.Predicate;
+import java.text.ParseException;
+import java.util.List;
+import java.util.NoSuchElementException;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.*;
+import static org.testng.Assert.*;
+
+/**
+ * Locator for filters differs in React app.
+ */
 public class FiltersBucket extends AbstractBucket {
 
-    @FindBy(css = ".adi-bucket-item button")
+    @FindBy(css = ".adi-bucket-item .button")
     private List<WebElement> filters;
 
     private static final String LOADING = "...";
