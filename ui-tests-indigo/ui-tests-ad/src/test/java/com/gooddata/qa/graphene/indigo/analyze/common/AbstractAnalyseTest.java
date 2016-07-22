@@ -31,7 +31,7 @@ public abstract class AbstractAnalyseTest extends AbstractProjectTest {
 
             @Override
             public void waitForStartPageLoaded() {
-                waitForFragmentVisible(analysisPageReact);
+                waitForFragmentVisible(analysisPage);
             }
 
             @Override
@@ -43,12 +43,12 @@ public abstract class AbstractAnalyseTest extends AbstractProjectTest {
 
     protected void checkingOpenAsReport(String screenShot) {
         takeScreenshot(browser, screenShot + "-AD-page", getClass());
-        if (!analysisPageReact.getPageHeader().isExportButtonEnabled()) {
+        if (!analysisPage.getPageHeader().isExportButtonEnabled()) {
             log.info("[Open as Report] button is disabled. Skip export report!");
             return;
         }
 
-        analysisPageReact.exportReport();
+        analysisPage.exportReport();
 
         BrowserUtils.switchToLastTab(browser);
         waitForAnalysisPageLoaded(browser);

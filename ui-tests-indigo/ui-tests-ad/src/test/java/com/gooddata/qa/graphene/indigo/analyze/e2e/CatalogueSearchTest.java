@@ -23,12 +23,12 @@ public class CatalogueSearchTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_empty_catalogue_if_no_catalogue_item_is_matched() {
-        assertFalse(analysisPageReact.getCataloguePanel().search("xyz"));
+        assertFalse(analysisPage.getCataloguePanel().search("xyz"));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_only_matched_items() {
-        CataloguePanel panel = analysisPageReact.getCataloguePanel();
+        CataloguePanel panel = analysisPage.getCataloguePanel();
 
         panel.search("Opps.");
         assertTrue(panel.getFieldNamesInViewPort()
@@ -39,7 +39,7 @@ public class CatalogueSearchTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_case_insensitive() {
-        CataloguePanel panel = analysisPageReact.getCataloguePanel();
+        CataloguePanel panel = analysisPage.getCataloguePanel();
 
         panel.search("opps.");
         assertTrue(panel.getFieldNamesInViewPort()
@@ -48,7 +48,7 @@ public class CatalogueSearchTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_cancel_search() {
-        CataloguePanel panel = analysisPageReact.getCataloguePanel();
+        CataloguePanel panel = analysisPage.getCataloguePanel();
 
         panel.search(METRIC_NUMBER_OF_LOST_OPPS);
         assertFalse(panel.getFieldNamesInViewPort().contains(ATTR_ACTIVITY_TYPE));

@@ -29,33 +29,33 @@ public class ComparisonRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_apply_first_attribute_and_hide_recommendation() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
         Graphene.createPageFragment(RecommendationContainer.class,
             waitForElementVisible(RecommendationContainer.LOCATOR, browser))
             .<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).select(ATTR_ACTIVITY_TYPE).apply();
-        analysisPageReact.waitForReportComputing();
+        analysisPage.waitForReportComputing();
         assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison"), browser));
-        assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_apply_first_attribute_and_show_other_recommendations() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
         Graphene.createPageFragment(RecommendationContainer.class,
             waitForElementVisible(RecommendationContainer.LOCATOR, browser))
             .<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).select(ATTR_ACTIVITY_TYPE).apply();
-        analysisPageReact.waitForReportComputing();
+        analysisPage.waitForReportComputing();
         assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison"), browser));
-        assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
         assertTrue(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
         assertTrue(isElementPresent(cssSelector(".s-recommendation-contribution"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_have_initial_value_selected_after_resetting_report() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
         String initialValue = getValueFrom(".s-recommendation-comparison .s-attribute-switch");
 
@@ -64,9 +64,9 @@ public class ComparisonRecommendationTest extends AbstractAdE2ETest {
             .<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).select(ATTR_ACTIVITY_TYPE);
         String value = getValueFrom(".s-recommendation-comparison .s-attribute-switch");
 
-        analysisPageReact.resetToBlankState();
+        analysisPage.resetToBlankState();
 
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
         String resetValue = getValueFrom(".s-recommendation-comparison .s-attribute-switch");
         assertEquals(resetValue, initialValue);

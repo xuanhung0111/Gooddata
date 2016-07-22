@@ -27,38 +27,38 @@ public class GoodSalesAttributeBucketTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void replaceAttributeByNewOne() {
-        final AttributesBucket categoriesBucket = analysisPageReact.getAttributesBucket();
-        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
-        final StacksBucket stacksBucket = analysisPageReact.getStacksBucket();
+        final AttributesBucket categoriesBucket = analysisPage.getAttributesBucket();
+        final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
+        final StacksBucket stacksBucket = analysisPage.getStacksBucket();
 
-        analysisPageReact.addAttribute(ATTR_STAGE_NAME);
+        analysisPage.addAttribute(ATTR_STAGE_NAME);
         assertTrue(isEqualCollection(categoriesBucket.getItemNames(), asList(ATTR_STAGE_NAME)));
         assertTrue(filtersBucketReact.isFilterVisible(ATTR_STAGE_NAME));
 
-        analysisPageReact.replaceAttribute(ATTR_STAGE_NAME, ATTR_PRODUCT);
+        analysisPage.replaceAttribute(ATTR_STAGE_NAME, ATTR_PRODUCT);
         assertTrue(isEqualCollection(categoriesBucket.getItemNames(), asList(ATTR_PRODUCT)));
         assertFalse(filtersBucketReact.isFilterVisible(ATTR_STAGE_NAME));
         assertTrue(filtersBucketReact.isFilterVisible(ATTR_PRODUCT));
 
-        analysisPageReact.changeReportType(ReportType.LINE_CHART);
-        analysisPageReact.addStack(ATTR_STAGE_NAME);
+        analysisPage.changeReportType(ReportType.LINE_CHART);
+        analysisPage.addStack(ATTR_STAGE_NAME);
         assertEquals(stacksBucket.getAttributeName(), ATTR_STAGE_NAME);
         assertTrue(filtersBucketReact.isFilterVisible(ATTR_STAGE_NAME));
         assertTrue(filtersBucketReact.isFilterVisible(ATTR_PRODUCT));
 
-        analysisPageReact.replaceStack(ATTR_DEPARTMENT);
+        analysisPage.replaceStack(ATTR_DEPARTMENT);
         assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
         assertFalse(filtersBucketReact.isFilterVisible(ATTR_STAGE_NAME));
         assertTrue(filtersBucketReact.isFilterVisible(ATTR_PRODUCT));
         assertTrue(filtersBucketReact.isFilterVisible(ATTR_DEPARTMENT));
 
-        analysisPageReact.undo();
+        analysisPage.undo();
         assertEquals(stacksBucket.getAttributeName(), ATTR_STAGE_NAME);
         assertTrue(filtersBucketReact.isFilterVisible(ATTR_STAGE_NAME));
         assertTrue(filtersBucketReact.isFilterVisible(ATTR_PRODUCT));
         assertFalse(filtersBucketReact.isFilterVisible(ATTR_DEPARTMENT));
 
-        analysisPageReact.redo();
+        analysisPage.redo();
         assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
         assertFalse(filtersBucketReact.isFilterVisible(ATTR_STAGE_NAME));
         assertTrue(filtersBucketReact.isFilterVisible(ATTR_PRODUCT));
@@ -68,14 +68,14 @@ public class GoodSalesAttributeBucketTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void switchAttributesBetweenAxisAndStackBy() {
-        final AttributesBucket categoriesBucket = analysisPageReact.getAttributesBucket();
-        final StacksBucket stacksBucket = analysisPageReact.getStacksBucket();
+        final AttributesBucket categoriesBucket = analysisPage.getAttributesBucket();
+        final StacksBucket stacksBucket = analysisPage.getStacksBucket();
 
-        analysisPageReact.addAttribute(ATTR_STAGE_NAME).addStack(ATTR_DEPARTMENT);
+        analysisPage.addAttribute(ATTR_STAGE_NAME).addStack(ATTR_DEPARTMENT);
         assertTrue(isEqualCollection(categoriesBucket.getItemNames(), asList(ATTR_STAGE_NAME)));
         assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
 
-        analysisPageReact.drag(categoriesBucket.getFirst(), stacksBucket.get());
+        analysisPage.drag(categoriesBucket.getFirst(), stacksBucket.get());
         assertTrue(isEqualCollection(categoriesBucket.getItemNames(), asList(ATTR_DEPARTMENT)));
         assertEquals(stacksBucket.getAttributeName(), ATTR_STAGE_NAME);
         checkingOpenAsReport("switchAttributesBetweenAxisAndStackBy");

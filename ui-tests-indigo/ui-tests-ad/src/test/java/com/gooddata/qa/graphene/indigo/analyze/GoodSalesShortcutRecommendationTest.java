@@ -34,13 +34,13 @@ public class GoodSalesShortcutRecommendationTest extends GoodSalesAbstractAnalys
 
     @Test(dependsOnGroups = {"init"})
     public void testColumnChartShortcut() {
-        WebElement metric = analysisPageReact.getCataloguePanel()
+        WebElement metric = analysisPage.getCataloguePanel()
                 .searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC);
 
         Supplier<WebElement> recommendation = () ->
             waitForElementPresent(ShortcutPanel.AS_A_COLUMN_CHART.getLocator(), browser);
 
-        ChartReport report = analysisPageReact.drag(metric, recommendation)
+        ChartReport report = analysisPage.drag(metric, recommendation)
                 .waitForReportComputing().getChartReport();
 
         assertThat(report.getTrackersCount(), equalTo(1));
@@ -50,28 +50,28 @@ public class GoodSalesShortcutRecommendationTest extends GoodSalesAbstractAnalys
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        analysisPageReact.changeReportType(ReportType.BAR_CHART).waitForReportComputing();
+        analysisPage.changeReportType(ReportType.BAR_CHART).waitForReportComputing();
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
 
-        analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing();
+        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing();
         assertThat(report.getTrackersCount(), equalTo(4));
         checkingOpenAsReport("dragMetricToColumnChartShortcutPanel");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void testTrendShortcut() {
-        WebElement metric = analysisPageReact.getCataloguePanel()
+        WebElement metric = analysisPage.getCataloguePanel()
                 .searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC);
 
         Supplier<WebElement> trendRecommendation = () ->
             waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
 
-        ChartReport report = analysisPageReact.drag(metric, trendRecommendation)
+        ChartReport report = analysisPage.drag(metric, trendRecommendation)
                 .waitForReportComputing().getChartReport();
 
         assertTrue(report.getTrackersCount() >= 1);
-        assertTrue(analysisPageReact.getFilterBuckets().isFilterVisible("Activity"));
-        assertThat(analysisPageReact.getFilterBuckets().getFilterText("Activity"), equalTo("Activity: Last 4 quarters"));
+        assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
+        assertThat(analysisPage.getFilterBuckets().getFilterText("Activity"), equalTo("Activity: Last 4 quarters"));
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
@@ -81,48 +81,48 @@ public class GoodSalesShortcutRecommendationTest extends GoodSalesAbstractAnalys
 
     @Test(dependsOnGroups = {"init"})
     public void displayWhenDraggingFirstMetric() {
-        WebElement metric = analysisPageReact.getCataloguePanel()
+        WebElement metric = analysisPage.getCataloguePanel()
                 .searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC);
 
         Supplier<WebElement> trendRecommendation = () ->
             waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
 
-        analysisPageReact.drag(metric, trendRecommendation)
+        analysisPage.drag(metric, trendRecommendation)
             .waitForReportComputing();
 
-        assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(DATE));
-        assertTrue(analysisPageReact.getFilterBuckets().isFilterVisible("Activity"));
-        assertEquals(analysisPageReact.getFilterBuckets().getFilterText("Activity"), "Activity: Last 4 quarters");
-        assertTrue(analysisPageReact.getChartReport().getTrackersCount() >= 1);
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
+        assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
+        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity: Last 4 quarters");
+        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
         checkingOpenAsReport("displayWhenDraggingFirstMetric");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void createSimpleMetricFromFactUsingShortcut() {
-        WebElement fact = analysisPageReact.getCataloguePanel()
+        WebElement fact = analysisPage.getCataloguePanel()
                 .searchAndGet(FACT_AMOUNT, FieldType.FACT);
 
         Supplier<WebElement> recommendation = () ->
             waitForElementPresent(ShortcutPanel.AS_A_COLUMN_CHART.getLocator(), browser);
 
-        assertEquals(analysisPageReact.drag(fact, recommendation)
+        assertEquals(analysisPage.drag(fact, recommendation)
                 .waitForReportComputing()
                 .getMetricsBucket()
                 .getMetricConfiguration("Sum of " + FACT_AMOUNT)
                 .expandConfiguration()
                 .getAggregation(), "Sum");
-        assertEquals(analysisPageReact.getChartReport().getYaxisTitle(), "Sum of " + FACT_AMOUNT);
+        assertEquals(analysisPage.getChartReport().getYaxisTitle(), "Sum of " + FACT_AMOUNT);
 
-        analysisPageReact.resetToBlankState();
+        analysisPage.resetToBlankState();
 
         recommendation = () ->
             waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
 
-        analysisPageReact.drag(fact, recommendation)
+        analysisPage.drag(fact, recommendation)
             .waitForReportComputing();
-        assertEquals(analysisPageReact.getFilterBuckets().getDateFilterText(), "Closed: Last 4 quarters");
-        assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(DATE));
-        assertEquals(analysisPageReact.getAttributesBucket().getSelectedGranularity(), "Quarter");
+        assertEquals(analysisPage.getFilterBuckets().getDateFilterText(), "Closed: Last 4 quarters");
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
+        assertEquals(analysisPage.getAttributesBucket().getSelectedGranularity(), "Quarter");
         checkingOpenAsReport("createSimpleMetricFromFactUsingShortcut");
     }
 }

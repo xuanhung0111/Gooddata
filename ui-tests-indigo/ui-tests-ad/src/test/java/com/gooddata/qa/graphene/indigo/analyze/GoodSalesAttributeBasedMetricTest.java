@@ -30,9 +30,9 @@ public class GoodSalesAttributeBasedMetricTest extends GoodSalesAbstractAnalyseT
 
     @Test(dependsOnGroups = {"init"})
     public void createSimpleMetricFromAttribute() {
-        final MetricsBucket metricsBucket = analysisPageReact.getMetricsBucket();
+        final MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
 
-        assertTrue(analysisPageReact.addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
+        assertTrue(analysisPage.addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
                 .waitForReportComputing()
                 .getChartReport()
                 .getTrackersCount() > 0);
@@ -43,13 +43,13 @@ public class GoodSalesAttributeBasedMetricTest extends GoodSalesAbstractAnalyseT
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        analysisPageReact.undo();
+        analysisPage.undo();
         assertTrue(metricsBucket.isEmpty());
 
-        analysisPageReact.redo();
+        analysisPage.redo();
         assertFalse(metricsBucket.isEmpty());
 
-        assertEquals(analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE)
+        assertEquals(analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing()
             .getChartReport()
             .getYaxisTitle(), COUNT_OF_ACTIVITY);
@@ -59,18 +59,18 @@ public class GoodSalesAttributeBasedMetricTest extends GoodSalesAbstractAnalyseT
 
     @Test(dependsOnGroups = {"init"})
     public void showInPercent() {
-        assertTrue(analysisPageReact.addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
+        assertTrue(analysisPage.addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .getChartReport()
                 .getTrackersCount() > 0);
 
-        analysisPageReact.getMetricsBucket()
+        analysisPage.getMetricsBucket()
             .getMetricConfiguration(COUNT_OF_ACTIVITY)
             .expandConfiguration()
             .showPercents();
 
-        assertTrue(analysisPageReact.waitForReportComputing()
+        assertTrue(analysisPage.waitForReportComputing()
                 .getChartReport()
                 .getTrackersCount() > 0);
 
@@ -79,7 +79,7 @@ public class GoodSalesAttributeBasedMetricTest extends GoodSalesAbstractAnalyseT
 
     @Test(dependsOnGroups = {"init"})
     public void dragSameAttributeBasedMetrics() {
-        assertTrue(analysisPageReact.addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
+        assertTrue(analysisPage.addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
                 .addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
@@ -89,7 +89,7 @@ public class GoodSalesAttributeBasedMetricTest extends GoodSalesAbstractAnalyseT
 
     @Test(dependsOnGroups = {"init"})
     public void shouldNotCreateDuplicateMetricFromAttribute() {
-        final String identifier = Stream.of(analysisPageReact.addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
+        final String identifier = Stream.of(analysisPage.addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
             .waitForReportComputing()
             .getMetricsBucket()
             .get(COUNT_OF_ACTIVITY)
@@ -100,7 +100,7 @@ public class GoodSalesAttributeBasedMetricTest extends GoodSalesAbstractAnalyseT
             .get()
             .split("-")[2];
 
-        assertTrue(analysisPageReact.removeMetric(COUNT_OF_ACTIVITY)
+        assertTrue(analysisPage.removeMetric(COUNT_OF_ACTIVITY)
             .waitForReportComputing()
             .addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
             .waitForReportComputing()

@@ -26,46 +26,46 @@ public class ResetButtonTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"init"})
     public void should_clear_bar_visualization() {
         // Render bar chart
-        analysisPageReact.changeReportType(ReportType.BAR_CHART)
+        analysisPage.changeReportType(ReportType.BAR_CHART)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addStack(ATTR_DEPARTMENT)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-visualization-bar"), browser));
 
-        analysisPageReact.resetToBlankState();
+        analysisPage.resetToBlankState();
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_clear_table_visualization_properly() {
         // Render table
-        analysisPageReact.changeReportType(ReportType.TABLE)
+        analysisPage.changeReportType(ReportType.TABLE)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-visualization-table"), browser));
 
-        analysisPageReact.resetToBlankState();
+        analysisPage.resetToBlankState();
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_stay_clear_when_dragged_to_a_non_accepting_bucket() {
         // The category bucket DOES NOT accept a metric
-        assertTrue(analysisPageReact.drag(analysisPageReact.getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC),
-                analysisPageReact.getAttributesBucket().getInvitation())
+        assertTrue(analysisPage.drag(analysisPage.getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC),
+                analysisPage.getAttributesBucket().getInvitation())
                 .isBlankState());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_reset_selected_date_dimension() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate()
             .getAttributesBucket()
             .changeDateDimension("Created");
 
-        analysisPageReact.resetToBlankState()
+        analysisPage.resetToBlankState()
             .addDate();
 
         takeScreenshot(browser, "Date-dimension-reset", getClass());
-        assertEquals(analysisPageReact.getAttributesBucket().getSelectedDimensionSwitch(), "Activity");
+        assertEquals(analysisPage.getAttributesBucket().getSelectedDimensionSwitch(), "Activity");
     }
 }

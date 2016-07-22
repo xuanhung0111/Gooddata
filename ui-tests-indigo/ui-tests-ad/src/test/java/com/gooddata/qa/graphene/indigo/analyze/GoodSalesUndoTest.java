@@ -40,40 +40,40 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testAfterAddMetric() {
-        ReportState baseState = ReportState.getCurrentState(analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES));
+        ReportState baseState = ReportState.getCurrentState(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES));
 
         checkUndoRedoForEmptyState(true);
         checkUndoRedoForReport(baseState, false);
 
-        analysisPageReact.addMetric(METRIC_AMOUNT);
+        analysisPage.addMetric(METRIC_AMOUNT);
         checkUndoRedoForReport(baseState, true);
     }
 
     @Test(dependsOnGroups = {"init"})
     public void testAfterAddAtribute() {
-        analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE);
+        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE);
 
         checkUndoRedoForEmptyState(true);
 
-        analysisPageReact.redo();
-        assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
+        analysisPage.redo();
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void testAfterRemoveMetricAndAttribute() {
-        ReportState baseState = ReportState.getCurrentState(analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES));
+        ReportState baseState = ReportState.getCurrentState(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES));
 
-        analysisPageReact.removeMetric(METRIC_NUMBER_OF_ACTIVITIES);
-        assertFalse(analysisPageReact.getMetricsBucket().getItemNames().contains(METRIC_NUMBER_OF_ACTIVITIES));
+        analysisPage.removeMetric(METRIC_NUMBER_OF_ACTIVITIES);
+        assertFalse(analysisPage.getMetricsBucket().getItemNames().contains(METRIC_NUMBER_OF_ACTIVITIES));
 
         checkUndoRedoForReport(baseState, true);
         checkUndoRedoForEmptyState(false);
 
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE);
-        ReportState baseStateWithAttribute = ReportState.getCurrentState(analysisPageReact);
+        ReportState baseStateWithAttribute = ReportState.getCurrentState(analysisPage);
 
-        analysisPageReact.removeAttribute(ATTR_ACTIVITY_TYPE);
+        analysisPage.removeAttribute(ATTR_ACTIVITY_TYPE);
 
         checkUndoRedoForReport(baseStateWithAttribute, true);
         checkUndoRedoForReport(baseState, false);
@@ -81,41 +81,41 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testAfterChangeDateDimensionOnBucket() {
-        final AttributesBucket categoriesBucket = analysisPageReact.getAttributesBucket();
+        final AttributesBucket categoriesBucket = analysisPage.getAttributesBucket();
 
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().undo();
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().undo();
         assertTrue(categoriesBucket.isEmpty());
-        analysisPageReact.redo();
+        analysisPage.redo();
         assertFalse(categoriesBucket.isEmpty());
 
         categoriesBucket.changeDateDimension(CREATED);
         assertEquals(categoriesBucket.getSelectedDimensionSwitch(), CREATED);
-        analysisPageReact.undo();
+        analysisPage.undo();
         assertEquals(categoriesBucket.getSelectedDimensionSwitch(), ACTIVITY);
-        analysisPageReact.redo();
+        analysisPage.redo();
         assertEquals(categoriesBucket.getSelectedDimensionSwitch(), CREATED);
     }
 
     @Test(dependsOnGroups = {"init"})
     public void testAfterChangeDateDimensionInFilter() {
-        final FiltersBucket FiltersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket FiltersBucketReact = analysisPage.getFilterBuckets();
 
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDateFilter().undo();
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDateFilter().undo();
         assertFalse(FiltersBucketReact.isFilterVisible(ACTIVITY));
 
-        analysisPageReact.redo();
+        analysisPage.redo();
         assertTrue(FiltersBucketReact.isFilterVisible(ACTIVITY));
 
         WebElement filter = FiltersBucketReact.getFilter(ACTIVITY);
         FiltersBucketReact.changeDateDimension(ACTIVITY, CREATED);
 
-        analysisPageReact.undo();
+        analysisPage.undo();
         filter.click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
               waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
         assertEquals(panel.getSelectedDimensionSwitch(), ACTIVITY);
 
-        analysisPageReact.redo();
+        analysisPage.redo();
         filter.click();
         waitForElementVisible(panel.getRoot());
         assertEquals(panel.getSelectedDimensionSwitch(), CREATED);
@@ -124,35 +124,35 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
     @Test(dependsOnGroups = {"init"})
     public void testAfterAddFilter() {
         int actionsCount = 0;
-        final FiltersBucket FiltersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket FiltersBucketReact = analysisPage.getFilterBuckets();
 
-        analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE); actionsCount++;
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES); actionsCount++;
-        analysisPageReact.addFilter(ATTR_DEPARTMENT); actionsCount++;
+        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE); actionsCount++;
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES); actionsCount++;
+        analysisPage.addFilter(ATTR_DEPARTMENT); actionsCount++;
 
-        analysisPageReact.undo();
+        analysisPage.undo();
         assertFalse(FiltersBucketReact.isFilterVisible(ATTR_DEPARTMENT));
 
-        analysisPageReact.redo();
+        analysisPage.redo();
         assertTrue(FiltersBucketReact.isFilterVisible(ATTR_DEPARTMENT));
 
-        analysisPageReact.removeFilter(ATTR_DEPARTMENT);
+        analysisPage.removeFilter(ATTR_DEPARTMENT);
         actionsCount++;
         assertFalse(FiltersBucketReact.isFilterVisible(ATTR_DEPARTMENT));
         takeScreenshot(browser, "Indigo_remove_filter", this.getClass());
 
-        analysisPageReact.undo();
+        analysisPage.undo();
         assertTrue(FiltersBucketReact.isFilterVisible(ATTR_DEPARTMENT));
 
-        analysisPageReact.redo();
+        analysisPage.redo();
         assertFalse(FiltersBucketReact.isFilterVisible(ATTR_DEPARTMENT));
 
-        AnalysisPageHeader pageHeader = analysisPageReact.getPageHeader();
+        AnalysisPageHeader pageHeader = analysisPage.getPageHeader();
         // Check that the undo must go back to the start of his session
         assertTrue(pageHeader.isUndoButtonEnabled());
         assertFalse(pageHeader.isRedoButtonEnabled());
         for (int i = 1; i <= actionsCount; i++) {
-            analysisPageReact.undo();
+            analysisPage.undo();
         }
         assertFalse(pageHeader.isUndoButtonEnabled());
         assertTrue(pageHeader.isRedoButtonEnabled());
@@ -160,36 +160,36 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testAfterChangeReportType() {
-        analysisPageReact.changeReportType(ReportType.TABLE);
-        assertTrue(analysisPageReact.isReportTypeSelected(ReportType.TABLE));
+        analysisPage.changeReportType(ReportType.TABLE);
+        assertTrue(analysisPage.isReportTypeSelected(ReportType.TABLE));
 
-        analysisPageReact.undo();
-        assertTrue(analysisPageReact.isReportTypeSelected(ReportType.COLUMN_CHART));
+        analysisPage.undo();
+        assertTrue(analysisPage.isReportTypeSelected(ReportType.COLUMN_CHART));
 
-        analysisPageReact.redo();
-        assertTrue(analysisPageReact.isReportTypeSelected(ReportType.TABLE));
+        analysisPage.redo();
+        assertTrue(analysisPage.isReportTypeSelected(ReportType.TABLE));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void testAfterReset() {
-        ReportState baseState = ReportState.getCurrentState(analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ReportState baseState = ReportState.getCurrentState(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE));
-        analysisPageReact.resetToBlankState();
+        analysisPage.resetToBlankState();
         checkUndoRedoForReport(baseState, true);
     }
 
     @Test(dependsOnGroups = {"init"})
     public void testUndoNotApplicableOnNonActiveSession() {
-        ReportState baseState = ReportState.getCurrentState(analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES));
-        analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE);
+        ReportState baseState = ReportState.getCurrentState(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES));
+        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE);
 
-        final CataloguePanel cataloguePanel = analysisPageReact.getCataloguePanel();
+        final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
         cataloguePanel.search(ATTR_DEPARTMENT);
         assertEquals(cataloguePanel.getFieldNamesInViewPort(), asList(ATTR_DEPARTMENT));
         checkUndoRedoForReport(baseState, true);
         assertEquals(cataloguePanel.getFieldNamesInViewPort(), asList(ATTR_DEPARTMENT));
 
-        analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE).exportReport();
+        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).exportReport();
         checkUndoRedoForReport(baseState, true);
     }
 
@@ -199,18 +199,18 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
 
     private void checkUndoRedoForReport(ReportState expectedState, boolean isUndo) {
         if (isUndo) {
-            analysisPageReact.undo();
+            analysisPage.undo();
         } else {
-            analysisPageReact.redo();
+            analysisPage.redo();
         }
 
         if (expectedState == null) {
-            assertTrue(analysisPageReact.getMetricsBucket().isEmpty());
-            assertTrue(analysisPageReact.getAttributesBucket().isEmpty());
-            assertTrue(analysisPageReact.getFilterBuckets().isEmpty());
-            assertTrue(analysisPageReact.getMainEditor().isEmpty());
+            assertTrue(analysisPage.getMetricsBucket().isEmpty());
+            assertTrue(analysisPage.getAttributesBucket().isEmpty());
+            assertTrue(analysisPage.getFilterBuckets().isEmpty());
+            assertTrue(analysisPage.getMainEditor().isEmpty());
         } else {
-            ReportState currentState = ReportState.getCurrentState(analysisPageReact);
+            ReportState currentState = ReportState.getCurrentState(analysisPage);
             assertTrue(currentState.equals(expectedState));
         }
       }

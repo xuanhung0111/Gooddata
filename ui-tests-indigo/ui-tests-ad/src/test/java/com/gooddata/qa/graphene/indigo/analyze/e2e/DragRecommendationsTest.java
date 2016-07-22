@@ -23,7 +23,7 @@ public class DragRecommendationsTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"init"})
     public void should_render_column_chart_after_a_metric_is_dragged_to_main_recommendation() {
         // D&D the first metric to the initial metric recommendation
-        analysisPageReact.drag(analysisPageReact.getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC),
+        analysisPage.drag(analysisPage.getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC),
                 () -> waitForElementVisible(cssSelector(".s-recommendation-metric-canvas"), browser))
                 .waitForReportComputing();
 
@@ -36,13 +36,13 @@ public class DragRecommendationsTest extends AbstractAdE2ETest {
     public void should_render_date_sliced_metric_column_chart_after_a_metric_is_dragged_to_the_overtime_recommendation() {
         String quarterYearActivityLabel = ".s-id-" + getAttributeDisplayFormIdentifier("Quarter/Year (Activity)", "Short");
         // D&D the first metric to the metric overtime recommendation
-        analysisPageReact.drag(analysisPageReact.getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC),
+        analysisPage.drag(analysisPage.getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC),
                 () -> waitForElementVisible(cssSelector(".s-recommendation-metric-over-time-canvas"), browser))
                 .waitForReportComputing();
 
         // Check bucket items
-        assertTrue(analysisPageReact.getMetricsBucket().getItemNames().contains(METRIC_NUMBER_OF_ACTIVITIES));
-        assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(DATE));
+        assertTrue(analysisPage.getMetricsBucket().getItemNames().contains(METRIC_NUMBER_OF_ACTIVITIES));
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
 
         // should get a column sliced by the Quarter attribute on the X axis
         assertTrue(isElementPresent(cssSelector(
@@ -54,7 +54,7 @@ public class DragRecommendationsTest extends AbstractAdE2ETest {
         assertTrue(isElementPresent(cssSelector(
                 ".adi-components .visualization-column .s-property-where.s-where-___between____3_0__"), browser));
 
-        analysisPageReact.resetToBlankState();
+        analysisPage.resetToBlankState();
 
         // check that filter to the last four quarters is now disabled again
         assertFalse(isElementPresent(cssSelector(".adi-components .visualization-column .s-property-where"), browser));
@@ -63,12 +63,12 @@ public class DragRecommendationsTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"init"})
     public void should_render_attribute_elements_table_after_an_attribute_is_dragged_to_main_recommendation() {
         // D&D the first metric to the metric overtime recommendation
-        analysisPageReact.drag(analysisPageReact.getCataloguePanel().getDate(),
+        analysisPage.drag(analysisPage.getCataloguePanel().getDate(),
                 () -> waitForElementVisible(cssSelector(".s-recommendation-attribute-canvas"), browser))
                 .waitForReportComputing();
 
         // Check bucket items
-        assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(DATE));
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
 
         // should get a table sliced by the Quarter attribute on the X axis
         assertTrue(isElementPresent(cssSelector(".adi-components .dda-table-component .s-id-" +

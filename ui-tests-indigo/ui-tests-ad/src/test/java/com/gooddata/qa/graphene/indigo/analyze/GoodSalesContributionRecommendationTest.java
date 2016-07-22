@@ -28,7 +28,7 @@ public class GoodSalesContributionRecommendationTest extends GoodSalesAbstractAn
 
     @Test(dependsOnGroups = {"init"})
     public void testSimpleContribution() {
-        ChartReport report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .getChartReport();
@@ -39,17 +39,17 @@ public class GoodSalesContributionRecommendationTest extends GoodSalesAbstractAn
         assertTrue(recommendationContainer
                 .isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_PERCENTS).apply();
-        assertTrue(analysisPageReact.waitForReportComputing().isReportTypeSelected(ReportType.BAR_CHART));
+        assertTrue(analysisPage.waitForReportComputing().isReportTypeSelected(ReportType.BAR_CHART));
         assertEquals(report.getTrackersCount(), 4);
 
-        MetricConfiguration metricConfiguration = analysisPageReact.getMetricsBucket()
+        MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration("% " + METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
         assertTrue(metricConfiguration.isShowPercentEnabled());
         assertTrue(metricConfiguration.isShowPercentSelected());
 
-        analysisPageReact.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing();
-        assertTrue(analysisPageReact.isReportTypeSelected(ReportType.BAR_CHART));
+        analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing();
+        assertTrue(analysisPage.isReportTypeSelected(ReportType.BAR_CHART));
         assertEquals(report.getTrackersCount(), 2);
         assertTrue(metricConfiguration.isShowPercentEnabled());
         assertTrue(metricConfiguration.isShowPercentSelected());
@@ -58,7 +58,7 @@ public class GoodSalesContributionRecommendationTest extends GoodSalesAbstractAn
 
     @Test(dependsOnGroups = {"init"})
     public void testAnotherApproachToShowContribution() {
-        ChartReport report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 1);
@@ -70,7 +70,7 @@ public class GoodSalesContributionRecommendationTest extends GoodSalesAbstractAn
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select(ATTR_ACTIVITY_TYPE).apply();
-        analysisPageReact.waitForReportComputing();
+        analysisPage.waitForReportComputing();
         assertTrue(recommendationContainer
                 .isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
         checkingOpenAsReport("testAnotherApproachToShowContribution");

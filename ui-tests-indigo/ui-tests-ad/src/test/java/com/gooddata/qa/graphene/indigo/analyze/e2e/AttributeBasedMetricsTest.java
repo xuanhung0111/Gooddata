@@ -22,15 +22,15 @@ public class AttributeBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_drop_attribute_to_the_metrics_bucket() {
-        analysisPageReact.addMetric(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE)
+        analysisPage.addMetric(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE)
             .waitForReportComputing();
 
-        assertFalse(analysisPageReact.getMetricsBucket().isEmpty());
+        assertFalse(analysisPage.getMetricsBucket().isEmpty());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_remove_created_metric() {
-        assertTrue(analysisPageReact.addMetric(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE)
+        assertTrue(analysisPage.addMetric(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE)
             .removeMetric("Count of " + ATTR_ACTIVITY_TYPE)
             .getMetricsBucket()
             .isEmpty());
@@ -38,7 +38,7 @@ public class AttributeBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_drop_same_attribute_multiple_time_to_metrics() {
-        assertEquals(analysisPageReact.addMetric(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE)
+        assertEquals(analysisPage.addMetric(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE)
             .addMetric(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE)
             .addMetric(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE)
             .getMetricsBucket()
@@ -48,7 +48,7 @@ public class AttributeBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_and_visualize_attribute_based_metrics_with_correct_titles() {
-        assertEquals(analysisPageReact.addMetric(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE)
+        assertEquals(analysisPage.addMetric(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE)
             .addMetric(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE)
             .waitForReportComputing()
             .getChartReport()
@@ -57,7 +57,7 @@ public class AttributeBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_combine_attribute_and_fact_based_metrics() {
-        assertEquals(analysisPageReact.addMetric(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE)
+        assertEquals(analysisPage.addMetric(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE)
                 .addMetric(FACT_AMOUNT, FieldType.FACT)
                 .waitForReportComputing()
                 .getChartReport()

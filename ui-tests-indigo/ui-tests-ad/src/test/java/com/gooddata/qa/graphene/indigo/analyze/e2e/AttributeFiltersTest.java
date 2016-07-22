@@ -27,7 +27,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
     public void should_reset_search_results_after_closing() {
         beforeEach();
 
-        WebElement filter = analysisPageReact.getFilterBuckets().getFilter(ATTR_ACTIVITY_TYPE);
+        WebElement filter = analysisPage.getFilterBuckets().getFilter(ATTR_ACTIVITY_TYPE);
         filter.click();
 
         AttributeFilterPickerPanel panel = AttributeFilterPickerPanel.getInstance(browser);
@@ -48,10 +48,10 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
     public void should_be_possible_to_add_and_remove_attribute_from_filters_bucket() {
         beforeEach();
 
-        analysisPageReact.getFilterBuckets().getFilter(ATTR_ACTIVITY_TYPE);
+        analysisPage.getFilterBuckets().getFilter(ATTR_ACTIVITY_TYPE);
 
         // try to drag a duplicate attribute filter
-        assertTrue(analysisPageReact.addFilter(ATTR_ACTIVITY_TYPE)
+        assertTrue(analysisPage.addFilter(ATTR_ACTIVITY_TYPE)
             .removeFilter(ATTR_ACTIVITY_TYPE)
             .getFilterBuckets()
             .isEmpty());
@@ -61,13 +61,13 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
     public void should_not_allow_moving_other_buckets_items_to_filters_bucket() {
         beforeEach();
 
-        assertTrue(analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE)
+        assertTrue(analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
             .removeFilter(ATTR_ACTIVITY_TYPE)
             .getFilterBuckets()
             .isEmpty());
 
-        assertTrue(analysisPageReact.drag(analysisPageReact.getAttributesBucket().getFirst(),
-                analysisPageReact.getFilterBuckets().getInvitation())
+        assertTrue(analysisPage.drag(analysisPage.getAttributesBucket().getFirst(),
+                analysisPage.getFilterBuckets().getInvitation())
             .getFilterBuckets()
             .isEmpty());
     }
@@ -103,7 +103,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
         AttributeFilterPickerPanel panel = beforeEachDisablingApplyButton();
         panel.select("Email");
 
-        analysisPageReact.getFilterBuckets().getFilter(ATTR_ACTIVITY_TYPE).click();
+        analysisPage.getFilterBuckets().getFilter(ATTR_ACTIVITY_TYPE).click();
         panel.getClearButton().click();
         panel.searchForText("Email");
         assertTrue(panel.getApplyButton()
@@ -122,7 +122,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
                 .contains("disabled"));
 
         panel.getApplyButton().click();
-        assertEquals(analysisPageReact.getFilterBuckets().getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": Email");
+        assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": Email");
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {"disabling-Apply-button"})
@@ -130,7 +130,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
         AttributeFilterPickerPanel panel = beforeEachDisablingApplyButton();
         panel.select("Email", "In Person Meeting");
 
-        analysisPageReact.getFilterBuckets().getFilter(ATTR_ACTIVITY_TYPE).click();
+        analysisPage.getFilterBuckets().getFilter(ATTR_ACTIVITY_TYPE).click();
         panel.getClearButton().click();
         panel.searchForText("Email");
         panel.searchForText("In Person Meeting");
@@ -140,7 +140,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
     }
 
     private void beforeEach() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addFilter(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing();
     }
@@ -148,7 +148,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
     private AttributeFilterPickerPanel beforeEachDisablingApplyButton() {
         beforeEach();
 
-        analysisPageReact.getFilterBuckets().getFilter(ATTR_ACTIVITY_TYPE).click();
+        analysisPage.getFilterBuckets().getFilter(ATTR_ACTIVITY_TYPE).click();
         return AttributeFilterPickerPanel.getInstance(browser);
     }
 }
