@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidget;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteAnalyticalDashboard;
@@ -107,14 +108,6 @@ public class InsightOnDashboardTest extends DashboardsTest {
         }
     }
 
-    @Test(dependsOnGroups = { "dashboardsInit", "createInsight" })
-    public void testInsightListWithCreatedByMeFilter() {
-        initIndigoDashboardsPage().getSplashScreen().startEditingWidgets();
-        indigoDashboardsPage.getInsightSelectionPanel().searchInsight(TEST_INSIGHT);
-        assertTrue(indigoDashboardsPage.getInsightSelectionPanel().getInsightItems().stream().anyMatch(
-                e -> TEST_INSIGHT.equals(e.getName())), TEST_INSIGHT + " is not available on result list");
-    }
-
     @Test(dependsOnGroups = { "dashboardsInit" })
     public void testCreatingInsightsForFilterTest() throws ParseException, IOException, JSONException {
         addEditorUserToProject();
@@ -147,6 +140,19 @@ public class InsightOnDashboardTest extends DashboardsTest {
     }
 
     @Test(dependsOnMethods = { "testCreatingInsightsForFilterTest" })
+    public void testInsightListWithCreatedByMeFilter() {
+        initIndigoDashboardsPage().getSplashScreen().startEditingWidgets();
+        final List<InsightItem> insights = indigoDashboardsPage.getInsightSelectionPanel().getInsightItems();
+        takeScreenshot(browser, "Test-Insight-List-With-Created-By-Me-Filter", getClass());
+        assertTrue(insights.stream().anyMatch(e -> INSIGHT_CREATED_BY_MAIN_USER.equals(e.getName())),
+                INSIGHT_CREATED_BY_MAIN_USER + " does not exist on result list");
+
+        //ONE-1653: List of insights created by me show as all insights on KPIs
+        assertFalse(insights.stream().anyMatch(e -> INSIGHT_CREATED_BY_EDITOR.equals(e.getName())),
+                INSIGHT_CREATED_BY_EDITOR + " exists on result list");
+    }
+
+    @Test(dependsOnMethods = { "testCreatingInsightsForFilterTest" })
     public void testInsightListWithAllFilter() throws JSONException, IOException {
         initIndigoDashboardsPage().getSplashScreen().startEditingWidgets();
         indigoDashboardsPage.getInsightSelectionPanel()
@@ -159,11 +165,11 @@ public class InsightOnDashboardTest extends DashboardsTest {
                 2, "The expected insights are not displayed");
     }
 
-    @Test(dependsOnGroups = { "dashboardsInit" })
+    @Test(dependsOnGroups = { "dashboardsInit", "createInsight" })
     public void testNoMatchingSearch() {
         final String nonExistingInsight = "Non-Existing-Insight";
         initIndigoDashboardsPage().getSplashScreen().startEditingWidgets();
-        indigoDashboardsPage.getInsightSelectionPanel().searchInsight(nonExistingInsight);
+        indigoDashboardsPage.searchInsight(nonExistingInsight);
         assertTrue(indigoDashboardsPage.getInsightSelectionPanel().isEmpty(), "No data message is not displayed");
     }
 
@@ -176,19 +182,19 @@ public class InsightOnDashboardTest extends DashboardsTest {
         };
     }
 
-    @Test(dependsOnGroups = { "dashboardsInit" }, dataProvider = "specialInsightNameProvider")
+    @Test(dependsOnGroups = { "dashboardsInit", "createInsight" }, dataProvider = "specialInsightNameProvider")
     public void testSearchUsingSpecialValues(final String searchValue) {
         initIndigoDashboardsPage().getSplashScreen().startEditingWidgets();
-        indigoDashboardsPage.getInsightSelectionPanel().searchInsight(searchValue);
+        indigoDashboardsPage.searchInsight(searchValue);
         assertTrue(indigoDashboardsPage.getInsightSelectionPanel().isEmpty(),
                 "No data message is not dispayed");
     }
 
-    @Test(dependsOnGroups = { "dashboardsInit" })
+    @Test(dependsOnGroups = { "dashboardsInit", "createInsight" })
     public void testClearSearchInput() {
         final String insight = "Test-Clear-Search-Input";
         initIndigoDashboardsPage().getSplashScreen().startEditingWidgets();
-        indigoDashboardsPage.getInsightSelectionPanel().searchInsight(insight);
+        indigoDashboardsPage.searchInsight(insight);
         assertTrue(indigoDashboardsPage.getInsightSelectionPanel().isEmpty(),
                 "No data message is not dispayed");
 
@@ -197,6 +203,22 @@ public class InsightOnDashboardTest extends DashboardsTest {
                 "Search text box is not empty");
         assertFalse(indigoDashboardsPage.getInsightSelectionPanel().isEmpty(),
                 "No data message still exists after clicking on clear icon");
+    }
+
+    @Test(dependsOnGroups = { "dashboardsInit", "createInsight" },
+            description = "ONE-1671: Search insights in dashboard always switch to created by me tab after clear search keyword")
+    public void testSelectedFilterAfterClearingInput() {
+        final String insight = "Test-Selected-Filter-After-Clearing-Search-Input";
+        initIndigoDashboardsPage().getSplashScreen().startEditingWidgets();
+        indigoDashboardsPage.getInsightSelectionPanel().switchFilter(FilterType.ALL);
+        assertTrue(indigoDashboardsPage.getInsightSelectionPanel().isFilterActive(FilterType.ALL),
+                "All tab was not selected ");
+
+        indigoDashboardsPage.searchInsight(insight);
+        indigoDashboardsPage.getInsightSelectionPanel().clearInputText();
+        takeScreenshot(browser, "Test-Selected-Filter-After-Clearing-Input", getClass());
+        assertTrue(indigoDashboardsPage.getInsightSelectionPanel().isFilterActive(FilterType.ALL),
+                "All tab was not selected");
     }
 
     @DataProvider(name = "filterTypeProvider")
@@ -212,7 +234,7 @@ public class InsightOnDashboardTest extends DashboardsTest {
             final List<String> expectedInsights) {
         final String nonExistingInsight = "Non-Existing-Insight";
         initIndigoDashboardsPage().getSplashScreen().startEditingWidgets();
-        indigoDashboardsPage.getInsightSelectionPanel().searchInsight(nonExistingInsight);
+        indigoDashboardsPage.searchInsight(nonExistingInsight);
         assertTrue(indigoDashboardsPage.getInsightSelectionPanel().isEmpty(),
                 "No data message is not dispayed");
 

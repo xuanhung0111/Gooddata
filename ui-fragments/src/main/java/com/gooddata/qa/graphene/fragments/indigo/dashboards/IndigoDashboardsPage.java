@@ -432,4 +432,8 @@ public class IndigoDashboardsPage extends AbstractFragment {
         dragAndDropWithCustomBackend(browser, sourceCssSelector, targetCssSelector, dropZoneCssSelector);
         return this;
     }
+
+    public boolean searchInsight(final String insight) {
+        return getInsightSelectionPanel().searchInsight(insight);
+    }
 }
