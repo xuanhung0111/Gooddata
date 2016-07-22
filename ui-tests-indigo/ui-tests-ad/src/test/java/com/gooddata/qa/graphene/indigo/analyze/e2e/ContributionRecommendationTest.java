@@ -27,7 +27,7 @@ public class ContributionRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_apply_in_percent_recommendation() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing();
 
@@ -35,7 +35,7 @@ public class ContributionRecommendationTest extends AbstractAdE2ETest {
             waitForElementVisible(RecommendationContainer.LOCATOR, browser))
             .<SeeingPercentsRecommendation>getRecommendation(RecommendationStep.SEE_PERCENTS).apply();
 
-        analysisPageReact.waitForReportComputing();
+        analysisPage.waitForReportComputing();
 //        assertTrue(isElementPresent(cssSelector(
 //                ".adi-components .visualization-bar .s-property-y.s-id-metricvalues"), browser));
 

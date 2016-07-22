@@ -62,7 +62,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void analyzeReportOnProductionData() {
-        ChartReport report = analysisPageReact.addMetric("Close Price", FieldType.FACT)
+        ChartReport report = analysisPage.addMetric("Close Price", FieldType.FACT)
                 .addDate()
                 .addStack("Industry")
                 .waitForReportComputing()
@@ -70,9 +70,9 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
         takeScreenshot(browser, "analyzeReportOnProductionData", getClass());
         assertThat(report.getTrackersCount(), greaterThanOrEqualTo(1));
 
-        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
         filtersBucketReact.configAttributeFilter("Industry", "Apparel Stores", "Consumer Services");
-        analysisPageReact.waitForReportComputing();
+        analysisPage.waitForReportComputing();
         assertThat(report.getTrackersCount(), greaterThanOrEqualTo(1));
         takeScreenshot(browser, "analyzeReportOnProductionData - apply attribute filter", getClass());
         assertEquals(filtersBucketReact.getFilterText("Industry"), "Industry: Apparel Stores, Consumer Services\n(2)");
@@ -80,9 +80,9 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void analyzeReportOnPayrollData() {
-        analysisPageReact.getCataloguePanel().changeDataset(PAYROLL_DATASET);
+        analysisPage.getCataloguePanel().changeDataset(PAYROLL_DATASET);
 
-        ChartReport report = analysisPageReact.addMetric(AMOUNT, FieldType.FACT)
+        ChartReport report = analysisPage.addMetric(AMOUNT, FieldType.FACT)
             .addDate()
             .addStack("County")
             .waitForReportComputing()
@@ -90,9 +90,9 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
         takeScreenshot(browser, "analyzeReportOnPayrollData", getClass());
         assertThat(report.getTrackersCount(), greaterThanOrEqualTo(1));
 
-        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
         filtersBucketReact.configAttributeFilter("County", "Austin", "Clover");
-        analysisPageReact.waitForReportComputing();
+        analysisPage.waitForReportComputing();
         assertThat(report.getTrackersCount(), greaterThanOrEqualTo(1));
         takeScreenshot(browser, "analyzeReportOnPayrollData - apply attribute filter", getClass());
         assertEquals(filtersBucketReact.getFilterText("County"), "County: Austin, Clover");
@@ -100,7 +100,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void searchDataAfterSelectDataset() {
-        final CataloguePanel cataloguePanel = analysisPageReact.getCataloguePanel();
+        final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
 
         assertFalse(cataloguePanel.changeDataset(PRODUCTION_DATASET)
             .search(AMOUNT));

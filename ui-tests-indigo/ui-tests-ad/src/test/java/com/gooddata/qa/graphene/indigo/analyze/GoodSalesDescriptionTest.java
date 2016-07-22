@@ -63,7 +63,7 @@ public class GoodSalesDescriptionTest extends GoodSalesAbstractAnalyseTest {
 
         createMetric(name, completedMaql, "#,##0");
 
-        String metricDescription = analysisPageReact.getCataloguePanel().getMetricDescription(name);
+        String metricDescription = analysisPage.getCataloguePanel().getMetricDescription(name);
 
         takeScreenshot(browser, "Metric with identifier " + name, getClass());
         assertThat(metricDescription, containsString(identifier));
@@ -75,7 +75,7 @@ public class GoodSalesDescriptionTest extends GoodSalesAbstractAnalyseTest {
                 .append("Represents all your dates in project. Can group by Day, Week, Month, Quarter & Year.\n")
                 .append("Field Type\n")
                 .append("Date\n");
-        assertEquals(analysisPageReact.getCataloguePanel().getDateDescription(), expected.toString());
+        assertEquals(analysisPage.getCataloguePanel().getDateDescription(), expected.toString());
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -86,7 +86,7 @@ public class GoodSalesDescriptionTest extends GoodSalesAbstractAnalyseTest {
                 .append("Values\n")
                 .append("Direct Sales\n")
                 .append("Inside Sales\n");
-        assertEquals(analysisPageReact.getCataloguePanel().getAttributeDescription(ATTR_DEPARTMENT), expected.toString());
+        assertEquals(analysisPage.getCataloguePanel().getAttributeDescription(ATTR_DEPARTMENT), expected.toString());
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -96,13 +96,13 @@ public class GoodSalesDescriptionTest extends GoodSalesAbstractAnalyseTest {
                 .append("Calculated Measure\n")
                 .append("Defined As\n")
                 .append("SELECT COUNT(Activity)\n");
-        assertEquals(analysisPageReact.getCataloguePanel().getMetricDescription(METRIC_NUMBER_OF_ACTIVITIES), expected.toString());
+        assertEquals(analysisPage.getCataloguePanel().getMetricDescription(METRIC_NUMBER_OF_ACTIVITIES), expected.toString());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void exploreAttributeInMetricFilter() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES);
-        final MetricConfiguration metricConfiguration = analysisPageReact.getMetricsBucket()
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES);
+        final MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
         assertTrue(metricConfiguration.canAddAnotherFilter());
@@ -124,6 +124,6 @@ public class GoodSalesDescriptionTest extends GoodSalesAbstractAnalyseTest {
                 .append("Measure\n")
                 .append("Dataset\n")
                 .append("Activity\n");
-        assertEquals(analysisPageReact.getCataloguePanel().getFactDescription(ACTIVITY_DATE), expected.toString());
+        assertEquals(analysisPage.getCataloguePanel().getFactDescription(ACTIVITY_DATE), expected.toString());
     }
 }
