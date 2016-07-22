@@ -36,7 +36,7 @@ public class NonProductionDatasetInsightTest extends AbstractAnalyseTest {
         final String insight = "Open-Insight-Containing-Non-Production-Dataset-Test";
         final CataloguePanel panel = initAnalysePage().getCataloguePanel();
         panel.changeDataset(PAYROLL_DATASET);
-        analysisPageReact.addMetric("Amount", FieldType.FACT)
+        analysisPage.addMetric("Amount", FieldType.FACT)
                 .addAttribute("Education")
                 .waitForReportComputing()
                 .saveInsight(insight);
@@ -46,9 +46,9 @@ public class NonProductionDatasetInsightTest extends AbstractAnalyseTest {
         assertTrue(panel.isDatasetApplied(PRODUCTION_DATASET), PRODUCTION_DATASET + " has not been applied");
 
         browser.navigate().refresh();
-        analysisPageReact.openInsight(insight).waitForReportComputing();
+        analysisPage.openInsight(insight).waitForReportComputing();
         takeScreenshot(browser, "open-insight-containing-non-production-dataset", getClass());
-        assertEquals(analysisPageReact.getChartReport().getTrackersCount(), 5,
+        assertEquals(analysisPage.getChartReport().getTrackersCount(), 5,
                 "The chart renders incorrectly");
     }
 }

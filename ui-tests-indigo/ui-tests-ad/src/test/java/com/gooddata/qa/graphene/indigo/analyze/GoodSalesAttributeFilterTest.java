@@ -32,9 +32,9 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void filterOnAttribute() {
-        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
 
-        ChartReport report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .getChartReport();
@@ -48,14 +48,14 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
         attributePanel.discard();
 
         filtersBucketReact.configAttributeFilter(ATTR_ACTIVITY_TYPE, "Email", "Web Meeting");
-        analysisPageReact.waitForReportComputing();
+        analysisPage.waitForReportComputing();
         assertEquals(report.getTrackersCount(), 2);
         assertEquals(filtersBucketReact.getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": Email, Web Meeting\n(2)");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void addFilterNotHideRecommendation() {
-        assertEquals(analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        assertEquals(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .getChartReport()
@@ -67,7 +67,7 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
                 .isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        analysisPageReact.addFilter(ATTR_DEPARTMENT).waitForReportComputing();
+        analysisPage.addFilter(ATTR_DEPARTMENT).waitForReportComputing();
         assertTrue(recommendationContainer
                 .isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
@@ -76,9 +76,9 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void filterOnDateAndAttribute() {
-        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
 
-        ChartReport report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .addDateFilter()
                 .waitForReportComputing()
@@ -88,51 +88,51 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
 
         assertEquals(filtersBucketReact.configDateFilter("This year")
                 .getFilterText("Activity"), "Activity: This year");
-        analysisPageReact.waitForReportComputing();
+        analysisPage.waitForReportComputing();
         assertTrue(report.getTrackersCount() >= 1);
         checkingOpenAsReport("filterOnDateAndAttribute");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void addAttributeToFilterBucket() {
-        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
 
-        assertEquals(analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        assertEquals(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .getChartReport()
                 .getTrackersCount(), 4);
         assertEquals(filtersBucketReact.getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": All");
 
-        analysisPageReact.addFilter(ATTR_DEPARTMENT);
+        analysisPage.addFilter(ATTR_DEPARTMENT);
         assertEquals(filtersBucketReact.getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ": All");
         checkingOpenAsReport("addAttributeToFilterBucket");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void testAttributeReplaceDate() {
-        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
 
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
-        assertTrue(analysisPageReact.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
+        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
         assertTrue(filtersBucketReact.isDateFilterVisible());
 
-        analysisPageReact.replaceAttribute(DATE, ATTR_ACTIVITY_TYPE);
+        analysisPage.replaceAttribute(DATE, ATTR_ACTIVITY_TYPE);
         assertFalse(filtersBucketReact.isDateFilterVisible());
         assertTrue(filtersBucketReact.isFilterVisible(ATTR_ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void testReplaceAttribute() {
-        final FiltersBucket filtersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
 
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE);
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE);
         assertTrue(filtersBucketReact.isFilterVisible(ATTR_ACTIVITY_TYPE));
 
-        analysisPageReact.addStack(ATTR_DEPARTMENT);
+        analysisPage.addStack(ATTR_DEPARTMENT);
         assertTrue(filtersBucketReact.isFilterVisible(ATTR_DEPARTMENT));
 
-        analysisPageReact.replaceAttribute(ATTR_ACTIVITY_TYPE, "Region");
+        analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, "Region");
         assertFalse(filtersBucketReact.isFilterVisible(ATTR_ACTIVITY_TYPE));
         assertTrue(filtersBucketReact.isFilterVisible("Region"));
         checkingOpenAsReport("testReplaceAttribute");
@@ -140,16 +140,16 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void checkRelatedDateShownCorrectly() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
 
-        AttributesBucket attributesBucket = analysisPageReact.getAttributesBucket();
+        AttributesBucket attributesBucket = analysisPage.getAttributesBucket();
 
         takeScreenshot(browser, "Related-date-shows-correctly-with-metric-activity", getClass());
         assertEquals(attributesBucket.getSelectedDimensionSwitch(), "Activity");
         assertEquals(attributesBucket.getSelectedGranularity(), "Year");
 
-        analysisPageReact.removeMetric(METRIC_NUMBER_OF_ACTIVITIES).removeAttribute(DATE);
-        analysisPageReact.addMetric(METRIC_AMOUNT).addDate();
+        analysisPage.removeMetric(METRIC_NUMBER_OF_ACTIVITIES).removeAttribute(DATE);
+        analysisPage.addMetric(METRIC_AMOUNT).addDate();
 
         takeScreenshot(browser, "Relate-date-shows-correctly-with-metric-amount", getClass());
         assertEquals(attributesBucket.getSelectedDimensionSwitch(), "Closed");

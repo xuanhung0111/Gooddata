@@ -33,14 +33,14 @@ public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void dropAttributeToReportHaveOneMetric() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing();
-        ChartReport report = analysisPageReact.getChartReport();
+        ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 4);
 
-        analysisPageReact.addStack(ATTR_DEPARTMENT);
-        analysisPageReact.waitForReportComputing();
+        analysisPage.addStack(ATTR_DEPARTMENT);
+        analysisPage.waitForReportComputing();
         assertEquals(report.getTrackersCount(), 8);
     }
 
@@ -48,13 +48,13 @@ public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
     public void dropThirdAttributeToBucket() {
         dropAttributeToReportHaveOneMetric();
 
-        analysisPageReact.replaceAttribute(ATTR_ACTIVITY_TYPE, PRIORITY);
-        Collection<String> addedAttributes = analysisPageReact.getAttributesBucket().getItemNames();
+        analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, PRIORITY);
+        Collection<String> addedAttributes = analysisPage.getAttributesBucket().getItemNames();
         assertTrue(addedAttributes.contains(PRIORITY));
         assertFalse(addedAttributes.contains(ATTR_ACTIVITY_TYPE));
 
-        analysisPageReact.replaceStack(REGION);
-        assertEquals(analysisPageReact.getStacksBucket().getAttributeName(), REGION);
+        analysisPage.replaceStack(REGION);
+        assertEquals(analysisPage.getStacksBucket().getAttributeName(), REGION);
         checkingOpenAsReport("dropThirdAttributeToBucket");
     }
 
@@ -62,8 +62,8 @@ public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
     public void removeAttributeOnXBucket() {
         dropAttributeToReportHaveOneMetric();
 
-        analysisPageReact.removeAttribute(ATTR_ACTIVITY_TYPE);
-        Collection<String> addedAttributes = analysisPageReact.getAttributesBucket().getItemNames();
+        analysisPage.removeAttribute(ATTR_ACTIVITY_TYPE);
+        Collection<String> addedAttributes = analysisPage.getAttributesBucket().getItemNames();
         assertFalse(addedAttributes.contains(ATTR_ACTIVITY_TYPE));
     }
 
@@ -71,22 +71,22 @@ public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
     public void recommendNextStep() {
         dropAttributeToReportHaveOneMetric();
 
-        MetricConfiguration metricConfiguration = analysisPageReact.getMetricsBucket()
+        MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
         assertFalse(metricConfiguration.isShowPercentEnabled());
         assertFalse(metricConfiguration.isPopEnabled());
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
 
-        analysisPageReact.resetToBlankState();
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
+        analysisPage.resetToBlankState();
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
         metricConfiguration.expandConfiguration();
         assertFalse(metricConfiguration.isShowPercentEnabled());
         assertFalse(metricConfiguration.isPopEnabled());
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() > 0);
 
-        analysisPageReact.addStack(ATTR_DEPARTMENT);
-        analysisPageReact.waitForReportComputing();
+        analysisPage.addStack(ATTR_DEPARTMENT);
+        analysisPage.waitForReportComputing();
         assertFalse(metricConfiguration.isShowPercentEnabled());
         assertFalse(metricConfiguration.isPopEnabled());
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() > 0);
@@ -96,9 +96,9 @@ public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
     @Test(dependsOnGroups = {"init"})
     public void applyAttributeFiltersInReport() {
         dropAttributeToReportHaveOneMetric();
-        analysisPageReact.getFilterBuckets().configAttributeFilter(ATTR_ACTIVITY_TYPE, "Email", "Phone Call")
+        analysisPage.getFilterBuckets().configAttributeFilter(ATTR_ACTIVITY_TYPE, "Email", "Phone Call")
             .configAttributeFilter(ATTR_DEPARTMENT, "Inside Sales");
-        ChartReport report = analysisPageReact.waitForReportComputing().getChartReport();
+        ChartReport report = analysisPage.waitForReportComputing().getChartReport();
         assertEquals(report.getTrackersCount(), 2);
         checkingOpenAsReport("applyAttributeFiltersInReport");
     }
@@ -106,38 +106,38 @@ public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
     @Test(dependsOnGroups = {"init"})
     public void reportVisualization() {
         dropAttributeToReportHaveOneMetric();
-        final StacksBucket stacksBucket = analysisPageReact.getStacksBucket();
+        final StacksBucket stacksBucket = analysisPage.getStacksBucket();
 
-        analysisPageReact.changeReportType(ReportType.BAR_CHART);
+        analysisPage.changeReportType(ReportType.BAR_CHART);
         assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
 
-        analysisPageReact.changeReportType(ReportType.LINE_CHART);
+        analysisPage.changeReportType(ReportType.LINE_CHART);
         assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
 
-        analysisPageReact.changeReportType(ReportType.TABLE);
+        analysisPage.changeReportType(ReportType.TABLE);
         assertFalse(isElementPresent(className(StacksBucket.CSS_CLASS), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void testUndoRedo() {
         dropAttributeToReportHaveOneMetric();
-        final StacksBucket stacksBucket = analysisPageReact.getStacksBucket();
+        final StacksBucket stacksBucket = analysisPage.getStacksBucket();
 
-        analysisPageReact.undo();
+        analysisPage.undo();
         assertTrue(stacksBucket.isEmpty());
-        analysisPageReact.redo();
+        analysisPage.redo();
         assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
 
-        analysisPageReact.replaceStack(REGION);
+        analysisPage.replaceStack(REGION);
         assertEquals(stacksBucket.getAttributeName(), REGION);
 
-        analysisPageReact.undo();
+        analysisPage.undo();
         assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
 
-        analysisPageReact.undo();
+        analysisPage.undo();
         assertTrue(stacksBucket.isEmpty());
 
-        analysisPageReact.redo().redo();
+        analysisPage.redo().redo();
         assertEquals(stacksBucket.getAttributeName(), REGION);
     }
 }

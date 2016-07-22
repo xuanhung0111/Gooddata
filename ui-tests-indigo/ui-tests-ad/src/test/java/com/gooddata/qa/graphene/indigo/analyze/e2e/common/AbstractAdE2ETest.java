@@ -22,7 +22,7 @@ public abstract class AbstractAdE2ETest extends GoodSalesAbstractAnalyseTest {
 
             @Override
             public void waitForStartPageLoaded() {
-                waitForFragmentVisible(analysisPageReact);
+                waitForFragmentVisible(analysisPage);
             }
 
             @Override

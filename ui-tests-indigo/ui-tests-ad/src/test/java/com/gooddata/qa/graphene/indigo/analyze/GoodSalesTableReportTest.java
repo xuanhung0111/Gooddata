@@ -49,7 +49,7 @@ public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void createTableReportWithMoreThan3Metrics() {
-        List<String> headers = analysisPageReact.changeReportType(ReportType.TABLE)
+        List<String> headers = analysisPage.changeReportType(ReportType.TABLE)
             .addMetric(METRIC_NUMBER_OF_LOST_OPPS)
             .addMetric(METRIC_NUMBER_OF_OPEN_OPPS)
             .addMetric(METRIC_NUMBER_OF_OPPORTUNITIES)
@@ -68,18 +68,18 @@ public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
 
         Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART, ReportType.LINE_CHART)
             .forEach(type -> {
-                analysisPageReact.changeReportType(type);
+                analysisPage.changeReportType(type);
                 takeScreenshot(browser, "createReportWithMoreThan3Metrics-switchFromTableTo-" + type.name(),
                         getClass());
-                assertFalse(analysisPageReact.waitForReportComputing()
+                assertFalse(analysisPage.waitForReportComputing()
                     .isExplorerMessageVisible());
-                analysisPageReact.undo();
+                analysisPage.undo();
             });
     }
 
     @Test(dependsOnGroups = {"init"})
     public void checkReportContentWhenAdd3Metrics1Attribute() {
-        TableReport report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        TableReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addMetric(METRIC_QUOTA)
                 .addMetric(METRIC_SNAPSHOT_BOP)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -89,7 +89,7 @@ public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
         sleepTight(3000);
         List<List<String>> analysisContent = report.getContent();
 
-        analysisPageReact.exportReport();
+        analysisPage.exportReport();
         BrowserUtils.switchToLastTab(browser);
 
         assertEquals(analysisContent, getTableContentFromReportPage(Graphene.createPageFragment(
@@ -104,7 +104,7 @@ public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
     
     @Test(dependsOnGroups = {"init"})
     public void createReportWithManyAttributes() {
-        List<List<String>> adReportContent = analysisPageReact.changeReportType(ReportType.TABLE)
+        List<List<String>> adReportContent = analysisPage.changeReportType(ReportType.TABLE)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
@@ -117,14 +117,14 @@ public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void filterReportIncludeManyAttributes() {
-        analysisPageReact.changeReportType(ReportType.TABLE)
+        analysisPage.changeReportType(ReportType.TABLE)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES);
-        analysisPageReact.getFilterBuckets().configAttributeFilter(ATTR_ACTIVITY_TYPE, "Email")
+        analysisPage.getFilterBuckets().configAttributeFilter(ATTR_ACTIVITY_TYPE, "Email")
             .configAttributeFilter(ATTR_DEPARTMENT, "Direct Sales");
 
-        List<List<String>> adReportContent = analysisPageReact.waitForReportComputing()
+        List<List<String>> adReportContent = analysisPage.waitForReportComputing()
             .getTableReport()
             .getContent();
 
@@ -134,7 +134,7 @@ public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
     @Test(dependsOnGroups = {"init"})
     public void orderDataInTableReport() {
         List<List<String>> content = sortReportBaseOnHeader(
-                analysisPageReact.changeReportType(ReportType.TABLE)
+                analysisPage.changeReportType(ReportType.TABLE)
                     .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                     .waitForReportComputing()
                     .getTableReport(),
@@ -142,14 +142,14 @@ public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
         assertEquals(content, asList(asList("154,271")));
 
         content = sortReportBaseOnHeader(
-                analysisPageReact.addMetric(METRIC_QUOTA)
+                analysisPage.addMetric(METRIC_QUOTA)
                     .waitForReportComputing()
                     .getTableReport(),
                 METRIC_QUOTA);
         assertEquals(content, asList(asList("154,271", "$3,300,000")));
 
         content = sortReportBaseOnHeader(
-                analysisPageReact.resetToBlankState()
+                analysisPage.resetToBlankState()
                     .changeReportType(ReportType.TABLE)
                     .addAttribute(ATTR_ACTIVITY_TYPE)
                     .waitForReportComputing()
@@ -159,7 +159,7 @@ public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
                 asList("Email")));
 
         content = sortReportBaseOnHeader(
-                analysisPageReact.addAttribute(ATTR_DEPARTMENT)
+                analysisPage.addAttribute(ATTR_DEPARTMENT)
                     .waitForReportComputing()
                     .getTableReport(),
                 ATTR_DEPARTMENT);
@@ -169,7 +169,7 @@ public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
                 asList("Phone Call", "Inside Sales"), asList("Web Meeting", "Inside Sales")));
 
         content = sortReportBaseOnHeader(
-                analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                     .addMetric(METRIC_QUOTA)
                     .waitForReportComputing()
                     .getTableReport(),
@@ -197,7 +197,7 @@ public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
             initAnalysePage();
 
             com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport tableReport =
-                    analysisPageReact.changeReportType(ReportType.TABLE)
+                    analysisPage.changeReportType(ReportType.TABLE)
                         .addMetric(METRIC_NUMBER_OF_ACTIVITIES).getTableReport();
             assertEquals(tableReport.getFormatFromValue(), "color: rgb(255, 0, 0);");
         } finally {
@@ -229,12 +229,12 @@ public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
 
     private List<List<String>> sortReportBaseOnHeader(TableReport report, String name) {
         report.sortBaseOnHeader(name);
-        analysisPageReact.waitForReportComputing();
+        analysisPage.waitForReportComputing();
         return report.getContent();
     }
 
     private List<List<String>> getTableReportContentInReportPage() {
-        analysisPageReact.exportReport();
+        analysisPage.exportReport();
 
         String currentWindowHandle = browser.getWindowHandle();
         for (String handle : browser.getWindowHandles()) {

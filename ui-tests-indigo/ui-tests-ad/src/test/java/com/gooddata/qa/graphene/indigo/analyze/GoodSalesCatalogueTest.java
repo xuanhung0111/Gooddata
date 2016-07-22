@@ -40,7 +40,7 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testFilteringFieldsInCatalog() {
-        final CataloguePanel cataloguePanel = analysisPageReact.getCataloguePanel();
+        final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
 
         cataloguePanel.filterCatalog(CatalogFilterType.MEASURES)
             .search("am");
@@ -65,14 +65,14 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testCreateReportWithFieldsInCatalogFilter() {
-        final CataloguePanel cataloguePanel = analysisPageReact.getCataloguePanel();
+        final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
 
         cataloguePanel.filterCatalog(CatalogFilterType.MEASURES);
-        analysisPageReact.addMetric(METRIC_AMOUNT);
+        analysisPage.addMetric(METRIC_AMOUNT);
         cataloguePanel.filterCatalog(CatalogFilterType.ATTRIBUTES);
-        analysisPageReact.addAttribute(ATTR_STAGE_NAME)
+        analysisPage.addAttribute(ATTR_STAGE_NAME)
             .waitForReportComputing();
-        assertTrue(analysisPageReact.getChartReport().getTrackersCount() >= 1);
+        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
     }
 
     @Test(dependsOnGroups = {"init"}, description = "https://jira.intgdc.com/browse/CL-6942")
@@ -85,8 +85,8 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
 
         try {
             initAnalysePage();
-            analysisPageReact.getCataloguePanel().search("aaaa");
-            assertEquals(analysisPageReact.getCataloguePanel().getFieldNamesInViewPort(),
+            analysisPage.getCataloguePanel().search("aaaa");
+            assertEquals(analysisPage.getCataloguePanel().getFieldNamesInViewPort(),
                     asList("aaaaA1", "AAAAb2"));
         } finally {
             deleteMetric("aaaaA1");
@@ -109,7 +109,7 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
 
         try {
             initAnalysePage();
-            final CataloguePanel cataloguePanel = analysisPageReact.getCataloguePanel();
+            final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
 
             assertFalse(cataloguePanel.search("<button> test XSS </button>"));
             assertFalse(cataloguePanel.search("<script> alert('test'); </script>"));
@@ -131,12 +131,12 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
                     .append("true\n");
             assertEquals(cataloguePanel.getAttributeDescription(xssAttribute), expected.toString());
 
-            analysisPageReact.addMetric(xssMetric).addAttribute(xssAttribute)
+            analysisPage.addMetric(xssMetric).addAttribute(xssAttribute)
                 .waitForReportComputing();
-            assertEquals(analysisPageReact.getMetricsBucket().getItemNames(), asList(xssMetric));
-            assertEquals(analysisPageReact.getAttributesBucket().getItemNames(), asList(xssAttribute));
-            assertTrue(analysisPageReact.getFilterBuckets().isFilterVisible(xssAttribute));
-            assertEquals(analysisPageReact.getChartReport().getTooltipTextOnTrackerByIndex(0),
+            assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(xssMetric));
+            assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(xssAttribute));
+            assertTrue(analysisPage.getFilterBuckets().isFilterVisible(xssAttribute));
+            assertEquals(analysisPage.getChartReport().getTooltipTextOnTrackerByIndex(0),
                     asList(asList(xssAttribute, "true"), asList(xssMetric, "1,160.9%")));
         } finally {
             initAttributePage();
@@ -151,9 +151,9 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testHiddenUnrelatedObjects() {
-        final CataloguePanel cataloguePanel = analysisPageReact.getCataloguePanel();
+        final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
 
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE);
         assertTrue(cataloguePanel.search(""));
         assertThat(cataloguePanel.getUnrelatedItemsHiddenCount(), equalTo(48));
@@ -179,16 +179,16 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
     @Test(dependsOnGroups = {"init"})
     public void searchNonExistent() {
         Stream.of(CatalogFilterType.values()).forEach(type -> {
-            assertFalse(analysisPageReact.getCataloguePanel().filterCatalog(type)
+            assertFalse(analysisPage.getCataloguePanel().filterCatalog(type)
                     .search("abcxyz"));
             assertTrue(isElementPresent(ByJQuery.selector(
                     ".adi-no-items:contains('No data matching\"abcxyz\"')"), browser));
         });
 
-        analysisPageReact.getCataloguePanel().filterCatalog(CatalogFilterType.ALL);
-        analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE);
+        analysisPage.getCataloguePanel().filterCatalog(CatalogFilterType.ALL);
+        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE);
         Stream.of(CatalogFilterType.values()).forEach(type -> {
-            assertFalse(analysisPageReact.getCataloguePanel().filterCatalog(type).search("Am"));
+            assertFalse(analysisPage.getCataloguePanel().filterCatalog(type).search("Am"));
             assertTrue(isElementPresent(ByJQuery.selector(
                     ".adi-no-items:contains('No data matching\"Am\"')"), browser));
 

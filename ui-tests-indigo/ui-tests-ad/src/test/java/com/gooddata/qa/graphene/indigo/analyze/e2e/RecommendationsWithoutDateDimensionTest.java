@@ -47,8 +47,8 @@ public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void trending_recommendation_should_not_be_visible() {
-        assertFalse(analysisPageReact.getCataloguePanel().getFieldNamesInViewPort().contains(DATE));
-        analysisPageReact.addMetric(METRIC_AMOUNT, FieldType.FACT)
+        assertFalse(analysisPage.getCataloguePanel().getFieldNamesInViewPort().contains(DATE));
+        analysisPage.addMetric(METRIC_AMOUNT, FieldType.FACT)
             .waitForReportComputing();
 //        enable with CL-9443
 //        assertTrue(isElementPresent(cssSelector(".s-recommendation-comparison"), browser));
@@ -57,7 +57,7 @@ public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void metric_with_period_recommendation_should_not_be_visible() {
-        analysisPageReact.addMetric(FACT_AMOUNT, FieldType.FACT)
+        analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT)
             .addAttribute("id")
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-recommendation-contribution"), browser));

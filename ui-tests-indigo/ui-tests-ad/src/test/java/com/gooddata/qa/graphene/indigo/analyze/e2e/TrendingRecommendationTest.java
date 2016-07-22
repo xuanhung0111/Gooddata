@@ -29,32 +29,32 @@ public class TrendingRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_add_date_item_with_proper_granularity_to_category_bucket() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-recommendation-trending"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_apply_month_in_trending_widget_and_hide_it() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing();
         Graphene.createPageFragment(RecommendationContainer.class,
                 waitForElementVisible(RecommendationContainer.LOCATOR, browser))
                 .<TrendingRecommendation>getRecommendation(RecommendationStep.SEE_TREND).select("Month").apply();
-        analysisPageReact.waitForReportComputing();
+        analysisPage.waitForReportComputing();
         assertFalse(isElementPresent(cssSelector(".s-recommendation-trending"), browser));
-        assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(DATE));
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void ashould_have_quarter_selected_after_resetting_a_widget() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing();
         Graphene.createPageFragment(RecommendationContainer.class,
                 waitForElementVisible(RecommendationContainer.LOCATOR, browser))
                 .<TrendingRecommendation>getRecommendation(RecommendationStep.SEE_TREND).select("Month");
 
-        analysisPageReact.resetToBlankState()
+        analysisPage.resetToBlankState()
                 .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing();
         assertEquals(new Select(waitForElementVisible(cssSelector(".s-date-granularity-switch"), browser))
@@ -63,14 +63,14 @@ public class TrendingRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_select_last_4_quarters_on_date_filter_when_trending() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing();
         Graphene.createPageFragment(RecommendationContainer.class,
                 waitForElementVisible(RecommendationContainer.LOCATOR, browser))
                 .<TrendingRecommendation>getRecommendation(RecommendationStep.SEE_TREND).apply();
 
-        analysisPageReact.waitForReportComputing();
-        assertTrue(analysisPageReact.getFilterBuckets().isDateFilterVisible());
+        analysisPage.waitForReportComputing();
+        assertTrue(analysisPage.getFilterBuckets().isDateFilterVisible());
         assertThat(waitForElementVisible(cssSelector(
                 ".s-date-filter .s-attribute-filter-label"), browser).getText(),
                 containsString("Last 4 quarters"));
