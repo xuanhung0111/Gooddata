@@ -21,6 +21,7 @@ import com.gooddata.qa.graphene.indigo.analyze.GoodSalesDropAttributeTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesFactBasedMetricTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesMetricBucketTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesMetricFilterTest;
+import com.gooddata.qa.graphene.indigo.analyze.GoodSalesNotRenderedInsightTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesShortcutRecommendationTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesTableReportTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesTrendingRecommendationTest;
@@ -100,6 +101,7 @@ public class UITestsRegistry {
 //                  WalkmeTest.class, CL-9704: Walkme is not available on new AD
                     AnalyticalDesignerSanityTest.class,
                     NonProductionDatasetInsightTest.class,
+                    GoodSalesNotRenderedInsightTest.class,
                     "testng-ad-permissions-MetricVisibility.xml",
                     "testng-ad-permissions-ProjectNavigation.xml",
                     "testng-ad-permissions-InsightTest.xml",
