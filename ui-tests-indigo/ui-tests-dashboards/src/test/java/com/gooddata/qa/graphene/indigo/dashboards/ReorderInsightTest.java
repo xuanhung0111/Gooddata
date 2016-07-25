@@ -18,6 +18,7 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Widget.DropZone;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidgetWrap;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class ReorderInsightTest extends DashboardsTest {
@@ -39,10 +40,11 @@ public class ReorderInsightTest extends DashboardsTest {
 
     @Test(dependsOnGroups = { "dashboardsInit" })
     public void testAddingInsightsToDashboard() throws JSONException, IOException {
-        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
-                asList(createBlankInsightUsingRest(FIRST_INSIGHT),
-                        createBlankInsightUsingRest(SECOND_INSIGHT),
-                        createBlankInsightUsingRest(THIRD_INSIGHT)));
+        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), asList(
+                createBlankInsightWrapUsingRest(FIRST_INSIGHT),
+                createBlankInsightWrapUsingRest(SECOND_INSIGHT),
+                createBlankInsightWrapUsingRest(THIRD_INSIGHT)
+        ));
 
         initIndigoDashboardsPage().waitForDashboardLoad();
         checkInsightOrder(FIRST_INSIGHT, SECOND_INSIGHT, THIRD_INSIGHT, "Adding-Insight-To-Dashboard");
@@ -92,12 +94,14 @@ public class ReorderInsightTest extends DashboardsTest {
         checkInsightOrder(SECOND_INSIGHT, FIRST_INSIGHT, THIRD_INSIGHT, "Insight-Oder-After-Switching-Page");
     }
 
-    private String createBlankInsightUsingRest(final String insightTitle) throws JSONException, IOException {
-        return createVisualizationWidget(getRestApiClient(), testParams.getProjectId(),
+    private String createBlankInsightWrapUsingRest(final String insightTitle) throws JSONException, IOException {
+        String insightUri = createVisualizationWidget(getRestApiClient(), testParams.getProjectId(),
                 new VisualizationMDConfiguration.Builder()
                         .title(insightTitle)
                         .type(ReportType.BAR_CHART.getLabel())
                         .build());
+
+        return createVisualizationWidgetWrap(getRestApiClient(), testParams.getProjectId(), insightUri, insightTitle);
     }
 
     private void checkInsightOrder(final String firstWidget, final String secondWidget, final String thirdWidget,
