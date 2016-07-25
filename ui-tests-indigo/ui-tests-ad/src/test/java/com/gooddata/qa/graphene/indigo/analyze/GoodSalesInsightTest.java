@@ -4,6 +4,8 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_STAGE_VELOCITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAllInsightNames;
 import static org.openqa.selenium.By.className;
@@ -20,6 +22,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.dialog.SaveInsightDialog;
@@ -32,6 +35,10 @@ import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
 
     private static final String INSIGHT_TEST = "Insight-Test";
+    private static final String CLOSED = "Closed";
+    private static final String CREATED = "Created";
+    private static final String DATE_CLOSED_DIMENSION_INSIGHT = "Save-Insight-Containing-Date-Closed-Dimension";
+    private static final String DATE_CREATED_DIMENSION_INSIGHT = "Save-Insight-Containing-Date-Created-Dimension";
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -452,6 +459,68 @@ public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
             assertTrue(browser.getCurrentUrl().contains(mainProjectId));
             assertTrue(analysisPage.isBlankState(), "AD does not show blank state after switching project");
         }
+    }
+
+    @Test(dependsOnGroups = { "init" }, groups = { "save-insight-containing-date-dimension" })
+    public void testSaveInsightContainingDateClosedDimension() {
+        final int expectedTrackers = analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT)
+                .addDate()
+                .waitForReportComputing()
+                .getChartReport()
+                .getTrackersCount();
+
+        assertEquals(analysisPage.getAttributesBucket().getSelectedDimensionSwitch(), CLOSED,
+                "The selected dimension was not displayed");
+
+        analysisPage.saveInsight(DATE_CLOSED_DIMENSION_INSIGHT);
+        //make sure data is cleared before opening insight
+        assertTrue(analysisPage.resetToBlankState().isBlankState(), "Working workspace was not been cleared");
+        analysisPage.openInsight(DATE_CLOSED_DIMENSION_INSIGHT).waitForReportComputing();
+
+        takeScreenshot(browser, "Save-Insight-Containing-Date-Closed-Dimension", getClass());
+        assertEquals(analysisPage.getChartReport().getTrackersCount(), expectedTrackers, "Chart render was not correct");
+        assertEquals(analysisPage.getAttributesBucket().getSelectedDimensionSwitch(), CLOSED,
+                "The selected dimension was not displayed");
+    }
+
+    @Test(dependsOnGroups = { "init" }, groups = { "save-insight-containing-date-dimension" })
+    public void testSaveInsightContainingDateCreatedDimension() {
+        final int expectedTrackers = analysisPage.addMetric(METRIC_STAGE_VELOCITY)
+                .addDate()
+                .waitForReportComputing()
+                .getChartReport()
+                .getTrackersCount();
+
+        assertEquals(analysisPage.getAttributesBucket().getSelectedDimensionSwitch(), CREATED,
+                "The selected dimension was not displayed");
+
+        analysisPage.saveInsight(DATE_CREATED_DIMENSION_INSIGHT);
+        //make sure data is cleared before opening insight
+        assertTrue(analysisPage.resetToBlankState().isBlankState(), "Working workspace was not been cleared");
+        analysisPage.openInsight(DATE_CREATED_DIMENSION_INSIGHT).waitForReportComputing();
+
+        takeScreenshot(browser, "Save-Insight-Containing-Date-Created-Dimension", getClass());
+        assertEquals(analysisPage.getChartReport().getTrackersCount(), expectedTrackers, "Chart render was not correct");
+        assertEquals(analysisPage.getAttributesBucket().getSelectedDimensionSwitch(), CREATED,
+                "The selected dimension was not displayed");
+    }
+
+    @Test(dependsOnGroups = { "save-insight-containing-date-dimension" },
+            description = "CL-9969: Date is remembered from previous viz")
+    public void testDateDimensionOnSavedInsights() {
+        //make sure data is cleared before opening first insight
+        assertTrue(analysisPage.resetToBlankState().isBlankState());
+        analysisPage.openInsight(DATE_CLOSED_DIMENSION_INSIGHT).waitForReportComputing();
+        assertEquals(analysisPage.getAttributesBucket().getSelectedDimensionSwitch(), CLOSED,
+                "Selected date dimension of " + DATE_CLOSED_DIMENSION_INSIGHT + "was not correct");
+
+        //make sure the first insight is loaded 
+        assertEquals(analysisPage.getPageHeader().getInsightTitle(), DATE_CLOSED_DIMENSION_INSIGHT);
+        //the second insight should be opened right after the first one 
+        assertEquals(analysisPage.openInsight(DATE_CREATED_DIMENSION_INSIGHT).waitForReportComputing()
+                .getPageHeader().getInsightTitle(), DATE_CREATED_DIMENSION_INSIGHT);
+        assertEquals(analysisPage.getAttributesBucket().getSelectedDimensionSwitch(), CREATED,
+                "Selected date dimension of " + DATE_CREATED_DIMENSION_INSIGHT + "was not correct");
     }
 
     private void checkRenamedInsight(final int expectedNumberOfInsights, final String oldInsight,
