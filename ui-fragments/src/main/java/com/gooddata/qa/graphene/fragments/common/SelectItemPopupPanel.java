@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -96,6 +97,16 @@ public class SelectItemPopupPanel extends AbstractFragment {
 
     public List<String> getItems() {
         return getElementTexts(items);
+    }
+
+    public SelectItemPopupPanel clearAllItems() {
+        Stream.of(By.className("s-btn-none"), By.className("clearVisible"))
+                .filter(by -> isElementPresent(by, getRoot()))
+                .map(by -> waitForElementVisible(by, getRoot()))
+                .findFirst()
+                .get()
+                .click();
+        return this;
     }
 
     // Just use this action when the expected item not visible in list
