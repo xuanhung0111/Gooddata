@@ -39,6 +39,7 @@ import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 public class InsightOnDashboardTest extends DashboardsTest {
 
     private static final String TEST_INSIGHT = "Test-Insight";
+    private static final String RENAMED_TEST_INSIGHT = "Renamed-Test-Insight";
     private static final String INSIGHT_CREATED_BY_EDITOR = "Insight-Created-By-Editor";
     private static final String INSIGHT_CREATED_BY_MAIN_USER = "Insight-Created-By-Main-User";
     private static final List<String> INSIGHTS_FOR_FILTER_TEST = asList(INSIGHT_CREATED_BY_EDITOR,
@@ -113,6 +114,40 @@ public class InsightOnDashboardTest extends DashboardsTest {
                     TEST_INSIGHT, 4);
         } finally {
             deleteAnalyticalDashboard(getRestApiClient(), dashboardUri);
+        }
+    }
+
+    @Test(dependsOnGroups = { "dashboardsInit", "createInsight" })
+    public void testInsightTitleOnDashboardAfterRenamedInAD() throws JSONException, IOException {
+        final String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
+                singletonList(
+                        createVisualizationWidgetWrap(
+                                getRestApiClient(),
+                                testParams.getProjectId(),
+                                getInsightUri(TEST_INSIGHT, getRestApiClient(), testParams.getProjectId()),
+                                TEST_INSIGHT
+                        )
+                ));
+        final String expectedInsightTitle = initIndigoDashboardsPage()
+                .waitForAllInsightWidgetContentLoaded()
+                .getLastVisualization()
+                .getHeadline();
+        try {
+            takeScreenshot(browser, "testInsightTitleOnDashboardAfterRenamedInAD-before", getClass());
+
+            initAnalysePage().openInsight(expectedInsightTitle).setInsightTitle(RENAMED_TEST_INSIGHT).saveInsight();
+
+            String actualInsightTitle = initIndigoDashboardsPage()
+                .waitForAllInsightWidgetContentLoaded()
+                .getLastVisualization()
+                .getHeadline();
+
+            takeScreenshot(browser, "testInsightTitleOnDashboardAfterRenamedInAD-after", getClass());
+
+            assertEquals(actualInsightTitle, expectedInsightTitle);
+        } finally {
+            deleteAnalyticalDashboard(getRestApiClient(), dashboardUri);
+            initAnalysePage().openInsight(RENAMED_TEST_INSIGHT).setInsightTitle(expectedInsightTitle).saveInsight();
         }
     }
 
