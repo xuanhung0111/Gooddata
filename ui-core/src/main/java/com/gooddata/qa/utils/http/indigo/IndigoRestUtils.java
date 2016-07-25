@@ -100,6 +100,25 @@ public class IndigoRestUtils {
         }
     };
 
+    private static final Supplier<String> VISUALIZATION_WIDGET_WRAP_BODY = () -> {
+        try {
+            return new JSONObject() {{
+                put("visualizationWidget", new JSONObject() {{
+                    put("meta", new JSONObject() {{
+                        put("title", "${title}");
+                        put("category", "visualizationWidget");
+                    }});
+                    put("content", new JSONObject() {{
+                        put("visualization", "${visualization}");
+                        put("ignoreDashboardFilters", new JSONArray());
+                    }});
+                }});
+            }}.toString();
+        } catch (JSONException e) {
+            throw new IllegalStateException("There is an exception during json object initialization! ", e);
+        }
+    };
+
     /**
      * Get analytical dashboards of a project
      *
@@ -190,6 +209,32 @@ public class IndigoRestUtils {
         return getJsonObject(restApiClient,
                 restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId), content))
                     .getJSONObject("visualization")
+                    .getJSONObject("meta")
+                    .getString("uri");
+    }
+
+    /**
+     * Create Visualization widget wrap
+     *
+     * @param restApiClient
+     * @param projectId
+     * @param visualizationTitle
+     * @param visualizationUri
+     * @return Visualization widget uri
+     * @throws org.json.JSONException
+     * @throws java.io.IOException
+     */
+    public static String createVisualizationWidgetWrap(final RestApiClient restApiClient, final String projectId,
+            final String visualizationUri, final String visualizationTitle) throws JSONException, IOException {
+        String content = VISUALIZATION_WIDGET_WRAP_BODY.get()
+                .replace("${title}", visualizationTitle)
+                .replace("${visualization}", visualizationUri);
+
+        JSONObject response = getJsonObject(restApiClient,
+                restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId), content));
+
+        return response
+                    .getJSONObject("visualizationWidget")
                     .getJSONObject("meta")
                     .getString("uri");
     }
@@ -343,7 +388,7 @@ public class IndigoRestUtils {
 
     /**
      * Get all created insight names in a specified project
-     * 
+     *
      * @param restApiClient
      * @param projectId
      * @return a list of insight names
@@ -361,7 +406,7 @@ public class IndigoRestUtils {
 
     /**
      * Get insight uri by a specified name
-     * 
+     *
      * @param insight
      * @param restApiClient
      * @param projectId
@@ -381,7 +426,7 @@ public class IndigoRestUtils {
 
     /**
      * Delete a dashboard by its uri
-     * 
+     *
      * @param restApiClient
      * @param dashboardUri
      */

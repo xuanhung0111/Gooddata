@@ -33,6 +33,7 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Visualization;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.FilterType;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.InsightItem;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidgetWrap;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class InsightOnDashboardTest extends DashboardsTest {
@@ -97,7 +98,14 @@ public class InsightOnDashboardTest extends DashboardsTest {
     @Test(dependsOnGroups = { "dashboardsInit", "createInsight" })
     public void testInsightRenderInViewModeAfterSwitchingPage() throws JSONException, IOException {
         final String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
-                singletonList(getInsightUri(TEST_INSIGHT, getRestApiClient(), testParams.getProjectId())));
+                singletonList(
+                        createVisualizationWidgetWrap(
+                                getRestApiClient(),
+                                testParams.getProjectId(),
+                                getInsightUri(TEST_INSIGHT, getRestApiClient(), testParams.getProjectId()),
+                                TEST_INSIGHT
+                        )
+                ));
         try {
             initAnalysePage();
             assertTrue(browser.getCurrentUrl().contains("/reportId/edit"), "AD page is not loaded");
@@ -224,7 +232,7 @@ public class InsightOnDashboardTest extends DashboardsTest {
     @DataProvider(name = "filterTypeProvider")
     public Object[][] filterTypeProvider() {
         return new Object[][] {
-            {FilterType.ALL, INSIGHTS_FOR_FILTER_TEST}, 
+            {FilterType.ALL, INSIGHTS_FOR_FILTER_TEST},
             {FilterType.BY_ME, singletonList(INSIGHT_CREATED_BY_MAIN_USER)}
         };
     }
