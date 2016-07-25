@@ -9,8 +9,10 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
@@ -19,10 +21,14 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class SimpleMenu extends AbstractFragment {
 
-    public static final By LOCATOR = By.cssSelector(".gdc-menu-simple:not(.yui3-overlay-hidden):not(.hidden)");
+    protected static final By LOCATOR = By.cssSelector(".gdc-menu-simple:not(.yui3-overlay-hidden):not(.hidden)");
 
     @FindBy(css = "li:not(.separator)")
     protected List<WebElement> items;
+
+    public static SimpleMenu getInstance(SearchContext searchContext) {
+        return Graphene.createPageFragment(SimpleMenu.class, waitForElementVisible(LOCATOR, searchContext));
+    }
 
     public int getItemsCount() {
         waitForAllItemsVisible();

@@ -2,12 +2,15 @@ package com.gooddata.qa.graphene.fragments.dashboards.menu;
 
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
 import java.util.function.Predicate;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
@@ -15,6 +18,10 @@ import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
 public class DashboardMenu extends SimpleMenu {
 
     private static final By BY_DASHBOARD_SELECTOR_TITLE = By.xpath("a/span");
+
+    public static DashboardMenu getInstance(SearchContext searchContext) {
+        return Graphene.createPageFragment(DashboardMenu.class, waitForElementVisible(LOCATOR, searchContext));
+    }
 
     @Override
     public int getItemsCount() {

@@ -33,12 +33,12 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.report.WhatItem;
-import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbedDashboardDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
@@ -343,7 +343,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         initDashboardsPage()
                 .addNewDashboard("Dashboard with filter")
                 .addReportToDashboard(tabularReportDef.getName())
-                .addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_YEAR_CREATED)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_YEAR_CREATED)
                 .saveDashboard();
 
         EmbedDashboardDialog dashboardEmbedDialog = dashboardsPage.openEmbedDashboardDialog();

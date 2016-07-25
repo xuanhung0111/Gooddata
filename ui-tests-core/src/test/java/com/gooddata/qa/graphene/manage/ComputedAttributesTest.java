@@ -33,8 +33,7 @@ import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
-import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.utils.graphene.Screenshots;
@@ -233,7 +232,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     public void computedAttributeVariableOnDashboard() {
         try {
             addReportToNewDashboard(CA_VARIABLE_REPORT_NAME, TEST_DASHBOAD_NAME);
-            dashboardsPage.addListFilterToDashboard(DashFilterTypes.PROMPT, VARIABLE_NAME)
+            dashboardsPage.addAttributeFilterToDashboard(DashAttributeFilterTypes.PROMPT, VARIABLE_NAME)
                     .saveDashboard();
 
             browser.navigate().refresh();
@@ -259,10 +258,10 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     public void computedAttributeReportOnDashboard() {
         try {
             addReportToNewDashboard(REPORT_NAME, TEST_DASHBOAD_NAME);
-            dashboardsPage.editDashboard();
-            DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-            dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, COMPUTED_ATTRIBUTE_NAME);
-            dashboardEditBar.saveDashboard();
+            dashboardsPage
+                    .editDashboard()
+                    .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, COMPUTED_ATTRIBUTE_NAME)
+                    .saveDashboard();
 
             browser.navigate().refresh();
             waitForDashboardPageLoaded(browser);

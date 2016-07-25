@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
@@ -34,12 +35,13 @@ import com.gooddata.qa.graphene.entity.report.HowItem.Position;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.entity.variable.NumericVariable;
-import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.AttributeFilterPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 import com.gooddata.qa.graphene.fragments.reports.report.AbstractReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.CssUtils;
@@ -74,7 +76,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     public void testSingleOptionAttributeFilter() {
         try {
             addReportToDashboard(TESTING_REPORT, DashboardWidgetDirection.LEFT);
-            addAttributeFilterToDashboard(ATTR_STAGE_NAME, DashFilterTypes.ATTRIBUTE);
+            addAttributeFilterToDashboard(ATTR_STAGE_NAME, DashAttributeFilterTypes.ATTRIBUTE);
 
             dashboardsPage.editDashboard();
             FilterWidget filter = getFilterWidget(STAGE_NAME_FILTER);
@@ -98,7 +100,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     public void verifyFilterConnectedWithReport() {
         try {
             addReportToDashboard(TESTING_REPORT, DashboardWidgetDirection.LEFT);
-            addAttributeFilterToDashboard(ATTR_STAGE_NAME, DashFilterTypes.ATTRIBUTE);
+            addAttributeFilterToDashboard(ATTR_STAGE_NAME, DashAttributeFilterTypes.ATTRIBUTE);
 
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
             assertTrue(isEqualCollection(report.openReportInfoViewPanel().getAllFilterNames(),
@@ -136,10 +138,10 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         try {
             addReportToDashboard(TESTING_REPORT, DashboardWidgetDirection.LEFT);
 
-            DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
-            dashboardEditBar.addTimeFilterToDashboard(3, String.format("%s ago", 
-                    Calendar.getInstance().get(Calendar.YEAR) - YEAR_OF_DATA));
-            dashboardEditBar.saveDashboard();
+            dashboardsPage
+                    .addTimeFilterToDashboard(DATE_DIMENSION_SNAPSHOT, DateGranularity.YEAR, 
+                            String.format("%s ago", Calendar.getInstance().get(Calendar.YEAR) - YEAR_OF_DATA))
+                    .saveDashboard();
 
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
             assertTrue(isEqualCollection(report.openReportInfoViewPanel().getAllFilterNames(),
@@ -159,7 +161,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             dashboardsPage.editDashboard();
             report = dashboardsPage.getContent().getLatestReport(TableReport.class);
             report.removeFilters("Date dimension (Snapshot)");
-            dashboardEditBar.saveDashboard();
+            dashboardsPage.saveDashboard();
 
             report = dashboardsPage.getContent().getLatestReport(TableReport.class);
             report.waitForReportLoading();
@@ -176,9 +178,9 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         try {
             initDashboardsPage().addNewDashboard(TEST_DASHBOAD_FILTERS);
 
-            DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
-            dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, "Account");
-            dashboardEditBar.saveDashboard();
+            dashboardsPage
+                    .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, "Account")
+                    .saveDashboard();
             checkRedBar(browser);
             assertEquals(getFilterWidget("account").getTitle(), "ACCOUNT");
 
@@ -191,12 +193,12 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
 
             dashboardsPage.editDashboard();
             getFilterWidget("account_edit").changeTitle("Filter Account");
-            dashboardEditBar.saveDashboard();
+            dashboardsPage.saveDashboard();
             assertEquals(getFilterWidget("filter_account").getTitle(), "FILTER ACCOUNT");
 
             dashboardsPage.editDashboard();
             getFilterWidget("filter_account").changeTitle("");
-            dashboardEditBar.saveDashboard();
+            dashboardsPage.saveDashboard();
             assertEquals(getFilterWidget("account_edit").getTitle(), "ACCOUNT EDIT");
         } finally {
             dashboardsPage.deleteDashboard();
@@ -245,8 +247,8 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         try {
             addReportToDashboard(REPORT_1, DashboardWidgetDirection.LEFT);
             addReportToCurrentDashboard(REPORT_2, DashboardWidgetDirection.RIGHT);
-            addAttributeFilterToDashboard("FQuarter/Year", DashFilterTypes.PROMPT, DashboardWidgetDirection.UP);
-            addAttributeFilterToDashboard("FStageName", DashFilterTypes.PROMPT, DashboardWidgetDirection.DOWN);
+            addAttributeFilterToDashboard("FQuarter/Year", DashAttributeFilterTypes.PROMPT, DashboardWidgetDirection.UP);
+            addAttributeFilterToDashboard("FStageName", DashAttributeFilterTypes.PROMPT, DashboardWidgetDirection.DOWN);
 
             dashboardsPage.editDashboard();
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
@@ -269,8 +271,8 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         try {
             addReportToDashboard(REPORT_1, DashboardWidgetDirection.LEFT);
             addReportToCurrentDashboard(REPORT_2, DashboardWidgetDirection.RIGHT);
-            addAttributeFilterToDashboard("FQuarter/Year", DashFilterTypes.PROMPT, DashboardWidgetDirection.UP);
-            addAttributeFilterToDashboard("FStageName", DashFilterTypes.PROMPT, DashboardWidgetDirection.DOWN);
+            addAttributeFilterToDashboard("FQuarter/Year", DashAttributeFilterTypes.PROMPT, DashboardWidgetDirection.UP);
+            addAttributeFilterToDashboard("FStageName", DashAttributeFilterTypes.PROMPT, DashboardWidgetDirection.DOWN);
 
             dashboardsPage.editDashboard();
             FilterWidget filter = getFilterWidget("fstagename");
@@ -341,7 +343,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             addReportToDashboard("Report 3", DashboardWidgetDirection.LEFT);
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
             assertTrue(getRowElementsFrom(report).size() == 1);
-            addAttributeFilterToDashboard(ATTR_STAGE_NAME, DashFilterTypes.ATTRIBUTE);
+            addAttributeFilterToDashboard(ATTR_STAGE_NAME, DashAttributeFilterTypes.ATTRIBUTE);
             assertTrue(getRowElementsFrom(report).size() > 1);
         } finally {
             dashboardsPage.deleteDashboard();
@@ -367,14 +369,14 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         checkRedBar(browser);
     }
 
-    private void addAttributeFilterToDashboard(String attribute, DashFilterTypes type,
+    private void addAttributeFilterToDashboard(String attribute, DashAttributeFilterTypes type,
             DashboardWidgetDirection direction) {
-        initDashboardsPage().selectDashboard(TEST_DASHBOAD_FILTERS);;
-        DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
-        dashboardEditBar.addListFilterToDashboard(type, attribute);
+        initDashboardsPage()
+                .selectDashboard(TEST_DASHBOAD_FILTERS)
+                .addAttributeFilterToDashboard(type, attribute);
 
         if (direction == DashboardWidgetDirection.NONE) {
-            dashboardEditBar.saveDashboard();
+            dashboardsPage.saveDashboard();
             checkRedBar(browser);
             return;
         }
@@ -383,11 +385,11 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         // get focus
         filter.click();
         direction.moveElementToRightPlace(filter);
-        dashboardEditBar.saveDashboard();
+        dashboardsPage.saveDashboard();
         checkRedBar(browser);
     }
 
-    private void addAttributeFilterToDashboard(String attribute, DashFilterTypes type) {
+    private void addAttributeFilterToDashboard(String attribute, DashAttributeFilterTypes type) {
         addAttributeFilterToDashboard(attribute, type, DashboardWidgetDirection.NONE);
     }
 
