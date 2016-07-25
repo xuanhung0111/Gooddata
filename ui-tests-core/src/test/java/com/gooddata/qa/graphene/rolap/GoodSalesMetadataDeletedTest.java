@@ -28,10 +28,10 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
-import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
 import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.utils.http.RestUtils;
@@ -172,7 +172,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
                 createReportUsing(new UiReportDefinition().withName("Report " + System.currentTimeMillis())
                         .withHows(IS_WON_ATTRIBUTE.name));
         try {
-            createDashboardWithAttributeFilter(DashFilterTypes.ATTRIBUTE, IS_WON_ATTRIBUTE.name);
+            createDashboardWithAttributeFilter(DashAttributeFilterTypes.ATTRIBUTE, IS_WON_ATTRIBUTE.name);
             String savedViewName = createSavedView("true");
 
             dropObject(IS_WON_ATTRIBUTE.identifier, DropStrategy.CASCADE);
@@ -208,7 +208,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         assertTrue(isObjectDeleted(QUOTA_VARIABLE.affectedReport, Places.REPORT));
 
         try {
-            createDashboardWithAttributeFilter(DashFilterTypes.PROMPT, STATUS_VARIABLE.name);
+            createDashboardWithAttributeFilter(DashAttributeFilterTypes.PROMPT, STATUS_VARIABLE.name);
 
             dropObject(STATUS_VARIABLE.identifier, DropStrategy.CASCADE);
             assertTrue(isObjectDeleted(STATUS_VARIABLE.name, Places.DASHBOARD_FILTER));
@@ -331,7 +331,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"resetLDM"}, groups = {"group2"})
     public void deleteDatasetWithAttributeUsageUsingCascadeStrategy() throws IOException, JSONException {
         try {
-            createDashboardWithAttributeFilter(DashFilterTypes.ATTRIBUTE, STAGE_DATASET.attributes[0]);
+            createDashboardWithAttributeFilter(DashAttributeFilterTypes.ATTRIBUTE, STAGE_DATASET.attributes[0]);
 
             dropObject(STAGE_DATASET.identifier, DropStrategy.CASCADE);
             assertTrue(isObjectDeleted(STAGE_DATASET.attributes[0], Places.DASHBOARD_FILTER));
@@ -347,7 +347,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     public void deleteDatasetWithAttributeUsageUsingAllInStrategy() throws JSONException,
             ParseException, IOException {
         try {
-            createDashboardWithAttributeFilter(DashFilterTypes.ATTRIBUTE, STAGE_DATASET.attributes[0]);
+            createDashboardWithAttributeFilter(DashAttributeFilterTypes.ATTRIBUTE, STAGE_DATASET.attributes[0]);
 
             tryDropObject(STAGE_DATASET.identifier, DropStrategy.ALL_IN);
         } finally {
@@ -566,16 +566,13 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         dashboardEditBar.saveDashboard();
     }
 
-    private void createDashboardWithAttributeFilter(DashFilterTypes filterType, String attribute)
-            {
-        initDashboardsPage();
-        dashboardsPage.addNewDashboard(DASHBOARD_NAME);
-
-        DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
-        dashboardEditBar.addListFilterToDashboard(filterType, attribute);
-        dashboardEditBar.turnSavedViewOption(true);
+    private void createDashboardWithAttributeFilter(DashAttributeFilterTypes filterType, String attribute) {
+        initDashboardsPage()
+                .addNewDashboard(DASHBOARD_NAME)
+                .addAttributeFilterToDashboard(filterType, attribute)
+                .turnSavedViewOption(true);
         sleepTightInSeconds(3);
-        dashboardEditBar.saveDashboard();
+        dashboardsPage.saveDashboard();
     }
 
     private String createSavedView(String... values) {

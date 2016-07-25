@@ -899,9 +899,7 @@ public class ReportPage extends AbstractFragment {
 
     public SimpleMenu openOptionsMenu() {
         waitForElementVisible(optionsButton).click();
-        SimpleMenu menu = Graphene.createPageFragment(SimpleMenu.class,
-                waitForElementVisible(SimpleMenu.LOCATOR, browser));
-        return menu;
+        return SimpleMenu.getInstance(browser);
     }
 
     private void setReportVisibleSettings(boolean isVisible) {

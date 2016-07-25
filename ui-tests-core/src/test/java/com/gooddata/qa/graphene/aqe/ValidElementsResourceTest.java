@@ -28,10 +28,10 @@ import com.gooddata.qa.graphene.entity.report.HowItem;
 import com.gooddata.qa.graphene.entity.report.HowItem.Position;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
-import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.graphene.Screenshots;
@@ -71,9 +71,10 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
             dashboardsPage.editDashboard();
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
 
-            dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_DEPARTMENT);
-            dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
-            dashboardEditBar.saveDashboard();
+            dashboardEditBar
+                    .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_DEPARTMENT)
+                    .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_PRODUCT)
+                    .saveDashboard();
 
             FilterWidget departmentFilter = getFilterWidget(ATTR_DEPARTMENT);
             FilterWidget productFilter = getFilterWidget(ATTR_PRODUCT);
@@ -146,10 +147,10 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
         dashboardsPage.selectDashboard(DASH_PIPELINE_ANALYSIS);
         dashboardsPage.getTabs().openTab(1);
 
-        dashboardsPage.editDashboard();
-        DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-        dashboardEditBar.addListFilterToDashboard(DashFilterTypes.PROMPT, "Status");
-        dashboardEditBar.saveDashboard();
+        dashboardsPage
+                .editDashboard()
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.PROMPT, "Status")
+                .saveDashboard();
 
         signInAsDifferentUser(UserRoles.EDITOR);
         openDashboardTab(1);

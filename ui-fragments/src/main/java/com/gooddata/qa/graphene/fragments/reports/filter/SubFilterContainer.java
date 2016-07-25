@@ -69,8 +69,7 @@ public class SubFilterContainer extends AbstractFragment {
 
     private void selectType(String menu) {
         waitForElementVisible(filterMetricByButton).click();
-        Graphene.createPageFragment(SimpleMenu.class, waitForElementVisible(SimpleMenu.LOCATOR, browser))
-                .select(menu);
+        SimpleMenu.getInstance(browser).select(menu);
     }
 
     private void searchAndSelectItem(String item) {

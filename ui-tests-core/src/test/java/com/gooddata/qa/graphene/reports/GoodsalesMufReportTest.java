@@ -26,7 +26,7 @@ import com.gooddata.md.Attribute;
 import com.gooddata.md.AttributeElement;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 
 public class GoodsalesMufReportTest extends GoodSalesAbstractTest {
@@ -98,7 +98,7 @@ public class GoodsalesMufReportTest extends GoodSalesAbstractTest {
         dashboardsPage.addNewDashboard("New-Dashboard-" + uniqueString)
                 .editDashboard()
                 .addReportToDashboard(reportName)
-                .addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, attribute)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, attribute)
                 .saveDashboard();
 
         attributeElements = dashboardsPage
