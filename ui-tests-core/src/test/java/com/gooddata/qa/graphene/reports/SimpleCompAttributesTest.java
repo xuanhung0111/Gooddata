@@ -50,7 +50,7 @@ public class SimpleCompAttributesTest extends AbstractProjectTest {
         projectTitle = "SimpleProject-test-compAttrs";
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void loadProject() throws JSONException, URISyntaxException, IOException {
         // create model
         URL maqlResource = getClass().getResource("/etl/maql-simple.txt");

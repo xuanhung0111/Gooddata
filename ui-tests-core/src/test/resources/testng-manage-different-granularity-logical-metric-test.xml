@@ -6,11 +6,9 @@
             <run>
                 <include name="different-granularity-logical-metric" />
                 <include name="createProject" />
-                <include name="projectInit" />
                 <include name="arquillian" />
             </run>
             <dependencies>
-                <group name="createProject" depends-on="projectInit" />
                 <group name="different-granularity-logical-metric" depends-on="createProject" />
             </dependencies>
         </groups>

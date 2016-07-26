@@ -46,7 +46,7 @@ public class DeployProcessTest extends AbstractDISCTest {
         projectTitle = "Disc-test-deploy-process";
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void deployRubyInProjectsPage() {
         try {
             deployInProjectsPage(DeployPackages.RUBY, "Ruby - Projects List Page",
@@ -56,7 +56,7 @@ public class DeployProcessTest extends AbstractDISCTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void deployRubyInProjectDetailPage() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -66,7 +66,7 @@ public class DeployProcessTest extends AbstractDISCTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void redeployProcessWithDifferentProcessType() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -78,7 +78,7 @@ public class DeployProcessTest extends AbstractDISCTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void redeployProcessWithSamePackage() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -91,7 +91,7 @@ public class DeployProcessTest extends AbstractDISCTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void emptyInputErrorDeployment() {
         openUrl(DISC_PROJECTS_PAGE_URL);
         selectProjectsToDeployInProjectsPage(testParams.getProjectId());
@@ -102,7 +102,7 @@ public class DeployProcessTest extends AbstractDISCTest {
         assertTrue(deployForm.isCorrectInvalidProcessNameError(), "Incorrect process name validation error!");
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void notZipFileErrorDeployment() {
         openUrl(DISC_PROJECTS_PAGE_URL);
         selectProjectsToDeployInProjectsPage(testParams.getProjectId());
@@ -113,7 +113,7 @@ public class DeployProcessTest extends AbstractDISCTest {
         assertTrue(deployForm.isCorrectInvalidPackageError(), "Incorrect package validation error!");
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void tooLargeZipFileErrorDeployment() {
         openUrl(DISC_PROJECTS_PAGE_URL);
         selectProjectsToDeployInProjectsPage(testParams.getProjectId());
@@ -124,45 +124,45 @@ public class DeployProcessTest extends AbstractDISCTest {
         assertTrue(deployForm.isCorrectInvalidPackageError(), "Incorrect package validation error!");
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void deployWithoutExecutablesInProjectsPage() {
         failedDeployInProjectsPage(DeployPackages.NOT_EXECUTABLE, ProcessTypes.DEFAULT,
                 "Not Executables", testParams.getProjectId());
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void deployCloudConnectWithRubyTypeInProjectsPage() {
         failedDeployInProjectsPage(DeployPackages.CLOUDCONNECT, ProcessTypes.RUBY,
                 "CloudConnect with Ruby type", testParams.getProjectId());
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void deployRubyWithCloudConnectTypeInProjectsPage() {
         failedDeployInProjectsPage(DeployPackages.RUBY, ProcessTypes.GRAPH,
                 "Ruby with CloudConnect type", testParams.getProjectId());
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void deployWithoutExecutablesInProjectDetailPage() {
         openProjectDetailPage(testParams.getProjectId());
         failedDeployInProjectDetailPage(DeployPackages.NOT_EXECUTABLE, ProcessTypes.DEFAULT, "Not Executable");
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void deployCloudConnectWithRubyTypeInProjectDetailPage() {
         openProjectDetailPage(testParams.getProjectId());
         failedDeployInProjectDetailPage(DeployPackages.CLOUDCONNECT, ProcessTypes.RUBY,
                 "Deploy CloudConnect package with ruby type");
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void deployRubyWithCloudConnectTypeInProjectDetailPage() {
         openProjectDetailPage(testParams.getProjectId());
         failedDeployInProjectDetailPage(DeployPackages.RUBY, ProcessTypes.GRAPH,
                 "Deploy Ruby package with graph type");
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void redeployWithoutExecutables() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -174,7 +174,7 @@ public class DeployProcessTest extends AbstractDISCTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void redeployCloudConnectWithRubyType() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -186,7 +186,7 @@ public class DeployProcessTest extends AbstractDISCTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void redeployRubyWithCloudConnectType() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -202,7 +202,7 @@ public class DeployProcessTest extends AbstractDISCTest {
      * The tests for checking deploy dialog message are disabled until MSF-7601, MSF-6156 are
      * considered by MSF team
      */
-    @Test(enabled = false, dependsOnMethods = {"createProject"})
+    @Test(enabled = false, dependsOnGroups = {"createProject"})
     public void checkDeployDialogMessageInProjectDetail() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -212,7 +212,7 @@ public class DeployProcessTest extends AbstractDISCTest {
         }
     }
 
-    @Test(enabled = false, dependsOnMethods = {"createProject"})
+    @Test(enabled = false, dependsOnGroups = {"createProject"})
     public void checkFailedDeployMessageInProjectDetail() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -222,7 +222,7 @@ public class DeployProcessTest extends AbstractDISCTest {
         }
     }
 
-    @Test(enabled = false, dependsOnMethods = {"createProject"})
+    @Test(enabled = false, dependsOnGroups = {"createProject"})
     public void checkDeployDialogMessageInProjectsPage() {
         try {
             checkSuccessfulDeployDialogMessageInProjectsPage(DeployPackages.BASIC, ProcessTypes.GRAPH, testParams.getProjectId());
@@ -231,7 +231,7 @@ public class DeployProcessTest extends AbstractDISCTest {
         }
     }
 
-    @Test(enabled = false, dependsOnMethods = {"createProject"})
+    @Test(enabled = false, dependsOnGroups = {"createProject"})
     public void checkFailedDeployMessageInProjectsPage() {
         try {
             checkFailedDeployDialogMessageInProjectsPage(DeployPackages.BASIC, ProcessTypes.RUBY, testParams.getProjectId());

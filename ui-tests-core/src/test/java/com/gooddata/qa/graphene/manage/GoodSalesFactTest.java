@@ -16,7 +16,7 @@ public class GoodSalesFactTest extends ObjectAbstractTest {
         projectTitle = "GoodSales-test-fact";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = { "object-tests" })
+    @Test(dependsOnGroups = {"createProject"}, groups = { "object-tests" })
     public void initialize() throws JSONException {
         name = "Amount";
         this.factFolder = "Stage History";

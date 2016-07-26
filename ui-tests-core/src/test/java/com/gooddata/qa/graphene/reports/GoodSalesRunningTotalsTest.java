@@ -58,7 +58,7 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
     private final static String STATUS = "Status";
     private final static String AVG_AMOUNT = "Avg. Amount";
     
-    @Test(dependsOnMethods = "createProject")
+    @Test(dependsOnGroups = "createProject")
     public void createRunningTotalReport() {
         //create report using UI due to attribute position
         initReportCreation().createReport(new UiReportDefinition()
@@ -142,7 +142,7 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
                 "Running sum values are not correct");
     }
 
-    @Test(dependsOnMethods = "createProject")
+    @Test(dependsOnGroups = "createProject")
     public void testRunningTotalIsNotMetric() {
         final String metricAlias = "Amount-Sum";
         final String stageNameUri = getMdService().getObj(getProject(), Attribute.class, title(STAGE_NAME))
@@ -200,7 +200,7 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
                 "There is more than 1 item which relates to metric");
     }
 
-    @Test(dependsOnMethods = "createProject")
+    @Test(dependsOnGroups = "createProject")
     public void calculateRunningTotalsForTotalColumns() {
         final String reportName = "Running-totals-for-total-columns";
         //create report using UI due to attribute position
@@ -229,7 +229,7 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
         assertEquals(table.getTotalValues(), asList(23767077.60f, 0.0f));
     }
 
-    @Test(dependsOnMethods = "createProject")
+    @Test(dependsOnGroups = "createProject")
     public void drillOnReportContainingRunningTotals() {
         final String reportName = "Drill-in-report-containing-totals";
         //create report using UI due to attribute position

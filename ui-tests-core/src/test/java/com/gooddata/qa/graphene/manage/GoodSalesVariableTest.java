@@ -15,7 +15,7 @@ public class GoodSalesVariableTest extends ObjectAbstractTest {
         projectTitle = "GoodSales-test-variable";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = { "object-tests" })
+    @Test(dependsOnGroups = {"createProject"}, groups = { "object-tests" })
     public void createNumericVariableTest() {
         initVariablePage();
         variablePage.createVariable(new NumericVariable("Test variable" + System.currentTimeMillis())
@@ -23,12 +23,12 @@ public class GoodSalesVariableTest extends ObjectAbstractTest {
                 .withUserNumber(UserRoles.ADMIN, 5678));
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = { "object-tests" })
+    @Test(dependsOnGroups = {"createProject"}, groups = { "object-tests" })
     public void createAttributeVariableDefaultValueTest() {
         variablePage.createVariable(initAttributeVariable());
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = { "object-tests" })
+    @Test(dependsOnGroups = {"createProject"}, groups = { "object-tests" })
     public void createAttributeVariableUserValueTest() {
         variablePage.createVariable(initAttributeVariable()
                 .withUserSpecificValues());

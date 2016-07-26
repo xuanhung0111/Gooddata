@@ -29,7 +29,7 @@ public class NavigationErrorTest extends AbstractCsvUploaderTest {
         waitForStringInUrl("/projects.html#status=notAuthorized");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = "csv")
+    @Test(dependsOnGroups = {"createProject"}, groups = "csv")
     public void showErrorOnUploadsPageWhenInvalidDatasetId() {
         openUrl(format(CSV_DATASET_DETAIL_PAGE_URI_TEMPLATE, testParams.getProjectId(), "nonExistingDataset"));
         final String errorMessage = DatasetMessageBar.getInstance(browser).waitForErrorMessageBar().getText();
@@ -37,13 +37,13 @@ public class NavigationErrorTest extends AbstractCsvUploaderTest {
         assertThat(errorMessage, containsString("The dataset you are looking for no longer exists."));
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = "csv")
+    @Test(dependsOnGroups = {"createProject"}, groups = "csv")
     public void showUploadsPageWhenBadUrlAfterExistingProjectId() {
         openUrl(format(CSV_UPLOADER_PROJECT_ROOT_TEMPLATE + "/this/is/bad/url", testParams.getProjectId()));
         waitForFragmentVisible(datasetsListPage);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = "csv")
+    @Test(dependsOnGroups = {"createProject"}, groups = "csv")
     public void redirectToErrorPageWhenInsufficientAccessRights() throws ParseException, IOException, JSONException {
         addViewerUserToProject();
 

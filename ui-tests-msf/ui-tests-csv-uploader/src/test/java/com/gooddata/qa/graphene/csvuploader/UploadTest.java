@@ -55,7 +55,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         datasetNames.clear();
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkUploadedDatasetAtManagePage() {
         final Dataset dataset = uploadCsv(PAYROLL);
         final String datasetName = dataset.getName();
@@ -71,7 +71,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         assertThat(datasetDetailPage.getFacts(), containsInAnyOrder("Amount"));
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkOnlyUploadedDatasetSync() {
         Dataset dataset = uploadCsv(PAYROLL);
         final String firstDatasetUploadName = dataset.getName();
@@ -94,7 +94,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         assertEquals(waitForFragmentVisible(datasetDetailPage).getLatestUploadDate(), latestUploadDate);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void uploadOneCsvFileMultipleTime() {
         Dataset dataset = uploadCsv(PAYROLL);
         final String firstDatasetName = dataset.getName();
@@ -109,7 +109,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         datasetNames.add(secondDatasetName);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkDatasetAnalyzeLink() {
         final Dataset dataset = uploadCsv(PAYROLL);
         final String datasetName = dataset.getName();
@@ -127,7 +127,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
                 .getDatasetAnalyzeLink(), adReportLink);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkBasicUploadProgress() {
         final Dataset dataset = uploadCsv(PAYROLL);
         final String datasetName = dataset.getName();
@@ -137,7 +137,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         datasetNames.addAll(asList(datasetName, "Date (Paydate)"));
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void uploadWithoutAttributeCSV() throws IOException {
         final CsvFile fileToUpload = new CsvFile("without attribute")
             .columns(new CsvFile.Column("Amount", "Measure"))
@@ -153,7 +153,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         datasetNames.add(datasetName);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void uploadWithoutDateCSV() throws IOException {
         final CsvFile fileToUpload = new CsvFile("without date")
             .columns(new CsvFile.Column("state", "Attribute"),
@@ -172,7 +172,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         datasetNames.add(datasetName);
     }
 
-    @Test(enabled = false, dependsOnMethods = {"createProject"})
+    @Test(enabled = false, dependsOnGroups = {"createProject"})
     public void uploadSpecialUnicodeCharacterColumnName() {
         final DataPreviewPage dataPreviewPage = initDataUploadPage().uploadFile(PAYROLL.getFilePath());
 
@@ -200,7 +200,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         checkCsvDatasetDetail(datasetName, customHeaderColumns, PAYROLL.getColumnTypes());
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void uploadNegativeNumber() {
         final CsvFile fileToUpload = CsvFile.loadFile(
                 getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/payroll.negative.number.csv"))
@@ -228,7 +228,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         log.info("Negative numbers are displayed well in report!");
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void uploadNullNumber() throws IOException {
         final CsvFile fileToUpload = new CsvFile("null number")
             .columns(new CsvFile.Column("Attribute", "Attribute"),
@@ -260,7 +260,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         log.info("Null numbers are displayed well in report!");
     }
 
-    @Test(dependsOnMethods = "createProject")
+    @Test(dependsOnGroups = "createProject")
     public void checkCSVUploaderWithLDMModeler() throws ParseException, JSONException, IOException {
         updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES + "/" + initialLdmMaqlFile));
 

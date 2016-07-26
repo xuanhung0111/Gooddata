@@ -64,7 +64,7 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
     private String embeddedCode;
     private String embedUri;
 
-    @Test(dependsOnMethods = "createProject", groups = "precondition")
+    @Test(dependsOnGroups = "createProject", groups = "precondition")
     public void prepareUserForTest() throws ParseException, JSONException, IOException {
         newAdminUser = generateEmail(testParams.getUser());
         newAdminPassword = testParams.getPassword();

@@ -36,7 +36,7 @@ public class ProjectSwitchTest extends AbstractCsvUploaderTest {
         projectTitle = "Project-switch-" + UNIQUE_ID;
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"precondition"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
     public void prepareUserForSwitchingTest() throws ParseException, JSONException, IOException {
         newAdminUser = generateEmail(testParams.getUser());
         newAdminPassword = testParams.getPassword();

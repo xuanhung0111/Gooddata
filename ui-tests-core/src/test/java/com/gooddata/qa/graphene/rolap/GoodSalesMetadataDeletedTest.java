@@ -113,7 +113,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         projectTitle = "GoodSales-metadata-deteled";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"group1"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
     public void deleteScheduleEmail() throws IOException, JSONException {
         try {
             String dashboardSchedule = "dashboard";
@@ -139,7 +139,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"group1"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
     public void deleteComment() throws IOException, JSONException {
         String[] objectLinks = {
             DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT,
@@ -162,7 +162,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         assertFalse(isObjectDeleted(QUOTA_VARIABLE.name, Places.VARIABLE));
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"group1"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
     public void deleteAttribute() throws JSONException, IOException {
         String userFilterUri = createUserFilterFrom(IS_WON_ATTRIBUTE);
         String computedAttributeName = createComputedAttributeUsing(IS_WON_ATTRIBUTE);
@@ -192,7 +192,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"group1"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
     public void deleteFact() throws JSONException, IOException {
         String metricName = createMetricUsing(VELOCITY_FACT, SimpleMetricTypes.SUM);
 
@@ -201,7 +201,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         assertTrue(isObjectDeleted(metricName, Places.METRIC));
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"group1"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
     public void deletePrompt() throws JSONException, IOException {
         dropObject(QUOTA_VARIABLE.identifier, DropStrategy.CASCADE);
         assertTrue(isObjectDeleted(QUOTA_VARIABLE.affectedMetric, Places.METRIC));
@@ -217,7 +217,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"group1"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
     public void deleteMetric() throws JSONException, IOException {
         try {
             createDashboardWithGeoChart(NUMBER_OF_OPPORTUNITIES_METRIC.name);
@@ -233,7 +233,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"group1"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
     public void deleteReport() throws JSONException, IOException {
         String reportSchedule = null;
         try {
@@ -249,7 +249,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"group1"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
     public void deleteDashboard() throws IOException, JSONException {
         addReportToNewDashboard(NEW_LOST_DRILL_IN_REPORT.name, DASHBOARD_NAME);
 

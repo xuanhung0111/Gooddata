@@ -47,7 +47,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         projectTitle = "Disc-test-schedule";
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createScheduleWithCustomInput() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -68,7 +68,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createScheduleForSpecificExecutable() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -87,7 +87,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createScheduleFromSchedulesList() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -105,7 +105,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createScheduleWithEveryWeekCronTime() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -124,7 +124,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createScheduleWithEveryDayCronTime() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -142,7 +142,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createScheduleWithCronExpression() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -160,7 +160,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkStopManualExecution() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -188,7 +188,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void changeExecutableOfSchedule() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -207,7 +207,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void deleteSchedule() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -228,7 +228,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void changeScheduleCronTime() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -247,7 +247,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void editScheduleParameters() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -276,7 +276,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void addNewParametersForSchedule() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -307,7 +307,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createScheduleWithIncorrectCron() {
         openProjectDetailPage(testParams.getProjectId());
 
@@ -327,7 +327,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
                 "Inserted cron format is invalid. Please verify and try again.");
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void editScheduleWithIncorrectCron() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -357,7 +357,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkBrokenSchedule() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -393,7 +393,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkBrokenScheduleWithRenamedGraph() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -429,7 +429,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkDeleteScheduleParams() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -453,7 +453,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkCancelDeleteScheduleParams() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -477,7 +477,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkIncorrectRetryDelay() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -501,7 +501,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkCancelCreateSchedule() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -520,7 +520,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkCancelChangeScheduleExecutable() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -539,7 +539,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkCancelChangeScheduleCronTime() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -558,7 +558,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkCancelAddRetryDelay() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -581,7 +581,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkCancelEditScheduleParams() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -607,7 +607,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkCancelDeleteSchedule() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -625,7 +625,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkRemoveRetry() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -645,7 +645,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkExecutionHistoryEmptyState() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -665,7 +665,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkScheduleExecutionState() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -695,7 +695,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkSuccessfulExecutionGroup() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -717,7 +717,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createScheduleWithCustomName() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -732,7 +732,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void editScheduleWithCustomName() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -753,7 +753,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createScheduleWithEmptyCustomName() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -774,7 +774,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void editScheduleWithEmptyCustomName() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -792,7 +792,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createScheduleNotUniqueName() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -815,7 +815,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void editScheduleWithNotUniqueName() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -837,7 +837,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void cancelEditScheduleName() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -856,7 +856,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createScheduleWithCustomNameForRubyScript() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -873,22 +873,22 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkCustomScheduleNameInFailedOverview() {
         checkScheduleNameInOverviewPage(OverviewProjectStates.FAILED);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkCustomScheduleNameInSuccessfulOverview() {
         checkScheduleNameInOverviewPage(OverviewProjectStates.SUCCESSFUL);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkCustomScheduleNameInRunningOverview() {
         checkScheduleNameInOverviewPage(OverviewProjectStates.RUNNING);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkProjectWithOneSchedule() {
         cleanProcessesInWorkingProject();
 
@@ -905,7 +905,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkScheduleTriggerBySuccessfulSchedule() {
         try {
             String processName = "Check Schedule With Trigger Schedule";
@@ -925,7 +925,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkScheduleTriggerInLoop() {
         cleanProcessesInWorkingProject();
 
@@ -949,7 +949,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkScheduleTriggerByItself() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -972,7 +972,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkMissingScheduleTrigger() {
         try {
             String processName = "Check Schedule With Trigger Schedule";
@@ -1004,7 +1004,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkExecutionLog() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -1033,7 +1033,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void editScheduleNameWithPencilIcon() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -1052,7 +1052,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkEffectiveUserOfSchedule() throws JSONException, ParseException, IOException {
         try {
             addUserToProject(testParams.getEditorUser(), UserRoles.ADMIN);
@@ -1100,7 +1100,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkExecutionTooltipOnTimeLine() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -1129,7 +1129,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void closeScheduleDetail() {
         try {
             openProjectDetailPage(testParams.getProjectId());

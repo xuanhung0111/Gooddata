@@ -62,7 +62,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
 
     private static final String FACT_INFO = "Represents the value or amount that you want to measure.";
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkNoHeaderCsvFile() throws IOException {
         final int datasetCountBeforeUpload = initDataUploadPage().getMyDatasetsCount();
 
@@ -108,7 +108,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         datasetDetailPage.clickBackButton();
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkFieldTypeDetection() {
         final int datasetCountBeforeUpload = initDataUploadPage().getMyDatasetsCount();
 
@@ -136,7 +136,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         datasetDetailPage.clickBackButton();
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void changeColumnType() {
         final int datasetCountBeforeUpload = initDataUploadPage().getMyDatasetsCount();
 
@@ -173,7 +173,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         waitForFragmentVisible(datasetDetailPage).clickBackButton();
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkCsvFileWithMultipleHeaderRows() {
         final int datasetCountBeforeUpload = initDataUploadPage().getMyDatasetsCount();
         final CsvFile fileToUpload = CsvFile.loadFile(
@@ -222,7 +222,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         checkCsvDatasetDetail(datasetName, fileToUpload.getColumnNames(), fileToUpload.getColumnTypes());
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void setCustomHeader() {
         final int datasetCountBeforeUpload = initDataUploadPage().getMyDatasetsCount();
 
@@ -295,7 +295,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         checkCsvDatasetDetail(datasetName, customHeaderColumns, PAYROLL.getColumnTypes());
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void cancelChangeColumnNames() {
         final int datasetCountBeforeUpload = initDataUploadPage().getMyDatasetsCount();
 
@@ -344,7 +344,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         checkCsvDatasetDetail(datasetName, PAYROLL.getColumnNames(), PAYROLL.getColumnTypes());
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void setHeaderForNoHeaderCsvFile() throws IOException {
         final int datasetCountBeforeUpload = initDataUploadPage().getMyDatasetsCount();
 
@@ -418,7 +418,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         };
     }
 
-    @Test(dependsOnMethods = {"createProject"}, dataProvider = "csvDataProvider")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "csvDataProvider")
     public void checkPreviewPageDisplayWithMaximun50Row(CsvFile csvFile, String rowCountMessage) {
         final DataPreviewPage dataPreviewPage = initDataUploadPage().uploadFile(csvFile.getFilePath());
 
@@ -426,7 +426,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         assertEquals(dataPreviewPage.getRowCountMessage(), format(rowCountMessage, csvFile.getDataRowCount()));
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testDropdownMenu() throws IOException {
         // This test case just need a simple csv data which has enough column type: Attribute, Fact, and Date
         final CsvFile csvFile = new CsvFile("dropdown.menu")
@@ -469,7 +469,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         }
     }
 
-    @Test(dependsOnMethods = "createProject")
+    @Test(dependsOnGroups = {"createProject"})
     public void checkScrollbarShowInPreviewTable() {
         final CsvFile csvFileWithManyColumnRow = CsvFile.loadFile(
                 getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/unsupported.date.formats.csv"));

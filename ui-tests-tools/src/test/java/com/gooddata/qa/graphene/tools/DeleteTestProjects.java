@@ -19,7 +19,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 @Test(groups = {"tools"}, description = "Tools tests")
 public class DeleteTestProjects extends AbstractUITest {
 
-    @Test(groups = {"deleteProjectsInit", PROJECT_INIT_GROUP})
+    @Test(groups = {"deleteProjectsInit"})
     public void initTest() throws JSONException {
         signIn(false, UserRoles.ADMIN);
     }

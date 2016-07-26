@@ -37,7 +37,7 @@ public class DynamicImageTest extends AbstractProjectTest {
     private final static String IMAGE_SOURCE_3 =
             "source=http://samsuria.com/wp-content/uploads/2014/10/wallpaper-nature-3d.jpg";
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void uploadCsvFile() {
         uploadCSV(ResourceUtils.getFilePathFromResource("/" + ResourceDirectory.DYNAMIC_IMAGES + "/image_url.csv"));
         takeScreenshot(browser, "uploaded-image-file", getClass());

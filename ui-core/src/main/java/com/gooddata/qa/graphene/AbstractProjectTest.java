@@ -4,12 +4,13 @@ import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.browser.BrowserUtils.getCurrentBrowserAgent;
 import static com.gooddata.qa.browser.BrowserUtils.maximize;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static org.testng.Assert.assertEquals;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import com.gooddata.project.ProjectValidationResults;
+
 import org.json.JSONException;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
@@ -19,17 +20,21 @@ import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
 import com.gooddata.project.Project;
 import com.gooddata.project.ProjectDriver;
+import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
+
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static org.testng.Assert.assertFalse;
 
 import com.gooddata.qa.utils.http.rolap.RolapRestUtils;
+
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.UUID;
+
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -47,7 +52,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     // validations are enabled by default on any child class
     protected boolean validateAfterClass = true;
 
-    @Test(groups = {PROJECT_INIT_GROUP})
+    @Test(groups = {"createProject"})
     public void init() throws JSONException {
         System.out.println("Current browser agent is: " + getCurrentBrowserAgent(browser).toUpperCase());
 
@@ -64,7 +69,23 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
     }
 
-    @Test(dependsOnGroups = {PROJECT_INIT_GROUP}, groups = {"createProject"})
+    @Test(dependsOnMethods = {"init"}, groups = {"createProject"})
+    public void configureStartPage() {
+        startPageContext = new StartPageContext() {
+
+            @Override
+            public void waitForStartPageLoaded() {
+                waitForProjectsPageLoaded(browser);
+            }
+
+            @Override
+            public String getStartPage() {
+                return PAGE_PROJECTS;
+            }
+        };
+    }
+
+    @Test(dependsOnMethods = {"configureStartPage"}, groups = {"createProject"})
     public void createProject() throws JSONException, IOException {
         if (testParams.isReuseProject()) {
             if (testParams.getProjectId() != null && !testParams.getProjectId().isEmpty()) {

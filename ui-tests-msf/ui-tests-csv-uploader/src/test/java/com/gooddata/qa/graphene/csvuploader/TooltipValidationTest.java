@@ -31,7 +31,7 @@ public class TooltipValidationTest extends AbstractCsvUploaderTest {
     private static final String DUPLICATED_NAME_MESSAGE = "The name is already in use. Use an unique name.";
 //    private static final String LIMITED_CHARACTER_MESSAGE = "Header name exceeds the limit of 255 characters.";
 
-    @Test(dependsOnMethods = "createProject")
+    @Test(dependsOnGroups = "createProject")
     public void checkTooltipValidation() throws IOException, AWTException {
         String csvFileFilePath = CsvFile.loadFile(
                 getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/24dates.yyyy.csv"))
@@ -79,7 +79,7 @@ public class TooltipValidationTest extends AbstractCsvUploaderTest {
         assertEquals(tooltipOnDeleteButton, DELELE_BUTTON_TOOLTIP);
     }
 
-    @Test(dependsOnMethods = "createProject")
+    @Test(dependsOnGroups = "createProject")
     public void checkErrorBubbleValidation() throws AWTException, IOException {
         String csvFileFilePath = new CsvFile("Bubble validation")
                 .columns(new CsvFile.Column("Firstname"), new CsvFile.Column("Number"))

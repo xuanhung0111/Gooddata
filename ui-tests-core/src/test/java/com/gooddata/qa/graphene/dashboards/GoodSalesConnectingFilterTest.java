@@ -52,7 +52,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
         projectTitle = "GoodSales-test-connecting-filter";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"init"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
     public void createVariable() {
         initVariablePage();
 

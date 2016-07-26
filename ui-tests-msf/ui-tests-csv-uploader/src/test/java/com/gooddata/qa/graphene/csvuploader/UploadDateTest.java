@@ -82,7 +82,7 @@ public class UploadDateTest extends AbstractCsvUploaderTest {
         };
     }
 
-    @Test(dependsOnMethods = {"createProject"}, dataProvider = "dateDataProvider")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "dateDataProvider")
     public void uploadDateDatasetWithDifferentFormats(CsvFile fileToUpload) {
         final DataPreviewPage dataPreviewPage = initDataUploadPage().uploadFile(fileToUpload.getFilePath());
 
@@ -142,7 +142,7 @@ public class UploadDateTest extends AbstractCsvUploaderTest {
         };
     }
 
-    @Test(dependsOnMethods = {"createProject"}, dataProvider = "ambiguousDateDataProvider")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "ambiguousDateDataProvider")
     public void uploadAmbigousDateDataset(CsvFile fileToUpload, List<DateFormat> dateFormats, int dateFormatCounts) {
         final DataPreviewPage dataPreviewPage = initDataUploadPage().uploadFile(fileToUpload.getFilePath());
 
@@ -180,7 +180,7 @@ public class UploadDateTest extends AbstractCsvUploaderTest {
         assertThat(csvDatasetDetailPage.getColumnTypes(), contains(columnTypes.toArray()));
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void updateDateDataset() {
         final Dataset dataset = uploadCsv(DATE_YYYY_FILE);
         final String datasetName = dataset.getName();

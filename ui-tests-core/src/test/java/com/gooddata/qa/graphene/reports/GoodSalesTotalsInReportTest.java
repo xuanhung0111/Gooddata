@@ -58,7 +58,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
     private final static String SHORT_LIST = "Short List";
     private final static String OF_ALL_COLUMNS = "of All Columns";
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createReport() {
         //create report on UI due to attribute order
         initReportCreation().createReport(new UiReportDefinition()
@@ -98,7 +98,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
         };
     }
 
-    @Test(dependsOnMethods = {"createReport"}, dataProvider = "rowTotalDataProvider")
+    @Test(dependsOnGroups = {"createReport"}, dataProvider = "rowTotalDataProvider")
     public void addAndRemoveRowTotalOnAttributeHeader(final AggregationType type,
             final List<Float> totalValuesOfAllRows, final List<Float> totalValuesOfEachStage) {
         final TableReport table = openReport(SIMPLE_REPORT).getTableReport();
@@ -315,7 +315,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
         assertTrue(table.getTotalValues().equals(totalValues), type.getType() + " values are not correct");
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createReportForAddingMultipleTotals() {
         initReportCreation().createReport(new UiReportDefinition()
                 .withName(MULTIPLE_TOTALS_REPORT)

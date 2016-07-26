@@ -48,7 +48,7 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
         imapPassword = testParams.loadProperty("imap.password");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"schedules"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"schedules"})
     public void verifyEmptySchedules() {
         initEmailSchedulesPage();
         assertEquals(emailSchedulesPage.getNumberOfGlobalSchedules(), 0, "There is no schedule.");

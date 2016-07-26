@@ -72,7 +72,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         projectTitle = "GoodSales-test-computed-attribute";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, priority = 0)
+    @Test(dependsOnGroups = {"createProject"}, priority = 0)
     public void createComputedAttributeTest() {
         createComputedAttribute();
         createAttributePage.cancel();
@@ -98,7 +98,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         checkDeleteButtonAndInfo();
     }
 
-    @Test(dependsOnMethods = {"createProject"}, priority = 0)
+    @Test(dependsOnGroups = {"createProject"}, priority = 0)
     public void checkValidationOfBucketFields() {
         initAttributePage();
         attributePage.createAttribute();

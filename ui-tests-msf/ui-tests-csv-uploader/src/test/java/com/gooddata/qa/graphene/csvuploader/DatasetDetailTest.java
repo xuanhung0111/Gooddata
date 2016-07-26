@@ -21,7 +21,7 @@ public class DatasetDetailTest extends AbstractCsvUploaderTest {
     private static String PAYROLL_DATASET_NAME = PAYROLL.getDatasetNameOfFirstUpload();
     private static final long PAYROLL_FILE_SIZE_MINIMUM = 476L;
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkCsvUploadHappyPath() {
         assertTrue(uploadCsv(PAYROLL)
             .getStatus()

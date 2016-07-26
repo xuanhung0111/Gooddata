@@ -59,7 +59,7 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
         };
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void loadProject() throws JSONException, URISyntaxException, IOException {
         URL maqlResource = getClass().getResource("/etl/maql-simple.txt");
         postMAQL(IOUtils.toString(maqlResource), statusPollingCheckIterations);

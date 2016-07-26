@@ -96,7 +96,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
      * 
      * Notes: This test always run first base on alphabet order. 
      */
-    @Test(groups = PROJECT_INIT_GROUP)
+    @Test
     public void checkWalkme() throws ParseException, JSONException, IOException {
         deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), REGISTRATION_USER);
 
@@ -122,14 +122,14 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         assertFalse(isWalkmeDisplayed(), "Walkme-dialog-displays-more-than-one-time-in-Product-Tour-project");
     }
 
-    @Test(groups = PROJECT_INIT_GROUP)
+    @Test
     public void selectLoginLink() {
         initRegistrationPage()
             .selectLoginLink()
             .openRegistrationPage();
     }
 
-    @Test(groups = PROJECT_INIT_GROUP)
+    @Test
     public void registerUserWithInvalidValue() {
         initRegistrationPage()
             .fillInRegistrationForm(new RegistrationForm())
@@ -155,7 +155,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         assertEquals(RegistrationPage.getInstance(browser).getErrorMessage(), INVALID_PHONE_NUMBER_ERROR_MESSAGE);
     }
 
-    @Test(groups = PROJECT_INIT_GROUP)
+    @Test
     public void loginAsUnverifiedUserAfterRegistering()
             throws ParseException, JSONException, IOException, MessagingException {
         deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), REGISTRATION_USER);
@@ -205,7 +205,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         assertEquals(userProfilePage.getUserRole(), UserRoles.ADMIN.getName());
     }
 
-    @Test(groups = {PROJECT_INIT_GROUP, "sanity"})
+    @Test(groups = {"sanity"})
     public void registerNewUser() throws MessagingException, IOException, ParseException, JSONException {
         if (!testParams.isClusterEnvironment() || testParams.isProductionEnvironment() ||
                 testParams.isPerformanceEnvironment()) {
@@ -236,7 +236,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         }
     }
 
-    @Test(groups = PROJECT_INIT_GROUP, dependsOnMethods = {"registerNewUser"})
+    @Test(dependsOnMethods = {"registerNewUser"})
     public void openAtivationLinkAfterRegistration() {
         openUrl(activationLink);
         assertEquals(LoginFragment.getInstance(browser).getNotificationMessage(), ALREADY_ACTIVATED_MESSAGE);
@@ -245,7 +245,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
     }
 
-    @Test(groups = PROJECT_INIT_GROUP, dependsOnMethods = {"registerNewUser"})
+    @Test(dependsOnMethods = {"registerNewUser"})
     public void registerUserWithEmailOfExistingAccount() {
         initRegistrationPage()
                 .fillInRegistrationForm(new RegistrationForm())

@@ -58,6 +58,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     protected static final By BY_IFRAME = By.tagName("iframe");
     private static final By BY_SCHEDULES_LOADING = By.cssSelector(".loader");
 
+    protected static final String PAGE_PROJECTS = "projects.html";
     protected static final String PAGE_UI_ANALYSE_PREFIX = "analyze/#/";
     protected static final String PAGE_UI_PROJECT_PREFIX = "#s=/gdc/projects/";
     protected static final String ACCOUNT_PAGE = "account.html";

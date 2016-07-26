@@ -34,7 +34,7 @@ public class GoodSalesDashboardWidgetManipulationTest extends GoodSalesAbstractT
         projectTitle = "GoodSales-dashboard-widget-manipulation";
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testZIndex() {
         WidgetConfigPanel configPanel;
         ArrangeConfigPanel arrangeConfigPanel;

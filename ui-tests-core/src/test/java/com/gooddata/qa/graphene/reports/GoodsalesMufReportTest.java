@@ -38,7 +38,7 @@ public class GoodsalesMufReportTest extends GoodSalesAbstractTest {
 
     private String combinedMufExpression;
 
-    @Test(dependsOnMethods = "createProject")
+    @Test(dependsOnGroups = "createProject")
     public void initData() {
         stageNameAttribute = getMdService().getObj(getProject(), Attribute.class, identifier("attr.stage.name"));
         stageNameValue = getMdService()

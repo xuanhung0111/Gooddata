@@ -24,7 +24,6 @@ import com.gooddata.qa.graphene.connectors.AbstractConnectorsCheckTest;
 import com.gooddata.qa.graphene.enums.Connectors;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.greypages.connectors.CoupaInstanceFragment;
-import com.gooddata.qa.utils.graphene.Screenshots;
 import com.google.common.base.Predicate;
 
 @Test(groups = {"connectors", "coupa"}, description = "Checklist tests for Coupa connector in GD platform")

@@ -43,7 +43,7 @@ public class KpiAlertInMobileTest extends DashboardsGeneralTest {
         projectTemplate = "";
     }
 
-    @Test(dependsOnMethods = "createProject", groups = "precondition")
+    @Test(dependsOnGroups = "createProject", groups = "precondition")
     public void initIndigoDashboardWithKpi() throws JSONException, IOException, URISyntaxException {
         setupMaql(KPI_ALERT_RESOURCE + "user.maql");
 

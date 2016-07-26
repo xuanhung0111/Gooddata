@@ -35,7 +35,7 @@ public class GoodSalesPersonalObjectsInDashboardWidgetTest extends GoodSalesAbst
         personalMetric = "[Personal] Share %";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"pre-condition"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"pre-condition"})
     public void createPersonalMetric() {
         initMetricPage();
         personalMetric = "[Personal] Share %";

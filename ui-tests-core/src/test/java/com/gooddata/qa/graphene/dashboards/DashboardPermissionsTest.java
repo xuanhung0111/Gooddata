@@ -55,7 +55,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         viewerProfileUri = testParams.loadProperty("viewerProfileUri");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"admin-tests", "sanity"}, priority = 0)
+    @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests", "sanity"}, priority = 0)
     public void checkBackToTheOnlyOneVisibileDashboard() throws IOException, JSONException {
         try {
             selectDashboard(DASH_PIPELINE_ANALYSIS);
@@ -89,14 +89,14 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
      * 
      * @throws Exception
      */
-    @Test(dependsOnMethods = {"createProject"}, groups = {"admin-tests", "sanity"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests", "sanity"})
     public void shouldLockDashboard() throws Exception {
         createDashboard(getRestApiClient(), "Locked dashboard");
         lockDashboard(true);
         assertEquals(dashboardsPage.isLocked(), true);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"admin-tests", "sanity"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests", "sanity"})
     public void shouldUnlockDashboard() throws Exception {
         createDashboard(getRestApiClient(), "Unlocked dashboard");
         lockDashboard(false);
@@ -108,7 +108,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
      * @throws IOException 
      * @throws JSONException 
      */
-    @Test(dependsOnMethods = {"createProject"}, groups = {"admin-tests", "sanity"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests", "sanity"})
     public void shouldPublishDashboard() throws JSONException, IOException {
         createDashboard(getRestApiClient(), "Published dashboard");
         publishDashboard(true);
@@ -120,7 +120,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
      * @throws IOException 
      * @throws JSONException 
      */
-    @Test(dependsOnMethods = {"createProject"}, groups = {"admin-tests", "sanity"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests", "sanity"})
     public void shouldUnpublishDashboard() throws JSONException, IOException {
         createDashboard(getRestApiClient(), "Unpublished dashboard");
         publishDashboard(false);
@@ -134,7 +134,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
      * @throws IOException 
      * @throws JSONException 
      */
-    @Test(dependsOnMethods = {"createProject"}, groups = {"admin-tests"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests"})
     public void shouldNotChangePermissionsWhenCancelled() throws JSONException, IOException {
         createDashboard(getRestApiClient(), UNCHANGED_DASHBOARD);
 
@@ -152,7 +152,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
      * click to "eye" icon instead of settings and check that dashboard is locked and not visible
      * for all
      */
-    @Test(dependsOnMethods = {"createProject"}, groups = {"admin-tests"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests"})
     public void shouldOpenPermissionsDialogWhenClickingOnLockIcon() {
         initDashboardsPage();
 
@@ -167,7 +167,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
      * click to "eye" icon instead of settings and check that dashboard is locked and not visible
      * for all
      */
-    @Test(dependsOnMethods = {"createProject"}, groups = {"admin-tests"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests"})
     public void shouldOpenPermissionsDialogWhenClickingOnEyeIcon() {
         initDashboardsPage();
 
@@ -184,7 +184,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
      * @throws IOException 
      * @throws JSONException 
      */
-    @Test(dependsOnMethods = {"createProject"}, groups = {"admin-tests", "sanity"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests", "sanity"})
     public void checkPermissionDialogInDashboardEditMode() throws JSONException, IOException {
         createDashboard(getRestApiClient(), "Check Permission in Edit Mode");
 

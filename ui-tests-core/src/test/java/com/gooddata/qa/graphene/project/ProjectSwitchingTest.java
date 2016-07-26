@@ -49,7 +49,7 @@ public class ProjectSwitchingTest extends AbstractProjectTest {
         projectTitle = "Project-switch-" + UNIQUE_ID;
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void inviteUsersToProject() throws ParseException, IOException, JSONException {
         newAdminUser = generateEmail(testParams.getUser());
         newAdminPassword = testParams.getPassword();

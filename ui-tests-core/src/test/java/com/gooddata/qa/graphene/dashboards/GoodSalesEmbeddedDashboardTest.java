@@ -95,7 +95,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
                         .withType(ReportTypes.HEADLINE);
     }
 
-    @Test(dependsOnMethods = "createProject")
+    @Test(dependsOnGroups = "createProject")
     public void prepareReportsForEmbeddedDashboard() {
         createReport(tabularReportDef, tabularReportDef.getName());
         TableReport tabularReport = reportPage.getTableReport();

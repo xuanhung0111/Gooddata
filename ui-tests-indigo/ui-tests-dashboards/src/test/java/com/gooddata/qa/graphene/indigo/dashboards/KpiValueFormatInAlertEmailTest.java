@@ -60,7 +60,7 @@ public class KpiValueFormatInAlertEmailTest extends AbstractProjectTest {
         imapPassword = testParams.loadProperty("imap.password");
     }
 
-    @Test(dependsOnMethods = "createProject", groups = "precondition")
+    @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
     public void initIndigoDashboardWithKpi() throws JSONException, IOException {
         csvFile = new CsvFile(DATASET_NAME)
                 .columns(new CsvFile.Column("firstname"), new CsvFile.Column("number"), new CsvFile.Column("Date"))

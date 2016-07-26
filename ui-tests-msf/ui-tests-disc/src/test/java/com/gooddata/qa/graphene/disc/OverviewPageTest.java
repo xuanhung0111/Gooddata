@@ -44,7 +44,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
     // Due to bootstrap just save the last visited page, and account qa+test is used in many job at the same time,
     // the expected page will be incorrect in this case after logout and sign in again.
     // So we should use a separate user for this test case
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkOverviewPageShowAfterLogoutAndSignIn() throws ParseException, JSONException, IOException {
         String newUser = generateEmail(testParams.getUser());
 
@@ -69,7 +69,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkDefaultOverviewState() {
         initDISCOverviewPage();
         assertTrue(discOverview.isActive(OverviewProjectStates.FAILED));
@@ -78,25 +78,25 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         assertFalse(discOverview.isActive(OverviewProjectStates.SUCCESSFUL));
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkEmptyFailedState() {
         initDISCOverviewPage();
         checkFilteredOutOverviewProject(OverviewProjectStates.FAILED, testParams.getProjectId());
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkEmptyRunningState() {
         initDISCOverviewPage();
         checkFilteredOutOverviewProject(OverviewProjectStates.RUNNING, testParams.getProjectId());
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkEmptySucessfulState() {
         initDISCOverviewPage();
         checkFilteredOutOverviewProject(OverviewProjectStates.SUCCESSFUL, testParams.getProjectId());
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkScheduledStateNumber() {
         OverviewProjectDetails overviewProject = new OverviewProjectDetails();
         OverviewProcess overviewProcess =
@@ -110,7 +110,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         assertOverviewStateNumber(OverviewProjectStates.SCHEDULED, discOverviewProjects.getOverviewProjectNumber());
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkCombinedStatesNumber() {
         String processName = "Check Combined States Number";
         openProjectDetailPage(testParams.getProjectId());
@@ -137,7 +137,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         checkFilteredOutOverviewProject(OverviewProjectStates.RUNNING, testParams.getProjectId());
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkOverviewFailedProjects() {
         OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectId(testParams.getProjectId());
         OverviewProcess overviewProcess =
@@ -153,7 +153,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         checkOtherOverviewStates(OverviewProjectStates.FAILED, testParams.getProjectId());
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkOverviewSuccessfulProject() {
         OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectId(testParams.getProjectId());
         OverviewProcess overviewProcess =
@@ -171,7 +171,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         checkOtherOverviewStates(OverviewProjectStates.SUCCESSFUL, testParams.getProjectId());
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkOverviewRunningProject() {
         OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectId(testParams.getProjectId());
         OverviewProcess overviewProcess =
@@ -189,7 +189,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         checkOtherOverviewStates(OverviewProjectStates.RUNNING, testParams.getProjectId());
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void accessProjectDetailFromOverviewPage() {
         String processName = "Check Access Project Detail Page";
         openProjectDetailPage(testParams.getProjectId());
@@ -211,7 +211,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         accessWorkingProjectDetail(OverviewProjectStates.FAILED);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void restartFailedProjects() {
         OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectId(testParams.getProjectId());
         OverviewProcess overviewProcess =
@@ -227,22 +227,22 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void restartFailedSchedule() {
         bulkActionsScheduleInOverviewPage(OverviewProjectStates.FAILED);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void disableFailedProjects() {
         disableProjectInOverviewPage(OverviewProjectStates.FAILED);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void disableFailedSchedule() {
         disableScheduleInOverviewPage(OverviewProjectStates.FAILED);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void runSuccessfulProjects() {
         OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectId(testParams.getProjectId());
         OverviewProcess overviewProcess =
@@ -257,22 +257,22 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         assertSuccessfulExecution();
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void runSuccessfulSchedule() {
         bulkActionsScheduleInOverviewPage(OverviewProjectStates.SUCCESSFUL);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void disableSuccessfulProjects() {
         disableProjectInOverviewPage(OverviewProjectStates.SUCCESSFUL);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void disableSuccessfulSchedule() {
         disableScheduleInOverviewPage(OverviewProjectStates.SUCCESSFUL);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void stopRunningProjects() {
         OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectId(testParams.getProjectId());
         OverviewProcess overviewProcess =
@@ -286,32 +286,32 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         assertManualStoppedExecution();
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void stopRunningSchedule() {
         bulkActionsScheduleInOverviewPage(OverviewProjectStates.RUNNING);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void disableRunningProjects() {
         disableProjectInOverviewPage(OverviewProjectStates.RUNNING);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void disableRunningSchedule() {
         disableScheduleInOverviewPage(OverviewProjectStates.RUNNING);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"project-overview"})
     public void checkProjectsNotAdminInFailedState() throws ParseException, JSONException, IOException {
         checkOverviewProjectWithoutAdminRole(OverviewProjectStates.FAILED);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"project-overview"})
     public void checkProjectsNotAdminInSucessfulState() throws ParseException, JSONException, IOException {
         checkOverviewProjectWithoutAdminRole(OverviewProjectStates.SUCCESSFUL);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"project-overview"})
     public void checkProjectsNotAdminInRunningState() throws ParseException, JSONException, IOException {
         checkOverviewProjectWithoutAdminRole(OverviewProjectStates.RUNNING);
     }

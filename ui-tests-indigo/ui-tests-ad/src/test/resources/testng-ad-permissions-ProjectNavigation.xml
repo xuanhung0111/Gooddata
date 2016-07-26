@@ -8,12 +8,10 @@
                 <include name="precondition" />
                 <include name="init" />
                 <include name="createProject" />
-                <include name="projectInit" />
                 <include name="arquillian" />
             </run>
             <dependencies>
                 <group name="analyse" depends-on="switchProject" />
-                <group name="switchProject" depends-on="projectInit" />
             </dependencies>
         </groups>
         <classes>

@@ -54,7 +54,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         projectTitle = "GoodSales-save-report-test";
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createReport() {
         createReport(new UiReportDefinition().withName(VERSION_REPORT).withWhats(METRIC_NUMBER_OF_ACTIVITIES),
                 "openUpToDateReport");
@@ -84,7 +84,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         assertThat(reportPage.saveReport().getVersionsCount(), equalTo(3));
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void saveTooLargeReport() {
         createReport(new UiReportDefinition().withName("R1").withWhats("Amount").withHows("Opp. Snapshot"),
                 "saveTooLargeReport");
@@ -92,7 +92,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         assertTrue(waitForFragmentVisible(reportPage).isReportTooLarge());
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void leaveUnsavedChangesInNewReport() {
         initReportsPage();
         waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder(UNSORTED);
@@ -116,7 +116,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         assertThat(reportsPage.getReportsList().getNumberOfReports(), equalTo(currentReportsCount));
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void cancelLeavingUnsavedChangesInNewReport() {
         initReportsPage();
         waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder(UNSORTED);
@@ -154,7 +154,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         assertThat(waitForFragmentVisible(reportPage).getVersionsCount(), equalTo(versionCount));
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void leaveAndSaveNewReport() {
         initReportsPage();
         waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder(UNSORTED);
@@ -205,7 +205,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         assertThat(waitForFragmentVisible(reportPage).getVersionsCount(), equalTo(versionCount + 1));
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void cancelComputingInNewReport() {
         initReportsPage();
         waitForFragmentVisible(reportsPage).startCreateReport();
@@ -224,7 +224,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void cancelComputingOldReport() {
         initReportsPage();
         waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder(ALL);
@@ -262,7 +262,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         assertThat(waitForFragmentVisible(reportPage).getVersionsCount(), equalTo(1));
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void saveReportPlacedOnDashboard() {
         initReportsPage();
         waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder(ALL);
@@ -276,7 +276,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         reportPage.clickSaveReport().confirmSaveReport().waitForReportSaved();
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void saveAsReportPlacedOnDashboard() {
         initReportsPage();
         waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder(ALL);
@@ -295,7 +295,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         waitForFragmentVisible(reportsPage).getReportsList().openReport("Copy of " + QTD_GOAL);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void cancelReportPlacedOnDashboard() {
         initReportsPage();
         waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder(ALL);

@@ -40,7 +40,7 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
             + "deleted along with the computed measures and visualization where they are used. "
             + "This action cannot be undone.";
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void deleteCsvDatasetFromList() {
         final String datasetName = uploadCsv(PAYROLL).getName();
 
@@ -73,7 +73,7 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
         checkObjectsCreatedAfterDatasetRemoved();
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void deleteCsvDatasetFromDetail() {
         final String datasetName = uploadCsv(PAYROLL).getName();
 

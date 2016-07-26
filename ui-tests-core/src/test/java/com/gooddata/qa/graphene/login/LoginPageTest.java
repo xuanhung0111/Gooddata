@@ -23,12 +23,12 @@ public class LoginPageTest extends AbstractUITest {
 
             @Override
             public void waitForStartPageLoaded() {
-                // no need to wait projects page because it will be redirected to login page
+                LoginFragment.waitForPageLoaded(browser);
             }
 
             @Override
             public String getStartPage() {
-                return PAGE_PROJECTS;
+                return PAGE_LOGIN;
             }
         };
     }

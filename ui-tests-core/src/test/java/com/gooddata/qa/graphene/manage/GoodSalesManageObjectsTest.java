@@ -19,7 +19,7 @@ public class GoodSalesManageObjectsTest extends ManageObjectsAbstractTest {
         projectTitle = "GoodSales-test-manage-objects";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, priority = 1, groups = {"viewObjetcs", "fact"})
+    @Test(dependsOnGroups = {"createProject"}, priority = 1, groups = {"viewObjetcs", "fact"})
     public void viewFactsTable() {
         viewSortObjectsTable(factsTable, ObjectTypes.FACT, factsList);
         Map<String, List<String>> taggedObjects = new HashMap<String, List<String>>();
@@ -32,7 +32,7 @@ public class GoodSalesManageObjectsTest extends ManageObjectsAbstractTest {
         checkObjectLinkInTable(factsTable, "Opp. Close (Date)");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, priority = 1, groups = {"viewObjects", "attribute"})
+    @Test(dependsOnGroups = {"createProject"}, priority = 1, groups = {"viewObjects", "attribute"})
     public void viewAttributesTable() {
         viewSortObjectsTable(attributesTable, ObjectTypes.ATTRIBUTE, attributesList);
         List<String> filteredObjectsList = Arrays.asList("Day of Week (Mon-Sun) (Activity)",
@@ -50,7 +50,7 @@ public class GoodSalesManageObjectsTest extends ManageObjectsAbstractTest {
         checkObjectLinkInTable(attributesTable, "Day of Week (Mon-Sun) (Activity)");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, priority = 1, groups = {"viewObjetcs", "metric"})
+    @Test(dependsOnGroups = {"createProject"}, priority = 1, groups = {"viewObjetcs", "metric"})
     public void viewMetricsTable() {
         viewSortObjectsTable(metricsTable, ObjectTypes.METRIC, metricsList);
         Map<String, List<String>> taggedObjects = new HashMap<String, List<String>>();
@@ -63,7 +63,7 @@ public class GoodSalesManageObjectsTest extends ManageObjectsAbstractTest {
         checkObjectLinkInTable(metricsTable, "# of Opportunities [BOP]");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, priority = 1, groups = {"viewObjetcs", "variable"})
+    @Test(dependsOnGroups = {"createProject"}, priority = 1, groups = {"viewObjetcs", "variable"})
     public void viewVariablesTable() {
         openObjectsTable(variablesTable, ObjectTypes.VARIABLE);
         variablesTable.assertTableHeader();
@@ -79,41 +79,41 @@ public class GoodSalesManageObjectsTest extends ManageObjectsAbstractTest {
         checkObjectLinkInTable(variablesTable, "Status");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, priority = 1, groups = {"moveObjects", "fact"})
+    @Test(dependsOnGroups = {"createProject"}, priority = 1, groups = {"moveObjects", "fact"})
     public void moveFactsBetweenFolders() {
         List<String> movedObjects = Arrays.asList("Amount", "Days to Close", "Duration", "Probability", 
                 "Velocity", "Timeline (Date)");
         moveObjectsBetweenFolders(ObjectTypes.FACT, factsTable, movedObjects, "2", "Stage History");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, priority = 1, groups = {"moveObjects", "attribute"})
+    @Test(dependsOnGroups = {"createProject"}, priority = 1, groups = {"moveObjects", "attribute"})
     public void moveAttributesBetweenFolders() {
         List<String> movedObjects = Arrays.asList("Activity", "Priority", "Product", "Region");
         moveObjectsBetweenFolders(ObjectTypes.ATTRIBUTE, attributesTable, movedObjects, "2", "Activity");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, priority = 1, groups = {"moveObjects", "metric"})
+    @Test(dependsOnGroups = {"createProject"}, priority = 1, groups = {"moveObjects", "metric"})
     public void moveMetricsBetweenFolders() {
         List<String> movedObjects = Arrays.asList("Amount [BOP]", "Best Case [BOP]", "Probability [BOP]", 
                 "_Close [EOP]");
         moveObjectsBetweenFolders(ObjectTypes.METRIC, metricsTable, movedObjects, "2", "_System");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, priority = 2, groups = {"deleteObjects", "fact"})
+    @Test(dependsOnGroups = {"createProject"}, priority = 2, groups = {"deleteObjects", "fact"})
     public void deleteFacts() {
         List<String> deletedObjects = Arrays.asList("Amount", "Days to Close", "Duration", "Probability", 
                 "Velocity", "Timeline (Date)");
         deleteObjectsTable(factsTable, deletedObjects, factsList, ObjectTypes.FACT);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, priority = 2, groups = {"deleteObjects", "attribute"})
+    @Test(dependsOnGroups = {"createProject"}, priority = 2, groups = {"deleteObjects", "attribute"})
     public void deleteAttributes() {
         List<String> deletedObjects = Arrays.asList("Activity", "Department",
                 "Month of Quarter (Created)", "Priority", "Product", "Region");
         deleteObjectsTable(attributesTable, deletedObjects, attributesList, ObjectTypes.ATTRIBUTE);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, priority = 2, groups = {"deleteObjects", "metric"})
+    @Test(dependsOnGroups = {"createProject"}, priority = 2, groups = {"deleteObjects", "metric"})
     public void deleteMetrics() {
         List<String> deletedObjects = Arrays.asList("Amount [BOP]", "Best Case [BOP]", "Probability [BOP]", 
                 "_Close [EOP]");

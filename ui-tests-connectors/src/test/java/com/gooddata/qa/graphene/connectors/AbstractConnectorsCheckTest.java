@@ -19,7 +19,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.springframework.http.HttpStatus;
 import org.testng.ITestContext;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
@@ -51,8 +50,8 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
     @FindBy(tagName = "form")
     protected ConnectorFragment connector;
 
-    @BeforeClass(dependsOnMethods = {"loadRequiredProperties"})
-    public void initProperties() {
+    @Override
+    public void configureStartPage() {
         startPageContext = new StartPageContext() {
             
             @Override
@@ -80,7 +79,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
      * ------------- Shared test methods -----------
      */
 
-    @Test(groups = {"connectorInit"}, dependsOnMethods = {"createProject"})
+    @Test(groups = {"connectorInit"}, dependsOnGroups = {"createProject"})
     public void createIntegration() throws JSONException {
         // verify that connector resource exist
         openUrl(getConnectorUri());

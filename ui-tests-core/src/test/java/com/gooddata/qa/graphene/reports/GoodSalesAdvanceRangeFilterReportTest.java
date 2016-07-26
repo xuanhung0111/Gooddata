@@ -38,7 +38,7 @@ public class GoodSalesAdvanceRangeFilterReportTest extends GoodSalesAbstractTest
         projectTitle = "Advance-numeric-range-filter-report-test";
     }
 
-    @Test(dependsOnMethods = "createProject")
+    @Test(dependsOnGroups = "createProject")
     public void createReport() {
         createReport(new UiReportDefinition()
                 .withName(REPORT_NAME)
@@ -48,7 +48,7 @@ public class GoodSalesAdvanceRangeFilterReportTest extends GoodSalesAbstractTest
                 "Advance-numeric-range-filter-report");
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void addNewVariable() {
         initVariablePage();
         variablePage.createVariable(new AttributeVariable(VARIABLE_NAME)

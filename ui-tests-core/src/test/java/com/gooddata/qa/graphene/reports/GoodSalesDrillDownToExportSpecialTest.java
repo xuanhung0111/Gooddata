@@ -79,7 +79,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
         projectTitle = "GoodSales-drill-down-to-export-special-test";
     }
 
-    @Test(dependsOnMethods = { "createProject" })
+    @Test(dependsOnGroups = { "createProject" })
     public void testCreatingLargeReport() {
         initReportCreation().createReport(new UiReportDefinition()
                 .withName(TOO_LARGE_REPORT)
@@ -89,7 +89,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
                 "The created report is not large report type");
     }
 
-    @Test(dependsOnMethods = { "createProject" })
+    @Test(dependsOnGroups = { "createProject" })
     public void testCreatingIncomputableReport() {
         final String amountUri = getMdService().getObjUri(getProject(), Metric.class, title(METRIC_AMOUNT));
         final String activityUri = getMdService().getObj(getProject(), Attribute.class, title(ATTR_ACTIVITY))
@@ -105,7 +105,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
                 "The created report is not incomputable type");
     }
 
-    @Test(dependsOnMethods = { "createProject" })
+    @Test(dependsOnGroups = { "createProject" })
     public void testCreatingEmptyReport() {
         initReportCreation().createReport(new UiReportDefinition()
                 .withName(EMPTY_REPORT)
@@ -163,7 +163,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
         }
     }
 
-    @Test(dependsOnMethods = { "createProject" })
+    @Test(dependsOnGroups = { "createProject" })
     public void exportReportUsingRawFormat() throws JSONException, IOException {
         final String dashboard = "Dashboard-For-Export-Report-Using-Raw-Format";
         final String report = "Report-For-Export-Report-Using-Raw-Format";

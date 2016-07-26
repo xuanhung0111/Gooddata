@@ -6,7 +6,6 @@
 			<define name="auto_run_schedule">
 				<include name="autoRun" />
 				<include name="createProject" />
-				<include name="projectInit" />
 				<include name="arquillian" />
 			</define>
 			<run>

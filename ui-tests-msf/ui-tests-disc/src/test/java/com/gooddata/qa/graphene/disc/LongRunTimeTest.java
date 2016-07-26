@@ -26,7 +26,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
         projectTitle = "Disc-test-long-time-running-schedule";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"autoRun"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"autoRun"})
     public void checkScheduleAutoRun() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -45,7 +45,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"autoRun"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"autoRun"})
     public void checkErrorExecution() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -64,7 +64,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"autoRun"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"autoRun"})
     public void checkRetryExecution() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -90,7 +90,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"autoRun"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"autoRun"})
     public void checkStopAutoExecution() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -116,7 +116,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"autoRun"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"autoRun"})
     public void checkLongTimeExecution() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -135,7 +135,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"disabledSchedule"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"disabledSchedule"})
     public void disableSchedule() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -159,7 +159,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"repeatedFailures"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"repeatedFailures"})
     public void checkScheduleFailForManyTimes() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -190,7 +190,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"autoRun"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"autoRun"})
     public void checkScheduleTriggerByFailedSchedule() {
         try {
             String processName = "Check Schedule With Trigger Schedule";
@@ -210,7 +210,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"autoRun"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"autoRun"})
     public void checkMultipleScheduleTriggers() {
         try {
             String processName1 = "Check Schedule With Trigger Schedule 1";
@@ -241,7 +241,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"disabledSchedule"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"disabledSchedule"})
     public void checkDisableDependentSchedule() {
         try {
             String processName = "Check Schedule With Trigger Schedule";

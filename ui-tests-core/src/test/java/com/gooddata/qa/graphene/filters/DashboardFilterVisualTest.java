@@ -21,7 +21,7 @@ public class DashboardFilterVisualTest extends GoodSalesAbstractTest {
         projectTitle = "GoodSales-dashboard-filter-visual";
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testDoesNotDisplayOnlyAnchor() {
         List<FilterPanelRow> rows = getProductFilterInFirstTab().getPanel(AttributeFilterPanel.class)
                 .getRows();
@@ -37,7 +37,7 @@ public class DashboardFilterVisualTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testDisplaysOnlyAnchorOnHover() {
         List<FilterPanelRow> rows = getProductFilterInFirstTab().getPanel(AttributeFilterPanel.class)
                 .getRows();
@@ -53,7 +53,7 @@ public class DashboardFilterVisualTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testSelectOneValueOnSelectOnlyClick() {
         List<FilterPanelRow> rows = getProductFilterInFirstTab().getPanel(AttributeFilterPanel.class)
                 .getRows();
@@ -77,7 +77,7 @@ public class DashboardFilterVisualTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testSelectAllFiltered() {
         List<FilterPanelRow> rows = getProductFilterInFirstTab().getPanel(AttributeFilterPanel.class)
                 .deselectAll()
@@ -96,7 +96,7 @@ public class DashboardFilterVisualTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testAllValuesAreSelectedByDefault() {
         List<FilterPanelRow> rows = getProductFilterInFirstTab().getPanel(AttributeFilterPanel.class)
                 .getRows();
@@ -108,7 +108,7 @@ public class DashboardFilterVisualTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testDeselectAllValues() {
         List<FilterPanelRow> rows = getProductFilterInFirstTab().getPanel(AttributeFilterPanel.class)
                 .deselectAll()
@@ -121,7 +121,7 @@ public class DashboardFilterVisualTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testSelectAllValues() {
         List<FilterPanelRow> rows = getProductFilterInFirstTab().getPanel(AttributeFilterPanel.class)
                 .deselectAll()
@@ -135,7 +135,7 @@ public class DashboardFilterVisualTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testValuesAreFileteredCorrectly() {
         List<FilterPanelRow> rows = getProductFilterInFirstTab().getPanel(AttributeFilterPanel.class)
                 .search("on")

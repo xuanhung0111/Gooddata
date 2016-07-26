@@ -17,7 +17,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 
 public class ManageUserTest extends AbstractProjectTest {
 
-    @Test(dependsOnMethods = "createProject")
+    @Test(dependsOnGroups = "createProject")
     public void addNewUserToProject() throws ParseException, IOException, JSONException {
         addUserToProject(testParams.getViewerUser(), UserRoles.ADMIN);
 

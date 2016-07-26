@@ -49,7 +49,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
      * This test is to cover the following bug: "AQE-1028 - Get 500 Internal Error when creating
      * filtered variable with some attribute elements
      */
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkForFilteredVariable() {
         initVariablePage();
         variablePage.createVariable(new AttributeVariable("Test variable" + System.currentTimeMillis())
@@ -61,7 +61,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
      * This test is to cover the following bug:
      * "AQE-1029 - Cascading filter: get 400 bad request when opening list value of child filter"
      */
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkForCascadingFilter() {
         List<String> filteredValuesProduct =
                 asList("CompuSci", "Educationly", "Explorer", "Grammar Plus", "PhoenixSoft", "WonderKid");
@@ -102,7 +102,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
      * This test is to cover the following bug:
      * "AQE-1030 - Get 400 bad request when filtering by Date"
      */
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkTimeFilter() {
         String top5OpenByMoneyReport = "Top 5 Open (by $)";
         String top5WonByMoneyReport = "Top 5 Won (by $)";
@@ -137,7 +137,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
      * This test is to cover the following bug:
      * "AQE-1031 - Get 500 internal server error when going to dashboard content variable status"
      */
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkVariableFilterDashboard() throws ParseException, IOException, JSONException {
         String top5OpenByMoney = "Top 5 Open (by $)";
         UserManagementRestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), testParams.getEditorUser(),
@@ -172,7 +172,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
     }
 
     // This test is to cover the bug "AQE-1033 - Get 400 bad request when adding filter into report"
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkListElementsInReportFilter() {
         initReportsPage();
         createReport(new UiReportDefinition().withType(ReportTypes.TABLE)
@@ -203,7 +203,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
      * This test is to cover the bug
      * "AQE-1034 - Get 500 Internal Server Error when loading list element of attribute in analysis page"
      */
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkListElementsInChartReportFilter() {
         initReportsPage();
         createReport(new UiReportDefinition().withType(ReportTypes.FUNNEL)

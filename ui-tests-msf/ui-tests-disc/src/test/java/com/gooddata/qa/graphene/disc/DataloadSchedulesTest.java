@@ -58,7 +58,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
         getProcessService().removeProcess(getDataloadProcess().get());
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"dataloadSchedulesTest"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"dataloadSchedulesTest"})
     public void setUp() throws IOException, JSONException {
         prepareLDMAndADSInstance();
         setUpOutputStageAndCreateCloudConnectProcess();

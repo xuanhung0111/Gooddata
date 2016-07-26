@@ -57,7 +57,7 @@ public class ResetPasswordTest extends AbstractUITest {
 
     private ImapClient imapClient;
 
-    @Test(groups = {PROJECT_INIT_GROUP})
+    @Test
     public void init() {
         user = testParams.getUser();
         oldPassword = testParams.getPassword();
@@ -69,7 +69,7 @@ public class ResetPasswordTest extends AbstractUITest {
         imapClient = new ImapClient(imapHost, imapUser, imapPassword);
     }
 
-    @Test(dependsOnMethods = {"init"}, groups = {PROJECT_INIT_GROUP})
+    @Test(dependsOnMethods = {"init"})
     public void resetPasswordWithInvalidEmail() {
         assertEquals(initLostPasswordPage()
             .resetPassword(INVALID_EMAIL, false)
@@ -85,7 +85,7 @@ public class ResetPasswordTest extends AbstractUITest {
             .backToLoginPage();
     }
 
-    @Test(dependsOnMethods = {"resetPasswordWithInvalidEmail"}, groups = {PROJECT_INIT_GROUP})
+    @Test(dependsOnMethods = {"resetPasswordWithInvalidEmail"})
     public void resetWithValidAndInvalidPassword() throws MessagingException, IOException, JSONException {
         String resetPasswordLink = LoginFragment.getInstance(browser)
                 .openLostPasswordPage()

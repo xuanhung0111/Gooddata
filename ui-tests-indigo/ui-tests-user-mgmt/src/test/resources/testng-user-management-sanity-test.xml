@@ -7,11 +7,9 @@
                 <include name="sanity" />
                 <include name="initialize" />
                 <include name="createProject" />
-                <include name="projectInit" />
                 <include name="arquillian" />
             </run>
             <dependencies>
-                <group name="createProject" depends-on="projectInit" />
                 <group name="initialize" depends-on="createProject" />
             </dependencies>
         </groups>

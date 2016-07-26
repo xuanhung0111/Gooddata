@@ -26,7 +26,7 @@ import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadDialog;
 
 public class RefreshTest extends AbstractCsvUploaderTest {
 
-    @Test(dependsOnMethods = {"createProject"}, groups = "precondition")
+    @Test(dependsOnGroups = {"createProject"}, groups = "precondition")
     public void checkCsvUploadHappyPath() {
         assertTrue(uploadCsv(PAYROLL)
             .getStatus()

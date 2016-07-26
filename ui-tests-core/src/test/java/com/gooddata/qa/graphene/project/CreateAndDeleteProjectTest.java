@@ -31,7 +31,7 @@ public class CreateAndDeleteProjectTest extends AbstractProjectTest {
     private String invitedAdminUser;
     private String invitedAdminUserPassword;
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void initData() {
         fisrtProjectId = testParams.getProjectId();
         projectTitle = "Project-create-and-delete-test";

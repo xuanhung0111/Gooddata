@@ -63,7 +63,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
     private final static String REPORT_NOT_COMPUTABLE_MESSAGE = "Report not computable due to improper metric definition";
     private final static String DISPLAY_LABEL = "http://www.google.com";
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void setupProject() {
         final String stageNameUri = getMdService()
                 .getObj(getProject(), Attribute.class, title(ATTR_STAGE_NAME))
@@ -159,7 +159,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
         
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void manipulateWithOnlyAttributeReport() {
         initReportCreation().createReport(new UiReportDefinition()
                 .withName(REPORT_WITHOUT_METRIC)
@@ -172,7 +172,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
                 "Totals group is displayed");
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void drillAttributeToHyperlinkLabel() {
         final String hyperlinkReport = "Hyperlink-report";
         assertTrue(initAttributePage().initAttribute(ATTR_OPPORTUNITY).isDrillToExternalPage(),
@@ -219,7 +219,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
         assertTrue(table.getAttributesHeader().contains(ATTR_ACCOUNT), "The expected attribute is not displayed");
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void editHeadlineReport() throws ParseException, JSONException, IOException {
         final String headlineReport = "Headline-Report";
         final String metricName = "Simple-Metric";

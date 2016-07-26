@@ -30,7 +30,7 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
         projectTitle = "GoodSales-test-filter";
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createReportTest() {
         createReport(new UiReportDefinition().withName(REPORT_NAME)
                         .withWhats("Amount")
@@ -38,7 +38,7 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
                 "Simple filter report");
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createVariableTest() {
         initVariablePage();
         variablePage.createVariable(new AttributeVariable(VARIABLE_NAME)

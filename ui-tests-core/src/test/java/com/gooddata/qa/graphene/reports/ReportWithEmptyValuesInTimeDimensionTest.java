@@ -29,7 +29,7 @@ public class ReportWithEmptyValuesInTimeDimensionTest extends AbstractProjectTes
     private final static String BACHELORS_DEGREE = "Bachelors Degree";
     private final static String OF_ALL_ROWS = "of All Rows";
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void setupProject() {
         uploadCSV(ResourceUtils.getFilePathFromResource("/" + ResourceDirectory.PAYROLL_CSV + "/payroll_null_date.csv"));
         takeScreenshot(browser, "uploaded-payroll-file", getClass());

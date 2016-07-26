@@ -6,11 +6,9 @@
             <run>
                 <include name="non-UI-metric" />
                 <include name="createProject" />
-                <include name="projectInit" />
                 <include name="arquillian" />
             </run>
             <dependencies>
-                <group name="createProject" depends-on="projectInit" />
                 <group name="non-UI-metric" depends-on="createProject" />
             </dependencies>
         </groups>

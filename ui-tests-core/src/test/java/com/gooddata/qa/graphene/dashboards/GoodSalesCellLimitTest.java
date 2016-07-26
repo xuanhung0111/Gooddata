@@ -31,7 +31,7 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
         projectTitle = "GoodSales-" + TEST_CELL_LIMIT;
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createTestingReports() {
         initReportsPage();
         createReport(

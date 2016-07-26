@@ -65,7 +65,7 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
         projectTitle = "GoodSales-key-metric-test";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"init"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
     public void setupPrecondition() throws ParseException, JSONException, IOException {
         String productUri = getMdService().getObjUri(getProject(), Attribute.class, title(ATTR_PRODUCT));
         String variableUri = createFilterVariable(getRestApiClient(), testParams.getProjectId(), VARIABLE_NAME, productUri);

@@ -38,7 +38,7 @@ public class GoodSalesReportStatisticsTest extends GoodSalesAbstractTest {
 
     final static By SIDE_BAR_SELECTOR = By.className("s-sidebar-open");
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createSimpleReport() {
         final String amountUri = getMdService()
                 .getObjUri(getProject(), Metric.class, title(METRIC_AMOUNT));
@@ -84,7 +84,7 @@ public class GoodSalesReportStatisticsTest extends GoodSalesAbstractTest {
         checkReportUsage(new ReportUsage(scheduleEmailSubject, UsageLocation.SCHEDULE_EMAIL));
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void switchWideAndNarrowWorkspace() {
         final String largeReport = "Large-Report";
         final String opportunityUri = getMdService()

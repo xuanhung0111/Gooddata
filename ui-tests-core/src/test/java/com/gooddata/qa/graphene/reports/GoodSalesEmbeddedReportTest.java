@@ -66,7 +66,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         projectTitle = "GoodSales-embedded-report-test";
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createReportToShare() {
         createReport(new UiReportDefinition().withName(EMBEDDED_REPORT_TITLE)
                 .withHows(ATTR_STATUS).withWhats(METRIC_AMOUNT), "Report-To-Share");

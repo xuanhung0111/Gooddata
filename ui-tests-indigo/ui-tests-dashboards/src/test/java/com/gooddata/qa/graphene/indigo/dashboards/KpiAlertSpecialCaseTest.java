@@ -63,7 +63,7 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
         imapPassword = testParams.loadProperty("imap.password");
     }
 
-    @Test(dependsOnMethods = "createProject", groups = "precondition")
+    @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
     public void inviteUserToProject() throws ParseException, IOException, JSONException {
         addUserToProject(imapUser, UserRoles.ADMIN);
         logoutAndLoginAs(imapUser, imapPassword);

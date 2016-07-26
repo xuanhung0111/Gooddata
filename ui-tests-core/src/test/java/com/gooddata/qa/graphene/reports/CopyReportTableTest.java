@@ -52,7 +52,7 @@ public class CopyReportTableTest extends AbstractProjectTest {
         getClipboard().setContents(new StringSelection(""), null);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void uploadCsvFile() {
         uploadCSV(ResourceUtils.getFilePathFromResource("/" + ResourceDirectory.PAYROLL_CSV + "/payroll.csv"));
         takeScreenshot(browser, "uploaded-payroll-file", getClass());

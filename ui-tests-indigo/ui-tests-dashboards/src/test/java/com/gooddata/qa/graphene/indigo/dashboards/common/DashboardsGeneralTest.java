@@ -50,7 +50,7 @@ public abstract class DashboardsGeneralTest extends GoodSalesAbstractTest {
     }
 
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"dashboardsInit"})
     @Parameters({"windowSize"})
     public void initDashboardTests(@Optional("maximize") String windowSize) throws JSONException {
         adjustWindowSize(windowSize);

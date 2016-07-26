@@ -54,7 +54,7 @@ public class WalkmeTest extends AbstractUITest {
         put("You're ready.", "Go ahead. Start discovering the insights that await in your data!");
     }};
 
-    @Test(groups = PROJECT_INIT_GROUP)
+    @Test
     public void registerNewUser() throws ParseException, JSONException, IOException {
         deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), REGISTRATION_USER);
 
@@ -72,7 +72,7 @@ public class WalkmeTest extends AbstractUITest {
         waitForDashboardPageLoaded(browser);
     }
 
-    @Test(dependsOnGroups = PROJECT_INIT_GROUP)
+    @Test(dependsOnMethods = {"registerNewUser"})
     public void testWalkme() {
         testParams.setProjectId(getProjectId(GOODDATA_PRODUCT_TOUR_PROJECT));
 

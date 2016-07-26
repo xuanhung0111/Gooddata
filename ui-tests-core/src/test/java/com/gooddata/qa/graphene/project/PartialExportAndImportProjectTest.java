@@ -57,7 +57,7 @@ public class PartialExportAndImportProjectTest extends AbstractProjectTest {
         projectTemplate = PROJECT_TEMPLATE;
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void setUpProject() {
         sourceProjectId = testParams.getProjectId();
         targetProjectId = ProjectRestUtils.createProject(getGoodDataClient(),

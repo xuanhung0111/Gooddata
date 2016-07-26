@@ -148,25 +148,25 @@ public class NotificationsTest extends AbstractDISCTest {
         userProfileId = userProfileId.substring(userProfileId.lastIndexOf("/") + 1);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"notification"})
     public void prepareDataForSucessEvent() {
         openProjectDetailPage(testParams.getProjectId());
         deployInProjectDetailPage(DeployPackages.BASIC, SUCCESS_NOTIFICATION_TEST_PROCESS);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"notification"})
     public void prepareDataForFailureEvent() {
         openProjectDetailPage(testParams.getProjectId());
         deployInProjectDetailPage(DeployPackages.BASIC, FAILURE_NOTIFICATION_TEST_PROCESS);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"notification"})
     public void prepareDataForNotificationFormChecking() {
         openProjectDetailPage(testParams.getProjectId());
         deployInProjectDetailPage(DeployPackages.BASIC, NOTIFICATION_TEST_PROCESS);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"notification"})
     public void prepareDataForCustomEvent() {
         openProjectDetailPage(testParams.getProjectId());
         deployInProjectDetailPage(DeployPackages.CTL_EVENT, CUSTOM_NOTIFICATION_TEST_PROCESS);
@@ -404,7 +404,7 @@ public class NotificationsTest extends AbstractDISCTest {
         assertEquals(notificationRule.getAvailableParams(), failureNotificationParams);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"notification"})
     public void checkNotificationNumber() {
         String processName = "Check Notification Number";
         try {
@@ -477,7 +477,7 @@ public class NotificationsTest extends AbstractDISCTest {
         checkNotificationNumber(notificationNumber - 1, NOTIFICATION_TEST_PROCESS);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"notification"})
     public void checkEditNotification() throws MessagingException {
         openProjectDetailPage(testParams.getProjectId());
         String processName = "Check Edit Notification";
@@ -512,7 +512,7 @@ public class NotificationsTest extends AbstractDISCTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"notification"})
     public void checkCancelEditNotification() throws MessagingException {
         openProjectDetailPage(testParams.getProjectId());
         String processName = "Check Cancel Edit Notification";
@@ -555,7 +555,7 @@ public class NotificationsTest extends AbstractDISCTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"notification"})
     public void checkRepeatedDataLoadingFailureNotification()
             throws IOException, JSONException, MessagingException {
         try {
@@ -588,7 +588,7 @@ public class NotificationsTest extends AbstractDISCTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"notification"})
     public void checkEmptyStateNotificationList() {
         openProjectDetailPage(testParams.getProjectId());
         String processName = "Check Empty State Notification List";
