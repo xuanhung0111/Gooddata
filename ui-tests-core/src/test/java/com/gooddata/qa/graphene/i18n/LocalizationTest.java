@@ -24,6 +24,7 @@ public class LocalizationTest extends AbstractUITest {
             @Override
             public void waitForStartPageLoaded() {
                 // no need to wait projects page because it will be redirected to login page
+                waitForFragmentVisible(loginFragment);
             }
 
             @Override
@@ -40,26 +41,24 @@ public class LocalizationTest extends AbstractUITest {
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"entry-point"})
     public void verifyLoginPage() {
-        waitForFragmentVisible(loginFragment);
         checkLocalization(browser);
     }
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"entry-point"})
     public void verifyRegistrationPage() {
-        waitForFragmentVisible(loginFragment).openRegistrationPage();
+        loginFragment.openRegistrationPage();
         waitForFragmentVisible(registrationPage);
         checkLocalization(browser);
     }
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"entry-point"})
     public void verifyResetPasswordPage() {
-        waitForFragmentVisible(loginFragment).openLostPasswordPage();
+        loginFragment.openLostPasswordPage();
         checkLocalization(browser);
     }
 
     @Test(dependsOnGroups = {"entry-point"}, alwaysRun = true)
     public void login() throws JSONException {
-        waitForFragmentVisible(loginFragment);
         signIn(false, UserRoles.ADMIN);
     }
 
