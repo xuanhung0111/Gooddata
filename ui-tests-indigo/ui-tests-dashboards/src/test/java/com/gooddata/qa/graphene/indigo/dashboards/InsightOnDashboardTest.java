@@ -110,7 +110,7 @@ public class InsightOnDashboardTest extends DashboardsTest {
         try {
             initAnalysePage();
             assertTrue(browser.getCurrentUrl().contains("/reportId/edit"), "AD page is not loaded");
-            checkInsightRender(initIndigoDashboardsPage().waitForAllInsightWidgetContentLoaded().getLastVisualization(),
+            checkInsightRender(initIndigoDashboardsPageWithWidgets().waitForAllInsightWidgetContentLoaded().getLastVisualization(),
                     TEST_INSIGHT, 4);
         } finally {
             deleteAnalyticalDashboard(getRestApiClient(), dashboardUri);
@@ -128,26 +128,33 @@ public class InsightOnDashboardTest extends DashboardsTest {
                                 TEST_INSIGHT
                         )
                 ));
-        final String expectedInsightTitle = initIndigoDashboardsPage()
-                .waitForAllInsightWidgetContentLoaded()
-                .getLastVisualization()
-                .getHeadline();
+
         try {
-            takeScreenshot(browser, "testInsightTitleOnDashboardAfterRenamedInAD-before", getClass());
+            initIndigoDashboardsPageWithWidgets().waitForAllInsightWidgetContentLoaded();
+            takeScreenshot(browser, "testInsightTitleOnDashboardAfterRenamedInAD-beforeRename", getClass());
 
-            initAnalysePage().openInsight(expectedInsightTitle).setInsightTitle(RENAMED_TEST_INSIGHT).saveInsight();
-
-            String actualInsightTitle = initIndigoDashboardsPage()
+            initAnalysePage().openInsight(TEST_INSIGHT).setInsightTitle(RENAMED_TEST_INSIGHT).saveInsight();
+            String insightInsertedBeforeRenameTitle = initIndigoDashboardsPageWithWidgets()
                 .waitForAllInsightWidgetContentLoaded()
                 .getLastVisualization()
                 .getHeadline();
 
-            takeScreenshot(browser, "testInsightTitleOnDashboardAfterRenamedInAD-after", getClass());
+            takeScreenshot(browser, "testInsightTitleOnDashboardAfterRenamedInAD-afterRename", getClass());
+            assertEquals(insightInsertedBeforeRenameTitle, TEST_INSIGHT);
 
-            assertEquals(actualInsightTitle, expectedInsightTitle);
+            boolean insightListItemTitleFound = indigoDashboardsPage.switchToEditMode().searchInsight(RENAMED_TEST_INSIGHT);
+
+            takeScreenshot(browser, "testInsightTitleOnDashboardAfterRenamedInAD-afterRename-insightFound", getClass());
+            assertTrue(insightListItemTitleFound);
+
+            indigoDashboardsPage.addInsightToLastPosition(RENAMED_TEST_INSIGHT);
+            String insightInsertedAfterRenameTitle = indigoDashboardsPage.getLastVisualization().getHeadline();
+
+            takeScreenshot(browser, "testInsightTitleOnDashboardAfterRenamedInAD-afterRename-insightInsertedAfterRename", getClass());
+            assertEquals(insightInsertedAfterRenameTitle, RENAMED_TEST_INSIGHT);
         } finally {
             deleteAnalyticalDashboard(getRestApiClient(), dashboardUri);
-            initAnalysePage().openInsight(RENAMED_TEST_INSIGHT).setInsightTitle(expectedInsightTitle).saveInsight();
+            initAnalysePage().openInsight(RENAMED_TEST_INSIGHT).setInsightTitle(TEST_INSIGHT).saveInsight();
         }
     }
 
