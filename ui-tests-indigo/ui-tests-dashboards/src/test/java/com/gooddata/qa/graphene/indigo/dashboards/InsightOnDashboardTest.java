@@ -141,16 +141,34 @@ public class InsightOnDashboardTest extends DashboardsTest {
 
             takeScreenshot(browser, "testInsightTitleOnDashboardAfterRenamedInAD-afterRename", getClass());
             assertEquals(insightInsertedBeforeRenameTitle, TEST_INSIGHT);
+        } finally {
+            deleteAnalyticalDashboard(getRestApiClient(), dashboardUri);
+            initAnalysePage().openInsight(RENAMED_TEST_INSIGHT).setInsightTitle(TEST_INSIGHT).saveInsight();
+        }
+    }
 
-            boolean insightListItemTitleFound = indigoDashboardsPage.switchToEditMode().searchInsight(RENAMED_TEST_INSIGHT);
+    @Test(dependsOnGroups = { "dashboardsInit", "createInsight" })
+    public void testInsightTitleOnDashboardAddedAfterRename() throws JSONException, IOException {
+        final String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
+                singletonList(
+                        createVisualizationWidgetWrap(
+                                getRestApiClient(),
+                                testParams.getProjectId(),
+                                getInsightUri(TEST_INSIGHT, getRestApiClient(), testParams.getProjectId()),
+                                TEST_INSIGHT
+                        )
+                ));
 
-            takeScreenshot(browser, "testInsightTitleOnDashboardAfterRenamedInAD-afterRename-insightFound", getClass());
-            assertTrue(insightListItemTitleFound);
+        try {
+            initAnalysePage().openInsight(TEST_INSIGHT).setInsightTitle(RENAMED_TEST_INSIGHT).saveInsight();
+            String insightInsertedAfterRenameTitle = initIndigoDashboardsPageWithWidgets()
+                .waitForAllInsightWidgetContentLoaded()
+                .switchToEditMode()
+                .addInsightToLastPosition(RENAMED_TEST_INSIGHT)
+                .getLastVisualization()
+                .getHeadline();
 
-            indigoDashboardsPage.addInsightToLastPosition(RENAMED_TEST_INSIGHT);
-            String insightInsertedAfterRenameTitle = indigoDashboardsPage.getLastVisualization().getHeadline();
-
-            takeScreenshot(browser, "testInsightTitleOnDashboardAfterRenamedInAD-afterRename-insightInsertedAfterRename", getClass());
+            takeScreenshot(browser, "testInsightTitleOnDashboardAddedAfterRename", getClass());
             assertEquals(insightInsertedAfterRenameTitle, RENAMED_TEST_INSIGHT);
         } finally {
             deleteAnalyticalDashboard(getRestApiClient(), dashboardUri);
