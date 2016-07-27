@@ -192,7 +192,8 @@ public class InsightOnDashboardTest extends DashboardsTest {
     @Test(dependsOnMethods = { "testCreatingInsightsForFilterTest" })
     public void testInsightListWithCreatedByMeFilter() {
         initIndigoDashboardsPage().getSplashScreen().startEditingWidgets();
-        final List<InsightItem> insights = indigoDashboardsPage.getInsightSelectionPanel().getInsightItems();
+        final List<InsightItem> insights = indigoDashboardsPage.getInsightSelectionPanel()
+                .waitForInsightListVisible().getInsightItems();
         takeScreenshot(browser, "Test-Insight-List-With-Created-By-Me-Filter", getClass());
         assertTrue(insights.stream().anyMatch(e -> INSIGHT_CREATED_BY_MAIN_USER.equals(e.getName())),
                 INSIGHT_CREATED_BY_MAIN_USER + " does not exist on result list");
