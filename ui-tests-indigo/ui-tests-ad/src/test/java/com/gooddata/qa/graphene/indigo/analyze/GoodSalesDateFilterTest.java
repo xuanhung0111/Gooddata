@@ -2,7 +2,9 @@ package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -27,9 +29,12 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.browser.BrowserUtils;
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter;
 import com.google.common.base.Predicate;
@@ -226,6 +231,54 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
         } finally {
             BrowserUtils.switchToFirstTab(browser);
         }
+    }
+
+    @Test(dependsOnGroups = {"init"},
+            description = "CL-9980: Date filter isn't remained when adding trending from recommendation panel")
+    public void keepDateDimensionAfterApplyingSeeTrendRecommendation() {
+        final String newDateDimension = "Created";
+        analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT).addDateFilter().getFilterBuckets()
+                .changeDateDimension("Closed", newDateDimension);
+
+        assertTrue(analysisPage.waitForReportComputing().getFilterBuckets().getDateFilterText()
+                .startsWith(newDateDimension), "Date dimension was not changed to " + newDateDimension);
+
+        Graphene.createPageFragment(RecommendationContainer.class,
+                waitForElementVisible(RecommendationContainer.LOCATOR, browser))
+                .getRecommendation(RecommendationStep.SEE_TREND).apply();
+
+        analysisPage.waitForReportComputing();
+        takeScreenshot(browser, "keep-date-dimension-after-applying-seetrend-recommendation", getClass());
+        assertTrue(analysisPage.getFilterBuckets().getDateFilterText().startsWith(newDateDimension),
+                "Date dimension was changed after user applied see trend recommendation");
+    }
+
+    @Test(dependsOnGroups = {"init"},
+            description = "CL-9955: Date is changed to unrelated when adding percent for viz")
+    public void keepDateRelationAfterAddingPercent() {
+        final String expectedDate = "Closed: This quarter";
+        analysisPage.addMetric(ATTR_STAGE_NAME, FieldType.ATTRIBUTE).addAttribute(ATTR_STAGE_NAME)
+                .waitForReportComputing();
+
+        RecommendationContainer recommendationContainer =
+                Graphene.createPageFragment(RecommendationContainer.class,
+                        waitForElementVisible(RecommendationContainer.LOCATOR, browser));
+        recommendationContainer.getRecommendation(RecommendationStep.COMPARE).apply();
+        analysisPage.waitForReportComputing();
+        assertEquals(analysisPage.getFilterBuckets().getDateFilterText(), expectedDate,
+                "Date was not displayed after applying compare recommendation");
+
+        recommendationContainer.getRecommendation(RecommendationStep.SEE_PERCENTS).apply();
+        analysisPage.waitForReportComputing();
+
+        assertTrue(
+                analysisPage.getMetricsBucket().getMetricConfiguration("% Count of " + ATTR_STAGE_NAME)
+                        .expandConfiguration().isShowPercentSelected(),
+                "Percent was not added after using see percent recommendation");
+
+        takeScreenshot(browser, "keep-date-relation-after-adding-percent", getClass());
+        assertEquals(analysisPage.getFilterBuckets().getDateFilterText(), expectedDate,
+                "Date has been changed after adding percent");
     }
 
     private String getTimeString(Calendar date) {

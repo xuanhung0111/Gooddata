@@ -1,9 +1,12 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.UPLOAD_CSV;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForStringInUrl;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.testng.Assert.assertEquals;
@@ -32,11 +35,16 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
     private static final String QUOTES_CSV_PATH = "/quotes/quotes.csv";
     private static final String UPLOAD_INFO_PATH = "/quotes/upload_info.json";
     private static final String PAYROLL_CSV_PATH = "/" + UPLOAD_CSV + "/payroll.csv";
+    private static final String GEO_CHART_CSV_PATH = "/" + UPLOAD_CSV + "/geo_chart.csv";
 
     private static final String PRODUCTION_DATASET = "Production data";
     private static final String PAYROLL_DATASET = "Payroll";
+    private static final String GEO_CHART_DATASET = "Geo Chart";
 
     private static final String AMOUNT = "Amount";
+    private static final String HIGH_PRICE = "High Price";
+    private static final String MARKET = "Market";
+    
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -113,6 +121,46 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
         takeScreenshot(browser, "searchDataAfterSelectDataset - search in payroll data", getClass());
         assertTrue(cataloguePanel.search("County"));
         assertFalse(cataloguePanel.search("Id"));
+    }
+
+    @Test(dependsOnGroups = {"init"},
+            description = "CL-9815: Filter for metric is undefined after switching dataset")
+    public void addMetricFilterAfterSwitchingDataset() {
+        analysisPage.addMetric(HIGH_PRICE, FieldType.FACT).addAttribute(MARKET).waitForReportComputing();
+
+        analysisPage.getCataloguePanel().changeDataset(PAYROLL_DATASET);
+        analysisPage.removeAttribute(MARKET)
+                .addMetric(AMOUNT, FieldType.FACT)
+                .getMetricsBucket()
+                .getMetricConfiguration("Sum of " + AMOUNT)
+                .expandConfiguration()
+                .addFilter("Education", "Bachelors Degree", "Partial High School");
+        analysisPage.waitForReportComputing();
+        takeScreenshot(browser, "add-metric-filter-after-switching-dataset", getClass());
+        assertEquals(analysisPage.getChartReport().getDataLabels(), asList("171,741.48", "2,553,804.79"),
+                "Metric filter was not applied");
+    }
+
+    @Test(dependsOnGroups = {"init"},
+            description = "CL-9957: Get error when working on viz containing unrelated date")
+    public void showPercentOnInsightContainingUnrelatedDate() {
+        //need a dataset containing no date
+        uploadCSV(getFilePathFromResource(GEO_CHART_CSV_PATH));
+        takeScreenshot(browser, "uploaded-geochart", getClass());
+
+        initAnalysePage().addMetric(HIGH_PRICE, FieldType.FACT)
+                .addDate()
+                .waitForReportComputing()
+                .getCataloguePanel()
+                .changeDataset(GEO_CHART_DATASET);
+
+        //ensure working dataset is geo_chart before adding percent to chart
+        waitForStringInUrl("csv_geo_chart");
+        analysisPage.getMetricsBucket().getMetricConfiguration("Sum of " + HIGH_PRICE).expandConfiguration()
+                .showPercents();
+        analysisPage.waitForReportComputing();
+        takeScreenshot(browser, "show-percent-on-insight-containing-unrelated-date", getClass());
+        assertEquals(analysisPage.getChartReport().getDataLabels(), singletonList("100.00%"));
     }
 
     private void setupProductionData() throws JSONException, URISyntaxException, IOException {
