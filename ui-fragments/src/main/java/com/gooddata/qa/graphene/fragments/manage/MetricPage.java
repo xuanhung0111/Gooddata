@@ -30,20 +30,20 @@ public class MetricPage extends AbstractFragment {
     @FindBy(xpath = "//a[@class='interpolateProject']")
     private WebElement dataLink;
 
-    public void createShareMetric(String metricName, String usedMetric, String attrFolder, String attr) {
+    public void createShareMetric(String metricName, String usedMetric, String attr) {
         openMetricEditor();
         Graphene.createPageFragment(MetricEditorDialog.class,
                 waitForElementVisible(MetricEditorDialog.LOCATOR, browser))
-            .createShareMetric(metricName, usedMetric, attrFolder, attr);
+            .createShareMetric(metricName, usedMetric, attr);
         backToMetricsTable();
     }
 
-    public void createDifferentMetric(String metricName, String usedMetric, String attrFolder, String attr,
+    public void createDifferentMetric(String metricName, String usedMetric, String attr,
             String attrValue) {
         openMetricEditor();
         Graphene.createPageFragment(MetricEditorDialog.class,
                 waitForElementVisible(MetricEditorDialog.LOCATOR, browser))
-            .createDifferentMetric(metricName, usedMetric, attrFolder, attr, attrValue);
+            .createDifferentMetric(metricName, usedMetric, attr, attrValue);
         backToMetricsTable();
     }
 

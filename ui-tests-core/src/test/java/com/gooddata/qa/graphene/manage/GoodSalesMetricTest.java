@@ -1,10 +1,7 @@
 package com.gooddata.qa.graphene.manage;
 
-import static com.gooddata.qa.graphene.entity.metric.CustomMetricUI.buildAttribute;
 import static com.gooddata.qa.graphene.entity.metric.CustomMetricUI.buildAttributeValue;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_DIMENSION_CLOSE;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_DIMENSION_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_MONTH_YEAR_SNAPSHOT;
@@ -30,7 +27,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPE
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPPORTUNITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON_OPPS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PROBABILITY;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_REMAINING_QUOTA;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_VELOCITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_WIN_RATE;
@@ -101,7 +97,6 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     private static final String YEAR_2011 = "2011";
     private static final String YEAR_2012 = "2012";
 
-    private static final String STAGE = "Stage";
     private static final String NEGATIVE = "negative";
     private static final String NULL_METRIC = "null-metric";
 
@@ -136,8 +131,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     public void createShareMetric() {
         initMetricPage();
         String metricName = "Share % " + getCurrentDateString();
-        waitForFragmentVisible(metricPage).createShareMetric(metricName, METRIC_AMOUNT, ATTR_DATE_DIMENSION_SNAPSHOT,
-                ATTR_YEAR_SNAPSHOT);
+        waitForFragmentVisible(metricPage).createShareMetric(metricName, METRIC_AMOUNT, ATTR_YEAR_SNAPSHOT);
 
         String expectedMaql =
                 "SELECT " + METRIC_AMOUNT + " / (SELECT " + METRIC_AMOUNT + " BY " + ATTR_YEAR_SNAPSHOT + ", ALL OTHER WITHOUT PF)";
@@ -152,8 +146,8 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     public void createDifferentMetricTest() {
         initMetricPage();
         String metricName = "Difference " + getCurrentDateString();
-        waitForFragmentVisible(metricPage).createDifferentMetric(metricName, METRIC_AMOUNT,
-                ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT, YEAR_2010);
+        waitForFragmentVisible(metricPage).createDifferentMetric(metricName, METRIC_AMOUNT, ATTR_YEAR_SNAPSHOT,
+                YEAR_2010);
 
         String expectedMaql =
                 "SELECT " + METRIC_AMOUNT + " - (SELECT " + METRIC_AMOUNT + " BY ALL " + ATTR_YEAR_SNAPSHOT + " WHERE "
@@ -183,9 +177,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"}, groups = {"aggregation-metric"})
     public void createAggregationMetricTest() {
         CustomMetricUI customMetricInfo = new CustomMetricUI()
-            .withAttributes(
-                buildAttribute(STAGE, ATTR_STAGE_NAME),
-                buildAttribute(ATTR_STAGE_HISTORY, ATTR_STAGE_HISTORY));
+            .withAttributes(ATTR_STAGE_NAME, ATTR_STAGE_HISTORY);
 
         for (MetricTypes metric : MetricTypes.values()) {
             if (!metric.getType().equalsIgnoreCase(AGGREGATION)) {
@@ -264,7 +256,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                 customMetricInfo.withMetrics(METRIC_WIN_RATE);
 
             } else if (metric == MetricTypes.SIGN) {
-                customMetricInfo.withMetrics(METRIC_REMAINING_QUOTA);
+                customMetricInfo.withMetrics(METRIC_LOST);
 
             } else {
                 customMetricInfo.withMetrics(METRIC_BEST_CASE);
@@ -308,15 +300,15 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
             if (metric.in(asList(MetricTypes.FOR_PREVIOUS, MetricTypes.FOR_NEXT_PERIOD,
                     MetricTypes.FOR_PREVIOUS_PERIOD))) {
                 customMetricInfo.withMetrics(METRIC_NUMBER_OF_OPEN_OPPS)
-                    .withAttributes(buildAttribute(ATTR_DATE_DIMENSION_CLOSE, ATTR_YEAR_CLOSE));
+                    .withAttributes(ATTR_YEAR_CLOSE);
 
             } else if (metric == MetricTypes.WITHIN) {
                 customMetricInfo.withMetrics(METRIC_AVG_AMOUNT)
-                .withAttributes(buildAttribute(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT));
+                .withAttributes(ATTR_YEAR_SNAPSHOT);
 
             } else {
                 customMetricInfo.withMetrics(METRIC_AMOUNT, METRIC_NUMBER_OF_WON_OPPS)
-                    .withAttributes(buildAttribute(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT));
+                    .withAttributes(ATTR_YEAR_SNAPSHOT);
                 if (metric.in(asList(MetricTypes.FOR_NEXT, MetricTypes.BY_ALL_EXCEPT))) {
                     customMetricInfo.withMetrics(METRIC_AMOUNT);
                 }
@@ -370,9 +362,8 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
             initMetricPage();
             customMetricInfo.withName(metric + " " + getCurrentDateString())
-                .withAttributeValues(buildAttributeValue(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT,
-                        YEAR_2011))
-                .withAttributes(buildAttribute(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT));
+                .withAttributeValues(buildAttributeValue(ATTR_YEAR_SNAPSHOT, YEAR_2011))
+                .withAttributes(ATTR_YEAR_SNAPSHOT);
 
             if (metric == MetricTypes.CASE) {
                 customMetricInfo.withMetrics(METRIC_LOST, METRIC_WON, METRIC_LOST, METRIC_WON);
@@ -384,9 +375,8 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                 customMetricInfo.withMetrics(METRIC_NUMBER_OF_OPEN_OPPS);
                 if (metric.in(asList(MetricTypes.AND, MetricTypes.OR))) {
                     customMetricInfo.addMoreAttributeValues(
-                            buildAttributeValue(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_MONTH_YEAR_SNAPSHOT,
-                                    "May 2011"))
-                        .addMoreAttributes(buildAttribute(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_MONTH_YEAR_SNAPSHOT));
+                            buildAttributeValue(ATTR_MONTH_YEAR_SNAPSHOT, "May 2011"))
+                        .addMoreAttributes(ATTR_MONTH_YEAR_SNAPSHOT);
                 }
             }
 
@@ -421,27 +411,27 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
             initMetricPage();
             customMetricInfo.withName(metric + " " + getCurrentDateString())
-                .withAttributes(buildAttribute(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT))
+                .withAttributes(ATTR_YEAR_SNAPSHOT)
                 .withMetrics(METRIC_NUMBER_OF_OPEN_OPPS);
 
             if (metric.in(asList(MetricTypes.LESS, MetricTypes.LESS_OR_EQUAL))) {
                 customMetricInfo.withAttributeValues(
-                        buildAttributeValue(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT, YEAR_2011));
+                        buildAttributeValue(ATTR_YEAR_SNAPSHOT, YEAR_2011));
 
             } else if (metric.in(asList(MetricTypes.TOP, MetricTypes.BOTTOM))) {
                 customMetricInfo.addMoreMetrics(METRIC_AMOUNT);
 
             } else if (metric == MetricTypes.BETWEEN) {
                 customMetricInfo.withAttributeValues(
-                        buildAttributeValue(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT, YEAR_2010),
-                        buildAttributeValue(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT, YEAR_2012));
+                        buildAttributeValue(ATTR_YEAR_SNAPSHOT, YEAR_2010),
+                        buildAttributeValue(ATTR_YEAR_SNAPSHOT, YEAR_2012));
 
             } else {
                 customMetricInfo.withAttributeValues(
-                        buildAttributeValue(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT, YEAR_2010));
+                        buildAttributeValue(ATTR_YEAR_SNAPSHOT, YEAR_2010));
                 if (metric.in(asList(MetricTypes.NOT_BETWEEN, MetricTypes.IN, MetricTypes.NOT_IN))) {
                     customMetricInfo.addMoreAttributeValues(
-                            buildAttributeValue(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT, YEAR_2011));
+                            buildAttributeValue(ATTR_YEAR_SNAPSHOT, YEAR_2011));
                 }
                 if (metric == MetricTypes.WITHOUT_PF) {
                     customMetricInfo.addMoreMetrics(METRIC_AMOUNT);
@@ -811,10 +801,10 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     public void createInvalidMetric() {
         CustomMetricUI customMetricInfo = new CustomMetricUI().withName("WRONG METRIC WITH BETWEEN")
                 .withMetrics(METRIC_NUMBER_OF_OPEN_OPPS)
-                .withAttributes(buildAttribute(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT))
+                .withAttributes(ATTR_YEAR_SNAPSHOT)
                 .withAttributeValues(
-                        buildAttributeValue(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT, YEAR_2012),
-                        buildAttributeValue(ATTR_DATE_DIMENSION_SNAPSHOT, ATTR_YEAR_SNAPSHOT, YEAR_2010));
+                        buildAttributeValue(ATTR_YEAR_SNAPSHOT, YEAR_2012),
+                        buildAttributeValue(ATTR_YEAR_SNAPSHOT, YEAR_2010));
         initMetricPage();
         createCustomMetric(customMetricInfo, MetricTypes.BETWEEN, FILTER);
 
@@ -1023,7 +1013,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
             case TRUNC:
                 return asList(5319697f, 4363972f, 20255220f, 1670164f, 1198603f, 3036473f);
             case SIGN:
-                return asList(1f, -1f, -1f, -1f, -1f, -1f, -1f, -1f, -1f);
+                return asList(1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f);
             case SQRT:
                 return asList(2306.45f, 2089.01f, 4500.58f, 1292.35f, 1094.81f, 1742.55f);
             case SUBTRACTION:

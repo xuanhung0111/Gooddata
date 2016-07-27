@@ -600,8 +600,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     private String createMetricUsing(AttributeInfo attribute) {
         String name = "Metric " + System.currentTimeMillis();
         initMetricPage();
-        metricPage.createDifferentMetric(name, WIN_RATE_METRIC, attribute.dataset, attribute.name,
-                attribute.elements[0].name);
+        metricPage.createDifferentMetric(name, WIN_RATE_METRIC, attribute.name, attribute.elements[0].name);
 
         return name;
     }

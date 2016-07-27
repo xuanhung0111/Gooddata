@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.entity.metric;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -100,34 +99,21 @@ public class CustomMetricUI {
         }
 
         for(String attr : attributes) {
-            maqlTemplate = maqlTemplate.replaceFirst("__attr__", extractAttribute(attr).getRight());
+            maqlTemplate = maqlTemplate.replaceFirst("__attr__", attr);
         }
 
         for(String value : attributeValues) {
-            maqlTemplate = maqlTemplate.replaceFirst("__attrValue__", extractAttributeValue(value).get(2));
+            maqlTemplate = maqlTemplate.replaceFirst("__attrValue__", extractAttributeValue(value).getRight());
         }
         return maqlTemplate;
     }
 
-    public static String buildAttribute(String folder, String attribute) {
-        return format("%s > %s", folder, attribute);
+    public static String buildAttributeValue(String attribute, String value) {
+        return format("%s > %s", attribute, value);
     }
 
-    public static Pair<String, String> extractAttribute(String attribute) {
-        String[] parts = attribute.split(">");
-        return Pair.of(parts[0].trim(), parts[1].trim());
-    }
-
-    public static String buildAttributeValue(String folder, String attribute, String value) {
-        return format("%s > %s > %s", folder, attribute, value);
-    }
-
-    public static List<String> extractAttributeValue(String value) {
+    public static Pair<String, String> extractAttributeValue(String value) {
         String[] parts = value.split(">");
-        List<String> ret = new ArrayList<String>();
-        for (String part : parts) {
-            ret.add(part.trim());
-        }
-        return ret;
+        return Pair.of(parts[0].trim(), parts[1].trim());
     }
 }
