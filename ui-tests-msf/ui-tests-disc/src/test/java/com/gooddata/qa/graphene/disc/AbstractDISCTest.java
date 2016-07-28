@@ -61,6 +61,15 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
         assertDeployedProcessInProjects(processName, deployPackage, projectIds);
     }
 
+    protected String deployRubyGitStoreInProjectDetailPage(String rubyGitPath, String processName) {
+        waitForElementVisible(projectDetailPage.getRoot());
+        projectDetailPage.clickOnDeployProcessButton();
+        deployForm.deployProcess(rubyGitPath, processName);
+        waitForFragmentNotVisible(deployForm);
+        assertFalse(projectDetailPage.isErrorDialogVisible(), "An error is shown!");
+        return browser.getCurrentUrl();
+    }
+
     protected String deployInProjectDetailPage(DeployPackages deployPackage, String processName) {
         String processUrl = null;
         waitForElementVisible(projectDetailPage.getRoot());

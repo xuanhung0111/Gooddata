@@ -26,11 +26,26 @@ public class DeployForm extends AbstractFragment {
     @FindBy(css = "div.select-zip>div>input")
     private WebElement zipFileInput;
 
-    @FindBy(css = "div.deploy-process-dialog-area>div.whole-line-text>input")
+    @FindBy(css = ".deploy-process-dialog-area h3:last-of-type + * input")
     private WebElement processNameInput;
 
     @FindBy(css = "div.deploy-process-button-area button.button-positive")
     private WebElement deployConfirmButton;
+
+    @FindBy(css = ".git-radio input")
+    private WebElement gitChoice;
+
+    @FindBy(css = "input[placeholder]")
+    private WebElement gitInput;
+
+    public void deployProcess(String gitRubyPath, String processName) {
+        waitForElementVisible(getRoot());
+        waitForElementVisible(gitChoice).click();
+        setGitPath(gitRubyPath);
+        setProcessName(processName);
+        waitForElementVisible(deployConfirmButton).click();
+        System.out.println("Deploy progress is finished!");
+    }
 
     public void deployProcess(String zipFile, ProcessTypes processType, String processName) {
         tryToDeployProcess(zipFile, processType, processName);
@@ -72,6 +87,10 @@ public class DeployForm extends AbstractFragment {
                 .contains("has-error");
     }
 
+    public boolean isGitStoreError() {
+        return waitForElementVisible(gitInput).getAttribute("class").contains("has-error");
+    }
+
     public boolean inputProcessNameHasError() {
         return waitForElementVisible(processNameInput).getAttribute("class").contains("has-error");
     }
@@ -93,6 +112,11 @@ public class DeployForm extends AbstractFragment {
     private void setProcessName(String processName) {
         processNameInput.clear();
         processNameInput.sendKeys(processName);
+    }
+
+    private void setGitPath(String gitPath) {
+        waitForElementVisible(gitInput).clear();
+        gitInput.sendKeys(gitPath);
     }
 
     private WebElement getProcessName() {
