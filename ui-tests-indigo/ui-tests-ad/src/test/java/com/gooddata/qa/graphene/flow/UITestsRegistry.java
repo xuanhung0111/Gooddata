@@ -31,6 +31,7 @@ import com.gooddata.qa.graphene.indigo.analyze.GoodSalesVisualizationTest;
 import com.gooddata.qa.graphene.indigo.analyze.MultipleDatasetsTest;
 import com.gooddata.qa.graphene.indigo.analyze.NonProductionDatasetInsightTest;
 import com.gooddata.qa.graphene.indigo.analyze.SpecialCasesTest;
+import com.gooddata.qa.graphene.indigo.analyze.WalkmeOnEmbeddedAdTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.AttributeBasedMetricsTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.AttributeFiltersTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.BucketsTest;
@@ -102,9 +103,11 @@ public class UITestsRegistry {
                     AnalyticalDesignerSanityTest.class,
                     NonProductionDatasetInsightTest.class,
                     GoodSalesNotRenderedInsightTest.class,
+                    WalkmeOnEmbeddedAdTest.class,
                     "testng-ad-permissions-MetricVisibility.xml",
                     "testng-ad-permissions-ProjectNavigation.xml",
                     "testng-ad-permissions-InsightTest.xml",
+                    "testng-ad-permissions-EmbeddedAd.xml",
                     "testng-ad-ChartLabelFormat.xml",
                     "testng-ad-MetricNumberFormat.xml"
                 ));

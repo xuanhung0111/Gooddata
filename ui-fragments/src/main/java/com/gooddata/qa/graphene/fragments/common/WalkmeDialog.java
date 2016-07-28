@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.common;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
@@ -54,6 +55,10 @@ public class WalkmeDialog extends AbstractFragment {
 
     public boolean canFinish() {
         return isElementVisible(BY_DONE_BUTTON, getRoot());
+    }
+
+    public static boolean isPresent(final SearchContext context) {
+        return isElementPresent(LOCATOR, context);
     }
 
     private WalkmeDialog goToStep(By locator) {

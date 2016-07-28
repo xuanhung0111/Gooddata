@@ -27,7 +27,7 @@ public class AnalysisPageHeader extends AbstractFragment {
     @FindBy(className = "s-clear")
     private WebElement resetButton;
 
-    @FindBy(className = "s-export-to-report")
+    @FindBy(className = EXPORT_BUTTON_CLASS)
     private WebElement exportToReportButton;
 
     @FindBy(className = "s-undo")
@@ -49,6 +49,7 @@ public class AnalysisPageHeader extends AbstractFragment {
     private WebElement insightTitle;
 
     private static final String SAVE_AS_CLASS= "s-save_as_new";
+    private static final String EXPORT_BUTTON_CLASS= "s-export-to-report";
 
     public void resetToBlankState() {
         waitForElementVisible(resetButton).click();
@@ -65,6 +66,10 @@ public class AnalysisPageHeader extends AbstractFragment {
 
     public boolean isExportButtonEnabled() {
         return !isElementDisabled(waitForElementVisible(exportToReportButton));
+    }
+
+    public boolean isExportButtonPresent() {
+        return isElementPresent(className(EXPORT_BUTTON_CLASS), getRoot());
     }
 
     public AnalysisPageHeader undo() {

@@ -38,11 +38,12 @@ public class ApplicationHeaderBar extends AbstractFragment {
     @FindBy(className = "users-link")
     private WebElement usersLink;
 
+    public static final String ROOT_LOCATOR = "appHeader";
     public static final String KPIS_LINK_CLASS = "kpis-link";
 
     private static ApplicationHeaderBar getInstance(WebDriver browser) {
         return Graphene.createPageFragment(ApplicationHeaderBar.class,
-                waitForElementVisible(By.className("appHeader"), browser));
+                waitForElementVisible(By.className(ROOT_LOCATOR), browser));
     }
 
     public static void goToKpisPage(WebDriver browser) {
