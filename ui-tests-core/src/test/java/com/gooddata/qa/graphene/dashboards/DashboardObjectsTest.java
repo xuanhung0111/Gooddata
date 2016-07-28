@@ -18,10 +18,11 @@ import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.enums.AttributeLabelTypes;
-import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.dashboard.TextObject;
 import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 
 @Test(groups = {"dashboardObjects"},
       description = "Tests for simple project and dashboard objects functionality in GD platform")
@@ -76,22 +77,25 @@ public class DashboardObjectsTest extends AbstractProjectTest {
         String dashboardName = "Test";
         dashboardsPage.addNewDashboard(dashboardName);
         DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
-        dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, "County");
-        dashboardEditBar.addListFilterToDashboard(DashFilterTypes.PROMPT, this.variableName);
-        dashboardEditBar.addTimeFilterToDashboard(0, String.format("%s ago", 
-                Calendar.getInstance().get(Calendar.YEAR) - YEAR_OF_DATA));
-        dashboardEditBar.addReportToDashboard(REPORT_NAME);
+        dashboardEditBar
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, "County")
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.PROMPT, this.variableName)
+                .addTimeFilterToDashboard(DateGranularity.YEAR,
+                        String.format("%s ago", Calendar.getInstance().get(Calendar.YEAR) - YEAR_OF_DATA))
+                .addReportToDashboard(REPORT_NAME);
         sleepTightInSeconds(2);
-        dashboardEditBar.addTextToDashboard(TextObject.HEADLINE, "Headline", "google.com");
-        dashboardEditBar.addTextToDashboard(TextObject.SUB_HEADLINE, "Sub-Headline", "google.com");
-        dashboardEditBar.addTextToDashboard(TextObject.DESCRIPTION, "Description", "google.com");
-        dashboardEditBar.addLineToDashboard();
-        dashboardEditBar.addWidgetToDashboard(WidgetTypes.KEY_METRIC, METRIC_NAME);
+        dashboardEditBar
+                .addTextToDashboard(TextObject.HEADLINE, "Headline", "google.com")
+                .addTextToDashboard(TextObject.SUB_HEADLINE, "Sub-Headline", "google.com")
+                .addTextToDashboard(TextObject.DESCRIPTION, "Description", "google.com")
+                .addLineToDashboard()
+                .addWidgetToDashboard(WidgetTypes.KEY_METRIC, METRIC_NAME);
         sleepTightInSeconds(2);
         dashboardEditBar.addWidgetToDashboard(WidgetTypes.GEO_CHART, METRIC_NAME);
         sleepTightInSeconds(2);
-        dashboardEditBar.addWebContentToDashboard("https://www.gooddata.com");
-        dashboardEditBar.saveDashboard();
+        dashboardEditBar
+                .addWebContentToDashboard("https://www.gooddata.com")
+                .saveDashboard();
     }
 
     @Test(dependsOnMethods = {"addDashboardObjectsTest"})

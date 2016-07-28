@@ -116,6 +116,14 @@ public class DashboardContent extends AbstractFragment {
         return createPageFragment(FilterWidget.class, filter);
     }
 
+    public FilterWidget getFilterWidgetByName(final String name) {
+        return getFilters()
+                .stream()
+                .filter(e -> name.equalsIgnoreCase(e.getTitle()))
+                .findFirst()
+                .get();
+    }
+
     public boolean isEmpty() {
         return widgets.size() == 0;
     }

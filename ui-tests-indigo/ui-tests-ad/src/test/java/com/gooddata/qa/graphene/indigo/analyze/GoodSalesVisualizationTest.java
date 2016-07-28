@@ -45,13 +45,13 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeaderReact;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucketReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 
 public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
@@ -67,16 +67,16 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testWithAttribute() {
-        assertEquals(analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE)
+        assertEquals(analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
                 .getExplorerMessage(), "Now select a measure to display");
 
-        assertEquals(analysisPageReact.changeReportType(ReportType.BAR_CHART)
+        assertEquals(analysisPage.changeReportType(ReportType.BAR_CHART)
                 .getExplorerMessage(), "Now select a measure to display");
 
-        assertEquals(analysisPageReact.changeReportType(ReportType.LINE_CHART)
+        assertEquals(analysisPage.changeReportType(ReportType.LINE_CHART)
                 .getExplorerMessage(), "Now select a measure to display");
 
-        TableReportReact report = analysisPageReact.changeReportType(ReportType.TABLE)
+        TableReport report = analysisPage.changeReportType(ReportType.TABLE)
                 .waitForReportComputing().getTableReport();
         assertThat(report.getHeaders().stream().map(String::toLowerCase).collect(toList()),
                 equalTo(asList(ATTR_ACTIVITY_TYPE.toLowerCase())));
@@ -85,7 +85,7 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testResetFunction() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing().getChartReport();
         assertThat(report.getTrackersCount(), equalTo(1));
         RecommendationContainer recommendationContainer =
@@ -94,27 +94,27 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        analysisPageReact.changeReportType(ReportType.BAR_CHART).waitForReportComputing();
+        analysisPage.changeReportType(ReportType.BAR_CHART).waitForReportComputing();
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
 
-        analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing();
+        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing();
         assertThat(report.getTrackersCount(), equalTo(4));
 
-        analysisPageReact.resetToBlankState();
+        analysisPage.resetToBlankState();
     }
 
     @Test(dependsOnGroups = {"init"})
     public void disableExportForUnexportableVisualization() {
-        final AnalysisPageHeaderReact pageHeader = analysisPageReact.getPageHeader();
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_AMOUNT)
+        final AnalysisPageHeader pageHeader = analysisPage.getPageHeader();
+        ChartReport report = analysisPage.addMetric(METRIC_AMOUNT)
                 .waitForReportComputing().getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         assertTrue(pageHeader.isExportButtonEnabled());
 
-        analysisPageReact.addAttribute(ATTR_STAGE_NAME).waitForReportComputing();
+        analysisPage.addAttribute(ATTR_STAGE_NAME).waitForReportComputing();
         assertEquals(report.getTrackersCount(), 8);
 
-        analysisPageReact.addStack(ATTR_STAGE_NAME).waitForReportComputing();
+        analysisPage.addStack(ATTR_STAGE_NAME).waitForReportComputing();
         assertEquals(report.getTrackersCount(), 8);
 
         assertFalse(pageHeader.isExportButtonEnabled());
@@ -123,17 +123,17 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void resetSpecialReports() {
-        analysisPageReact.resetToBlankState();
+        analysisPage.resetToBlankState();
 
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACCOUNT).waitForReportComputing();
-        assertTrue(analysisPageReact.isExplorerMessageVisible());
-        assertEquals(analysisPageReact.getExplorerMessage(), "Too many data points to display");
-        analysisPageReact.resetToBlankState();
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACCOUNT).waitForReportComputing();
+        assertTrue(analysisPage.isExplorerMessageVisible());
+        assertEquals(analysisPage.getExplorerMessage(), "Too many data points to display");
+        analysisPage.resetToBlankState();
     }
 
     @Test(dependsOnGroups = {"init"}, description = "https://jira.intgdc.com/browse/CL-6401")
     public void gridlinesShouldBeCheckedWhenExportBarChart() {
-        analysisPageReact.addMetric(METRIC_AMOUNT)
+        analysisPage.addMetric(METRIC_AMOUNT)
                 .addAttribute(ATTR_STAGE_NAME)
                 .changeReportType(ReportType.BAR_CHART)
                 .waitForReportComputing()
@@ -168,11 +168,11 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
         try {
             initAnalysePage();
-            analysisPageReact.addMetric(METRIC_PERCENT_OF_GOAL)
+            analysisPage.addMetric(METRIC_PERCENT_OF_GOAL)
                   .addAttribute(ATTR_IS_WON)
                   .addStack(ATTR_IS_WON)
                   .waitForReportComputing();
-            ChartReportReact report = analysisPageReact.getChartReport();
+            ChartReport report = analysisPage.getChartReport();
             assertTrue(report.getTrackersCount() >= 1);
             assertEquals(report.getLegends(), asList("true"));
 
@@ -185,16 +185,16 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void exportCustomDiscovery() {
-        assertTrue(analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        assertTrue(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .changeReportType(ReportType.TABLE)
                 .getPageHeader()
                 .isExportButtonEnabled());
-        TableReportReact analysisReport = analysisPageReact.waitForReportComputing().getTableReport();
+        TableReport analysisReport = analysisPage.waitForReportComputing().getTableReport();
         List<List<String>> analysisContent = analysisReport.getContent();
         Iterator<String> analysisHeaders = analysisReport.getHeaders().iterator();
 
-        analysisPageReact.exportReport();
+        analysisPage.exportReport();
         String currentWindowHandle = browser.getWindowHandle();
         for (String handle : browser.getWindowHandles()) {
             if (!handle.equals(currentWindowHandle))
@@ -233,14 +233,14 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void exportVisualizationWithOneAttributeInChart() {
-        assertEquals(analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE).getExplorerMessage(),
+        assertEquals(analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).getExplorerMessage(),
                 "Now select a measure to display");
-        assertFalse(analysisPageReact.getPageHeader().isExportButtonEnabled());
+        assertFalse(analysisPage.getPageHeader().isExportButtonEnabled());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void switchReportHasOneMetricManyAttributes() {
-        analysisPageReact.changeReportType(ReportType.TABLE)
+        analysisPage.changeReportType(ReportType.TABLE)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
@@ -248,23 +248,23 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
         Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART, ReportType.LINE_CHART)
             .forEach(type -> {
-                analysisPageReact.changeReportType(type);
+                analysisPage.changeReportType(type);
                 takeScreenshot(browser, "switchReportHasOneMetricManyAttributes-" + type.name(), getClass());
-                assertEquals(analysisPageReact.getStacksBucket().getAttributeName(), ATTR_DEPARTMENT);
-                assertEquals(analysisPageReact.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE));
-                assertEquals(analysisPageReact.getMetricsBucket().getWarningMessage(), type.getMetricMessage());
-                analysisPageReact.undo();
+                assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_DEPARTMENT);
+                assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE));
+                assertEquals(analysisPage.getMetricsBucket().getWarningMessage(), type.getMetricMessage());
+                analysisPage.undo();
         });
 
-        analysisPageReact.changeReportType(ReportType.COLUMN_CHART)
+        analysisPage.changeReportType(ReportType.COLUMN_CHART)
             .changeReportType(ReportType.TABLE);
         takeScreenshot(browser, "switchReportHasOneMetricManyAttributes-backToTable", getClass());
-        assertEquals(analysisPageReact.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT));
+        assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void switchReportHasManyMetricsManyAttributes() {
-        analysisPageReact.changeReportType(ReportType.TABLE)
+        analysisPage.changeReportType(ReportType.TABLE)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
@@ -273,39 +273,39 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
         Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART, ReportType.LINE_CHART)
             .forEach(type -> {
-                analysisPageReact.changeReportType(type);
+                analysisPage.changeReportType(type);
                 takeScreenshot(browser, "switchReportHasManyMetricsManyAttributes-" + type.name(), getClass());
-                assertEquals(analysisPageReact.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE));
-                assertEquals(analysisPageReact.getStacksBucket().getWarningMessage(), type.getStackByMessage());
-                analysisPageReact.undo();
+                assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE));
+                assertEquals(analysisPage.getStacksBucket().getWarningMessage(), type.getStackByMessage());
+                analysisPage.undo();
         });
 
-        analysisPageReact.changeReportType(ReportType.COLUMN_CHART)
+        analysisPage.changeReportType(ReportType.COLUMN_CHART)
             .changeReportType(ReportType.TABLE);
         takeScreenshot(browser, "switchReportHasManyMetricsManyAttributes-backToTable", getClass());
-        assertEquals(analysisPageReact.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE));
+        assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void switchReportWithDateAttributes() {
-        final StacksBucket stacksBucket = analysisPageReact.getStacksBucket();
-        final AttributesBucketReact categoriesBucket = analysisPageReact.getAttributesBucket();
+        final StacksBucket stacksBucket = analysisPage.getStacksBucket();
+        final AttributesBucket categoriesBucket = analysisPage.getAttributesBucket();
 
-        analysisPageReact.changeReportType(ReportType.TABLE)
+        analysisPage.changeReportType(ReportType.TABLE)
             .addDate()
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT);
 
         Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART, ReportType.LINE_CHART)
             .forEach(type -> {
-                analysisPageReact.changeReportType(type);
+                analysisPage.changeReportType(type);
                 takeScreenshot(browser, "switchReportWithDateAttributes-firstDate-" + type.name(), getClass());
                 assertEquals(stacksBucket.getAttributeName(), ATTR_ACTIVITY_TYPE);
                 assertEquals(categoriesBucket.getItemNames(), asList(DATE));
-                analysisPageReact.undo();
+                analysisPage.undo();
         });
 
-        analysisPageReact.resetToBlankState()
+        analysisPage.resetToBlankState()
             .changeReportType(ReportType.TABLE)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addDate()
@@ -313,20 +313,20 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
         Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART)
             .forEach(type -> {
-                analysisPageReact.changeReportType(type);
+                analysisPage.changeReportType(type);
                 takeScreenshot(browser, "switchReportWithDateAttributes-secondDate-" + type.name(), getClass());
                 assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
                 assertEquals(categoriesBucket.getItemNames(), asList(ATTR_ACTIVITY_TYPE));
-                analysisPageReact.undo();
+                analysisPage.undo();
         });
 
-        analysisPageReact.changeReportType(ReportType.LINE_CHART);
+        analysisPage.changeReportType(ReportType.LINE_CHART);
         takeScreenshot(browser, "switchReportWithDateAttributes-secondDate-" + ReportType.LINE_CHART.name(),
                 getClass());
         assertEquals(stacksBucket.getAttributeName(), ATTR_ACTIVITY_TYPE);
         assertEquals(categoriesBucket.getItemNames(), asList(DATE));
 
-        analysisPageReact.resetToBlankState()
+        analysisPage.resetToBlankState()
             .changeReportType(ReportType.TABLE)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
@@ -334,14 +334,14 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
         Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART)
             .forEach(type -> {
-                analysisPageReact.changeReportType(type);
+                analysisPage.changeReportType(type);
                 takeScreenshot(browser, "switchReportWithDateAttributes-thirdDate-" + type.name(), getClass());
                 assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
                 assertEquals(categoriesBucket.getItemNames(), asList(ATTR_ACTIVITY_TYPE));
-                analysisPageReact.undo();
+                analysisPage.undo();
         });
 
-        analysisPageReact.changeReportType(ReportType.LINE_CHART);
+        analysisPage.changeReportType(ReportType.LINE_CHART);
         takeScreenshot(browser, "switchReportWithDateAttributes-thirdDate-" + ReportType.LINE_CHART.name(),
                 getClass());
         assertEquals(stacksBucket.getAttributeName(), ATTR_ACTIVITY_TYPE);
@@ -350,22 +350,22 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void addStackByIfMoreThanOneMetricInReport() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addMetric("Best Case").addAttribute("Region");
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addMetric("Best Case").addAttribute("Region");
 
-        final StacksBucket stacksBucket = analysisPageReact.getStacksBucket();
+        final StacksBucket stacksBucket = analysisPage.getStacksBucket();
         assertTrue(stacksBucket.isDisabled());
         assertEquals(stacksBucket.getWarningMessage(), "TO STACK BY, AN INSIGHT CAN HAVE ONLY ONE MEASURE");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void addSecondMetricIfAttributeInStackBy() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE).addStack(ATTR_DEPARTMENT);
-        assertEquals(analysisPageReact.getMetricsBucket().getWarningMessage(), "TO ADD ADDITIONAL MEASURE, REMOVE FROM STACK BY");
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE).addStack(ATTR_DEPARTMENT);
+        assertEquals(analysisPage.getMetricsBucket().getWarningMessage(), "TO ADD ADDITIONAL MEASURE, REMOVE FROM STACK BY");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void createChartReportWithMoreThan3Metrics() {
-        List<String> legends = analysisPageReact.addMetric(METRIC_NUMBER_OF_LOST_OPPS)
+        List<String> legends = analysisPage.addMetric(METRIC_NUMBER_OF_LOST_OPPS)
                 .addMetric(METRIC_NUMBER_OF_OPEN_OPPS)
                 .addMetric(METRIC_NUMBER_OF_OPPORTUNITIES)
                 .addMetric(METRIC_NUMBER_OF_WON_OPPS)
@@ -376,7 +376,7 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
                 METRIC_NUMBER_OF_WON_OPPS));
         checkingOpenAsReport("createReportWithMoreThan3Metrics-chartReport");
 
-        List<String> headers = analysisPageReact.changeReportType(ReportType.TABLE)
+        List<String> headers = analysisPage.changeReportType(ReportType.TABLE)
             .waitForReportComputing()
             .getTableReport()
             .getHeaders()

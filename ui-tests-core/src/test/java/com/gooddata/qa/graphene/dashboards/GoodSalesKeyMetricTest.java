@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.dashboards;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CREATED;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -34,15 +35,16 @@ import org.testng.annotations.Test;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.Metric;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardAddWidgetPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.FiltersConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.MetricConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.MetricStyleConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel.Tab;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
@@ -81,17 +83,16 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
             .selectDashboard(DASHBOARD_NAME);
 
         dashboardsPage.editDashboard()
-            .addTimeFilterToDashboard(2, format("%s ago", Calendar.getInstance().get(YEAR) - YEAR_OF_DATA));
+            .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR,
+                    format("%s ago", Calendar.getInstance().get(YEAR) - YEAR_OF_DATA));
         DashboardWidgetDirection.UP.moveElementToRightPlace(
                 dashboardsPage.getContent().getFilterWidget("filter-time").getRoot());
 
-        dashboardsPage.getDashboardEditBar()
-            .addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
+        dashboardsPage.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
         DashboardWidgetDirection.RIGHT.moveElementToRightPlace(
                 dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_PRODUCT)).getRoot());
 
-        dashboardsPage.getDashboardEditBar()
-            .addListFilterToDashboard(DashFilterTypes.PROMPT, VARIABLE_NAME);
+        dashboardsPage.addAttributeFilterToDashboard(DashAttributeFilterTypes.PROMPT, VARIABLE_NAME);
         DashboardWidgetDirection.LEFT.moveElementToRightPlace(
                 dashboardsPage.getContent().getFilterWidget(simplifyText(VARIABLE_NAME)).getRoot());
 

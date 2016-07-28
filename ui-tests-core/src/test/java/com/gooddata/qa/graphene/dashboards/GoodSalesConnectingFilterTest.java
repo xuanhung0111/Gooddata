@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.dashboards;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_SNAPSHOT;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
@@ -23,10 +24,11 @@ import com.gooddata.qa.graphene.entity.report.HowItem;
 import com.gooddata.qa.graphene.entity.report.HowItem.Position;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
-import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.utils.Sleeper;
 
@@ -301,7 +303,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
             {
         addReportsAndFilters(dashboardEditBar);
 
-        dashboardEditBar.addTimeFilterToDashboard(3, timeRange);
+        dashboardEditBar.addTimeFilterToDashboard(DATE_DIMENSION_SNAPSHOT, DateGranularity.YEAR, timeRange);
         WebElement filter = dashboardsPage.getContent().getFilterWidget("filter-time").getRoot();
         filter.click();
         DashboardWidgetDirection.DOWN.moveElementToRightPlace(filter);
@@ -316,12 +318,12 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
         report = dashboardsPage.getContent().getLatestReport(TableReport.class).getRoot();
         DashboardWidgetDirection.RIGHT.moveElementToRightPlace(report);
 
-        dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME);
+        dashboardEditBar.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME);
         WebElement filter = dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME)).getRoot();
         filter.click();
         DashboardWidgetDirection.UP.moveElementToRightPlace(filter);
 
-        dashboardEditBar.addListFilterToDashboard(DashFilterTypes.PROMPT, V_STAGE);
+        dashboardEditBar.addAttributeFilterToDashboard(DashAttributeFilterTypes.PROMPT, V_STAGE);
         filter = dashboardsPage.getContent().getFilterWidget(simplifyText(V_STAGE)).getRoot();
         filter.click();
         DashboardWidgetDirection.MIDDLE.moveElementToRightPlace(filter);

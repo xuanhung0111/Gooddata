@@ -14,13 +14,13 @@ import java.util.List;
 import javax.mail.MessagingException;
 
 import org.apache.http.ParseException;
-import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractUITest;
 import com.gooddata.qa.graphene.fragments.account.LostPasswordPage;
+import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 
@@ -71,31 +71,29 @@ public class ResetPasswordTest extends AbstractUITest {
 
     @Test(dependsOnMethods = {"init"}, groups = {PROJECT_INIT_GROUP})
     public void resetPasswordWithInvalidEmail() {
-        initLostPasswordPage();
-
-        lostPasswordPage.resetPassword(INVALID_EMAIL, false);
-        assertEquals(lostPasswordPage.getErrorMessage(), INVALID_EMAIL_MESSAGE);
+        assertEquals(initLostPasswordPage()
+            .resetPassword(INVALID_EMAIL, false)
+            .getErrorMessage(), INVALID_EMAIL_MESSAGE);
         takeScreenshot(browser, "Invalid email error message", this.getClass());
 
-        lostPasswordPage.resetPassword(NON_REGISTERED_EMAIL, true);
-        assertEquals(lostPasswordPage.getPageLocalMessage(), PASSWORD_PAGE_LOCAL_MESSAGE);
+        LostPasswordPage.getInstance(browser)
+            .resetPassword(NON_REGISTERED_EMAIL, true);
+        assertEquals(LostPasswordPage.getPageLocalMessage(browser), PASSWORD_PAGE_LOCAL_MESSAGE);
         takeScreenshot(browser, "Reset password with non-registered email", this.getClass());
 
-        initLostPasswordPage();
-        lostPasswordPage.backToLoginPage();
-        waitForElementVisible(loginFragment.getRoot());
+        initLostPasswordPage()
+            .backToLoginPage();
     }
 
     @Test(dependsOnMethods = {"resetPasswordWithInvalidEmail"}, groups = {PROJECT_INIT_GROUP})
     public void resetWithValidAndInvalidPassword() throws MessagingException, IOException, JSONException {
-        LostPasswordPage lostPasswordPage = loginFragment.openLostPasswordPage();
-
-        String resetPasswordLink = lostPasswordPage.resetPassword(imapClient, user);
-        assertEquals(lostPasswordPage.getPageLocalMessage(), PASSWORD_PAGE_LOCAL_MESSAGE);
+        String resetPasswordLink = LoginFragment.getInstance(browser)
+                .openLostPasswordPage()
+                .resetPassword(imapClient, user);
+        assertEquals(LostPasswordPage.getPageLocalMessage(browser), PASSWORD_PAGE_LOCAL_MESSAGE);
 
         openUrl(resetPasswordLink);
-        LostPasswordPage resetPasswordPage = Graphene.createPageFragment(LostPasswordPage.class,
-                waitForElementVisible(RESET_PASSWORD_PAGE_LOCATOR, browser));
+        LostPasswordPage resetPasswordPage = LostPasswordPage.getInstance(RESET_PASSWORD_PAGE_LOCATOR, browser);
 
         resetPasswordPage.setNewPassword("aaaaa");
         assertEquals(resetPasswordPage.getErrorMessage(), SHORT_PASSWORD_ERROR_MESSAGE);
@@ -109,10 +107,9 @@ public class ResetPasswordTest extends AbstractUITest {
             testParams.setPassword(NEW_PASSWORD);
 
             resetPasswordPage.setNewPassword(NEW_PASSWORD);
-            waitForElementVisible(loginFragment.getRoot());
-            assertEquals(loginFragment.getNotificationMessage(), RESET_PASSWORD_SUCCESS_MESSAGE);
+            assertEquals(LoginFragment.getInstance(browser).getNotificationMessage(), RESET_PASSWORD_SUCCESS_MESSAGE);
 
-            loginFragment.login(user, NEW_PASSWORD, true);
+            LoginFragment.getInstance(browser).login(user, NEW_PASSWORD, true);
             waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
 
         } catch(Exception e) {
@@ -120,8 +117,8 @@ public class ResetPasswordTest extends AbstractUITest {
             throw e;
 
         } finally {
-            logout();
-            loginFragment.login(testParams.getUser(), NEW_PASSWORD, true);
+            logout()
+                .login(testParams.getUser(), NEW_PASSWORD, true);
             waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
 
             UserManagementRestUtils.updateCurrentUserPassword(getRestApiClient(), NEW_PASSWORD, oldPassword);
@@ -154,7 +151,7 @@ public class ResetPasswordTest extends AbstractUITest {
             sleepTightInSeconds(600);
 
             browser.navigate().refresh();
-            waitForElementVisible(loginFragment.getRoot());
+            LoginFragment.waitForPageLoaded(browser);
             takeScreenshot(browser, "Out of section after reset password", this.getClass());
 
         } catch(Exception e) {
@@ -162,15 +159,15 @@ public class ResetPasswordTest extends AbstractUITest {
             throw e;
 
         } finally {
-            loginFragment.login(user, NEW_PASSWORD, true);
+            LoginFragment.getInstance(browser).login(user, NEW_PASSWORD, true);
             waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
 
             testParams.setPassword(NEW_PASSWORD);
             UserManagementRestUtils.updateCurrentUserPassword(getRestApiClient(), NEW_PASSWORD, oldPassword);
 
             testParams.setPassword(oldPassword);
-            logout();
-            loginFragment.login(user, oldPassword, true);
+            logout()
+                .login(user, oldPassword, true);
             waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
         }
     }

@@ -6,6 +6,8 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY;
+
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -17,6 +19,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -32,14 +35,14 @@ import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucketReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 
 public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
 
@@ -53,16 +56,16 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testWithAttribute() {
-        assertEquals(analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE)
+        assertEquals(analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
                 .getExplorerMessage(), "Now select a measure to display");
 
-        assertEquals(analysisPageReact.changeReportType(ReportType.BAR_CHART)
+        assertEquals(analysisPage.changeReportType(ReportType.BAR_CHART)
                 .getExplorerMessage(), "Now select a measure to display");
 
-        assertEquals(analysisPageReact.changeReportType(ReportType.LINE_CHART)
+        assertEquals(analysisPage.changeReportType(ReportType.LINE_CHART)
                 .getExplorerMessage(), "Now select a measure to display");
 
-        TableReportReact report = analysisPageReact
+        TableReport report = analysisPage
                 .changeReportType(ReportType.TABLE)
                 .waitForReportComputing()
                 .getTableReport();
@@ -73,13 +76,13 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void dragMetricToColumnChartShortcutPanel() {
-        WebElement metric = analysisPageReact.getCataloguePanel()
+        WebElement metric = analysisPage.getCataloguePanel()
                 .searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC);
 
         Supplier<WebElement> recommendation = () ->
             waitForElementPresent(ShortcutPanel.AS_A_COLUMN_CHART.getLocator(), browser);
 
-        ChartReportReact report = analysisPageReact.drag(metric, recommendation)
+        ChartReport report = analysisPage.drag(metric, recommendation)
                     .waitForReportComputing().getChartReport();
 
         assertThat(report.getTrackersCount(), equalTo(1));
@@ -89,17 +92,17 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        analysisPageReact.changeReportType(ReportType.BAR_CHART);
+        analysisPage.changeReportType(ReportType.BAR_CHART);
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
 
-        analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing();
+        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing();
         assertThat(report.getTrackersCount(), equalTo(4));
         checkingOpenAsReport("dragMetricToColumnChartShortcutPanel");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void testSimpleContribution() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .getChartReport();
@@ -110,16 +113,16 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
         assertTrue(recommendationContainer
                 .isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_PERCENTS).apply();
-        assertTrue(analysisPageReact.waitForReportComputing().isReportTypeSelected(ReportType.BAR_CHART));
+        assertTrue(analysisPage.waitForReportComputing().isReportTypeSelected(ReportType.BAR_CHART));
         assertEquals(report.getTrackersCount(), 4);
 
-        MetricConfiguration metricConfiguration = analysisPageReact.getMetricsBucket()
+        MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration("% " + METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
         assertTrue(metricConfiguration.isShowPercentEnabled());
         assertTrue(metricConfiguration.isShowPercentSelected());
 
-        assertTrue(analysisPageReact.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing()
+        assertTrue(analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing()
                 .isReportTypeSelected(ReportType.BAR_CHART));
         assertEquals(report.getTrackersCount(), 2);
         assertTrue(metricConfiguration.isShowPercentEnabled());
@@ -128,7 +131,7 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
     }
     @Test(dependsOnGroups = {"init"})
     public void testSimpleComparison() {
-        ChartReportReact report = analysisPageReact
+        ChartReport report = analysisPage
                 .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing()
                 .getChartReport();
@@ -141,15 +144,15 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select(ATTR_ACTIVITY_TYPE).apply();
-        assertTrue(analysisPageReact.waitForReportComputing().getAttributesBucket().getItemNames()
+        assertTrue(analysisPage.waitForReportComputing().getAttributesBucket().getItemNames()
                 .contains(ATTR_ACTIVITY_TYPE));
-        assertEquals(analysisPageReact.getFilterBuckets().getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": All");
+        assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": All");
         assertEquals(report.getTrackersCount(), 4);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        analysisPageReact.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing();
-        assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(ATTR_DEPARTMENT));
-        assertEquals(analysisPageReact.getFilterBuckets().getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ": All");
+        analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing();
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ATTR_DEPARTMENT));
+        assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ": All");
         assertEquals(report.getTrackersCount(), 2);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
         checkingOpenAsReport("testSimpleComparison");
@@ -157,35 +160,35 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void displayWhenDraggingFirstMetric() {
-        WebElement metric = analysisPageReact.getCataloguePanel()
+        WebElement metric = analysisPage.getCataloguePanel()
                 .searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC);
 
         Supplier<WebElement> trendRecommendation = () ->
             waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
 
-        analysisPageReact.drag(metric, trendRecommendation)
+        analysisPage.drag(metric, trendRecommendation)
             .waitForReportComputing();
 
-        assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(DATE));
-        assertTrue(analysisPageReact.getFilterBuckets().isFilterVisible("Activity"));
-        assertEquals(analysisPageReact.getFilterBuckets().getFilterText("Activity"), "Activity: Last 4 quarters");
-        assertTrue(analysisPageReact.getChartReport().getTrackersCount() >= 1);
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
+        assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
+        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity: Last 4 quarters");
+        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
         checkingOpenAsReport("displayWhenDraggingFirstMetric");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void exportCustomDiscovery() {
-        assertTrue(analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        assertTrue(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .changeReportType(ReportType.TABLE)
                 .waitForReportComputing()
                 .getPageHeader()
                 .isExportButtonEnabled());
-        TableReportReact analysisReport = analysisPageReact.getTableReport();
+        TableReport analysisReport = analysisPage.getTableReport();
         List<List<String>> analysisContent = analysisReport.getContent();
         Iterator<String> analysisHeaders = analysisReport.getHeaders().iterator();
 
-        analysisPageReact.exportReport();
+        analysisPage.exportReport();
         String currentWindowHandle = browser.getWindowHandle();
         for (String handle : browser.getWindowHandles()) {
             if (!handle.equals(currentWindowHandle))
@@ -224,44 +227,47 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void filterOnDateAttribute() {
-        final FiltersBucketReact filtersBucket = analysisPageReact.getFilterBuckets();
+        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .addDateFilter()
                 .waitForReportComputing();
-        assertEquals(analysisPageReact.getChartReport().getTrackersCount(), 4);
+        assertEquals(analysisPage.getChartReport().getTrackersCount(), 4);
         assertEquals(filtersBucket.getFilterText("Activity"), "Activity: All time");
 
         filtersBucket.configDateFilter("This year");
-        analysisPageReact.waitForReportComputing();
+        analysisPage.waitForReportComputing();
         assertEquals(filtersBucket.getFilterText("Activity"), "Activity: This year");
-        assertTrue(analysisPageReact.getChartReport().getTrackersCount() >= 1);
+        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
         checkingOpenAsReport("filterOnDateAttribute");
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void testSimplePoP() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+    public void testSimplePoP() throws ParseException {
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate()
-            .waitForReportComputing();
-        assertTrue(analysisPageReact.getFilterBuckets()
-                .isFilterVisible("Activity"));
-        assertEquals(analysisPageReact.getFilterBuckets().getFilterText("Activity"), "Activity: All time");
-        ChartReportReact report = analysisPageReact.getChartReport();
-        assertThat(report.getTrackersCount(), equalTo(6));
+            .getFilterBuckets()
+            .configDateFilter("01/01/2012", "12/31/2012");
+
+        assertTrue(analysisPage.getFilterBuckets()
+                .isFilterVisible(ATTR_ACTIVITY));
+        assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY),
+                "Activity: Jan 1, 2012 - Dec 31, 2012");
+        ChartReport report = analysisPage.waitForReportComputing().getChartReport();
+        assertThat(report.getTrackersCount(), equalTo(1));
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
         recommendationContainer.getRecommendation(RecommendationStep.COMPARE).apply();
-        analysisPageReact.waitForReportComputing();
+        analysisPage.waitForReportComputing();
         assertTrue(report.getTrackersCount() >= 1);
         List<String> legends = report.getLegends();
         assertEquals(legends.size(), 2);
         assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES + " - previous year", METRIC_NUMBER_OF_ACTIVITIES));
 
-        analysisPageReact.addMetric(METRIC_SNAPSHOT_BOP).waitForReportComputing();
+        analysisPage.addMetric(METRIC_SNAPSHOT_BOP).waitForReportComputing();
         assertTrue(report.getTrackersCount() >= 1);
         legends = report.getLegends();
         assertEquals(legends.size(), 2);
@@ -271,35 +277,35 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void replaceMetricByNewOne() {
-        final MetricsBucket metricsBucket = analysisPageReact.getMetricsBucket();
+        final MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
 
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
         assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(METRIC_NUMBER_OF_ACTIVITIES)));
 
-        analysisPageReact.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT).waitForReportComputing();
+        analysisPage.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT).waitForReportComputing();
         assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(METRIC_AMOUNT)));
 
-        analysisPageReact.changeReportType(ReportType.BAR_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.changeReportType(ReportType.BAR_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing();
         assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT)));
 
-        analysisPageReact.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, EXPECTED).waitForReportComputing();
+        analysisPage.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, EXPECTED).waitForReportComputing();
         assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(EXPECTED, METRIC_AMOUNT)));
 
-        analysisPageReact.changeReportType(ReportType.TABLE).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.changeReportType(ReportType.TABLE).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing();
         assertTrue(isEqualCollection(metricsBucket.getItemNames(),
                 asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT, EXPECTED)));
 
-        analysisPageReact.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, REMAINING_QUOTA).waitForReportComputing();
+        analysisPage.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, REMAINING_QUOTA).waitForReportComputing();
         assertTrue(isEqualCollection(metricsBucket.getItemNames(),
                 asList(REMAINING_QUOTA, METRIC_AMOUNT, EXPECTED)));
 
-        analysisPageReact.undo().waitForReportComputing();
+        analysisPage.undo().waitForReportComputing();
         assertTrue(isEqualCollection(metricsBucket.getItemNames(),
                 asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT, EXPECTED)));
 
-        analysisPageReact.redo().waitForReportComputing();
+        analysisPage.redo().waitForReportComputing();
         assertTrue(isEqualCollection(metricsBucket.getItemNames(),
                 asList(REMAINING_QUOTA, METRIC_AMOUNT, EXPECTED)));
         checkingOpenAsReport("replaceMetricByNewOne");
@@ -307,10 +313,10 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void dropAttributeToReportHaveOneMetric() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE);
-        assertEquals(analysisPageReact.waitForReportComputing().getChartReport().getTrackersCount(), 4);
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE);
+        assertEquals(analysisPage.waitForReportComputing().getChartReport().getTrackersCount(), 4);
 
-        analysisPageReact.addStack(ATTR_DEPARTMENT);
-        assertEquals(analysisPageReact.waitForReportComputing().getChartReport().getTrackersCount(), 8);
+        analysisPage.addStack(ATTR_DEPARTMENT);
+        assertEquals(analysisPage.waitForReportComputing().getChartReport().getTrackersCount(), 8);
     }
 }

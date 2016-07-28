@@ -17,7 +17,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricC
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
 public class GoodSalesContributionRecommendationTest extends GoodSalesAbstractAnalyseTest {
 
@@ -28,7 +28,7 @@ public class GoodSalesContributionRecommendationTest extends GoodSalesAbstractAn
 
     @Test(dependsOnGroups = {"init"})
     public void testSimpleContribution() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .getChartReport();
@@ -39,17 +39,17 @@ public class GoodSalesContributionRecommendationTest extends GoodSalesAbstractAn
         assertTrue(recommendationContainer
                 .isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_PERCENTS).apply();
-        assertTrue(analysisPageReact.waitForReportComputing().isReportTypeSelected(ReportType.BAR_CHART));
+        assertTrue(analysisPage.waitForReportComputing().isReportTypeSelected(ReportType.BAR_CHART));
         assertEquals(report.getTrackersCount(), 4);
 
-        MetricConfiguration metricConfiguration = analysisPageReact.getMetricsBucket()
+        MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration("% " + METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
         assertTrue(metricConfiguration.isShowPercentEnabled());
         assertTrue(metricConfiguration.isShowPercentSelected());
 
-        analysisPageReact.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing();
-        assertTrue(analysisPageReact.isReportTypeSelected(ReportType.BAR_CHART));
+        analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing();
+        assertTrue(analysisPage.isReportTypeSelected(ReportType.BAR_CHART));
         assertEquals(report.getTrackersCount(), 2);
         assertTrue(metricConfiguration.isShowPercentEnabled());
         assertTrue(metricConfiguration.isShowPercentSelected());
@@ -58,7 +58,7 @@ public class GoodSalesContributionRecommendationTest extends GoodSalesAbstractAn
 
     @Test(dependsOnGroups = {"init"})
     public void testAnotherApproachToShowContribution() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 1);
@@ -70,7 +70,7 @@ public class GoodSalesContributionRecommendationTest extends GoodSalesAbstractAn
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select(ATTR_ACTIVITY_TYPE).apply();
-        analysisPageReact.waitForReportComputing();
+        analysisPage.waitForReportComputing();
         assertTrue(recommendationContainer
                 .isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
         checkingOpenAsReport("testAnotherApproachToShowContribution");

@@ -84,17 +84,18 @@ public class RestApiClient {
         }
     }
 
-    public HttpResponse execute(HttpRequestBase request, int expectedStatusCode, String unexpectedMessage) {
+    public HttpResponse execute(HttpRequestBase request, int expectedStatusCode) {
         HttpResponse response = execute(request);
         int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode != expectedStatusCode) {
-            throw new InvalidStatusCodeException(String.format("%s [%d]", unexpectedMessage, statusCode), statusCode);
+            throw new InvalidStatusCodeException(String.format("%s expected code [%d], but got [%d]",
+                    request.getURI(), expectedStatusCode, statusCode), statusCode);
         }
         return response;
     }
 
-    public HttpResponse execute(HttpRequestBase request, HttpStatus expectedStatus, String unexpectedMessage) {
-        return execute(request, expectedStatus.value(), unexpectedMessage);
+    public HttpResponse execute(HttpRequestBase request, HttpStatus expectedStatus) {
+        return execute(request, expectedStatus.value());
     }
 
     public HttpGet newGetMethod(String uri) {

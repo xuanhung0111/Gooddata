@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.i18n;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkLocalization;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 
 import org.json.JSONException;
 import org.testng.annotations.AfterClass;
@@ -12,6 +11,7 @@ import com.gooddata.project.ProjectDriver;
 import com.gooddata.qa.graphene.AbstractUITest;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.graphene.utils.WaitUtils;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
@@ -40,26 +40,25 @@ public class LocalizationTest extends AbstractUITest {
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"entry-point"})
     public void verifyLoginPage() {
-        waitForFragmentVisible(loginFragment);
+        LoginFragment.waitForPageLoaded(browser);
         checkLocalization(browser);
     }
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"entry-point"})
     public void verifyRegistrationPage() {
-        waitForFragmentVisible(loginFragment).openRegistrationPage();
-        waitForFragmentVisible(registrationPage);
+        LoginFragment.getInstance(browser).openRegistrationPage();
         checkLocalization(browser);
     }
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"entry-point"})
     public void verifyResetPasswordPage() {
-        waitForFragmentVisible(loginFragment).openLostPasswordPage();
+        LoginFragment.getInstance(browser).openLostPasswordPage();
         checkLocalization(browser);
     }
 
     @Test(dependsOnGroups = {"entry-point"}, alwaysRun = true)
     public void login() throws JSONException {
-        waitForFragmentVisible(loginFragment);
+        LoginFragment.waitForPageLoaded(browser);
         signIn(false, UserRoles.ADMIN);
     }
 

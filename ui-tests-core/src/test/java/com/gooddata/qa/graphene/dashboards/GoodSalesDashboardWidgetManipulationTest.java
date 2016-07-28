@@ -16,9 +16,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.ArrangeConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
@@ -54,7 +54,7 @@ public class GoodSalesDashboardWidgetManipulationTest extends GoodSalesAbstractT
         assertThat(reportZIndex, equalTo(2));
         configPanel.discardConfiguration();
 
-        dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME);
+        dashboardEditBar.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME);
         FilterWidget stageNameFilter = dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME));
         WebElement stageNameRootElement = stageNameFilter.getRoot();
 

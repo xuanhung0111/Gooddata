@@ -13,12 +13,12 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucketReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.TrendingRecommendation;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
 public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalyseTest {
 
@@ -29,20 +29,20 @@ public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalys
 
     @Test(dependsOnGroups = {"init"})
     public void testOverrideDateFilter() {
-        final FiltersBucketReact FiltersBucketReact = analysisPageReact.getFilterBuckets();
+        final FiltersBucket FiltersBucketReact = analysisPage.getFilterBuckets();
 
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDateFilter();
         assertEquals(FiltersBucketReact.getFilterText("Activity"), "Activity: All time");
         FiltersBucketReact.configDateFilter("Last 12 months");
-        ChartReportReact report = analysisPageReact.waitForReportComputing().getChartReport();
+        ChartReport report = analysisPage.waitForReportComputing().getChartReport();
         assertEquals(report.getTrackersCount(), 1);
 
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();
-        analysisPageReact.waitForReportComputing();
+        analysisPage.waitForReportComputing();
         assertEquals(FiltersBucketReact.getFilterText("Activity"), "Activity: Last 4 quarters");
         assertTrue(report.getTrackersCount() >= 1);
         checkingOpenAsReport("testOverrideDateFilter");
@@ -50,9 +50,9 @@ public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalys
 
     @Test(dependsOnGroups = {"init"})
     public void applyParameter() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing().getChartReport();
-        final MetricConfiguration metricConfiguration = analysisPageReact.getMetricsBucket()
+        final MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
 
@@ -66,10 +66,10 @@ public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalys
         TrendingRecommendation trendingRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND);
         trendingRecommendation.select("Month").apply();
-        analysisPageReact.waitForReportComputing();
-        assertTrue(analysisPageReact.getAttributesBucket().getItemNames().contains(DATE));
-        assertTrue(analysisPageReact.getFilterBuckets().isFilterVisible("Activity"));
-        assertEquals(analysisPageReact.getFilterBuckets().getFilterText("Activity"), "Activity: Last 4 quarters");
+        analysisPage.waitForReportComputing();
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
+        assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
+        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity: Last 4 quarters");
         assertTrue(metricConfiguration.isShowPercentEnabled());
         assertTrue(metricConfiguration.isPopEnabled());
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
@@ -80,7 +80,7 @@ public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalys
 
     @Test(dependsOnGroups = {"init"})
     public void displayInColumnChartWithOnlyMetric() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing().getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
@@ -88,16 +88,16 @@ public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalys
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
 
-        analysisPageReact.addFilter(ATTR_ACTIVITY_TYPE).waitForReportComputing();
+        analysisPage.addFilter(ATTR_ACTIVITY_TYPE).waitForReportComputing();
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
 
-        analysisPageReact.changeReportType(ReportType.BAR_CHART).waitForReportComputing();
+        analysisPage.changeReportType(ReportType.BAR_CHART).waitForReportComputing();
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
 
-        analysisPageReact.changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
+        analysisPage.changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
 
-        analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing();
+        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing();
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         checkingOpenAsReport("displayInColumnChartWithOnlyMetric");
     }

@@ -17,7 +17,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.disc.*;
 import com.gooddata.qa.graphene.fragments.i18n.LocalizationPage;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPageReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
@@ -80,9 +80,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     /**
      * ----- UI fragmnets -----
      */
-
-    @FindBy(css = ".s-loginPage.s-ready")
-    protected LoginFragment loginFragment;
 
     @FindBy(id = "root")
     protected DashboardsPage dashboardsPage;
@@ -156,12 +153,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(id = "accountSettingsMenu")
     protected AccountPage accountPage;
 
-    @FindBy(className = LostPasswordPage.LOST_PASSWORD_PAGE_CLASS_NAME)
-    protected LostPasswordPage lostPasswordPage;
-
-    @FindBy(css = ".s-registrationPage")
-    protected RegistrationPage registrationPage;
-
     /**
      * ----- DISC fragments -----
      */
@@ -201,8 +192,8 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(css = ".ait-overview-projects-fragment")
     protected OverviewProjects discOverviewProjects;
 
-    @FindBy(className = AnalysisPageReact.MAIN_CLASS)
-    protected AnalysisPageReact analysisPageReact;
+    @FindBy(className = AnalysisPage.MAIN_CLASS)
+    protected AnalysisPage analysisPage;
 
     @FindBy(css = ".ember-application .main")
     protected UserManagementPage userManagementPage;
@@ -246,19 +237,19 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public void signInAtUI(String username, String password) {
         if (!browser.getCurrentUrl().contains(ACCOUNT_PAGE)) {
             openUrl(PAGE_LOGIN);
-            waitForElementVisible(loginFragment.getRoot());
         }
-        loginFragment.login(username, password, true);
+        LoginFragment.getInstance(browser).login(username, password, true);
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
         takeScreenshot(browser, "login-ui", this.getClass());
         System.out.println("Successful login with user: " + username);
     }
 
-    public void logout() {
+    public LoginFragment logout() {
         openUrl(PAGE_PROJECTS);
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser).click();
         waitForElementVisible(BY_LOGOUT_LINK, browser).click();
         waitForElementNotPresent(BY_LOGGED_USER_BUTTON);
+        return LoginFragment.getInstance(browser);
     }
 
     public void logoutAndLoginAs(boolean greyPages, UserRoles userRole) throws JSONException {
@@ -339,8 +330,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
         sleepTightInSeconds(3);
         DashboardTabs tabs = dashboardsPage.getTabs();
         int tabsCount = tabs.getNumberOfTabs();
-        dashboardsPage.editDashboard();
-        waitForDashboardPageLoaded(browser);
         dashboardsPage.addNewTab(tabName);
         checkRedBar(browser);
         assertEquals(tabs.getNumberOfTabs(), tabsCount + 1, "New tab is not present");
@@ -550,9 +539,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     }
 
-    public AnalysisPageReact initAnalysePage() {
+    public AnalysisPage initAnalysePage() {
         openUrl(PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/reportId/edit");
-        return waitForFragmentVisible(analysisPageReact);
+        return waitForFragmentVisible(analysisPage);
     }
 
     public void initAccountPage() {
@@ -639,14 +628,14 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForFragmentVisible(discProjectsList);
     }
 
-    public void initLostPasswordPage() {
+    public LostPasswordPage initLostPasswordPage() {
         openUrl(PAGE_LOST_PASSWORD);
-        waitForFragmentVisible(lostPasswordPage);
+        return LostPasswordPage.getInstance(browser);
     }
 
-    public void initRegistrationPage() {
+    public RegistrationPage initRegistrationPage() {
         openUrl(PAGE_REGISTRATION);
-        waitForFragmentVisible(registrationPage);
+        return RegistrationPage.getInstance(browser);
     }
 
     public LocalizationPage initLocalizationPage() {

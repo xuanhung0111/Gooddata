@@ -8,7 +8,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACT
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_QUOTA;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.openqa.selenium.By.className;
@@ -18,18 +17,15 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.Arrays;
 
-import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
-import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReportReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
 public class GoodSalesMetricBucketTest extends GoodSalesAbstractAnalyseTest {
 
@@ -43,54 +39,49 @@ public class GoodSalesMetricBucketTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void checkSeriesStateTransitions() {
-        ChartReportReact report = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addDate()
                 .waitForReportComputing()
                 .getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
 
-        MetricConfiguration metricConfiguration = analysisPageReact.getMetricsBucket()
+        MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
         assertTrue(metricConfiguration.isPopEnabled());
         assertTrue(metricConfiguration.isShowPercentEnabled());
-        RecommendationContainer recommendationContainer =
-                Graphene.createPageFragment(RecommendationContainer.class,
-                        waitForElementVisible(RecommendationContainer.LOCATOR, browser));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        analysisPageReact.addMetric(METRIC_QUOTA).waitForReportComputing();
+        analysisPage.addMetric(METRIC_QUOTA).waitForReportComputing();
         sleepTight(3000);
         assertTrue(report.getTrackersCount() >= 1);
         assertFalse(metricConfiguration.isPopEnabled());
         assertFalse(metricConfiguration.isShowPercentEnabled());
         assertEquals(report.getLegends(), asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_QUOTA));
-        assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
-        assertEquals(analysisPageReact.getMetricsBucket().getItemNames(), asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_QUOTA));
+        assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_QUOTA));
 
-        analysisPageReact.addMetric(METRIC_SNAPSHOT_BOP).waitForReportComputing();
+        analysisPage.addMetric(METRIC_SNAPSHOT_BOP).waitForReportComputing();
         assertTrue(report.getTrackersCount() >= 1);
-        assertEquals(analysisPageReact.getMetricsBucket().getItemNames(), asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_QUOTA, METRIC_SNAPSHOT_BOP));
+        assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_QUOTA, METRIC_SNAPSHOT_BOP));
         checkingOpenAsReport("checkSeriesStateTransitions");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void testBuiltInMetric() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES);
-        MetricConfiguration activitiesConfiguration = analysisPageReact.getMetricsBucket()
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES);
+        MetricConfiguration activitiesConfiguration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES);
         assertTrue(activitiesConfiguration.isConfigurationCollapsed());
 
         activitiesConfiguration.expandConfiguration();
-        analysisPageReact.addMetric(METRIC_AMOUNT);
+        analysisPage.addMetric(METRIC_AMOUNT);
         assertFalse(activitiesConfiguration.isConfigurationCollapsed());
 
-        MetricConfiguration amountConfiguration = analysisPageReact.getMetricsBucket()
+        MetricConfiguration amountConfiguration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration(METRIC_AMOUNT);
         assertTrue(amountConfiguration.isConfigurationCollapsed());
 
         amountConfiguration.expandConfiguration();
-        analysisPageReact.addMetric(METRIC_AMOUNT);
+        analysisPage.addMetric(METRIC_AMOUNT);
         assertFalse(amountConfiguration.isConfigurationCollapsed());
         assertTrue(activitiesConfiguration.isConfigurationCollapsed());
         checkingOpenAsReport("testBuiltInMetric");
@@ -98,9 +89,9 @@ public class GoodSalesMetricBucketTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testMetricFromAttribute() {
-        analysisPageReact.addMetric(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE);
+        analysisPage.addMetric(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE);
 
-        MetricConfiguration metricConfiguration = analysisPageReact.getMetricsBucket()
+        MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
             .getMetricConfiguration("Count of " + ATTR_ACTIVITY_TYPE);
         assertTrue(metricConfiguration.isConfigurationCollapsed());
 
@@ -111,7 +102,7 @@ public class GoodSalesMetricBucketTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void showInPercentAndPop() {
-        MetricConfiguration metricConfiguration = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        MetricConfiguration metricConfiguration = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate()
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
@@ -121,21 +112,21 @@ public class GoodSalesMetricBucketTest extends GoodSalesAbstractAnalyseTest {
         assertTrue(metricConfiguration.isShowPercentEnabled());
 
         metricConfiguration.showPercents().showPop();
-        analysisPageReact.getAttributesBucket().changeDateDimension("Created");
-        analysisPageReact.waitForReportComputing()
+        analysisPage.getAttributesBucket().changeDateDimension("Created");
+        analysisPage.waitForReportComputing()
             .addMetric(METRIC_AMOUNT, FieldType.FACT);
 
         assertFalse(metricConfiguration.isPopEnabled());
         assertFalse(metricConfiguration.isShowPercentEnabled());
 
-        analysisPageReact.undo();
+        analysisPage.undo();
         metricConfiguration.expandConfiguration();
         assertTrue(metricConfiguration.isPopEnabled());
         assertTrue(metricConfiguration.isShowPercentEnabled());
         assertTrue(metricConfiguration.isPopSelected());
         assertTrue(metricConfiguration.isShowPercentSelected());
 
-        metricConfiguration = analysisPageReact.replaceMetric("% " + METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT)
+        metricConfiguration = analysisPage.replaceMetric("% " + METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT)
                 .getMetricsBucket()
                 .getMetricConfiguration(METRIC_AMOUNT)
                 .expandConfiguration();
@@ -145,7 +136,7 @@ public class GoodSalesMetricBucketTest extends GoodSalesAbstractAnalyseTest {
         assertFalse(metricConfiguration.isShowPercentSelected());
 
         metricConfiguration.collapseConfiguration();
-        metricConfiguration = analysisPageReact.replaceMetric(METRIC_AMOUNT, METRIC_NUMBER_OF_ACTIVITIES)
+        metricConfiguration = analysisPage.replaceMetric(METRIC_AMOUNT, METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
@@ -158,74 +149,74 @@ public class GoodSalesMetricBucketTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void disablePopCheckboxOnDroppingNonDateAttribute() {
-        MetricConfiguration metricConfiguration = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        MetricConfiguration metricConfiguration = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing()
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
-        ChartReportReact report = analysisPageReact.getChartReport();
+        ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 4);
         assertTrue(metricConfiguration.isShowPercentEnabled());
 
-        analysisPageReact.addStack(ATTR_DEPARTMENT);
-        analysisPageReact.waitForReportComputing();
+        analysisPage.addStack(ATTR_DEPARTMENT);
+        analysisPage.waitForReportComputing();
         assertFalse(metricConfiguration.isShowPercentEnabled());
         checkingOpenAsReport("disablePopCheckboxOnDroppingNonDateAttribute");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void uncheckSelectedPopWhenReplaceAttribute() {
-        MetricConfiguration metricConfiguration = analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        MetricConfiguration metricConfiguration = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate()
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
-        assertTrue(analysisPageReact.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
+        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
         assertTrue(metricConfiguration.isPopEnabled());
 
         metricConfiguration.showPop();
-        assertTrue(analysisPageReact.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
+        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
 
-        analysisPageReact.replaceAttribute(DATE, ATTR_ACTIVITY_TYPE);
-        assertTrue(analysisPageReact.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
+        analysisPage.replaceAttribute(DATE, ATTR_ACTIVITY_TYPE);
+        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
         assertFalse(metricConfiguration.isPopEnabled());
         assertFalse(metricConfiguration.isPopSelected());
-        assertEquals(analysisPageReact.getAttributesBucket().getItemNames(), Arrays.asList(ATTR_ACTIVITY_TYPE));
+        assertEquals(analysisPage.getAttributesBucket().getItemNames(), Arrays.asList(ATTR_ACTIVITY_TYPE));
         checkingOpenAsReport("uncheckSelectedPopWhenReplaceAttribute");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void replaceMetricByNewOne() {
-        final MetricsBucket metricsBucket = analysisPageReact.getMetricsBucket();
+        final MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
 
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES);
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES);
         assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(METRIC_NUMBER_OF_ACTIVITIES)));
 
-        analysisPageReact.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT);
+        analysisPage.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT);
         assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(METRIC_AMOUNT)));
 
-        analysisPageReact.changeReportType(ReportType.BAR_CHART);
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES);
+        analysisPage.changeReportType(ReportType.BAR_CHART);
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES);
         assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT)));
 
-        analysisPageReact.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, EXPECTED);
+        analysisPage.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, EXPECTED);
         assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(EXPECTED, METRIC_AMOUNT)));
 
-        analysisPageReact.changeReportType(ReportType.TABLE);
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES);
+        analysisPage.changeReportType(ReportType.TABLE);
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES);
         assertTrue(isEqualCollection(metricsBucket.getItemNames(),
                 asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT, EXPECTED)));
 
-        analysisPageReact.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, REMAINING_QUOTA);
+        analysisPage.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, REMAINING_QUOTA);
         assertTrue(isEqualCollection(metricsBucket.getItemNames(),
                 asList(REMAINING_QUOTA, METRIC_AMOUNT, EXPECTED)));
 
-        analysisPageReact.undo();
+        analysisPage.undo();
         assertTrue(isEqualCollection(metricsBucket.getItemNames(),
                 asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT, EXPECTED)));
 
-        analysisPageReact.redo();
+        analysisPage.redo();
         assertTrue(isEqualCollection(metricsBucket.getItemNames(),
                 asList(REMAINING_QUOTA, METRIC_AMOUNT, EXPECTED)));
         checkingOpenAsReport("replaceMetricByNewOne");

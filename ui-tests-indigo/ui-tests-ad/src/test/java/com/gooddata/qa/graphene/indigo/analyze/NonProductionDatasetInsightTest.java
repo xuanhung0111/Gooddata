@@ -10,7 +10,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanelReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 
 public class NonProductionDatasetInsightTest extends AbstractAnalyseTest {
@@ -34,9 +34,9 @@ public class NonProductionDatasetInsightTest extends AbstractAnalyseTest {
             description = "Graphene test for bug ONE-1464 Get error when opening viz belong to non-production dataset")
     public void openInsightContainingNonProductionDataset() {
         final String insight = "Open-Insight-Containing-Non-Production-Dataset-Test";
-        final CataloguePanelReact panel = initAnalysePage().getCataloguePanel();
+        final CataloguePanel panel = initAnalysePage().getCataloguePanel();
         panel.changeDataset(PAYROLL_DATASET);
-        analysisPageReact.addMetric("Amount", FieldType.FACT)
+        analysisPage.addMetric("Amount", FieldType.FACT)
                 .addAttribute("Education")
                 .waitForReportComputing()
                 .saveInsight(insight);
@@ -46,9 +46,9 @@ public class NonProductionDatasetInsightTest extends AbstractAnalyseTest {
         assertTrue(panel.isDatasetApplied(PRODUCTION_DATASET), PRODUCTION_DATASET + " has not been applied");
 
         browser.navigate().refresh();
-        analysisPageReact.openInsight(insight).waitForReportComputing();
+        analysisPage.openInsight(insight).waitForReportComputing();
         takeScreenshot(browser, "open-insight-containing-non-production-dataset", getClass());
-        assertEquals(analysisPageReact.getChartReport().getTrackersCount(), 5,
+        assertEquals(analysisPage.getChartReport().getTrackersCount(), 5,
                 "The chart renders incorrectly");
     }
 }

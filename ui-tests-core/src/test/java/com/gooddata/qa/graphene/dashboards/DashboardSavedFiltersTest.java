@@ -22,14 +22,15 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
-import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditFilter;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardSettingsDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget.SavedViewPopupMenu;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 @Test(groups = {"dashboardSavedFilters"}, description = "Test saved filters work on dashboard in Portal")
@@ -293,11 +294,10 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
 
         // Create new dashboard SECOND_DASHBOARD_NAME to test
         initNewDashboard_AddFilter_TurnOnSavedView(SECOND_DASHBOARD_NAME);
-        dashboardsPage.editDashboard();
-        DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-        dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, "Department");
-        dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, "County");
-        dashboardEditBar.saveDashboard();
+        dashboardsPage.editDashboard()
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, "Department")
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, "County")
+                .saveDashboard();
 
         // Create saved view 1 "Abundant Foodz"
         sleepTightInSeconds(1);
@@ -392,12 +392,11 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     @Test(dependsOnMethods = {"savedViewFilterDoNotApplyOnFiltersAfterRemovingTest"})
     public void dashboardHasManyFiltersInManyTabsTest() {
         initDashboardsPage();
-        dashboardsPage.selectDashboard(SECOND_DASHBOARD_NAME);
-        DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
-        dashboardsPage.addNewTab("second tab");
-        dashboardEditBar.turnSavedViewOption(true);
-        dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, "Firstname");
-        dashboardEditBar.saveDashboard();
+        dashboardsPage.selectDashboard(SECOND_DASHBOARD_NAME)
+                .addNewTab("second tab")
+                .turnSavedViewOption(true)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, "Firstname")
+                .saveDashboard();
 
         dashboardsPage.getFilterWidget("firstname").changeAttributeFilterValue("Adam");
         dashboardsPage.getTabs().openTab(0);
@@ -432,7 +431,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         dashboardsPage.editDashboard();
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         dashboardEditBar = dashboardsPage.getDashboardEditBar();
-        dashboardEditBar.addTimeFilterToDashboard(-1, "this");
+        dashboardEditBar.addTimeFilterToDashboard(DateGranularity.YEAR, "this");
         dashboardEditBar.saveDashboard();
 
         dashboardsPage.editDashboard();

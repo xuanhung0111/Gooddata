@@ -131,7 +131,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         connectorType = Connectors.ZENDESK4;
         expectedDashboardsAndTabs = new HashMap<String, String[]>();
         expectedDashboardsAndTabs.put("Insights - View Only", new String[]{
-                "Overview", "Tickets", "Satisfaction", "Efficiency", "Agent Activity", "Learn More"
+                "Overview", "Tickets", "Satisfaction", "Efficiency", "Agent Activity", "SLAs", "Learn More"
         });
         expectedDashboardsAndTabs.put("My dashboard", new String[]{"First Tab"});
         zendeskAPIUser = testParams.loadProperty("connectors.zendesk.apiUser");

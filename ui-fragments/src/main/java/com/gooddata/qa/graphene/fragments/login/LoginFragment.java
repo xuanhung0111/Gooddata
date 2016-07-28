@@ -1,16 +1,19 @@
 package com.gooddata.qa.graphene.fragments.login;
 
-import static com.gooddata.qa.graphene.fragments.account.LostPasswordPage.LOST_PASSWORD_PAGE_CLASS_NAME;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static org.openqa.selenium.By.cssSelector;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.account.LostPasswordPage;
+import com.gooddata.qa.graphene.fragments.account.RegistrationPage;
 
 public class LoginFragment extends AbstractFragment {
 
@@ -34,6 +37,20 @@ public class LoginFragment extends AbstractFragment {
 
     private static final String ERROR_CLASS = "has-error";
     private static final By NOTIFICATION_MESSAGE_LOCATOR = By.cssSelector(".login-message.is-success");
+
+    private static LoginFragment instance = null;
+
+    public static final LoginFragment getInstance(SearchContext context) {
+        if (instance == null) {
+            instance = Graphene.createPageFragment(LoginFragment.class,
+                    waitForElementVisible(cssSelector(".s-loginPage.s-ready"), context));
+        }
+        return waitForFragmentVisible(instance);
+    }
+
+    public static final void waitForPageLoaded(SearchContext context) {
+        getInstance(context);
+    }
 
     public void login(String username, String password, boolean validLogin) {
         waitForElementVisible(email).clear();
@@ -70,12 +87,12 @@ public class LoginFragment extends AbstractFragment {
 
     public LostPasswordPage openLostPasswordPage() {
         waitForElementVisible(forgotPasswordLink).click();
-        return Graphene.createPageFragment(LostPasswordPage.class,
-                waitForElementVisible(By.className(LOST_PASSWORD_PAGE_CLASS_NAME), browser));
+        return LostPasswordPage.getInstance(browser);
     }
 
-    public void openRegistrationPage() {
+    public RegistrationPage openRegistrationPage() {
         waitForElementVisible(registrationLink).click();
+        return RegistrationPage.getInstance(browser);
     }
 
     public String getNotificationMessage() {

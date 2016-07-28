@@ -56,7 +56,7 @@ public class ColorPaletteTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"init"})
     public void should_have_correct_series_order_in_bar_and_column_chart_in_stacked_charts() {
         List<String> expectedLegend = asList("Email", "In Person Meeting", "Phone Call", "Web Meeting");
-        assertEquals(analysisPageReact.addStack(ATTR_ACTIVITY_TYPE)
+        assertEquals(analysisPage.addStack(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing()
@@ -65,7 +65,7 @@ public class ColorPaletteTest extends AbstractAdE2ETest {
 
         List<String> legendColors = newArrayList(COLOR_PALETTE.subList(0, expectedLegend.size()));
 
-        assertEquals(analysisPageReact.changeReportType(ReportType.BAR_CHART)
+        assertEquals(analysisPage.changeReportType(ReportType.BAR_CHART)
             .waitForReportComputing()
             .getChartReport()
             .getLegends(), expectedLegend);
@@ -76,7 +76,7 @@ public class ColorPaletteTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"init"})
     public void should_have_correct_series_colors_in_line_chart_which_has_attribute_in_segment_by() {
         List<String> expectedLegend = asList("Email", "In Person Meeting", "Phone Call", "Web Meeting");
-        assertEquals(analysisPageReact.addStack(ATTR_ACTIVITY_TYPE)
+        assertEquals(analysisPage.addStack(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing()
@@ -85,7 +85,7 @@ public class ColorPaletteTest extends AbstractAdE2ETest {
 
         List<String> legendColors = newArrayList(COLOR_PALETTE.subList(0, expectedLegend.size()));
 
-        assertEquals(analysisPageReact.changeReportType(ReportType.LINE_CHART)
+        assertEquals(analysisPage.changeReportType(ReportType.LINE_CHART)
             .waitForReportComputing()
             .getChartReport()
             .getLegends(), expectedLegend);
@@ -96,7 +96,7 @@ public class ColorPaletteTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"init"})
     public void should_have_correct_series_order_in_bar_and_column_chart_in_non_stacked_charts() {
         List<String> expectedLegend = asList("# of Activities", "# of Lost Opps.");
-        assertEquals(analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        assertEquals(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addMetric(METRIC_NUMBER_OF_LOST_OPPS)
             .waitForReportComputing()
             .getChartReport()
@@ -104,7 +104,7 @@ public class ColorPaletteTest extends AbstractAdE2ETest {
 
         List<String> legendColors = newArrayList(COLOR_PALETTE.subList(0, expectedLegend.size()));
 
-        assertEquals(analysisPageReact.changeReportType(ReportType.BAR_CHART)
+        assertEquals(analysisPage.changeReportType(ReportType.BAR_CHART)
             .waitForReportComputing()
             .getChartReport()
             .getLegends(), expectedLegend);

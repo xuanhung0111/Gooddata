@@ -20,11 +20,11 @@ import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.entity.variable.NumericVariable;
 import com.gooddata.qa.graphene.enums.ResourceDirectory;
-import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.enums.dashboard.TextObject;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
@@ -154,7 +154,7 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
     @Test(dependsOnMethods = {"testExportImportProject"})
     public void editDashboardOnImportedProject() {
         final DashboardEditBar editBar = initDashboardsPage().editDashboard()
-                .addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, EDUTCATION);
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, EDUTCATION);
 
         final FilterWidget filterWidget = dashboardsPage.getContent().getFilterWidget(simplifyText(EDUTCATION));
 
@@ -200,8 +200,10 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
                 "There is difference between actual and expected attributes");
         takeScreenshot(browser, "added-reports-to-dashboard", getClass());
 
-        dashboardsPage.editDashboard().addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, EDUTCATION)
-                .addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, POSITION)
+        dashboardsPage
+                .editDashboard()
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, EDUTCATION)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, POSITION)
                 .saveDashboard();
         takeScreenshot(browser, "added-filters-to-dashboard", getClass());
 

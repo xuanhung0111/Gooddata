@@ -13,7 +13,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanelReact;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
 public class AvailableItemsTest extends AbstractAdE2ETest {
@@ -25,55 +25,55 @@ public class AvailableItemsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_unavailable_attributes_when_metric_is_added() {
-        CataloguePanelReact panel = analysisPageReact.getCataloguePanel();
+        CataloguePanel panel = analysisPage.getCataloguePanel();
 
         assertTrue(panel.getFieldNamesInViewPort().contains(ATTR_ACTIVITY_TYPE));
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_LOST_OPPS).waitForReportComputing();
+        analysisPage.addMetric(METRIC_NUMBER_OF_LOST_OPPS).waitForReportComputing();
         assertFalse(panel.clearInputText().getFieldNamesInViewPort().contains(ATTR_ACTIVITY_TYPE));
 
-        analysisPageReact.removeMetric(METRIC_NUMBER_OF_LOST_OPPS).waitForReportComputing();
+        analysisPage.removeMetric(METRIC_NUMBER_OF_LOST_OPPS).waitForReportComputing();
         assertTrue(panel.getFieldNamesInViewPort().contains(ATTR_ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_unavailable_metrics_when_attribute_is_in_categories() {
-        CataloguePanelReact panel = analysisPageReact.getCataloguePanel();
+        CataloguePanel panel = analysisPage.getCataloguePanel();
 
         assertTrue(panel.getFieldNamesInViewPort().contains(METRIC_NUMBER_OF_LOST_OPPS));
-        analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE);
+        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE);
         assertFalse(panel.clearInputText().getFieldNamesInViewPort().contains(METRIC_NUMBER_OF_LOST_OPPS));
 
-        analysisPageReact.removeAttribute(ATTR_ACTIVITY_TYPE);
+        analysisPage.removeAttribute(ATTR_ACTIVITY_TYPE);
         assertTrue(panel.getFieldNamesInViewPort().contains(METRIC_NUMBER_OF_LOST_OPPS));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_unavailable_metrics_when_attribute_is_in_stacks() {
-        CataloguePanelReact panel = analysisPageReact.getCataloguePanel();
+        CataloguePanel panel = analysisPage.getCataloguePanel();
 
         assertTrue(panel.getFieldNamesInViewPort().contains(METRIC_NUMBER_OF_LOST_OPPS));
-        analysisPageReact.addStack(ATTR_ACTIVITY_TYPE);
+        analysisPage.addStack(ATTR_ACTIVITY_TYPE);
         assertFalse(panel.clearInputText().getFieldNamesInViewPort().contains(METRIC_NUMBER_OF_LOST_OPPS));
 
-        analysisPageReact.removeStack();
+        analysisPage.removeStack();
         assertTrue(panel.getFieldNamesInViewPort().contains(METRIC_NUMBER_OF_LOST_OPPS));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_unavailable_facts() {
-        CataloguePanelReact panel = analysisPageReact.getCataloguePanel();
+        CataloguePanel panel = analysisPage.getCataloguePanel();
 
         assertTrue(panel.getFieldNamesInViewPort().contains(METRIC_AMOUNT));
-        analysisPageReact.addStack(ATTR_ACTIVITY_TYPE);
+        analysisPage.addStack(ATTR_ACTIVITY_TYPE);
         assertFalse(panel.clearInputText().getFieldNamesInViewPort().contains(METRIC_AMOUNT));
 
-        analysisPageReact.removeStack();
+        analysisPage.removeStack();
         assertTrue(panel.getFieldNamesInViewPort().contains(METRIC_AMOUNT));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_all_items_on_reset() {
-        CataloguePanelReact panel = analysisPageReact.addStack(ATTR_ACTIVITY_TYPE)
+        CataloguePanel panel = analysisPage.addStack(ATTR_ACTIVITY_TYPE)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getCataloguePanel()
             .filterCatalog(CatalogFilterType.ATTRIBUTES);
@@ -83,7 +83,7 @@ public class AvailableItemsTest extends AbstractAdE2ETest {
                 .getFieldNamesInViewPort()
                 .contains(METRIC_NUMBER_OF_LOST_OPPS));
 
-        analysisPageReact.resetToBlankState();
+        analysisPage.resetToBlankState();
         assertTrue(panel.filterCatalog(CatalogFilterType.ATTRIBUTES)
                 .getFieldNamesInViewPort()
                 .contains(ATTR_PRODUCT));
@@ -94,31 +94,31 @@ public class AvailableItemsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_metric_after_undo() {
-        CataloguePanelReact panel = analysisPageReact.addAttribute(ATTR_ACTIVITY_TYPE).getCataloguePanel().clearInputText();
+        CataloguePanel panel = analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).getCataloguePanel().clearInputText();
         assertFalse(panel.getFieldNamesInViewPort().contains(METRIC_NUMBER_OF_LOST_OPPS));
 
-        analysisPageReact.resetToBlankState();
+        analysisPage.resetToBlankState();
         assertTrue(panel.getFieldNamesInViewPort().contains(METRIC_NUMBER_OF_LOST_OPPS));
 
-        analysisPageReact.undo();
+        analysisPage.undo();
         assertFalse(panel.getFieldNamesInViewPort().contains(METRIC_NUMBER_OF_LOST_OPPS));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_attribute_after_undo() {
-        CataloguePanelReact panel = analysisPageReact.addMetric(METRIC_NUMBER_OF_LOST_OPPS).getCataloguePanel().clearInputText();
+        CataloguePanel panel = analysisPage.addMetric(METRIC_NUMBER_OF_LOST_OPPS).getCataloguePanel().clearInputText();
         assertFalse(panel.getFieldNamesInViewPort().contains(ATTR_ACTIVITY_TYPE));
 
-        analysisPageReact.resetToBlankState();
+        analysisPage.resetToBlankState();
         assertTrue(panel.getFieldNamesInViewPort().contains(ATTR_ACTIVITY_TYPE));
 
-        analysisPageReact.undo();
+        analysisPage.undo();
         assertFalse(panel.getFieldNamesInViewPort().contains(ATTR_ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_special_message_if_only_unavailable_items_matched() {
-        CataloguePanelReact panel = analysisPageReact.addMetric(METRIC_NUMBER_OF_LOST_OPPS).getCataloguePanel();
+        CataloguePanel panel = analysisPage.addMetric(METRIC_NUMBER_OF_LOST_OPPS).getCataloguePanel();
         assertFalse(panel.search(ATTR_ACTIVITY_TYPE));
         assertEquals(panel.getUnrelatedItemsHiddenCount(), 1);
     }

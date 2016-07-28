@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.fragments.dashboards;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.util.List;
@@ -13,12 +14,14 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 
-import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.dashboard.TextObject;
 import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.DropDown;
+import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 
 public class DashboardEditBar extends AbstractFragment {
 
@@ -80,7 +83,7 @@ public class DashboardEditBar extends AbstractFragment {
     private WebElement attributeFilter;
 
     @FindBy(xpath = "//div[contains(@class,'gdc-overlay-simple') and not(contains(@class,'yui3-overlay-hidden'))]")
-    private DashboardFilter dashboardFilter;
+    private AddDashboardFilterPanel dashboardFilter;
 
     @FindBy(xpath = "//div[contains(@class,'gdc-menu-simple')]//span[text()='Date']")
     private WebElement dateFilter;
@@ -141,26 +144,28 @@ public class DashboardEditBar extends AbstractFragment {
         return this;
     }
 
-    public DashboardEditBar addListFilterToDashboard(DashFilterTypes type, String name) {
-        int widgetCountBefore = listDashboardWidgets.size();
-        waitForElementVisible(addFilterMenu).click();
-        waitForElementVisible(attributeFilter).click();
-        waitForElementVisible(dashboardFilter.getRoot());
-        dashboardFilter.addListFilter(type, name);
-        Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1,
-                "Widget wasn't added");
+    public DashboardEditBar addAttributeFilterToDashboard(DashAttributeFilterTypes type, String name) {
+        openFilterMenu().select("Attribute");
+        waitForFragmentVisible(dashboardFilter).addAttributeFilter(type, name);
+
         return this;
     }
 
-    public void addTimeFilterToDashboard(int dateDimensionIndex, String dateRange) {
-        int widgetCountBefore = listDashboardWidgets.size();
-        waitForElementVisible(addFilterMenu).click();
-        waitForElementVisible(dateFilter).click();
-        waitForElementVisible(dashboardFilter.getRoot());
-        sleepTightInSeconds(1);
-        dashboardFilter.addTimeFilter(dateDimensionIndex, dateRange);
-        Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1,
-                "Widget wasn't added");
+    public DashboardEditBar addTimeFilterToDashboard(String dateDimension, DateGranularity dateGranularity,
+            String timeLine) {
+        if (dateGranularity == DateGranularity.DAY) {
+            throw new UnsupportedOperationException(
+                    "Date granularity type: " + dateGranularity + " is not supported");
+        }
+
+        openFilterMenu().select("Date");
+        waitForFragmentVisible(dashboardFilter).addTimeFilter(dateDimension, dateGranularity, timeLine);
+
+        return this;
+    }
+
+    public DashboardEditBar addTimeFilterToDashboard(DateGranularity dateGranularity, String timeLine) {
+        return addTimeFilterToDashboard(null, dateGranularity, timeLine);
     }
 
     public WidgetConfigPanel openGroupConfigPanel() {
@@ -189,7 +194,7 @@ public class DashboardEditBar extends AbstractFragment {
                 "Widget wasn't added");
     }
 
-    public void addLineToDashboard() {
+    public DashboardEditBar addLineToDashboard() {
         int widgetCountBefore = listDashboardWidgets.size();
         waitForElementVisible(addLine).click();
         waitForElementVisible(dashboardLineObject.getRoot());
@@ -199,6 +204,7 @@ public class DashboardEditBar extends AbstractFragment {
         dashboardLineObject.addLineVerticalToDashboard();
         Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 2,
                 "Widget wasn't added");
+        return this;
     }
 
     public void saveDashboard() {
@@ -264,5 +270,10 @@ public class DashboardEditBar extends AbstractFragment {
 
     public int getDashboardWidgetsCount() {
         return listDashboardWidgets.size();
+    }
+
+    private SimpleMenu openFilterMenu() {
+        waitForElementVisible(addFilterMenu).click();
+        return SimpleMenu.getInstance(browser);
     }
 }

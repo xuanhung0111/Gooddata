@@ -1,13 +1,12 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.GOODSALES_TEMPLATE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_CREATED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.GOODSALES_TEMPLATE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.String.valueOf;
@@ -34,12 +33,12 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.report.WhatItem;
-import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbedDashboardDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
@@ -47,6 +46,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.EmbeddedWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.StyleConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel.Tab;
+import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.graphene.fragments.reports.report.ChartReport;
 import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
@@ -343,7 +343,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         initDashboardsPage()
                 .addNewDashboard("Dashboard with filter")
                 .addReportToDashboard(tabularReportDef.getName())
-                .addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_YEAR_CREATED)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_YEAR_CREATED)
                 .saveDashboard();
 
         EmbedDashboardDialog dashboardEmbedDialog = dashboardsPage.openEmbedDashboardDialog();
@@ -377,8 +377,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         try {
             signInAtGreyPages(testParams.getViewerUser(), testParams.getViewerPassword());
             browser.get(embedUri);
-            waitForFragmentVisible(loginFragment);
-            String notAuthorizedMessage = loginFragment.getNotAuthorizedMessage();
+            String notAuthorizedMessage = LoginFragment.getInstance(browser).getNotAuthorizedMessage();
             log.info("Not authorized message: " + notAuthorizedMessage);
             assertTrue(notAuthorizedMessage.contains("ACCESS DENIED"));
             assertTrue(notAuthorizedMessage

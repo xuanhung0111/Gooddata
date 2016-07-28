@@ -5,7 +5,6 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -29,6 +28,8 @@ import com.gooddata.qa.graphene.AbstractUITest;
 import com.gooddata.qa.graphene.entity.account.RegistrationForm;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.account.InviteUserDialog;
+import com.gooddata.qa.graphene.fragments.account.RegistrationPage;
+import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 
 public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
@@ -99,9 +100,8 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     public void checkWalkme() throws ParseException, JSONException, IOException {
         deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), REGISTRATION_USER);
 
-        initRegistrationPage();
-        registrationPage.registerNewUser(registrationForm);
-        waitForFragmentNotVisible(registrationPage);
+        initRegistrationPage()
+            .registerNewUserSuccessfully(registrationForm);
 
         waitForDashboardPageLoaded(browser);
         assertTrue(isWalkmeDisplayed(), "Walkme-dialog-is-not-visible");
@@ -124,37 +124,35 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
     @Test(groups = PROJECT_INIT_GROUP)
     public void selectLoginLink() {
-        initRegistrationPage();
-
-        registrationPage.selectLoginLink();
-        waitForElementVisible(loginFragment.getRoot());
-
-        loginFragment.openRegistrationPage();
-        waitForElementVisible(registrationPage.getRoot());
+        initRegistrationPage()
+            .selectLoginLink()
+            .openRegistrationPage();
     }
 
     @Test(groups = PROJECT_INIT_GROUP)
     public void registerUserWithInvalidValue() {
-        initRegistrationPage();
+        initRegistrationPage()
+            .fillInRegistrationForm(new RegistrationForm())
+            .submitForm();
+        assertEquals(RegistrationPage.getInstance(browser).getErrorMessage(), FIELD_MISSING_ERROR_MESSAGE);
 
-        registrationPage.fillInRegistrationForm(new RegistrationForm())
-                .submitForm();
-        assertEquals(registrationPage.getErrorMessage(), FIELD_MISSING_ERROR_MESSAGE);
+        RegistrationPage.getInstance(browser)
+            .fillInRegistrationForm(registrationForm)
+            .enterEmail(INVALID_EMAIL)
+            .submitForm();
+        assertEquals(RegistrationPage.getInstance(browser).getErrorMessage(), INVALID_EMAIL_ERROR_MESSAGE);
 
-        registrationPage.fillInRegistrationForm(registrationForm)
-                .enterEmail(INVALID_EMAIL)
-                .submitForm();
-        assertEquals(registrationPage.getErrorMessage(), INVALID_EMAIL_ERROR_MESSAGE);
+        RegistrationPage.getInstance(browser)
+            .fillInRegistrationForm(registrationForm)
+            .enterPassword(INVALID_PASSWORD)
+            .submitForm();
+        assertEquals(RegistrationPage.getInstance(browser).getErrorMessage(), INVALID_PASSWORD_ERROR_MESSAGE);
 
-        registrationPage.fillInRegistrationForm(registrationForm)
-                .enterPassword(INVALID_PASSWORD)
-                .submitForm();
-        assertEquals(registrationPage.getErrorMessage(), INVALID_PASSWORD_ERROR_MESSAGE);
-
-        registrationPage.fillInRegistrationForm(registrationForm)
-                .enterPhoneNumber(INVALID_PHONE_NUMBER)
-                .submitForm();
-        assertEquals(registrationPage.getErrorMessage(), INVALID_PHONE_NUMBER_ERROR_MESSAGE);
+        RegistrationPage.getInstance(browser)
+            .fillInRegistrationForm(registrationForm)
+            .enterPhoneNumber(INVALID_PHONE_NUMBER)
+            .submitForm();
+        assertEquals(RegistrationPage.getInstance(browser).getErrorMessage(), INVALID_PHONE_NUMBER_ERROR_MESSAGE);
     }
 
     @Test(groups = PROJECT_INIT_GROUP)
@@ -162,12 +160,8 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
             throws ParseException, JSONException, IOException, MessagingException {
         deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), REGISTRATION_USER);
 
-        initRegistrationPage();
-
         activationLink = doActionWithImapClient(
-                imapClient -> registrationPage.registerNewUser(imapClient, registrationForm));
-
-        waitForFragmentNotVisible(registrationPage);
+                imapClient -> initRegistrationPage().registerNewUserSuccessfully(imapClient, registrationForm));
         waitForDashboardPageLoaded(browser);
 
         testParams.setProjectId(getProjectId(GOODDATA_PRODUCT_TOUR_PROJECT));
@@ -187,15 +181,14 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         assertEquals(userProfilePage.getUserRole(), "", "Unverified admin should not show role");
         takeScreenshot(browser, "Unverified user has no role", this.getClass());
 
-        logout();
-        loginFragment.login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, false);
+        logout()
+            .login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, false);
         assertEquals(getPageErrorMessage(), NOT_FULLY_ACTIVATED_MESSAGE);
 
         openUrl(activationLink);
-        waitForElementVisible(loginFragment.getRoot());
-        assertEquals(loginFragment.getNotificationMessage(), ACTIVATION_SUCCESS_MESSAGE);
+        assertEquals(LoginFragment.getInstance(browser).getNotificationMessage(), ACTIVATION_SUCCESS_MESSAGE);
 
-        loginFragment.login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
+        LoginFragment.getInstance(browser).login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
         waitForDashboardPageLoaded(browser);
 
         initProjectsAndUsersPage();
@@ -214,28 +207,26 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
     @Test(groups = {PROJECT_INIT_GROUP, "sanity"})
     public void registerNewUser() throws MessagingException, IOException, ParseException, JSONException {
-        if (!testParams.isClusterEnvironment() || testParams.isProductionEnvironment()) {
+        if (!testParams.isClusterEnvironment() || testParams.isProductionEnvironment() ||
+                testParams.isPerformanceEnvironment()) {
             log.warning("Register New User is not tested on PI or Production environment");
             return;
         }
         deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), REGISTRATION_USER);
 
-        initRegistrationPage();
-
         activationLink = doActionWithImapClient(
-                imapClient -> registrationPage.registerNewUser(imapClient, registrationForm));
+                imapClient -> initRegistrationPage().registerNewUserSuccessfully(imapClient, registrationForm));
 
-        waitForFragmentNotVisible(registrationPage);
         waitForDashboardPageLoaded(browser);
 
         openUrl(activationLink);
-        waitForElementVisible(loginFragment.getRoot());
+        LoginFragment.waitForPageLoaded(browser);
 
         takeScreenshot(browser, "register user successfully", this.getClass());
-        assertEquals(loginFragment.getNotificationMessage(), ACTIVATION_SUCCESS_MESSAGE);
+        assertEquals(LoginFragment.getInstance(browser).getNotificationMessage(), ACTIVATION_SUCCESS_MESSAGE);
 
         try {
-            loginFragment.login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
+            LoginFragment.getInstance(browser).login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
             waitForDashboardPageLoaded(browser);
 
             openProject(DEMO_PROJECT);
@@ -248,49 +239,48 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     @Test(groups = PROJECT_INIT_GROUP, dependsOnMethods = {"registerNewUser"})
     public void openAtivationLinkAfterRegistration() {
         openUrl(activationLink);
-        waitForElementVisible(loginFragment.getRoot());
-        assertEquals(loginFragment.getNotificationMessage(), ALREADY_ACTIVATED_MESSAGE);
+        assertEquals(LoginFragment.getInstance(browser).getNotificationMessage(), ALREADY_ACTIVATED_MESSAGE);
 
-        loginFragment.login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
+        LoginFragment.getInstance(browser).login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
     }
 
     @Test(groups = PROJECT_INIT_GROUP, dependsOnMethods = {"registerNewUser"})
     public void registerUserWithEmailOfExistingAccount() {
-        initRegistrationPage();
-
-        registrationPage.fillInRegistrationForm(new RegistrationForm())
+        initRegistrationPage()
+                .fillInRegistrationForm(new RegistrationForm())
                 .enterEmail(generateEmail(REGISTRATION_USER))
                 .enterSpecialCaptcha()
                 .agreeRegistrationLicense()
                 .submitForm();
 
         takeScreenshot(browser, "Verification-on-un-registered-email-show-nothing-when-missing-other-fields", getClass());
-        assertFalse(registrationPage.isEmailInputError(), "Email input shows error but expected is not");
-        assertFalse(registrationPage.isCaptchaInputError(), "Captcha input shows error but expected is not");
-        assertEquals(registrationPage.getErrorMessage(), FIELD_MISSING_ERROR_MESSAGE);
+        assertFalse(RegistrationPage.getInstance(browser).isEmailInputError(), "Email input shows error but expected is not");
+        assertFalse(RegistrationPage.getInstance(browser).isCaptchaInputError(), "Captcha input shows error but expected is not");
+        assertEquals(RegistrationPage.getInstance(browser).getErrorMessage(), FIELD_MISSING_ERROR_MESSAGE);
 
-        registrationPage.enterEmail(REGISTRATION_USER).submitForm();
+        RegistrationPage.getInstance(browser).enterEmail(REGISTRATION_USER).submitForm();
 
         takeScreenshot(browser, "Verification-on-registered-email-show-nothing-when-missing-other-fields", getClass());
-        assertFalse(registrationPage.isEmailInputError(), "Email input shows error but expected is not");
-        assertFalse(registrationPage.isCaptchaInputError(), "Captcha input shows error but expected is not");
-        assertEquals(registrationPage.getErrorMessage(), FIELD_MISSING_ERROR_MESSAGE);
+        assertFalse(RegistrationPage.getInstance(browser).isEmailInputError(), "Email input shows error but expected is not");
+        assertFalse(RegistrationPage.getInstance(browser).isCaptchaInputError(), "Captcha input shows error but expected is not");
+        assertEquals(RegistrationPage.getInstance(browser).getErrorMessage(), FIELD_MISSING_ERROR_MESSAGE);
 
-        registrationPage.enterCaptcha("aaaaa").submitForm();
+        RegistrationPage.getInstance(browser).enterCaptcha("aaaaa").submitForm();
 
         takeScreenshot(browser, "Email-and-captcha-field-show-nothing-when-enter-wrong-captcha", getClass());
-        assertFalse(registrationPage.isEmailInputError(), "Email input shows error but expected is not");
-        assertFalse(registrationPage.isCaptchaInputError(), "Error not show on captcha input");
-        assertEquals(registrationPage.getErrorMessage(), FIELD_MISSING_ERROR_MESSAGE);
+        assertFalse(RegistrationPage.getInstance(browser).isEmailInputError(), "Email input shows error but expected is not");
+        assertFalse(RegistrationPage.getInstance(browser).isCaptchaInputError(), "Error not show on captcha input");
+        assertEquals(RegistrationPage.getInstance(browser).getErrorMessage(), FIELD_MISSING_ERROR_MESSAGE);
 
-        registrationPage.fillInRegistrationForm(registrationForm)
+        RegistrationPage.getInstance(browser)
+                .fillInRegistrationForm(registrationForm)
                 .enterSpecialCaptcha()
                 .submitForm();
 
         takeScreenshot(browser, "Error-message-displays-when-register-user-with-an-existed-email", getClass());
-        assertTrue(registrationPage.isEmailInputError(), "Error not show on email input");
-        assertEquals(registrationPage.getErrorMessage(), EXISTED_EMAIL_ERROR_MESSAGE);
+        assertTrue(RegistrationPage.getInstance(browser).isEmailInputError(), "Error not show on email input");
+        assertEquals(RegistrationPage.getInstance(browser).getErrorMessage(), EXISTED_EMAIL_ERROR_MESSAGE);
     }
 
     @Test(dependsOnMethods = "registerUserWithEmailOfExistingAccount")
@@ -300,21 +290,21 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         initAccountPage();
 
         accountPage.tryDeleteAccountButDiscard();
-        logout();
-        loginFragment.login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
+        logout()
+            .login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
 
         initAccountPage();
         accountPage.deleteAccount();
-        waitForElementVisible(loginFragment.getRoot());
 
-        loginFragment.login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, false);
-        loginFragment.checkInvalidLogin();
+        LoginFragment.getInstance(browser).login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, false);
+        LoginFragment.getInstance(browser).checkInvalidLogin();
     }
 
     @AfterClass(alwaysRun = true)
     public void tearDown() throws ParseException, JSONException, IOException {
-        if (!testParams.isClusterEnvironment() || testParams.isProductionEnvironment()) return;
+        if (!testParams.isClusterEnvironment() || testParams.isProductionEnvironment() ||
+                testParams.isPerformanceEnvironment()) return;
         deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), REGISTRATION_USER);
     }
 

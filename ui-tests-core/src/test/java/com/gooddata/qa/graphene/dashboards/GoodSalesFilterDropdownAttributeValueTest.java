@@ -46,10 +46,10 @@ import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
-import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardContent;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.AttributeFilterPanel;
@@ -138,7 +138,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
         WebElement report = dashboardsPage.getContent().getLatestReport(TableReport.class).getRoot();
         DashboardWidgetDirection.LEFT.moveElementToRightPlace(report);
 
-        dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME);
+        dashboardEditBar.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME);
         WebElement filter = dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME)).getRoot();
         filter.click();
         DashboardWidgetDirection.UP.moveElementToRightPlace(filter);
@@ -160,7 +160,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
         WebElement report = dashboardsPage.getContent().getLatestReport(TableReport.class).getRoot();
         DashboardWidgetDirection.RIGHT.moveElementToRightPlace(report);
 
-        dashboardEditBar.addListFilterToDashboard(DashFilterTypes.PROMPT, F_STAGE_NAME);
+        dashboardEditBar.addAttributeFilterToDashboard(DashAttributeFilterTypes.PROMPT, F_STAGE_NAME);
         WebElement filter = dashboardsPage.getContent().getFilterWidget(simplifyText(F_STAGE_NAME)).getRoot();
         filter.click();
         DashboardWidgetDirection.DOWN.moveElementToRightPlace(filter);
@@ -187,7 +187,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
 
             dashboardsPage.editDashboard();
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-            dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, "Account");
+            dashboardEditBar.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, "Account");
             dashboardEditBar.saveDashboard();
 
             assertTrue(isUseAvailableStillRemainInDashboard(getCurrentDashboardUri()));
@@ -207,10 +207,10 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
             assertTrue(isEqualCollection(asList("Discovery", "Risk Assessment"),
                     getAttributeValuesInFirstRow(REPORT_2)));
 
-            dashboardsPage.editDashboard();
-            DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-            dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, "Account");
-            dashboardEditBar.saveDashboard();
+            dashboardsPage
+                    .editDashboard()
+                    .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, "Account")
+                    .saveDashboard();
 
             assertTrue(isUseAvailableStillRemainInDashboard(getCurrentDashboardUri()),
                     "UseAvailable is removed from dashboard!");
@@ -230,7 +230,6 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
 
         makeCopyFromDashboard(USE_AVAILABLE_DASHBOARD_1);
         try {
-            dashboardsPage.editDashboard();
             dashboardsPage.addNewTab("new_tab");
 
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
@@ -238,7 +237,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
             WebElement report = dashboardsPage.getContent().getLatestReport(TableReport.class).getRoot();
             DashboardWidgetDirection.LEFT.moveElementToRightPlace(report);
 
-            dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME);
+            dashboardEditBar.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME);
             WebElement filter = dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME)).getRoot();
             filter.click();
             DashboardWidgetDirection.UP.moveElementToRightPlace(filter);

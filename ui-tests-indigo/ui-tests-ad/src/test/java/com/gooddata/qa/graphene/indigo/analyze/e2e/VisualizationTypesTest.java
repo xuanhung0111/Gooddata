@@ -22,7 +22,7 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_table_visualization() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .changeReportType(ReportType.TABLE)
             .waitForReportComputing();
@@ -31,7 +31,7 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_line_chart_visualization() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .changeReportType(ReportType.LINE_CHART)
             .waitForReportComputing();
@@ -40,7 +40,7 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_bar_chart_visualization() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .changeReportType(ReportType.BAR_CHART)
             .waitForReportComputing();
@@ -49,7 +49,7 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_column_chart_visualization() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .changeReportType(ReportType.COLUMN_CHART)
             .waitForReportComputing();
@@ -58,48 +58,48 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_apply_changing_the_visualization_type() {
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .changeReportType(ReportType.TABLE)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".adi-report-visualization.s-visualization-table"), browser));
 
-        analysisPageReact.changeReportType(ReportType.LINE_CHART)
+        analysisPage.changeReportType(ReportType.LINE_CHART)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".adi-report-visualization.s-visualization-line"), browser));
 
-        analysisPageReact.changeReportType(ReportType.BAR_CHART)
+        analysisPage.changeReportType(ReportType.BAR_CHART)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".adi-report-visualization.s-visualization-bar"), browser));
 
-        analysisPageReact.changeReportType(ReportType.COLUMN_CHART)
+        analysisPage.changeReportType(ReportType.COLUMN_CHART)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".adi-report-visualization.s-visualization-column"), browser));
 
-        analysisPageReact.changeReportType(ReportType.TABLE)
+        analysisPage.changeReportType(ReportType.TABLE)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".adi-report-visualization.s-visualization-table"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_missing_metric_if_one_attribute_is_dragged_in() {
-        analysisPageReact.changeReportType(ReportType.COLUMN_CHART)
+        analysisPage.changeReportType(ReportType.COLUMN_CHART)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(
                 ".adi-editor-canvas .adi-canvas-message.adi-canvas-message-missing-metric"), browser));
 
-        analysisPageReact.changeReportType(ReportType.TABLE)
+        analysisPage.changeReportType(ReportType.TABLE)
             .waitForReportComputing();
         assertFalse(isElementPresent(cssSelector(
                 ".adi-editor-canvas .adi-canvas-message"), browser));
 
-        analysisPageReact.changeReportType(ReportType.LINE_CHART)
+        analysisPage.changeReportType(ReportType.LINE_CHART)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(
                 ".adi-editor-canvas .adi-canvas-message.adi-canvas-message-missing-metric"), browser));
 
-        analysisPageReact.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
         assertFalse(isElementPresent(cssSelector(
                 ".adi-editor-canvas .adi-canvas-message"), browser));

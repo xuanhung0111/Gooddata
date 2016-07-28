@@ -217,7 +217,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
         System.out.println("Waiting for process synchronized: " + processUrl);
         int i = 0;
         String status = getProcessStatus();
-        while (!"SYNCHRONIZED".equals(status) && i < checkIterations) {
+        while (!isFinalStatus(status) && i < checkIterations) {
             System.out.println("Current process status is: " + status);
             assertNotEquals(status, "ERROR", "Error status appeared");
             sleepTightInSeconds(5);
@@ -227,6 +227,13 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
         }
         assertEquals(status, "SYNCHRONIZED", "Process is synchronized");
         System.out.println("Integration was synchronized at +- " + (i * 5) + "seconds");
+    }
+
+    private boolean isFinalStatus(final String status) {
+        return
+                "SYNCHRONIZED".equals(status) ||
+                "ERROR".equals(status) ||
+                "USER_ERROR".equals(status);
     }
 
     private String getProcessStatus() throws JSONException {

@@ -6,8 +6,13 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+import com.gooddata.project.Project;
+import com.gooddata.project.ProjectDriver;
+import com.gooddata.project.ProjectService;
+import com.gooddata.project.ProjectValidationResults;
 import org.apache.http.HttpHost;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.testng.Arquillian;
@@ -158,5 +163,15 @@ public abstract class AbstractTest extends Arquillian {
 
     public String generateEmail(String email) {
         return email.replace("@", "+" + UUID.randomUUID().toString().substring(0, 5) + "@");
+    }
+
+    public ProjectValidationResults validateProject() {
+        final int timeout = testParams.getProjectDriver() == ProjectDriver.VERTICA ?
+                testParams.getExtendedTimeout() : testParams.getDefaultTimeout();
+        final ProjectService service = getGoodDataClient().getProjectService();
+        final Project project = service.getProjectById(testParams.getProjectId());
+        final ProjectValidationResults results = service.validateProject(project).get(timeout, TimeUnit.SECONDS);
+        System.out.println("Project valid: " + results.isValid());
+        return results;
     }
 }

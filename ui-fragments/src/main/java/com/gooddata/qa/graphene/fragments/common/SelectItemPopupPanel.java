@@ -32,20 +32,20 @@ public class SelectItemPopupPanel extends AbstractFragment {
     private static final String BUTTON_GROUP_XPATH_LOCATOR = "//*[contains(@class,'gdc-buttonGroup')]//span[.='%s']";
 
     @FindBys({
-        @FindBy(css = ".overlayPlugin-plugged>:not(.gdc-hidden),.pickerRoot,.sndPanelFilter,.filter"),
+        @FindBy(css = ".overlayPlugin-plugged>:not(.gdc-hidden),.sndPanelFilter,.filter"),
         @FindBy(css = "input.gdc-input")
     })
     private WebElement searchInput;
 
-    @FindBy(css = ".s-btn-add,.s-btn-select")
-    private WebElement addButton;
+    @FindBy(css = ".overlayPlugin-plugged>:not(.gdc-hidden) .s-btn-add,.s-btn-select")
+    private WebElement submitButton;
 
     @FindBy(css = ".s-btn-cancel")
     private WebElement cancelButton;
 
     @FindBys({
         @FindBy(css = ".overlayPlugin-plugged>:not(.gdc-hidden),.afp-list"),
-        @FindBy(css = "div.es_body:not(.hidden):not(.gdc-hidden)")
+        @FindBy(css = "div.es_body:not(.hidden):not(.gdc-hidden),.yui3-c-label:not(.es_head):not(.gdc-hidden)")
     })
     private List<WebElement> items;
 
@@ -66,7 +66,7 @@ public class SelectItemPopupPanel extends AbstractFragment {
     }
 
     public void submitPanel() {
-        waitForElementVisible(addButton).click();
+        waitForElementVisible(submitButton).click();
         waitForPanelNotVisible();
     }
 
