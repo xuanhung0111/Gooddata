@@ -13,6 +13,7 @@ import java.util.List;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -59,10 +60,15 @@ public class DashboardContent extends AbstractFragment {
     }
 
     public <T extends AbstractReport> T getReport(final String name, Class<T> clazz) {
+        java.util.function.Predicate<? super WebElement> neededReport = report ->
+            name.equals(report.findElement(REPORT_TITLE_LOCATOR).findElement(BY_LINK).getAttribute("title"));
+
+        Predicate<WebDriver> reportAppeared = driver -> getReports().stream().anyMatch(neededReport);
+        Graphene.waitGui().until(reportAppeared);
+
         return createPageFragment(clazz, getReports()
             .stream()
-            .filter(report ->
-                name.equals(report.findElement(REPORT_TITLE_LOCATOR).findElement(BY_LINK).getAttribute("title")))
+            .filter(neededReport)
             .findFirst()
             .get());
     }
