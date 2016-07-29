@@ -42,7 +42,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
         projectTitle = "GoodSales-test-drill-report";
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createDrillReport() {
         initReportsPage();
         UiReportDefinition reportDefinition = new UiReportDefinition()

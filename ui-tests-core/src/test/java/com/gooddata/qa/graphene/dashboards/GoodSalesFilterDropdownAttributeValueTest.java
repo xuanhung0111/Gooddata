@@ -87,13 +87,13 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
         projectTitle = "GoodSales-test-filter-dropdown-attribute-value";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"init"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
     public void initialization() {
         amountMetricUri = getMdService().getObjUri(getProject(), Metric.class, identifier("ah1EuQxwaCqs"));
         stageName = getMdService().getObj(getProject(), Attribute.class, identifier("attr.stage.name"));
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"init"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
     public void createVariable() {
         initVariablePage();
 

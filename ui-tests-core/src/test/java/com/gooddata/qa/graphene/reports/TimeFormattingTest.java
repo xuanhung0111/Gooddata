@@ -34,7 +34,7 @@ public class TimeFormattingTest extends AbstractProjectTest {
         projectTitle = "Time-formatting-test";
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void setupProject() {
         uploadCSV(ResourceUtils.getFilePathFromResource("/" + UPLOAD_CSV + "/customer.csv"));
     }

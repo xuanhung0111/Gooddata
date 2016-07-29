@@ -34,7 +34,7 @@ public class GoodSalesFilterGroupTest extends GoodSalesAbstractTest {
         projectTitle = "GoodSales-test-filter-group";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"init"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
     public void createReport() {
         initReportsPage();
         UiReportDefinition rd = new UiReportDefinition().withName(REPORT).withWhats(METRIC_AMOUNT)

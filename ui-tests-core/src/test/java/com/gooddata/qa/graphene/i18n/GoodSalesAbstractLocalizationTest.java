@@ -22,7 +22,7 @@ public abstract class GoodSalesAbstractLocalizationTest extends GoodSalesAbstrac
 
     protected String embeddedUri;
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"precondition"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
     public void createAndUsingTestUser() throws ParseException, JSONException, IOException {
         final String testUser = generateEmail(testParams.getUser());
         userUri = UserManagementRestUtils.createUser(getRestApiClient(), testParams.getUserDomain(), testUser,

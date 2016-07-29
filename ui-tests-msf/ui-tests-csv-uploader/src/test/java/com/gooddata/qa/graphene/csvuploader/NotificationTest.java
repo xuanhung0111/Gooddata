@@ -43,7 +43,7 @@ public class NotificationTest extends AbstractCsvUploaderTest {
         imapPassword = testParams.loadProperty("imap.password");
     }
 
-    @Test(dependsOnMethods = "createProject", groups = "precondition")
+    @Test(dependsOnGroups = "createProject", groups = "precondition")
     public void inviteUserToProject() throws ParseException, IOException, JSONException {
         addUserToProject(imapUser, UserRoles.ADMIN);
 

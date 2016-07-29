@@ -31,7 +31,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
         projectTitle = "SimpleProject-test-geos-labels";
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void initialize() {
         attributesList =
                 asList("Geo Pushpin", "Aus State Name", "Aus State Iso", "Statename", "Stateid",

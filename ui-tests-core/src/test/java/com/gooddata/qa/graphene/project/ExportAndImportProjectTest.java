@@ -54,7 +54,7 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
 
     private final static String TARGET_PROJECT_TITLE = "Target-Project";
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void setUpProject() {
         uploadCSV(ResourceUtils.getFilePathFromResource("/" + ResourceDirectory.PAYROLL_CSV + "/payroll.csv"));
         takeScreenshot(browser, "uploaded-payroll-file", getClass());

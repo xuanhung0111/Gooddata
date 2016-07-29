@@ -4,7 +4,6 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.checkLocalization;
 
 import org.json.JSONException;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.project.ProjectDriver;
@@ -17,18 +16,18 @@ import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class LocalizationTest extends AbstractUITest {
 
-    @BeforeClass(alwaysRun = true)
+    @Test(dependsOnMethods = {"changeLanguage"}, groups = {"precondition"})
     public void initStartPage() {
         startPageContext = new StartPageContext() {
 
             @Override
             public void waitForStartPageLoaded() {
-                // no need to wait projects page because it will be redirected to login page
+                LoginFragment.waitForPageLoaded(browser);
             }
 
             @Override
             public String getStartPage() {
-                return PAGE_PROJECTS;
+                return PAGE_LOGIN;
             }
         };
     }
@@ -40,7 +39,6 @@ public class LocalizationTest extends AbstractUITest {
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"entry-point"})
     public void verifyLoginPage() {
-        LoginFragment.waitForPageLoaded(browser);
         checkLocalization(browser);
     }
 
@@ -58,19 +56,8 @@ public class LocalizationTest extends AbstractUITest {
 
     @Test(dependsOnGroups = {"entry-point"}, alwaysRun = true)
     public void login() throws JSONException {
-        LoginFragment.waitForPageLoaded(browser);
         signIn(false, UserRoles.ADMIN);
-    }
 
-    @Test(dependsOnMethods = {"login"}, groups = {"configure-goodsales"})
-    public void createGoodSalesProject() {
-        testParams.setProjectId(ProjectRestUtils.createProject(getGoodDataClient(), "GoodSales-Localization-test",
-                "/projectTemplates/GoodSalesDemo/2", testParams.getAuthorizationToken(), ProjectDriver.POSTGRES,
-                testParams.getProjectEnvironment()));
-    }
-
-    @Test(dependsOnMethods = {"login"}, groups = {"configure-goodsales"})
-    public void configureStartPage() {
         startPageContext = new StartPageContext() {
 
             @Override
@@ -83,6 +70,13 @@ public class LocalizationTest extends AbstractUITest {
                 return PAGE_PROJECTS;
             }
         };
+    }
+
+    @Test(dependsOnMethods = {"login"}, groups = {"configure-goodsales"})
+    public void createGoodSalesProject() {
+        testParams.setProjectId(ProjectRestUtils.createProject(getGoodDataClient(), "GoodSales-Localization-test",
+                "/projectTemplates/GoodSalesDemo/2", testParams.getAuthorizationToken(), ProjectDriver.POSTGRES,
+                testParams.getProjectEnvironment()));
     }
 
     @Test(dependsOnGroups = {"configure-goodsales"})

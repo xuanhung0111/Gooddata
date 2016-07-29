@@ -32,7 +32,7 @@ public class GoodSalesSortByTotalsTest extends GoodSalesAbstractTest {
     private final static String AVG_AMOUNT = "Avg. Amount";
     private final static String BY_STAGE_NAME = "by Stage Name";
 
-    @Test(dependsOnMethods = "createProject")
+    @Test(dependsOnGroups = "createProject")
     public void sortByTotalsInOnTopAttributeReport() {
         //create report using UI due to attribute position
         initReportCreation().createReport(new UiReportDefinition()
@@ -52,7 +52,7 @@ public class GoodSalesSortByTotalsTest extends GoodSalesAbstractTest {
                 "Report is rendered well and expected values are displayed");
     }
 
-    @Test(dependsOnMethods = "createProject")
+    @Test(dependsOnGroups = "createProject")
     public void createReportContainingOneMetric() {
         //create report using UI due to attribute position
         initReportCreation().createReport(new UiReportDefinition()

@@ -295,7 +295,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         takeScreenshot(browser, "Goodsales-schedules-muf-report", this.getClass());
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"verify-UI"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"verify-UI"})
     public void deleteReport() {
         String title = "verify-UI-title";
         String report = "# test report";
@@ -333,7 +333,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"verify-UI"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"verify-UI"})
     public void editSchedule() {
         String title = "verify-UI-title";
         String updatedTitle = title + "Updated";
@@ -364,7 +364,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"verify-UI"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"verify-UI"})
     public void changeScheduleTime() {
         String title = "verify-UI-title";
         initEmailSchedulesPage();

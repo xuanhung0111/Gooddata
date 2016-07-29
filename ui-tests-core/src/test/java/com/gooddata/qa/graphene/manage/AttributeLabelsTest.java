@@ -45,13 +45,13 @@ public class AttributeLabelsTest extends AbstractProjectTest {
         projectTitle = "SimpleProject-test-attribute-labels";
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void initDataTest() {
         uploadCSV(getFilePathFromResource("/" + PAYROLL_CSV + "/attribute_labels.csv"));
         takeScreenshot(browser, "uploaded-attribute_labels", getClass());
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void setSFDCCredentialsTest() throws JSONException {
         openUrl(PAGE_GDC_PROJECTS + "/" + testParams.getProjectId() + "/credentials/sfdc");
         waitForElementVisible(sfdc.getRoot());

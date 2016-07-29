@@ -59,7 +59,7 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
         projectTitle = "GoodSales-basic-filter-report-test";
     }
 
-    @Test(dependsOnMethods = "createProject")
+    @Test(dependsOnGroups = "createProject")
     public void addNewVariable() {
         initVariablePage();
         variablePage.createVariable(new AttributeVariable(VARIABLE_NAME)
@@ -67,7 +67,7 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
                 .withAttributeElements(listAttributeValues));
     }
 
-    @Test(dependsOnMethods = "createProject")
+    @Test(dependsOnGroups = "createProject")
     public void addFilterBySpecifyingAttributeValues() {
         AttributeFilterFragment filterFragment = initReport(REPORT_NAME + System.currentTimeMillis())
                 .openFilterPanel()
@@ -95,7 +95,7 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
         checkRedBar(browser);
     }
 
-    @Test(dependsOnMethods = "createProject")
+    @Test(dependsOnGroups = "createProject")
     public void addFilterBySpecifyingFloatingTime() {
         int rangeNumber = getCurrentYear() - 2012;
 
@@ -152,7 +152,7 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
                 "Prompt filter is not applied successfully");
     }
 
-    @Test(dependsOnMethods = "createProject")
+    @Test(dependsOnGroups = "createProject")
     public void addRankingFilter() {
         initReport(REPORT_NAME + System.currentTimeMillis())
                 .addFilter(FilterItem.Factory
@@ -166,7 +166,7 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
         checkRedBar(browser);
     }
 
-    @Test(dependsOnMethods = "createProject")
+    @Test(dependsOnGroups = "createProject")
     public void checkFilterAppliedInOrder() {
         initReport(REPORT_NAME + System.currentTimeMillis())
                 .addFilter(FilterItem.Factory.createAttributeFilter(ATTR_YEAR_SNAPSHOT, "2010"));

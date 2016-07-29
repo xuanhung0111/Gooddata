@@ -29,7 +29,7 @@ public class UploadHistoryInfoTest extends AbstractCsvUploaderTest {
 
     private CsvFile csvFile;
 
-    @Test(dependsOnMethods = {"createProject"}, groups = "precondition")
+    @Test(dependsOnGroups = {"createProject"}, groups = "precondition")
     public void inviteUser() throws ParseException, IOException, JSONException {
         otherAdminUser = testParams.getEditorUser();
         otherAdminPassword = testParams.getEditorPassword();

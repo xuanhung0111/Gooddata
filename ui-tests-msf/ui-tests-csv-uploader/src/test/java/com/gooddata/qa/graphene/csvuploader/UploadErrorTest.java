@@ -72,7 +72,7 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
         };
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkCsvBadFormat() {
         uploadCsvFileWithErrors(BAD_STRUCTURE_FILE,
                 asList(format(ROW_CONTAINS_MORE_COLUMNS_THAN_THE_HEADER_ROW, 2)));
@@ -83,7 +83,7 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
                 not(hasItem(datasetName)));
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkNoFactAndNumericColumnNameCsvConfig() {
         final DataPreviewPage dataPreviewPage = initDataUploadPage().uploadFile(PAYROLL.getFilePath());
 
@@ -112,7 +112,7 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
                 "Add data button should be disabled when column names start with numbers");
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkCsvDuplicateColumnNames() {
         final DataPreviewPage dataPreviewPage = initDataUploadPage().uploadFile(PAYROLL.getFilePath());
 
@@ -135,7 +135,7 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
         assertFalse(dataPreviewPage.isIntegrationButtonDisabled(), "Add data button should be enabled");
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void uploadTooLargeCsvFile() throws IOException {
         final String filePath = new CsvFile("too large")
             .columns(new CsvFile.Column("Measure", "Measure"))
@@ -165,7 +165,7 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, dataProvider = "errorCsvFileProvider")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "errorCsvFileProvider")
     public void uploadCsvFileWithErrors(CsvFile csvFile, List<String> errorMessages) {
         final FileUploadDialog fileUploadDialog = initDataUploadPage().tryUploadFile(csvFile.getFilePath());
 

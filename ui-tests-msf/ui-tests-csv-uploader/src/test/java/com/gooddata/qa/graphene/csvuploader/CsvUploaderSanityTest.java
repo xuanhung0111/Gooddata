@@ -11,7 +11,7 @@ import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 
 public class CsvUploaderSanityTest extends AbstractCsvUploaderTest {
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkCsvUploadHappyPath() {
         assertTrue(uploadCsv(PAYROLL)
             .getStatus()

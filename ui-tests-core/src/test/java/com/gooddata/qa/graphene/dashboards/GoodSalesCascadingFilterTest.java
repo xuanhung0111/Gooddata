@@ -68,7 +68,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
         projectTitle = "GoodSales-test-cascading-filter";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"init"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
     public void createReports() {
         GoodData goodDataClient = getGoodDataClient();
         Project project = goodDataClient.getProjectService().getProjectById(testParams.getProjectId());

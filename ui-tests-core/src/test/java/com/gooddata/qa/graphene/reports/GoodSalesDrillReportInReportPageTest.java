@@ -40,7 +40,7 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
         projectTitle = "GoodSales-test-drill-report";
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void drillDownAttributeElement() {
         setDrillAttribute(ATTR_ACCOUNT, ATTR_PRODUCT);
 
@@ -87,7 +87,7 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
         assertFalse(isLinkAppearedWhenHoveringOn(getAttributeValueElement(ATTRIBUTE_VALUE_TO_DRILL)));
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void drillDownMetric() {
         initReportsPage();
         UiReportDefinition rd = new UiReportDefinition().withName(METRIC_REPORT_NAME)
@@ -120,7 +120,7 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
         assertFalse(isLinkAppearedWhenHoveringOn(getMetricElement(METRIC_VALUE_TO_DRILL)));
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void drillOnAttributeHaveMultiDisplayForm() {
         String reportName = "multi display";
         String attributeValue = "6/2010";

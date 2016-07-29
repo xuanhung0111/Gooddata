@@ -70,7 +70,7 @@ public class UserAccountSettingTest extends AbstractUITest {
     private PersonalInfo personalInfo;
     private PersonalInfo personalInfoOrigin;
 
-    @Test(groups = {PROJECT_INIT_GROUP})
+    @Test
     public void initLoginAndData() throws JSONException {
         signIn(false, UserRoles.ADMIN);
 

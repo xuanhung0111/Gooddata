@@ -35,7 +35,7 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
         projectTitle = "GoodSales-test-drill-report-to-export";
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createDrillReportToExport() {
         initReportsPage();
         UiReportDefinition reportDefinition = new UiReportDefinition()

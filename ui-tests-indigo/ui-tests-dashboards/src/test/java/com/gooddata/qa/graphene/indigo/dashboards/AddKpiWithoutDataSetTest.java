@@ -29,7 +29,7 @@ public class AddKpiWithoutDataSetTest extends AbstractProjectTest {
         projectTitle = "Add-kpi-without-data-set-test";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"precondition"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
     public void setupFeatureFlag() throws JSONException {
         ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);

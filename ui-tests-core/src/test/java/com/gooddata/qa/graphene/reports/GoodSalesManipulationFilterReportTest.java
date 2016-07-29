@@ -42,7 +42,7 @@ public class GoodSalesManipulationFilterReportTest extends GoodSalesAbstractTest
         projectTitle = "GoodSales-manipulation-filter-report-test";
     }
 
-    @Test(dependsOnMethods = "createProject")
+    @Test(dependsOnGroups = "createProject")
     public void createReport() {
         createReport(new UiReportDefinition()
                 .withName(REPORT_NAME)
@@ -52,7 +52,7 @@ public class GoodSalesManipulationFilterReportTest extends GoodSalesAbstractTest
                 "Manipulation-filter-report");
     }
 
-    @Test(dependsOnMethods = "createProject")
+    @Test(dependsOnGroups = "createProject")
     public void addNumericVariable() {
         initVariablePage();
         variablePage.createVariable(new NumericVariable(VARIABLE_NAME).withDefaultNumber(500));

@@ -6,13 +6,13 @@ import org.testng.annotations.Test;
 
 public class EmptyStateTest extends AbstractCsvUploaderTest {
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkDataUploadPageHeader() {
         initDataUploadPage().waitForHeaderVisible();
         datasetsListPage.waitForAddDataButtonVisible();
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkEmptyState() {
         initDataUploadPage().waitForEmptyStateLoaded();
         takeScreenshot(browser, "empty-state", getClass());

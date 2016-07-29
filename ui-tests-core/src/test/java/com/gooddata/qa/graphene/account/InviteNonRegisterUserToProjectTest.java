@@ -62,7 +62,7 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
         projectTitle = "Invite-non-register-user-to-project-test";
     }
 
-    @Test(dependsOnMethods = "createProject")
+    @Test(dependsOnGroups = "createProject")
     public void initData() {
         String registrationString = String.valueOf(System.currentTimeMillis());
 

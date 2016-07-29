@@ -56,7 +56,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         cleanWorkingProjectAfterTest(m);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkProjectFilterOptions() {
         initDISCProjectsPage();
         Select select = discProjectsPage.getProjectFilterSelect();
@@ -71,22 +71,22 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         assertEquals(ProjectStateFilters.ALL.getOption(), discProjectsPage.getSelectedFilterOption().getText());
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkFailedProjectsFilterOption() {
         checkProjectsFilter(ProjectStateFilters.FAILED);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkSuccessfulProjectsFilterOptions() {
         checkProjectsFilter(ProjectStateFilters.SUCCESSFUL);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkRunningProjectsFilterOptions() {
         checkProjectsFilter(ProjectStateFilters.RUNNING);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkScheduledProjectsFilterOptions() {
         String projectId = createBlankProject("Disc-test-scheduled-filter-option");
         try {
@@ -100,17 +100,17 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkUnscheduledProjectsFilterOptions() {
         checkProjectsFilter(ProjectStateFilters.UNSCHEDULED);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkDisabledProjectsFilterOptions() {
         checkProjectsFilter(ProjectStateFilters.DISABLED);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkDataLoadingProcess() {
         String processName1 = "Check Data Loading Processes 1";
         String processName2 = "Check Data Loading Processes 2";
@@ -135,7 +135,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         assertThat(discProjectsList.getProcessesLabel(testParams.getProjectId()), is(expectedDataLoadingProcess));
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkLastSuccessfulExecution() {
         String processName = "Check Last Successful Execution";
         openProjectDetailPage(testParams.getProjectId());
@@ -168,7 +168,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
                 Joiner.on(" ").join(lastSuccessfulExecutionDate, lastSuccessfulExecutionTime.substring(14)));
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkLastSuccessfulAutoExecution() {
         String processName = "Check Last Successful Auto Execution";
         openProjectDetailPage(testParams.getProjectId());
@@ -191,7 +191,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
                 Joiner.on(" ").join(lastSuccessfulExecutionDate, lastSuccessfulExecutionTime.substring(14)));
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkProjectsNotAdmin() {
         try {
             addUsersWithOtherRolesToProject();
@@ -229,7 +229,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkPagingOptions() {
         initDISCProjectsPage();
         Select select = discProjectsPage.getProjectsPerPageSelect();
@@ -239,7 +239,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         assertEquals(select.getFirstSelectedOption().getText(), "20");
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkPagingProjectsPage() {
         openUrl(PAGE_PROJECTS);
         waitForElementVisible(projectsPage.getRoot());
@@ -317,7 +317,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkEmptySearchResult() {
         initDISCProjectsPage();
         for (ProjectStateFilters projectFilter : ProjectStateFilters.values()) {
@@ -341,43 +341,43 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkSearchProjectByName() {
         checkSearchWorkingProjectByName();
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkSearchProjectById() {
         checkSearchWorkingProjectById();
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkSearchProjectInSuccessfulState() {
         checkSearchProjectInSpecificState(ProjectStateFilters.SUCCESSFUL);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkSearchProjectInFailedState() {
         checkSearchProjectInSpecificState(ProjectStateFilters.FAILED);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkSearchProjectInRunningState() {
         checkSearchProjectInSpecificState(ProjectStateFilters.RUNNING);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkSearchProjectInDisabledState() {
         checkSearchProjectInSpecificState(ProjectStateFilters.DISABLED);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkSearchProjectInUnscheduledState() {
         initDISCProjectsPage();
         searchProjectInSpecificState(ProjectStateFilters.UNSCHEDULED, testParams.getProjectId(), projectTitle);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkSearchUnicodeProjectName() {
         String unicodeProjectName = "Tiếng Việt ພາສາລາວ  résumé";
         String projectId = createBlankProject(unicodeProjectName);
@@ -394,7 +394,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
 
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkDefaultSearchBox() {
         initDISCProjectsPage();
         WebElement searchBox = discProjectsPage.getSearchBox();
@@ -403,7 +403,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
                 "Incorrect placeholder in search box!");
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkDeleteSearchKey() {
         initDISCProjectsPage();
         discProjectsPage.enterSearchKey("no search result");
@@ -414,7 +414,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         waitForFragmentVisible(discProjectsList);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkProjectListAfterLeaveAProject() {
         String secondAdmin = testParams.getEditorUser();
         String secondAdminPassword = testParams.getEditorPassword();
@@ -446,7 +446,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkProjectsPageHeader() {
         initDISCProjectsPage();
         waitForFragmentVisible(discNavigation);

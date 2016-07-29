@@ -14,7 +14,7 @@ public class ProjectWalktroughTest extends AbstractUITest {
         testParams.setProjectId(testParams.loadProperty("projectId"));
     }
 
-    @Test(groups = {PROJECT_INIT_GROUP, "projectWalkthroughInit"})
+    @Test(groups = {"projectWalkthroughInit"})
     public void userLogin() throws JSONException {
         // sign in with demo user
         signInAtUI(testParams.getUser(), testParams.getPassword());

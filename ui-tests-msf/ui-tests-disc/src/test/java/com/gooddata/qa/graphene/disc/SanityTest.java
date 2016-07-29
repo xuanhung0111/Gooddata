@@ -36,7 +36,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
         imapPassword = testParams.loadProperty("imap.password");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"deploy"})
     public void deployCloudConnectInProjectsPage() {
         try {
             deployInProjectsPage(DeployPackages.CLOUDCONNECT, "CloudConnect - Projects List Page",
@@ -46,7 +46,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"deploy"})
     public void deployCloudConnectInProjectDetailPage() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -56,7 +56,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"deploy"})
     public void redeployProcessWithDifferentPackage() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -68,7 +68,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"schedule"})
     public void createAndAssertSchedule() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -84,7 +84,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"schedule"})
     public void checkManualExecution() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -109,7 +109,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
      * @throws IOException 
      * @throws ParseException 
      */
-    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"schedule"})
     public void checkRubyExecution() throws ParseException, IOException {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -130,7 +130,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"schedule"})
     public void checkScheduleAutoRun() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -149,7 +149,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"notification"})
     public void createAndAssertNotification() throws MessagingException {
         openProjectDetailPage(testParams.getProjectId());
         String processName = "Check Notification";
@@ -180,7 +180,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"project-overview"})
     public void checkFailedOverviewNumber() {
         try {
             checkOverviewStateNumber(OverviewProjectStates.FAILED);
@@ -189,7 +189,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"project-overview"})
     public void checkRunningOverviewNumber() {
         try {
             checkOverviewStateNumber(OverviewProjectStates.RUNNING);
@@ -198,7 +198,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"project-overview"})
     public void checkSuccessfulOverviewNumber() {
         try {
             checkOverviewStateNumber(OverviewProjectStates.SUCCESSFUL);
@@ -207,7 +207,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"projects-page"})
     public void checkFailedProjectsFilterOption() {
         try {
             checkProjectsFilter(ProjectStateFilters.FAILED);
@@ -216,7 +216,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"projects-page"})
     public void checkSuccessfulProjectsFilterOptions() {
         try {
             checkProjectsFilter(ProjectStateFilters.SUCCESSFUL);
@@ -225,7 +225,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"projects-page"})
     public void checkRunningProjectsFilterOptions() {
         try {
             checkProjectsFilter(ProjectStateFilters.RUNNING);
@@ -234,12 +234,12 @@ public class SanityTest extends AbstractOverviewProjectsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"projects-page"})
     public void checkSearchProjectByName() {
         checkSearchWorkingProjectByName();
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"projects-page"})
     public void checkSearchProjectById() {
         checkSearchWorkingProjectById();
     }

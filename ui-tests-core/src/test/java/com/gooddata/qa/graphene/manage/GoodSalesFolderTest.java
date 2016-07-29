@@ -41,7 +41,7 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
         addUsersWithOtherRoles = true;
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void initialize() throws JSONException {
         newName = "New Folder";
         unicodeName = "ພາສາລາວ résumé اللغة";

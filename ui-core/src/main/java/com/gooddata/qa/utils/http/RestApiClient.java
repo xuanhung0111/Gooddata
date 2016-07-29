@@ -132,6 +132,7 @@ public class RestApiClient {
         requestBase.addHeader("Accept", ContentType.APPLICATION_JSON.getMimeType());
     }
 
+    @SuppressWarnings("deprecation")
     protected HttpClient getGooddataHttpClient(HttpHost hostGoodData, String user, String password,
             boolean useSST, boolean useApiProxy) throws RuntimeException {
         final HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();

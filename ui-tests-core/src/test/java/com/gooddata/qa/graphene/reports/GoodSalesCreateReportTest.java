@@ -67,7 +67,7 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
         projectTitle = "GoodSales-test-create-report";
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createReportWithInapplicableAttribute() {
         initReportCreation();
 
@@ -89,7 +89,7 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
         assertThat(invalidDataReportMessage, equalTo(INVALID_DATA_REPORT_MESSAGE));
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void tryToAddFilterInWrongState() {
         initReportCreation();
 
@@ -104,7 +104,7 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
         assertThat(wrongStateFilterMessage, equalTo(WRONG_STATE_FILTER_MESSAGE));
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void cancelCreatingReport() {
         initReportCreation();
 
@@ -121,7 +121,7 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
         waitForFragmentVisible(reportPage);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void switchBetweenFolderAndTagView() {
         initReportCreation();
 
@@ -134,7 +134,7 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
                 equalTo(asList("date", "day", "eu", "month", "quarter", "week", "year")));
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void loadAllAttributesInFilterPanel() {
         initReportCreation();
 
@@ -146,7 +146,7 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
         waitForElementVisible(cssSelector(".guidedNavigation .hyperlinkOn:not(.hidden) a"), browser).sendKeys(Keys.ENTER);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createReportWithNonDefaultAttributeLabel() {
         initReportCreation();
 
@@ -160,7 +160,7 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
 
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createFilterBeforeAddingMetricAttribute() {
         initReportCreation();
 
@@ -171,7 +171,7 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
             .doneSndPanel();
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testFilterNotRemoveWhenAttributeRemovedFromHow() {
         initReportCreation();
 

@@ -44,7 +44,7 @@ public class DataloadResourcesTest extends AbstractMSFTest {
         projectTitle = "Dataload-resources-test";
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkResourcesWithoutADSInstance() throws IOException, JSONException {
         prepareLDMAndADSInstance();
 

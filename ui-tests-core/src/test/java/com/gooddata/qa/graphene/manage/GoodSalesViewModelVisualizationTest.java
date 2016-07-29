@@ -28,7 +28,7 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
     private static final String MODEL_IMAGE_WITH_ATTRIBUTE_ACCOUNT_CHANGED_FILE = "ldmAfterChangeAccountToAcsount.svg";
     
     @SuppressWarnings("unchecked")
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkLDMImageTest() throws IOException, JSONException {
         File tmpImage = getLDMImageFromGrayPage();
         replaceContentInSVGFile(tmpImage, Pair.of(testParams.getHost(), HOST_NAME), 

@@ -69,7 +69,7 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
     @FindBy(css = ANNIE_DIALOG_CSS_LOCATOR)
     protected AnnieUIDialogFragment annieUIDialog;
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"initialDataForDLUI"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"initialDataForDLUI"})
     public void prepareDataForDLUI() throws JSONException, ParseException, IOException {
         initManagePage();
         assertThat(browser.findElements(By.cssSelector(ADD_DATA_BUTTON_CSS_LOCATOR)), is(empty()));

@@ -26,7 +26,7 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
         projectTitle = "User-profile-information-test";
     }
 
-    @Test(dependsOnMethods = { "createProject" })
+    @Test(dependsOnGroups = { "createProject" })
     public void createReportTest() {
         createReport(new UiReportDefinition()
                 .withName(REPORT_NAME)
@@ -35,7 +35,7 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
                 "Simple report");
     }
 
-    @Test(dependsOnMethods = { "createProject" })
+    @Test(dependsOnGroups = { "createProject" })
     public void initGetUserInformation() {
         initAccountPage();
 

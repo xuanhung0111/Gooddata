@@ -17,7 +17,7 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
     private static final long expectedDashboardExportSize = 65000L;
     private String exportedDashboardName;
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"dashboards-verification"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"dashboards-verification"})
     public void verifyDashboardTabs() {
         verifyProjectDashboardsAndTabs(true, expectedGoodSalesDashboardsAndTabs, true);
     }

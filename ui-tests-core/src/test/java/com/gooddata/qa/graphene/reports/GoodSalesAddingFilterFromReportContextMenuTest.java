@@ -30,7 +30,7 @@ public class GoodSalesAddingFilterFromReportContextMenuTest extends GoodSalesAbs
         projectTitle = "GoodSales-adding-filter-from-report-context-menu-test";
     }
 
-    @Test(dependsOnMethods = "createProject")
+    @Test(dependsOnGroups = "createProject")
     public void addAndRemoveReportFilterInSndDialog() {
         createReport(new UiReportDefinition()
                 .withName(REPORT_NAME)

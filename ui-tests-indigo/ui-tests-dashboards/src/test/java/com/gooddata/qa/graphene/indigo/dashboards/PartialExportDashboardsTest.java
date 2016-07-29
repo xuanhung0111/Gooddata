@@ -28,7 +28,7 @@ public class PartialExportDashboardsTest extends AbstractProjectTest {
         projectTemplate = "/projectTemplates/OnboardingWalkMe/3";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void setupFeatureFlag() throws JSONException {
         ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);

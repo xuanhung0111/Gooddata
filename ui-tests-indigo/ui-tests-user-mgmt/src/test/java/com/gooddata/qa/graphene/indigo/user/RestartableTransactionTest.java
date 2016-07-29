@@ -17,7 +17,7 @@ import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class RestartableTransactionTest extends AbstractUITest {
 
-    @Test(groups = {PROJECT_INIT_GROUP, "precondition"})
+    @Test(groups = {"precondition"})
     public void userLogin() throws JSONException {
         signIn(true, UserRoles.ADMIN);
     }

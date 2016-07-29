@@ -41,7 +41,7 @@ public class DashboardObjectsTest extends AbstractProjectTest {
         projectTitle = "SimpleProject-test-dashboard-objects";
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void uploadDataTest() {
         uploadCSV(getFilePathFromResource("/" + PAYROLL_CSV + "/payroll.csv"));
         takeScreenshot(browser, "uploaded-payroll", getClass());

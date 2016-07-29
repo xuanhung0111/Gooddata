@@ -75,7 +75,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
                 ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
     }
 
-    @Test(dependsOnMethods = "createProject", groups = "desktop")
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void setupProject() throws JSONException, IOException {
         setupProjectMaql();
         setupFeatureFlag();

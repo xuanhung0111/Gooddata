@@ -21,7 +21,7 @@ public class GoodSalesReportsPageTest extends GoodSalesAbstractTest {
     private static final String ACTIVITY_REPORTS_FOLDER = "Activity Reports";
     private static final String ALL_FOLDER = "All";
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void addTagToReport() {
         initReportsPage();
         waitForFragmentVisible(reportsPage).getReportsList().openReport(TAG_REPORT);
@@ -29,7 +29,7 @@ public class GoodSalesReportsPageTest extends GoodSalesAbstractTest {
         waitForFragmentVisible(reportPage).addTag(TAG_NAME);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void verifyReportsPage() {
         initReportsPage();
         assertTrue(isEqualCollection(waitForFragmentVisible(reportsPage).getDefaultFolders().getAllFolderNames(),

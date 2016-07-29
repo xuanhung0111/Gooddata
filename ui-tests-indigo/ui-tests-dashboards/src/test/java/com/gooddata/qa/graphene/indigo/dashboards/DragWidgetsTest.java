@@ -29,7 +29,7 @@ public class DragWidgetsTest extends DashboardsGeneralTest {
     private static final String DROPZONE_NEXT = "next";
     private static final String DROPZONE_PREV = "prev";
 
-    @Test(dependsOnMethods = "createProject")
+    @Test(dependsOnGroups = "createProject")
     public void initIndigoDashboardWithKpis() throws JSONException, IOException {
         Metric metric = getMdService().getObj(getProject(), Metric.class, title("Amount"));
 

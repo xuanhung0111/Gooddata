@@ -36,7 +36,7 @@ public class DataloadResourcesPermissionTest extends AbstractMSFTest {
         projectTitle = "Dataload resources permission test";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = { "initialData" })
+    @Test(dependsOnGroups = {"createProject"}, groups = { "initialData" })
     public void initialData() throws JSONException, IOException {
         prepareLDMAndADSInstance();
         setUpOutputStageAndCreateCloudConnectProcess();

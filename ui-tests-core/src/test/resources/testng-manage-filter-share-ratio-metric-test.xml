@@ -6,11 +6,9 @@
             <run>
                 <include name="filter-share-ratio-metric" />
                 <include name="createProject" />
-                <include name="projectInit" />
                 <include name="arquillian" />
             </run>
             <dependencies>
-                <group name="createProject" depends-on="projectInit" />
                 <group name="filter-share-ratio-metric" depends-on="createProject" />
             </dependencies>
         </groups>

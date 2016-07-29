@@ -48,7 +48,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     private String regionLocator = "//div[@*[local-name() = 'gdc:region']='0,0,0,0']/span";
 
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void verifyReportsPage() {
         initReportsPage();
         assertEquals(reportsPage.getReportsList().getNumberOfReports(), expectedGoodSalesReportsCount,

@@ -67,7 +67,7 @@ public class InsightOnDashboardTest extends DashboardsTest {
                 "All tab is not visible in filter section");
     }
 
-    @Test(dependsOnMethods = { "createProject" }, groups = { "createInsight" })
+    @Test(dependsOnGroups = { "createProject" }, groups = { "createInsight" })
     public void testCreatingSimpleInsightUsingAd() throws JSONException, IOException {
         //need an insight having real data, so we can't use REST API
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE)

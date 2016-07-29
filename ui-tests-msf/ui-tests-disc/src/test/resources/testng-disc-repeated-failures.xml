@@ -6,7 +6,6 @@
 			<define name="repeated_failures_schedule">
 				<include name="repeatedFailures" />
 				<include name="createProject" />
-				<include name="projectInit" />
 				<include name="arquillian" />
 			</define>
 			<run>

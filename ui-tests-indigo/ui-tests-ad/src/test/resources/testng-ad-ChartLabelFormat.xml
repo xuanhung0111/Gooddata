@@ -7,13 +7,11 @@
                 <include name="precondition" />
                 <include name="init" />
                 <include name="createProject" />
-                <include name="projectInit" />
                 <include name="arquillian" />
             </run>
             <dependencies>
                 <group name="chartLabel" depends-on="precondition" />
                 <group name="precondition" depends-on="init" />
-                <group name="init" depends-on="projectInit" />
             </dependencies>
         </groups>
         <classes>

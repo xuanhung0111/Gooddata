@@ -90,7 +90,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         addUsersWithOtherRoles = true;
     }
 
-    @Test(dependsOnMethods = { "createProject" }, groups = { "initialize", "sanity" })
+    @Test(dependsOnGroups = { "createProject" }, groups = { "initialize", "sanity" })
     public void initData() throws JSONException, IOException {
         userManagementAdmin = generateEmail(testParams.getUser());
         userManagementPassword = testParams.getPassword();

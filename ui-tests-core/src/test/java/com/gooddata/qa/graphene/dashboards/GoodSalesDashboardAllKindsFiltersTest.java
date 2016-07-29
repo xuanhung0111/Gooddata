@@ -64,7 +64,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         projectTitle = "GoodSales-test-dashboard-all-kinds-filters";
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createTestingReport() {
         initReportsPage();
         createReport(new UiReportDefinition().withName(TESTING_REPORT).withWhats(METRIC_AMOUNT).withHows(ATTR_STAGE_NAME)
@@ -173,7 +173,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void filterInheritAttributeName() {
         try {
             initDashboardsPage().addNewDashboard(TEST_DASHBOAD_FILTERS);
@@ -208,7 +208,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createVariables() {
         initVariablePage();
         variablePage.createVariable(new AttributeVariable("FStageName").withAttribute(ATTR_STAGE_NAME));
@@ -328,7 +328,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testDashboardFilterOverrideReportFilter() {
         initReportsPage();
         createReport(

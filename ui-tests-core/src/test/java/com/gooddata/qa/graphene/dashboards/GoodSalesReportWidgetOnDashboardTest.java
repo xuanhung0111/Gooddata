@@ -52,7 +52,7 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
         addUsersWithOtherRoles = true;
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void workWithHeadlineReport() {
         String reportName = "Headline report";
         String headlineValue = "$116,625,456.54";
@@ -87,7 +87,7 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void editReportFromDashboard() {
         initDashboardsPage();
         dashboardsPage.addNewDashboard(TOP_5_OPEN_REPORT);
@@ -133,7 +133,7 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createTestReport() {
         createReport(new UiReportDefinition().withName(REPORT).withWhats("# of Activities")
                 .withHows("Department"), REPORT);
@@ -166,7 +166,7 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void deleteWidgetsByHotKey() {
         String dashboardName = "Delete widgets by hot keys";
 
@@ -232,7 +232,7 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createNumericVariableTest() {
         initVariablePage();
         variablePage.createVariable(new NumericVariable(VARIABLE_NAME)

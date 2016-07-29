@@ -2,8 +2,6 @@ package com.gooddata.qa.graphene;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -20,12 +18,10 @@ import org.openqa.selenium.WebDriver;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
-import org.testng.annotations.Test;
 
 import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.common.TestParameters;
-import com.gooddata.qa.graphene.utils.WaitUtils;
 import com.gooddata.qa.utils.ads.AdsHelper;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.testng.listener.AuxiliaryFailureScreenshotListener;
@@ -52,12 +48,8 @@ public abstract class AbstractTest extends Arquillian {
     protected AdsHelper adsHelper = null;
 
     protected StartPageContext startPageContext = null;
-    protected static final String PAGE_PROJECTS = "projects.html";
 
     protected static final Logger log = Logger.getLogger(AbstractTest.class.getName());
-
-    //the projectInit group which will be skipped for loadPlatformPageBeforeTestMethod 
-    protected static final String PROJECT_INIT_GROUP = "projectInit";
 
     @BeforeClass(alwaysRun = true)
     public void loadProperties() {
@@ -75,24 +67,11 @@ public abstract class AbstractTest extends Arquillian {
         }
 
         testParams = new TestParameters(testVariables);
-        
-        startPageContext = new StartPageContext() {
-            
-            @Override
-            public void waitForStartPageLoaded() {
-                WaitUtils.waitForProjectsPageLoaded(browser);
-            }
-            
-            @Override
-            public String getStartPage() {
-                return PAGE_PROJECTS;
-            }
-        };
     }
 
     @BeforeMethod(alwaysRun = true)
-    public void loadPlatformPageBeforeTestMethod(Method m) {
-        if (Arrays.asList(m.getAnnotation(Test.class).groups()).contains(PROJECT_INIT_GROUP)) {
+    public void loadPlatformPageBeforeTestMethod() {
+        if (startPageContext == null) {
             return;
         }
         openUrl(startPageContext.getStartPage());

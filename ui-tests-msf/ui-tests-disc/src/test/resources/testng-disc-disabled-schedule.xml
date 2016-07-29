@@ -6,7 +6,6 @@
 			<define name="disabled_schedule">
 				<include name="disabledSchedule" />
 				<include name="createProject" />
-				<include name="projectInit" />
 				<include name="arquillian" />
 			</define>
 			<run>

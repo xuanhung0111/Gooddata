@@ -54,7 +54,7 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
         cleanWorkingProjectAfterTest(m);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkProjectInfo() {
         openProjectDetailPage(testParams.getProjectId());
         String processName = "Check Project Info";
@@ -69,7 +69,7 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
         assertEquals(testParams.getProjectId(), projectDetailPage.getProjectMetadata("Project ID"));
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkProcessInfo() {
         openProjectDetailPage(testParams.getProjectId());
         String processName = "Check Process Info";
@@ -95,7 +95,7 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
         assertEquals(processID, projectDetailPage.getMetadata(), "Incorrect process metadata!");
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkGoToDashboardsLinkInProjectDetailPage() {
         openProjectDetailPage(testParams.getProjectId());
         waitForElementVisible(projectDetailPage.getRoot());
@@ -103,7 +103,7 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
         waitForDashboardPageLoaded(browser);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkEmptyProjectState() {
         openProjectDetailPage(testParams.getProjectId());
         waitForElementVisible(projectDetailPage.getRoot());
@@ -111,7 +111,7 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
         assertEquals(PROJECT_EMPTY_STATE_MESSAGE, projectDetailPage.getProjectEmptyStateMessage());
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void downloadProcess() {
         openProjectDetailPage(testParams.getProjectId());
         String processName = "Download Process Test";
@@ -138,7 +138,7 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
         zipDownload.delete();
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkSortedProcesses() {
         openProjectDetailPage(testParams.getProjectId());
         deployInProjectDetailPage(DeployPackages.BASIC, "Process-A");
@@ -150,7 +150,7 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
         checkSortedProcessList();
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkSortedProcessesAfterRedeploy() {
         openProjectDetailPage(testParams.getProjectId());
         deployInProjectDetailPage(DeployPackages.BASIC, "Process-A");
@@ -164,7 +164,7 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
         checkSortedProcessList();
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkDeleteProcess() {
         openProjectDetailPage(testParams.getProjectId());
         deployInProjectDetailPage(DeployPackages.BASIC, "Process-A");
@@ -178,7 +178,7 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
         checkSortedProcessList();
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkProcessDeleteDialog() {
         openProjectDetailPage(testParams.getProjectId());
         deployInProjectDetailPage(DeployPackages.BASIC, "Process-B");
@@ -194,7 +194,7 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
         projectDetailPage.clickOnProcessDeleteCancelButton();
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkCancelProcessDeleteDialog() {
         openProjectDetailPage(testParams.getProjectId());
         String processName = "Process-A";
@@ -205,7 +205,7 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
         assertTrue(projectDetailPage.isExistingProcess(processName), "Process is not deleted well!");
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkExecutableScheduleNumber() {
         openProjectDetailPage(testParams.getProjectId());
         String processName = "Process-A";
@@ -219,7 +219,7 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
         checkExecutableScheduleNumber(processName, Executables.SUCCESSFUL_GRAPH.getExecutableName(), 1);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkProcessScheduleList() {
         openProjectDetailPage(testParams.getProjectId());
         String processName = "Check Process Schedule List";
@@ -254,7 +254,7 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
         assertScheduleStatus(failedSchedule, ScheduleStatus.DISABLED);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkAccessProjectDetailWithNonAdminRole() throws ParseException, IOException, JSONException {
         try {
             addUsersWithOtherRolesToProject();

@@ -48,7 +48,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         projectTitle = "SimpleProject-test-dashboard-saved-filters";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"init-data"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"init-data"})
     public void uploadCsvDataForBlankProject() {
         uploadCSV(getFilePathFromResource("/" + PAYROLL_CSV + "/payroll.csv"));
     }

@@ -27,7 +27,7 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
     private String newAdminUser;
     private String newAdminPassword;
 
-    @Test(dependsOnMethods = {"createProject"}, groups = "csv")
+    @Test(dependsOnGroups = {"createProject"}, groups = "csv")
     public void checkMyDataAndNoDataOfOthers() {
         final Dataset dataset = uploadCsv(PAYROLL);
         assertTrue(dataset.getStatus()
