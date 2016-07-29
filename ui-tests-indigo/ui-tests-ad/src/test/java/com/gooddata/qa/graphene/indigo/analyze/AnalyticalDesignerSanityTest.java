@@ -57,13 +57,13 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
     @Test(dependsOnGroups = {"init"})
     public void testWithAttribute() {
         assertEquals(analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
-                .getExplorerMessage(), "Now select a measure to display");
+                .getExplorerMessage(), "No measure in your insight");
 
         assertEquals(analysisPage.changeReportType(ReportType.BAR_CHART)
-                .getExplorerMessage(), "Now select a measure to display");
+                .getExplorerMessage(), "No measure in your insight");
 
         assertEquals(analysisPage.changeReportType(ReportType.LINE_CHART)
-                .getExplorerMessage(), "Now select a measure to display");
+                .getExplorerMessage(), "No measure in your insight");
 
         TableReport report = analysisPage
                 .changeReportType(ReportType.TABLE)
