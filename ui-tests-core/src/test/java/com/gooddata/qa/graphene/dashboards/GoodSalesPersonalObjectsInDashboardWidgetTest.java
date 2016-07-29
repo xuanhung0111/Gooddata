@@ -4,6 +4,8 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
@@ -39,8 +41,7 @@ public class GoodSalesPersonalObjectsInDashboardWidgetTest extends GoodSalesAbst
     public void createPersonalMetric() {
         initMetricPage();
         personalMetric = "[Personal] Share %";
-        waitForFragmentVisible(metricPage).createShareMetric(personalMetric, "Amount", "Date dimension (Snapshot)",
-                "Year (Snapshot)");
+        waitForFragmentVisible(metricPage).createShareMetric(personalMetric, METRIC_AMOUNT, ATTR_YEAR_SNAPSHOT);
     }
 
     @Test(dependsOnMethods = {"createPersonalMetric"}, groups = {"pre-condition"})

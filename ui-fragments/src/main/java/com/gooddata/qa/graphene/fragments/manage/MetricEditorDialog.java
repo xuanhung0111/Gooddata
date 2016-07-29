@@ -1,16 +1,13 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
-import static com.gooddata.qa.graphene.entity.metric.CustomMetricUI.extractAttribute;
 import static com.gooddata.qa.graphene.entity.metric.CustomMetricUI.extractAttributeValue;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsEmpty;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static java.lang.String.format;
 
 import java.util.List;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -18,6 +15,7 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.entity.metric.CustomMetricUI;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 
 public class MetricEditorDialog extends AbstractFragment {
 
@@ -44,12 +42,6 @@ public class MetricEditorDialog extends AbstractFragment {
     @FindBy(css = ".elementList .c-label:not(.gdc-hidden) span")
     private List<WebElement> attributeElelements;
 
-    private static final String SELECTED_ELEMENT_LOCATOR = "//ul[@class='elementList']/li[text()='${text}']";
-    private static final String SELECTED_ELEMENT_VALUE_LOCATOR = 
-            "//div[contains(@class,'elementList')]//div[not(contains(@class,'gdc-hidden'))]/span[text()='${text}']";
-    private static final By SEARCH_ELEMENT_VALUE_LOCATOR = 
-            By.xpath("//div[contains(@class,'elementList ')]//input");
-    
     private static final String METRIC_LINK_LOCATOR = "${metricType}";
     private static final String METRIC_TEMPLATE_TAB_LOCATOR = "//ul[@role='tablist']//em[text()='${tab}']";
 
@@ -61,8 +53,6 @@ public class MetricEditorDialog extends AbstractFragment {
             By.xpath(format(SELECTION_LOCATOR, "attributeElements"));
     private static final By FACT_SELECTION_LOCATOR = By.xpath(format(SELECTION_LOCATOR, "facts"));
     private static final By METRIC_SELECTION_LOCATOR = By.xpath(format(SELECTION_LOCATOR, "metrics"));
-    
-    private static final String WEIRD_STRING_TO_CLEAR_ALL_ITEMS = "!@#$%^";
 
     public void clickShareMetricLink() {
         waitForElementVisible(By.cssSelector("div.shareTemplate"), browser).click();
@@ -80,21 +70,18 @@ public class MetricEditorDialog extends AbstractFragment {
         waitForElementVisible(By.cssSelector("div.customMetric"), browser).click();
     }
 
-    public void createShareMetric(String metricName, String usedMetric, String attrFolder, String attr) {
+    public void createShareMetric(String metricName, String usedMetric, String attr) {
         clickShareMetricLink();
         selectElement(usedMetric);
-        selectElement(attrFolder);
         selectElement(attr);
         enterMetricNameAndSubmit(metricName);
     }
 
-    public void createDifferentMetric(String metricName, String usedMetric, String attrFolder, String attr,
-            String attrValue) {
+    public void createDifferentMetric(String metricName, String usedMetric, String attr, String attrValue) {
         clickDifferentMetricLink();
         selectElement(usedMetric);
-        selectElement(attrFolder);
         selectElement(attr);
-        selectElementValue(attrValue);
+        selectElement(attrValue);
         enterMetricNameAndSubmit(metricName);
     }
 
@@ -185,27 +172,23 @@ public class MetricEditorDialog extends AbstractFragment {
     }
 
     private void selectAttributes(CustomMetricUI metricUI) {
-        Pair<String, String> attributeInfo;
         for (String attribute : metricUI.getAttributes()) {
-            attributeInfo = extractAttribute(attribute);
             waitForElementVisible(ATTRIBUTE_SELECTION_LOCATOR, browser)
                 .click();
-            selectElement(attributeInfo.getLeft());
-            selectElement(attributeInfo.getRight());
+            selectElement(attribute);
             waitForElementVisible(addSelectedButton).click();
             waitForElementVisible(customCategoryList);
         }
     }
 
     private void selectAttrElements(CustomMetricUI metricUI) {
-        List<String> attributeValueInfo;
+        Pair<String, String> attributeValueInfo;
         for (String value : metricUI.getAttributeValues()) {
             attributeValueInfo = extractAttributeValue(value);
             waitForElementVisible(ATTRIBUTE_ELEMENT_SELECTION_LOCATOR, browser)
                 .click();
-            selectElement(attributeValueInfo.get(0));
-            selectElement(attributeValueInfo.get(1));
-            selectElementValue(attributeValueInfo.get(2));
+            selectElement(attributeValueInfo.getLeft());
+            selectElement(attributeValueInfo.getRight());
             waitForElementVisible(addSelectedButton).click();
             waitForElementVisible(customCategoryList);
         }
@@ -228,24 +211,12 @@ public class MetricEditorDialog extends AbstractFragment {
             waitForElementVisible(customCategoryList);
         }
     }
-    
+
     private void selectElement(String element) {
-        waitForElementVisible(By.xpath(SELECTED_ELEMENT_LOCATOR.replace("${text}", element)), browser).click();
-    }
-
-    private void selectElementValue(String element) {
-        WebElement input = waitForElementVisible(SEARCH_ELEMENT_VALUE_LOCATOR, browser);
-        waitForCollectionIsNotEmpty(attributeElelements);
-        input.clear();
-        input.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
-        sleepTightInSeconds(1);
-        waitForCollectionIsEmpty(attributeElelements);
-
-        input.clear();
-        input.sendKeys(element);
-        sleepTightInSeconds(1);
-        waitForCollectionIsNotEmpty(attributeElelements);
-        waitForElementVisible(By.xpath(SELECTED_ELEMENT_VALUE_LOCATOR.replace("${text}", element)), browser).click();
+        SelectItemPopupPanel panel = Graphene.createPageFragment(SelectItemPopupPanel.class, 
+                waitForElementVisible(By.cssSelector(".s-metricEditor > [style='display: block;'] .listContainer"),
+                        browser));
+        panel.searchAndSelectItem(element);
     }
 
     private void createTemplateMetricTab(MetricTypes metric) {
