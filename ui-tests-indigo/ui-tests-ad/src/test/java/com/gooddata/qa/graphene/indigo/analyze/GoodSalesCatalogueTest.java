@@ -12,7 +12,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.openqa.selenium.By.cssSelector;
+import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -192,7 +192,7 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
             assertTrue(isElementPresent(ByJQuery.selector(
                     ".adi-no-items:contains('No data matching\"Am\"')"), browser));
 
-            assertTrue(waitForElementVisible(cssSelector(".adi-no-items .s-unavailable-items-matched"), browser)
+            assertTrue(waitForElementVisible(className("s-unavailable-items-matched"), browser)
                     .getText().matches("^\\d unrelated data item[s]? hidden$"));
         });
     }
