@@ -36,6 +36,7 @@ import java.net.URL;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.http.ParseException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
@@ -86,7 +87,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     }
 
     @Test(dependsOnMethods = {"configureStartPage"}, groups = {"createProject"})
-    public void createProject() throws JSONException, IOException {
+    public void createProject() throws JSONException {
         if (testParams.isReuseProject()) {
             if (testParams.getProjectId() != null && !testParams.getProjectId().isEmpty()) {
                 System.out.println("Project will be re-used, id: " + testParams.getProjectId());
@@ -135,8 +136,16 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
         ProjectRestUtils.updateProjectTitle(getRestApiClient(), getProject(), projectTitle);
         log.info("Project title: " + projectTitle);
+    }
 
-        if (addUsersWithOtherRoles) addUsersWithOtherRolesToProject();
+    @Test(dependsOnMethods = {"createProject"}, groups = {"createProject"})
+    public void inviteUsersIntoProject() throws ParseException, IOException, JSONException {
+        if (addUsersWithOtherRoles) {
+            addUsersWithOtherRolesToProject();
+            return;
+        }
+
+        log.warning("This test does not need to invite users into project!");
     }
 
     @AfterClass(alwaysRun = true)
