@@ -16,6 +16,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
+import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 public class UploadHistoryInfoTest extends AbstractCsvUploaderTest {
@@ -112,7 +113,8 @@ public class UploadHistoryInfoTest extends AbstractCsvUploaderTest {
     }
 
     private String getFullNameOf(String userEmail) throws ParseException, IOException, JSONException {
-        JSONObject userInfo = UserManagementRestUtils.getUserProfileByEmail(getRestApiClient(), testParams.getUserDomain(),
+        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
+        JSONObject userInfo = UserManagementRestUtils.getUserProfileByEmail(restApiClient, testParams.getUserDomain(),
                 userEmail);
         return userInfo.getString("firstName") + " " + userInfo.getString("lastName");
     }

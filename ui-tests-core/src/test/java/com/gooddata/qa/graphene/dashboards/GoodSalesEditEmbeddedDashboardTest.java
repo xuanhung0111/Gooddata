@@ -15,16 +15,11 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
 import static com.gooddata.qa.browser.BrowserUtils.switchToMainWindow;
-import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 
-import java.io.IOException;
 import java.util.List;
 
-import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
-import org.json.JSONException;
 import org.openqa.selenium.By;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -38,7 +33,6 @@ import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbedDashboardDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.DashboardEditWidgetToolbarPanel;
@@ -46,7 +40,6 @@ import com.gooddata.qa.graphene.fragments.manage.MetricEditorDialog;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.EmbeddedReportPage;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
@@ -58,26 +51,10 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
     private static final String RED_BAR_MESSAGE =
             "Please remove this report from all dashboards and email distribution lists before deleting.";
 
-    private String newAdminUser;
-    private String newAdminPassword;
-
     private String embeddedCode;
     private String embedUri;
 
     @Test(dependsOnGroups = "createProject", groups = "precondition")
-    public void prepareUserForTest() throws ParseException, JSONException, IOException {
-        newAdminUser = generateEmail(testParams.getUser());
-        newAdminPassword = testParams.getPassword();
-
-        UserManagementRestUtils.createUser(getRestApiClient(), testParams.getUserDomain(),
-                newAdminUser, newAdminPassword);
-        addUserToProject(newAdminUser, UserRoles.ADMIN);
-
-        logout();
-        signInAtGreyPages(newAdminUser, newAdminPassword);
-    }
-
-    @Test(dependsOnMethods = "prepareUserForTest", groups = "precondition")
     public void initData() {
         EmbedDashboardDialog embeddedDialog = initDashboardsPage()
                 .addNewDashboard("New Dashboard")
@@ -271,13 +248,6 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
         takeScreenshot(browser, "Delete-report-in-embedded-Domain-page", getClass());
         assertFalse(embeddedReportsPage.openCustomFolder(reportFolder).isReportVisible(report.getTitle()),
                 "Report is still not deleted");
-    }
-
-    @AfterClass(alwaysRun = true)
-    public void tearDown() throws JSONException, ParseException, IOException {
-        logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
-
-        UserManagementRestUtils.deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), newAdminUser);
     }
 
     private EmbeddedDashboard initEmbeddedDashboard(String dashboardName) {

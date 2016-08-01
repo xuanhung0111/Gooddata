@@ -2,8 +2,6 @@ package com.gooddata.qa.graphene.indigo.user;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.createUser;
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.deleteUserByEmail;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -21,7 +19,6 @@ import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -39,7 +36,6 @@ import com.gooddata.qa.graphene.fragments.indigo.user.GroupDialog;
 import com.gooddata.qa.graphene.fragments.indigo.user.UserInvitationDialog;
 import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
 import com.gooddata.qa.graphene.utils.Sleeper;
-import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
@@ -55,11 +51,8 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     private static final String GROUP2 = "Group2";
     private static final String GROUP3 = "Group3";
 
-    private String userManagementAdmin;
-    private String userManagementPassword;
     private String editorUser;
     private String viewerUser;
-    private String domainAdminUser;
 
     private static final String CHANGE_GROUP_SUCCESSFUL_MESSAGE = "Group membership successfully changed.";
     private static final String DEACTIVATE_SUCCESSFUL_MESSAGE = "The selected users have been deactivated.";
@@ -92,11 +85,6 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = { "createProject" }, groups = { "initialize", "sanity" })
     public void initData() throws JSONException, IOException {
-        userManagementAdmin = generateEmail(testParams.getUser());
-        userManagementPassword = testParams.getPassword();
-        createUser(getRestApiClient(), testParams.getUserDomain(), userManagementAdmin, userManagementPassword);
-
-        domainAdminUser = testParams.getUser();
         editorUser = testParams.getEditorUser();
         viewerUser = testParams.getViewerUser();
 
@@ -111,15 +99,6 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = { "initData" }, groups = { "initialize", "sanity" })
     public void prepareUserManagementAdminAndDashboard() throws 
             ParseException, IOException, JSONException {
-        // Use another admin user (userManagementAdmin) for testing
-        // The reason here is that user mangement page has no context (projectID)
-        // the test will probably fail if the original admin user is used in parallel in many test executions
-        UserManagementRestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), userManagementAdmin,
-                UserRoles.ADMIN);
-        logout();
-        signInAtGreyPages(userManagementAdmin, userManagementPassword);
-
-        // Go to Dashboard page of new created project to use User management page of that project
         initDashboardsPage();
         dashboardsPage.addNewDashboard(DASHBOARD_TEST);
     }
@@ -131,16 +110,15 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         initDashboardsPage();
         initUserManagementPage();
 
-        userManagementPage.addUsersToGroup(GROUP1, userManagementAdmin)
+        userManagementPage.addUsersToGroup(GROUP1, testParams.getUser())
             .addUsersToGroup(GROUP2, editorUser)
             .addUsersToGroup(GROUP3, viewerUser);
     }
 
     @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement" })
     public void checkXssInUsername() throws ParseException, JSONException, IOException {
-        final RestApiClient restApiClient = getRestApiClient(userManagementAdmin, userManagementPassword);
         final String xssUser = "<button>XSS user</button>";
-        String oldUser = UserManagementRestUtils.updateFirstNameOfCurrentAccount(restApiClient, xssUser);
+        String oldUser = UserManagementRestUtils.updateFirstNameOfCurrentAccount(getRestApiClient(), xssUser);
 
         try {
             initDashboardsPage();
@@ -149,7 +127,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
                     .stream()
                     .anyMatch(name -> name.startsWith(xssUser)), "Cannot find user with first name: " + xssUser);
         } finally {
-            UserManagementRestUtils.updateFirstNameOfCurrentAccount(restApiClient, oldUser);
+            UserManagementRestUtils.updateFirstNameOfCurrentAccount(getRestApiClient(), oldUser);
         }
     }
 
@@ -199,8 +177,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
             selectDashboard(DASHBOARD_TEST);
             checkEditorCannotAccessUserGroupsLinkInDashboardPage(dashboardsPage.openPermissionsDialog());
         } finally {
-            logout();
-            signInAtGreyPages(userManagementAdmin, userManagementPassword);
+            logoutAndLoginAs(true, UserRoles.ADMIN);
         }
     }
 
@@ -210,7 +187,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         initUserManagementPage();
         userManagementPage.openInviteUserDialog().cancelInvitation();
         assertEquals(userManagementPage.getUsersCount(), 4);
-        userManagementPage.selectUsers(userManagementAdmin, editorUser, viewerUser, domainAdminUser);
+        userManagementPage.selectUsers(testParams.getUser(), editorUser, viewerUser, testParams.getDomainUser());
         userManagementPage.openGroupDialog(GroupDialog.State.CREATE).closeDialog();
     }
 
@@ -230,7 +207,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         initUserManagementPage();
 
         assertEquals( userManagementPage.openSpecificGroupPage(GROUP1)
-                .getAllUserEmails(), asList(userManagementAdmin));
+                .getAllUserEmails(), asList(testParams.getUser()));
         assertEquals(userManagementPage.getAllUserGroups(), groups);
     }
 
@@ -250,7 +227,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
             // Check "Active" and "All active users" links of sidebar are selected
             assertEquals(userManagementPage.getAllSidebarActiveLinks(), asList("Active", "All active users"));
             assertTrue(compareCollections(userManagementPage.getAllUserEmails(), 
-                    asList(userManagementAdmin, editorUser, viewerUser, domainAdminUser)));
+                    asList(testParams.getUser(), editorUser, viewerUser, testParams.getDomainUser())));
         } finally {
             UserManagementRestUtils.deleteUserGroup(restApiClient, groupUri);
         }
@@ -263,9 +240,9 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         try {
             initDashboardsPage();
             initUserManagementPage();
-            userManagementPage.addUsersToGroup(group, userManagementAdmin)
+            userManagementPage.addUsersToGroup(group, testParams.getUser())
                 .openSpecificGroupPage(group)
-                .removeUsersFromGroup(group, userManagementAdmin)
+                .removeUsersFromGroup(group, testParams.getUser())
                 .waitForEmptyGroup();
         } finally {
             UserManagementRestUtils.deleteUserGroup(restApiClient, groupUri);
@@ -276,14 +253,14 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     public void verifyUngroupedUsersGroup() {
         initDashboardsPage();
         initUserManagementPage();
-        removeUserFromGroups(userManagementAdmin, GROUP1, GROUP2, GROUP3);
+        removeUserFromGroups(testParams.getUser(), GROUP1, GROUP2, GROUP3);
 
         try {
             initUngroupedUsersPage();
-            assertTrue(userManagementPage.getAllUserEmails().contains(userManagementAdmin));
+            assertTrue(userManagementPage.getAllUserEmails().contains(testParams.getUser()));
         } finally {
             initUserManagementPage();
-            userManagementPage.addUsersToGroup(GROUP1, userManagementAdmin);
+            userManagementPage.addUsersToGroup(GROUP1, testParams.getUser());
         }
     }
 
@@ -294,11 +271,11 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         initUserManagementPage();
 
         for (String group : groups) {
-            assertEquals(userManagementPage.addUsersToGroup(group, userManagementAdmin, editorUser, viewerUser)
+            assertEquals(userManagementPage.addUsersToGroup(group, testParams.getUser(), editorUser, viewerUser)
                     .getMessageText(), CHANGE_GROUP_SUCCESSFUL_MESSAGE);
         }
 
-        List<String> expectedUsers = asList(userManagementAdmin, editorUser, viewerUser);
+        List<String> expectedUsers = asList(testParams.getUser(), editorUser, viewerUser);
         for (String group : groups) {
             assertTrue(compareCollections(userManagementPage.openSpecificGroupPage(group)
                     .getAllUserEmails(), expectedUsers));
@@ -311,14 +288,14 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         initUserManagementPage();
 
         for (String group : asList(GROUP1, GROUP2)) {
-            assertEquals(userManagementPage.removeUsersFromGroup(group, userManagementAdmin)
+            assertEquals(userManagementPage.removeUsersFromGroup(group, testParams.getUser())
                     .getMessageText(), CHANGE_GROUP_SUCCESSFUL_MESSAGE);
         }
 
         initUserManagementPage();
-        assertTrue(userManagementPage.addUsersToGroup(GROUP3, userManagementAdmin)
+        assertTrue(userManagementPage.addUsersToGroup(GROUP3, testParams.getUser())
                 .openSpecificGroupPage(GROUP3)
-                .getAllUserEmails().contains(userManagementAdmin));
+                .getAllUserEmails().contains(testParams.getUser()));
     }
 
     @Test(dependsOnMethods = { "verifyUserManagementUI" }, groups = { "userManagement", "sanity" })
@@ -362,14 +339,14 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     public void checkUserCannotChangeRoleOfHimself() {
         initDashboardsPage();
         initUserManagementPage();
-        userManagementPage.changeRoleOfUsers(UserRoles.EDITOR, userManagementAdmin);
+        userManagementPage.changeRoleOfUsers(UserRoles.EDITOR, testParams.getUser());
 
         Predicate<WebDriver> changeRoleFailed = 
                 browser -> String.format(CHANGE_ROLE_FAILED_MESSAGE, UserRoles.EDITOR.getName())
                     .equals(userManagementPage.getMessageText());
         Graphene.waitGui().until(changeRoleFailed);
 
-        assertEquals(userManagementPage.getUserRole(userManagementAdmin), UserRoles.ADMIN.getName());
+        assertEquals(userManagementPage.getUserRole(testParams.getUser()), UserRoles.ADMIN.getName());
     }
 
     @Test(dependsOnMethods = { "inviteUserToProject" }, groups = { "userManagement" }, alwaysRun = true)
@@ -420,9 +397,9 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     public void checkUserCannotDeactivateHimself() {
         initDashboardsPage();
         initUserManagementPage();
-        assertEquals(userManagementPage.deactivateUsers(userManagementAdmin)
+        assertEquals(userManagementPage.deactivateUsers(testParams.getUser())
                 .getMessageText(), CAN_NOT_DEACTIVATE_HIMSELF_MESSAGE);
-        assertTrue(userManagementPage.getAllUserEmails().contains(userManagementAdmin));
+        assertTrue(userManagementPage.getAllUserEmails().contains(testParams.getUser()));
         assertEquals(userManagementPage.filterUserState(UserStates.DEACTIVATED)
                 .waitForEmptyGroup()
                 .getStateGroupMessage(), NO_DEACTIVATED_USER_MESSAGE);
@@ -459,10 +436,10 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         String group = "Test add group";
         checkAddingUserGroup(group);
         initUserManagementPage();
-        userManagementPage.addUsersToGroup(group, userManagementAdmin);
+        userManagementPage.addUsersToGroup(group, testParams.getUser());
 
         assertTrue(userManagementPage.openSpecificGroupPage(group)
-                .getAllUserEmails().contains(userManagementAdmin));
+                .getAllUserEmails().contains(testParams.getUser()));
     }
 
     @Test(dependsOnGroups = "verifyUI")
@@ -565,7 +542,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
 
         assertEquals(userManagementPage.getUserGroupsCount(), customGroupCount);
 
-        List<String> emailsList = asList(domainAdminUser, userManagementAdmin, editorUser, viewerUser);
+        List<String> emailsList = asList(testParams.getDomainUser(), testParams.getUser(), editorUser, viewerUser);
        
         assertEquals(userManagementPage.openSpecificGroupPage(GROUP1)
                 .deleteUserGroup()
@@ -578,7 +555,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         initDashboardsPage();
         initUserManagementPage();
 
-        List<String> emailsList = asList(domainAdminUser, userManagementAdmin, editorUser, viewerUser);
+        List<String> emailsList = asList(testParams.getDomainUser(), testParams.getUser(), editorUser, viewerUser);
         while (userManagementPage.getUserGroupsCount() > 0) {
             userManagementPage.openSpecificGroupPage(userManagementPage.getAllUserGroups().get(0))
                 .deleteUserGroup();
@@ -603,11 +580,6 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     public void turnOffUserManagementFeature() throws IOException, JSONException {
         ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.DISPLAY_USER_MANAGEMENT, false);
-    }
-
-    @AfterClass
-    public void deleteAccount() throws ParseException, IOException, JSONException {
-        deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), userManagementAdmin);
     }
 
     private void checkEditorCannotAccessUserGroupsLinkInDashboardPage(PermissionsDialog permissionsDialog) {

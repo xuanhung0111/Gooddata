@@ -178,7 +178,7 @@ public final class DashboardsRestUtils {
      */
     public static String addComment(final RestApiClient restApiClient, final String projectId,
             final String comment, final String objectId) throws ParseException, JSONException, IOException {
-        final String objectUri = format(OBJ_LINK, projectId) + objectId;
+        final String objectUri = objectId.startsWith("/gdc") ? objectId : format(OBJ_LINK, projectId) + objectId;
 
         log.info("Verify object id: " + objectUri);
         getJsonObject(restApiClient, objectUri);

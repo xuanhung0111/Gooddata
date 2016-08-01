@@ -37,6 +37,7 @@ import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
@@ -384,7 +385,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
                     .contains("You are not authorized to access this area. Please contact your administrator."));
         } finally {
             logout();
-            signInAtGreyPages(testParams.getUser(), testParams.getPassword());
+            signIn(false, UserRoles.ADMIN);
         }
     }
 

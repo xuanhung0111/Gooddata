@@ -35,6 +35,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.Das
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 @Test(groups = {"GoodSalesValidElements"}, description = "Tests for GoodSales project relates to ValidElements resource")
@@ -140,7 +141,8 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"})
     public void checkVariableFilterDashboard() throws ParseException, IOException, JSONException {
         String top5OpenByMoney = "Top 5 Open (by $)";
-        UserManagementRestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), testParams.getEditorUser(),
+        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
+        UserManagementRestUtils.addUserToProject(restApiClient, testParams.getProjectId(), testParams.getEditorUser(),
                 UserRoles.ADMIN);
 
         initDashboardsPage();

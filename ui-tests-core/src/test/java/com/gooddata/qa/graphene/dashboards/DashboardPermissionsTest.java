@@ -7,12 +7,13 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmp
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -347,15 +348,21 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
 
         List<WebElement> candidates =
                 Lists.newArrayList(waitForCollectionIsNotEmpty(addGranteesDialog.getGrantees()));
-        assertEquals(candidates.size(), 4);
+
+        assertEquals(candidates.size(), testParams.getDomainUser() != null ? 5 : 4);
         By nameSelector = By.cssSelector(".grantee-name");
         By loginSelector = By.cssSelector(".grantee-email");
         List<String> expectedGrantees =
-                Arrays.asList(ALCOHOLICS_ANONYMOUS, XENOFOBES_XYLOPHONES, editorLogin, viewerLogin);
+                new ArrayList<>(asList(ALCOHOLICS_ANONYMOUS, XENOFOBES_XYLOPHONES, editorLogin, viewerLogin));
         List<String> actualGrantees =
-                Arrays.asList(candidates.get(0).findElement(nameSelector).getText().trim(), candidates.get(1)
+                new ArrayList<>(asList(candidates.get(0).findElement(nameSelector).getText().trim(), candidates.get(1)
                         .findElement(nameSelector).getText().trim(), candidates.get(2).findElement(loginSelector)
-                        .getText().trim(), candidates.get(3).findElement(loginSelector).getText().trim());
+                        .getText().trim(), candidates.get(3).findElement(loginSelector).getText().trim()));
+
+        if (testParams.getDomainUser() != null) {
+            expectedGrantees.add(testParams.getDomainUser());
+            actualGrantees.add(candidates.get(4).findElement(loginSelector).getText().trim());
+        }
         assertTrue(CollectionUtils.isEqualCollection(expectedGrantees, actualGrantees),
                 "Report isn't applied filter correctly");
     }
@@ -455,14 +462,23 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
         final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
 
-        selectCandidatesAndShare(addGranteesDialog, viewerLogin, editorLogin, ALCOHOLICS_ANONYMOUS,
-                XENOFOBES_XYLOPHONES);
+        List<String> candidates = new ArrayList<>(asList(viewerLogin, editorLogin, ALCOHOLICS_ANONYMOUS,
+                XENOFOBES_XYLOPHONES));
+        if (testParams.getDomainUser() != null) {
+            candidates.add(testParams.getDomainUser());
+        }
+
+        selectCandidatesAndShare(addGranteesDialog, candidates.toArray(new String[0]));
 
         assertEquals(permissionsDialog.getAddedGrantees().size(), 5);
 
         permissionsDialog.openAddGranteePanel();
 
-        assertEquals(addGranteesDialog.getGranteesCount("", false), 0);
+        if (testParams.getDomainUser() != null) {
+            assertEquals(addGranteesDialog.getGranteesCount("", true), 1);
+        } else {
+            assertEquals(addGranteesDialog.getGranteesCount("", false), 0);
+        }
     }
 
     @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests"})

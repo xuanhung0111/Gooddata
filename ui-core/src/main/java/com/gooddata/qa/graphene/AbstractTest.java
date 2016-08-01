@@ -102,6 +102,10 @@ public abstract class AbstractTest extends Arquillian {
         return getRootUrl().substring(0, rootUrl.length() - 1);
     }
 
+    public RestApiClient getDomainUserRestApiClient() {
+        return getRestApiClient(testParams.getDomainUser(), testParams.getPassword());
+    }
+
     /**
      * Create {@link com.gooddata.qa.utils.http.RestApiClient} for admin user and save it to the test context.
      * @return {@link com.gooddata.qa.utils.http.RestApiClient} client for admin user
@@ -142,6 +146,10 @@ public abstract class AbstractTest extends Arquillian {
 
     public String generateEmail(String email) {
         return email.replace("@", "+" + UUID.randomUUID().toString().substring(0, 5) + "@");
+    }
+
+    public String generateDynamicUser(String user) {
+        return user.replace("@", "+dynamic+" + UUID.randomUUID().toString().substring(0, 5) + "@");
     }
 
     public ProjectValidationResults validateProject() {

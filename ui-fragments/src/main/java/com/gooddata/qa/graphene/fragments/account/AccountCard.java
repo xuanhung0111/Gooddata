@@ -19,10 +19,15 @@ public class AccountCard extends AbstractFragment {
 
     public PersonalInfo getUserInfo() {
         String contacts = waitForElementVisible(contactInfo).getText();
-        return new PersonalInfo()
+        PersonalInfo info = new PersonalInfo()
                 .withFullName(waitForElementVisible(fullName).getText())
-                .withEmail(contactInfo.findElement(By.tagName("span")).getAttribute("title"))
-                .withPhoneNumber(contacts.substring(contacts.lastIndexOf(":") + 2));
+                .withEmail(contactInfo.findElement(By.tagName("span")).getAttribute("title"));
+
+        if (contacts.contains("phone:")) {
+            info.withPhoneNumber(contacts.substring(contacts.lastIndexOf(":") + 2));
+        }
+
+        return info;
     }
 
 }

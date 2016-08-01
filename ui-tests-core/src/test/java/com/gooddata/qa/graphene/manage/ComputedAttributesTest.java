@@ -33,6 +33,7 @@ import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.CssUtils;
@@ -307,7 +308,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
                     "Metric values are incorrrect");
             logout();
 
-            signInAtUI(testParams.getUser(), testParams.getPassword());
+            signIn(false, UserRoles.ADMIN);
             restApiClient = getRestApiClient();
 
             String mufUri = createStageMuf(Arrays.asList("Won", "Lost"), "Status User Filters");
@@ -330,7 +331,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
                     "Metric values are incorrrect");
         } finally {
             logout();
-            signInAtUI(testParams.getUser(), testParams.getPassword());
+            signIn(false, UserRoles.ADMIN);
         }
     }
 

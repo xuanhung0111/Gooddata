@@ -96,7 +96,7 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = "initData")
     public void confirmInvitationRegistrationForm() throws MessagingException, IOException, JSONException {
-        deleteUserIfExist(getRestApiClient(), INVITATION_USER);
+        deleteUserIfExist(testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient(), INVITATION_USER);
 
         initProjectsAndUsersPage();
         String invitationLink = projectAndUsersPage.inviteUsersWithBlankMessage(imapClient,
@@ -144,7 +144,7 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
     @Test(dependsOnMethods = "initData")
     public void inviteUnverifiedUserToProject()
             throws ParseException, JSONException, IOException, MessagingException {
-        deleteUserIfExist(getRestApiClient(), INVITATION_USER);
+        deleteUserIfExist(testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient(), INVITATION_USER);
 
         initRegistrationPage()
             .registerNewUserSuccessfully(registrationForm);
@@ -176,7 +176,7 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
 
     @AfterClass(alwaysRun = true)
     public void tearDown() throws ParseException, JSONException, IOException {
-        deleteUserIfExist(getRestApiClient(), INVITATION_USER);
+        deleteUserIfExist(testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient(), INVITATION_USER);
     }
 
     private UserProfilePage openUserProfileInProject(RestApiClient restApiClient, String projectId)

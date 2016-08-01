@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForStringInUrl;
@@ -9,43 +8,27 @@ import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import java.io.IOException;
 import java.util.List;
 
-import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.TimeoutException;
 import org.testng.SkipException;
-import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.indigo.HamburgerMenu;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
 
-    private String testUser = "";
-    private String testUserPassword = "";
     private boolean isTestedOnBrowserStack = false;
-    
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"dashboardWidgetsInit"})
-    public void prepareUserForResponsiveNavigationTest() throws ParseException, IOException, JSONException {
+
+    @BeforeClass(alwaysRun = true)
+    public void detectExecutionEnvironment() {
         String executionEnv = System.getProperty("test.execution.env");
-
         isTestedOnBrowserStack = executionEnv != null && executionEnv.contains("browserstack-mobile");
-
-        testUser = generateEmail(testParams.getUser());
-        testUserPassword = testParams.getPassword();
-        
-        UserManagementRestUtils.createUser(getRestApiClient(), testParams.getUserDomain(),
-                testUser, testUserPassword);
-        addUserToProject(testUser, UserRoles.ADMIN);
-
-        logout();
-        signInAtUI(testUser, testUserPassword);
     }
 
     @Test(dependsOnGroups = {"dashboardWidgetsInit"}, groups = {"mobile"})
@@ -91,7 +74,7 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
             browser.get(currentUrl);
             waitForStringInUrl(ACCOUNT_PAGE);
         } finally {
-            signInAtUI(testUser, testUserPassword);
+            signIn(false, UserRoles.ADMIN);
         }
     }
 
@@ -117,7 +100,7 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
             navigateToEachHamburgerMenuItem(page);
 
             logout();
-            signInAtUI(testUser, testUserPassword);
+            signIn(false, UserRoles.ADMIN);
             waitForFragmentVisible(indigoDashboardsPage)
                 .waitForDashboardLoad()
                 .waitForAllKpiWidgetsLoaded();
@@ -126,7 +109,6 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnGroups = {"dashboardWidgetsInit"}, groups = {"desktop"})
     public void checkHamburgerMenuNotPresentInDesktop() {
-        System.out.println();
         assertFalse(initIndigoDashboardsPage().isHamburgerMenuLinkPresent());
     }
 
@@ -139,7 +121,7 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
             openUrl(getIndigoDashboardsPageUri());
             waitForStringInUrl(ACCOUNT_PAGE);
         } finally {
-            signInAtUI(testUser, testUserPassword);
+            signIn(false, UserRoles.ADMIN);
         }
     }
 
@@ -156,13 +138,6 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
         waitForFragmentVisible(indigoDashboardsPage)
             .waitForDashboardLoad()
             .waitForAllKpiWidgetsLoaded();
-    }
-
-    @AfterClass(alwaysRun = true)
-    public void tearDown() throws IOException, JSONException {
-        logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
-
-        UserManagementRestUtils.deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), testUser);
     }
 
     private boolean isDeviceSupportHamburgerMenu() {

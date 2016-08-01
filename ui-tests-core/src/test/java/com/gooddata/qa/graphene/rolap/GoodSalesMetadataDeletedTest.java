@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.rolap;
 
+import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
@@ -25,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.md.report.Report;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
@@ -52,6 +54,8 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     private static final String MOVED_IN_PIPELINE_DRILL_IN_REPORT = "Moved In Pipeline [Drill - In]";
     private static final String STARTING_PIPELINE_REPORT = "Starting Pipeline [hl]";
     private static final String ACTIVITIES_BY_TYPE_REPORT = "Activities by Type";
+    private static final String NEW_WON_DRILL_IN_REPORT = "New Won [Drill-In]";
+    private static final String NEW_LOST_DRILL_IN_REPORT = "New Lost [Drill-In]";
 
     private static final String COMMENT = "comment";
 
@@ -78,12 +82,6 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
             .withName("# of Opportunities").<MetricInfo>withIdentifier("afdV48ABh8CN")
             .withAffectedMetric("# of Won Opps.")
             .withAffectedReports("Top 5 Lost (by $)", "Total Lost [hl]", "Quarterly Win Rate");
-
-    private static final ReportInfo NEW_WON_DRILL_IN_REPORT = new ReportInfo().withId("64072")
-            .withName("New Won [Drill-In]").withIdentifier("afPveYFCcevy");
-
-    private static final ReportInfo NEW_LOST_DRILL_IN_REPORT = new ReportInfo()
-            .<ReportInfo>withName("New Lost [Drill-In]").withReportDef("64178");
 
     private static final DatasetInfo PRODUCT_DATASET = new DatasetInfo().withId("947").withName("Product")
             .<DatasetInfo>withIdentifier("dataset.product").withAttributes("Product");
@@ -143,7 +141,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     public void deleteComment() throws IOException, JSONException {
         String[] objectLinks = {
             DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT,
-                    NEW_LOST_DRILL_IN_REPORT.reportDef),
+                    getMdService().getObjUri(getProject(), Report.class, title(NEW_LOST_DRILL_IN_REPORT))),
             DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT, ACCOUNT_ATTRIBUTE.id),
             DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT,
                     NUMBER_OF_OPPORTUNITIES_METRIC.id),
@@ -154,7 +152,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
 
         dropAllComments(objectLinks, DropStrategy.CASCADE);
 
-        assertFalse(isObjectDeleted(NEW_LOST_DRILL_IN_REPORT.name, Places.REPORT));
+        assertFalse(isObjectDeleted(NEW_LOST_DRILL_IN_REPORT, Places.REPORT));
         assertFalse(isObjectDeleted(ACCOUNT_DATASET.name, Places.DATASET));
         assertFalse(isObjectDeleted(ACCOUNT_ATTRIBUTE.name, Places.ATTRIBUTE));
         assertFalse(isObjectDeleted(NUMBER_OF_OPPORTUNITIES_METRIC.name, Places.METRIC));
@@ -237,11 +235,12 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     public void deleteReport() throws JSONException, IOException {
         String reportSchedule = null;
         try {
-            addReportToNewDashboard(NEW_WON_DRILL_IN_REPORT.name, DASHBOARD_NAME);
-            reportSchedule = createReportSchedule(NEW_WON_DRILL_IN_REPORT.name);
+            addReportToNewDashboard(NEW_WON_DRILL_IN_REPORT, DASHBOARD_NAME);
+            reportSchedule = createReportSchedule(NEW_WON_DRILL_IN_REPORT);
 
-            dropObject(NEW_WON_DRILL_IN_REPORT.identifier, DropStrategy.CASCADE);
-            assertTrue(isObjectDeleted(NEW_WON_DRILL_IN_REPORT.name, Places.DASHBOARD_REPORT));
+            dropObject(getMdService().getObj(getProject(), Report.class, title(NEW_WON_DRILL_IN_REPORT))
+                    .getIdentifier(), DropStrategy.CASCADE);
+            assertTrue(isObjectDeleted(NEW_WON_DRILL_IN_REPORT, Places.DASHBOARD_REPORT));
             assertFalse(isObjectDeleted(reportSchedule, Places.SCHEDULE_EMAIL));
         } finally {
             tryDeleteDashboard();
@@ -251,7 +250,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
     public void deleteDashboard() throws IOException, JSONException {
-        addReportToNewDashboard(NEW_LOST_DRILL_IN_REPORT.name, DASHBOARD_NAME);
+        addReportToNewDashboard(NEW_LOST_DRILL_IN_REPORT, DASHBOARD_NAME);
 
         String url = browser.getCurrentUrl();
         System.out.println(url);
@@ -484,6 +483,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
                 return !variablePage.isVariableVisible(object);
             case REPORT:
                 initReportsPage();
+                selectReportsDomainFolder("All");
                 return !reportsPage.isReportVisible(object);
             case DASHBOARD_FILTER:
                 initDashboardsPage();
@@ -693,15 +693,6 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
 
         public MetricInfo withAffectedReports(String... affectedReports) {
             this.affectedReports = affectedReports;
-            return this;
-        }
-    }
-
-    private static class ReportInfo extends MetadataInfo {
-        private String reportDef;
-
-        public ReportInfo withReportDef(String reportDef) {
-            this.reportDef = reportDef;
             return this;
         }
     }

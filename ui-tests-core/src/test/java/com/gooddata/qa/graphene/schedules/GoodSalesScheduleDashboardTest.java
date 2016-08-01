@@ -44,6 +44,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbedDashboardDialog;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
@@ -341,20 +342,22 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         String userB = "qa+test+schedule+b@gooddata.com";
         String scheduleUserA = "Schedule with deleted bcc email";
         String scheduleUserB = "Schedule with deleted author";
-        String userAUri = UserManagementRestUtils.createUser(getRestApiClient(), testParams.getUserDomain(), userA,
+        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
+
+        String userAUri = UserManagementRestUtils.createUser(restApiClient, testParams.getUserDomain(), userA,
                 testParams.getPassword());
-        String userBUri = UserManagementRestUtils.createUser(getRestApiClient(), testParams.getUserDomain(), userB,
+        String userBUri = UserManagementRestUtils.createUser(restApiClient, testParams.getUserDomain(), userB,
                 testParams.getPassword());
 
         try {
             String userUri = getGoodDataClient().getAccountService().getCurrent().getUri();
-            UserManagementRestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), userA, UserRoles.EDITOR);
-            UserManagementRestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), userB, UserRoles.ADMIN);
+            UserManagementRestUtils.addUserToProject(restApiClient, testParams.getProjectId(), userA, UserRoles.EDITOR);
+            UserManagementRestUtils.addUserToProject(restApiClient, testParams.getProjectId(), userB, UserRoles.ADMIN);
 
             initDashboardsPage();
             dashboardsPage.selectDashboard(PIPELINE_ANALYSIS_DASHBOARD);
             createDashboardSchedule(scheduleUserA, asList(userA));
-            UserManagementRestUtils.deleteUserByUri(getRestApiClient(), userAUri);
+            UserManagementRestUtils.deleteUserByUri(restApiClient, userAUri);
 
             initEmailSchedulesPage();
             assertDashboardScheduleInfo(scheduleUserA, userUri, asList(userA));
@@ -366,15 +369,15 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
 
             logout();
             signIn(true, UserRoles.ADMIN);
-            UserManagementRestUtils.deleteUserByUri(getRestApiClient(), userBUri);
+            UserManagementRestUtils.deleteUserByUri(restApiClient, userBUri);
 
             initEmailSchedulesPage();
             assertFalse(emailSchedulesPage.isPrivateSchedulePresent(scheduleUserB),
                     "Schedule of deleted user was not hidden.");
         } finally {
             loginAs(UserRoles.ADMIN);
-            UserManagementRestUtils.deleteUserByUri(getRestApiClient(), userAUri);
-            UserManagementRestUtils.deleteUserByUri(getRestApiClient(), userBUri);
+            UserManagementRestUtils.deleteUserByUri(restApiClient, userAUri);
+            UserManagementRestUtils.deleteUserByUri(restApiClient, userBUri);
         }
     }
 

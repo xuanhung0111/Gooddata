@@ -44,6 +44,7 @@ import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.account.RegistrationPage;
+import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.io.ResourceUtils;
 
@@ -157,7 +158,8 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
 
             ++expectedMessageCount;
         } finally {
-            UserManagementRestUtils.deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(),
+            RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
+            UserManagementRestUtils.deleteUserByEmail(restApiClient, testParams.getUserDomain(),
                     nonRegistedUser);
         }
     }
@@ -216,6 +218,7 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
     }
 
     private boolean isUserUsingMuf(String mufUri, String userEmail) throws JSONException, IOException {
+        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
         final JSONObject userProfile = getUserProfileByEmail(restApiClient, testParams.getUserDomain(), userEmail);
         if(Objects.isNull(userProfile))
             return false;

@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
-import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.GOODSALES_TEMPLATE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
@@ -8,7 +7,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoade
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static java.util.Objects.isNull;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
@@ -17,7 +15,6 @@ import java.util.UUID;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -28,17 +25,12 @@ import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest {
 
     private static final String UNIQUE_ID = UUID.randomUUID().toString().substring(0, 10);
     private static final String NEW_PROJECT_NAME = "New-project-navigation-" + UNIQUE_ID;
     private static final String ANALYZE_PAGE_URL = "analyze";
-
-    private String newAdminUser;
-    private String newAdminPassword;
-    private String newAdminUserUri;
 
     private String embededDashboardUser;
     private String embededDashboardUserPassword;
@@ -48,8 +40,6 @@ public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest
     private String currentProjectId;
     private String newProjectId;
 
-    private GoodData newAdminGoodDataClient;
-
     @BeforeClass(alwaysRun = true)
     public void initialize() {
         projectTitle += "Project-navigation-" + UNIQUE_ID;
@@ -57,31 +47,21 @@ public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest
 
     @Test(dependsOnGroups = {"init"}, groups = {"precondition"})
    public void prepareUserForSwitchingTest() throws ParseException, JSONException, IOException {
-        newAdminUser = generateEmail(testParams.getUser());
-        newAdminPassword = testParams.getPassword();
-
-        newAdminUserUri = UserManagementRestUtils.createUser(getRestApiClient(), testParams.getUserDomain(),
-                newAdminUser, newAdminPassword);
-
         embededDashboardUser = testParams.getEditorUser();
         embededDashboardUserPassword = testParams.getEditorPassword();
 
         viewerUser = testParams.getViewerUser();
         viewerUserPassword = testParams.getViewerPassword();
 
-        addUserToProject(newAdminUser, UserRoles.ADMIN);
         addUserToProject(embededDashboardUser, UserRoles.DASHBOARD_ONLY);
         addUserToProject(viewerUser, UserRoles.VIEWER);
-
-        logout();
-        signInAtGreyPages(newAdminUser, newAdminPassword);
     }
 
     @Test(dependsOnMethods = {"prepareUserForSwitchingTest"}, groups = {"precondition"})
     public void getMoreProject() {
         currentProjectId = testParams.getProjectId();
 
-        newProjectId = ProjectRestUtils.createProject(getNewAdminGoodDataClient(), NEW_PROJECT_NAME, GOODSALES_TEMPLATE,
+        newProjectId = ProjectRestUtils.createProject(getGoodDataClient(), NEW_PROJECT_NAME, GOODSALES_TEMPLATE,
                 testParams.getAuthorizationToken(), testParams.getProjectDriver(),
                 testParams.getProjectEnvironment());
     }
@@ -135,7 +115,7 @@ public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest
             testParams.setProjectId(currentProjectId);
 
             logout();
-            signInAtGreyPages(newAdminUser, newAdminPassword);
+            signIn(false, UserRoles.ADMIN);
 
             ProjectRestUtils.deleteProject(goodDataClient, newProjectId);
         }
@@ -143,7 +123,7 @@ public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"switchProject"})
     public void switchProjectWithFeatureFlagDisabled() {
-        ProjectRestUtils.setFeatureFlagInProject(getNewAdminGoodDataClient(), newProjectId,
+        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), newProjectId,
                 ProjectFeatureFlags.ANALYTICAL_DESIGNER, false);
 
         initAnalysePage();
@@ -157,7 +137,7 @@ public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"switchProject"})
     public void switchProject() {
-        ProjectRestUtils.setFeatureFlagInProject(getNewAdminGoodDataClient(), newProjectId,
+        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), newProjectId,
                 ProjectFeatureFlags.ANALYTICAL_DESIGNER, true);
 
         initAnalysePage();
@@ -177,7 +157,7 @@ public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"switchProject"})
     public void checkLastVisitedProject() throws JSONException {
-        ProjectRestUtils.setFeatureFlagInProject(getNewAdminGoodDataClient(), newProjectId,
+        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), newProjectId,
                 ProjectFeatureFlags.ANALYTICAL_DESIGNER, true);
 
         initAnalysePage();
@@ -213,7 +193,7 @@ public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest
         assertThat(browser.getCurrentUrl(), containsString(currentProjectId));
 
         logout();
-        signInAtUI(newAdminUser, newAdminPassword);
+        signIn(false, UserRoles.ADMIN);
 
         takeScreenshot(browser, "Last-visited-project-is-updated-with-project-" + projectTitle, getClass());
         assertThat(browser.getCurrentUrl(), containsString(currentProjectId));
@@ -245,20 +225,5 @@ public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest
         takeScreenshot(browser, "Re-open-Analyse-page-of-project-:"
                 + currentProjectId + "after-delete-project-" + newProjectId, getClass());
         assertThat(browser.getCurrentUrl(), containsString(currentProjectId));
-    }
-
-    @AfterClass(alwaysRun = true)
-    public void tearDown() throws JSONException {
-        logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
-
-        UserManagementRestUtils.deleteUserByUri(getRestApiClient(), newAdminUserUri);
-    }
-
-    private GoodData getNewAdminGoodDataClient() {
-        if (isNull(newAdminGoodDataClient)) {
-            newAdminGoodDataClient = getGoodDataClient(newAdminUser, newAdminPassword);
-        }
-
-        return newAdminGoodDataClient;
     }
 }
