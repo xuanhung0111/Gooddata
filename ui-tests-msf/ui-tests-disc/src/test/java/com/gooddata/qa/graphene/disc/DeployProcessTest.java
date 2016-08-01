@@ -6,6 +6,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
+import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -14,6 +15,7 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
@@ -238,6 +240,56 @@ public class DeployProcessTest extends AbstractDISCTest {
         } finally {
             cleanProcessesInWorkingProject();
         }
+    }
+
+    @DataProvider(name = "invalidGitStorePath")
+    public Object[][] invalidGitStorePath() {
+        return new Object[][] {
+            {""},
+            {"           "},
+            {"!@#$%^&*()'\"~"},
+            {"C:\\Testdata\\abc"},
+            {"${PUBLIC_APPSTORE}:branch"}
+        };
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "invalidGitStorePath")
+    public void cannotDeployRubyGitStoreProcessWithInvalidFormat(String gitPath) {
+        openProjectDetailPage(testParams.getProjectId());
+        String processName = "Cannot deploy process";
+        waitForFragmentVisible(projectDetailPage).clickOnDeployProcessButton();
+        deployForm.deployProcess(gitPath, processName);
+        assertTrue(deployForm.isGitStoreError(), "Error is not shown in git store path");
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void cannotDeployRubySelfServiceProcessInCaseMissingInfoJson() {
+        String gitPath = "${PUBLIC_APPSTORE}:branch/prodigy-testing:/abc/doesnotexist";
+        openProjectDetailPage(testParams.getProjectId());
+        String processName = "Cannot deploy process";
+        waitForFragmentVisible(projectDetailPage).clickOnDeployProcessButton();
+        deployForm.deployProcess(gitPath, processName);
+        assertEquals(waitForElementVisible(className("dialog-title"), browser).getText().trim(),
+                "Process failed to deploy");
+        assertEquals(waitForElementVisible(className("dialog-body"), browser).getText().trim(),
+                "Failed to deploy the process as " + processName +
+                ". Reason: Deployment failed on internal error, error_messsage: Info.json is missing in root application directory .");
+        waitForElementVisible(className("s-btn-ok"), browser).click();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void cannotDeployRubySelfServiceProcessWithRelativePath() {
+        String gitPath = "${PUBLIC_APPSTORE}:branch/prodigy-testing:/../ReadFile";
+        openProjectDetailPage(testParams.getProjectId());
+        String processName = "Cannot deploy process";
+        waitForFragmentVisible(projectDetailPage).clickOnDeployProcessButton();
+        deployForm.deployProcess(gitPath, processName);
+        assertEquals(waitForElementVisible(className("dialog-title"), browser).getText().trim(),
+                "Process failed to deploy");
+        assertEquals(waitForElementVisible(className("dialog-body"), browser).getText().trim(),
+                "Failed to deploy the process as " + processName + ". Reason: Invalid path. Deployment path " +
+                        gitPath + " cannot contain relative references..");
+        waitForElementVisible(className("s-btn-ok"), browser).click();
     }
 
     private void failedDeployInProjectsPage(DeployPackages deployPackage, ProcessTypes processType,

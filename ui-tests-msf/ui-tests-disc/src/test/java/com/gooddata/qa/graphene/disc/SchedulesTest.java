@@ -15,6 +15,7 @@ import java.util.List;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
@@ -47,7 +48,31 @@ public class SchedulesTest extends AbstractSchedulesTest {
         projectTitle = "Disc-test-schedule";
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @DataProvider(name = "rubyGitStoreProvider")
+    public Object[][] rubyGitStoreProvider() {
+        return new Object[][] {
+            {"${PUBLIC_APPSTORE}:branch/prodigy-testing:/vietnam/ReadFile"},
+            {"${PRIVATE_APPSTORE}:branch/prodigy-testing:/vietnam/ReadFile"}
+        };
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "rubyGitStoreProvider")
+    public void createScheduleToExecuteRubyInGitStore(String gitStorePath) {
+        try {
+            openProjectDetailPage(testParams.getProjectId());
+
+            String processName = "Create Schedule to execute Ruby in Git store";
+            deployRubyGitStoreInProjectDetailPage(gitStorePath, processName);
+            createSchedule(new ScheduleBuilder().setProcessName(processName).setConfirmed(true));
+
+            scheduleDetail.manualRun();
+            assertSuccessfulExecution();
+        } finally {
+            cleanProcessesInWorkingProject();
+        }
+    }
+
+    @Test(dependsOnMethods = {"createProject"})
     public void createScheduleWithCustomInput() {
         try {
             openProjectDetailPage(testParams.getProjectId());
