@@ -98,7 +98,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
         };
     }
 
-    @Test(dependsOnGroups = {"createReport"}, dataProvider = "rowTotalDataProvider")
+    @Test(dependsOnMethods = {"createReport"}, dataProvider = "rowTotalDataProvider")
     public void addAndRemoveRowTotalOnAttributeHeader(final AggregationType type,
             final List<Float> totalValuesOfAllRows, final List<Float> totalValuesOfEachStage) {
         final TableReport table = openReport(SIMPLE_REPORT).getTableReport();
