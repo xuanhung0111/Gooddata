@@ -31,16 +31,16 @@ public class UITestsRegistry {
                     SimpleProjectEtlTest.class,
                     GoodSalesDashboardTest.class,
                     GoodSalesReportsTest.class,
+                    new GdcTest("testng-imap-GoodSales-email-schedule.xml")
+                        .param("GRAPHENE_USER", "gd.scheduledemail@gmail.com")
+                        .param("GRAPHENE_PASSWORD", "$CHECKLIST_SCHEDULED_EMAIL_USER_PASSWORD"),
+                    new GdcTest(LocalizationTest.class)
+                        .param("LANGUAGE_CODE", "fr-FR")
                     /**
                      * @TODO: this test needs to be removed from basic test until the issue with wrong link 
                      * (use backend instead client-demo)
                      */
-//                    new GdcTest("testng-imap-GoodSales-email-schedule.xml")
-//                        .param("GRAPHENE_USER", "gd.scheduledemail@gmail.com")
-//                        .param("GRAPHENE_PASSWORD", "$CHECKLIST_SCHEDULED_EMAIL_USER_PASSWORD"),
-                    new GdcTest(LocalizationTest.class)
-                        .param("LANGUAGE_CODE", "fr-FR"),
-                    "testng-imap-project-n-users-sanity-test.xml"
+//                    "testng-imap-project-n-users-sanity-test.xml"
                 ));
             } else if ("filters".equals(suite)) {
                 tests.addAll(asList(
