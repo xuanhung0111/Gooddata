@@ -105,6 +105,11 @@ public class DateFilterPickerPanel extends AbstractFragment {
         return getDateDatasetSelect().getRoot().getText();
     }
 
+    public DateDimensionSelect getDateDatasetSelect() {
+        return Graphene.createPageFragment(DateDimensionSelect.class,
+                waitForElementVisible(By.className("adi-date-dataset-select-dropdown"), browser));
+    }
+
     private void configTimeFilterByRangeHelper(String from, String to, boolean apply) {
         waitForElementVisible(dateRangeSection).click();
         waitForElementVisible(fromDate).clear();
@@ -115,10 +120,5 @@ public class DateFilterPickerPanel extends AbstractFragment {
 
         waitForElementVisible(apply ? applyButton : cancelButton).click();
         waitForFragmentNotVisible(this);
-    }
-
-    private DateDimensionSelect getDateDatasetSelect() {
-        return Graphene.createPageFragment(DateDimensionSelect.class,
-                waitForElementVisible(By.className("adi-date-dataset-select-dropdown"), browser));
     }
 }
