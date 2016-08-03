@@ -55,7 +55,7 @@ public class ScheduleDetail extends ScheduleForm {
     private static final By BY_EXECUTION_STATUS = By.cssSelector(".execution-status");
     private static final By BY_EXECUTION_DESCRIPTION = By.cssSelector(".ait-execution-history-item-description");
     private static final By BY_EXECUTION_ERROR_DESCRIPTION = By
-            .cssSelector(".ait-execution-history-item-description.is-error");
+            .cssSelector(".execution-history-error");
     private static final By BY_EXECUTION_LOG = By.cssSelector(".ait-execution-history-item-log");
     private static final By BY_EXECUTION_RUNTIME = By.cssSelector(".execution-runtime");
     private static final By BY_EXECUTION_DATE = By.cssSelector(".execution-date");
@@ -576,7 +576,7 @@ public class ScheduleDetail extends ScheduleForm {
                 getLastExecution().findElement(BY_EXECUTION_STATUS)).isDisplayed();
     }
 
-    public WebElement getLastExecution() {
+    private WebElement getLastExecution() {
         if (scheduleExecutionItems.isEmpty())
             waitForExecutionHistoryLoading();
         return waitForElementVisible(lastExecutionItem);

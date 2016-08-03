@@ -216,7 +216,8 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
     protected void assertFailedExecution(Executables executable) {
         scheduleDetail.waitForExecutionFinish();
         assertTrue(scheduleDetail.isErrorIconVisible(), "Error icon is not shown!");
-        assertThat(scheduleDetail.getLastExecutionDescription(), containsString(executable.getErrorMessage()));
+        assertThat(scheduleDetail.getLastExecutionDescription(), is("ERROR"));
+        assertThat(scheduleDetail.getExecutionErrorDescription(), containsString(executable.getErrorMessage()));
         assertLastExecutionDetail();
     }
 
