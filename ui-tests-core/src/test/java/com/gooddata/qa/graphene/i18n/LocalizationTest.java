@@ -33,8 +33,12 @@ public class LocalizationTest extends AbstractUITest {
     }
 
     @Test(groups = {"precondition"})
-    public void changeLanguage() {
+    public void changeLanguage() throws JSONException {
+        signIn(true, UserRoles.ADMIN);
+
         initLocalizationPage().selectLanguge(testParams.getLanguageCode());
+
+        logout();
     }
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"entry-point"})
