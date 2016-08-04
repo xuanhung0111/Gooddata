@@ -27,9 +27,9 @@ import com.google.common.collect.Iterables;
 public class LostPasswordPage extends AbstractFragment {
 
     public static final By ERROR_MESSAGE_LOCATOR = By.cssSelector(".validation-error, #gd-overlays div.content");
+    public static final String PASSWORD_HINT = "Choose a unique password of at least 7 characters.";
 
     private static final By PAGE_MESSAGE_LOCATOR = By.className("login-message");
-
     private static final String RESET_PASSWORD_EMAIL_SUBJECT = "GoodData password reset request";
 
     @FindBy(css = "input[type='email']")
@@ -99,6 +99,10 @@ public class LostPasswordPage extends AbstractFragment {
     public LoginFragment backToLoginPage() {
         waitForElementVisible(backToLoginLink).click();
         return LoginFragment.getInstance(browser);
+    }
+
+    public String getPasswordHint() {
+        return waitForElementVisible(By.className("field-hint"), getRoot()).getText();
     }
 
     private String getResetPasswordLink(ImapClient imapClient, int expectedMessageCount)

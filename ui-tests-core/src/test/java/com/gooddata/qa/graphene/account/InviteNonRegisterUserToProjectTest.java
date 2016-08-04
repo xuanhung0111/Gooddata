@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.graphene.fragments.account.LostPasswordPage.PASSWORD_HINT;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -46,6 +47,15 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
     private static final String INVITATION_USER_PASSWORD = "changeit";
 
     private static final By INVITATION_PAGE_LOCATOR = By.cssSelector(".s-invitationPage");
+
+    private static final String SHORT_PASSWORD_ERROR_MESSAGE = "Password too short. "
+            + "Minimum length is 7 characters.";
+    
+    private static final String COMMONLY_PASSWORD_ERROR_MESSAGE = "You selected a commonly used password. "
+            + "Choose something unique.";
+
+    private static final String SEQUENTIAL_PASSWORD_ERROR_MESSAGE = "Sequential and repeated characters are "
+            + "not allowed in passwords.";
 
     private static final String USER_PROFILE_PAGE_URL = PAGE_UI_PROJECT_PREFIX + "%s|profilePage|%s";
 
@@ -98,8 +108,31 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
                 waitForElementVisible(INVITATION_PAGE_LOCATOR, browser));
         assertFalse(invitationPage.isEmailFieldEditable(), "Email is editable");
         assertFalse(invitationPage.isCaptchaFieldPresent(), "Captcha field is present");
+        assertEquals(invitationPage.getPasswordHint(), PASSWORD_HINT);
 
-        invitationPage.registerNewUserSuccessfully(registrationForm);
+        invitationPage
+                .fillInRegistrationForm(registrationForm)
+                .enterPassword("aaaaaa")
+                .agreeRegistrationLicense()
+                .submitForm();
+        takeScreenshot(browser, "Error-message-for-short-password-shows", getClass());
+        assertEquals(invitationPage.getErrorMessage(), SHORT_PASSWORD_ERROR_MESSAGE);
+
+        invitationPage
+                .enterPassword("12345678")
+                .submitForm();
+        takeScreenshot(browser, "Error-message-for-commonly-password-shows", getClass());
+        assertEquals(invitationPage.getErrorMessage(), COMMONLY_PASSWORD_ERROR_MESSAGE);
+
+        invitationPage
+                .enterPassword("aaaaaaaa")
+                .submitForm();
+        takeScreenshot(browser, "Error-message-for-sequential-password-shows", getClass());
+        assertEquals(invitationPage.getErrorMessage(), SEQUENTIAL_PASSWORD_ERROR_MESSAGE);
+
+        invitationPage
+                .enterPassword(INVITATION_USER_PASSWORD)
+                .submitForm();
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
         assertThat(browser.getCurrentUrl(), containsString(testParams.getProjectId()));
     }

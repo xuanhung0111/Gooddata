@@ -10,6 +10,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.deleteUserByEmail;
+import static com.gooddata.qa.graphene.fragments.account.LostPasswordPage.PASSWORD_HINT;
 
 import java.io.IOException;
 
@@ -41,16 +42,21 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     private static final String DEMO_PROJECT = "GoodSales";
     private static final String GOODDATA_PRODUCT_TOUR_PROJECT = "GoodData Product Tour";
 
+    private static final String SHORT_PASSWORD_ERROR_MESSAGE = "Password too short. "
+            + "Minimum length is 7 characters.";
+    
+    private static final String COMMONLY_PASSWORD_ERROR_MESSAGE = "You selected a commonly used password. "
+            + "Choose something unique.";
+
+    private static final String SEQUENTIAL_PASSWORD_ERROR_MESSAGE = "Sequential and repeated characters are "
+            + "not allowed in passwords.";
+
     private static final String INVALID_EMAIL = "johndoe@yahoocom";
-    private static final String INVALID_PASSWORD = "aaaaaa";
     private static final String INVALID_PHONE_NUMBER = "12345678901234567890";
 
     private static final String EXISTED_EMAIL_ERROR_MESSAGE = "This email address is already in use.";
     private static final String INVALID_EMAIL_ERROR_MESSAGE = "This is not a valid email address.";
     private static final String FIELD_MISSING_ERROR_MESSAGE = "Field is required.";
-
-    private static final String INVALID_PASSWORD_ERROR_MESSAGE = "Password too short."
-            + " Minimum length is 7 characters.";
 
     private static final String INVALID_PHONE_NUMBER_ERROR_MESSAGE = "This is not a valid phone number.";
 
@@ -130,7 +136,36 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     }
 
     @Test
-    public void registerUserWithInvalidValue() {
+    public void registerUserWithInvalidPasswordValidation() throws ParseException, IOException, JSONException {
+        initRegistrationPage();
+        assertEquals(RegistrationPage.getInstance(browser).getPasswordHint(), PASSWORD_HINT);
+
+        RegistrationPage.getInstance(browser)
+                .fillInRegistrationForm(registrationForm)
+                .enterEmail(generateEmail(REGISTRATION_USER))
+                .enterPassword("aaaaaa")
+                .agreeRegistrationLicense()
+                .submitForm();
+        takeScreenshot(browser, "Error-message-for-short-password-shows", getClass());
+        assertEquals(RegistrationPage.getInstance(browser).getErrorMessage(), SHORT_PASSWORD_ERROR_MESSAGE);
+
+        RegistrationPage.getInstance(browser)
+                .enterPassword("12345678")
+                .enterSpecialCaptcha()
+                .submitForm();
+        takeScreenshot(browser, "Error-message-for-commonly-password-shows", getClass());
+        assertEquals(RegistrationPage.getInstance(browser).getErrorMessage(), COMMONLY_PASSWORD_ERROR_MESSAGE);
+
+        RegistrationPage.getInstance(browser)
+                .enterPassword("aaaaaaaa")
+                .enterSpecialCaptcha()
+                .submitForm();
+        takeScreenshot(browser, "Error-message-for-sequential-password-shows", getClass());
+        assertEquals(RegistrationPage.getInstance(browser).getErrorMessage(), SEQUENTIAL_PASSWORD_ERROR_MESSAGE);
+    }
+
+    @Test
+    public void registerUserWithInvalidValue() throws ParseException, IOException, JSONException {
         initRegistrationPage()
             .fillInRegistrationForm(new RegistrationForm())
             .submitForm();
@@ -141,12 +176,6 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
             .enterEmail(INVALID_EMAIL)
             .submitForm();
         assertEquals(RegistrationPage.getInstance(browser).getErrorMessage(), INVALID_EMAIL_ERROR_MESSAGE);
-
-        RegistrationPage.getInstance(browser)
-            .fillInRegistrationForm(registrationForm)
-            .enterPassword(INVALID_PASSWORD)
-            .submitForm();
-        assertEquals(RegistrationPage.getInstance(browser).getErrorMessage(), INVALID_PASSWORD_ERROR_MESSAGE);
 
         RegistrationPage.getInstance(browser)
             .fillInRegistrationForm(registrationForm)

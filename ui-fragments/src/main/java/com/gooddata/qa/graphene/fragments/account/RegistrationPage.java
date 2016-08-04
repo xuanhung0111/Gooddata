@@ -175,6 +175,13 @@ public class RegistrationPage extends AbstractFragment {
         return this;
     }
 
+    public String getPasswordHint() {
+        return waitForElementVisible(password)
+                .findElement(By.xpath("./ancestor::div[@class='form-item']"))
+                .findElement(By.className("field-hint"))
+                .getText();
+    }
+
     private RegistrationPage selectIndustry(String industry) {
         waitForElementVisible(industrySelect).selectByVisibleText(industry);
         return this;
