@@ -22,7 +22,7 @@ public class DataSetTest extends DashboardWithWidgetsTest {
     public void checkAvailableDataSets() {
         ConfigurationPanel cp = initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
-            .clickAddWidget()
+            .dragAddKpiPlaceholder()
             .getConfigurationPanel();
 
         cp.selectMetricByName(METRIC_LOST);

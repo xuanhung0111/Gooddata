@@ -44,7 +44,7 @@ public class MetricsAccessibilityTest extends DashboardWithWidgetsTest {
     public void testMetricsAccessibility() {
         final MetricSelect metricSelect = initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
-            .clickAddWidget()
+            .dragAddKpiPlaceholder()
             .getConfigurationPanel()
             .getMetricSelect();
 

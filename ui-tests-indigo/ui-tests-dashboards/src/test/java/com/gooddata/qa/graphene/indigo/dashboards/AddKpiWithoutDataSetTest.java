@@ -54,7 +54,7 @@ public class AddKpiWithoutDataSetTest extends AbstractProjectTest {
 
         waitForFragmentVisible(indigoDashboardsPage)
             .waitForDashboardLoad()
-            .clickAddWidget();
+            .dragAddKpiPlaceholder();
 
         assertFalse(indigoDashboardsPage.getConfigurationPanel()
                 .selectMetricByName(METRIC_NOT_CONNECT_WITH_DATA_SET)
