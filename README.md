@@ -4,12 +4,12 @@ This maven project consists of following technologies/frameworks:
  - TestNG
  - Arquillian (testng-standalone)
  - Graphene/Drone
- 
+
 This combination allows you to easily write UI tests in Java.
 
 ## Documentation
-Basic documentation is available on Confluence page [Graphene UI Tests](https://confluence.intgdc.com/display/Quality/Graphene+UI+Tests).
- 
+Basic documentation is available on Confluence page [Graphene UI Tests](https://confluence.intgdc.com/display/plat/Graphene+UI+Tests).
+
 ## Test variables
 Variables are listed at properties file ui-tests-core/src/test/resources/variables-env-test.properties, verify the variables before running the test.
 You can also created a new properties file (ideally copy of original one with changed values) and then use parameter ```-DpropertiesPath=/path_to_file```
