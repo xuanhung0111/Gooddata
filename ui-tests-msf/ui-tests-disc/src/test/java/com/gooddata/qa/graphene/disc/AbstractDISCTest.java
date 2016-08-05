@@ -339,8 +339,6 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
                 "OK icon is not shown for OK execution group!");
         assertThat(scheduleDetail.getExecutionDescription(okExecutionGroup).getText(),
                 containsString(groupDescription));
-        assertTrue(scheduleDetail.getLastExecutionOfOkGroup(okExecutionGroup).isDisplayed(),
-                "Last execution of OK group is not shown!");
         System.out.println("Execution runtime of ok execution group: "
                 + scheduleDetail.getExecutionRunTime(okExecutionGroup).getText());
         assertTrue(scheduleDetail.getExecutionRunTime(okExecutionGroup).isDisplayed(),
