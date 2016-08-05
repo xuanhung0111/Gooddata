@@ -127,13 +127,14 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
                     continue;
                 }
 
-                if (state == OverviewProjectStates.FAILED)
+                if (state == OverviewProjectStates.FAILED) {
                     assertFailedExecution(executable);
-                else if (state == OverviewProjectStates.SUCCESSFUL)
+                    overviewSchedule.setExecutionDescription(scheduleDetail.getExecutionErrorDescription());
+                } else if (state == OverviewProjectStates.SUCCESSFUL) {
                     assertSuccessfulExecution();
-
+                    overviewSchedule.setExecutionDescription(scheduleDetail.getLastExecutionDescription());
+                }
                 overviewSchedule.setLastExecutionDate(scheduleDetail.getLastExecutionDate());
-                overviewSchedule.setExecutionDescription(scheduleDetail.getLastExecutionDescription());
                 overviewSchedule.setLastExecutionTime(scheduleDetail.getLastExecutionTime());
                 overviewSchedule.setLastExecutionRunTime(scheduleDetail.getLastExecutionRuntime());
             }

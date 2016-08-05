@@ -17,6 +17,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.utils.WaitUtils;
 
 public class ChartReport extends AbstractFragment {
 
@@ -144,6 +145,9 @@ public class ChartReport extends AbstractFragment {
     }
 
     private List<String> getLabels(Collection<WebElement> labels) {
-        return getElementTexts(waitForCollectionIsNotEmpty(labels));
+        // all labels need to be visible before getting text
+        // without this it's specially unstable on embedded AD
+        labels.stream().forEach(WaitUtils::waitForElementVisible);
+        return getElementTexts(labels);
     }
 }
