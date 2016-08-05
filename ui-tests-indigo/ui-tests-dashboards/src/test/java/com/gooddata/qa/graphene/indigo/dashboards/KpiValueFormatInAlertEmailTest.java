@@ -70,14 +70,15 @@ public class KpiValueFormatInAlertEmailTest extends AbstractProjectTest {
         uploadCSV(csvFile.getFilePath());
 
         String numberFactUri = getMdService().getObjUri(getProject(), Fact.class, title("Number"));
-        String firstNameAttributeUri = getMdService().getObjUri(getProject(), Attribute.class, title("Firstname"));
-        String firstNameValueUri = firstNameAttributeUri + "/elements?id=2";
+        Attribute firstNameAttribute = getMdService().getObj(getProject(), Attribute.class, title("Firstname"));
+        String firstNameValueUri = getMdService().getAttributeElements(firstNameAttribute)
+                .stream().filter(e -> "Khoa".equals(e.getTitle())).findFirst().get().getUri();
 
         String dateDatasetUri = getMdService().getObjUri(getProject(), Dataset.class,
                 identifier("date.dataset.dt"));
 
         String maqlExpression = format("SELECT SUM([%s]) WHERE [%s] = [%s]",
-                numberFactUri, firstNameAttributeUri, firstNameValueUri);
+                numberFactUri, firstNameAttribute.getUri(), firstNameValueUri);
 
         List<Metric> metrics = Arrays.asList(
                 new Metric(generateUniqueMetricName(), maqlExpression, "[<15000]#,##0.00 $"),
