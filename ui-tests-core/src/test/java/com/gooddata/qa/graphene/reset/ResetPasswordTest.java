@@ -7,6 +7,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static com.gooddata.qa.graphene.fragments.account.LostPasswordPage.PASSWORD_HINT;
 
 import java.io.IOException;
 import java.util.List;
@@ -94,6 +95,7 @@ public class ResetPasswordTest extends AbstractUITest {
 
         openUrl(resetPasswordLink);
         LostPasswordPage resetPasswordPage = LostPasswordPage.getInstance(RESET_PASSWORD_PAGE_LOCATOR, browser);
+        assertEquals(resetPasswordPage.getPasswordHint(), PASSWORD_HINT);
 
         resetPasswordPage.setNewPassword("aaaaa");
         assertEquals(resetPasswordPage.getErrorMessage(), SHORT_PASSWORD_ERROR_MESSAGE);
