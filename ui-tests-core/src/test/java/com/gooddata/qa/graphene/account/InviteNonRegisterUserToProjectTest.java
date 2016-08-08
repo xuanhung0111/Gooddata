@@ -29,6 +29,7 @@ import org.openqa.selenium.WebElement;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.account.RegistrationForm;
@@ -108,7 +109,9 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
                 waitForElementVisible(INVITATION_PAGE_LOCATOR, browser));
         assertFalse(invitationPage.isEmailFieldEditable(), "Email is editable");
         assertFalse(invitationPage.isCaptchaFieldPresent(), "Captcha field is present");
-        assertEquals(invitationPage.getPasswordHint(), PASSWORD_HINT);
+
+        final SoftAssert softAssert = new SoftAssert();
+        softAssert.assertEquals(invitationPage.getPasswordHint(), PASSWORD_HINT);
 
         invitationPage
                 .fillInRegistrationForm(registrationForm)
@@ -116,19 +119,20 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
                 .agreeRegistrationLicense()
                 .submitForm();
         takeScreenshot(browser, "Error-message-for-short-password-shows", getClass());
-        assertEquals(invitationPage.getErrorMessage(), SHORT_PASSWORD_ERROR_MESSAGE);
+        softAssert.assertEquals(invitationPage.getErrorMessage(), SHORT_PASSWORD_ERROR_MESSAGE);
 
         invitationPage
                 .enterPassword("12345678")
                 .submitForm();
         takeScreenshot(browser, "Error-message-for-commonly-password-shows", getClass());
-        assertEquals(invitationPage.getErrorMessage(), COMMONLY_PASSWORD_ERROR_MESSAGE);
+        softAssert.assertEquals(invitationPage.getErrorMessage(), COMMONLY_PASSWORD_ERROR_MESSAGE);
 
         invitationPage
                 .enterPassword("aaaaaaaa")
                 .submitForm();
         takeScreenshot(browser, "Error-message-for-sequential-password-shows", getClass());
-        assertEquals(invitationPage.getErrorMessage(), SEQUENTIAL_PASSWORD_ERROR_MESSAGE);
+        softAssert.assertEquals(invitationPage.getErrorMessage(), SEQUENTIAL_PASSWORD_ERROR_MESSAGE);
+        softAssert.assertAll();
 
         invitationPage
                 .enterPassword(INVITATION_USER_PASSWORD)

@@ -24,6 +24,7 @@ import org.openqa.selenium.TimeoutException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
 
 import com.gooddata.qa.graphene.AbstractUITest;
 import com.gooddata.qa.graphene.entity.account.RegistrationForm;
@@ -137,8 +138,10 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
     @Test
     public void registerUserWithInvalidPasswordValidation() throws ParseException, IOException, JSONException {
+        final SoftAssert softAssert = new SoftAssert();
+
         initRegistrationPage();
-        assertEquals(RegistrationPage.getInstance(browser).getPasswordHint(), PASSWORD_HINT);
+        softAssert.assertEquals(RegistrationPage.getInstance(browser).getPasswordHint(), PASSWORD_HINT);
 
         RegistrationPage.getInstance(browser)
                 .fillInRegistrationForm(registrationForm)
@@ -147,21 +150,25 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
                 .agreeRegistrationLicense()
                 .submitForm();
         takeScreenshot(browser, "Error-message-for-short-password-shows", getClass());
-        assertEquals(RegistrationPage.getInstance(browser).getErrorMessage(), SHORT_PASSWORD_ERROR_MESSAGE);
+        softAssert.assertEquals(RegistrationPage.getInstance(browser).getErrorMessage(),
+                SHORT_PASSWORD_ERROR_MESSAGE);
 
         RegistrationPage.getInstance(browser)
                 .enterPassword("12345678")
                 .enterSpecialCaptcha()
                 .submitForm();
         takeScreenshot(browser, "Error-message-for-commonly-password-shows", getClass());
-        assertEquals(RegistrationPage.getInstance(browser).getErrorMessage(), COMMONLY_PASSWORD_ERROR_MESSAGE);
+        softAssert.assertEquals(RegistrationPage.getInstance(browser).getErrorMessage(),
+                COMMONLY_PASSWORD_ERROR_MESSAGE);
 
         RegistrationPage.getInstance(browser)
                 .enterPassword("aaaaaaaa")
                 .enterSpecialCaptcha()
                 .submitForm();
         takeScreenshot(browser, "Error-message-for-sequential-password-shows", getClass());
-        assertEquals(RegistrationPage.getInstance(browser).getErrorMessage(), SEQUENTIAL_PASSWORD_ERROR_MESSAGE);
+        softAssert.assertEquals(RegistrationPage.getInstance(browser).getErrorMessage(),
+                SEQUENTIAL_PASSWORD_ERROR_MESSAGE);
+        softAssert.assertAll();
     }
 
     @Test

@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.json.JSONException;
 import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
 
 import com.gooddata.qa.graphene.AbstractUITest;
 import com.gooddata.qa.graphene.entity.account.PersonalInfo;
@@ -196,35 +197,37 @@ public class UserAccountSettingTest extends AbstractUITest {
 
     @Test(dependsOnMethods = { "openOneProject" })
     public void editUserPasswordWithInvalidValue() {
-        initAccountPage();
+        final SoftAssert softAssert = new SoftAssert();
 
+        initAccountPage();
         ChangePasswordDialog changePasswordDialog = accountPage.openChangePasswordDialog();
         changePasswordDialog.enterOldPassword(SHORT_PASSWORD)
                 .saveChange();
-        assertEquals(changePasswordDialog.getErrorMessage(), SHORT_PASSWORD_ERROR_MESSAGE);
+        softAssert.assertEquals(changePasswordDialog.getErrorMessage(), SHORT_PASSWORD_ERROR_MESSAGE);
 
         changePasswordDialog.enterOldPassword(oldPassword)
                 .enterNewPassword(SHORT_PASSWORD)
                 .saveChange();
-        assertEquals(changePasswordDialog.getErrorMessage(), SHORT_PASSWORD_ERROR_MESSAGE);
+        softAssert.assertEquals(changePasswordDialog.getErrorMessage(), SHORT_PASSWORD_ERROR_MESSAGE);
 
         changePasswordDialog.changePassword("", "");
-        assertEquals(changePasswordDialog.getErrorMessage(), FIELD_REQUIRED_ERROR_MESSAGE);
+        softAssert.assertEquals(changePasswordDialog.getErrorMessage(), FIELD_REQUIRED_ERROR_MESSAGE);
 
         changePasswordDialog.changePassword(oldPassword, "12345678");
-        assertEquals(changePasswordDialog.getErrorMessage(), COMMONLY_PASSWORD_ERROR_MESSAGE);
+        softAssert.assertEquals(changePasswordDialog.getErrorMessage(), COMMONLY_PASSWORD_ERROR_MESSAGE);
 
         changePasswordDialog.changePassword(oldPassword, "aaaaaaaa");
-        assertEquals(changePasswordDialog.getErrorMessage(), SEQUENTIAL_PASSWORD_ERROR_MESSAGE);
+        softAssert.assertEquals(changePasswordDialog.getErrorMessage(), SEQUENTIAL_PASSWORD_ERROR_MESSAGE);
 
         changePasswordDialog.changePassword(WRONG_PASSWORD, NEW_PASSWORD);
-        assertEquals(changePasswordDialog.getErrorMessage(), WRONG_PASSWORD_ERROR_MESSAGE);
+        softAssert.assertEquals(changePasswordDialog.getErrorMessage(), WRONG_PASSWORD_ERROR_MESSAGE);
 
         changePasswordDialog.enterOldPassword(oldPassword)
                 .enterNewPassword(NEW_PASSWORD)
                 .enterConfirmPassword("")
                 .saveChange();
-        assertEquals(changePasswordDialog.getErrorMessage(), PASSWORD_NOT_RELATED_ERROR_MESSAGE);
+        softAssert.assertEquals(changePasswordDialog.getErrorMessage(), PASSWORD_NOT_RELATED_ERROR_MESSAGE);
+        softAssert.assertAll();
     }
 
     @Test(dependsOnMethods = { "openOneProject" })

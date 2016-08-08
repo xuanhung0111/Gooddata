@@ -18,6 +18,7 @@ import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
 
 import com.gooddata.qa.graphene.AbstractUITest;
 import com.gooddata.qa.graphene.fragments.account.LostPasswordPage;
@@ -95,16 +96,20 @@ public class ResetPasswordTest extends AbstractUITest {
 
         openUrl(resetPasswordLink);
         LostPasswordPage resetPasswordPage = LostPasswordPage.getInstance(RESET_PASSWORD_PAGE_LOCATOR, browser);
-        assertEquals(resetPasswordPage.getPasswordHint(), PASSWORD_HINT);
+
+        final SoftAssert softAssert = new SoftAssert();
+        softAssert.assertEquals(resetPasswordPage.getPasswordHint(), PASSWORD_HINT);
 
         resetPasswordPage.setNewPassword("aaaaa");
-        assertEquals(resetPasswordPage.getErrorMessage(), SHORT_PASSWORD_ERROR_MESSAGE);
+        softAssert.assertEquals(resetPasswordPage.getErrorMessage(), SHORT_PASSWORD_ERROR_MESSAGE);
 
         resetPasswordPage.setNewPassword("12345678");
-        assertEquals(resetPasswordPage.getErrorMessage(), COMMONLY_PASSWORD_ERROR_MESSAGE);
+        softAssert.assertEquals(resetPasswordPage.getErrorMessage(), COMMONLY_PASSWORD_ERROR_MESSAGE);
 
         resetPasswordPage.setNewPassword("aaaaaaaa");
-        assertEquals(resetPasswordPage.getErrorMessage(), SEQUENTIAL_PASSWORD_ERROR_MESSAGE);
+        softAssert.assertEquals(resetPasswordPage.getErrorMessage(), SEQUENTIAL_PASSWORD_ERROR_MESSAGE);
+        softAssert.assertAll();
+
         try {
             testParams.setPassword(NEW_PASSWORD);
 
@@ -119,10 +124,6 @@ public class ResetPasswordTest extends AbstractUITest {
             throw e;
 
         } finally {
-            logout()
-                .login(testParams.getUser(), NEW_PASSWORD, true);
-            waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
-
             UserManagementRestUtils.updateCurrentUserPassword(getRestApiClient(), NEW_PASSWORD, oldPassword);
             testParams.setPassword(oldPassword);
         }
