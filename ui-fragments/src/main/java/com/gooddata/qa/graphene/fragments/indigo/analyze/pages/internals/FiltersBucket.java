@@ -140,7 +140,7 @@ public class FiltersBucket extends AbstractBucket {
         throw new UnsupportedOperationException();
     }
 
-    private DateFilterPickerPanel openDatePanelOfFilter(WebElement filter) {
+    public DateFilterPickerPanel openDatePanelOfFilter(WebElement filter) {
         filter.click();
         return Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));

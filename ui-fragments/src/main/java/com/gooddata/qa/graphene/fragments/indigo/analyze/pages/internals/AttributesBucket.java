@@ -61,7 +61,7 @@ public class AttributesBucket extends AbstractBucket {
         throw new UnsupportedOperationException();
     }
 
-    private DateDimensionSelect getDateDatasetSelect() {
+    public DateDimensionSelect getDateDatasetSelect() {
         return Graphene.createPageFragment(DateDimensionSelect.class,
                 waitForElementVisible(BY_DATE_DATASET_SELECT, browser));
     }
