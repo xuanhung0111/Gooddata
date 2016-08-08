@@ -63,7 +63,7 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
 
         initVariablePage().createVariable(new AttributeVariable(SIMPLE_FILTERED_VARIABLE)
                 .withAttribute(EDUTCATION)
-                .withAttributeElements(asList(PARTIAL_COLLEGE, PARTIAL_HIGH_SCHOOL)));
+                .withAttributeValues(asList(PARTIAL_COLLEGE, PARTIAL_HIGH_SCHOOL)));
 
         initVariablePage().createVariable(new NumericVariable(SIMPLE_NUMERIC_VARIABLE)
                 .withDefaultNumber(SIMPLE_NUMERIC_VARIABLE_VALUE));
@@ -101,8 +101,8 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
                         PARTIAL_HIGH_SCHOOL)), "There is difference between actual and expected attributes");
         takeScreenshot(browser, "imported-dashboard", getClass());
 
-        assertTrue(initVariablePage().isVariableVisible(SIMPLE_NUMERIC_VARIABLE) && variablePage
-                .isVariableVisible(SIMPLE_FILTERED_VARIABLE), "Imported variables are not exist");
+        assertTrue(initVariablePage().hasVariable(SIMPLE_NUMERIC_VARIABLE) && variablePage
+                .hasVariable(SIMPLE_FILTERED_VARIABLE), "Imported variables are not exist");
 
         assertTrue(initMetricPage().isMetricVisible(SUM_METRIC), "Imported metric is not exist");
     }
@@ -136,7 +136,7 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
         final String attributeVariableName = "Position variable";
         initVariablePage().createVariable(new AttributeVariable(attributeVariableName)
                 .withAttribute(POSITION)
-                .withAttributeElements(asList(STORE_MANAGER, VP_FINANCE)));
+                .withAttributeValues(asList(STORE_MANAGER, VP_FINANCE)));
 
         initReportCreation().createReport(new UiReportDefinition()
                 .withName(REPORT_WITH_NEW_OBJS)

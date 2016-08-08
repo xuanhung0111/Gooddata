@@ -49,10 +49,9 @@ public class DashboardObjectsTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"uploadDataTest"})
     public void createvariableTest() {
-        initVariablePage();
-        variablePage.createVariable(new AttributeVariable(variableName)
+        initVariablePage().createVariable(new AttributeVariable(variableName)
                 .withAttribute("Education")
-                .withAttributeElements("Bachelors Degree", "Graduate Degree"));
+                .withAttributeValues("Bachelors Degree", "Graduate Degree"));
     }
 
     @Test(dependsOnMethods = {"uploadDataTest"})

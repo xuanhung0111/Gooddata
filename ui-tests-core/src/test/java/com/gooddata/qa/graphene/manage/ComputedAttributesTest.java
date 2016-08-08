@@ -210,7 +210,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     public void applyVariableFiltersOnReportWithComputedAttribute() {
         initVariablePage();
         variablePage.createVariable(new AttributeVariable(VARIABLE_NAME).withAttribute("Stage Name")
-                .withAttributeElements("Closed Won", "Closed Lost"));
+                .withAttributeValues("Closed Won", "Closed Lost"));
         createReport(
                 new UiReportDefinition().withName(CA_VARIABLE_REPORT_NAME).withWhats("Amount")
                         .withHows(COMPUTED_ATTRIBUTE_NAME), CA_VARIABLE_REPORT_NAME);
@@ -366,9 +366,9 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"computedAttributeVariableOnDashboard"})
     public void deleteVariableUsedInComputedAttributeReport() {
-        initVariablePage();
-        variablePage.openVariableFromList(VARIABLE_NAME);
-        variableDetailPage.deleteVariable();
+        initVariablePage()
+                .openVariableFromList(VARIABLE_NAME)
+                .deleteVariable();
 
         initReportsPage();
         reportsPage.getReportsList().openReport(CA_VARIABLE_REPORT_NAME);

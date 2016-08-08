@@ -12,7 +12,11 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileUri;
 
+import java.io.IOException;
+
+import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -33,6 +37,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.Widget
 import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.Sort;
+import com.gooddata.qa.utils.http.RestApiClient;
 
 public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest {
 
@@ -233,11 +238,13 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void createNumericVariableTest() {
-        initVariablePage();
-        variablePage.createVariable(new NumericVariable(VARIABLE_NAME)
+    public void createNumericVariableTest() throws ParseException, JSONException, IOException {
+        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
+        initVariablePage()
+                .createVariable(new NumericVariable(VARIABLE_NAME)
                 .withDefaultNumber(1234)
-                .withUserNumber(UserRoles.EDITOR, 5678));
+                .withUserSpecificNumber(
+                        getUserProfileUri(restApiClient, testParams.getUserDomain(), testParams.getEditorUser()), 5678));
     }
 
     @Test(dependsOnMethods = {"createNumericVariableTest"})

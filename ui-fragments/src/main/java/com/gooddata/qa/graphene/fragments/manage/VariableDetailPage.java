@@ -1,252 +1,254 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static org.testng.Assert.assertEquals;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static java.util.stream.Collectors.toList;
+import static java.lang.Integer.parseInt;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
+import java.util.Map;
+import java.util.stream.Stream;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.entity.variable.NumericVariable;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.AbstractTable;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
-import com.gooddata.qa.utils.CssUtils;
 
 public class VariableDetailPage extends AbstractFragment {
 
-    @FindBy(xpath = "//div[contains(@class,'s-name-ipe-editor')]//button[text()='Ok']")
-    private WebElement okNameButton;
+    private static final By LOCATOR = By.cssSelector("#p-objectPage.s-displayed");
 
-    @FindBy(xpath = "//label[text()='Filtered Variable']")
-    private WebElement filterVariable;
+    private static final By BY_VARIABLES_PAGE_LINK = By.cssSelector("#p-objectPage .interpolateProject");
 
-    @FindBy(xpath = "//label[text()='Numerical Variable']")
-    private WebElement numericalVariable;
+    private static final By BY_NAME_INPUT = By.cssSelector(".s-name-ipe-editor input");
+    private static final By BY_SAVE_NAME_BUTTON = By.cssSelector(".s-name-ipe-editor .s-ipeSaveButton");
 
-    @FindBy(xpath = "//div[@class='pickerRoot']//input[contains(@class,'s-afp-input')]")
-    private WebElement searchAttributeText;
+    private static final By BY_DEFAULT_NUMERIC_VALUE_INPUT = By.cssSelector(".defaultValue input");
 
-    @FindBy(xpath = "//span[text()='Select Attribute']")
-    private WebElement selectAttribute;
+    private static final By BY_SAVE_CHANGES_BUTTON = By.cssSelector(".yui3-c-button-showInline.s-btn-save_changes");
+    private static final By BY_DELETE_VARIABLE_BUTTON = By.cssSelector(".specialButton .s-btn-delete");
+    private static final By BY_CONFIRM_DELETE_VARIABLE_BUTTON = By.cssSelector(".t-confirmDelete .s-btn-delete");
 
-    @FindBy(xpath = "//button[text()='Select']")
-    private WebElement selectButton;
+    @FindBy(className = "s-name-ipe-placeholder")
+    private WebElement nameTag;
 
-    @FindBy(xpath = "//div[contains(@class,'defaultValue')]/button[contains(@class,'iconBtnEdit')]")
-    private WebElement editButton;
+    @FindBy(className = "usersTable")
+    private UserSpecificTable userSpecificTable;
 
-    @FindBy(xpath = "//div[@class='confirm']/div[@class='btns']/button[text()='Set']")
-    private WebElement setButton;
-
-    @FindBy(xpath = "//button[text()='Save Changes']")
-    private WebElement saveChangeButton;
-
-    @FindBy(xpath = "//div[contains(@class,'defaultValue')]/span[@class='answer']/span")
-    private WebElement selectedValues;
-
-    @FindBy(xpath = "//div[@class='subContent']/table")
-    private WebElement userTable;
-
-    @FindBy(xpath = "//div[contains(@class, 'c-textBox')]/input")
-    private WebElement scalarValueInput;
-
-    @FindBy(xpath = "//div[contains(@class,'unSavedBarInactive')]")
-    private WebElement unSavedBarInactive;
-
-    @FindBy(xpath = "//table[contains(@class,'usersTable')]//button[text()='Set']")
-    private WebElement userSetButton;
-
-    @FindBy(xpath = "//div[contains(@class, 's-btn-ipe-editor')]//input[@class='ipeEditor']")
-    private WebElement userNumberSet;
-
-    @FindBy(xpath = "//div[contains(@class, 's-btn-ipe-editor')]//button[text() = 'Ok']")
-    private WebElement userOkButton;
-
-    @FindBy(xpath = "//span[contains(@class, 'defaultVal')]")
-    private WebElement userDefaultValue;
-
-    @FindBy(xpath = "//span[contains(@class,'numberVal')]/span")
-    private WebElement userNumberValue;
-
-    @FindBy(css = ".s-btn-default")
-    private WebElement userDefaultButton;
-
-    @FindBy(xpath = "//div[contains(@class = 'clearAnswer') and text() = 'Reset']")
-    private WebElement resetButton;
-
-    @FindBy(xpath = "//span[@class = 'answer' and text() = '(all values)']")
-    private WebElement allValues;
-
-    @FindBy(xpath = "//button[text() = 'Choose']")
-    private WebElement chooseButton;
-
-    @FindBy(xpath = "//span[contains(@class,'listVal')]/span")
-    private WebElement userListValue;
-
-    @FindBy(xpath = "//a[@class='interpolateProject']")
-    private WebElement dataLink;
-
-    @FindBy(xpath = "//div[contains(@class, 'attributeElements')]//input[contains(@class, 'gdc-input')]")
-    private WebElement searchAttributeElement;
-
-    @FindBy(css = "#p-objectPage .s-btn-delete")
-    private WebElement deleteButton;
-
-    private static final By confirmDeleteButtonLocator = By
-            .cssSelector(".yui3-d-modaldialog:not(.gdc-hidden) .c-modalDialog .s-btn-delete");
-    
-    private static final String setBtnLocator = "//table[contains(@class,'usersTable')]//td[contains(@class,'role') and text()='%s']/following-sibling::td//button[contains(@class,'s-btn-set')]";
-
-    @FindBy(id = "p-objectPage")
-    protected ObjectPropertiesPage objectPropertiesPage;
-
-    private static final String listOfAttributeLocator =
-            "div.yui3-c-simpleColumn-underlay > div.c-label.s-item-${label}:not(.gdc-hidden):not(.hidden)";
-
-    private static final String listOfElementLocator =
-            "div.yui3-c-simpleColumn-underlay > div.c-checkBox.s-item-${label}:not(.gdc-hidden)";
-
-    public void createNumericVariable(NumericVariable var) {
-        waitForElementVisible(objectPropertiesPage.objectNameInput).sendKeys(var.getName());
-        waitForElementVisible(okNameButton).click();
-        waitForElementVisible(numericalVariable).click();
-        waitForElementVisible(scalarValueInput).sendKeys(String.valueOf(var.getDefaultNumber()));
-        waitForElementVisible(numericalVariable).click();
-        waitForElementVisible(saveChangeButton).click();
-        waitForElementVisible(unSavedBarInactive);
-        waitForElementVisible(dataLink).click();
+    public static VariableDetailPage getInstance(SearchContext searchContext) {
+        return Graphene.createPageFragment(VariableDetailPage.class, waitForElementVisible(LOCATOR, searchContext));
     }
 
-    public void createFilterVariable(AttributeVariable var) {
-        waitForElementVisible(objectPropertiesPage.objectNameInput).sendKeys(var.getName());
-        waitForElementVisible(okNameButton).click();
-        waitForElementVisible(filterVariable).click();
-        waitForElementVisible(selectAttribute).click();
-        waitForElementVisible(searchAttributeText);
+    public String createNumericVariable(NumericVariable variable) {
+        enterName(variable.getName())
+                .selectVariableType(VariableTypes.NUMERICAL_VARIABLE)
+                .setDefaultNumericValue(variable.getDefaultNumber())
+                .setUserSpecificNumericValue(variable.getUserSpecificNumber())
+                .saveChange();
 
-        String attribute = var.getAttribute();
-        searchAttributeText.sendKeys(attribute);
-        By listOfAttribute =
-                By.cssSelector(listOfAttributeLocator.replace("${label}", CssUtils.simplifyText(attribute)));
-        waitForElementVisible(listOfAttribute, browser).click();
-        waitForElementVisible(selectButton).click();
-
-        if (!var.getAttributeElements().isEmpty()) {
-            if (var.isUserSpecificValues()) {
-                waitForElementVisible(chooseButton).click();
-            } else {
-                waitForElementVisible(editButton).click();
-            }
-    
-            selectAttrElement(var.getAttributeElements());
-        }
-        waitForElementVisible(saveChangeButton).click();
-        waitForElementVisible(unSavedBarInactive);
-        waitForElementVisible(userTable);
-        waitForElementVisible(dataLink).click();
+        return getVariableUri();
     }
 
-    public void selectAttrElement(List<String> elements) {
-        By listOfElement;
-        for (String ele : elements) {
-            waitForElementVisible(searchAttributeElement).clear();
-            searchAttributeElement.sendKeys(ele);
-            listOfElement = By.cssSelector(listOfElementLocator.replace("${label}", CssUtils.simplifyText(ele)));
-            waitForElementVisible(listOfElement, browser).click();
-        }
-        waitForElementVisible(setButton).click();
-        waitForElementNotVisible(setButton);
+    public String createFilterVariable(AttributeVariable variable) {
+        enterName(variable.getName())
+                .selectVariableType(VariableTypes.FILTERED_VARIABLE)
+                .selectAttribute(variable.getAttribute())
+                .selectDefaultAttributeValues(variable.getAttributeValues())
+                .selectUserSpecificAttributeValues(variable.getUserSpecificValues())
+                .saveChange();
+
+        return getVariableUri();
     }
 
-    public void setUserValueNumericVariable(UserRoles userRole, int number) {
-        waitForElementVisible(By.xpath(String.format(setBtnLocator, userRole.getName())), this.getRoot()).click();
-        waitForElementVisible(userNumberSet).sendKeys(String.valueOf(number));
-        waitForElementVisible(userOkButton).click();
-        waitForElementNotVisible(userNumberSet);
-        assertEquals(waitForElementVisible(userNumberValue).getText(), String.valueOf(number),
-                "Set value for specific user doesn't work properly");
-        waitForElementVisible(saveChangeButton).click();
-        waitForElementVisible(unSavedBarInactive);
-        waitForElementVisible(userTable);
-        waitForElementVisible(dataLink).click();
-    }
+    public VariableDetailPage setDefaultNumericValue(int value) {
+        WebElement defaultValueInput = waitForElementVisible(BY_DEFAULT_NUMERIC_VALUE_INPUT, getRoot());
+        defaultValueInput.clear();
+        defaultValueInput.sendKeys(String.valueOf(value));
+        // Should press TAB key here to make default value effect and save changes button enable
+        defaultValueInput.sendKeys(Keys.TAB);
 
-    public void verifyNumericalVariable(NumericVariable var) {
-        waitForElementVisible(userTable);
-        String defValue = waitForElementVisible(scalarValueInput).getAttribute("value");
-        assertEquals(defValue, String.valueOf(var.getDefaultNumber()),
-                "Default value of numeric variable is NOT set properly");
-
-        if (var.getUserNumber() != Integer.MAX_VALUE) {
-            String userNumber = waitForElementVisible(userNumberValue).getText();
-            assertEquals(userNumber, String.valueOf(var.getUserNumber()),
-                    "User specifc value of numeric variable is NOT set properly");
-        }
-
-        waitForElementVisible(dataLink).click();
-    }
-
-    public void verifyAttributeVariable(AttributeVariable var) {
-        List<String> elements = var.getAttributeElements();
-        if (elements.isEmpty()) {
-            waitForElementVisible(dataLink).click();
-            return;
-        }
-
-        waitForElementVisible(userTable);
-        if (var.isUserSpecificValues()) {
-            String userValue = waitForElementVisible(userListValue).getAttribute("title");
-            List<String> actualUserList = Arrays.asList(userValue.split(", "));
-            assertEquals(actualUserList, elements, "User value of attribute variable is NOT set properly");
-        } else {
-            String defaultValue = waitForElementVisible(selectedValues).getAttribute("title");
-            List<String> actualDefaultList = Arrays.asList(defaultValue.split(", "));
-            assertEquals(actualDefaultList, elements, "Default value of attribute variable is NOT set properly");
-        }
-        waitForElementVisible(dataLink).click();
-    }
-
-    public void deleteVariable() {
-        waitForElementVisible(deleteButton).click();
-        waitForElementVisible(confirmDeleteButtonLocator, browser).click();
-        waitForDataPageLoaded(browser);
-    }
-
-    public void setDefaultValue(int value) {
-        waitForElementVisible(scalarValueInput).click();
-        scalarValueInput.clear();
-        sleepTightInSeconds(1);
-        scalarValueInput.sendKeys(String.valueOf(value));
-        // do not focus on scalarValueInput
-        waitForElementVisible(numericalVariable).click();
-        assertEquals(scalarValueInput.getAttribute("value"), String.valueOf(value));
-        waitForElementVisible(saveChangeButton).click();
-        waitForElementVisible(unSavedBarInactive);
-        waitForElementVisible(userTable);
-        waitForElementVisible(dataLink).click();
-    }
-
-    public VariableDetailPage selectUserSpecificValues(List<String> values) {
-        waitForElementVisible(chooseButton).click();
-
-        Graphene.createPageFragment(SelectItemPopupPanel.class,
-                waitForElementVisible(By.cssSelector(".c-mdObjectsPicker:not(.gdc-hidden)"), browser))
-                .searchAndSelectItems(values)
-                .submitPanel();
         return this;
     }
 
-    public void saveChange() {
-        waitForElementVisible(saveChangeButton).click();
-        waitForElementNotVisible(saveChangeButton);
+    public VariableDetailPage selectUserSpecificAttributeValues(String userProfile, Collection<String> values) {
+        waitForFragmentVisible(userSpecificTable)
+                .selectUserSpecificAttributeValues(userProfile, values);
+        return this;
+    }
+
+    public VariableDetailPage saveChange() {
+        waitForElementVisible(BY_SAVE_CHANGES_BUTTON, getRoot()).click();
+        waitForElementNotPresent(BY_SAVE_CHANGES_BUTTON);
+        return this;
+    }
+
+    public void deleteVariable() {
+        waitForElementVisible(BY_DELETE_VARIABLE_BUTTON, getRoot()).click();
+        waitForElementVisible(BY_CONFIRM_DELETE_VARIABLE_BUTTON, browser).click();
+        waitForDataPageLoaded(browser);
+    }
+
+    public VariablesPage goToVariablesPage() {
+        waitForElementVisible(BY_VARIABLES_PAGE_LINK, getRoot()).click();
+        return Graphene.createPageFragment(VariablesPage.class,
+                waitForElementVisible(By.cssSelector(VariablesPage.CSS_CLASS), browser));
+    }
+
+    public Collection<String> getDefaultAttributeValues() {
+        return Stream.of(waitForElementVisible(By.cssSelector(".filterAnswer .answer"), getRoot()).getText().split(","))
+                .map(value -> value.trim())
+                .collect(toList());
+    }
+
+    public Collection<String> getUserSpecificAttributeValues(String userProfileUri) {
+        return waitForFragmentVisible(userSpecificTable).getUserAttributeValues(userProfileUri);
+    }
+
+    public int getDefaultNumericValue() {
+        return parseInt(waitForElementVisible(BY_DEFAULT_NUMERIC_VALUE_INPUT, getRoot()).getAttribute("value"));
+    }
+
+    public int getUserSpecificNumericValue(String userProfileUri) {
+        return waitForFragmentVisible(userSpecificTable).getUserNumericValue(userProfileUri);
+    }
+
+    private VariableDetailPage enterName(String name) {
+        if (!isElementPresent(BY_NAME_INPUT, browser)) {
+            waitForElementVisible(nameTag).click();
+        }
+
+        final WebElement nameInput = waitForElementVisible(BY_NAME_INPUT, browser);
+        nameInput.clear();
+        nameInput.sendKeys(name);
+
+        waitForElementVisible(BY_SAVE_NAME_BUTTON, browser).click();
+        return this;
+    }
+
+    private VariableDetailPage selectVariableType(VariableTypes type) {
+        final WebElement typeRadio = waitForElementVisible(type.getLocator(), getRoot());
+
+        if (!typeRadio.isSelected()) typeRadio.click();
+        return this;
+    }
+
+    private VariableDetailPage selectAttribute(String attribute) {
+        waitForElementVisible(By.className("s-btn-select_attribute"), getRoot()).click();
+
+        SelectItemPopupPanel.getInstance(browser)
+                .searchAndSelectItem(attribute)
+                .submitPanel();
+
+        return this;
+    }
+
+    private VariableDetailPage selectDefaultAttributeValues(Collection<String> values) {
+        if (values.isEmpty()) {
+            return this;
+        }
+
+        waitForElementVisible(By.className("s-btn-edit"), getRoot()).click();
+        SelectItemPopupPanel.getInstance(browser)
+                .searchAndSelectItems(values)
+                .submitPanel();
+
+        return this;
+    }
+
+    private VariableDetailPage selectUserSpecificAttributeValues(Map<String, Collection<String>> userSpecificValues) {
+        if (userSpecificValues.isEmpty()) {
+            return this;
+        }
+
+        for (String user : userSpecificValues.keySet()) {
+            waitForFragmentVisible(userSpecificTable).selectUserSpecificAttributeValues(user, userSpecificValues.get(user));
+        }
+
+        return this;
+    }
+
+    private VariableDetailPage setUserSpecificNumericValue(Map<String, Integer> userSpecificValue) {
+        if (userSpecificValue.isEmpty()) {
+            return this;
+        }
+
+        for (String user : userSpecificValue.keySet()) {
+            waitForFragmentVisible(userSpecificTable).setUserSpecificNumericValue(user, userSpecificValue.get(user));
+        }
+
+        return this;
+    }
+
+    private String getVariableUri() {
+        return browser.getCurrentUrl().split("objectPage\\|")[1].split("\\|\\|")[0];
+    }
+
+    public static class UserSpecificTable extends AbstractTable {
+
+        private static final By BY_SET_NUMERIC_VALUE_BUTTON = By.className("s-btn-set");
+        private static final By BY_SET_NUMERIC_VALUE_INPUT = By.cssSelector(".s-btn-ipe-editor input");
+        private static final By BY_OK_BUTTON = By.cssSelector(".s-btn-ipe-editor .s-btn-ok");
+
+        private UserSpecificTable selectUserSpecificAttributeValues(String userProfileUri, Collection<String> values) {
+            waitForElementVisible(By.className("s-btn-choose"), getUserRow(userProfileUri)).click();
+
+            SelectItemPopupPanel.getInstance(browser)
+                    .searchAndSelectItems(values)
+                    .submitPanel();
+
+            return this;
+        }
+
+        private UserSpecificTable setUserSpecificNumericValue(String userProfileUri, int value) {
+            waitForElementVisible(BY_SET_NUMERIC_VALUE_BUTTON, getUserRow(userProfileUri)).click();
+            waitForElementVisible(BY_SET_NUMERIC_VALUE_INPUT, browser).sendKeys(String.valueOf(value));
+            waitForElementVisible(BY_OK_BUTTON, browser).click();
+
+            return this;
+        }
+
+        private Collection<String> getUserAttributeValues(String userProfileUri) {
+            return Stream.of(waitForElementVisible(By.cssSelector(".listVal"),
+                            getUserRow(userProfileUri)).getText().split(","))
+                    .map(value -> value.trim())
+                    .collect(toList());
+        }
+
+        private int getUserNumericValue(String userProfileUri) {
+            return parseInt(waitForElementVisible(By.cssSelector(".numberVal"), getUserRow(userProfileUri)).getText());
+        }
+
+        private WebElement getUserRow(String userProfileUri) {
+            return getRows().stream()
+                    .filter(r -> r.findElement(By.cssSelector(".user a")).getAttribute("href").contains(userProfileUri))
+                    .findFirst()
+                    .get();
+        }
+    }
+
+    private static enum VariableTypes {
+        NUMERICAL_VARIABLE("promptTypeScalar"),
+        FILTERED_VARIABLE("promptTypeFilter");
+
+        private String locator;
+
+        private VariableTypes(String locator) {
+            this.locator = locator;
+        }
+
+        private By getLocator() {
+            return By.id(locator);
+        }
     }
 }

@@ -55,7 +55,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
         initVariablePage();
         variablePage.createVariable(new AttributeVariable("Test variable" + System.currentTimeMillis())
             .withAttribute(ATTR_MONTH_YEAR_CREATED)
-            .withAttributeElements("Jan 2010", "Feb 2010", "Mar 2010"));
+            .withAttributeValues("Jan 2010", "Feb 2010", "Mar 2010"));
     }
 
     /*

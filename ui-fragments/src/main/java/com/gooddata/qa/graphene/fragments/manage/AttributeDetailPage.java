@@ -7,7 +7,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static org.testng.Assert.assertEquals;
 
-import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -113,8 +112,7 @@ public class AttributeDetailPage extends AbstractFragment {
             clearDrillingSetting();
         }
         waitForElementVisible(selectDrillAttributeButton).click();
-        SelectItemPopupPanel popup = Graphene.createPageFragment(SelectItemPopupPanel.class,
-                waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser));
+        SelectItemPopupPanel popup = SelectItemPopupPanel.getInstance(browser);
         popup.searchAndSelectItem(attribute).submitPanel();
         waitForElementNotVisible(popup.getRoot());
         waitForElementVisible(By.cssSelector(".attr.option"), browser);

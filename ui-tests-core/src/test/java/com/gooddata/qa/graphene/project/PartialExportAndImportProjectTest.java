@@ -164,7 +164,7 @@ public class PartialExportAndImportProjectTest extends AbstractProjectTest {
     public void partialExportAndImportVariable() throws JSONException {
         final AttributeVariable simpleVariable = new AttributeVariable(SIMPLE_FILTERED_VARIABLE)
                 .withAttribute(REGION)
-                .withAttributeElements(asList(SOUTH, WEST));
+                .withAttributeValues(asList(SOUTH, WEST));
 
         final String simpleVariableUri = initVariablePage().createVariable(simpleVariable);
         final String exportToken = exportPartialProject(simpleVariableUri, DEFAULT_PROJECT_CHECK_LIMIT);
@@ -173,7 +173,8 @@ public class PartialExportAndImportProjectTest extends AbstractProjectTest {
             testParams.setProjectId(targetProjectId);
             importPartialProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
 
-            initVariablePage().openVariableFromList(SIMPLE_FILTERED_VARIABLE).verifyAttributeVariable(simpleVariable);
+            assertTrue(initVariablePage().hasVariable(SIMPLE_FILTERED_VARIABLE),
+                    "There has an issue after import partial project");
         } finally {
             testParams.setProjectId(sourceProjectId);
         }

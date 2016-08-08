@@ -226,7 +226,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     public void scheduleReportApplyFilteredVariable() {
         initVariablePage();
         variablePage.createVariable(new AttributeVariable("FVariable")
-            .withAttribute("Activity Type").withAttributeElements("Email"));
+            .withAttribute("Activity Type").withAttributeValues("Email"));
 
         initReportsPage();
         UiReportDefinition rd = new UiReportDefinition().withName("Filtered variable report")

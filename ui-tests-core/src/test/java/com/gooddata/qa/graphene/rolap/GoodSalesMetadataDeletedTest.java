@@ -480,7 +480,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
                 return !datasetsTable.getAllItems().contains(object);
             case VARIABLE:
                 initVariablePage();
-                return !variablePage.isVariableVisible(object);
+                return !variablePage.hasVariable(object);
             case REPORT:
                 initReportsPage();
                 selectReportsDomainFolder("All");
@@ -611,7 +611,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         waitForDataPageLoaded(browser);
         sleepTightInSeconds(5);
         variablePage.createVariable(new AttributeVariable(name).withAttribute(attribute.name)
-                .withAttributeElements(attribute.elements[0].name));
+                .withAttributeValues(attribute.elements[0].name));
 
         String url = browser.getCurrentUrl();
         return Pair.of(url.substring(url.lastIndexOf("/") + 1), name);

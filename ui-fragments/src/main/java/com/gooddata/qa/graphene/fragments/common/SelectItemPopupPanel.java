@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -48,6 +49,14 @@ public class SelectItemPopupPanel extends AbstractFragment {
         @FindBy(css = "div.es_body:not(.hidden):not(.gdc-hidden),.yui3-c-label:not(.es_head):not(.gdc-hidden)")
     })
     private List<WebElement> items;
+
+    public static SelectItemPopupPanel getInstance(SearchContext searchContext) {
+        return Graphene.createPageFragment(SelectItemPopupPanel.class, waitForElementVisible(LOCATOR, searchContext));
+    }
+
+    public static SelectItemPopupPanel getInstance(By locator, SearchContext searchContext) {
+        return Graphene.createPageFragment(SelectItemPopupPanel.class, waitForElementVisible(locator, searchContext));
+    }
 
     public SelectItemPopupPanel searchAndSelectItem(String item) {
         final Optional<WebElement> itemElement = findItemFrom(item, getItemListInDefaultStage());

@@ -1,16 +1,17 @@
 package com.gooddata.qa.graphene.entity.variable;
 
-import com.gooddata.qa.graphene.enums.user.UserRoles;
+import static java.util.Collections.unmodifiableMap;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class NumericVariable extends AbstractVariable {
 
     private int defaultNumber;
-    private int userNumber;
-    private UserRoles userRole;
+    private Map<String, Integer> userSpecificNumber = new HashMap<>();
 
     public NumericVariable(String name) {
         super(name);
-        userNumber = Integer.MAX_VALUE;
     }
 
     public NumericVariable withDefaultNumber(int number) {
@@ -18,9 +19,8 @@ public class NumericVariable extends AbstractVariable {
         return this;
     }
 
-    public NumericVariable withUserNumber(UserRoles userRole, int number) {
-        userNumber = number;
-        this.userRole = userRole;
+    public NumericVariable withUserSpecificNumber(String userProfileUri, int specificNumber) {
+        this.userSpecificNumber.put(userProfileUri, specificNumber);
         return this;
     }
 
@@ -28,11 +28,7 @@ public class NumericVariable extends AbstractVariable {
         return defaultNumber;
     }
 
-    public int getUserNumber() {
-        return userNumber;
-    }
-    
-    public UserRoles getUserRole() {
-        return userRole;
+    public Map<String, Integer> getUserSpecificNumber() {
+        return unmodifiableMap(userSpecificNumber);
     }
 }
