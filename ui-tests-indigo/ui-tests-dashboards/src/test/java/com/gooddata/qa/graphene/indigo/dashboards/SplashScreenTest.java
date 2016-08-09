@@ -44,10 +44,10 @@ public class SplashScreenTest extends DashboardsTest {
     }
 
     @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop", "empty-state"})
-    public void checkNewProjectWithoutKpisFallsToSplashCreen() {
+    public void checkNewProjectWithoutKpisFallsToSplashScreen() {
         initIndigoDashboardsPage().getSplashScreen();
 
-        takeScreenshot(browser, "checkNewProjectWithoutKpisFallsToSplashCreen", getClass());
+        takeScreenshot(browser, "checkNewProjectWithoutKpisFallsToSplashScreen", getClass());
     }
 
     @Test(dependsOnGroups = {"empty-state"}, groups = {"desktop"})
@@ -157,7 +157,7 @@ public class SplashScreenTest extends DashboardsTest {
         indigoDashboardsPage.getSplashScreen();
     }
 
-    @Test(dependsOnMethods = {"checkNewProjectWithoutKpisFallsToSplashCreen"}, groups = {"desktop", "empty-state"})
+    @Test(dependsOnMethods = {"checkNewProjectWithoutKpisFallsToSplashScreen"}, groups = {"desktop", "empty-state"})
     public void checkDeleteDashboardButtonMissingOnUnsavedDashboard() {
         initIndigoDashboardsPage()
                 .getSplashScreen()

@@ -54,11 +54,11 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(css = "." + SAVE_BUTTON_CLASS_NAME + ":not(.disabled)")
     private WebElement enabledSaveButton;
 
-    @FindBy(className = "configuration-panel")
+    @FindBy(css = ".dash-nav-right .configuration-panel")
     private ConfigurationPanel configurationPanel;
 
-    @FindBy(className = "kpi-placeholder")
-    private WebElement addWidget;
+    @FindBy(className = ADD_KPI_PLACEHOLDER_CLASS_NAME)
+    private WebElement addKpiPlaceholder;
 
     @FindBy(xpath = "//*[contains(concat(' ', normalize-space(@class), ' '), ' s-dialog ')]")
     private ConfirmDialog dialog;
@@ -75,11 +75,14 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(className = VISUALIZATIONS_LIST_CLASS_NAME)
     private VisualizationsList visualizationsList;
 
+    private static final String DASHBOARD_BODY = "dash-section-kpis";
     private static final String EDIT_BUTTON_CLASS_NAME = "s-edit_button";
     private static final String SAVE_BUTTON_CLASS_NAME = "s-save_button";
     private static final String DELETE_BUTTON_CLASS_NAME = "s-delete_dashboard";
     private static final String ALERTS_LOADED_CLASS_NAME = "alerts-loaded";
     private static final String VISUALIZATIONS_LIST_CLASS_NAME = "gd-visualizations-list";
+    private static final String ADD_KPI_PLACEHOLDER_CLASS_NAME = "add-kpi-placeholder";
+    private static final String LAST_DROPZONE_CLASS_NAME = "s-last-drop-position";
 
     private static final By DASHBOARD_LOADED = By.cssSelector(".is-dashboard-loaded");
     private static final By SAVE_BUTTON_ENABLED = By.cssSelector("." + SAVE_BUTTON_CLASS_NAME + ":not(.disabled)");
@@ -289,17 +292,17 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public IndigoDashboardsPage waitForKpiEditable() {
         waitForElementNotPresent(Kpi.IS_NOT_EDITABLE);
-
         return this;
     }
 
-    public IndigoDashboardsPage clickAddWidget() {
-        waitForElementPresent(addWidget).click();
+    public IndigoDashboardsPage dragAddKpiPlaceholder() {
+        waitForElementPresent(addKpiPlaceholder);
+        addKpiWidget();
         return this;
     }
 
     public IndigoDashboardsPage addWidget(KpiConfiguration config) {
-        clickAddWidget();
+        dragAddKpiPlaceholder();
         configurationPanel
             .selectMetricByName(config.getMetric())
             .selectDataSetByName(config.getDataSet());
@@ -421,6 +424,15 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public IndigoDashboardsPage addInsightToLastPosition(final String insight) {
         getInsightSelectionPanel().addInsightToLastPosition(insight);
+        return this;
+    }
+
+    public IndigoDashboardsPage addKpiWidget() {
+        final String sourceCssSelector = convertCSSClassTojQuerySelector(ADD_KPI_PLACEHOLDER_CLASS_NAME);
+        final String targetCssSelector = convertCSSClassTojQuerySelector(DASHBOARD_BODY);
+        final String dropZoneCssSelector = convertCSSClassTojQuerySelector(LAST_DROPZONE_CLASS_NAME);
+
+        dragAndDropWithCustomBackend(browser, sourceCssSelector, targetCssSelector, dropZoneCssSelector);
         return this;
     }
 

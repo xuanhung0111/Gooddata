@@ -39,7 +39,7 @@ public class MetricsDropdownTest extends DashboardWithWidgetsTest {
 
         assertEquals(3, ms.getValues().size());
 
-        waitForFragmentVisible(indigoDashboardsPage).clickAddWidget(); // clicking away shall close MetricsDropdown
+        waitForFragmentVisible(indigoDashboardsPage).dragAddKpiPlaceholder(); // dragging addKpiPlaceholder shall close MetricsDropdown
         ms.ensureDropdownOpen();
         takeScreenshot(browser, "checkSearchStringResetAfterDropdownClose-searchField_<empty>", this.getClass());
 
@@ -50,7 +50,7 @@ public class MetricsDropdownTest extends DashboardWithWidgetsTest {
     public void checkSearchStringResetAfterItemSelect() {
         IndigoDashboardsPage page = initIndigoDashboardsPageWithWidgets()
                 .switchToEditMode()
-                .clickAddWidget();
+                .dragAddKpiPlaceholder();
 
         MetricSelect ms = page.getConfigurationPanel()
                 .selectMetricByName(METRIC_AMOUNT)
@@ -76,7 +76,7 @@ public class MetricsDropdownTest extends DashboardWithWidgetsTest {
     private MetricSelect getMetricSelect() {
         return initIndigoDashboardsPageWithWidgets()
                 .switchToEditMode()
-                .clickAddWidget()
+                .dragAddKpiPlaceholder()
                 .getConfigurationPanel()
                 .getMetricSelect();
     }

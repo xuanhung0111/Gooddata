@@ -42,16 +42,16 @@ public class DragAndDropUtils {
      * @param dropSelector css selector of an element onto which we should drop
      */
     public static void dragAndDropWithCustomBackend(WebDriver driver, String fromSelector, String toSelector, String dropSelector) {
-        WebElement source = waitForElementPresent(By.cssSelector(fromSelector), driver);
+        WebElement source = waitForElementVisible(By.cssSelector(fromSelector), driver);
         Actions driverActions = new Actions(driver);
 
         driverActions.clickAndHold(source).perform();
 
         try {
-            WebElement target = waitForElementPresent(By.cssSelector(toSelector), driver);
+            WebElement target = waitForElementVisible(By.cssSelector(toSelector), driver);
             driverActions.moveToElement(target).perform();
 
-            WebElement drop = waitForElementPresent(By.cssSelector(dropSelector), driver);
+            WebElement drop = waitForElementVisible(By.cssSelector(dropSelector), driver);
             driverActions.moveToElement(drop).perform();
         } finally {
             driverActions.release().perform();

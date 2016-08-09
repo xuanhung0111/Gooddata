@@ -238,7 +238,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
         MetricSelect metricSelect = initIndigoDashboardsPageWithWidgets()
                 .switchToEditMode()
-                .clickAddWidget()
+                .dragAddKpiPlaceholder()
                 .getConfigurationPanel()
                 .getMetricSelect();
         metricSelect.searchForText(LONG_NAME_METRIC);
