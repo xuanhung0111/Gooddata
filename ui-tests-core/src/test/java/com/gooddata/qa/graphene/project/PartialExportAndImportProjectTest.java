@@ -47,7 +47,7 @@ public class PartialExportAndImportProjectTest extends AbstractProjectTest {
     private static final String NORTHEAST = "Northeast";
     private static final String SALES = "Sales";
     private static final String SPEND = "Spend";
-    private static final String HL_SALES = "HL: Sales";
+    private static final String BAR_CHART_REPORT = "Bar Chart: Email Open Rate by Month";
 
     private String sourceProjectId;
     private String targetProjectId;
@@ -112,7 +112,7 @@ public class PartialExportAndImportProjectTest extends AbstractProjectTest {
         initDashboardsPage().selectDashboard(CONSUMER_INSIGHTS);
         final String existingDashobardUri = getObjdUri(browser.getCurrentUrl());
 
-        dashboardsPage.addNewDashboard(NEW_DASHBOARD).editDashboard().addReportToDashboard(HL_SALES).saveDashboard();
+        dashboardsPage.addNewDashboard(NEW_DASHBOARD).editDashboard().addReportToDashboard(BAR_CHART_REPORT).saveDashboard();
         takeScreenshot(browser, "HL-Sales-report-on-dashboard", getClass());
 
         dashboardsPage.selectDashboard(NEW_DASHBOARD);
@@ -131,7 +131,7 @@ public class PartialExportAndImportProjectTest extends AbstractProjectTest {
                     .equals(dashboardsPage.getTabs().getAllTabNames()), "The imported dashboard is incorrect ");
 
             dashboardsPage.selectDashboard(NEW_DASHBOARD);
-            assertTrue(dashboardsPage.getContent().getReport(HL_SALES, OneNumberReport.class).getRoot().isDisplayed(),
+            assertTrue(dashboardsPage.getContent().getReport(BAR_CHART_REPORT, OneNumberReport.class).getRoot().isDisplayed(),
                     "The imported dashboard is not correct");
         } finally {
             testParams.setProjectId(sourceProjectId);

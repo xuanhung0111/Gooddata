@@ -22,7 +22,7 @@ public class EmbeddedDashboardReportsPageLocalizationTest extends GoodSalesAbstr
         projectTitle = "GoodSales-embeded-dashboard-reports-page-localization-test";
     }
 
-    @Test(dependsOnMethods = {"createAndUsingTestUser"}, groups = {"precondition"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
     public void initEmbeddedDashboardUri() {
         embeddedUri = initDashboardsPage()
             .openEmbedDashboardDialog()

@@ -32,6 +32,7 @@ import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
+import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
@@ -138,8 +139,9 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
         } finally {
             switchToAdmin();
             if (metricUri != null) {
-                RestUtils.deleteObject(restApiClient, metricUri);
+                RestUtils.deleteObject(getRestApiClient(), metricUri);
             }
+            RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
             UserManagementRestUtils.deleteUserByUri(restApiClient, userUri);
         }
     }
@@ -157,9 +159,10 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
     }
 
     private String addImapUserToProject(String email, String password) throws ParseException, IOException, JSONException {
-        String userUri = UserManagementRestUtils.createUser(getRestApiClient(), testParams.getUserDomain(), email,
+        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
+        String userUri = UserManagementRestUtils.createUser(restApiClient, testParams.getUserDomain(), email,
                 password);
-        UserManagementRestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(),
+        UserManagementRestUtils.addUserToProject(restApiClient, testParams.getProjectId(),
                 email, UserRoles.ADMIN);
 
         return userUri;

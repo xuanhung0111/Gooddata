@@ -16,6 +16,7 @@ public class TestParameters {
 
     private String host;
     private String projectId;
+    private String domainUser = null;
     private String user;
     private String password;
     private String editorUser;
@@ -96,6 +97,14 @@ public class TestParameters {
 
     public void setProjectId(String projectId) {
         this.projectId = projectId;
+    }
+
+    public void setDomainUser(String domainUser) {
+        this.domainUser = domainUser;
+    }
+
+    public String getDomainUser() {
+        return domainUser;
     }
 
     public String getUser() {

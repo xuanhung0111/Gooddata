@@ -244,7 +244,9 @@ public class AbstractGreyPageTest extends AbstractTest {
     }
 
     protected void addUserToProject(String email, UserRoles userRole) throws ParseException, IOException, JSONException {
-        UserManagementRestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), email, userRole);
+        UserManagementRestUtils.addUserToProject(
+                testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient(),
+                        testParams.getProjectId(), email, userRole);
     }
 
     private String getLDMImageFile() throws ParseException, IOException, JSONException {

@@ -38,6 +38,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
+import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
@@ -334,8 +335,9 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
     @Test(dependsOnGroups = "precondition", groups = "desktop")
     public void removeUserAfterSettingAlert() throws JSONException, IOException {
         String newImapUser = generateEmail(imapUser);
+        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
 
-        UserManagementRestUtils.createUser(getRestApiClient(), testParams.getUserDomain(), newImapUser, imapPassword);
+        UserManagementRestUtils.createUser(restApiClient, testParams.getUserDomain(), newImapUser, imapPassword);
         addUserToProject(newImapUser, UserRoles.ADMIN);
 
         String kpiName = generateUniqueName();
@@ -351,7 +353,7 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
 
             logoutAndLoginAs(imapUser, imapPassword);
 
-            deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), newImapUser);
+            deleteUserByEmail(restApiClient, testParams.getUserDomain(), newImapUser);
 
             updateCsvDataset(DATASET_NAME, csvFilePath);
 
@@ -361,7 +363,7 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
         } finally {
             logoutAndLoginAs(imapUser, imapPassword);
 
-            deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), newImapUser);
+            deleteUserByEmail(restApiClient, testParams.getUserDomain(), newImapUser);
 
             getMdService().removeObjByUri(indigoDashboardUri);
         }

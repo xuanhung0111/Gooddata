@@ -4,7 +4,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static java.util.Arrays.asList;
@@ -215,11 +214,8 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
 
         DashboardsRestUtils.changeMetricExpression(getRestApiClient(), testMetric.getUri(),
                 "SELECT ["+ amount.getUri() + "]");
-        initReportsPage();
-        reportsPage.getReportsList().openReport(reportName);
-        waitForAnalysisPageLoaded(browser);
 
-        assertThat(reportPage.getInvalidDataReportMessage(),
+        assertThat(openReport(reportName).getInvalidDataReportMessage(),
                 equalTo(REPORT_NOT_COMPUTABLE_MESSAGE));
     }
 

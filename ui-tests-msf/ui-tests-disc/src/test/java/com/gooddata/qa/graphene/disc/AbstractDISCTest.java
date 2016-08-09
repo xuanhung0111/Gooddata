@@ -26,6 +26,7 @@ import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
+import org.testng.annotations.BeforeClass;
 
 import com.gooddata.qa.graphene.AbstractMSFTest;
 import com.gooddata.qa.graphene.entity.disc.NotificationBuilder;
@@ -44,6 +45,11 @@ import com.google.common.collect.Iterables;
 public abstract class AbstractDISCTest extends AbstractMSFTest {
 
     private static final String OK_GROUP_DESCRIPTION_FORMAT = "OK %d×";
+
+    @BeforeClass(alwaysRun = true)
+    public void disableDynamicUser() {
+        useDynamicUser = false;
+    }
 
     protected void cleanWorkingProjectAfterTest(Method m) {
         if (!m.getDeclaringClass().equals(this.getClass()))

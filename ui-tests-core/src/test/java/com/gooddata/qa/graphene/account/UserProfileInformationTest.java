@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.account;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
 import java.util.List;
 
@@ -40,6 +41,7 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
         initAccountPage();
 
         PersonalInfoDialog personalInfoDialog = accountPage.openPersonalInfoDialog();
+        takeScreenshot(browser, "User info", getClass());
         userInfo = personalInfoDialog.getUserInfo();
 
         initVariablePage();
@@ -61,7 +63,7 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
         assertTrue(userProfilePage.isItemDisplayedInRecentActivity(REPORT_NAME),
                 "Report: " + REPORT_NAME + " is not displayed in Recent Activity");
 
-        assertTrue(userProfilePage.getRecentActivityItems() == 10,
+        assertTrue(userProfilePage.getRecentActivityItems() <= 10,
                 "Number of items in Recent Activity has exceeded over 10");
 
         assertEquals(allVariables, userProfilePage.getAllUserVariables());

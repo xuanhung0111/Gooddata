@@ -30,6 +30,7 @@ import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.account.InviteUserDialog;
 import com.gooddata.qa.graphene.fragments.account.RegistrationPage;
+import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 public class InviteUserTest extends AbstractProjectTest {
@@ -131,7 +132,8 @@ public class InviteUserTest extends AbstractProjectTest {
 
             ++expectedMessageCount;
         } finally {
-            UserManagementRestUtils.deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), nonRegistedUser);
+            RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
+            UserManagementRestUtils.deleteUserByEmail(restApiClient, testParams.getUserDomain(), nonRegistedUser);
         }
     }
 

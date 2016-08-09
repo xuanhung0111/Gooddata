@@ -117,6 +117,11 @@ public final class UserManagementRestUtils {
         }
     };
 
+    public static boolean isDomainUser(final RestApiClient restApiClient, final String userDomain) {
+        return HttpStatus.OK.value() == executeRequest(restApiClient,
+                restApiClient.newGetMethod(format(DOMAIN_USER_LINK, userDomain)));
+    }
+
     /**
      * Create new user
      * 

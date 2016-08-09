@@ -1,9 +1,11 @@
 package com.gooddata.qa.graphene.fragments.profile;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static org.openqa.selenium.By.cssSelector;
 
 import java.util.List;
 
@@ -18,18 +20,14 @@ import com.gooddata.qa.graphene.fragments.AbstractTable;
 public class UserProfilePage extends AbstractFragment {
 
     public static final By USER_PROFILE_PAGE_LOCATOR = By.cssSelector("#p-profilePage");
+    private static final By PHONE_LOCATOR = cssSelector(".phone div.value");
+    private static final By COMPANY_LOCATOR = cssSelector(".company div.value");
 
     @FindBy(css = ".fullname")
     private WebElement fullname;
 
     @FindBy(css = ".email a")
     private WebElement email;
-
-    @FindBy(css = ".phone div.value")
-    private WebElement phone;
-
-    @FindBy(css = ".company div.value")
-    private WebElement company;
 
     @FindBy(css = ".usersTable")
     private UserVariableTable userVariableTable;
@@ -41,11 +39,19 @@ public class UserProfilePage extends AbstractFragment {
     private WebElement role;
 
     public PersonalInfo getUserInfo() {
-        return new PersonalInfo()
+        PersonalInfo info = new PersonalInfo()
                 .withFullName(waitForElementVisible(fullname).getText())
-                .withEmail(waitForElementVisible(email).getText())
-                .withCompany(waitForElementVisible(company).getText())
-                .withPhoneNumber(waitForElementVisible(phone).getText());
+                .withEmail(waitForElementVisible(email).getText());
+
+        if (isElementVisible(COMPANY_LOCATOR, getRoot())) {
+            info.withCompany(waitForElementVisible(COMPANY_LOCATOR, getRoot()).getText());
+        }
+
+        if (isElementVisible(PHONE_LOCATOR, getRoot())) {
+            info.withPhoneNumber(waitForElementVisible(PHONE_LOCATOR, getRoot()).getText());
+        }
+
+        return info;
     }
 
     public List<String> getAllUserVariables() {

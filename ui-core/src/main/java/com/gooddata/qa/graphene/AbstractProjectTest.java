@@ -14,6 +14,7 @@ import com.gooddata.project.ProjectValidationResults;
 import org.json.JSONException;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.MetadataService;
@@ -30,6 +31,7 @@ import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static org.testng.Assert.assertFalse;
 
 import com.gooddata.qa.utils.http.rolap.RolapRestUtils;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -49,9 +51,19 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     protected String projectTemplate = "";
     protected int projectCreateCheckIterations = DEFAULT_PROJECT_CHECK_LIMIT;
 
+    // use to add some users as role editor and viewer
     protected boolean addUsersWithOtherRoles = false;
+
     // validations are enabled by default on any child class
     protected boolean validateAfterClass = true;
+
+    // this flag will enable feature: create new user for each test instead of using provided user account
+    protected boolean useDynamicUser;
+
+    @BeforeClass(alwaysRun = true)
+    public void enableDynamicUser() {
+        useDynamicUser = Boolean.parseBoolean(System.getProperty("useDynamicUser"));
+    }
 
     @Test(groups = {"createProject"})
     public void init() throws JSONException {
@@ -148,6 +160,36 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         log.warning("This test does not need to invite users into project!");
     }
 
+    @Test(dependsOnMethods = {"inviteUsersIntoProject"}, groups = {"createProject"})
+    public void createAndUseDynamicUser() throws ParseException, JSONException, IOException {
+        if (!useDynamicUser) {
+            log.warning("This test does not need to use dynamic user!");
+            return;
+        }
+
+        if (!isCurrentUserDomainUser()) {
+            log.warning("Main user in this test is not domain user. Cannot use dynamic user! Use the current to test!");
+            return;
+        }
+
+        String dynamicUser = generateDynamicUser(testParams.getUser());
+        UserManagementRestUtils.createUser(getRestApiClient(), testParams.getUserDomain(), dynamicUser, testParams.getPassword());
+        UserManagementRestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), dynamicUser, UserRoles.ADMIN);
+
+        // update domain user
+        if (isCurrentUserDomainUser()) {
+            testParams.setDomainUser(testParams.getUser());
+        }
+
+        testParams.setUser(dynamicUser);
+
+        // update REST clients to the correct user because they can be generated and cached
+        restApiClient = getRestApiClient(testParams.getUser(), testParams.getPassword());
+        goodDataClient = getGoodDataClient(testParams.getUser(), testParams.getPassword());
+
+        logoutAndLoginAs(true, UserRoles.ADMIN);
+    }
+
     @AfterClass(alwaysRun = true)
     public void validateProjectTearDown() throws JSONException {
         //it is necessary to login admin to validate project on afterClass
@@ -201,6 +243,13 @@ public abstract class AbstractProjectTest extends AbstractUITest {
             }
         } else {
             System.out.println("No project created -> no delete...");
+        }
+    }
+
+    @AfterClass(dependsOnMethods = {"deleteProjectTearDown"}, alwaysRun = true)
+    public void deleteDynamicUser() throws ParseException, IOException, JSONException {
+        if (useDynamicUser && testParams.getDomainUser() != null) {
+            UserManagementRestUtils.deleteUserByEmail(getDomainUserRestApiClient(), testParams.getUserDomain(), testParams.getUser());
         }
     }
 
@@ -273,5 +322,9 @@ public abstract class AbstractProjectTest extends AbstractUITest {
             webdavServerUrl = serverRootUrl + userUploadsLink;
         }
         return webdavServerUrl;
+    }
+
+    private boolean isCurrentUserDomainUser() {
+        return UserManagementRestUtils.isDomainUser(getRestApiClient(), testParams.getUserDomain());
     }
 }
