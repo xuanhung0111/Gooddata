@@ -98,11 +98,11 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
 
         assertFalse(isElementPresent(cssSelector(".s-filter-button"), browser));
 
-        assertEquals(analysisPage.redo()
+        assertTrue(analysisPage.redo()
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
-            .getFilterText(), ATTR_ACTIVITY_TYPE + ": All");
+            .getFilterText().contains(ATTR_ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -138,7 +138,7 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
             .expandConfiguration()
             .clickAddAttributeFilter()
             .selectAttribute(ATTR_ACTIVITY_TYPE);
-        assertFalse(isElementPresent(cssSelector(labelCount), browser));
+        assertEquals(waitForElementVisible(cssSelector(labelCount), browser).getText(), "All");
 
         AttributeFilterPicker panel = Graphene.createPageFragment(AttributeFilterPicker.class,
                 waitForElementVisible(MetricConfiguration.BY_ATTRIBUTE_FILTER_PICKER, browser));
@@ -151,6 +151,6 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
         waitForElementVisible(cssSelector(".s-filter-button"), browser).click();
         panel.selectAll()
             .apply();
-        assertFalse(isElementPresent(cssSelector(labelCount), browser));
+        assertEquals(waitForElementVisible(cssSelector(labelCount), browser).getText(), "All");
     }
 }
