@@ -51,8 +51,8 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @DataProvider(name = "rubyGitStoreProvider")
     public Object[][] rubyGitStoreProvider() {
         return new Object[][] {
-            {"${PUBLIC_APPSTORE}:branch/prodigy-testing:/vietnam/ReadFile"},
-            {"${PRIVATE_APPSTORE}:branch/prodigy-testing:/vietnam/ReadFile"}
+            {"${PUBLIC_APPSTORE}:branch/prodigy-testing:/vietnam/default/ReadFile"},
+            {"${PRIVATE_APPSTORE}:branch/prodigy-testing:/vietnam/default/ReadFile"}
         };
     }
 
