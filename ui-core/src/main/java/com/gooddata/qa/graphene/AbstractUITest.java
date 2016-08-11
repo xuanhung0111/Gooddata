@@ -151,9 +151,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(id = "p-objectPage")
     protected CreateAttributePage createAttributePage;
 
-    @FindBy(id = "accountSettingsMenu")
-    protected AccountPage accountPage;
-
     /**
      * ----- DISC fragments -----
      */
@@ -545,9 +542,10 @@ public class AbstractUITest extends AbstractGreyPageTest {
         return waitForFragmentVisible(analysisPage);
     }
 
-    public void initAccountPage() {
+    public AccountPage initAccountPage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|accountPage|");
         waitForAccountPageLoaded(browser);
+        return AccountPage.getInstance(browser);
     }
 
     public VariablesPage initVariablePage() {

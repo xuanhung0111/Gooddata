@@ -2,9 +2,11 @@ package com.gooddata.qa.graphene.fragments.account;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
+import static org.openqa.selenium.By.id;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -35,6 +37,10 @@ public class AccountPage extends AbstractFragment {
 
     @FindBy(css = ".deleteAccount a")
     private WebElement deleteYourAccountLink;
+
+    public static final AccountPage getInstance(SearchContext context) {
+        return Graphene.createPageFragment(AccountPage.class, waitForElementVisible(id("accountSettingsMenu"), context));
+    }
 
     public PersonalInfoDialog openPersonalInfoDialog() {
         waitForElementVisible(personalInformationLink).click();
