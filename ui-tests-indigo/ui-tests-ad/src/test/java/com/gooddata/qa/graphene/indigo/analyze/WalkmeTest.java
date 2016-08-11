@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.testng.Assert.assertEquals;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.deleteUserByEmail;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -107,7 +106,6 @@ public class WalkmeTest extends AbstractUITest {
     }
 
     private String getProjectId(String name) {
-        initProjectsPage();
-        return waitForFragmentVisible(projectsPage).getProjectsIds(name).get(0);
+        return initProjectsPage().getProjectsIds(name).get(0);
     }
 }

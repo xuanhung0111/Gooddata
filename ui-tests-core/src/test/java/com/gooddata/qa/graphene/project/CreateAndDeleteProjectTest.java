@@ -18,6 +18,7 @@ import org.testng.annotations.Test;
 import com.gooddata.project.ProjectDriver;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class CreateAndDeleteProjectTest extends AbstractProjectTest {
@@ -51,7 +52,7 @@ public class CreateAndDeleteProjectTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"createProjectByRestApi"})
     public void renameProjectByOwner() {
-        projectsPage.goToProject(fisrtProjectId);
+        ProjectsPage.getInstance(browser).goToProject(fisrtProjectId);
         waitForDashboardPageLoaded(browser);
 
         initProjectsAndUsersPage();
@@ -59,8 +60,7 @@ public class CreateAndDeleteProjectTest extends AbstractProjectTest {
         assertEquals(projectAndUsersPage.getProjectName(), FIRST_EDITED_PROJECT_NAME);
         assertEquals(getCurrentProjectName(browser), FIRST_EDITED_PROJECT_NAME);
 
-        initProjectsPage();
-        assertEquals(projectsPage.getProjectNameFrom(fisrtProjectId), FIRST_EDITED_PROJECT_NAME);
+        assertEquals(initProjectsPage().getProjectNameFrom(fisrtProjectId), FIRST_EDITED_PROJECT_NAME);
     }
 
     @Test(dependsOnMethods = {"renameProjectByOwner"})
@@ -70,8 +70,7 @@ public class CreateAndDeleteProjectTest extends AbstractProjectTest {
             .login(invitedAdminUser, invitedAdminUserPassword, true);
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
 
-        initProjectsPage();
-        projectsPage.goToProject(fisrtProjectId);
+        initProjectsPage().goToProject(fisrtProjectId);
         waitForDashboardPageLoaded(browser);
 
         initProjectsAndUsersPage();
@@ -79,8 +78,7 @@ public class CreateAndDeleteProjectTest extends AbstractProjectTest {
         assertEquals(projectAndUsersPage.getProjectName(), SECOND_EDITED_PROJECT_NAME);
         assertEquals(getCurrentProjectName(browser), SECOND_EDITED_PROJECT_NAME);
 
-        initProjectsPage();
-        assertEquals(projectsPage.getProjectNameFrom(fisrtProjectId), SECOND_EDITED_PROJECT_NAME);
+        assertEquals(initProjectsPage().getProjectNameFrom(fisrtProjectId), SECOND_EDITED_PROJECT_NAME);
     }
 
     @Test(dependsOnMethods = { "renameProjectByInvitedAdminUser" })
@@ -90,13 +88,11 @@ public class CreateAndDeleteProjectTest extends AbstractProjectTest {
             assertTrue(projectAndUsersPage.isDeleteButtonEnabled(), "Delete button is not enabled");
 
             projectAndUsersPage.tryDeleteProjectButDiscard();
-            initProjectsPage();
-            assertTrue(projectsPage.isProjectDisplayed(fisrtProjectId),
+            assertTrue(initProjectsPage().isProjectDisplayed(fisrtProjectId),
                     "Project is still deleted after discard Delete project dialog");
 
             initProjectsAndUsersPage();
-            projectAndUsersPage.deteleProject();
-            assertFalse(projectsPage.isProjectDisplayed(fisrtProjectId), "Project is still not deleted");
+            assertFalse(projectAndUsersPage.deteleProject().isProjectDisplayed(fisrtProjectId), "Project is still not deleted");
 
         } catch(Exception e) {
             takeScreenshot(browser, "Fail to delete project", this.getClass());

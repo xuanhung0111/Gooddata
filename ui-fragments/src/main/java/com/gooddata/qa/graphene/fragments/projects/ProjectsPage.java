@@ -1,10 +1,15 @@
 package com.gooddata.qa.graphene.fragments.projects;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.openqa.selenium.By.id;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -21,6 +26,10 @@ public class ProjectsPage extends AbstractFragment {
     private List<WebElement> demoProjects;
 
     private static final By BY_PROJECT_TITLE = By.cssSelector(".projectTitle");
+
+    public static final ProjectsPage getInstance(SearchContext context) {
+        return Graphene.createPageFragment(ProjectsPage.class, waitForElementVisible(id("projectsCentral"), context));
+    }
 
     public List<WebElement> getProjectsElements() {
         return projects;

@@ -22,6 +22,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 
 public class ProjectSwitchingTest extends AbstractProjectTest {
 
@@ -63,11 +64,10 @@ public class ProjectSwitchingTest extends AbstractProjectTest {
             logout();
             signInAtGreyPages(embededDashboardUser, embededDashboardUserPassword);
 
-            initProjectsPage();
-            assertTrue(projectsPage.isProjectDisplayed(testParams.getProjectId()),
+            assertTrue(initProjectsPage().isProjectDisplayed(testParams.getProjectId()),
                     "Dashboard-Only user cannot view the project in Projects page");
 
-            projectsPage.goToProject(testParams.getProjectId());
+            ProjectsPage.getInstance(browser).goToProject(testParams.getProjectId());
             waitForProjectsPageLoaded(browser);
 
             takeScreenshot(browser, "Dashboard only user cannot access the project", getClass());
@@ -84,11 +84,10 @@ public class ProjectSwitchingTest extends AbstractProjectTest {
         try {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.EDITOR);
 
-            initProjectsPage();
-            assertTrue(projectsPage.isProjectDisplayed(testParams.getProjectId()),
+            assertTrue(initProjectsPage().isProjectDisplayed(testParams.getProjectId()),
                     "Project does not display with invited user");
 
-            projectsPage.goToProject(testParams.getProjectId());
+            ProjectsPage.getInstance(browser).goToProject(testParams.getProjectId());
             waitForDashboardPageLoaded(browser);
 
             logout();
@@ -108,7 +107,7 @@ public class ProjectSwitchingTest extends AbstractProjectTest {
             initProjectsPage();
 
             takeScreenshot(browser, "Disable user cannot view the project", getClass());
-            assertFalse(projectsPage.isProjectDisplayed(testParams.getProjectId()),
+            assertFalse(ProjectsPage.getInstance(browser).isProjectDisplayed(testParams.getProjectId()),
                     "Project still displays with disabled user");
 
         } finally {

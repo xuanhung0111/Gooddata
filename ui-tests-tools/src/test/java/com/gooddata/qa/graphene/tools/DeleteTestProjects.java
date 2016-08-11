@@ -1,8 +1,5 @@
 package com.gooddata.qa.graphene.tools;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
-
 import java.util.List;
 
 import org.json.JSONException;
@@ -45,10 +42,7 @@ public class DeleteTestProjects extends AbstractUITest {
     }
 
     private void deleteProjects(String projectSubstring) {
-        openUrl(PAGE_PROJECTS);
-        waitForElementVisible(projectsPage.getRoot());
-        sleepTight(5000);
-        List<String> projectsToDelete = projectsPage.getProjectsIds(projectSubstring);
+        List<String> projectsToDelete = initProjectsPage().getProjectsIds(projectSubstring);
         System.out.println("Going to delete " + projectsToDelete.size() + " projects, " + projectsToDelete.toString());
         for (String projectToDelete : projectsToDelete) {
             deleteProject(projectToDelete);

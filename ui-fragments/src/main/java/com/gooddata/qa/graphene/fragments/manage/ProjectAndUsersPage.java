@@ -25,6 +25,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.account.InviteUserDialog;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
+import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.google.common.base.Predicate;
 
@@ -78,12 +79,13 @@ public class ProjectAndUsersPage extends AbstractFragment {
             .cssSelector(".yui3-d-modaldialog:not(.gdc-hidden) .s-btn-cancel");
     private static final By EMAILING_DASHBOARDS_TAB_LOCATOR = By.cssSelector(".s-menu-schedulePage");
 
-    public void deteleProject() {
+    public ProjectsPage deteleProject() {
         waitForElementVisible(deleteProjectButton).click();
         waitForElementVisible(deleteProjectDialogButton).click();
         //redirect to projects page
         waitForElementVisible(BY_PROJECTS_LIST, browser);
         System.out.println("Project deleted...");
+        return ProjectsPage.getInstance(browser);
     }
 
     public void openUserManagementPage() {
