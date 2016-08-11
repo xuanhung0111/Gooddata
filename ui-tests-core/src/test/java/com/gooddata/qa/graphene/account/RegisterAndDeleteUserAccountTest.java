@@ -323,15 +323,14 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     public void deleteUserAccount() throws JSONException {
         testParams.setProjectId(getProjectId(DEMO_PROJECT));
 
-        initAccountPage();
-
-        accountPage.tryDeleteAccountButDiscard();
+        initAccountPage()
+            .tryDeleteAccountButDiscard();
         logout()
             .login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
 
-        initAccountPage();
-        accountPage.deleteAccount();
+        initAccountPage()
+            .deleteAccount();
 
         LoginFragment.getInstance(browser).login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, false);
         LoginFragment.getInstance(browser).checkInvalidLogin();

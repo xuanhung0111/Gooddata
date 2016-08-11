@@ -38,9 +38,7 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = { "createProject" })
     public void initGetUserInformation() {
-        initAccountPage();
-
-        PersonalInfoDialog personalInfoDialog = accountPage.openPersonalInfoDialog();
+        PersonalInfoDialog personalInfoDialog = initAccountPage().openPersonalInfoDialog();
         takeScreenshot(browser, "User info", getClass());
         userInfo = personalInfoDialog.getUserInfo();
 

@@ -23,6 +23,7 @@ import org.testng.asserts.SoftAssert;
 import com.gooddata.qa.graphene.AbstractUITest;
 import com.gooddata.qa.graphene.entity.account.PersonalInfo;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.account.AccountPage;
 import com.gooddata.qa.graphene.fragments.account.ChangePasswordDialog;
 import com.gooddata.qa.graphene.fragments.account.PersonalInfoDialog;
 import com.gooddata.qa.graphene.fragments.account.RegionalNumberFormattingDialog;
@@ -101,33 +102,29 @@ public class UserAccountSettingTest extends AbstractUITest {
 
     @Test(dependsOnMethods = {"openOneProject"})
     public void getUserInformation() {
-        initAccountPage();
-
-        PersonalInfoDialog personalInfoDialog = accountPage.openPersonalInfoDialog();
+        PersonalInfoDialog personalInfoDialog = initAccountPage().openPersonalInfoDialog();
         personalInfoOrigin = personalInfoDialog.getUserInfo();
     }
 
     @Test(dependsOnMethods = { "getUserInformation" })
     public void editUserInformation() {
         try {
-            initAccountPage();
-
-            PersonalInfoDialog personalInfoDialog = accountPage.openPersonalInfoDialog();
+            PersonalInfoDialog personalInfoDialog = initAccountPage().openPersonalInfoDialog();
             assertFalse(personalInfoDialog.isEmailInputFieldEditable());
 
             personalInfoDialog.fillInfoFrom(personalInfo);
             assertEquals(personalInfoDialog.getUserInfo(), personalInfo);
 
             personalInfoDialog.discardChange();
-            accountPage.openPersonalInfoDialog();
+            AccountPage.getInstance(browser).openPersonalInfoDialog();
             assertEquals(personalInfoDialog.getUserInfo(), personalInfoOrigin);
 
             personalInfoDialog.fillInfoFrom(personalInfo)
                     .saveChange();
             checkGreenBar(browser, format(SUCCESS_MESSAGE, "account", " information"));
 
-            refreshAccountPage();
-            accountPage.openPersonalInfoDialog();
+            refreshAccountPage()
+                .openPersonalInfoDialog();
             assertEquals(personalInfoDialog.getUserInfo(), personalInfo);
 
         } catch(Exception e) {
@@ -135,9 +132,7 @@ public class UserAccountSettingTest extends AbstractUITest {
             throw e;
 
         } finally {
-            initAccountPage();
-
-            PersonalInfoDialog personalInformationDialog = accountPage.openPersonalInfoDialog();
+            PersonalInfoDialog personalInformationDialog = initAccountPage().openPersonalInfoDialog();
             personalInformationDialog.fillInfoFrom(personalInfoOrigin)
                     .saveChange();
             checkGreenBar(browser, format(SUCCESS_MESSAGE, "account", " information"));
@@ -146,9 +141,7 @@ public class UserAccountSettingTest extends AbstractUITest {
 
     @Test(dependsOnMethods = { "getUserInformation" })
     public void editUserInformationWithEmptyData() {
-        initAccountPage();
-
-        PersonalInfoDialog personalInfoDialog = accountPage.openPersonalInfoDialog();
+        PersonalInfoDialog personalInfoDialog = initAccountPage().openPersonalInfoDialog();
         assertFalse(personalInfoDialog.isEmailInputFieldEditable());
 
         personalInfoDialog.fillInfoFrom(new PersonalInfo())
@@ -162,9 +155,7 @@ public class UserAccountSettingTest extends AbstractUITest {
     @Test(dependsOnMethods = { "openOneProject" })
     public void editUserPassword() throws JSONException {
         try {
-            initAccountPage();
-
-            ChangePasswordDialog changePasswordDialog = accountPage.openChangePasswordDialog();
+            ChangePasswordDialog changePasswordDialog = initAccountPage().openChangePasswordDialog();
             changePasswordDialog.enterOldPassword(oldPassword).enterNewPassword(NEW_PASSWORD)
                     .enterConfirmPassword(NEW_PASSWORD);
             assertTrue(changePasswordDialog.areAllInputsFilled());
@@ -199,8 +190,7 @@ public class UserAccountSettingTest extends AbstractUITest {
     public void editUserPasswordWithInvalidValue() {
         final SoftAssert softAssert = new SoftAssert();
 
-        initAccountPage();
-        ChangePasswordDialog changePasswordDialog = accountPage.openChangePasswordDialog();
+        ChangePasswordDialog changePasswordDialog = initAccountPage().openChangePasswordDialog();
         changePasswordDialog.enterOldPassword(SHORT_PASSWORD)
                 .saveChange();
         softAssert.assertEquals(changePasswordDialog.getErrorMessage(), SHORT_PASSWORD_ERROR_MESSAGE);
@@ -233,22 +223,20 @@ public class UserAccountSettingTest extends AbstractUITest {
     @Test(dependsOnMethods = { "openOneProject" })
     public void editRegionalNumberFormat() {
         try {
-            initAccountPage();
-
-            RegionalNumberFormattingDialog numberFormattingDialog = accountPage
+            RegionalNumberFormattingDialog numberFormattingDialog = initAccountPage()
                     .openRegionalNumberFormattingDialog();
             numberFormattingDialog.selectNumberFormat(NEW_NUMBER_FORMAT);
             assertEquals(numberFormattingDialog.getSelectedNumberFormat(), NEW_NUMBER_FORMAT);
 
             numberFormattingDialog.discardChange();
-            accountPage.openRegionalNumberFormattingDialog();
+            AccountPage.getInstance(browser).openRegionalNumberFormattingDialog();
             assertEquals(numberFormattingDialog.getSelectedNumberFormat(), OLD_NUMBER_FORMAT);
 
             numberFormattingDialog.selectNumberFormat(NEW_NUMBER_FORMAT).saveChange();
             checkGreenBar(browser, NUMBER_FORMAT_SUCCESS_MESSAGE);
 
-            refreshAccountPage();
-            accountPage.openRegionalNumberFormattingDialog();
+            refreshAccountPage()
+                .openRegionalNumberFormattingDialog();
             assertEquals(numberFormattingDialog.getSelectedNumberFormat(), NEW_NUMBER_FORMAT);
 
         } catch(Exception e) {
@@ -256,8 +244,7 @@ public class UserAccountSettingTest extends AbstractUITest {
             throw e;
 
         } finally {
-            initAccountPage();
-            RegionalNumberFormattingDialog numberFormattingDialog = accountPage
+            RegionalNumberFormattingDialog numberFormattingDialog = initAccountPage()
                     .openRegionalNumberFormattingDialog();
             numberFormattingDialog.selectNumberFormat(OLD_NUMBER_FORMAT).saveChange();
             checkGreenBar(browser, NUMBER_FORMAT_SUCCESS_MESSAGE);
@@ -266,23 +253,20 @@ public class UserAccountSettingTest extends AbstractUITest {
 
     @Test(dependsOnMethods = { "openOneProject" })
     public void goToActiveProjects() {
-        initAccountPage();
-
-        accountPage.openActiveProjectsPage();
+        initAccountPage().openActiveProjectsPage();
         projectsPage.goToProject(testParams.getProjectId());
         waitForDashboardPageLoaded(browser);
         assertThat(browser.getCurrentUrl(), containsString(testParams.getProjectId()));
     }
 
-    private void refreshAccountPage() {
+    private AccountPage refreshAccountPage() {
         browser.navigate().refresh();
         waitForAccountPageLoaded(browser);
+        return AccountPage.getInstance(browser);
     }
 
     private void changePassword(String oldPassword, String newPassword) {
-        initAccountPage();
-
-        ChangePasswordDialog changePasswordDialog = accountPage.openChangePasswordDialog();
+        ChangePasswordDialog changePasswordDialog = initAccountPage().openChangePasswordDialog();
         changePasswordDialog.changePassword(oldPassword, newPassword);
         checkGreenBar(browser, format(SUCCESS_MESSAGE, "password", ""));
     }
