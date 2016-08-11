@@ -39,7 +39,7 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
                 .waitForReportComputing()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 4);
-        assertEquals(filtersBucketReact.getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": All");
+        assertEquals(filtersBucketReact.getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ":\nAll");
 
         WebElement filter = filtersBucketReact.getFilter(ATTR_ACTIVITY_TYPE);
         filter.click();
@@ -102,10 +102,10 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
                 .waitForReportComputing()
                 .getChartReport()
                 .getTrackersCount(), 4);
-        assertEquals(filtersBucketReact.getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": All");
+        assertEquals(filtersBucketReact.getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ":\nAll");
 
         analysisPage.addFilter(ATTR_DEPARTMENT);
-        assertEquals(filtersBucketReact.getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ": All");
+        assertEquals(filtersBucketReact.getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ":\nAll");
         checkingOpenAsReport("addAttributeToFilterBucket");
     }
 

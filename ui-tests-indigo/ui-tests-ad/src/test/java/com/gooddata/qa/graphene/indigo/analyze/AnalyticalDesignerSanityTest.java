@@ -146,13 +146,13 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
         comparisonRecommendation.select(ATTR_ACTIVITY_TYPE).apply();
         assertTrue(analysisPage.waitForReportComputing().getAttributesBucket().getItemNames()
                 .contains(ATTR_ACTIVITY_TYPE));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": All");
+        assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ":\nAll");
         assertEquals(report.getTrackersCount(), 4);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
         analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing();
         assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ATTR_DEPARTMENT));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ": All");
+        assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ":\nAll");
         assertEquals(report.getTrackersCount(), 2);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
         checkingOpenAsReport("testSimpleComparison");
@@ -234,7 +234,7 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
                 .addDateFilter()
                 .waitForReportComputing();
         assertEquals(analysisPage.getChartReport().getTrackersCount(), 4);
-        assertEquals(filtersBucket.getFilterText("Activity"), "Activity: All time");
+        assertEquals(filtersBucket.getDateFilterText(), "Activity: All time");
 
         filtersBucket.configDateFilter("This year");
         analysisPage.waitForReportComputing();
