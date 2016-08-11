@@ -80,13 +80,13 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select(ATTR_ACTIVITY_TYPE).apply();
         assertTrue(analysisPage.waitForReportComputing().getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": All");
+        assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ":\nAll");
         assertEquals(report.getTrackersCount(), 4);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
         analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing();
         assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ATTR_DEPARTMENT));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ": All");
+        assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ":\nAll");
         assertEquals(report.getTrackersCount(), 2);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
         checkingOpenAsReport("testSimpleComparison");
@@ -110,7 +110,7 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
         comparisonRecommendation.select(ATTR_ACTIVITY_TYPE).apply();
         analysisPage.waitForReportComputing();
         assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
-        assertEquals(filtersBucketReact.getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": All");
+        assertEquals(filtersBucketReact.getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ":\nAll");
         assertEquals(report.getTrackersCount(), 4);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
@@ -118,7 +118,7 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select("This month").apply();
         analysisPage.waitForReportComputing();
-        assertEquals(filtersBucketReact.getFilterText("Activity"), "Activity: This month");
+        assertEquals(filtersBucketReact.getDateFilterText(), "Activity: This month");
         if (analysisPage.isExplorerMessageVisible()) {
             log.info("Error message: " + analysisPage.getExplorerMessage());
             log.info("Stop testing because of no data in [This month]");
@@ -130,7 +130,7 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
         assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES + " - previous year", METRIC_NUMBER_OF_ACTIVITIES));
 
         analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing();
-        assertEquals(filtersBucketReact.getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ": All");
+        assertEquals(filtersBucketReact.getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ":\nAll");
         assertTrue(report.getTrackersCount() >= 1);
         legends = report.getLegends();
         assertEquals(legends.size(), 2);
