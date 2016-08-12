@@ -98,8 +98,7 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
     public void confirmInvitationRegistrationForm() throws MessagingException, IOException, JSONException {
         deleteUserIfExist(testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient(), INVITATION_USER);
 
-        initProjectsAndUsersPage();
-        String invitationLink = projectAndUsersPage.inviteUsersWithBlankMessage(imapClient,
+        String invitationLink = initProjectsAndUsersPage().inviteUsersWithBlankMessage(imapClient,
                 projectTitle + " Invitation", UserRoles.EDITOR, INVITATION_USER);
         checkGreenBar(browser, INVITATION_SUCCESS_MESSAGE);
 
@@ -156,8 +155,7 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
         logout();
         signIn(false, UserRoles.ADMIN);
 
-        initProjectsAndUsersPage();
-        String invitationLink = projectAndUsersPage.inviteUsersWithBlankMessage(imapClient,
+        String invitationLink = initProjectsAndUsersPage().inviteUsersWithBlankMessage(imapClient,
                 projectTitle + " Invitation", UserRoles.EDITOR, INVITATION_USER);
         checkGreenBar(browser, INVITATION_SUCCESS_MESSAGE);
 

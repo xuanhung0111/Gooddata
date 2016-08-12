@@ -213,8 +213,8 @@ public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest
                     .withHows(ATTR_STAGE_NAME),
                     "Create Report");
 
-            initProjectsAndUsersPage();
-            projectAndUsersPage.deteleProject();
+            initProjectsAndUsersPage()
+                .deteleProject();
             waitForProjectsPageLoaded(browser);
 
         } finally {

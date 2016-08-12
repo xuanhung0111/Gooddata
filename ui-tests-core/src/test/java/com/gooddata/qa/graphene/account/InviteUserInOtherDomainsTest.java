@@ -13,6 +13,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
 
 public class InviteUserInOtherDomainsTest extends AbstractProjectTest {
 
@@ -34,25 +35,25 @@ public class InviteUserInOtherDomainsTest extends AbstractProjectTest {
         inviteUsersAsViewerRole(userA);
         checkInvitedUser("Invitation was successfully sent.", "invite-user-A", userA + " has not been invited");
 
-        projectAndUsersPage.dismissStatusBar().cancelAllInvitations();
+        ProjectAndUsersPage.getInstance(browser).dismissStatusBar().cancelAllInvitations();
 
         inviteUsersAsViewerRole(userA, userB);
         checkInvitedUser("2 invitations were successfully sent.", 
                 "invite-user-A-B", userA + " " + userB + "have not been invited");
 
-        projectAndUsersPage.dismissStatusBar().cancelAllInvitations();
+        ProjectAndUsersPage.getInstance(browser).dismissStatusBar().cancelAllInvitations();
 
         inviteUsersAsViewerRole(userC);
         checkInvitedUser(format(ERROR_MESSAGE, userC.replace("+", "\\+").replace("-", "\\-")), "invite-user-C",
                 "The error message is not displayed");
 
-        projectAndUsersPage.dismissStatusBar();
+        ProjectAndUsersPage.getInstance(browser).dismissStatusBar();
 
         inviteUsersAsViewerRole(userA, userC);
         checkInvitedUser(format(ERROR_MESSAGE_FOR_INVITATION_IN_TWO_DOMAINS,
                 userC.replace("+", "\\+").replace("-", "\\-"), 1), "invite-user-A-C", "The error message is not displayed");
 
-        projectAndUsersPage.dismissStatusBar().cancelAllInvitations();
+        ProjectAndUsersPage.getInstance(browser).dismissStatusBar().cancelAllInvitations();
 
         inviteUsersAsViewerRole(userA, userB, userC);
         checkInvitedUser(String.format(ERROR_MESSAGE_FOR_INVITATION_IN_TWO_DOMAINS,
@@ -66,12 +67,12 @@ public class InviteUserInOtherDomainsTest extends AbstractProjectTest {
     }
 
     private void inviteUsersAsViewerRole(String... user) {
-        waitForFragmentVisible(projectAndUsersPage.openInviteUserDialog())
+        waitForFragmentVisible(ProjectAndUsersPage.getInstance(browser).openInviteUserDialog())
                 .inviteUsers(UserRoles.VIEWER, INVITATION_MESSAGE, user);
     }
 
     private void checkInvitedUser(String expectedMessage, String screenshotName, String errorMessage) {
-        assertTrue(projectAndUsersPage.getStatusMessage().matches(expectedMessage), errorMessage);
+        assertTrue(ProjectAndUsersPage.getInstance(browser).getStatusMessage().matches(expectedMessage), errorMessage);
         takeScreenshot(browser, screenshotName, getClass());
     }
 

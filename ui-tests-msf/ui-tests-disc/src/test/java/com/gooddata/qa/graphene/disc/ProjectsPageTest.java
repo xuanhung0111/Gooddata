@@ -427,8 +427,8 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
 
             projectId = createBlankProject("Additional Project");
 
-            initProjectsAndUsersPage();
-            projectAndUsersPage.leaveProject();
+            initProjectsAndUsersPage()
+                .leaveProject();
             waitForProjectsPageLoaded(browser);
 
             initDISCProjectsPage();

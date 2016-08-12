@@ -30,6 +30,7 @@ import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.account.InviteUserDialog;
 import com.gooddata.qa.graphene.fragments.account.RegistrationPage;
+import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
@@ -80,7 +81,7 @@ public class InviteUserTest extends AbstractProjectTest {
                 INVITATION_MESSAGE, imapUser);
 
         dismissStatusBarMessage();
-        projectAndUsersPage.openInvitedUserTab();
+        ProjectAndUsersPage.getInstance(browser).openInvitedUserTab();
         checkResendAndCancelInvitationAvailable(imapUser);
 
         final Email lastEmail = doActionWithImapClient(imapClient ->
@@ -101,9 +102,8 @@ public class InviteUserTest extends AbstractProjectTest {
         assertTrue(browser.getCurrentUrl().contains(testParams.getProjectId()), imapUser + " can't log on to the project");
         takeScreenshot(browser, "registed-user-access-the-project-successfully", getClass());
 
-        initProjectsAndUsersPage();
-        assertTrue(projectAndUsersPage.isUserDisplayedInList(imapUser), imapUser + " has not been active");
-        assertEquals(projectAndUsersPage.getUserRole(imapUser), UserRoles.ADMIN.getName());
+        assertTrue(initProjectsAndUsersPage().isUserDisplayedInList(imapUser), imapUser + " has not been active");
+        assertEquals(ProjectAndUsersPage.getInstance(browser).getUserRole(imapUser), UserRoles.ADMIN.getName());
 
         ++expectedMessageCount;
     }
@@ -141,14 +141,13 @@ public class InviteUserTest extends AbstractProjectTest {
     public void resendInvitation() throws JSONException {
         final String nonRegistedUser = generateEmail(imapUser);
 
-        loginAndOpenProjectAndUserPage();
-
-        projectAndUsersPage.openInviteUserDialog().inviteUsers(UserRoles.EDITOR, INVITATION_MESSAGE, nonRegistedUser);
+        loginAndOpenProjectAndUserPage()
+            .openInviteUserDialog().inviteUsers(UserRoles.EDITOR, INVITATION_MESSAGE, nonRegistedUser);
         dismissStatusBarMessage();
 
         ++expectedMessageCount;
 
-        projectAndUsersPage.resendInvitation(nonRegistedUser);
+        ProjectAndUsersPage.getInstance(browser).resendInvitation(nonRegistedUser);
 
         final Collection<Message> invitations = doActionWithImapClient(imapClient ->waitForMessages(
                 imapClient, GDEmails.INVITATION, invitationSubject, expectedMessageCount + 1));
@@ -159,9 +158,7 @@ public class InviteUserTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"resendInvitation"})
     public void inviteAlreadyPresentUser() throws MessagingException, IOException, JSONException {
-        initProjectsAndUsersPage();
-
-        projectAndUsersPage.openInviteUserDialog().inviteUsers(UserRoles.EDITOR, INVITATION_MESSAGE, imapUser);
+        initProjectsAndUsersPage().openInviteUserDialog().inviteUsers(UserRoles.EDITOR, INVITATION_MESSAGE, imapUser);
 
         assertEquals(Graphene.createPageFragment(InviteUserDialog.class,
                 waitForElementVisible(INVITE_USER_DIALOG_LOCATOR, browser))
@@ -173,8 +170,7 @@ public class InviteUserTest extends AbstractProjectTest {
         final String nonRegistedUserA = generateEmail(imapUser);
         final String nonRegistedUserB = generateEmail(imapUser);
 
-        initProjectsAndUsersPage();
-        projectAndUsersPage.openInviteUserDialog().inviteUsers(UserRoles.EDITOR,
+        initProjectsAndUsersPage().openInviteUserDialog().inviteUsers(UserRoles.EDITOR,
                 INVITATION_MESSAGE, nonRegistedUserA, nonRegistedUserB);
 
         final Collection<Message> invitations = doActionWithImapClient(imapClient -> waitForMessages(
@@ -182,7 +178,7 @@ public class InviteUserTest extends AbstractProjectTest {
         assertTrue(invitations.size() == expectedMessageCount + 2, "There are less than 2 new invitations in inbox");
 
         dismissStatusBarMessage();
-        projectAndUsersPage.openInvitedUserTab();
+        ProjectAndUsersPage.getInstance(browser).openInvitedUserTab();
         checkResendAndCancelInvitationAvailable(nonRegistedUserA);
         checkResendAndCancelInvitationAvailable(nonRegistedUserB);
 
@@ -191,17 +187,18 @@ public class InviteUserTest extends AbstractProjectTest {
 
     private String inviteUsers(String emailSubject, UserRoles role, String message, String... emails) {
         return doActionWithImapClient((imapClient) ->
-            projectAndUsersPage.inviteUsers(imapClient, invitationSubject, role, INVITATION_MESSAGE, emails));
+            ProjectAndUsersPage.getInstance(browser).inviteUsers(imapClient, invitationSubject, role, INVITATION_MESSAGE, emails));
     }
 
-    private void loginAndOpenProjectAndUserPage() throws JSONException {
+    private ProjectAndUsersPage loginAndOpenProjectAndUserPage() throws JSONException {
         logoutAndLoginAs(true, UserRoles.ADMIN);
-        initProjectsAndUsersPage();
+        return initProjectsAndUsersPage();
     }
 
     private void checkResendAndCancelInvitationAvailable(String userEmail) {
-        assertTrue(projectAndUsersPage.isResendInvitationAvailable(userEmail) && projectAndUsersPage
-                .isCancelInvitationAvailable(userEmail),"Resend and Cancel invitation are not displayed");
+        assertTrue(ProjectAndUsersPage.getInstance(browser).isResendInvitationAvailable(userEmail) &&
+                ProjectAndUsersPage.getInstance(browser).isCancelInvitationAvailable(userEmail),
+                "Resend and Cancel invitation are not displayed");
     }
 
     private void dismissStatusBarMessage() {

@@ -31,6 +31,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.account.InviteUserDialog;
 import com.gooddata.qa.graphene.fragments.account.RegistrationPage;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
+import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 
@@ -202,18 +203,17 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
         testParams.setProjectId(getProjectId(GOODDATA_PRODUCT_TOUR_PROJECT));
 
-        initProjectsAndUsersPage();
-        assertFalse(projectAndUsersPage.isEmailingDashboardsTabDisplayed(),
+        assertFalse(initProjectsAndUsersPage().isEmailingDashboardsTabDisplayed(),
                 "Emailing Dashboards tab is still displayed");
 
-        projectAndUsersPage.clickInviteUserButton();
+        ProjectAndUsersPage.getInstance(browser).clickInviteUserButton();
         assertFalse(isElementPresent(INVITE_USER_DIALOG_LOCATOR, browser));
         assertEquals(waitForElementVisible(NEED_ACTIVATE_ACCOUNT_DIALOG_TITLE, browser).getText(),
                 NEED_ACTIVATE_ACCOUNT_MESSAGE);
         takeScreenshot(browser, "Need activate account before inviting users", getClass());
         waitForElementVisible(CLOSE_DIALOG_BUTTON_LOCATOR, browser).click();
 
-        UserProfilePage userProfilePage = projectAndUsersPage.openUserProfile(REGISTRATION_USER);
+        UserProfilePage userProfilePage = ProjectAndUsersPage.getInstance(browser).openUserProfile(REGISTRATION_USER);
         assertEquals(userProfilePage.getUserRole(), "", "Unverified admin should not show role");
         takeScreenshot(browser, "Unverified user has no role", this.getClass());
 
@@ -227,17 +227,16 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         LoginFragment.getInstance(browser).login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
         waitForDashboardPageLoaded(browser);
 
-        initProjectsAndUsersPage();
-        assertTrue(projectAndUsersPage.isEmailingDashboardsTabDisplayed(),
+        assertTrue(initProjectsAndUsersPage().isEmailingDashboardsTabDisplayed(),
                 "Emailing Dashboards tab is not displayed");
 
-        projectAndUsersPage.clickInviteUserButton();
+        ProjectAndUsersPage.getInstance(browser).clickInviteUserButton();
         InviteUserDialog inviteUserDialog = Graphene.createPageFragment(InviteUserDialog.class,
               waitForElementVisible(INVITE_USER_DIALOG_LOCATOR, browser));
         takeScreenshot(browser, "Active user can invite users", getClass());
         inviteUserDialog.cancelInvite();
 
-        userProfilePage =  projectAndUsersPage.openUserProfile(REGISTRATION_USER);
+        userProfilePage =  ProjectAndUsersPage.getInstance(browser).openUserProfile(REGISTRATION_USER);
         assertEquals(userProfilePage.getUserRole(), UserRoles.ADMIN.getName());
     }
 
