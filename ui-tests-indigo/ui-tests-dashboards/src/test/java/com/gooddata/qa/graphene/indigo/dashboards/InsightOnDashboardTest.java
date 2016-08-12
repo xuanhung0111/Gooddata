@@ -33,6 +33,7 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Visualization;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.FilterType;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.InsightItem;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidgetWrap;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
@@ -213,11 +214,11 @@ public class InsightOnDashboardTest extends DashboardsTest {
         final List<InsightItem> insights = indigoDashboardsPage.getInsightSelectionPanel()
                 .waitForInsightListVisible().getInsightItems();
         takeScreenshot(browser, "Test-Insight-List-With-Created-By-Me-Filter", getClass());
-        assertTrue(insights.stream().anyMatch(e -> INSIGHT_CREATED_BY_MAIN_USER.equals(e.getName())),
+        assertTrue(insights.stream().anyMatch(e -> e.matchesTitle(INSIGHT_CREATED_BY_MAIN_USER)),
                 INSIGHT_CREATED_BY_MAIN_USER + " does not exist on result list");
 
         //ONE-1653: List of insights created by me show as all insights on KPIs
-        assertFalse(insights.stream().anyMatch(e -> INSIGHT_CREATED_BY_EDITOR.equals(e.getName())),
+        assertFalse(insights.stream().anyMatch(e -> e.matchesTitle(INSIGHT_CREATED_BY_EDITOR)),
                 INSIGHT_CREATED_BY_EDITOR + " exists on result list");
     }
 
@@ -230,7 +231,7 @@ public class InsightOnDashboardTest extends DashboardsTest {
 
         assertEquals(
                 indigoDashboardsPage.getInsightSelectionPanel().waitForInsightListVisible().getInsightItems().stream()
-                        .map(InsightItem::getName).filter(e -> INSIGHTS_FOR_FILTER_TEST.contains(e)).count(),
+                        .filter(e -> INSIGHTS_FOR_FILTER_TEST.stream().anyMatch(t -> e.matchesTitle(t))).count(),
                 2, "The expected insights are not displayed");
     }
 
@@ -309,13 +310,18 @@ public class InsightOnDashboardTest extends DashboardsTest {
 
         indigoDashboardsPage.getInsightSelectionPanel().clearInputText().switchFilter(type);
 
+        final List<String> expectedInsightClasses = expectedInsights.stream()
+                .map(e -> "s-" + simplifyText(e))
+                .collect(toList());
+
         final List<String> insights = indigoDashboardsPage.getInsightSelectionPanel()
                 .waitForInsightListVisible()
                 .getInsightItems().stream()
-                        .map(InsightItem::getName)
-                        .filter(e -> expectedInsights.contains(e))
+                        .filter(e -> expectedInsightClasses.stream().anyMatch(t -> e.getCSSClass().contains(t)))
+                        .map(InsightItem::getCSSClass)
                         .collect(toList());
-        assertTrue(insights.containsAll(expectedInsights), "The expected insights are not displayed");
+
+        assertEquals(insights.size(), expectedInsights.size(), "The expected insights are not displayed");
     }
 
     private void checkInsightRender(final Visualization insight, final String expectedHeadline,

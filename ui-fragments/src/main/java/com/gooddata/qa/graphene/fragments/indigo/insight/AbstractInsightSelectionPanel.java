@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
@@ -42,7 +43,10 @@ public abstract class AbstractInsightSelectionPanel extends AbstractFragment {
         }
 
         return getInsightItems().stream()
-                .filter(e -> insightName.equals(e.getName())).findFirst().get();
+                // find by either non-shortened title or fallback to s-class if not found (item shoretened)
+                .filter(e -> e.getName().equals(insightName) || e.matchesTitle(insightName))
+                .findFirst()
+                .get();
     }
 
     public boolean searchInsight(final String insight) {
@@ -80,7 +84,7 @@ public abstract class AbstractInsightSelectionPanel extends AbstractFragment {
         return (T) this;
     }
 
-    
+
     public <T extends AbstractInsightSelectionPanel> T waitForLoading() {
         Predicate<WebDriver> isDataLoaded = browser ->
                 !isElementPresent(cssSelector(".gd-spinner.large"), getRoot());
@@ -138,6 +142,15 @@ public abstract class AbstractInsightSelectionPanel extends AbstractFragment {
 
         public String getName() {
             return waitForElementVisible(nameLabel).getText();
+        }
+
+        public String getCSSClass() {
+            return getRoot().getAttribute("class");
+        }
+
+        public boolean matchesTitle(String title) {
+            String titleSelector = "s-" + simplifyText(title);
+            return getCSSClass().contains(titleSelector);
         }
 
         public void delete() {
