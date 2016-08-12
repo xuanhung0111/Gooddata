@@ -57,4 +57,9 @@ public abstract class DashboardsGeneralTest extends GoodSalesAbstractTest {
         ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
     }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"dashboardsInit"})
+    public void setStartPageContext() {
+        startPageContext = null;
+    }
 }

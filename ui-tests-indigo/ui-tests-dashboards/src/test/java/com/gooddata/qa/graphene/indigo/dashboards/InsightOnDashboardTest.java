@@ -180,9 +180,7 @@ public class InsightOnDashboardTest extends DashboardsTest {
     @Test(dependsOnGroups = { "dashboardsInit" })
     public void testCreatingInsightsForFilterTest() throws ParseException, IOException, JSONException {
         addEditorUserToProject();
-        //need refresh to make sure editor is added to working project
-        browser.navigate().refresh();
-        waitForProjectsPageLoaded(browser);
+        initProjectsPage();
 
         createVisualizationWidget(
                 getRestApiClient(testParams.getEditorUser(), testParams.getEditorPassword()), testParams.getProjectId(),

@@ -78,6 +78,14 @@ public abstract class AbstractTest extends Arquillian {
         startPageContext.waitForStartPageLoaded();
     }
 
+    private String getUrlWithoutHash(String url) {
+        if (!url.contains("#")) {
+            return url;
+        }
+
+        return url.substring(0, url.indexOf("#"));
+    }
+
     public void openUrl(String url) {
         String currentUrl = browser.getCurrentUrl();
         String pageURL = getRootUrl() + url.replaceAll("^/", "");
@@ -87,8 +95,8 @@ public abstract class AbstractTest extends Arquillian {
         browser.get(pageURL);
 
         // We need to call browser#get(String) before refreshing page to make sure the last request to browser has
-        // method is GET unless we will get an alert about re-sending information to browser 
-        if (pageURL.equals(currentUrl)) {
+        // method is GET unless we will get an alert about re-sending information to browser
+        if (getUrlWithoutHash(pageURL).equals(getUrlWithoutHash(currentUrl))) {
             browser.navigate().refresh();
         }
     }
