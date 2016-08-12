@@ -67,8 +67,6 @@ import com.gooddata.qa.utils.http.ScheduleMailPssClient;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.google.common.base.Predicate;
 
-@Test(groups = {"GoodSalesSchedules"},
-      description = "Tests for GoodSales project (email schedules functionality) in GD platform")
 public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSchedulesTest {
 
     private String emptyDashboardTitle = "Empty-Dashboard";

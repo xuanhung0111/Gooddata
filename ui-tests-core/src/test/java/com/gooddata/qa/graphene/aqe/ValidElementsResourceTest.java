@@ -38,7 +38,6 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
-@Test(groups = {"GoodSalesValidElements"}, description = "Tests for GoodSales project relates to ValidElements resource")
 public class ValidElementsResourceTest extends GoodSalesAbstractTest {
 
     @BeforeClass

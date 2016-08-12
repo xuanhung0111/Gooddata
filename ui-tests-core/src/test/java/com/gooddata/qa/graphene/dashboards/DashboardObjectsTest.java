@@ -24,8 +24,6 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 
-@Test(groups = {"dashboardObjects"},
-      description = "Tests for simple project and dashboard objects functionality in GD platform")
 public class DashboardObjectsTest extends AbstractProjectTest {
 
     private final String variableName = "FVariable";

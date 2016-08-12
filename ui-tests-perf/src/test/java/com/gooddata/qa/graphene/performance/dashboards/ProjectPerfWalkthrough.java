@@ -30,7 +30,6 @@ import com.gooddata.qa.graphene.fragments.greypages.projects.ClearCaches;
 import com.gooddata.qa.graphene.utils.WaitUtils;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
-@Test(groups = {"projectDashboardPerf"}, description = "Tests for performance of rendering dashboards of given project")
 public class ProjectPerfWalkthrough extends AbstractUITest {
 
     private int startDashboardIndex = 1;

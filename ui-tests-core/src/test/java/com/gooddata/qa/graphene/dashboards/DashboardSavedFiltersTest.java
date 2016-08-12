@@ -33,7 +33,6 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
-@Test(groups = {"dashboardSavedFilters"}, description = "Test saved filters work on dashboard in Portal")
 public class DashboardSavedFiltersTest extends AbstractProjectTest{
 
     private static final String FIRST_DASHBOARD_NAME  = "Dashboard 1";

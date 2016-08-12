@@ -65,7 +65,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 
 @SuppressWarnings("serial")
-@Test(groups = {"connectors", "zendesk4"}, description = "Checklist tests for Zendesk4 REST API")
 public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
 
     private String zendeskAPIUser;

@@ -23,7 +23,6 @@ import com.gooddata.qa.graphene.fragments.greypages.md.query.scheduledemails.Que
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestUtils;
 
-@Test(groups = {"GoodSalesShareDashboard"}, description = "Tests for GoodSales project - schedule dashboard")
 public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSchedulesTest {
 
     @FindBy(tagName = "fieldset")

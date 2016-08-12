@@ -18,8 +18,6 @@ import com.gooddata.qa.graphene.entity.filter.RangeFilterItem.RangeType;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 
-@Test(groups = {"GoodSalesReportFilters"},
-        description = "Tests for GoodSales project (report filters functionality)")
 public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
 
     private static final String REPORT_NAME = "Test Filter";

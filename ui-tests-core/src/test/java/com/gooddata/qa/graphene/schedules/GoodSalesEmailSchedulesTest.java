@@ -27,8 +27,6 @@ import com.gooddata.qa.utils.http.ScheduleMailPssClient;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;
 
-@Test(groups = {"GoodSalesSchedules"},
-        description = "Tests for GoodSales project (email schedules functionality) in GD platform")
 public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedulesTest {
 
     private String reportTitle = "Normal-Report";

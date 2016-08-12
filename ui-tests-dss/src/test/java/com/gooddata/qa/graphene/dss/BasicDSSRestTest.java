@@ -24,7 +24,6 @@ import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceUsersFragment;
 import com.gooddata.qa.graphene.fragments.greypages.dss.StorageFragment;
 
-@Test(groups = {"dss"}, description = "Basic verification of dss restapi in GD platform")
 public class BasicDSSRestTest extends AbstractDSSTest {
 
     private String storageUrl;

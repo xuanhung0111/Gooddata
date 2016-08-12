@@ -11,7 +11,6 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
-@Test(groups = {"GoodSalesDashboard"}, description = "Tests for GoodSales project (dashboards functionality) in GD platform")
 public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 
     private static final long expectedDashboardExportSize = 65000L;

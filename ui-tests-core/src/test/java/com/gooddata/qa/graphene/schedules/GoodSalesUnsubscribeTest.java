@@ -31,7 +31,6 @@ import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage.RepeatTime;
 import com.gooddata.qa.utils.http.ScheduleMailPssClient;
 import com.gooddata.qa.utils.mail.ImapClient;
 
-@Test(groups = {"GoodSalesUnsubscribe"}, description = "Tests for GoodSales project - unsubscribe in GD platform")
 public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTest {
 
     private static final String UNSUBSCRIBE_PATTERN =

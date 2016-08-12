@@ -13,7 +13,6 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
  *
  * @author michal.vanco@gooddata.com
  */
-@Test(groups = {"tools"}, description = "Tools tests")
 public class DeleteTestProjects extends AbstractUITest {
 
     @Test(groups = {"deleteProjectsInit"})

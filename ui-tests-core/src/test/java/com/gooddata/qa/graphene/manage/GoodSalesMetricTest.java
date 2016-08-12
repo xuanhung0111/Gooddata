@@ -89,8 +89,6 @@ import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.gooddata.report.ReportExportFormat;
 import com.gooddata.report.ReportService;
 
-@Test(groups = {"GoodSalesMetrics"},
-        description = "Tests for GoodSales project (metric creation functionality) in GD platform")
 public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
     private static final String YEAR_2010 = "2010";

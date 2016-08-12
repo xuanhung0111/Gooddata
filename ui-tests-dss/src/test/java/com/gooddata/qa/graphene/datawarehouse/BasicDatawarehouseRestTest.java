@@ -23,7 +23,6 @@ import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceFragment;
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceUsersFragment;
 
-@Test(groups = {"datawarehouse"}, description = "Basic verification of datawarehouse restapi in GD platform")
 public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
 
     private String storageUrl;

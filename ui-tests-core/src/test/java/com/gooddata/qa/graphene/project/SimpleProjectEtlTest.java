@@ -23,7 +23,6 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 
-@Test(groups = {"projectSimpleETL"}, description = "Tests for basic ETL functionality in GD platform")
 public class SimpleProjectEtlTest extends AbstractProjectTest {
 
     protected int statusPollingCheckIterations = 60; // (60*5s)

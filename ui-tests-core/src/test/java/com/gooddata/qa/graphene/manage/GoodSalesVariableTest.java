@@ -7,7 +7,6 @@ import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.entity.variable.NumericVariable;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 
-@Test(groups = {"GoodSalesVariables"}, description = "Tests for GoodSales project (create/view and edit variable functionality) in GD platform")
 public class GoodSalesVariableTest extends ObjectAbstractTest {
 
     @BeforeClass

@@ -20,7 +20,6 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
-@Test(groups = {"GoodSalesShareDashboard"}, description = "Tests for GoodSales project - schedule dashboard")
 public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmailSchedulesTest {
     private final String SCHEDULE_INFO = "^This dashboard will be sent %s .* to %s as a PDF attachment.$";
     private DashboardScheduleDialog dashboardScheduleDialog;
