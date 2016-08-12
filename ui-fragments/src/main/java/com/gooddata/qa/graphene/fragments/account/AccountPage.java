@@ -11,6 +11,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 
 public class AccountPage extends AbstractFragment {
 
@@ -60,9 +61,10 @@ public class AccountPage extends AbstractFragment {
                 waitForElementVisible(REGIONAL_NUMBER_FORMATTING_DIALOG_LOCATOR, browser));
     }
 
-    public void openActiveProjectsPage() {
+    public ProjectsPage openActiveProjectsPage() {
         waitForElementVisible(activeProjectsLink).click();
         waitForProjectsPageLoaded(browser);
+        return ProjectsPage.getInstance(browser);
     }
 
     public void deleteAccount() {

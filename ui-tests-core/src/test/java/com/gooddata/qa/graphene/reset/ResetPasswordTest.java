@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.reset;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -23,6 +22,7 @@ import org.testng.asserts.SoftAssert;
 import com.gooddata.qa.graphene.AbstractUITest;
 import com.gooddata.qa.graphene.fragments.account.LostPasswordPage;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
+import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 
@@ -134,12 +134,10 @@ public class ResetPasswordTest extends AbstractUITest {
      */
     @Test(dependsOnMethods = {"resetWithValidAndInvalidPassword"}, enabled = false)
     public void openOneProject() {
-        initProjectsPage();
-
-        List<String> projectIds = waitForFragmentVisible(projectsPage).getProjectsIds(PROJECT_NAME);
+        List<String> projectIds = initProjectsPage().getProjectsIds(PROJECT_NAME);
         assertFalse(projectIds.isEmpty(), "Project Ids are empty");
 
-        projectsPage.goToProject(projectIds.get(0));
+        ProjectsPage.getInstance(browser).goToProject(projectIds.get(0));
         waitForDashboardPageLoaded(browser);
 
         testParams.setProjectId(projectIds.get(0));

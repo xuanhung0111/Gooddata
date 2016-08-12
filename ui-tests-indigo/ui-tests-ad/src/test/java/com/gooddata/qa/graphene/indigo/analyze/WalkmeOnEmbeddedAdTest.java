@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.deleteUserByEmail;
 import static java.lang.String.format;
 import static org.testng.Assert.assertFalse;
@@ -58,7 +57,6 @@ public class WalkmeOnEmbeddedAdTest extends AbstractUITest {
     }
 
     private String getProductTourProjectId() {
-        initProjectsPage();
-        return waitForFragmentVisible(projectsPage).getProjectsIds(GOODDATA_PRODUCT_TOUR_PROJECT).get(0);
+        return initProjectsPage().getProjectsIds(GOODDATA_PRODUCT_TOUR_PROJECT).get(0);
     }
 }

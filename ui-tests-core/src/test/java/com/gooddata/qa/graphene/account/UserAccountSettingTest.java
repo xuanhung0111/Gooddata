@@ -4,7 +4,6 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.checkGreenBar;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAccountPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -28,6 +27,7 @@ import com.gooddata.qa.graphene.fragments.account.ChangePasswordDialog;
 import com.gooddata.qa.graphene.fragments.account.PersonalInfoDialog;
 import com.gooddata.qa.graphene.fragments.account.RegionalNumberFormattingDialog;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
+import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 
 public class UserAccountSettingTest extends AbstractUITest {
 
@@ -89,12 +89,10 @@ public class UserAccountSettingTest extends AbstractUITest {
 
     @Test(dependsOnMethods = {"initLoginAndData"})
     public void openOneProject() {
-        initProjectsPage();
-
-        List<String> projectIds = waitForFragmentVisible(projectsPage).getProjectsIds(PROJECT_NAME);
+        List<String> projectIds = initProjectsPage().getProjectsIds(PROJECT_NAME);
         assertFalse(projectIds.isEmpty(), "Project Ids are empty");
 
-        projectsPage.goToProject(projectIds.get(0));
+        ProjectsPage.getInstance(browser).goToProject(projectIds.get(0));
         waitForDashboardPageLoaded(browser);
 
         testParams.setProjectId(projectIds.get(0));
@@ -253,8 +251,9 @@ public class UserAccountSettingTest extends AbstractUITest {
 
     @Test(dependsOnMethods = { "openOneProject" })
     public void goToActiveProjects() {
-        initAccountPage().openActiveProjectsPage();
-        projectsPage.goToProject(testParams.getProjectId());
+        initAccountPage()
+            .openActiveProjectsPage()
+            .goToProject(testParams.getProjectId());
         waitForDashboardPageLoaded(browser);
         assertThat(browser.getCurrentUrl(), containsString(testParams.getProjectId()));
     }

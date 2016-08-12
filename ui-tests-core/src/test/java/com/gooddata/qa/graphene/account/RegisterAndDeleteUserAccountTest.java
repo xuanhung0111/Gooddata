@@ -4,7 +4,6 @@ import static com.gooddata.qa.graphene.fragments.account.InviteUserDialog.INVITE
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -33,6 +32,7 @@ import com.gooddata.qa.graphene.fragments.account.InviteUserDialog;
 import com.gooddata.qa.graphene.fragments.account.RegistrationPage;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
+import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 
 public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
@@ -344,7 +344,8 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     }
 
     private void openProject(String projectName) {
-        projectsPage.goToProject(getProjectId(projectName));
+        String projectId = getProjectId(projectName);
+        ProjectsPage.getInstance(browser).goToProject(projectId);
         waitForDashboardPageLoaded(browser);
     }
 
@@ -353,8 +354,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     }
 
     private String getProjectId(String name) {
-        initProjectsPage();
-        return waitForFragmentVisible(projectsPage).getProjectsIds(name).get(0);
+        return initProjectsPage().getProjectsIds(name).get(0);
     }
 
     private boolean isWalkmeDisplayed() {

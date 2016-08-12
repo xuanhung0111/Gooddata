@@ -97,9 +97,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(id = "p-emailSchedulePage")
     protected EmailSchedulePage emailSchedulesPage;
 
-    @FindBy(id = "projectsCentral")
-    protected ProjectsPage projectsPage;
-
     @FindBy(className = "s-datasets-list")
     protected DatasetsListPage datasetsListPage;
 
@@ -497,10 +494,10 @@ public class AbstractUITest extends AbstractGreyPageTest {
         return waitForFragmentVisible(datasetsListPage);
     }
 
-    public void initProjectsPage() {
+    public ProjectsPage initProjectsPage() {
         openUrl(PAGE_PROJECTS);
         waitForProjectsPageLoaded(browser);
-        waitForElementVisible(projectsPage.getRoot());
+        return ProjectsPage.getInstance(browser);
     }
 
     public void initEmptyDashboardsPage() {

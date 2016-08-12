@@ -36,6 +36,7 @@ import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 import com.gooddata.qa.graphene.enums.disc.ProjectStateFilters;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.google.common.base.Joiner;
 
 public class ProjectsPageTest extends AbstractOverviewProjectsTest {
@@ -241,8 +242,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkPagingProjectsPage() {
-        openUrl(PAGE_PROJECTS);
-        waitForElementVisible(projectsPage.getRoot());
+        final ProjectsPage projectsPage = initProjectsPage();
         waitForCollectionIsNotEmpty(projectsPage.getProjectsElements());
         int projectsNumber =
                 projectsPage.getProjectsElements().size() + projectsPage.getDemoProjectsElements().size();
