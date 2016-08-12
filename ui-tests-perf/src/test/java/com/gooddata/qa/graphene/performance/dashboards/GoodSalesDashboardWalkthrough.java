@@ -17,7 +17,6 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 
-@Test(groups = {"dashboardPerf"}, description = "Tests for performance od rendering dashboards in GoodSales project")
 public class GoodSalesDashboardWalkthrough extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})

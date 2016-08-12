@@ -15,7 +15,6 @@ import com.gooddata.qa.graphene.AbstractGreyPageTest;
 import com.gooddata.qa.graphene.connectors.ZendeskHelper;
 import com.gooddata.qa.utils.http.RestApiClient;
 
-@Test(groups = {"connectors", "zendesk4", "apiTests"}, description = "Checklist tests for Zendesk Helper")
 public class Zendesk4ZendeskApiTest extends AbstractGreyPageTest {
 
     private String zendeskAPIUser;

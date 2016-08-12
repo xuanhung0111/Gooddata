@@ -23,8 +23,6 @@ import com.gooddata.qa.graphene.fragments.greypages.sfdc.ConfigureSFDCCredential
 import com.gooddata.qa.graphene.fragments.reports.report.ReportWithImage;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 
-@Test(groups = {"projectSimpleAttribute"},
-      description = "Tests for configuration of attribute labels functionality on simple project in GD platform")
 public class AttributeLabelsTest extends AbstractProjectTest {
 
     private static final String IMAGE_SFDC_ATTRIBUTE = "Image Sfdc";

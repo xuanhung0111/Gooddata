@@ -51,7 +51,6 @@ import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 
-@Test(groups = {"GoodSalesShareDashboard"}, description = "Tests for GoodSales project - schedule dashboard")
 public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedulesTest {
 
     private static final String SCHEDULE_WITHOUT_RECIPIENTS = "Schedule without recipient";

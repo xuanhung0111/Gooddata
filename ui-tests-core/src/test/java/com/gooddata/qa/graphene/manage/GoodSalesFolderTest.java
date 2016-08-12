@@ -16,7 +16,6 @@ import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 
-@Test(groups = {"GoodSalesFolder"}, description = "Tests for view and edit folder on GoodSales project in GD platform")
 public class GoodSalesFolderTest extends GoodSalesAbstractTest {
     private String newName;
     private String oldEditName;

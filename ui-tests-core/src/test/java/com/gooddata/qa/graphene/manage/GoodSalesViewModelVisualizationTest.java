@@ -20,7 +20,6 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 
-@Test(groups = {"viewModelVisualization"}, description = "Test view model visualization")
 public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
 
     private static final String MODEL_URI = "/gdc/projects/%s/ldm";

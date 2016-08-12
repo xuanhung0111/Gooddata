@@ -6,7 +6,6 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractUITest;
 
-@Test(groups = {"projectWalkthrough"}, description = "Tests for verification of existing project - test goes over all dashboard tabs and create screenshots")
 public class ProjectWalktroughTest extends AbstractUITest {
 
     @BeforeClass

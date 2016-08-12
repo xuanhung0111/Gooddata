@@ -23,7 +23,6 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 
-@Test(groups = {"projectSimpleCompAttributes"}, description = "Tests for basic Computed Attributes functionality in GD platform")
 public class SimpleCompAttributesTest extends AbstractProjectTest {
 
     private static final int statusPollingCheckIterations = 60; // (60*5s)

@@ -26,7 +26,6 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.greypages.connectors.CoupaInstanceFragment;
 import com.google.common.base.Predicate;
 
-@Test(groups = {"connectors", "coupa"}, description = "Checklist tests for Coupa connector in GD platform")
 public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 
     private static final By BY_INPUT_TIMEZONE = By.name("timeZone");

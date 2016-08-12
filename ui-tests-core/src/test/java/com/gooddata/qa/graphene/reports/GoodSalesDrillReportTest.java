@@ -31,7 +31,6 @@ import com.gooddata.qa.graphene.fragments.dashboards.ReportInfoViewPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.google.common.collect.Sets;
 
-@Test(groups = {"GoodSalesDrillReport"}, description = "Drill report placed on dashboard")
 public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
 
     private static final String TEST_DASHBOAD_NAME = "test-drill-report";

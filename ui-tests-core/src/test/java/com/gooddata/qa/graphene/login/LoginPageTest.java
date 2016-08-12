@@ -14,7 +14,6 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
-@Test(groups = {"login"}, description = "Tests for basic login functionality in GD platform")
 public class LoginPageTest extends AbstractUITest {
 
     @BeforeClass

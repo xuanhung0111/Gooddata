@@ -24,7 +24,6 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 
-@Test(groups = {"GoodSalesDrillReportToExport"}, description = "Drill report to export")
 public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
     
     private static final String TEST_DASHBOAD_NAME = "test-drill-report-to-export";

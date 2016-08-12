@@ -11,7 +11,6 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 
-@Test(groups = {"ManageObjects"}, description = "Tests for list, filter and sort objects in GD platform")
 public class GoodSalesManageObjectsTest extends ManageObjectsAbstractTest {
 
     @BeforeClass
