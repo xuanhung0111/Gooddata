@@ -418,15 +418,21 @@ public class AbstractUITest extends AbstractGreyPageTest {
                 + format.getName();
         File export = new File(fileURL);
         System.out.println("pdfExport = " + export);
-        Predicate<WebDriver> exportCompleted = browser -> export.length() > minimalSize;
-        Graphene.waitGui()
-            .pollingEvery(5, TimeUnit.SECONDS)
-            .withTimeout(5, TimeUnit.MINUTES)
-            .until(exportCompleted);
-        long fileSize = export.length();
-        System.out.println("File size: " + fileSize);
-        assertTrue(fileSize > minimalSize, "Export is probably invalid, check the file manually! Current size is "
-                + fileSize + ", but minimum " + minimalSize + " was expected");
+
+        try {
+            Predicate<WebDriver> exportCompleted = browser -> export.length() > minimalSize;
+            Graphene.waitGui()
+                .pollingEvery(5, TimeUnit.SECONDS)
+                .withTimeout(5, TimeUnit.MINUTES)
+                .until(exportCompleted);
+        } catch (TimeoutException e) { // do nothing
+        } finally {
+            long fileSize = export.length();
+            System.out.println("File size: " + fileSize);
+            assertTrue(fileSize > minimalSize, "Export is probably invalid, check the file manually! Current size is "
+                    + fileSize + ", but minimum " + minimalSize + " was expected");
+        }
+
         if (format == ExportFormat.IMAGE_PNG) {
             browser.get("file://" + fileURL);
             takeScreenshot(browser, "export-report-" + reportName, this.getClass());
