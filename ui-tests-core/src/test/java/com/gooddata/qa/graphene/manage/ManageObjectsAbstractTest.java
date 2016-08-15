@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForObjectPageLoaded;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static org.openqa.selenium.By.id;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -139,10 +140,9 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
                 this.getClass());
     }
 
-    protected void moveObjectsBetweenFolders(ObjectTypes objectType, ObjectsTable objectsTable,
-                                             List<String> movedObjects, String targetFolderID1, String targetFolderName2)
-            {
-        openObjectsTable(objectsTable, objectType);
+    protected void moveObjectsBetweenFolders(ObjectTypes objectType, List<String> movedObjects,
+            String targetFolderID1, String targetFolderName2) {
+        ObjectsTable objectsTable = openObjectsTable(objectType);
         checkAllCheckboxes(objectsTable);
         checkNoneCheckboxes(objectsTable);
         objectsTable.checkOnCheckboxes(movedObjects);
@@ -153,19 +153,17 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
         assertMovedObjectsInTargetFolder(targetFolderName2, objectsTable, movedObjects);
     }
 
-    protected void deleteObjectsTable(ObjectsTable objectsTable, List<String> deletedObjectsList, List<String> defaultObjectsList, ObjectTypes objectType) {
+    protected void deleteObjectsTable(List<String> deletedObjectsList, List<String> defaultObjectsList, ObjectTypes objectType) {
         List<String> remainedObjectsList = new ArrayList<String>();
         remainedObjectsList.addAll(defaultObjectsList);
         remainedObjectsList.removeAll(deletedObjectsList);
-        openObjectsTable(objectsTable, objectType);
-        objectsTable.checkOnCheckboxes(deletedObjectsList);
-        this.cancelDeleteObjects(objectType, objectsTable, deletedObjectsList, defaultObjectsList);
-        this.deleteObjects(objectType, objectsTable, deletedObjectsList,
-                remainedObjectsList);
+        openObjectsTable(objectType)
+            .checkOnCheckboxes(deletedObjectsList);
+        this.cancelDeleteObjects(objectType, deletedObjectsList, defaultObjectsList);
+        this.deleteObjects(objectType, deletedObjectsList, remainedObjectsList);
     }
 
-    protected void checkDeleteConfirmDialog(ObjectTypes objectType, ObjectsTable objectsTable,
-                                            List<String> deletedObjects) {
+    protected void checkDeleteConfirmDialog(ObjectTypes objectType, List<String> deletedObjects) {
         dataPage.getDeleteObjectsButton().sendKeys(Keys.ENTER);
         waitForElementVisible(dataPage.getDeleteConfirmDialog());
         String deleteConfirmDialogTitle = String.format("Delete %s(s)", objectType.getName());
@@ -180,9 +178,8 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
                 "delete-confirm-dialog-for-" + objectType.getObjectsTableID(), this.getClass());
     }
 
-    protected void deleteObjects(ObjectTypes objectType, ObjectsTable objectsTable,
-                                 List<String> deletedObjects, List<String> existingObjects) {
-        checkDeleteConfirmDialog(objectType, objectsTable, deletedObjects);
+    protected void deleteObjects(ObjectTypes objectType, List<String> deletedObjects, List<String> existingObjects) {
+        checkDeleteConfirmDialog(objectType, deletedObjects);
         Screenshots.takeScreenshot(browser, objectType.getObjectsTableID()
                 + "-before-deleting-selected-objects", this.getClass());
         dataPage.getDeleteConfirmButton().click();
@@ -190,18 +187,15 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
                 objectType.getName());
         Assert.assertEquals(waitForElementVisible(dataPage.getStatusMessageOnGreenBar()).getText(),
                 message);
-        waitForElementVisible(objectsTable.getRoot());
-        this.assertRowTitles(objectsTable, existingObjects);
+        this.assertRowTitles(ObjectsTable.getInstance(id(objectType.getObjectsTableID()), browser), existingObjects);
         Screenshots.takeScreenshot(browser, objectType.getObjectsTableID()
                 + "-after-deleting-selected-objects", this.getClass());
     }
 
-    protected void cancelDeleteObjects(ObjectTypes objectType, ObjectsTable objectsTable,
-                                       List<String> deletedObjects, List<String> defaultObjectsList)
-            {
-        checkDeleteConfirmDialog(objectType, objectsTable, deletedObjects);
+    protected void cancelDeleteObjects(ObjectTypes objectType, List<String> deletedObjects, List<String> defaultObjectsList) {
+        checkDeleteConfirmDialog(objectType, deletedObjects);
         dataPage.getCancelDeleteButton().click();
-        this.assertRowTitles(objectsTable, defaultObjectsList);
+        this.assertRowTitles(ObjectsTable.getInstance(id(objectType.getObjectsTableID()), browser), defaultObjectsList);
         Screenshots.takeScreenshot(browser, objectType.getObjectsTableID()
                 + "-after-canceling-deleting-objects", this.getClass());
     }
@@ -226,27 +220,25 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
         return assertResult;
     }
 
-    protected void openObjectsTable(ObjectsTable objectsTable, ObjectTypes objectType) {
+    protected ObjectsTable openObjectsTable(ObjectTypes objectType) {
         initManagePage();
         waitForElementVisible(dataPage.getMenuItem(objectType)).click();
         waitForDataPageLoaded(browser);
-        waitForElementVisible(objectsTable.getRoot());
-        Screenshots.takeScreenshot(browser, "open-" + objectsTable.getRoot().getAttribute("id"),
-                this.getClass());
+        Screenshots.takeScreenshot(browser, "open-" + objectType.getObjectsTableID(), this.getClass());
+        return ObjectsTable.getInstance(id(objectType.getObjectsTableID()), browser);
     }
 
-    protected void viewObjectsTable(ObjectsTable objectsTable, ObjectTypes objectType)
-            {
-        openObjectsTable(objectsTable, objectType);
-        objectsTable.assertTableHeader();
-        objectsTable.assertCheckboxes(true, false);
+    protected ObjectsTable viewObjectsTable(ObjectTypes objectType) {
+        ObjectsTable table = openObjectsTable(objectType)
+            .assertTableHeader()
+            .assertCheckboxes(true, false);
         dataPage.assertMassActions();
-        Screenshots.takeScreenshot(browser, "view-" + objectsTable.getRoot().getAttribute("id"),
-                this.getClass());
+        Screenshots.takeScreenshot(browser, "view-" + objectType.getObjectsTableID(), this.getClass());
+        return table;
     }
 
-    protected void viewSortObjectsTable(ObjectsTable objectsTable, ObjectTypes objectType, List<String> defaultObjectsList) {
-        viewObjectsTable(objectsTable, objectType);
+    protected void viewSortObjectsTable(ObjectTypes objectType, List<String> defaultObjectsList) {
+        ObjectsTable objectsTable = viewObjectsTable(objectType);
         createNewFolder(objectsTable, objectType, String.format("New %s folder", objectType.getName()));
         objectsTable.sortObjectsTable(ObjectsTable.SORT_DESC, defaultObjectsList);
         objectsTable.sortObjectsTable(ObjectsTable.SORT_ASC, defaultObjectsList);
