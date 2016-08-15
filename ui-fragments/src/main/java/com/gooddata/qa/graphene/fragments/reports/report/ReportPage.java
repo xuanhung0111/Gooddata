@@ -29,6 +29,7 @@ import static org.testng.Assert.assertEquals;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -263,12 +264,14 @@ public class ReportPage extends AbstractFragment {
         sleepTightInSeconds(2);
 
         waitForElementNotPresent(SND_DIALOG_LOADING);
-        waitForElementVisible(By.cssSelector("form.sndFooterForm > button.s-btn-done:not([disabled])"), browser).click();
+        waitForElementVisible(By.cssSelector("form.sndFooterForm > button.s-btn-done:not([disabled])"), browser)
+            .click();
+        waitForElementNotVisible(By.cssSelector("form.sndFooterForm > button.s-btn-done:not([disabled])"));
 
         Predicate<WebDriver> predicate = input -> !waitForElementVisible(filterButton)
                 .getAttribute("class")
                 .contains("disabled");
-        Graphene.waitGui().until(predicate);
+        Graphene.waitGui().withTimeout(3, TimeUnit.MINUTES).until(predicate);
         return this;
     }
 
