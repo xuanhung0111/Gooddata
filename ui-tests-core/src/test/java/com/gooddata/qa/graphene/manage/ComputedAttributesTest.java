@@ -35,6 +35,7 @@ import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
+import com.gooddata.qa.graphene.fragments.manage.CreateAttributePage;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.utils.graphene.Screenshots;
@@ -76,14 +77,14 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"}, priority = 0)
     public void createComputedAttributeTest() {
         createComputedAttribute();
-        createAttributePage.cancel();
+        CreateAttributePage.getInstance(browser).cancel();
         waitForDataPageLoaded(browser);
         By computedAttributeItem =
                 By.cssSelector(String.format(".s-title-%s a", CssUtils.simplifyText(COMPUTED_ATTRIBUTE_NAME)));
         assertTrue(browser.findElements(computedAttributeItem).isEmpty());
 
         createComputedAttribute();
-        createAttributePage.submit();
+        CreateAttributePage.getInstance(browser).submit();
 
         waitForElementVisible(attributeBucketName);
         Screenshots.takeScreenshot(browser, "computed-attribute-details-page", this.getClass());
@@ -92,7 +93,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         List<String> expectedBucketRanges =
                 Arrays.asList("# of Won Opps. <= 120", "120 < # of Won Opps. <= 200",
                         "200 < # of Won Opps. <= 250", "250 < # of Won Opps.");
-        createAttributePage.checkCreatedComputedAttribute(COMPUTED_ATTRIBUTE_NAME, expectedBucketNames,
+        CreateAttributePage.getInstance(browser).checkCreatedComputedAttribute(COMPUTED_ATTRIBUTE_NAME, expectedBucketNames,
                 expectedBucketRanges);
 
         // check delete button is disabled right after computed attribute creation
@@ -101,30 +102,29 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, priority = 0)
     public void checkValidationOfBucketFields() {
-        initAttributePage();
-        attributePage.createAttribute();
+        initAttributePage()
+            .createAttribute();
         waitForElementVisible(btnCreateComputedAttribute);
 
-        createAttributePage.selectAttribute("Sales Rep");
-        createAttributePage.selectMetric("# of Won Opps.");
-
-        createAttributePage.setBucket(0, "Poor", "");
+        CreateAttributePage.getInstance(browser).selectAttribute("Sales Rep")
+            .selectMetric("# of Won Opps.")
+            .setBucket(0, "Poor", "");
         assertTrue("is not a number".equals(getBubbleMessage(browser)), "error message");
 
-        createAttributePage.setBucket(0, "", "1000");
-        createAttributePage.setBucket(0, "");
+        CreateAttributePage.getInstance(browser).setBucket(0, "", "1000")
+            .setBucket(0, "");
         assertTrue("Field is required.".equals(getBubbleMessage(browser)), "error message");
 
-        createAttributePage.setBucket(0, "Poor", "abc");
+        CreateAttributePage.getInstance(browser).setBucket(0, "Poor", "abc");
         assertTrue("is not a number".equals(getBubbleMessage(browser)), "error message");
 
-        createAttributePage.setBucket(0, "Poor", "3000");
-        createAttributePage.setBucket(1, "Good", "2000");
+        CreateAttributePage.getInstance(browser).setBucket(0, "Poor", "3000")
+            .setBucket(1, "Good", "2000");
         assertTrue("Value should be greater than 3000".equals(getBubbleMessage(browser)), "error message");
 
-        createAttributePage.setBucket(0, "This is a long name which is longer than 128 characters. "
-                + "So it should show error that the Values is so long. And I am checking it", "1000");
-        createAttributePage.setBucket(0, "This is a long name which is longer than 128 characters. "
+        CreateAttributePage.getInstance(browser).setBucket(0, "This is a long name which is longer than 128 characters. "
+                + "So it should show error that the Values is so long. And I am checking it", "1000")
+                .setBucket(0, "This is a long name which is longer than 128 characters. "
                 + "So it should show error that the Values is so long. And I am checking it");
         assertTrue("Value is too long.".equals(getBubbleMessage(browser)), "error message");
     }
@@ -384,26 +384,26 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     }
 
     private void createComputedAttribute() {
-        initAttributePage();
-        attributePage.createAttribute();
+        initAttributePage()
+            .createAttribute();
         waitForElementVisible(btnCreateComputedAttribute);
         assertFalse(isCreatedButtonEnabled(), "Create Computed Attribute is Enabled");
 
-        createAttributePage.selectAttribute("Sales Rep");
+        CreateAttributePage.getInstance(browser).selectAttribute("Sales Rep");
         assertFalse(isCreatedButtonEnabled(), "Create Computed Attribute is Enabled");
 
-        createAttributePage.selectMetric("# of Won Opps.");
+        CreateAttributePage.getInstance(browser).selectMetric("# of Won Opps.");
         assertEquals(waitForElementVisible(bucketValues).getText(), "# of Won Opps.");
         assertTrue(isCreatedButtonEnabled(), "Create Computed Attribute is Enabled");
-
         assertEquals(bucketingRows.size(), 3);
-        createAttributePage.addBucket();
+
+        CreateAttributePage.getInstance(browser).addBucket();
         assertEquals(bucketingRows.size(), 4);
-        createAttributePage.setBucket(0, "Poor", "120");
-        createAttributePage.setBucket(1, "Good", "200");
-        createAttributePage.setBucket(2, "Great", "250");
-        createAttributePage.setBucket(3, "Best");
-        createAttributePage.setComputedAttributeName(COMPUTED_ATTRIBUTE_NAME);
+        CreateAttributePage.getInstance(browser).setBucket(0, "Poor", "120")
+            .setBucket(1, "Good", "200")
+            .setBucket(2, "Great", "250")
+            .setBucket(3, "Best")
+            .setComputedAttributeName(COMPUTED_ATTRIBUTE_NAME);
         Screenshots.takeScreenshot(browser, "computed-attribute-creation-page", this.getClass());
     }
 

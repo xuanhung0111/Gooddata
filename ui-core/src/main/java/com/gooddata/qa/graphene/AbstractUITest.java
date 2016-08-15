@@ -136,9 +136,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(id = "p-objectPage")
     protected ObjectPropertiesPage objectDetailPage;
 
-    @FindBy(id = "p-objectPage")
-    protected CreateAttributePage createAttributePage;
-
     /**
      * ----- DISC fragments -----
      */

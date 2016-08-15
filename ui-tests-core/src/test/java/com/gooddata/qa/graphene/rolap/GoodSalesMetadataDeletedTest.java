@@ -611,12 +611,12 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
 
     private String createComputedAttributeUsing(AttributeInfo attribute) {
         String name = "CA " + System.currentTimeMillis();
-        initAttributePage();
-        attributePage.createAttribute();
-        createAttributePage.selectAttribute(attribute.name);
-        createAttributePage.selectMetric(WIN_RATE_METRIC);
-        createAttributePage.setComputedAttributeName(name);
-        createAttributePage.submit();
+        initAttributePage()
+            .createAttribute()
+            .selectAttribute(attribute.name)
+            .selectMetric(WIN_RATE_METRIC)
+            .setComputedAttributeName(name)
+            .submit();
         waitForElementVisible(By.className("s-attributeBucketName"), browser);
 
         return name;
