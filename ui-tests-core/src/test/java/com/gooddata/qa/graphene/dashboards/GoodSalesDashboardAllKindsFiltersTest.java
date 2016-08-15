@@ -187,7 +187,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
 
             initAttributePage();
             attributePage.initAttribute("Account")
-                .changeObjectName("Account Edit");
+                .changeName("Account Edit");
 
             initDashboardsPage().selectDashboard(TEST_DASHBOAD_FILTERS);
             assertEquals(getFilterWidget("account_edit").getTitle(), "ACCOUNT EDIT");
@@ -205,7 +205,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             dashboardsPage.deleteDashboard();
             initAttributePage();
             attributePage.initAttribute("Account Edit")
-                .changeObjectName("Account");
+                .changeName("Account");
         }
     }
 

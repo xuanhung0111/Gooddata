@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.fragments.manage;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static org.openqa.selenium.By.xpath;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -26,8 +25,7 @@ public class MetricDetailsPage extends ObjectPropertiesPage {
             By.cssSelector(".s-permissionSettingsDialog .s-btn-save_permissions");
 
     public static final MetricDetailsPage getInstance(SearchContext context) {
-        return Graphene.createPageFragment(MetricDetailsPage.class,
-                waitForElementVisible(xpath(ROOT_XPATH_LOCATOR), context));
+        return Graphene.createPageFragment(MetricDetailsPage.class, waitForElementVisible(LOCATOR, context));
     }
 
     public String getMAQL() {

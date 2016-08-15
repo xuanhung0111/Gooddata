@@ -3,9 +3,11 @@ package com.gooddata.qa.graphene.fragments.manage;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.clickElementByVisibleLocator;
 import static java.util.stream.Collectors.toList;
 import static java.lang.Integer.parseInt;
+import static java.util.Objects.isNull;
 
 import java.util.Collection;
 import java.util.Map;
@@ -21,25 +23,16 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.entity.variable.NumericVariable;
 import com.gooddata.qa.graphene.fragments.AbstractTable;
+import com.gooddata.qa.graphene.fragments.common.IpeEditor;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 
 public class VariableDetailPage extends ObjectPropertiesPage {
 
-    private static final By LOCATOR = By.cssSelector("#p-objectPage.s-displayed");
-
-    private static final By BY_VARIABLES_PAGE_LINK = By.cssSelector("#p-objectPage .interpolateProject");
-
-    private static final By BY_NAME_INPUT = By.cssSelector(".s-name-ipe-editor input");
-    private static final By BY_SAVE_NAME_BUTTON = By.cssSelector(".s-name-ipe-editor .s-ipeSaveButton");
-
     private static final By BY_DEFAULT_NUMERIC_VALUE_INPUT = By.cssSelector(".defaultValue input");
-
+    private static final By BY_EDIT_ATTRIBUTE_VALUES_BUTTON = By.className("s-btn-edit");
     private static final By BY_SAVE_CHANGES_BUTTON = By.cssSelector(".yui3-c-button-showInline.s-btn-save_changes");
 
-    @FindBy(className = "s-name-ipe-placeholder")
-    private WebElement nameTag;
-
-    @FindBy(className = "usersTable")
+    @FindBy(className = UserSpecificTable.CLASS_NAME)
     private UserSpecificTable userSpecificTable;
 
     public static VariableDetailPage getInstance(SearchContext searchContext) {
@@ -47,8 +40,9 @@ public class VariableDetailPage extends ObjectPropertiesPage {
     }
 
     public String createNumericVariable(NumericVariable variable) {
-        enterName(variable.getName())
-                .selectVariableType(VariableTypes.NUMERICAL_VARIABLE)
+        changeName(variable.getName());
+
+        selectVariableType(VariableTypes.NUMERICAL_VARIABLE)
                 .setDefaultNumericValue(variable.getDefaultNumber())
                 .setUserSpecificNumericValue(variable.getUserSpecificNumber())
                 .saveChange();
@@ -57,14 +51,19 @@ public class VariableDetailPage extends ObjectPropertiesPage {
     }
 
     public String createFilterVariable(AttributeVariable variable) {
-        enterName(variable.getName())
-                .selectVariableType(VariableTypes.FILTERED_VARIABLE)
+        changeName(variable.getName());
+
+        selectVariableType(VariableTypes.FILTERED_VARIABLE)
                 .selectAttribute(variable.getAttribute())
                 .selectDefaultAttributeValues(variable.getAttributeValues())
                 .selectUserSpecificAttributeValues(variable.getUserSpecificValues())
                 .saveChange();
 
         return getVariableUri();
+    }
+
+    public boolean canEditDefaultNumericValue() {
+        return isNull(waitForElementVisible(BY_DEFAULT_NUMERIC_VALUE_INPUT, getRoot()).getAttribute("disabled"));
     }
 
     public VariableDetailPage setDefaultNumericValue(int value) {
@@ -77,10 +76,41 @@ public class VariableDetailPage extends ObjectPropertiesPage {
         return this;
     }
 
-    public VariableDetailPage selectUserSpecificAttributeValues(String userProfile, Collection<String> values) {
-        waitForFragmentVisible(userSpecificTable)
-                .selectUserSpecificAttributeValues(userProfile, values);
+    public VariableDetailPage setUserSpecificNumericValue(String userProfileUri, int value) {
+        waitForFragmentVisible(userSpecificTable.setUserSpecificNumericValue(userProfileUri, value));
         return this;
+    }
+
+    public boolean canEditDefaultAttributeValues() {
+        return isElementVisible(BY_EDIT_ATTRIBUTE_VALUES_BUTTON, getRoot());
+    }
+
+    public SelectItemPopupPanel clickEditAttributeValuesButton() {
+        waitForElementVisible(BY_EDIT_ATTRIBUTE_VALUES_BUTTON, getRoot()).click();
+        return SelectItemPopupPanel.getInstance(browser);
+    }
+
+    public VariableDetailPage selectDefaultAttributeValues(Collection<String> values) {
+        if (values.isEmpty()) {
+            return this;
+        }
+
+        clickEditAttributeValuesButton()
+                .clearAllItems()
+                .searchAndSelectItems(values)
+                .submitPanel();
+
+        return this;
+    }
+
+    public VariableDetailPage selectUserSpecificAttributeValues(String userProfileUri, Collection<String> values) {
+        waitForFragmentVisible(userSpecificTable)
+                .selectUserSpecificAttributeValues(userProfileUri, values);
+        return this;
+    }
+
+    public boolean isUserSpecificTableDisplayed() {
+        return UserSpecificTable.isVisible(browser);
     }
 
     public VariableDetailPage saveChange() {
@@ -90,13 +120,14 @@ public class VariableDetailPage extends ObjectPropertiesPage {
     }
 
     public VariablesPage goToVariablesPage() {
-        waitForElementVisible(BY_VARIABLES_PAGE_LINK, getRoot()).click();
+        clickDataPageLink();
         return Graphene.createPageFragment(VariablesPage.class,
                 waitForElementVisible(By.cssSelector(VariablesPage.CSS_CLASS), browser));
     }
 
     public Collection<String> getDefaultAttributeValues() {
-        return Stream.of(waitForElementVisible(By.cssSelector(".filterAnswer .answer"), getRoot()).getText().split(","))
+        return Stream.of(waitForElementVisible(By.cssSelector(".filterAnswer .answer span"), getRoot())
+                        .getAttribute("title").split(","))
                 .map(value -> value.trim())
                 .collect(toList());
     }
@@ -113,17 +144,12 @@ public class VariableDetailPage extends ObjectPropertiesPage {
         return waitForFragmentVisible(userSpecificTable).getUserNumericValue(userProfileUri);
     }
 
-    private VariableDetailPage enterName(String name) {
-        if (!isElementPresent(BY_NAME_INPUT, browser)) {
-            waitForElementVisible(nameTag).click();
-        }
+    public boolean canSelectAttributeVariableType() {
+        return VariableTypes.FILTERED_VARIABLE.canSelect(browser);
+    }
 
-        final WebElement nameInput = waitForElementVisible(BY_NAME_INPUT, browser);
-        nameInput.clear();
-        nameInput.sendKeys(name);
-
-        waitForElementVisible(BY_SAVE_NAME_BUTTON, browser).click();
-        return this;
+    public boolean canSelectNumericVariableType() {
+        return VariableTypes.NUMERICAL_VARIABLE.canSelect(browser);
     }
 
     private VariableDetailPage selectVariableType(VariableTypes type) {
@@ -138,20 +164,6 @@ public class VariableDetailPage extends ObjectPropertiesPage {
 
         SelectItemPopupPanel.getInstance(browser)
                 .searchAndSelectItem(attribute)
-                .submitPanel();
-
-        return this;
-    }
-
-    private VariableDetailPage selectDefaultAttributeValues(Collection<String> values) {
-        if (values.isEmpty()) {
-            return this;
-        }
-
-        waitForElementVisible(By.className("s-btn-edit"), getRoot()).click();
-        SelectItemPopupPanel.getInstance(browser)
-                .clearAllItems()
-                .searchAndSelectItems(values)
                 .submitPanel();
 
         return this;
@@ -187,12 +199,17 @@ public class VariableDetailPage extends ObjectPropertiesPage {
 
     public static class UserSpecificTable extends AbstractTable {
 
-        private static final By BY_SET_NUMERIC_VALUE_BUTTON = By.className("s-btn-set");
-        private static final By BY_SET_NUMERIC_VALUE_INPUT = By.cssSelector(".s-btn-ipe-editor input");
-        private static final By BY_OK_BUTTON = By.cssSelector(".s-btn-ipe-editor .s-btn-ok");
+        public static final String CLASS_NAME = "usersTable";
+
+        private static final By BY_BUTTON_CHOOSE = By.className("s-btn-choose");
+        private static final By BY_ATTRIBUTE_VALUES = By.className("listVal");
+
+        private static boolean isVisible(SearchContext searchContext) {
+            return isElementVisible(By.className(CLASS_NAME), searchContext);
+        }
 
         private UserSpecificTable selectUserSpecificAttributeValues(String userProfileUri, Collection<String> values) {
-            waitForElementVisible(By.className("s-btn-choose"), getUserRow(userProfileUri)).click();
+            clickElementByVisibleLocator(getUserRow(userProfileUri), BY_BUTTON_CHOOSE, BY_ATTRIBUTE_VALUES);
 
             SelectItemPopupPanel.getInstance(browser)
                     .clearAllItems()
@@ -203,16 +220,14 @@ public class VariableDetailPage extends ObjectPropertiesPage {
         }
 
         private UserSpecificTable setUserSpecificNumericValue(String userProfileUri, int value) {
-            waitForElementVisible(BY_SET_NUMERIC_VALUE_BUTTON, getUserRow(userProfileUri)).click();
-            waitForElementVisible(BY_SET_NUMERIC_VALUE_INPUT, browser).sendKeys(String.valueOf(value));
-            waitForElementVisible(BY_OK_BUTTON, browser).click();
+            waitForElementVisible(By.className("s-btn-set"), getUserRow(userProfileUri)).click();
+            IpeEditor.getInstance(browser).setText(String.valueOf(value));
 
             return this;
         }
 
         private Collection<String> getUserAttributeValues(String userProfileUri) {
-            return Stream.of(waitForElementVisible(By.cssSelector(".listVal"),
-                            getUserRow(userProfileUri)).getText().split(","))
+            return Stream.of(waitForElementVisible(BY_ATTRIBUTE_VALUES, getUserRow(userProfileUri)).getText().split(","))
                     .map(value -> value.trim())
                     .collect(toList());
         }
@@ -241,6 +256,10 @@ public class VariableDetailPage extends ObjectPropertiesPage {
 
         private By getLocator() {
             return By.id(locator);
+        }
+
+        private boolean canSelect(SearchContext searchContext) {
+            return isNull(waitForElementVisible(getLocator(), searchContext).getAttribute("disabled"));
         }
     }
 }

@@ -11,8 +11,10 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -92,5 +94,14 @@ public final class ElementUtils {
 
     public static String getBubbleMessage(WebDriver browser) {
         return waitForElementVisible(BY_BUBBLE_CONTENT, browser).getText();
+    }
+
+    public static void clickElementByVisibleLocator(SearchContext searchContext, By... bySelectors) {
+        Stream.of(bySelectors)
+                .filter(by -> isElementVisible(by, searchContext))
+                .map(by -> waitForElementVisible(by, searchContext))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("No visible element found"))
+                .click();
     }
 }

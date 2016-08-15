@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.fragments.manage;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForObjectPageLoaded;
-import static org.openqa.selenium.By.xpath;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -36,8 +35,7 @@ public class FactDetailPage extends ObjectPropertiesPage {
             "//div[@id = 'objectUsedInContainer']/a[text() = '${metricName}']";
 
     public static final FactDetailPage getInstance(SearchContext context) {
-        return Graphene.createPageFragment(FactDetailPage.class,
-                waitForElementVisible(xpath(ROOT_XPATH_LOCATOR), context));
+        return Graphene.createPageFragment(FactDetailPage.class, waitForElementVisible(LOCATOR, context));
     }
 
     public String createSimpleMetric(SimpleMetricTypes metricType, String factName) {

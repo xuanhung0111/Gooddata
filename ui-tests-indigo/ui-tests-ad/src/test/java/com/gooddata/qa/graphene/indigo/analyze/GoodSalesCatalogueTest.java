@@ -101,11 +101,11 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
 
         initAttributePage();
         waitForFragmentVisible(attributePage).initAttribute(ATTR_IS_WON)
-            .changeObjectName(xssAttribute);
+            .changeName(xssAttribute);
 
-        initMetricPage();
-        waitForFragmentVisible(metricPage).openMetricDetailPage(METRIC_PERCENT_OF_GOAL)
-            .changeObjectName(xssMetric);
+        initMetricPage()
+                .openMetricDetailPage(METRIC_PERCENT_OF_GOAL)
+                .changeName(xssMetric);
 
         try {
             initAnalysePage();
@@ -141,11 +141,11 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
         } finally {
             initAttributePage();
             waitForFragmentVisible(attributePage).initAttribute(xssAttribute)
-                .changeObjectName(ATTR_IS_WON);
+                .changeName(ATTR_IS_WON);
 
-            initMetricPage();
-            waitForFragmentVisible(metricPage).openMetricDetailPage(xssMetric)
-                .changeObjectName(METRIC_PERCENT_OF_GOAL);
+            initMetricPage()
+                    .openMetricDetailPage(xssMetric)
+                    .changeName(METRIC_PERCENT_OF_GOAL);
         }
     }
 
