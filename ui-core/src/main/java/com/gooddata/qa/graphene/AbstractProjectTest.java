@@ -19,6 +19,8 @@ import org.testng.annotations.Test;
 
 import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
+import com.gooddata.md.report.Report;
+import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.project.Project;
 import com.gooddata.project.ProjectDriver;
 import com.gooddata.qa.graphene.common.StartPageContext;
@@ -263,6 +265,11 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     protected Metric createMetric(String name, String expression, String format) {
         return getMdService().createObj(getProject(), new Metric(name, expression, format));
+    }
+
+    protected Report createReport(ReportDefinition defination) {
+        defination = getMdService().createObj(getProject(), defination);
+        return getMdService().createObj(getProject(), new Report(defination.getTitle(), defination));
     }
 
     public void setupMaql(String maqlPath) throws JSONException, IOException {

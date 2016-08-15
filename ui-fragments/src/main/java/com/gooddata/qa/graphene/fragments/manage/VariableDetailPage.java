@@ -160,6 +160,7 @@ public class VariableDetailPage extends AbstractFragment {
 
         waitForElementVisible(By.className("s-btn-edit"), getRoot()).click();
         SelectItemPopupPanel.getInstance(browser)
+                .clearAllItems()
                 .searchAndSelectItems(values)
                 .submitPanel();
 
@@ -204,6 +205,7 @@ public class VariableDetailPage extends AbstractFragment {
             waitForElementVisible(By.className("s-btn-choose"), getUserRow(userProfileUri)).click();
 
             SelectItemPopupPanel.getInstance(browser)
+                    .clearAllItems()
                     .searchAndSelectItems(values)
                     .submitPanel();
 

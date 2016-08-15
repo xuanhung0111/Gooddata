@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.flow;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,6 +11,7 @@ import com.gooddata.qa.graphene.dashboards.GoodSalesCascadingFilterTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesConnectingFilterTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardAllKindsFiltersTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardTest;
+import com.gooddata.qa.graphene.dashboards.GoodSalesDefaultFilterMultipleChoiceTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesFilterDropdownAttributeValueTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesFilterGroupTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesAdvancedConnectingFilterTest;
@@ -51,7 +53,8 @@ public class UITestsRegistry {
                     GoodSalesFilterGroupTest.class,
                     DashboardFilterVisualTest.class,
                     DashboardSavedFiltersTest.class,
-                    GoodSalesAdvancedConnectingFilterTest.class
+                    GoodSalesAdvancedConnectingFilterTest.class,
+                    GoodSalesDefaultFilterMultipleChoiceTest.class
                 ));
             }
         }

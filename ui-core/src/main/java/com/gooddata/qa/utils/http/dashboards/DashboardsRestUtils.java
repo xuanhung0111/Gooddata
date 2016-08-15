@@ -38,6 +38,7 @@ public final class DashboardsRestUtils {
     private static final String OBJ_LINK = "/gdc/md/%s/obj/";
     private static final String DASHBOARD_EDIT_MODE_LINK = "/gdc/md/%s/obj/%s?mode=edit";
     private static final String VARIABLE_LINK = "/gdc/md/%s/variables/item";
+    private static final String GET_VARIABLE_LINK = "/gdc/md/%s/query/prompts";
 
     private static final Supplier<String> MUF_OBJ =  () -> {
         try {
@@ -237,6 +238,21 @@ public final class DashboardsRestUtils {
                 }}.toString()));
 
         return variableUri;
+    }
+
+    public static String getVariableUri(RestApiClient restApiClient, String projectId, String title)
+            throws JSONException, IOException {
+        JSONArray variables = getJsonObject(restApiClient, format(GET_VARIABLE_LINK, projectId))
+                .getJSONObject("query")
+                .getJSONArray("entries");
+
+        for (int i = 0; i < variables.length(); i++) {
+            if (title.equals(variables.getJSONObject(i).getString("title"))) {
+                return variables.getJSONObject(i).getString("link");
+            }
+        }
+
+        throw new RuntimeException("No variable matches with title: " + title);
     }
 
     /**
