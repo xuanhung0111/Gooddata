@@ -53,7 +53,7 @@ public class GoodSalesAdvanceRangeFilterReportTest extends GoodSalesAbstractTest
         initVariablePage();
         variablePage.createVariable(new AttributeVariable(VARIABLE_NAME)
                 .withAttribute(ATTR_STAGE_NAME)
-                .withAttributeElements("Interest", "Discovery", "Short List", "Negotiation"));
+                .withAttributeValues("Interest", "Discovery", "Short List", "Negotiation"));
     }
 
     @Test(dependsOnMethods = "createReport")

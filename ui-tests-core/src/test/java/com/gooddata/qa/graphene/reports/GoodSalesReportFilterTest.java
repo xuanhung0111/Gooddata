@@ -41,7 +41,7 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
         initVariablePage();
         variablePage.createVariable(new AttributeVariable(VARIABLE_NAME)
                 .withAttribute("Stage Name")
-                .withAttributeElements("Interest", "Discovery", "Short List", "Negotiation"));
+                .withAttributeValues("Interest", "Discovery", "Short List", "Negotiation"));
     }
 
     @Test(dependsOnMethods = {"createReportTest"})

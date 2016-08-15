@@ -1,10 +1,9 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForObjectPageLoaded;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -15,67 +14,38 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class VariablesPage extends AbstractFragment {
 
+    public static final String CSS_CLASS = "#p-dataPage.s-displayed";
+
     @FindBy(css = ".s-btn-create_variable")
     private WebElement createVariableButton;
-
-    @FindBy(xpath = "//div[@id='p-objectPage' and contains(@class,'s-displayed')]")
-    protected VariableDetailPage variableDetailPage;
 
     @FindBy(id = "variablesTable")
     private ObjectsTable variablesTable;
 
-    public String createVariable(AbstractVariable var) {
+    public String createVariable(AbstractVariable variable) {
         waitForElementVisible(createVariableButton).click();
-        waitForObjectPageLoaded(browser);
-        String variableDetailsWindowHandle = browser.getWindowHandle();
-        browser.switchTo().window(variableDetailsWindowHandle);
-        String uri = "";
 
-        String varName = var.getName();
-        if (var instanceof AttributeVariable) {
-            AttributeVariable attrVar = (AttributeVariable) var;
-
-            variableDetailPage.createFilterVariable(attrVar);
-            openVariableFromList(varName);
-            uri = getUri();
-            variableDetailPage.verifyAttributeVariable(attrVar);
-
-        } else if (var instanceof NumericVariable) {
-            NumericVariable numVar = (NumericVariable) var;
-
-            variableDetailPage.createNumericVariable(numVar);
-            openVariableFromList(varName);
-            if (numVar.getUserNumber() != Integer.MAX_VALUE) { 
-                variableDetailPage.setUserValueNumericVariable(numVar.getUserRole(), numVar.getUserNumber());
-                openVariableFromList(varName);
-            }
-            uri = getUri();
-            variableDetailPage.verifyNumericalVariable(numVar);
-        }
-
-        return uri;
+        if (variable instanceof AttributeVariable) 
+            return getVariableDetailPage().createFilterVariable((AttributeVariable) variable);
+        return getVariableDetailPage().createNumericVariable((NumericVariable) variable);
     }
 
     public VariableDetailPage openVariableFromList(String variableName) {
-        waitForDataPageLoaded(browser);
-        waitForFragmentVisible(variablesTable);
-        variablesTable.selectObject(variableName);
-        waitForObjectPageLoaded(browser);
-        return waitForFragmentVisible(variableDetailPage);
+        waitForFragmentVisible(variablesTable).selectObject(variableName);
+        return getVariableDetailPage();
     }
 
-    public boolean isVariableVisible(String variableName) {
-        waitForDataPageLoaded(browser);
-        waitForFragmentVisible(variablesTable);
-        return variablesTable.getAllItems().contains(variableName);
+    public boolean hasVariable(final String variableName) {
+        return waitForFragmentVisible(variablesTable)
+                .getRows()
+                .stream()
+                .map(r -> r.findElement(By.className("title")))
+                .filter(e -> variableName.equals(e.getText()))
+                .findFirst()
+                .isPresent();
     }
 
-    private String getUri() {
-        for (String part : browser.getCurrentUrl().split("\\|")) {
-            if (part.startsWith("/gdc/md/")) {
-                return part;
-            }
-        }
-        return "";
+    private VariableDetailPage getVariableDetailPage() {
+        return VariableDetailPage.getInstance(browser);
     }
 }

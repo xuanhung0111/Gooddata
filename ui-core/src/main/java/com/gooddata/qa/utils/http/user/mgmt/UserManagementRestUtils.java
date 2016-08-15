@@ -201,6 +201,11 @@ public final class UserManagementRestUtils {
         }
     }
 
+    public static String getUserProfileUri(final RestApiClient restApiClient, final String userDomain,
+            final String email) throws ParseException, JSONException, IOException {
+        return getUserProfileByEmail(restApiClient, userDomain, email).getJSONObject("links").getString("self");
+    }
+
     /**
      * Update first name of current user
      * 

@@ -1,34 +1,23 @@
 package com.gooddata.qa.graphene.entity.variable;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableList;
+
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AttributeVariable extends AbstractVariable {
 
     private String attribute;
-    private List<String> elements;
-    private boolean userSpecificValues;
+    private List<String> attributeValues = new ArrayList<>();
+    private Map<String, Collection<String>> userSpecificValues = new HashMap<>();
 
     public AttributeVariable(String name) {
         super(name);
-        elements = new ArrayList<String>();
-        userSpecificValues = false;
-    }
-
-    public AttributeVariable withUserSpecificValues() {
-        userSpecificValues = true;
-        return this;
-    }
-
-    public AttributeVariable withAttributeElements(String... elements) {
-        this.elements.addAll(Arrays.asList(elements));
-        return this;
-    }
-
-    public AttributeVariable withAttributeElements(List<String> elements) {
-        this.elements.addAll(elements);
-        return this;
     }
 
     public AttributeVariable withAttribute(String attribute) {
@@ -36,15 +25,30 @@ public class AttributeVariable extends AbstractVariable {
         return this;
     }
 
+    public AttributeVariable withAttributeValues(String... values) {
+        this.attributeValues.addAll(asList(values));
+        return this;
+    }
+
+    public AttributeVariable withAttributeValues(Collection<String> values) {
+        this.attributeValues.addAll(values);
+        return this;
+    }
+
+    public AttributeVariable withUserSpecificValues(String userProfileUri, Collection<String> specificValues) {
+        this.userSpecificValues.put(userProfileUri, specificValues);
+        return this;
+    }
+
     public String getAttribute() {
         return attribute;
     }
 
-    public List<String> getAttributeElements() {
-        return elements;
+    public List<String> getAttributeValues() {
+        return unmodifiableList(attributeValues);
     }
 
-    public boolean isUserSpecificValues() {
-        return userSpecificValues;
+    public Map<String, Collection<String>> getUserSpecificValues() {
+        return unmodifiableMap(userSpecificValues);
     }
 }

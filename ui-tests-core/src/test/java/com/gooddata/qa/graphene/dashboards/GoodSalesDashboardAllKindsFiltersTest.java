@@ -42,6 +42,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.Das
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.AttributeFilterPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
+import com.gooddata.qa.graphene.fragments.manage.VariableDetailPage;
 import com.gooddata.qa.graphene.fragments.reports.report.AbstractReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.CssUtils;
@@ -210,12 +211,17 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
 
     @Test(dependsOnGroups = {"createProject"})
     public void createVariables() {
-        initVariablePage();
-        variablePage.createVariable(new AttributeVariable("FStageName").withAttribute(ATTR_STAGE_NAME));
-        variablePage.createVariable(new AttributeVariable("FQuarter/Year")
-                .withAttribute("Quarter/Year (Snapshot)").withAttributeElements("Q1/2012", "Q2/2012", "Q3/2012",
-                        "Q4/2012"));
-        nVariableUri = variablePage.createVariable(new NumericVariable("NVariable").withDefaultNumber(123456));
+        initVariablePage().createVariable(new AttributeVariable("FStageName").withAttribute(ATTR_STAGE_NAME));
+
+        VariableDetailPage.getInstance(browser)
+                .goToVariablesPage()
+                .createVariable(new AttributeVariable("FQuarter/Year")
+                        .withAttribute("Quarter/Year (Snapshot)")
+                        .withAttributeValues("Q1/2012", "Q2/2012", "Q3/2012", "Q4/2012"));
+
+        nVariableUri = VariableDetailPage.getInstance(browser)
+                .goToVariablesPage()
+                .createVariable(new NumericVariable("NVariable").withDefaultNumber(123456));
     }
 
     @Test(dependsOnMethods = {"createVariables"})
@@ -292,9 +298,10 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
 
     @Test(dependsOnMethods = {"createVariables"})
     public void testReportWithNumericalVariableInMetricSentence() {
-        initVariablePage();
-        variablePage.openVariableFromList("NVariable");
-        variableDetailPage.setDefaultValue(2011);
+        initVariablePage()
+                .openVariableFromList("NVariable")
+                .setDefaultNumericValue(2011)
+                .saveChange();
 
         GoodData goodDataClient = getGoodDataClient();
         Project project = goodDataClient.getProjectService().getProjectById(testParams.getProjectId());

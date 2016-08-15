@@ -13,11 +13,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileUri;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
+import org.apache.http.ParseException;
+import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -41,6 +45,7 @@ import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.fragments.reports.filter.AttributeFilterFragment;
 import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter.FilterFragment;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
+import com.gooddata.qa.utils.http.RestApiClient;
 import com.google.common.collect.Lists;
 
 public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
@@ -64,7 +69,7 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
         initVariablePage();
         variablePage.createVariable(new AttributeVariable(VARIABLE_NAME)
                 .withAttribute(ATTR_STAGE_NAME)
-                .withAttributeElements(listAttributeValues));
+                .withAttributeValues(listAttributeValues));
     }
 
     @Test(dependsOnGroups = "createProject")
@@ -127,7 +132,7 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = "addNewVariable")
-    public void addPromptFilter() {
+    public void addPromptFilter() throws ParseException, JSONException, IOException {
         String reportName = REPORT_NAME + System.currentTimeMillis();
 
         initReport(reportName)
@@ -138,10 +143,14 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
         reportPage.saveReport();
         checkRedBar(browser);
 
-        initVariablePage();
+        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
         listAttributeValues.add("Closed Won");
-        variablePage.openVariableFromList(VARIABLE_NAME)
-                .selectUserSpecificValues(listAttributeValues)
+
+        initVariablePage()
+                .openVariableFromList(VARIABLE_NAME)
+                .selectUserSpecificAttributeValues(
+                        getUserProfileUri(restApiClient, testParams.getUserDomain(), testParams.getUser()),
+                        listAttributeValues)
                 .saveChange();
 
         initReportsPage();
