@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.fragments.profile.UserProfilePage.USER_PR
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.openqa.selenium.By.id;
 
 import java.io.IOException;
 import java.util.List;
@@ -16,6 +17,7 @@ import javax.mail.MessagingException;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -79,6 +81,10 @@ public class ProjectAndUsersPage extends AbstractFragment {
             .cssSelector(".yui3-d-modaldialog:not(.gdc-hidden) .s-btn-cancel");
     private static final By EMAILING_DASHBOARDS_TAB_LOCATOR = By.cssSelector(".s-menu-schedulePage");
 
+    public static final ProjectAndUsersPage getInstance(SearchContext context) {
+        return Graphene.createPageFragment(ProjectAndUsersPage.class, waitForElementVisible(id("p-projectPage"), context));
+    }
+
     public ProjectsPage deteleProject() {
         waitForElementVisible(deleteProjectButton).click();
         waitForElementVisible(deleteProjectDialogButton).click();
@@ -97,12 +103,13 @@ public class ProjectAndUsersPage extends AbstractFragment {
         waitForElementVisible(BY_LEAVE_PROJECT_DIALOG_BUTTON, browser).click();
     }
 
-    public void renameProject(String name) {
+    public ProjectAndUsersPage renameProject(String name) {
         waitForElementVisible(projectNameTag).click();
         WebElement projectNameInput = waitForElementVisible(PROJECT_NAME_INPUT_LOCATOR, browser);
         projectNameInput.clear();
         projectNameInput.sendKeys(name);
         waitForElementVisible(SAVE_BUTTON_LOCATOR, browser).click();
+        return this;
     }
 
     public String getProjectName() {

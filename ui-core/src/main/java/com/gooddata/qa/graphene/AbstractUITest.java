@@ -91,9 +91,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(id = "p-analysisPage")
     protected ReportPage reportPage;
 
-    @FindBy(id = "p-projectPage")
-    protected ProjectAndUsersPage projectAndUsersPage;
-
     @FindBy(id = "p-emailSchedulePage")
     protected EmailSchedulePage emailSchedulesPage;
 
@@ -309,9 +306,8 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public void deleteProject(String projectId) {
         openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|projectPage");
         waitForProjectsAndUsersPageLoaded(browser);
-        waitForElementVisible(projectAndUsersPage.getRoot());
         System.out.println("Going to delete project: " + projectId);
-        projectAndUsersPage.deteleProject();
+        ProjectAndUsersPage.getInstance(browser).deteleProject();
         System.out.println("Deleted project: " + projectId);
     }
 
@@ -568,7 +564,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|projectPage|");
         waitForProjectsAndUsersPageLoaded(browser);
 
-        return projectAndUsersPage;
+        return ProjectAndUsersPage.getInstance(browser);
     }
 
     public UserManagementPage initUserManagementPage() {

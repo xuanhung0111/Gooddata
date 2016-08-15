@@ -110,9 +110,8 @@ public class ProjectSwitchTest extends DashboardWithWidgetsTest {
 
         testParams.setProjectId(newProjectId);
         try {
-            initProjectsAndUsersPage();
-
-            projectAndUsersPage.deteleProject();
+            initProjectsAndUsersPage()
+                .deteleProject();
             waitForProjectsPageLoaded(browser);
 
         } finally {

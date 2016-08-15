@@ -14,6 +14,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
 
 public class ManageUserTest extends AbstractProjectTest {
 
@@ -29,13 +30,12 @@ public class ManageUserTest extends AbstractProjectTest {
     public void disableAddedUser() throws JSONException {
         logoutAndLoginAs(true, UserRoles.ADMIN);
 
-        initProjectsAndUsersPage();
-        projectAndUsersPage.disableUser(testParams.getViewerUser());
+        initProjectsAndUsersPage().disableUser(testParams.getViewerUser());
 
-        assertFalse(projectAndUsersPage.isUserDisplayedInList(testParams.getViewerUser()),
+        assertFalse(ProjectAndUsersPage.getInstance(browser).isUserDisplayedInList(testParams.getViewerUser()),
                 testParams.getViewerUser() + " has not been deactivated");
 
-        assertTrue(projectAndUsersPage.openDeactivatedUserTab().isUserDisplayedInList(testParams.getViewerUser()),
+        assertTrue(ProjectAndUsersPage.getInstance(browser).openDeactivatedUserTab().isUserDisplayedInList(testParams.getViewerUser()),
                 testParams.getViewerUser() + " does not exist in deactive tab");
 
         assertTrue(accessProjectWithAnotherLogin(UserRoles.VIEWER, 
@@ -47,20 +47,18 @@ public class ManageUserTest extends AbstractProjectTest {
     public void enableAddedUser() throws JSONException {
         logoutAndLoginAs(true, UserRoles.ADMIN);
 
-        initProjectsAndUsersPage();
-        projectAndUsersPage.enableUser(testParams.getViewerUser());
+        initProjectsAndUsersPage().enableUser(testParams.getViewerUser());
 
-        assertFalse(projectAndUsersPage.isUserDisplayedInList(testParams.getViewerUser()),
+        assertFalse(ProjectAndUsersPage.getInstance(browser).isUserDisplayedInList(testParams.getViewerUser()),
                 testParams.getViewerUser() + " has not been activated");
 
-        assertTrue(projectAndUsersPage.openActiveUserTab().isUserDisplayedInList(testParams.getViewerUser()),
+        assertTrue(ProjectAndUsersPage.getInstance(browser).openActiveUserTab().isUserDisplayedInList(testParams.getViewerUser()),
                 testParams.getViewerUser() + " does not exist in active tab");
         
         assertTrue(accessProjectWithAnotherLogin(UserRoles.VIEWER, "Viewer-can-access-the-project-again", true)
                 .contains(testParams.getProjectId()));
 
-        initProjectsAndUsersPage();
-        assertFalse(projectAndUsersPage.openActiveUserTab()
+        assertFalse(initProjectsAndUsersPage().openActiveUserTab()
                 .isDeactivePermissionAvailable(testParams.getViewerUser()), "Deactive button is displayed");
     }
 

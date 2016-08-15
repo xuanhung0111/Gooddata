@@ -148,8 +148,8 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement", "sanity" })
     public void accessFromProjectsAndUsersPage() {
-        initProjectsAndUsersPage();
-        projectAndUsersPage.openUserManagementPage();
+        initProjectsAndUsersPage()
+            .openUserManagementPage();
         waitForFragmentVisible(userManagementPage).waitForUsersContentLoaded();
     }
 

@@ -23,6 +23,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
+import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
 
 public class ProjectSwitchingTest extends AbstractProjectTest {
 
@@ -93,13 +94,10 @@ public class ProjectSwitchingTest extends AbstractProjectTest {
             logout();
             signIn(true, UserRoles.ADMIN);
 
-            initProjectsAndUsersPage();
-            projectAndUsersPage.disableUser(testParams.getEditorUser());
-            assertFalse(projectAndUsersPage.isUserDisplayedInList(testParams.getEditorUser()),
+            assertFalse(initProjectsAndUsersPage().disableUser(testParams.getEditorUser()).isUserDisplayedInList(testParams.getEditorUser()),
                     "User is not disabled and still displays in Active tab");
 
-            projectAndUsersPage.openDeactivatedUserTab();
-            assertTrue(projectAndUsersPage.isUserDisplayedInList(testParams.getEditorUser()),
+            assertTrue(ProjectAndUsersPage.getInstance(browser).openDeactivatedUserTab().isUserDisplayedInList(testParams.getEditorUser()),
                     "User does not display in Deactivated tab after disabled");
 
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.EDITOR);
