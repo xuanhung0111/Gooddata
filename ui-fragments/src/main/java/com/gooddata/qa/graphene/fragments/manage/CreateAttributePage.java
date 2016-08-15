@@ -1,11 +1,14 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertEquals;
 
 import java.util.List;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -58,31 +61,40 @@ public class CreateAttributePage extends AbstractFragment {
 
     private static final By attributeBucketRangeLocator = By.cssSelector(".s-attributeBucketRange");
 
-    public void selectAttribute(String name) {
-        waitForElementVisible(attributeButton).click();
-        attributeDropDown.searchAndSelectItem(name);
+    public static final CreateAttributePage getInstance(SearchContext context) {
+        return Graphene.createPageFragment(CreateAttributePage.class, waitForElementVisible(id("p-objectPage"), context));
     }
 
-    public void selectMetric(String name) {
+    public CreateAttributePage selectAttribute(String name) {
+        waitForElementVisible(attributeButton).click();
+        attributeDropDown.searchAndSelectItem(name);
+        return this;
+    }
+
+    public CreateAttributePage selectMetric(String name) {
         waitForElementVisible(metricButton).click();
         metricDropDown.searchAndSelectItem(name);
+        return this;
     }
 
     public void addBucket() {
         addBucketButton.click();
     }
 
-    public void setBucket(int index, String name, String value) {
+    public CreateAttributePage setBucket(int index, String name, String value) {
         setBucketName(index, name);
         setBucketTo(index, value);
+        return this;
     }
 
-    public void setBucket(int index, String name) {
+    public CreateAttributePage setBucket(int index, String name) {
         setBucketName(index, name);
+        return this;
     }
 
-    public void setComputedAttributeName(String name) {
+    public CreateAttributePage setComputedAttributeName(String name) {
         waitForElementVisible(computedAttributeName).sendKeys(name);
+        return this;
     }
 
     public void submit() {

@@ -61,12 +61,10 @@ public class AttributePage extends AbstractFragment {
         return waitForFragmentVisible(attributeDetailPage);
     }
 
-    public void createAttribute() {
+    public CreateAttributePage createAttribute() {
         waitForElementVisible(createAttributeButton).click();
         waitForObjectPageLoaded(browser);
-        String computedAttributeWindowHandle = browser.getWindowHandle();
-        browser.switchTo().window(computedAttributeWindowHandle);
-        waitForElementVisible(createAttributePage.getRoot());
+        return CreateAttributePage.getInstance(browser);
     }
 
     public void renameAttribute(String attributeName, String newName) {
