@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -38,6 +40,10 @@ public class ObjectsTable extends AbstractTable {
     @FindBy(css = "th.col-author")
     private WebElement tableHeaderAuthor;
 
+    public static final ObjectsTable getInstance(By rootLocator, SearchContext context) {
+        return Graphene.createPageFragment(ObjectsTable.class, waitForElementVisible(rootLocator, context));
+    }
+
     public boolean selectObject(String objectName) {
         for (int i = 0; i < getNumberOfRows(); i++) {
             WebElement row = waitForElementVisible(rows.get(i));
@@ -59,7 +65,7 @@ public class ObjectsTable extends AbstractTable {
         return ret;
     }
 
-    public void assertCheckboxes(boolean checkSelection, boolean expectedSelection) {
+    public ObjectsTable assertCheckboxes(boolean checkSelection, boolean expectedSelection) {
         List<WebElement> tableRows = getRows();
         for (WebElement tableRow : tableRows) {
             assertTrue(tableRow.findElement(BY_ROW_CHECKBOX).isDisplayed());
@@ -68,9 +74,10 @@ public class ObjectsTable extends AbstractTable {
                         expectedSelection);
             }
         }
+        return this;
     }
 
-    public void checkOnCheckboxes(List<String> objectTitles) {
+    public ObjectsTable checkOnCheckboxes(List<String> objectTitles) {
         List<WebElement> tableRows = getRows();
         for (String objectName : objectTitles) {
             for (int i = 0; i < tableRows.size(); i++) {
@@ -84,12 +91,14 @@ public class ObjectsTable extends AbstractTable {
                 }
             }
         }
+        return this;
     }
 
-    public void assertTableHeader() {
+    public ObjectsTable assertTableHeader() {
         assertTrue(tableHeaderTitle.isDisplayed());
         assertTrue(tableHeaderTime.isDisplayed());
         assertTrue(tableHeaderAuthor.isDisplayed());
+        return this;
     }
 
     public void sortObjectsTable(String sortType, List<String> defaultObjectsList) {
