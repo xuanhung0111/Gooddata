@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.flow;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 
 import java.util.HashSet;
 import java.util.Set;

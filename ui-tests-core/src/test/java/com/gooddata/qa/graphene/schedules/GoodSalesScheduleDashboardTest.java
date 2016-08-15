@@ -43,6 +43,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbedDashboardDialog;
+import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
@@ -256,9 +257,8 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         createDashboardSchedule(SCHEDULE_WITH_MORE_THAN_10_RECIPIENTS, recipients,
                 "Maximum of ten recipients allowed. Remove some recipients.");
 
-        initEmailSchedulesPage();
         String schedule = "Public schedule test";
-        emailSchedulesPage.scheduleNewDahboardEmail(testParams.getUser(), schedule,
+        initEmailSchedulesPage().scheduleNewDahboardEmail(testParams.getUser(), schedule,
                 "Scheduled email test - dashboard.", "Outlook");
     }
 
@@ -268,11 +268,11 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         String userUri = getGoodDataClient().getAccountService().getCurrent().getUri();
         refreshSchedulesPage();
         assertDashboardScheduleInfo(SCHEDULE_WITHOUT_RECIPIENTS, 
-        		userUri, Collections.<String>emptyList());
+                userUri, Collections.<String>emptyList());
         assertDashboardScheduleInfo(SCHEDULE_WITH_INTERNAL_RECIPIENTS,
-        		userUri, asList(testParams.getEditorUser(), testParams.getViewerUser()));
+                userUri, asList(testParams.getEditorUser(), testParams.getViewerUser()));
         assertDashboardScheduleInfo(SCHEDULE_WITH_EXTERNAL_RECIPIENTS,
-        		userUri, asList(imapUser));
+                userUri, asList(imapUser));
     }
 
     @Test(dependsOnMethods = {"preparePublicAndPrivateSchedules"})
@@ -282,11 +282,10 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
             disableDashboardScheduleRecipientsFlag();
 
             initEmailSchedulesPage();
-            refreshSchedulesPage();
-            assertFalse(emailSchedulesPage.isBccColumnPresent(), "Bcc columns were not displayed as expected!");
-            assertTrue(emailSchedulesPage.isPrivateSchedulesTableVisible(),
+            assertFalse(refreshSchedulesPage().isBccColumnPresent(), "Bcc columns were not displayed as expected!");
+            assertTrue(EmailSchedulePage.getInstance(browser).isPrivateSchedulesTableVisible(),
                     "Private Schedules Created on Dashboard table was not displayed!");
-            assertTrue(emailSchedulesPage.isGlobalSchedulePresent(PUBLIC_SCHEDULE),
+            assertTrue(EmailSchedulePage.getInstance(browser).isGlobalSchedulePresent(PUBLIC_SCHEDULE),
                     "Public schedule was not displayed!");
 
             enableHideDashboardScheduleFlag();
@@ -323,12 +322,11 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
 
         try {
             loginAs(UserRoles.EDITOR);
-            initEmailSchedulesPage();
-            assertTrue(emailSchedulesPage.isPrivateSchedulePresent(publicDashboard), 
+            assertTrue(initEmailSchedulesPage().isPrivateSchedulePresent(publicDashboard), 
                     "Schedule of public dashboard " + publicDashboard + " was not present!");
-            assertTrue(emailSchedulesPage.isPrivateSchedulePresent(privateDashboard),
+            assertTrue(EmailSchedulePage.getInstance(browser).isPrivateSchedulePresent(privateDashboard),
                     "Schedule of private dashboard " + privateDashboard + " was not present!");
-            assertTrue(emailSchedulesPage.isPrivateSchedulesTableVisible(),
+            assertTrue(EmailSchedulePage.getInstance(browser).isPrivateSchedulesTableVisible(),
                     "Private schedule table was not present!");
         } finally {
             loginAs(UserRoles.ADMIN);
@@ -370,8 +368,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
             signIn(true, UserRoles.ADMIN);
             UserManagementRestUtils.deleteUserByUri(restApiClient, userBUri);
 
-            initEmailSchedulesPage();
-            assertFalse(emailSchedulesPage.isPrivateSchedulePresent(scheduleUserB),
+            assertFalse(initEmailSchedulesPage().isPrivateSchedulePresent(scheduleUserB),
                     "Schedule of deleted user was not hidden.");
         } finally {
             loginAs(UserRoles.ADMIN);
@@ -382,17 +379,16 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
 
     private void checkOnlyPublicScheduleVisible() {
         initEmailSchedulesPage();
-        refreshSchedulesPage();
-        assertTrue(emailSchedulesPage.isGlobalSchedulePresent(PUBLIC_SCHEDULE), "Public schedule was displayed!");
+        assertTrue(refreshSchedulesPage().isGlobalSchedulePresent(PUBLIC_SCHEDULE), "Public schedule was displayed!");
 
-        assertFalse(emailSchedulesPage.isPrivateSchedulesTableVisible(),
+        assertFalse(EmailSchedulePage.getInstance(browser).isPrivateSchedulesTableVisible(),
                 "Private Schedules Created on Dashboard table was not hidden");
 
-        assertFalse(emailSchedulesPage.isGlobalSchedulePresent(SCHEDULE_WITHOUT_RECIPIENTS),
+        assertFalse(EmailSchedulePage.getInstance(browser).isGlobalSchedulePresent(SCHEDULE_WITHOUT_RECIPIENTS),
                 "Private Schedule" + SCHEDULE_WITHOUT_RECIPIENTS + " was not displayed as expected!");
-        assertFalse(emailSchedulesPage.isGlobalSchedulePresent(SCHEDULE_WITH_EXTERNAL_RECIPIENTS),
+        assertFalse(EmailSchedulePage.getInstance(browser).isGlobalSchedulePresent(SCHEDULE_WITH_EXTERNAL_RECIPIENTS),
                 "Private Schedule" + SCHEDULE_WITH_EXTERNAL_RECIPIENTS + " was not displayed as expected!");
-        assertFalse(emailSchedulesPage.isGlobalSchedulePresent(SCHEDULE_WITH_INTERNAL_RECIPIENTS),
+        assertFalse(EmailSchedulePage.getInstance(browser).isGlobalSchedulePresent(SCHEDULE_WITH_INTERNAL_RECIPIENTS),
                 "Private Schedule" + SCHEDULE_WITH_INTERNAL_RECIPIENTS + " was not displayed as expected!");
     }
 
@@ -460,22 +456,23 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     }
 
     private void assertDashboardScheduleInfo(String title, String authorUri, Collection<String> bccEmails) {
-        assertTrue(emailSchedulesPage.isPrivateSchedulePresent(title), "Dashboard schedule was not displayed.");
-        WebElement schedule = emailSchedulesPage.getPrivateSchedule(title);
+        assertTrue(EmailSchedulePage.getInstance(browser).isPrivateSchedulePresent(title), "Dashboard schedule was not displayed.");
+        WebElement schedule = EmailSchedulePage.getInstance(browser).getPrivateSchedule(title);
 
-        assertEquals(emailSchedulesPage.getAuthorUriOfSchedule(schedule), authorUri,
+        assertEquals(EmailSchedulePage.getInstance(browser).getAuthorUriOfSchedule(schedule), authorUri,
                 "Author uri of schedule mail was not correct!");
 
-        assertEquals(emailSchedulesPage.getBccEmailsOfPrivateSchedule(schedule),
+        assertEquals(EmailSchedulePage.getInstance(browser).getBccEmailsOfPrivateSchedule(schedule),
                 Joiner.on(", ").join(bccEmails), "List of bcc emails was not correct.");
 
-        List<String> controls = emailSchedulesPage.getControlsOfSchedule(schedule);
+        List<String> controls = EmailSchedulePage.getInstance(browser).getControlsOfSchedule(schedule);
         assertEquals(controls.size(), 1, "List of controls button was not correct.");
         assertEquals(controls.get(0), DELETE, "Control button text was not correct.");
     }
 
-    private void refreshSchedulesPage() {
+    private EmailSchedulePage refreshSchedulesPage() {
         browser.navigate().refresh();
         waitForSchedulesPageLoaded(browser);
+        return EmailSchedulePage.getInstance(browser);
     }
 }

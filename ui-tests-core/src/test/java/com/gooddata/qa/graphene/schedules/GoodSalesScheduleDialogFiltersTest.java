@@ -64,8 +64,7 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
 
     @Test(dependsOnMethods = {"createDashboardSchedule"}, groups = {"schedules"})
     public void checkManagePageForScheduleExistence() {
-        initEmailSchedulesPage();
-        assertFalse(emailSchedulesPage.isGlobalSchedulePresent(customSubject));
+        assertFalse(initEmailSchedulesPage().isGlobalSchedulePresent(customSubject));
     }
 
     @Test(dependsOnMethods = {"createDashboardSchedule"}, groups = {"schedules"})

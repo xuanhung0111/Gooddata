@@ -48,6 +48,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.StyleC
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel.Tab;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
+import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
 import com.gooddata.qa.graphene.fragments.reports.report.ChartReport;
 import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
@@ -443,10 +444,9 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
                 .setCustomRecipients(Lists.newArrayList(testParams.getViewerUser()))
                 .schedule();
 
-        initEmailSchedulesPage();
-        assertTrue(emailSchedulesPage.isPrivateSchedulePresent(customScheduleSubject));
-        WebElement schedule1 = emailSchedulesPage.getPrivateSchedule(customScheduleSubject);
-        assertEquals(emailSchedulesPage.getBccEmailsOfPrivateSchedule(schedule1), testParams.getViewerUser());
+        assertTrue(initEmailSchedulesPage().isPrivateSchedulePresent(customScheduleSubject));
+        WebElement schedule1 = EmailSchedulePage.getInstance(browser).getPrivateSchedule(customScheduleSubject);
+        assertEquals(EmailSchedulePage.getInstance(browser).getBccEmailsOfPrivateSchedule(schedule1), testParams.getViewerUser());
 
         embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
 
@@ -465,10 +465,9 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
                 .setCustomRecipients(Lists.newArrayList(testParams.getViewerUser()))
                 .schedule();
 
-        initEmailSchedulesPage();
-        assertTrue(emailSchedulesPage.isPrivateSchedulePresent(customScheduleSubject));
-        WebElement schedule2 = emailSchedulesPage.getPrivateSchedule(customScheduleSubject);
-        assertEquals(emailSchedulesPage.getBccEmailsOfPrivateSchedule(schedule2), testParams.getViewerUser());
+        assertTrue(initEmailSchedulesPage().isPrivateSchedulePresent(customScheduleSubject));
+        WebElement schedule2 = EmailSchedulePage.getInstance(browser).getPrivateSchedule(customScheduleSubject);
+        assertEquals(EmailSchedulePage.getInstance(browser).getBccEmailsOfPrivateSchedule(schedule2), testParams.getViewerUser());
     }
 
     @AfterClass(alwaysRun = true)

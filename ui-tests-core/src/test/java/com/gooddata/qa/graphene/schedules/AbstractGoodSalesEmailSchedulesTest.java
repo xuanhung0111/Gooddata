@@ -50,8 +50,7 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"schedules"})
     public void verifyEmptySchedules() {
-        initEmailSchedulesPage();
-        assertEquals(emailSchedulesPage.getNumberOfGlobalSchedules(), 0, "There is no schedule.");
+        assertEquals(initEmailSchedulesPage().getNumberOfGlobalSchedules(), 0, "There is no schedule.");
         Screenshots.takeScreenshot(browser, "Goodsales-no-schedules", this.getClass());
     }
 
