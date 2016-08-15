@@ -22,6 +22,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
+import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.ScheduleMailPssClient;
 import com.gooddata.qa.utils.mail.ImapClient;
@@ -46,8 +47,7 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void createDashboardSchedule() {
-        initEmailSchedulesPage();
-        emailSchedulesPage.scheduleNewDahboardEmail(testParams.getUser(), dashboardTitle,
+        initEmailSchedulesPage().scheduleNewDahboardEmail(testParams.getUser(), dashboardTitle,
                 "Scheduled email test - dashboard.", "Outlook");
         checkRedBar(browser);
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard", this.getClass());
@@ -57,8 +57,7 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void createReportSchedule() {
-        initEmailSchedulesPage();
-        emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), reportTitle,
+        initEmailSchedulesPage().scheduleNewReportEmail(testParams.getUser(), reportTitle,
                 "Scheduled email test - report.", "Activities by Type", ExportFormat.ALL);
         checkRedBar(browser);
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-report", this.getClass());
@@ -68,16 +67,14 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
 
     @Test(dependsOnGroups = {"schedules"})
     public void verifyCreatedSchedules() {
-        initEmailSchedulesPage();
-        assertEquals(emailSchedulesPage.getNumberOfGlobalSchedules(), 2, "Schedules are properly created.");
+        assertEquals(initEmailSchedulesPage().getNumberOfGlobalSchedules(), 2, "Schedules are properly created.");
         Screenshots.takeScreenshot(browser, "Goodsales-schedules", this.getClass());
     }
 
     @Test(dependsOnMethods = {"verifyCreatedSchedules"})
     public void updateScheduledMailRecurrency() throws IOException {
-        initEmailSchedulesPage();
-        String reportScheduleUri = emailSchedulesPage.getScheduleMailUriByName(reportTitle);
-        String dashboardScheduleUri = emailSchedulesPage.getScheduleMailUriByName(dashboardTitle);
+        String reportScheduleUri = initEmailSchedulesPage().getScheduleMailUriByName(reportTitle);
+        String dashboardScheduleUri = EmailSchedulePage.getInstance(browser).getScheduleMailUriByName(dashboardTitle);
         updateRecurrencyString(reportScheduleUri);
         updateRecurrencyString(dashboardScheduleUri);
     }

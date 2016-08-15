@@ -55,8 +55,7 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void createReportSchedule() {
-        initEmailSchedulesPage();
-        emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), reportTitle,
+        initEmailSchedulesPage().scheduleNewReportEmail(testParams.getUser(), reportTitle,
                 "Unsubscribe bcc test - report.", "Activities by Type", ExportFormat.CSV, RepeatTime.DAILY);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-report", this.getClass());
@@ -64,15 +63,13 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
 
     @Test(dependsOnGroups = {"schedules"})
     public void verifyCreatedSchedules() {
-        initEmailSchedulesPage();
-        assertEquals(emailSchedulesPage.getNumberOfGlobalSchedules(), 1, "Schedule is properly created.");
+        assertEquals(initEmailSchedulesPage().getNumberOfGlobalSchedules(), 1, "Schedule is properly created.");
         takeScreenshot(browser, "Goodsales-schedules", this.getClass());
     }
 
     @Test(dependsOnMethods = {"verifyCreatedSchedules"})
     public void updateScheduledMail() throws IOException {
-        initEmailSchedulesPage();
-        String reportScheduleUri = emailSchedulesPage.getScheduleMailUriByName(reportTitle);
+        String reportScheduleUri = initEmailSchedulesPage().getScheduleMailUriByName(reportTitle);
         setBcc(reportScheduleUri, new String[] { getBccEmail() });
         updateRecurrencyString(reportScheduleUri);
     }
@@ -99,8 +96,7 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
                 takeScreenshot(browser, "Goodsales-schedules-unsubscribe-link-" + message.getAllRecipients()[0],
                     this.getClass());
             }
-            initEmailSchedulesPage();
-            updateRecurrencyString(emailSchedulesPage.getScheduleMailUriByName(reportTitle));
+            updateRecurrencyString(initEmailSchedulesPage().getScheduleMailUriByName(reportTitle));
             pssClient.accelerate();
 
             // check that no more email is sent
@@ -115,8 +111,7 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
 
     @Test(dependsOnMethods = {"waitForMessageAndUnsubscribe"})
     public void verifySuccesOfUnsubscribe() {
-        initEmailSchedulesPage();
-        String unsubscribed = emailSchedulesPage.getUnsubscribed(reportTitle);
+        String unsubscribed = initEmailSchedulesPage().getUnsubscribed(reportTitle);
         assertTrue(unsubscribed.contains(imapUser),
                 "The 'To' email is in the list of unsubscribed users. Expected '" + imapUser + "', found '"
                         + unsubscribed + "'.");

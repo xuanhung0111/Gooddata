@@ -120,15 +120,11 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
             initDashboardsPage();
             addReportToNewDashboard(ACTIVITIES_BY_TYPE_REPORT, DASHBOARD_NAME);
 
-            initEmailSchedulesPage();
-            emailSchedulesPage.scheduleNewDahboardEmail(testParams.getUser(), dashboardSchedule, "test",
-                    DASHBOARD_NAME);
-            emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), reportSchedule, "test",
-                    ACTIVITIES_BY_TYPE_REPORT, ExportFormat.ALL);
+            initEmailSchedulesPage().scheduleNewDahboardEmail(testParams.getUser(), dashboardSchedule, "test", DASHBOARD_NAME)
+                .scheduleNewReportEmail(testParams.getUser(), reportSchedule, "test", ACTIVITIES_BY_TYPE_REPORT, ExportFormat.ALL);
 
-            initEmailSchedulesPage();
-            emailSchedulesPage.deleteSchedule(dashboardSchedule);
-            emailSchedulesPage.deleteSchedule(reportSchedule);
+            initEmailSchedulesPage().deleteSchedule(dashboardSchedule)
+                .deleteSchedule(reportSchedule);
 
             assertFalse(isObjectDeleted(ACTIVITIES_BY_TYPE_REPORT, Places.REPORT));
             assertFalse(isObjectDeleted(DASHBOARD_NAME, Places.DASHBOARD));
@@ -388,8 +384,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         if (scheduleName == null)
             return;
 
-        initEmailSchedulesPage();
-        emailSchedulesPage.deleteSchedule(scheduleName);
+        initEmailSchedulesPage().deleteSchedule(scheduleName);
     }
 
     private void deleteDomainHelper(DropStrategy strategy, String... reports) throws IOException, JSONException {
@@ -427,16 +422,14 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
 
     private String createDashboardSchedule(String dashboard) {
         String subject = "Dashboard Schedule " + System.currentTimeMillis();
-        initEmailSchedulesPage();
-        emailSchedulesPage.scheduleNewDahboardEmail(testParams.getUser(), subject, "body", dashboard);
+        initEmailSchedulesPage().scheduleNewDahboardEmail(testParams.getUser(), subject, "body", dashboard);
 
         return subject;
     }
 
     private String createReportSchedule(String report) {
         String subject = "Report Schedule " + System.currentTimeMillis();
-        initEmailSchedulesPage();
-        emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), subject, "body", report, ExportFormat.ALL);
+        initEmailSchedulesPage().scheduleNewReportEmail(testParams.getUser(), subject, "body", report, ExportFormat.ALL);
 
         return subject;
     }
@@ -503,8 +496,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
                 dashboardsPage.selectDashboard(DASHBOARD_NAME);
                 return dashboardsPage.getContent().getNumberOfReports() == 0;
             case SCHEDULE_EMAIL:
-                initEmailSchedulesPage();
-                return !emailSchedulesPage.isGlobalSchedulePresent(object);
+                return !initEmailSchedulesPage().isGlobalSchedulePresent(object);
             case DASHBOARD_EMBED:
                 browser.get(object);
                 return REQUESTED_DASHBOARD_NOT_EXIST.equals(

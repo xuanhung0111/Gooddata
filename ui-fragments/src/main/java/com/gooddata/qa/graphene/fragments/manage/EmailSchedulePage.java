@@ -8,6 +8,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForEmailSchedulePageL
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.lang.String.format;
+import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
@@ -17,6 +18,7 @@ import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -102,6 +104,10 @@ public class EmailSchedulePage extends AbstractFragment {
 
     @FindBy(css = ".pickers > :not([style*='display: none']) input.gdc-input")
     private WebElement searchInput;
+
+    public static final EmailSchedulePage getInstance(SearchContext context) {
+        return Graphene.createPageFragment(EmailSchedulePage.class, waitForElementVisible(id("p-emailSchedulePage"), context));
+    }
 
     public String getSubjectFromInput() {
         return waitForElementVisible(emailSubjectInput).getAttribute("value");
@@ -204,7 +210,7 @@ public class EmailSchedulePage extends AbstractFragment {
         return this;
     }
 
-    public void scheduleNewDahboardEmail(String emailTo, String emailSubject, String emailBody,
+    public EmailSchedulePage scheduleNewDahboardEmail(String emailTo, String emailSubject, String emailBody,
             String dashboardName) {
         Graphene.guardAjax(waitForElementVisible(addScheduleButton)).click();
         waitForElementVisible(scheduleDetail);
@@ -218,6 +224,7 @@ public class EmailSchedulePage extends AbstractFragment {
         selectDashboard(dashboardName);
         // TODO - schedule (will be sent in the nearest time slot now)
         saveSchedule();
+        return this;
     }
 
     public void scheduleNewReportEmail(String emailTo, String emailSubject, String emailBody, String reportName,
@@ -254,7 +261,7 @@ public class EmailSchedulePage extends AbstractFragment {
         return hRefParts[hRefParts.length - 1];
     }
 
-    public void deleteSchedule(final String scheduleName) {
+    public EmailSchedulePage deleteSchedule(final String scheduleName) {
         final int numberOfSchedule = getNumberOfGlobalSchedules();
         waitForElementVisible(By.cssSelector(format(DELETE_SELECTOR, simplifyText(scheduleName))), browser)
             .click();
@@ -264,6 +271,7 @@ public class EmailSchedulePage extends AbstractFragment {
                 return getNumberOfGlobalSchedules() == numberOfSchedule - 1;
             }
         });
+        return this;
     }
 
     public void duplicateSchedule(String scheduleName) {

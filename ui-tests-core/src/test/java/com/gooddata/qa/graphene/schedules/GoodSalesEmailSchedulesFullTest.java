@@ -62,6 +62,7 @@ import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.entity.variable.NumericVariable;
 import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
+import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage.RepeatTime;
 import com.gooddata.qa.utils.http.ScheduleMailPssClient;
 import com.gooddata.qa.utils.mail.ImapClient;
@@ -106,8 +107,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     public void createEmptyDashboardSchedule() {
         initDashboardsPage();
         dashboardsPage.addNewDashboard("Empty dashboard");
-        initEmailSchedulesPage();
-        emailSchedulesPage.scheduleNewDahboardEmail(testParams.getUser(), emptyDashboardTitle,
+        initEmailSchedulesPage().scheduleNewDahboardEmail(testParams.getUser(), emptyDashboardTitle,
                 "Scheduled email test - empty dashboard.", "First Tab");
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-empty-dashboard", this.getClass());
@@ -119,8 +119,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void deleteDashboardUsedInSchedule() {
         String dashboardTitle = "Schedule dashboard";
-        initEmailSchedulesPage();
-        emailSchedulesPage.scheduleNewDahboardEmail(testParams.getUser(), dashboardTitle,
+        initEmailSchedulesPage().scheduleNewDahboardEmail(testParams.getUser(), dashboardTitle,
                 "Scheduled email test - dashboard.", "Outlook");
 
         try {
@@ -139,21 +138,18 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
             waitForElementVisible(BY_DISMISS_BUTTON, browser).click();
             dashboardsPage.getDashboardEditBar().cancelDashboard();
         } finally {
-            initEmailSchedulesPage();
-            waitForFragmentVisible(emailSchedulesPage).deleteSchedule(dashboardTitle);
+            waitForFragmentVisible(initEmailSchedulesPage()).deleteSchedule(dashboardTitle);
         }
     }
 
     @Test(dependsOnMethods = {"createEmptyDashboardSchedule"}, groups = {"schedules"})
     public void duplicateSchedule() {
-        initEmailSchedulesPage();
-        waitForFragmentVisible(emailSchedulesPage).duplicateSchedule(emptyDashboardTitle);
+        waitForFragmentVisible(initEmailSchedulesPage()).duplicateSchedule(emptyDashboardTitle);
     }
 
     @Test(dependsOnMethods = {"duplicateSchedule"}, groups = {"schedules"})
     public void deleteSchedule() {
-        initEmailSchedulesPage();
-        waitForFragmentVisible(emailSchedulesPage).deleteSchedule(emptyDashboardTitle);
+        waitForFragmentVisible(initEmailSchedulesPage()).deleteSchedule(emptyDashboardTitle);
     }
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
@@ -171,8 +167,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
-        initEmailSchedulesPage();
-        emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), noDataReportTitle,
+        initEmailSchedulesPage().scheduleNewReportEmail(testParams.getUser(), noDataReportTitle,
                 "Scheduled email test - no data report.", NO_DATA_REPORT, ExportFormat.ALL);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-no-data-report", this.getClass());
@@ -190,8 +185,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
-        initEmailSchedulesPage();
-        emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), incomputableReportTitle,
+        initEmailSchedulesPage().scheduleNewReportEmail(testParams.getUser(), incomputableReportTitle,
                 "Scheduled email test - incomputable report.", INCOMPUTABLE_REPORT, ExportFormat.PDF);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-incomputable-report", this.getClass());
@@ -213,8 +207,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
-        initEmailSchedulesPage();
-        emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), tooLargeReportTitle,
+        initEmailSchedulesPage().scheduleNewReportEmail(testParams.getUser(), tooLargeReportTitle,
                 "Scheduled email test - incomputable report.", TOO_LARGE_REPORT, ExportFormat.PDF);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-too-large-report", this.getClass());
@@ -233,8 +226,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         reportPage.addFilter(FilterItem.Factory.createPromptFilter("FVariable", "Email"));
         reportPage.saveReport();
 
-        initEmailSchedulesPage();
-        emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), filteredVariableReportTitle,
+        initEmailSchedulesPage().scheduleNewReportEmail(testParams.getUser(), filteredVariableReportTitle,
                 "Scheduled email test - Filtered variable report.", "Filtered variable report", ExportFormat.CSV);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-filtered-variable-report", this.getClass());
@@ -257,8 +249,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
-        initEmailSchedulesPage();
-        emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), numericVariableReportTitle,
+        initEmailSchedulesPage().scheduleNewReportEmail(testParams.getUser(), numericVariableReportTitle,
                 "Scheduled email test - Numeric variable report.", report, ExportFormat.CSV);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-numeric-variable-report", this.getClass());
@@ -286,8 +277,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
-        initEmailSchedulesPage();
-        emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), mufReportTitle,
+        initEmailSchedulesPage().scheduleNewReportEmail(testParams.getUser(), mufReportTitle,
                 "Scheduled email test - MUF report.", report, ExportFormat.CSV);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-muf-report", this.getClass());
@@ -306,8 +296,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
-        initEmailSchedulesPage();
-        emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), title,
+        initEmailSchedulesPage().scheduleNewReportEmail(testParams.getUser(), title,
                 "Scheduled email test - report.", report, ExportFormat.ALL);
 
         try {
@@ -324,8 +313,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
             logRedBarMessageInfo(browser);
             waitForElementVisible(BY_DISMISS_BUTTON, browser).click();
         } finally {
-            initEmailSchedulesPage();
-            waitForFragmentVisible(emailSchedulesPage).deleteSchedule(title);
+            waitForFragmentVisible(initEmailSchedulesPage()).deleteSchedule(title);
             initReportsPage();
             waitForFragmentVisible(reportsPage).deleteReports(report);
         }
@@ -335,59 +323,55 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     public void editSchedule() {
         String title = "verify-UI-title";
         String updatedTitle = title + "Updated";
-        initEmailSchedulesPage();
-        emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), title,
+        initEmailSchedulesPage().scheduleNewReportEmail(testParams.getUser(), title,
                 "Scheduled email test - report.", "Actual QTD", ExportFormat.CSV);
 
         try {
-            emailSchedulesPage.openSchedule(title)
+            EmailSchedulePage.getInstance(browser).openSchedule(title)
                 .setSubject(updatedTitle)
                 .setMessage("Scheduled email test - report. (Updated)")
                 .selectReportFormat(ExportFormat.ALL)
                 .saveSchedule();
-            assertFalse(emailSchedulesPage.isGlobalSchedulePresent(title));
-            assertTrue(emailSchedulesPage.isGlobalSchedulePresent(updatedTitle));
+            assertFalse(EmailSchedulePage.getInstance(browser).isGlobalSchedulePresent(title));
+            assertTrue(EmailSchedulePage.getInstance(browser).isGlobalSchedulePresent(updatedTitle));
 
-            assertEquals(emailSchedulesPage.openSchedule(updatedTitle).getMessageFromInput(),
+            assertEquals(EmailSchedulePage.getInstance(browser).openSchedule(updatedTitle).getMessageFromInput(),
                     "Scheduled email test - report. (Updated)");
-            assertEquals(emailSchedulesPage.getSelectedFormats(), asList("Inline message", "PDF",
+            assertEquals(EmailSchedulePage.getInstance(browser).getSelectedFormats(), asList("Inline message", "PDF",
                     "Excel (XLS)", "Excel (XLSX)", "CSV"));
         } finally {
-            initEmailSchedulesPage();
-            if (emailSchedulesPage.isGlobalSchedulePresent(updatedTitle)) {
-                waitForFragmentVisible(emailSchedulesPage).deleteSchedule(updatedTitle);
+            if (initEmailSchedulesPage().isGlobalSchedulePresent(updatedTitle)) {
+                waitForFragmentVisible(EmailSchedulePage.getInstance(browser)).deleteSchedule(updatedTitle);
                 return;
             }
-            waitForFragmentVisible(emailSchedulesPage).deleteSchedule(title);
+            waitForFragmentVisible(EmailSchedulePage.getInstance(browser)).deleteSchedule(title);
         }
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"verify-UI"})
     public void changeScheduleTime() {
         String title = "verify-UI-title";
-        initEmailSchedulesPage();
-        emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), title,
+        initEmailSchedulesPage().scheduleNewReportEmail(testParams.getUser(), title,
                 "Scheduled email test - report.", "Actual QTD", ExportFormat.ALL);
 
         try {
             String timeDescription = "";
             for (RepeatTime time : RepeatTime.values()) {
-                timeDescription = emailSchedulesPage.openSchedule(title)
+                timeDescription = EmailSchedulePage.getInstance(browser).openSchedule(title)
                     .changeTime(time)
                     .getTimeDescription();
-                emailSchedulesPage.saveSchedule();
-                assertEquals(emailSchedulesPage.getScheduleDescription(title),
+                EmailSchedulePage.getInstance(browser).saveSchedule();
+                assertEquals(EmailSchedulePage.getInstance(browser).getScheduleDescription(title),
                         format(title + " (%s)", timeDescription));
             }
         } finally {
-            waitForFragmentVisible(emailSchedulesPage).deleteSchedule(title);
+            EmailSchedulePage.getInstance(browser).deleteSchedule(title);
         }
     }
 
     @Test(dependsOnGroups = {"schedules", "verify-UI"})
     public void verifyCreatedSchedules() {
-        initEmailSchedulesPage();
-        assertEquals(emailSchedulesPage.getNumberOfGlobalSchedules(), messages.size(),
+        assertEquals(initEmailSchedulesPage().getNumberOfGlobalSchedules(), messages.size(),
                 "Schedules are properly created.");
         takeScreenshot(browser, "Goodsales-schedules", this.getClass());
     }
@@ -481,7 +465,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
 
     private void updateRecurrencies(Map<String, List<Message>> messages) throws IOException {
         for (String recurrency : messages.keySet()) {
-            updateRecurrencyString(emailSchedulesPage.getScheduleMailUriByName(recurrency));
+            updateRecurrencyString(EmailSchedulePage.getInstance(browser).getScheduleMailUriByName(recurrency));
         }
     }
 

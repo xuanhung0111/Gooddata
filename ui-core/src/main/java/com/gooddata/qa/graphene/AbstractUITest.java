@@ -91,9 +91,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(id = "p-analysisPage")
     protected ReportPage reportPage;
 
-    @FindBy(id = "p-emailSchedulePage")
-    protected EmailSchedulePage emailSchedulesPage;
-
     @FindBy(className = "s-datasets-list")
     protected DatasetsListPage datasetsListPage;
 
@@ -598,11 +595,11 @@ public class AbstractUITest extends AbstractGreyPageTest {
                 .waitForAllKpiWidgetsLoaded();
     }
 
-    public void initEmailSchedulesPage() {
+    public EmailSchedulePage initEmailSchedulesPage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|emailSchedulePage");
         waitForSchedulesPageLoaded(browser);
         waitForElementNotVisible(BY_SCHEDULES_LOADING);
-        waitForElementVisible(emailSchedulesPage.getRoot());
+        return EmailSchedulePage.getInstance(browser);
     }
 
     public void initDISCOverviewPage() {

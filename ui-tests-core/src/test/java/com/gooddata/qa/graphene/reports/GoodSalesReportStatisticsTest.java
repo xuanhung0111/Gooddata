@@ -30,6 +30,7 @@ import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
+import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
 
 public class GoodSalesReportStatisticsTest extends GoodSalesAbstractTest {
 
@@ -75,8 +76,7 @@ public class GoodSalesReportStatisticsTest extends GoodSalesAbstractTest {
                 .addReportToDashboard(SIMPLE_REPORT)
                 .saveDashboard();
 
-        initEmailSchedulesPage();
-        emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), scheduleEmailSubject,
+        initEmailSchedulesPage().scheduleNewReportEmail(testParams.getUser(), scheduleEmailSubject,
                 "report usage test", SIMPLE_REPORT, ExportFormat.PDF);
 
         openReport(SIMPLE_REPORT).showConfiguration().showMoreReportInfo();
@@ -160,7 +160,7 @@ public class GoodSalesReportStatisticsTest extends GoodSalesAbstractTest {
                 objectName = dashboardsPage.getDashboardName();
             } else {
                 waitForSchedulesPageLoaded(browser);
-                objectName = emailSchedulesPage.getSubjectFromInput();
+                objectName = EmailSchedulePage.getInstance(browser).getSubjectFromInput();
             }
             assertEquals(objectName, reportUsage.getName());
             browser.close();
