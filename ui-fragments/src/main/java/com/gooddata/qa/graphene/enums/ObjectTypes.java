@@ -6,7 +6,8 @@ public enum ObjectTypes {
     ATTRIBUTE("attribute", "attributesTable", "attributesMenuItem"),
     METRIC("metric", "metricsTable", "metricsMenuItem"),
     VARIABLE("variable", "variablesTable", "variablesMenuItem"),
-    MODEL("model", "ldmModelMenuItem");
+    MODEL("model", "ldmModelMenuItem"),
+    DATA_SETS("data sets", "uploadsTable", "dataSetsMenuItem");
 
     private final String name;
 

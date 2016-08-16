@@ -29,6 +29,7 @@ public class GoodSalesManageObjectsTest extends ManageObjectsAbstractTest {
         Map<String, List<String>> tagsMap = new HashMap<String, List<String>>();
         tagsMap.put("newtag1", Arrays.asList("1", "40px"));
         tagsMap.put("newtag2", Arrays.asList("2", "15px"));
+        ObjectsTable factsTable = ObjectsTable.getInstance(id(ObjectTypes.FACT.getObjectsTableID()), browser);
         this.checkTagObjects(factsTable, taggedObjects, tagsMap, Arrays.asList("Days to Close"));
         checkObjectLinkInTable(factsTable, "Opp. Close (Date)");
     }
@@ -61,16 +62,17 @@ public class GoodSalesManageObjectsTest extends ManageObjectsAbstractTest {
         Map<String, List<String>> tagsMap = new HashMap<String, List<String>>();
         tagsMap.put("newtag1", Arrays.asList("1", "40px"));
         tagsMap.put("newtag2", Arrays.asList("2", "15px"));
+        ObjectsTable metricsTable = ObjectsTable.getInstance(id(ObjectTypes.METRIC.getObjectsTableID()), browser);
         this.checkTagObjects(metricsTable, taggedObjects, tagsMap, Arrays.asList("# of Open Opps."));
         checkObjectLinkInTable(metricsTable, "# of Opportunities [BOP]");
     }
 
     @Test(dependsOnGroups = {"createProject"}, priority = 1, groups = {"viewObjetcs", "variable"})
     public void viewVariablesTable() {
-        openObjectsTable(ObjectTypes.VARIABLE);
-        variablesTable.assertTableHeader();
-        variablesTable.sortObjectsTable(ObjectsTable.SORT_DESC, variablesList);
-        variablesTable.sortObjectsTable(ObjectsTable.SORT_ASC, variablesList);
+        ObjectsTable variablesTable = openObjectsTable(ObjectTypes.VARIABLE)
+            .assertTableHeader()
+            .sortObjectsTable(ObjectsTable.SORT_DESC, variablesList)
+            .sortObjectsTable(ObjectsTable.SORT_ASC, variablesList);
         Map<String, List<String>> taggedObjects = new HashMap<String, List<String>>();
         taggedObjects.put("Quota", Arrays.asList("newtag1", "newtag2"));
         taggedObjects.put("Status", Arrays.asList("newtag1"));

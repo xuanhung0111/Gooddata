@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.account;
 
+import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -12,7 +13,9 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.account.PersonalInfo;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.fragments.account.PersonalInfoDialog;
+import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 
 public class UserProfileInformationTest extends GoodSalesAbstractTest {
@@ -43,7 +46,7 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
         userInfo = personalInfoDialog.getUserInfo();
 
         initVariablePage();
-        allVariables = variablesTable.getAllItems();
+        allVariables = ObjectsTable.getInstance(id(ObjectTypes.VARIABLE.getObjectsTableID()), browser).getAllItems();
     }
 
     @Test(dependsOnMethods = { "initGetUserInformation" })

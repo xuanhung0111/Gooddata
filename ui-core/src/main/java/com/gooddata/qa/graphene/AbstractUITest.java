@@ -97,12 +97,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(id = "p-dataPage")
     protected DataPage dataPage;
 
-    @FindBy(id = "uploadsTable")
-    protected ObjectsTable datasetsTable;
-
-    @FindBy(id = "variablesTable")
-    protected ObjectsTable variablesTable;
-
     @FindBy(id = "p-dataPage")
     protected AttributePage attributePage;
 
@@ -115,17 +109,11 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(css = VariablesPage.CSS_CLASS)
     protected VariablesPage variablePage;
 
-    @FindBy(id = "metricsTable")
-    protected ObjectsTable metricsTable;
-
     @FindBy(id = "p-objectPage")
     protected MetricDetailsPage metricDetailPage;
 
     @FindBy(id = "new")
     protected MetricPage metricPage;
-
-    @FindBy(id = "factsTable")
-    protected ObjectsTable factsTable;
 
     @FindBy(id = "p-objectPage")
     protected FactDetailPage factDetailPage;
