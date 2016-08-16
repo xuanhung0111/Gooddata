@@ -60,7 +60,7 @@ public class HeaderTest extends DashboardsTest {
             waitForDashboardPageLoaded(browser);
             takeScreenshot(browser, "KPI-header-display-when-FF-is-off-and-there-is-saved-KPI", getClass());
             assertTrue(ApplicationHeaderBar.isKpisLinkVisible(browser));
-            
+
             teardownKpiWithDashboardDelete();
             initDashboardsPage();
             browser.navigate().refresh();
