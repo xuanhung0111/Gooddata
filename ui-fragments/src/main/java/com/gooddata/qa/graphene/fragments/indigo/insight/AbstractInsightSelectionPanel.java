@@ -154,7 +154,8 @@ public abstract class AbstractInsightSelectionPanel extends AbstractFragment {
         }
 
         public void delete() {
-            getActions().moveToElement(getRoot()).perform();
+            // hover on type icon to avoid tooltip which is only displayed with long name
+            getActions().moveToElement(vizTypeIcon).perform();
             waitForElementVisible(deleteIcon).click();
             SaveInsightDialog.getInstance(browser).clickSubmitButton();
         }
