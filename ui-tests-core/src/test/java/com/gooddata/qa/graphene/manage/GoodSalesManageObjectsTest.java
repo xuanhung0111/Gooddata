@@ -1,7 +1,5 @@
 package com.gooddata.qa.graphene.manage;
 
-import static org.openqa.selenium.By.id;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -29,9 +27,8 @@ public class GoodSalesManageObjectsTest extends ManageObjectsAbstractTest {
         Map<String, List<String>> tagsMap = new HashMap<String, List<String>>();
         tagsMap.put("newtag1", Arrays.asList("1", "40px"));
         tagsMap.put("newtag2", Arrays.asList("2", "15px"));
-        ObjectsTable factsTable = ObjectsTable.getInstance(id(ObjectTypes.FACT.getObjectsTableID()), browser);
-        this.checkTagObjects(factsTable, taggedObjects, tagsMap, Arrays.asList("Days to Close"));
-        checkObjectLinkInTable(factsTable, "Opp. Close (Date)");
+        this.checkTagObjects(ObjectTypes.FACT, taggedObjects, tagsMap, Arrays.asList("Days to Close"));
+        checkObjectLinkInTable(ObjectTypes.FACT, "Opp. Close (Date)");
     }
 
     @Test(dependsOnGroups = {"createProject"}, priority = 1, groups = {"viewObjects", "attribute"})
@@ -43,14 +40,13 @@ public class GoodSalesManageObjectsTest extends ManageObjectsAbstractTest {
         Map<String, List<String>> tagsMap = new HashMap<String, List<String>>();
         tagsMap.put("day", Arrays.asList("2", "17px"));
         tagsMap.put("eu", Arrays.asList("3", "15px"));
-        ObjectsTable attributesTable = ObjectsTable.getInstance(id(ObjectTypes.ATTRIBUTE.getObjectsTableID()), browser);
-        this.filterObjectByTagList(attributesTable, filteredObjectsList, tagsMap);
+        this.filterObjectByTagList(ObjectTypes.ATTRIBUTE, filteredObjectsList, tagsMap);
         List<String> filteredObjectsCloud = Arrays.asList("Week (Mon-Sun) (Activity)",
                 "Week (Mon-Sun) (Closed)", "Week (Mon-Sun) (Created)", "Week (Mon-Sun) (Snapshot)",
                 "Week (Mon-Sun) (Timeline)");
         tagsMap.put("year", Arrays.asList("7", "19px"));
-        this.filterObjectByTagCloud(attributesTable, filteredObjectsCloud, tagsMap);
-        checkObjectLinkInTable(attributesTable, "Day of Week (Mon-Sun) (Activity)");
+        this.filterObjectByTagCloud(ObjectTypes.ATTRIBUTE, filteredObjectsCloud, tagsMap);
+        checkObjectLinkInTable(ObjectTypes.ATTRIBUTE, "Day of Week (Mon-Sun) (Activity)");
     }
 
     @Test(dependsOnGroups = {"createProject"}, priority = 1, groups = {"viewObjetcs", "metric"})
@@ -62,14 +58,13 @@ public class GoodSalesManageObjectsTest extends ManageObjectsAbstractTest {
         Map<String, List<String>> tagsMap = new HashMap<String, List<String>>();
         tagsMap.put("newtag1", Arrays.asList("1", "40px"));
         tagsMap.put("newtag2", Arrays.asList("2", "15px"));
-        ObjectsTable metricsTable = ObjectsTable.getInstance(id(ObjectTypes.METRIC.getObjectsTableID()), browser);
-        this.checkTagObjects(metricsTable, taggedObjects, tagsMap, Arrays.asList("# of Open Opps."));
-        checkObjectLinkInTable(metricsTable, "# of Opportunities [BOP]");
+        this.checkTagObjects(ObjectTypes.METRIC, taggedObjects, tagsMap, Arrays.asList("# of Open Opps."));
+        checkObjectLinkInTable(ObjectTypes.METRIC, "# of Opportunities [BOP]");
     }
 
     @Test(dependsOnGroups = {"createProject"}, priority = 1, groups = {"viewObjetcs", "variable"})
     public void viewVariablesTable() {
-        ObjectsTable variablesTable = openObjectsTable(ObjectTypes.VARIABLE)
+        openObjectsTable(ObjectTypes.VARIABLE)
             .assertTableHeader()
             .sortObjectsTable(ObjectsTable.SORT_DESC, variablesList)
             .sortObjectsTable(ObjectsTable.SORT_ASC, variablesList);
@@ -79,8 +74,8 @@ public class GoodSalesManageObjectsTest extends ManageObjectsAbstractTest {
         Map<String, List<String>> tagsMap = new HashMap<String, List<String>>();
         tagsMap.put("newtag1", Arrays.asList("1", "40px"));
         tagsMap.put("newtag2", Arrays.asList("2", "15px"));
-        this.checkTagObjects(variablesTable, taggedObjects, tagsMap, Arrays.asList("Quota"));
-        checkObjectLinkInTable(variablesTable, "Status");
+        this.checkTagObjects(ObjectTypes.VARIABLE, taggedObjects, tagsMap, Arrays.asList("Quota"));
+        checkObjectLinkInTable(ObjectTypes.VARIABLE, "Status");
     }
 
     @Test(dependsOnGroups = {"createProject"}, priority = 1, groups = {"moveObjects", "fact"})

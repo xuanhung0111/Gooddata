@@ -233,7 +233,7 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
     private void deleteAttribute(String attribute) {
         initAttributePage();
         attributePage.initAttribute(attribute)
-            .deleteAttribute();
+            .deleteObject();
     }
 
     private TableReport openTableReport(String reportName) {

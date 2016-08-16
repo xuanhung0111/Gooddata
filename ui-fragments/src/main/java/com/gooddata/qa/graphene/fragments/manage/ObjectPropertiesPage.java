@@ -1,8 +1,10 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -10,24 +12,20 @@ import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.utils.Sleeper;
 import com.google.common.base.Predicate;
 
-public class ObjectPropertiesPage extends AbstractFragment {
+public abstract class ObjectPropertiesPage extends AbstractFragment {
 
     @FindBy(css = ".s-name")
-    private WebElement objectNameIpe;
-
-    @FindBy(xpath = "//div[contains(@class,'s-name-ipe-editor')]//input[@class = 'ipeEditor']")
-    protected WebElement objectNameInput;
-
-    @FindBy(xpath = "//div[contains(@class,'s-name-ipe-editor')]//button[text() = 'Save']")
-    private WebElement objectNameSave;
+    private WebElement objectName;
 
     @FindBy(css = ".s-description-ipe-placeholder")
     private WebElement descriptionIpePlaceholder;
@@ -35,23 +33,11 @@ public class ObjectPropertiesPage extends AbstractFragment {
     @FindBy(css = ".s-description")
     private WebElement descriptionIpe;
 
-    @FindBy(xpath = "//div[contains(@class,'s-description-ipe-editor')]//input[@class = 'ipeEditor']")
-    private WebElement descriptionInput;
-
-    @FindBy(xpath = "//div[contains(@class,'s-description-ipe-editor')]//button[text() = 'Save']")
-    private WebElement descriptionSave;
+    @FindBy(css = "#p-objectPage .s-btn-delete")
+    private WebElement deleteButton;
 
     @FindBy(xpath = "//span[text() = 'Add Tags']")
     private WebElement addTagButton;
-
-    @FindBy(xpath = "//div[contains(@class,'s-btn-ipe-editor')]//input[@class = 'ipeEditor']")
-    private WebElement tagInput;
-
-    @FindBy(xpath = "//div[contains(@class,'s-btn-ipe-editor')]//button[text() = 'Add']")
-    private WebElement tagAddButton;
-
-    @FindBy(xpath = "//div[@class = 'tag']")
-    private List<WebElement> tagList;
 
     @FindBy(xpath = "//button[contains(@class, 's-btn-change_folder')]")
     private WebElement changeFolderButton;
@@ -62,13 +48,17 @@ public class ObjectPropertiesPage extends AbstractFragment {
     @FindBy(css = "div#p-objectPage h1 a span")
     private WebElement backDataPageLink;
 
-    private final String folderLocator =
-            "//div[@class = 'autocompletion']/div[@class = 'suggestions']/ul/li[text() = '${folder}']";
+    @FindBy(xpath = "//div[@class = 'tag']")
+    private List<WebElement> tagList;
+
+    private static final By CONFIRM_DELETE_BUTTON_LOCATOR =
+            By.cssSelector(".yui3-d-modaldialog:not(.gdc-hidden) .c-modalDialog .s-btn-delete");
+
+    public static final String ROOT_XPATH_LOCATOR = "//div[@id='p-objectPage' and contains(@class,'s-displayed')]";
 
     public void changeObjectFolder(final String newFolderName) {
         waitForElementVisible(changeFolderButton).click();
-        By objectFolder = By.xpath(folderLocator.replace("${folder}", newFolderName));
-        waitForElementVisible(objectFolder, browser).click();
+        IpeEditor.getInstance(browser).setText(newFolderName);
 
         final WebElement loadingWheelFolder = waitForElementPresent(By.cssSelector("span.loadingWheel"), browser);
         if (!loadingWheelFolder.getAttribute("class").contains("hidden")) {
@@ -94,29 +84,29 @@ public class ObjectPropertiesPage extends AbstractFragment {
     }
 
     public String changeObjectName(String newObjectName) {
-        waitForElementVisible(objectNameIpe).click();
-        waitForElementVisible(objectNameInput).clear();
-        objectNameInput.sendKeys(newObjectName);
-        waitForElementVisible(objectNameSave).click();
-        waitForElementNotVisible(objectNameInput);
-        assertEquals(objectNameIpe.getText(), newObjectName, "Change name doesn't work properly");
+        waitForElementVisible(objectName).click();
+        IpeEditor.getInstance(browser).setText(newObjectName);
+        waitForElementVisible(objectName);
+        assertEquals(objectName.getText(), newObjectName, "Change name doesn't work properly");
+
+        // name changed in UI is not sufficient for successful metric name change
+        // since this change is done on background, navigating to different page may
+        // interrupt it and metric name is not changed.
+        // TODO: attach some notification class to gdc-client or consider changing via rest
+        Sleeper.sleepTightInSeconds(1);
         return newObjectName;
     }
 
     public void addDescription(String description) {
         waitForElementVisible(descriptionIpePlaceholder).click();
-        waitForElementVisible(descriptionInput).sendKeys(description);
-        waitForElementVisible(descriptionSave).click();
-        waitForElementNotVisible(descriptionInput);
+        IpeEditor.getInstance(browser).setText(description);
         assertEquals(descriptionIpe.getText(), description, "Add description doesn't work properly");
     }
 
     public void addTag(String tagName) {
         int tagCountBefore = tagList.size();
         waitForElementVisible(addTagButton).click();
-        waitForElementVisible(tagInput).sendKeys(tagName);
-        waitForElementVisible(tagAddButton).click();
-        waitForElementNotVisible(tagInput);
+        IpeEditor.getInstance(browser).setText(tagName);
         int tagWords = 1;
         for (int i = 0; i < tagName.trim().length(); i++) {
             if (tagName.charAt(i) == ' ' && tagName.charAt(i + 1) != ' ') {
@@ -148,17 +138,54 @@ public class ObjectPropertiesPage extends AbstractFragment {
 
     public void verifyAllPropertiesAtOnce(String newObjectName, String description, String tagName) {
         verifyTagElements(tagName);
-        assertEquals(waitForElementVisible(objectNameIpe).getText(), newObjectName,
+        assertEquals(waitForElementVisible(objectName).getText(), newObjectName,
                 "Change name doesn't work properly");
         assertEquals(waitForElementVisible(descriptionIpe).getText(), description,
                 "Add description doesn't work properly");
     }
 
     public String getObjectName() {
-        return objectNameIpe.getText();
+        return waitForElementVisible(objectName).getText();
     }
 
     public WebElement getBackDataPageLink() {
-        return backDataPageLink;
+        return waitForElementVisible(backDataPageLink);
+    }
+
+    public void deleteObject() {
+        waitForElementVisible(deleteButton).click();
+        waitForElementVisible(CONFIRM_DELETE_BUTTON_LOCATOR, browser).click();
+        waitForDataPageLoaded(browser);
+    }
+
+    public boolean isDeleteButtonDisabled() {
+        waitForElementVisible(deleteButton);
+
+        // check that the button is truly non-clickable, i.e. that the delete
+        // confirmation dialog does not appear
+        deleteButton.click();
+        waitForElementNotVisible(By.cssSelector(".t-confirmDelete"));
+
+        return deleteButton.getAttribute("class").contains("disabled");
+    }
+
+    public static class IpeEditor extends AbstractFragment {
+
+        @FindBy(tagName = "input")
+        private WebElement input;
+
+        @FindBy(className = "s-ipeSaveButton")
+        private WebElement saveButton;
+
+        public static final IpeEditor getInstance(SearchContext context) {
+            return Graphene.createPageFragment(IpeEditor.class,
+                    waitForElementVisible(cssSelector(".c-ipeEditor[style*='display: block']"), context));
+        }
+
+        public void setText(String text) {
+            waitForElementVisible(input).clear();
+            input.sendKeys(text);
+            waitForElementVisible(saveButton).click();
+        }
     }
 }

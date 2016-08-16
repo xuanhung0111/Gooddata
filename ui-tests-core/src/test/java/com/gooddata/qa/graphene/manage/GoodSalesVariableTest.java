@@ -17,6 +17,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.entity.variable.NumericVariable;
+import com.gooddata.qa.graphene.fragments.manage.ObjectPropertiesPage;
 import com.gooddata.qa.utils.http.RestApiClient;
 
 public class GoodSalesVariableTest extends ObjectAbstractTest {
@@ -83,11 +84,11 @@ public class GoodSalesVariableTest extends ObjectAbstractTest {
     }
 
     @Override
-    public void initObject(String variableName) {
+    public ObjectPropertiesPage initObject(String variableName) {
         description = "Test description";
         tagName = "var";
         initVariablePage();
-        variablePage.openVariableFromList(variableName);
+        return variablePage.openVariableFromList(variableName);
     }
 
     private String generateVariableName() {

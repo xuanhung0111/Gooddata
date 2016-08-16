@@ -304,7 +304,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
     private void deleteDataset(String datasetName) {
         initManagePage();
         ObjectsTable.getInstance(id(ObjectTypes.DATA_SETS.getObjectsTableID()), browser).selectObject(datasetName);
-        datasetDetailPage.deleteDataset();
+        datasetDetailPage.deleteObject();
     }
 
     private List<String> getListOfDatasets(JSONObject dataModel) throws JSONException {
