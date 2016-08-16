@@ -37,6 +37,7 @@ import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
+import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.CreateAttributePage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
@@ -343,8 +344,8 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         "applyMufFiltersOnReportWithComputedAttribute"})
     public void deleteAttributeAndMetricUsedInComputedAttribute() {
         initAttributePage();
-        attributePage.initAttribute("Sales Rep");
-        attributeDetailPage.deleteAttribute();
+        attributePage.initAttribute("Sales Rep")
+            .deleteAttribute();
 
         initMetricPage();
         waitForDataPageLoaded(browser);
@@ -415,6 +416,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
     // check that delete button is disabled and that there's expected explanation message
     private void checkDeleteButtonAndInfo() {
+        AttributeDetailPage attributeDetailPage = AttributeDetailPage.getInstance(browser);
         assertTrue(attributeDetailPage.isDeleteButtonDisabled(), "Delete Button is Disabled");
         assertEquals(attributeDetailPage.getDeleteButtonDescription(), EXPECTED_DELETE_DESCRIPTION);
     }

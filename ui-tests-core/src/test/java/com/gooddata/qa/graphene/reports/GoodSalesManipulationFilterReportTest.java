@@ -113,8 +113,8 @@ public class GoodSalesManipulationFilterReportTest extends GoodSalesAbstractTest
         waitForFragmentVisible(metricDetailPage).deleteMetric();
 
         initAttributePage();
-        attributePage.initAttribute(ATTR_STAGE_NAME);
-        attributeDetailPage.deleteAttribute();
+        attributePage.initAttribute(ATTR_STAGE_NAME)
+            .deleteAttribute();
 
         initReport();
         assertThat(reportPage.getFilters(), hasItem(filterDescription));

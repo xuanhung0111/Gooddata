@@ -30,6 +30,7 @@ import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
+import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
 
 public class GoodSalesReportStatisticsTest extends GoodSalesAbstractTest {
@@ -132,8 +133,7 @@ public class GoodSalesReportStatisticsTest extends GoodSalesAbstractTest {
 
             final String objectName;
             if (type.toString().equals(DataType.ATTRIBUTE.toString())) {
-                waitForFragmentVisible(attributeDetailPage);
-                objectName = attributeDetailPage.getAttributeName();
+                objectName = AttributeDetailPage.getInstance(browser).getAttributeName();
             } else {
                 waitForFragmentVisible(metricDetailPage);
                 objectName = metricDetailPage.getName();

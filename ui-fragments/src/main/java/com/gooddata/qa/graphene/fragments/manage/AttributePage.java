@@ -21,7 +21,7 @@ public class AttributePage extends AbstractFragment {
     @FindBy(id = "attributesTable")
     protected ObjectsTable attributesTable;
 
-    @FindBy(xpath = "//div[@id='p-objectPage' and contains(@class,'s-displayed')]")
+    @FindBy(xpath = AttributeDetailPage.ROOT_XPATH_LOCATOR)
     protected AttributeDetailPage attributeDetailPage;
 
     @FindBy(xpath = "//div[@id='p-objectPage' and contains(@class,'s-displayed')]")

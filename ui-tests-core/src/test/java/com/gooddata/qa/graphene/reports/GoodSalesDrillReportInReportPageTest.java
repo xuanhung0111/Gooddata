@@ -220,20 +220,20 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
 
     private void setDrillAttribute(String source, String target) {
         initAttributePage();
-        attributePage.initAttribute(source);
-        attributeDetailPage.setDrillToAttribute(target);
+        attributePage.initAttribute(source)
+            .setDrillToAttribute(target);
     }
 
     private void clearDrillAttribute(String source) {
         initAttributePage();
-        attributePage.initAttribute(source);
-        attributeDetailPage.clearDrillingSetting();
+        attributePage.initAttribute(source)
+            .clearDrillingSetting();
     }
 
     private void deleteAttribute(String attribute) {
         initAttributePage();
-        attributePage.initAttribute(attribute);
-        attributeDetailPage.deleteAttribute();
+        attributePage.initAttribute(attribute)
+            .deleteAttribute();
     }
 
     private TableReport openTableReport(String reportName) {

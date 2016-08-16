@@ -5,9 +5,12 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static org.openqa.selenium.By.xpath;
 import static org.testng.Assert.assertEquals;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -58,6 +61,13 @@ public class AttributeDetailPage extends AbstractFragment {
     private static final By ATTRIBUTE_RENAME_INPUT_LOCATOR = By.cssSelector(".c-ipeEditorIn input");
     private static final By OK_BUTTON_LOCATOR              = By.cssSelector(".c-ipeEditorControls button");
     // ********************************************************
+
+    public static final String ROOT_XPATH_LOCATOR = "//div[@id='p-objectPage' and contains(@class,'s-displayed')]";
+
+    public static final AttributeDetailPage getInstance(SearchContext context) {
+        return Graphene.createPageFragment(AttributeDetailPage.class,
+                waitForElementVisible(xpath(ROOT_XPATH_LOCATOR), context));
+    }
 
     public String getAttributeName() {
         return waitForElementVisible(attributeName).getText();
