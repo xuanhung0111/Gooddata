@@ -43,6 +43,7 @@ import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.report.WhatItem;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
+import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.utils.WaitUtils;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
@@ -178,7 +179,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
         assertTrue(initAttributePage().initAttribute(ATTR_OPPORTUNITY).isDrillToExternalPage(),
                 "The attribute is not linked to external page");
 
-        attributeDetailPage.clearDrillingSetting().setDrillToExternalPage();
+        AttributeDetailPage.getInstance(browser).clearDrillingSetting().setDrillToExternalPage();
 
         initReportCreation().createReport(new UiReportDefinition()
                 .withName(hyperlinkReport)

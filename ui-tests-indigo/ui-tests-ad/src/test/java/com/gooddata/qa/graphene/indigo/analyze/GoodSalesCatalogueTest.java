@@ -100,8 +100,8 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
         String xssMetric = "<button>" + METRIC_PERCENT_OF_GOAL + "</button>";
 
         initAttributePage();
-        waitForFragmentVisible(attributePage).initAttribute(ATTR_IS_WON);
-        waitForFragmentVisible(attributeDetailPage).renameAttribute(xssAttribute);
+        waitForFragmentVisible(attributePage).initAttribute(ATTR_IS_WON)
+            .renameAttribute(xssAttribute);
 
         initMetricPage();
         waitForFragmentVisible(metricPage).openMetricDetailPage(METRIC_PERCENT_OF_GOAL);
@@ -140,8 +140,8 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
                     asList(asList(xssAttribute, "true"), asList(xssMetric, "1,160.9%")));
         } finally {
             initAttributePage();
-            waitForFragmentVisible(attributePage).initAttribute(xssAttribute);
-            waitForFragmentVisible(attributeDetailPage).renameAttribute(ATTR_IS_WON);
+            waitForFragmentVisible(attributePage).initAttribute(xssAttribute)
+                .renameAttribute(ATTR_IS_WON);
 
             initMetricPage();
             waitForFragmentVisible(metricPage).openMetricDetailPage(xssMetric);

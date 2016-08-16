@@ -28,6 +28,7 @@ import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.ReportInfoViewPanel;
+import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.google.common.collect.Sets;
 
@@ -201,13 +202,11 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createDrillReport"})
     public void drillAttribute() {
         initAttributePage();
-        attributePage.initAttribute("Opportunity");
-        assertTrue(attributeDetailPage.isDrillToExternalPage());
+        assertTrue(attributePage.initAttribute("Opportunity").isDrillToExternalPage());
 
-        attributeDetailPage.clearDrillingSetting();
-        assertFalse(attributeDetailPage.isDrillToExternalPage());
+        assertFalse(AttributeDetailPage.getInstance(browser).clearDrillingSetting().isDrillToExternalPage());
 
-        attributeDetailPage.setDrillToExternalPage();
+        AttributeDetailPage.getInstance(browser).setDrillToExternalPage();
 
         initReportsPage();
         UiReportDefinition reportDefinition = new UiReportDefinition()
@@ -240,8 +239,8 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             browser.switchTo().window(currentWindowHandle);
 
             initAttributePage();
-            attributePage.initAttribute("Opportunity");
-            attributeDetailPage.setDrillToAttribute("Account");
+            attributePage.initAttribute("Opportunity")
+                .setDrillToAttribute("Account");
 
             initDashboardsPage().selectDashboard(TEST_DASHBOAD_NAME);
             tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
@@ -258,9 +257,9 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             dashboardsPage.selectDashboard(TEST_DASHBOAD_NAME);
             dashboardsPage.deleteDashboard();
             initAttributePage();
-            attributePage.initAttribute("Opportunity");
-            attributeDetailPage.clearDrillingSetting();
-            attributeDetailPage.setDrillToExternalPage();
+            attributePage.initAttribute("Opportunity")
+                .clearDrillingSetting()
+                .setDrillToExternalPage();
         }
     }
 
@@ -292,8 +291,8 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createDrillReport"})
     public void overrideDrilldownAndDrillIn() {
         initAttributePage();
-        attributePage.initAttribute("Activity");
-        attributeDetailPage.setDrillToAttribute("Activity Type");
+        attributePage.initAttribute("Activity")
+            .setDrillToAttribute("Activity Type");
 
         initReportsPage();
         UiReportDefinition reportDefinition = new UiReportDefinition()
@@ -393,8 +392,8 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             dashboardsPage.deleteDashboard();
 
             initAttributePage();
-            attributePage.initAttribute("Activity");
-            attributeDetailPage.clearDrillingSetting();
+            attributePage.initAttribute("Activity")
+                .clearDrillingSetting();
         }
     }
 

@@ -769,8 +769,8 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"}, groups = {"aggregation-metric"})
     public void checkDrillDownDefine() {
         initAttributePage();
-        attributePage.initAttribute(ATTR_STAGE_NAME);
-        attributeDetailPage.setDrillToAttribute(ATTR_DEPARTMENT);
+        attributePage.initAttribute(ATTR_STAGE_NAME)
+            .setDrillToAttribute(ATTR_DEPARTMENT);
 
         String metricName = "RUNSUM-Amount";
         CustomMetricUI customMetricInfo = new CustomMetricUI().withName(metricName).withFacts(FACT_AMOUNT);
