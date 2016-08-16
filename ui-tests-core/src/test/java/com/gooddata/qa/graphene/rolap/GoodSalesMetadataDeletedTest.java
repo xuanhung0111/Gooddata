@@ -6,6 +6,7 @@ import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -30,11 +31,13 @@ import com.gooddata.md.report.Report;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
+import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
+import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
@@ -445,7 +448,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
 
     private String createMetricUsing(FactInfo fact, SimpleMetricTypes sum) {
         initFactPage();
-        factsTable.selectObject(fact.name);
+        ObjectsTable.getInstance(id(ObjectTypes.FACT.getObjectsTableID()), browser).selectObject(fact.name);
         return factDetailPage.createSimpleMetric(SimpleMetricTypes.SUM, fact.name);
     }
 

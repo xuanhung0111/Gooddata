@@ -124,9 +124,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(id = "new")
     protected MetricPage metricPage;
 
-    @FindBy(id = "factsTable")
-    protected ObjectsTable factsTable;
-
     @FindBy(id = "p-objectPage")
     protected FactDetailPage factDetailPage;
 

@@ -1,10 +1,14 @@
 package com.gooddata.qa.graphene.manage;
 
+import static org.openqa.selenium.By.id;
+
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
+import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 
 public class GoodSalesFactTest extends ObjectAbstractTest {
 
@@ -40,6 +44,6 @@ public class GoodSalesFactTest extends ObjectAbstractTest {
     @Override
     public void initObject(String factName) {
         initFactPage();
-        factsTable.selectObject(factName);
+        ObjectsTable.getInstance(id(ObjectTypes.FACT.getObjectsTableID()), browser).selectObject(factName);
     }
 }
