@@ -62,6 +62,7 @@ public class GoodSalesManageObjectsTest extends ManageObjectsAbstractTest {
         Map<String, List<String>> tagsMap = new HashMap<String, List<String>>();
         tagsMap.put("newtag1", Arrays.asList("1", "40px"));
         tagsMap.put("newtag2", Arrays.asList("2", "15px"));
+        ObjectsTable metricsTable = ObjectsTable.getInstance(id(ObjectTypes.METRIC.getObjectsTableID()), browser);
         this.checkTagObjects(metricsTable, taggedObjects, tagsMap, Arrays.asList("# of Open Opps."));
         checkObjectLinkInTable(metricsTable, "# of Opportunities [BOP]");
     }

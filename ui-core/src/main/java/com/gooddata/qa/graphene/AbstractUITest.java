@@ -115,9 +115,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(css = VariablesPage.CSS_CLASS)
     protected VariablesPage variablePage;
 
-    @FindBy(id = "metricsTable")
-    protected ObjectsTable metricsTable;
-
     @FindBy(id = "p-objectPage")
     protected MetricDetailsPage metricDetailPage;
 

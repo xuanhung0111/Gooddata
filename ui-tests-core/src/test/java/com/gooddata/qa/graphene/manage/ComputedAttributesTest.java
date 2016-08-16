@@ -6,6 +6,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForObjectPageLoaded;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getBubbleMessage;
+import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -33,9 +34,11 @@ import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
+import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.manage.CreateAttributePage;
+import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.utils.graphene.Screenshots;
@@ -344,9 +347,8 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         attributeDetailPage.deleteAttribute();
 
         initMetricPage();
-        waitForElementVisible(metricsTable.getRoot());
         waitForDataPageLoaded(browser);
-        metricsTable.selectObject("# of Won Opps.");
+        ObjectsTable.getInstance(id(ObjectTypes.METRIC.getObjectsTableID()), browser).selectObject("# of Won Opps.");
         waitForObjectPageLoaded(browser);
         metricDetailPage.deleteMetric();
 
