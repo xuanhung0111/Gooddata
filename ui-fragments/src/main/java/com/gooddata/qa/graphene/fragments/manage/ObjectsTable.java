@@ -101,7 +101,7 @@ public class ObjectsTable extends AbstractTable {
         return this;
     }
 
-    public void sortObjectsTable(String sortType, List<String> defaultObjectsList) {
+    public ObjectsTable sortObjectsTable(String sortType, List<String> defaultObjectsList) {
         WebElement table = getRoot();
         List<String> sortedObjectsList = new ArrayList<String>();
         sortedObjectsList.addAll(defaultObjectsList);
@@ -117,5 +117,6 @@ public class ObjectsTable extends AbstractTable {
             assertTrue(row.getText().contains(sortedObjectsList.get(index)));
             index--;
         }
+        return this;
     }
 }

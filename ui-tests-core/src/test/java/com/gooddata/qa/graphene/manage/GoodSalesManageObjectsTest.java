@@ -69,10 +69,10 @@ public class GoodSalesManageObjectsTest extends ManageObjectsAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, priority = 1, groups = {"viewObjetcs", "variable"})
     public void viewVariablesTable() {
-        openObjectsTable(ObjectTypes.VARIABLE);
-        variablesTable.assertTableHeader();
-        variablesTable.sortObjectsTable(ObjectsTable.SORT_DESC, variablesList);
-        variablesTable.sortObjectsTable(ObjectsTable.SORT_ASC, variablesList);
+        ObjectsTable variablesTable = openObjectsTable(ObjectTypes.VARIABLE)
+            .assertTableHeader()
+            .sortObjectsTable(ObjectsTable.SORT_DESC, variablesList)
+            .sortObjectsTable(ObjectsTable.SORT_ASC, variablesList);
         Map<String, List<String>> taggedObjects = new HashMap<String, List<String>>();
         taggedObjects.put("Quota", Arrays.asList("newtag1", "newtag2"));
         taggedObjects.put("Status", Arrays.asList("newtag1"));
