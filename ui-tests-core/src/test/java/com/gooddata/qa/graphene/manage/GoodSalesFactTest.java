@@ -8,6 +8,8 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
+import com.gooddata.qa.graphene.fragments.manage.FactDetailPage;
+import com.gooddata.qa.graphene.fragments.manage.ObjectPropertiesPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 
 public class GoodSalesFactTest extends ObjectAbstractTest {
@@ -37,13 +39,13 @@ public class GoodSalesFactTest extends ObjectAbstractTest {
 
     @Test(dependsOnMethods = {"initialize"}, groups = { "object-tests" })
     public void changeFactFolderTest() {
-        initObject(name);
-        factDetailPage.changeFactFolder(factFolder);
+        initObject(name).changeObjectFolder(factFolder);
     }
 
     @Override
-    public void initObject(String factName) {
+    public ObjectPropertiesPage initObject(String factName) {
         initFactPage();
         ObjectsTable.getInstance(id(ObjectTypes.FACT.getObjectsTableID()), browser).selectObject(factName);
+        return FactDetailPage.getInstance(browser);
     }
 }

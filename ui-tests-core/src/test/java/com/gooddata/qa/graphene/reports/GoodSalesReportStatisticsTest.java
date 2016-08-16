@@ -133,10 +133,10 @@ public class GoodSalesReportStatisticsTest extends GoodSalesAbstractTest {
 
             final String objectName;
             if (type.toString().equals(DataType.ATTRIBUTE.toString())) {
-                objectName = AttributeDetailPage.getInstance(browser).getAttributeName();
+                objectName = AttributeDetailPage.getInstance(browser).getObjectName();
             } else {
                 waitForFragmentVisible(metricDetailPage);
-                objectName = metricDetailPage.getName();
+                objectName = metricDetailPage.getObjectName();
             }
             assertEquals(objectName, data);
             browser.close();

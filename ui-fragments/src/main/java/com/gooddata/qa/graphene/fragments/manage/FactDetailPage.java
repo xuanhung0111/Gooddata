@@ -3,19 +3,21 @@ package com.gooddata.qa.graphene.fragments.manage;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForObjectPageLoaded;
+import static org.openqa.selenium.By.xpath;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 import java.util.List;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
-public class FactDetailPage extends AbstractFragment {
+public class FactDetailPage extends ObjectPropertiesPage {
 
     @FindBy(id = "objectUsedInContainer")
     private WebElement objectUsedInContainer;
@@ -26,9 +28,6 @@ public class FactDetailPage extends AbstractFragment {
     @FindBy(xpath = "//div[contains(@class,'MAQLDocumentationContainer')]/a")
     private WebElement factLink;
 
-    @FindBy(id = "p-objectPage")
-    protected ObjectPropertiesPage objectPropertiesPage;
-
     private final String metricButtonLocator =
             "//td[@class='fceName' and text()='${metricType}']/../td[@class='fceList']/button";
     private final String createdMetricLocator =
@@ -36,8 +35,10 @@ public class FactDetailPage extends AbstractFragment {
     private final String metricLinkLocator =
             "//div[@id = 'objectUsedInContainer']/a[text() = '${metricName}']";
 
-    @FindBy(id = "p-objectPage")
-    private MetricDetailsPage metricDetailPage;
+    public static final FactDetailPage getInstance(SearchContext context) {
+        return Graphene.createPageFragment(FactDetailPage.class,
+                waitForElementVisible(xpath(ROOT_XPATH_LOCATOR), context));
+    }
 
     public String createSimpleMetric(SimpleMetricTypes metricType, String factName) {
         waitForObjectPageLoaded(browser);
@@ -68,11 +69,6 @@ public class FactDetailPage extends AbstractFragment {
         waitForElementVisible(metricLink, browser).click();
         String expectedMaql = String.format("SELECT %s(%s)", metricType, factName);
         String expectedFormat = "#,##0.00";
-        assertTrue(metricDetailPage.isMetricCreatedSuccessfully(expectedMaql, expectedFormat));
-    }
-
-    public void changeFactFolder(String newFolderName) {
-        waitForObjectPageLoaded(browser);
-        objectPropertiesPage.changeObjectFolder(newFolderName);
+        assertTrue(MetricDetailsPage.getInstance(browser).isMetricCreatedSuccessfully(expectedMaql, expectedFormat));
     }
 }

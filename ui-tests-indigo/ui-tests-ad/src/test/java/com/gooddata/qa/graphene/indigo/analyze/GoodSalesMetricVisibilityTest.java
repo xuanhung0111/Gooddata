@@ -74,7 +74,7 @@ public class GoodSalesMetricVisibilityTest extends GoodSalesAbstractAnalyseTest 
             return true;
         }
         metricPage.openMetricDetailPage(RATIO_METRIC);
-        waitForFragmentVisible(metricDetailPage).deleteMetric();
+        waitForFragmentVisible(metricDetailPage).deleteObject();
 
         initMetricPage();
         return !waitForFragmentVisible(metricPage).isMetricVisible(RATIO_METRIC);

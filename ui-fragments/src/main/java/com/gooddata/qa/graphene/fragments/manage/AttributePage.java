@@ -32,7 +32,7 @@ public class AttributePage extends AbstractFragment {
 
     public void configureAttributeLabel(String attributeName, AttributeLabelTypes attributeLabel) {
         initAttribute(attributeName);
-        assertEquals(attributeDetailPage.getAttributeName(), attributeName,
+        assertEquals(attributeDetailPage.getObjectName(), attributeName,
                 "Invalid attribute name on detail page");
         attributeDetailPage.selectLabelType(attributeLabel.getlabel());
         sleepTightInSeconds(2);
@@ -71,8 +71,7 @@ public class AttributePage extends AbstractFragment {
         if (attributeName.equals(newName))
             return;
 
-        initAttribute(attributeName);
-        attributeDetailPage.renameAttribute(newName);
+        initAttribute(attributeName).changeObjectName(newName);
     }
 
     public List<String> getAllAttributes() {

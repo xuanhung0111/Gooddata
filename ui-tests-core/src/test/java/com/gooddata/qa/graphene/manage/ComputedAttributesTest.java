@@ -345,13 +345,13 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     public void deleteAttributeAndMetricUsedInComputedAttribute() {
         initAttributePage();
         attributePage.initAttribute("Sales Rep")
-            .deleteAttribute();
+            .deleteObject();
 
         initMetricPage();
         waitForDataPageLoaded(browser);
         ObjectsTable.getInstance(id(ObjectTypes.METRIC.getObjectsTableID()), browser).selectObject("# of Won Opps.");
         waitForObjectPageLoaded(browser);
-        metricDetailPage.deleteMetric();
+        metricDetailPage.deleteObject();
 
         initReportsPage();
         reportsPage.getReportsList().openReport(REPORT_NAME);
@@ -371,7 +371,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     public void deleteVariableUsedInComputedAttributeReport() {
         initVariablePage()
                 .openVariableFromList(VARIABLE_NAME)
-                .deleteVariable();
+                .deleteObject();
 
         initReportsPage();
         reportsPage.getReportsList().openReport(CA_VARIABLE_REPORT_NAME);

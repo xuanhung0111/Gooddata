@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
@@ -21,11 +20,10 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.entity.variable.NumericVariable;
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.AbstractTable;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 
-public class VariableDetailPage extends AbstractFragment {
+public class VariableDetailPage extends ObjectPropertiesPage {
 
     private static final By LOCATOR = By.cssSelector("#p-objectPage.s-displayed");
 
@@ -37,8 +35,6 @@ public class VariableDetailPage extends AbstractFragment {
     private static final By BY_DEFAULT_NUMERIC_VALUE_INPUT = By.cssSelector(".defaultValue input");
 
     private static final By BY_SAVE_CHANGES_BUTTON = By.cssSelector(".yui3-c-button-showInline.s-btn-save_changes");
-    private static final By BY_DELETE_VARIABLE_BUTTON = By.cssSelector(".specialButton .s-btn-delete");
-    private static final By BY_CONFIRM_DELETE_VARIABLE_BUTTON = By.cssSelector(".t-confirmDelete .s-btn-delete");
 
     @FindBy(className = "s-name-ipe-placeholder")
     private WebElement nameTag;
@@ -91,12 +87,6 @@ public class VariableDetailPage extends AbstractFragment {
         waitForElementVisible(BY_SAVE_CHANGES_BUTTON, getRoot()).click();
         waitForElementNotPresent(BY_SAVE_CHANGES_BUTTON);
         return this;
-    }
-
-    public void deleteVariable() {
-        waitForElementVisible(BY_DELETE_VARIABLE_BUTTON, getRoot()).click();
-        waitForElementVisible(BY_CONFIRM_DELETE_VARIABLE_BUTTON, browser).click();
-        waitForDataPageLoaded(browser);
     }
 
     public VariablesPage goToVariablesPage() {
