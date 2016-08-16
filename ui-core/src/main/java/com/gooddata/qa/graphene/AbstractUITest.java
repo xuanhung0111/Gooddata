@@ -97,9 +97,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(id = "p-dataPage")
     protected DataPage dataPage;
 
-    @FindBy(id = "uploadsTable")
-    protected ObjectsTable datasetsTable;
-
     @FindBy(id = "p-dataPage")
     protected AttributePage attributePage;
 

@@ -12,6 +12,7 @@ import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
@@ -36,9 +37,11 @@ import com.gooddata.qa.graphene.entity.dlui.Dataset;
 import com.gooddata.qa.graphene.entity.dlui.Field;
 import com.gooddata.qa.graphene.entity.dlui.Field.FieldStatus;
 import com.gooddata.qa.graphene.entity.dlui.Field.FieldTypes;
+import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.AnnieUIDialogFragment;
+import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.utils.ads.AdsHelper;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.google.common.base.Predicate;
@@ -454,8 +457,8 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
             uploadCSV(getFilePathFromResource("/" + PAYROLL_CSV + "/payroll.csv"));
             addMultiFieldsAndAssertAnnieDialog(UserRoles.ADMIN);
             initManagePage();
-            assertThat(datasetsTable.getAllItems(), containsInAnyOrder("person", "opportunity", "Payroll", 
-                    "Date (Paydate)")); 
+            assertThat(ObjectsTable.getInstance(id(ObjectTypes.DATA_SETS.getObjectsTableID()), browser).getAllItems(),
+                    containsInAnyOrder("person", "opportunity", "Payroll", "Date (Paydate)")); 
             openProjectDetailPage(testParams.getProjectId());
             ScheduleBuilder scheduleBuilder = new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
                                     .setCronTime(ScheduleCronTimes.CRON_EVERYDAY)

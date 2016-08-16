@@ -473,7 +473,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
                 return !attributePage.isAttributeVisible(object);
             case DATASET:
                 initManagePage();
-                return !datasetsTable.getAllItems().contains(object);
+                return !ObjectsTable.getInstance(id(ObjectTypes.DATA_SETS.getObjectsTableID()), browser).getAllItems().contains(object);
             case VARIABLE:
                 initVariablePage();
                 return !variablePage.hasVariable(object);

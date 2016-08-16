@@ -12,6 +12,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -31,10 +32,12 @@ import org.testng.annotations.Test;
 import com.gooddata.md.Fact;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
+import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.google.common.collect.Lists;
 
 public class UploadTest extends AbstractCsvUploaderTest {
@@ -64,7 +67,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         datasetNames.addAll(asList(datasetName, "Date (Paydate)"));
 
         initManagePage();
-        waitForFragmentVisible(datasetsTable).selectObject(datasetName);
+        ObjectsTable.getInstance(id(ObjectTypes.DATA_SETS.getObjectsTableID()), browser).selectObject(datasetName);
         waitForFragmentVisible(datasetDetailPage);
         assertThat(datasetDetailPage.getAttributes(), containsInAnyOrder("Lastname", "Firstname", "Education",
                 "Position", "Department", "State", "County", format("Records of %s", datasetName)));
@@ -80,7 +83,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         datasetNames.addAll(asList(firstDatasetUploadName, "Date (Paydate)"));
 
         initManagePage();
-        datasetsTable.selectObject(firstDatasetUploadName);
+        ObjectsTable.getInstance(id(ObjectTypes.DATA_SETS.getObjectsTableID()), browser).selectObject(firstDatasetUploadName);
         String latestUploadDate = waitForFragmentVisible(datasetDetailPage).getLatestUploadDate();
 
         dataset = uploadCsv(PAYROLL);
@@ -90,7 +93,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         datasetNames.add(secondDatasetUploadName);
 
         initManagePage();
-        datasetsTable.selectObject(firstDatasetUploadName);
+        ObjectsTable.getInstance(id(ObjectTypes.DATA_SETS.getObjectsTableID()), browser).selectObject(firstDatasetUploadName);
         assertEquals(waitForFragmentVisible(datasetDetailPage).getLatestUploadDate(), latestUploadDate);
     }
 
@@ -300,7 +303,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
 
     private void deleteDataset(String datasetName) {
         initManagePage();
-        datasetsTable.selectObject(datasetName);
+        ObjectsTable.getInstance(id(ObjectTypes.DATA_SETS.getObjectsTableID()), browser).selectObject(datasetName);
         datasetDetailPage.deleteDataset();
     }
 
