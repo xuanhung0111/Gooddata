@@ -104,8 +104,8 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
             .changeObjectName(xssAttribute);
 
         initMetricPage();
-        waitForFragmentVisible(metricPage).openMetricDetailPage(METRIC_PERCENT_OF_GOAL);
-        waitForFragmentVisible(metricDetailPage).changeObjectName(xssMetric);
+        waitForFragmentVisible(metricPage).openMetricDetailPage(METRIC_PERCENT_OF_GOAL)
+            .changeObjectName(xssMetric);
 
         try {
             initAnalysePage();
@@ -144,8 +144,8 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
                 .changeObjectName(ATTR_IS_WON);
 
             initMetricPage();
-            waitForFragmentVisible(metricPage).openMetricDetailPage(xssMetric);
-            waitForFragmentVisible(metricDetailPage).changeObjectName(METRIC_PERCENT_OF_GOAL);
+            waitForFragmentVisible(metricPage).openMetricDetailPage(xssMetric)
+                .changeObjectName(METRIC_PERCENT_OF_GOAL);
         }
     }
 
@@ -199,8 +199,8 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
 
     private void deleteMetric(String metric) {
         initMetricPage();
-        metricPage.openMetricDetailPage(metric);
-        waitForFragmentVisible(metricDetailPage).deleteObject();
+        metricPage.openMetricDetailPage(metric)
+            .deleteObject();
         assertFalse(metricPage.isMetricVisible(metric));
     }
 }

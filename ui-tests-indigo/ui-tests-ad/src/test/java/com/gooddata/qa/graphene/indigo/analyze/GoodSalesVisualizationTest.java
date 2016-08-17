@@ -160,8 +160,8 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
     @Test(dependsOnGroups = {"init"})
     public void checkXssInMetricData() throws ParseException, JSONException, IOException {
         initMetricPage();
-        waitForFragmentVisible(metricPage).openMetricDetailPage(METRIC_PERCENT_OF_GOAL);
-        String oldFormat = waitForFragmentVisible(metricDetailPage).getMetricFormat();
+        String oldFormat = waitForFragmentVisible(metricPage).openMetricDetailPage(METRIC_PERCENT_OF_GOAL)
+                .getMetricFormat();
 
         String uri = format(PERCENT_OF_GOAL_URI, testParams.getProjectId());
         changeMetricFormat(getRestApiClient(), uri, "<script> alert('test'); </script> #,##0.00");

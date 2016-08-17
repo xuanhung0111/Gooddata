@@ -39,6 +39,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.CreateAttributePage;
+import com.gooddata.qa.graphene.fragments.manage.MetricDetailsPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.CssUtils;
@@ -351,7 +352,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         waitForDataPageLoaded(browser);
         ObjectsTable.getInstance(id(ObjectTypes.METRIC.getObjectsTableID()), browser).selectObject("# of Won Opps.");
         waitForObjectPageLoaded(browser);
-        metricDetailPage.deleteObject();
+        MetricDetailsPage.getInstance(browser).deleteObject();
 
         initReportsPage();
         reportsPage.getReportsList().openReport(REPORT_NAME);

@@ -101,12 +101,13 @@ public class MetricPage extends AbstractFragment {
                 browser)).isMetricCreatedSuccessfully(expectedMaql, expectedFormat);
     }
 
-    public void openMetricDetailPage(String metric) {
+    public MetricDetailsPage openMetricDetailPage(String metric) {
         ObjectsTable metricsTable = Graphene.createPageFragment(ObjectsTable.class,
                 waitForElementVisible(By.id("metricsTable"), browser));
         waitForDataPageLoaded(browser);
         metricsTable.selectObject(metric);
         waitForObjectPageLoaded(browser);
+        return MetricDetailsPage.getInstance(browser);
     }
 
     public boolean isMetricVisible(String metric) {

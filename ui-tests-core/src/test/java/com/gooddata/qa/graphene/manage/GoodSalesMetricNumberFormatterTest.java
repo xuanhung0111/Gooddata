@@ -18,6 +18,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
+import com.gooddata.qa.graphene.fragments.manage.MetricDetailsPage;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
@@ -35,15 +36,15 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"})
     public void testNumberFormatEditor() {
         initMetricPage();
-        waitForFragmentVisible(metricPage).openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES);
         // don't know why get text of metric format in metric detail page return #,##0 instead of #,##0.00
-        assertTrue(Formatter.DEFAULT.toString().startsWith(waitForFragmentVisible(metricDetailPage)
+        assertTrue(Formatter.DEFAULT.toString().startsWith(waitForFragmentVisible(metricPage)
+                .openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES)
                 .changeMetricFormatButDiscard(Formatter.BARS)
                 .getMetricFormat()));
         Screenshots.takeScreenshot(browser, "testNumberFormatEditor-beforeChangeFormat", getClass());
-        metricDetailPage.changeMetricFormat(Formatter.BARS);
+        MetricDetailsPage.getInstance(browser).changeMetricFormat(Formatter.BARS);
         Screenshots.takeScreenshot(browser, "testNumberFormatEditor-afterChangeFormat", getClass());
-        assertEquals(metricDetailPage.getMetricFormat(), Formatter.BARS.toString());
+        assertEquals(MetricDetailsPage.getInstance(browser).getMetricFormat(), Formatter.BARS.toString());
 
         try {
             initReportPage();
@@ -162,8 +163,7 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
     private void resetMetricFormat() {
         initProjectsPage();
         initMetricPage();
-        waitForFragmentVisible(metricPage).openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES);
-        assertEquals(waitForFragmentVisible(metricDetailPage).changeMetricFormat(Formatter.DEFAULT)
-                .getMetricFormat(), Formatter.DEFAULT.toString());
+        assertEquals(waitForFragmentVisible(metricPage).openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES)
+                .changeMetricFormat(Formatter.DEFAULT).getMetricFormat(), Formatter.DEFAULT.toString());
     }
 }
