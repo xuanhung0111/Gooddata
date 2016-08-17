@@ -82,20 +82,20 @@ public class GoodSalesManageObjectsTest extends ManageObjectsAbstractTest {
     public void moveFactsBetweenFolders() {
         List<String> movedObjects = Arrays.asList("Amount", "Days to Close", "Duration", "Probability", 
                 "Velocity", "Timeline (Date)");
-        moveObjectsBetweenFolders(ObjectTypes.FACT, movedObjects, "2", "Stage History");
+        moveObjectsBetweenFolders(ObjectTypes.FACT, movedObjects, "Stage History");
     }
 
     @Test(dependsOnGroups = {"createProject"}, priority = 1, groups = {"moveObjects", "attribute"})
     public void moveAttributesBetweenFolders() {
         List<String> movedObjects = Arrays.asList("Activity", "Priority", "Product", "Region");
-        moveObjectsBetweenFolders(ObjectTypes.ATTRIBUTE, movedObjects, "2", "Activity");
+        moveObjectsBetweenFolders(ObjectTypes.ATTRIBUTE, movedObjects, "Activity");
     }
 
     @Test(dependsOnGroups = {"createProject"}, priority = 1, groups = {"moveObjects", "metric"})
     public void moveMetricsBetweenFolders() {
         List<String> movedObjects = Arrays.asList("Amount [BOP]", "Best Case [BOP]", "Probability [BOP]", 
                 "_Close [EOP]");
-        moveObjectsBetweenFolders(ObjectTypes.METRIC, movedObjects, "2", "_System");
+        moveObjectsBetweenFolders(ObjectTypes.METRIC, movedObjects, "_System");
     }
 
     @Test(dependsOnGroups = {"createProject"}, priority = 2, groups = {"deleteObjects", "fact"})
