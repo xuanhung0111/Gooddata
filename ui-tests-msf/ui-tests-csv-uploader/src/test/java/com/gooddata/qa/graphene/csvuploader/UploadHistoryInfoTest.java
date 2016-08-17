@@ -16,6 +16,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
+import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
@@ -62,7 +63,7 @@ public class UploadHistoryInfoTest extends AbstractCsvUploaderTest {
         Dataset.waitForDatasetLoaded(browser);
         takeScreenshot(browser, "Date-format-show-in-Date-Created-column", getClass());
 
-        assertTrue(datasetsListPage
+        assertTrue(DatasetsListPage.getInstance(browser)
                 .getMyDatasetsTable()
                 .getDataset(DATASET_NAME)
                 .getCreatedDate()
@@ -106,7 +107,7 @@ public class UploadHistoryInfoTest extends AbstractCsvUploaderTest {
         initDataUploadPage();
         takeScreenshot(browser, "Date-format-show-in-Date-Updated-column-by-another-user", getClass());
 
-        assertTrue(datasetsListPage.getMyDatasetsTable()
+        assertTrue(DatasetsListPage.getInstance(browser).getMyDatasetsTable()
                 .getDataset(DATASET_NAME)
                 .getUpdatedDate()
                 .matches(DATE_FORMAT + " by " + otherAdminUserName), "Date format is invalid");

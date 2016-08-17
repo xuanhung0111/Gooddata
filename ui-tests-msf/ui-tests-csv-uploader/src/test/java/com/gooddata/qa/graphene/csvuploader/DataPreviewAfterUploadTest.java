@@ -32,6 +32,7 @@ import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
+import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataTypeSelect.ColumnType;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;
 import com.google.common.collect.Lists;
@@ -70,7 +71,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
             NO_HEADER.saveToDisc(testParams.getCsvFolder());
         }
 
-        final DataPreviewPage dataPreviewPage = datasetsListPage.uploadFile(NO_HEADER.getFilePath());
+        final DataPreviewPage dataPreviewPage = DatasetsListPage.getInstance(browser).uploadFile(NO_HEADER.getFilePath());
         checkDataPreview(dataPreviewPage, NO_HEADER);
         takeScreenshot(browser, "empty-column-name-in-" + NO_HEADER.getFileName(), getClass());
 
@@ -91,15 +92,15 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
 
         final String datasetName = getNewDataset(NO_HEADER);
 
-        assertEquals(datasetsListPage.getMyDatasetsCount(), datasetCountBeforeUpload + 1);
+        assertEquals(DatasetsListPage.getInstance(browser).getMyDatasetsCount(), datasetCountBeforeUpload + 1);
 
-        assertTrue(datasetsListPage.getMyDatasetsTable()
+        assertTrue(DatasetsListPage.getInstance(browser).getMyDatasetsTable()
             .getDataset(datasetName)
             .getStatus()
             .matches(SUCCESSFUL_STATUS_MESSAGE_REGEX)); 
         takeScreenshot(browser, "dataset-uploaded-" + datasetName, getClass());
 
-        final DatasetDetailPage datasetDetailPage = waitForFragmentVisible(datasetsListPage)
+        final DatasetDetailPage datasetDetailPage = DatasetsListPage.getInstance(browser)
                 .openDatasetDetailPage(datasetName);
         takeScreenshot(browser, DATASET_DETAIL_PAGE_NAME, getClass());
 
@@ -112,22 +113,22 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
     public void checkFieldTypeDetection() {
         final int datasetCountBeforeUpload = initDataUploadPage().getMyDatasetsCount();
 
-        final DataPreviewPage dataPreviewPage = datasetsListPage.uploadFile(PAYROLL.getFilePath());
+        final DataPreviewPage dataPreviewPage = DatasetsListPage.getInstance(browser).uploadFile(PAYROLL.getFilePath());
         checkDataPreview(dataPreviewPage, PAYROLL);
         dataPreviewPage.triggerIntegration();
         Dataset.waitForDatasetLoaded(browser);
 
         final String datasetName = getNewDataset(PAYROLL);
 
-        assertEquals(datasetsListPage.getMyDatasetsCount(), datasetCountBeforeUpload + 1);
+        assertEquals(DatasetsListPage.getInstance(browser).getMyDatasetsCount(), datasetCountBeforeUpload + 1);
 
-        assertTrue(datasetsListPage.getMyDatasetsTable()
+        assertTrue(DatasetsListPage.getInstance(browser).getMyDatasetsTable()
             .getDataset(datasetName)
             .getStatus()
             .matches(SUCCESSFUL_STATUS_MESSAGE_REGEX)); 
         takeScreenshot(browser, "dataset-uploaded-" + datasetName, getClass());
 
-        final DatasetDetailPage datasetDetailPage = waitForFragmentVisible(datasetsListPage)
+        final DatasetDetailPage datasetDetailPage = DatasetsListPage.getInstance(browser)
                 .openDatasetDetailPage(datasetName);
         takeScreenshot(browser, DATASET_DETAIL_PAGE_NAME, getClass());
 
@@ -140,7 +141,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
     public void changeColumnType() {
         final int datasetCountBeforeUpload = initDataUploadPage().getMyDatasetsCount();
 
-        final DataPreviewPage dataPreviewPage = datasetsListPage.uploadFile(PAYROLL.getFilePath());
+        final DataPreviewPage dataPreviewPage = DatasetsListPage.getInstance(browser).uploadFile(PAYROLL.getFilePath());
         final DataPreviewTable dataPreviewTable = dataPreviewPage.getDataPreviewTable();
         final String columnNameToChangeType = "Paydate";
 
@@ -156,15 +157,15 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
 
         final String datasetName = getNewDataset(PAYROLL);
 
-        assertEquals(datasetsListPage.getMyDatasetsCount(), datasetCountBeforeUpload + 1);
+        assertEquals(DatasetsListPage.getInstance(browser).getMyDatasetsCount(), datasetCountBeforeUpload + 1);
 
-        assertTrue(datasetsListPage.getMyDatasetsTable()
+        assertTrue(DatasetsListPage.getInstance(browser).getMyDatasetsTable()
             .getDataset(datasetName)
             .getStatus()
             .matches(SUCCESSFUL_STATUS_MESSAGE_REGEX)); 
         takeScreenshot(browser, "changed-type-dataset-uploaded-" + datasetName, getClass());
 
-        final DatasetDetailPage datasetDetailPage = waitForFragmentVisible(datasetsListPage)
+        final DatasetDetailPage datasetDetailPage = DatasetsListPage.getInstance(browser)
                 .openDatasetDetailPage(datasetName);
         takeScreenshot(browser, DATASET_DETAIL_PAGE_NAME, getClass());
 
@@ -180,7 +181,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
                 getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/multiple.column.name.rows.csv"))
                     .setColumnTypes("Measure", "Attribute", "Attribute", "Measure", "Measure");
 
-        final DataPreviewPage dataPreviewPage = datasetsListPage.uploadFile(fileToUpload.getFilePath());
+        final DataPreviewPage dataPreviewPage = DatasetsListPage.getInstance(browser).uploadFile(fileToUpload.getFilePath());
         dataPreviewPage.selectHeader();
 
         final DataPreviewTable dataPreviewTable = dataPreviewPage.getDataPreviewTable();
@@ -208,15 +209,15 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
 
         final String datasetName = getNewDataset(fileToUpload);
 
-        assertEquals(datasetsListPage.getMyDatasetsCount(), datasetCountBeforeUpload + 1);
+        assertEquals(DatasetsListPage.getInstance(browser).getMyDatasetsCount(), datasetCountBeforeUpload + 1);
 
-        assertTrue(datasetsListPage.getMyDatasetsTable()
+        assertTrue(DatasetsListPage.getInstance(browser).getMyDatasetsTable()
             .getDataset(datasetName)
             .getStatus()
             .matches(SUCCESSFUL_STATUS_MESSAGE_REGEX)); 
         takeScreenshot(browser, "multi-header-dataset-uploaded-" + datasetName, getClass());
 
-        waitForFragmentVisible(datasetsListPage).openDatasetDetailPage(datasetName);
+        DatasetsListPage.getInstance(browser).openDatasetDetailPage(datasetName);
         takeScreenshot(browser, DATASET_DETAIL_PAGE_NAME, getClass());
 
         checkCsvDatasetDetail(datasetName, fileToUpload.getColumnNames(), fileToUpload.getColumnTypes());
@@ -226,7 +227,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
     public void setCustomHeader() {
         final int datasetCountBeforeUpload = initDataUploadPage().getMyDatasetsCount();
 
-        final DataPreviewPage dataPreviewPage = datasetsListPage.uploadFile(PAYROLL.getFilePath());
+        final DataPreviewPage dataPreviewPage = DatasetsListPage.getInstance(browser).uploadFile(PAYROLL.getFilePath());
         dataPreviewPage.selectHeader()
             .getRowSelectionTable()
             .getRow(3)
@@ -271,16 +272,16 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
 
         final String datasetName = getNewDataset(PAYROLL);
 
-        assertEquals(datasetsListPage.getMyDatasetsCount(), datasetCountBeforeUpload + 1);
+        assertEquals(DatasetsListPage.getInstance(browser).getMyDatasetsCount(), datasetCountBeforeUpload + 1);
 
-        assertTrue(datasetsListPage.getMyDatasetsTable()
+        assertTrue(DatasetsListPage.getInstance(browser).getMyDatasetsTable()
             .getDataset(datasetName)
             .getStatus()
             .matches(SUCCESSFUL_STATUS_MESSAGE_REGEX)); 
 
         final int numberOfRows = (int) (PAYROLL.getDataRowCount() - 3); // All rows above header shouldn't be added
 
-        assertTrue(waitForFragmentVisible(datasetsListPage)
+        assertTrue(DatasetsListPage.getInstance(browser)
                 .getMyDatasetsTable()
                 .getDataset(datasetName)
                 .getStatus()
@@ -289,7 +290,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
 
         takeScreenshot(browser, "dataset-uploaded" + datasetName, getClass());
 
-        waitForFragmentVisible(datasetsListPage).openDatasetDetailPage(datasetName);
+        DatasetsListPage.getInstance(browser).openDatasetDetailPage(datasetName);
         takeScreenshot(browser, DATASET_DETAIL_PAGE_NAME, getClass());
 
         checkCsvDatasetDetail(datasetName, customHeaderColumns, PAYROLL.getColumnTypes());
@@ -299,7 +300,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
     public void cancelChangeColumnNames() {
         final int datasetCountBeforeUpload = initDataUploadPage().getMyDatasetsCount();
 
-        final DataPreviewPage dataPreviewPage = datasetsListPage.uploadFile(PAYROLL.getFilePath());
+        final DataPreviewPage dataPreviewPage = DatasetsListPage.getInstance(browser).uploadFile(PAYROLL.getFilePath());
         dataPreviewPage.selectHeader()
             .getRowSelectionTable()
             .getRow(3)
@@ -330,15 +331,15 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
 
         final String datasetName = getNewDataset(PAYROLL);
 
-        assertEquals(datasetsListPage.getMyDatasetsCount(), datasetCountBeforeUpload + 1);
+        assertEquals(DatasetsListPage.getInstance(browser).getMyDatasetsCount(), datasetCountBeforeUpload + 1);
 
-        assertTrue(datasetsListPage.getMyDatasetsTable()
+        assertTrue(DatasetsListPage.getInstance(browser).getMyDatasetsTable()
             .getDataset(datasetName)
             .getStatus()
             .matches(SUCCESSFUL_STATUS_MESSAGE_REGEX)); 
         takeScreenshot(browser, "dataset-uploaded-" + datasetName, getClass());
 
-        waitForFragmentVisible(datasetsListPage).openDatasetDetailPage(datasetName);
+        DatasetsListPage.getInstance(browser).openDatasetDetailPage(datasetName);
         takeScreenshot(browser, DATASET_DETAIL_PAGE_NAME, getClass());
 
         checkCsvDatasetDetail(datasetName, PAYROLL.getColumnNames(), PAYROLL.getColumnTypes());
@@ -352,7 +353,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
             NO_HEADER.saveToDisc(testParams.getCsvFolder());
         }
 
-        final DataPreviewPage dataPreviewPage = datasetsListPage.uploadFile(NO_HEADER.getFilePath());
+        final DataPreviewPage dataPreviewPage = DatasetsListPage.getInstance(browser).uploadFile(NO_HEADER.getFilePath());
         checkDataPreview(dataPreviewPage, NO_HEADER);
 
         final DataPreviewTable dataPreviewTable = dataPreviewPage.getDataPreviewTable();
@@ -390,15 +391,15 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
 
         final String datasetName = getNewDataset(NO_HEADER);
 
-        assertEquals(datasetsListPage.getMyDatasetsCount(), datasetCountBeforeUpload + 1);
+        assertEquals(DatasetsListPage.getInstance(browser).getMyDatasetsCount(), datasetCountBeforeUpload + 1);
 
-        assertTrue(datasetsListPage.getMyDatasetsTable()
+        assertTrue(DatasetsListPage.getInstance(browser).getMyDatasetsTable()
             .getDataset(datasetName)
             .getStatus()
             .matches(SUCCESSFUL_STATUS_MESSAGE_REGEX)); 
         takeScreenshot(browser, "dataset-uploaded-" + datasetName, getClass());
 
-        waitForFragmentVisible(datasetsListPage).openDatasetDetailPage(datasetName);
+        DatasetsListPage.getInstance(browser).openDatasetDetailPage(datasetName);
         takeScreenshot(browser, DATASET_DETAIL_PAGE_NAME, getClass());
 
         checkCsvDatasetDetail(datasetName, customHeaderColumns, NO_HEADER.getColumnTypes());

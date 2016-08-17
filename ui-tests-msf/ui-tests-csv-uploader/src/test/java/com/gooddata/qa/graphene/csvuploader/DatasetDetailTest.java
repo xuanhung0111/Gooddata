@@ -65,7 +65,6 @@ public class DatasetDetailTest extends AbstractCsvUploaderTest {
     }
 
     private DatasetDetailPage openDatasetDetailsPage() {
-        initDataUploadPage();
-        return datasetsListPage.openDatasetDetailPage(PAYROLL_DATASET_NAME);
+        return initDataUploadPage().openDatasetDetailPage(PAYROLL_DATASET_NAME);
     }
 }

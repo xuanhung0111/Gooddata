@@ -26,6 +26,7 @@ import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
+import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataTypeSelect.ColumnType;
 import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadDialog;
 
@@ -79,7 +80,7 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
 
         final String datasetName = BAD_STRUCTURE_FILE.getDatasetNameOfFirstUpload();
         assertThat("Dataset with name '" + datasetName + "' should not be in datasets list.",
-                datasetsListPage.getMyDatasetsTable().getDatasetNames(),
+                DatasetsListPage.getInstance(browser).getMyDatasetsTable().getDatasetNames(),
                 not(hasItem(datasetName)));
     }
 

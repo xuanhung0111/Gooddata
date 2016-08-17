@@ -19,6 +19,7 @@ import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
+import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 
 public class TooltipValidationTest extends AbstractCsvUploaderTest {
 
@@ -37,14 +38,12 @@ public class TooltipValidationTest extends AbstractCsvUploaderTest {
                 getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/24dates.yyyy.csv"))
                 .getFilePath();
 
-        initDataUploadPage();
-
-        String tooltipOnAddDataButton = getTooltipFromElement(datasetsListPage.waitForAddDataButtonVisible(), browser);
+        String tooltipOnAddDataButton = getTooltipFromElement(initDataUploadPage().waitForAddDataButtonVisible(), browser);
 
         takeScreenshot(browser, "Tooltip-on-add-data-button", getClass());
         assertEquals(tooltipOnAddDataButton, ADD_DATA_BUTTON_TOOLTIP);
 
-        datasetsListPage
+        DatasetsListPage.getInstance(browser)
                 .uploadFile(csvFileFilePath)
                 .triggerIntegration();
 
@@ -86,9 +85,7 @@ public class TooltipValidationTest extends AbstractCsvUploaderTest {
                 .rows("Khoa", "99999")
                 .saveToDisc(testParams.getCsvFolder());
 
-        initDataUploadPage();
-
-        DataPreviewTable dataPreviewTable = datasetsListPage.uploadFile(csvFileFilePath)
+        DataPreviewTable dataPreviewTable = initDataUploadPage().uploadFile(csvFileFilePath)
                 .getDataPreviewTable();
 
         dataPreviewTable.changeColumnName(0, "Number");

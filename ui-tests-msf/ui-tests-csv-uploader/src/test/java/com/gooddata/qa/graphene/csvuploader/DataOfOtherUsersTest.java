@@ -21,6 +21,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
+import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 
 public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
 
@@ -57,9 +58,9 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
 
             initDataUploadPage().waitForMyDatasetsEmptyStateLoaded();
 
-            assertEquals(datasetsListPage.getOthersDatasetsTable().getNumberOfDatasets(),
+            assertEquals(DatasetsListPage.getInstance(browser).getOthersDatasetsTable().getNumberOfDatasets(),
                     projectOwnerDatasetNames.size());
-            assertThat(datasetsListPage.getOthersDatasetsTable().getDatasetNames(),
+            assertThat(DatasetsListPage.getInstance(browser).getOthersDatasetsTable().getDatasetNames(),
                     contains(projectOwnerDatasetNames.toArray()));
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
@@ -84,9 +85,9 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
 
             takeScreenshot(browser, "dataset-uploaded-" + dataset.getName(), getClass());
 
-            waitForCollectionIsNotEmpty(datasetsListPage.getOthersDatasetsTable().getRows());
-            assertEquals(datasetsListPage.getOtherDatasetsCount(), projectOwnerDatasetNames.size());
-            assertThat(datasetsListPage.getOthersDatasetsTable().getDatasetNames(),
+            waitForCollectionIsNotEmpty(DatasetsListPage.getInstance(browser).getOthersDatasetsTable().getRows());
+            assertEquals(DatasetsListPage.getInstance(browser).getOtherDatasetsCount(), projectOwnerDatasetNames.size());
+            assertThat(DatasetsListPage.getInstance(browser).getOthersDatasetsTable().getDatasetNames(),
                     contains(projectOwnerDatasetNames.toArray()));
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
@@ -102,7 +103,7 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
             final String datasetName = PAYROLL.getDatasetNameOfFirstUpload();
             final int datasetCountBeforeDelete = initDataUploadPage().getOtherDatasetsCount();
 
-            datasetsListPage.getOthersDatasetsTable()
+            DatasetsListPage.getInstance(browser).getOthersDatasetsTable()
                 .getDataset(datasetName)
                 .clickDeleteButton()
                 .clickDelete();
@@ -111,7 +112,7 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
             assertEquals(DatasetMessageBar.getInstance(browser).waitForSuccessMessageBar().getText(),
                     format("\"%s\" was successfully deleted!", datasetName));
 
-            final int datasetCountAfterDelete = waitForFragmentVisible(datasetsListPage).getOtherDatasetsCount();
+            final int datasetCountAfterDelete = DatasetsListPage.getInstance(browser).getOtherDatasetsCount();
             assertEquals(datasetCountAfterDelete, datasetCountBeforeDelete - 1,
                     "Dataset count <" + datasetCountAfterDelete + "> in the dataset list doesn't"
                             + " match expected value <" + (datasetCountBeforeDelete - 1) + ">.");
@@ -162,7 +163,7 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
             assertEquals(DatasetMessageBar.getInstance(browser).waitForSuccessMessageBar().getText(),
                     format("\"%s\" was successfully deleted!", datasetName));
 
-            final int datasetCountAfterDelete = waitForFragmentVisible(datasetsListPage).getMyDatasetsCount();
+            final int datasetCountAfterDelete = DatasetsListPage.getInstance(browser).getMyDatasetsCount();
             assertEquals(datasetCountAfterDelete, datasetCount,
                     "Dataset count <" + datasetCountAfterDelete + "> in the dataset list doesn't "
                             + "match expected value <" + datasetCount + ">.");

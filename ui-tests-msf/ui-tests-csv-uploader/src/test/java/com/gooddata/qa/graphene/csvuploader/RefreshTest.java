@@ -22,6 +22,7 @@ import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
+import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadDialog;
 
 public class RefreshTest extends AbstractCsvUploaderTest {
@@ -51,7 +52,7 @@ public class RefreshTest extends AbstractCsvUploaderTest {
     public void checkSetHeaderHiddenWhenUpdate() {
         initDataUploadPage();
 
-        waitForFragmentVisible(datasetsListPage)
+        DatasetsListPage.getInstance(browser)
             .getMyDatasetsTable()
             .getDataset(PAYROLL.getDatasetNameOfFirstUpload())
             .clickUpdateButton()
@@ -98,8 +99,8 @@ public class RefreshTest extends AbstractCsvUploaderTest {
             .clickUploadButton();
         DataPreviewPage.getInstance(browser).cancelTriggerIntegration();
 
-        waitForFragmentVisible(datasetsListPage);
-
+        // wait for data sets list page loaded
+        DatasetsListPage.getInstance(browser);
         final DatasetDetailPage datasetDetailPage = waitForFragmentVisible(dataset)
             .openDetailPage();
 

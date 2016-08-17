@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.csvuploader;
 
 import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
@@ -22,6 +21,7 @@ import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDeleteDialog;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
+import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.google.common.base.Predicate;
 
@@ -48,7 +48,7 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
 
         final int datasetCountBeforeDelete = initDataUploadPage().getMyDatasetsCount();
 
-        final DatasetDeleteDialog deleteDialog = datasetsListPage.getMyDatasetsTable()
+        final DatasetDeleteDialog deleteDialog = DatasetsListPage.getInstance(browser).getMyDatasetsTable()
             .getDataset(datasetName)
             .clickDeleteButton();
 
@@ -61,7 +61,7 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
         assertEquals(DatasetMessageBar.getInstance(browser).waitForSuccessMessageBar().getText(),
                 format(SUCCESSFUL_REMOVE_DATASET, datasetName));
 
-        final int datasetCountAfterDelete = waitForFragmentVisible(datasetsListPage).getMyDatasetsCount();
+        final int datasetCountAfterDelete = DatasetsListPage.getInstance(browser).getMyDatasetsCount();
         assertEquals(datasetCountAfterDelete, datasetCountBeforeDelete - 1,
                 "Dataset count <" + datasetCountAfterDelete + "> in the dataset list"
                         + " doesn't match expected value <" + (datasetCountBeforeDelete - 1) + ">.");
@@ -77,9 +77,9 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
     public void deleteCsvDatasetFromDetail() {
         final String datasetName = uploadCsv(PAYROLL).getName();
 
-        final int datasetCountBeforeDelete = datasetsListPage.getMyDatasetsCount();
+        final int datasetCountBeforeDelete = DatasetsListPage.getInstance(browser).getMyDatasetsCount();
 
-        datasetsListPage.getMyDatasetsTable()
+        DatasetsListPage.getInstance(browser).getMyDatasetsTable()
             .getDataset(datasetName)
             .openDetailPage()
             .clickDeleteButton()
@@ -89,7 +89,7 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
         assertEquals(DatasetMessageBar.getInstance(browser).waitForSuccessMessageBar().getText(),
                 format(SUCCESSFUL_REMOVE_DATASET, datasetName));
 
-        final int datasetCountAfterDelete = waitForFragmentVisible(datasetsListPage).getMyDatasetsCount();
+        final int datasetCountAfterDelete = DatasetsListPage.getInstance(browser).getMyDatasetsCount();
         assertEquals(datasetCountAfterDelete, datasetCountBeforeDelete - 1,
                 "Dataset count <" + datasetCountAfterDelete + "> in the dataset list"
                         + " doesn't match expected value <" + (datasetCountBeforeDelete - 1) + ">.");
@@ -103,9 +103,9 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
     public void cancelDeleteDataset() {
         final String datasetName = uploadCsv(PAYROLL).getName();
 
-        final int datasetCountBeforeDelete = datasetsListPage.getMyDatasetsCount();
+        final int datasetCountBeforeDelete = DatasetsListPage.getInstance(browser).getMyDatasetsCount();
 
-        final DatasetDetailPage datasetDetailPage = datasetsListPage
+        final DatasetDetailPage datasetDetailPage = DatasetsListPage.getInstance(browser)
                 .getMyDatasetsTable()
                 .getDataset(datasetName)
                 .openDetailPage();
@@ -120,13 +120,13 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
                 "Dataset count <" + datasetCountAfterDelete + "> in the dataset list"
                         + " doesn't match expected value <" + datasetCountBeforeDelete + ">.");
 
-        datasetsListPage
+        DatasetsListPage.getInstance(browser)
             .getMyDatasetsTable()
             .getDataset(datasetName)
             .clickDeleteButton()
             .clickCancel();
 
-        datasetCountAfterDelete = waitForFragmentVisible(datasetsListPage).getMyDatasetsCount();
+        datasetCountAfterDelete = DatasetsListPage.getInstance(browser).getMyDatasetsCount();
         assertEquals(datasetCountAfterDelete, datasetCountBeforeDelete,
                 "Dataset count <" + datasetCountAfterDelete + "> in the dataset list"
                         + " doesn't match expected value <" + datasetCountBeforeDelete + ">.");
@@ -141,7 +141,7 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
     private void checkForDatasetRemoved(final String csvDatasetName) {
         final Predicate<WebDriver> datasetSuccessfullyRemoved = input -> {
             try {
-                waitForFragmentVisible(datasetsListPage).getMyDatasetsTable().getDataset(csvDatasetName);
+                DatasetsListPage.getInstance(browser).getMyDatasetsTable().getDataset(csvDatasetName);
                 return false;
             } catch (NoSuchElementException e) {
                 return true;
