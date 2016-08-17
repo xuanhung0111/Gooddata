@@ -100,9 +100,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(id = "p-dataPage")
     protected AttributePage attributePage;
 
-    @FindBy(id = "p-objectPage")
-    protected DatasetDetailPage datasetDetailPage;
-
     @FindBy(css = VariablesPage.CSS_CLASS)
     protected VariablesPage variablePage;
 
