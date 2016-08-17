@@ -150,11 +150,11 @@ public class PartialExportAndImportProjectTest extends AbstractProjectTest {
             testParams.setProjectId(targetProjectId);
             importPartialProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
 
-            initMetricPage().openMetricDetailPage(SPEND);
-            assertTrue(metricDetailPage.getMAQL().equals("SELECT SUM(ifnull(Spend,0))"), "The imported metric is not correct");
+            assertTrue(initMetricPage().openMetricDetailPage(SPEND).getMAQL()
+                    .equals("SELECT SUM(ifnull(Spend,0))"), "The imported metric is not correct");
 
-            initMetricPage().openMetricDetailPage(SIMPLE_METRIC);
-            assertTrue(metricDetailPage.getMAQL().equals("SELECT SUM(Sales)"), "The imported metric is not correct");
+            assertTrue(initMetricPage().openMetricDetailPage(SIMPLE_METRIC).getMAQL()
+                    .equals("SELECT SUM(Sales)"), "The imported metric is not correct");
         } finally {
             testParams.setProjectId(sourceProjectId);
         }

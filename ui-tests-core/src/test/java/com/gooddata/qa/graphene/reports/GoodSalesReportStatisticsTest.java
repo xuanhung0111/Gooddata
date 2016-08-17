@@ -4,7 +4,6 @@ import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForSchedulesPageLoaded;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -32,6 +31,7 @@ import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
+import com.gooddata.qa.graphene.fragments.manage.MetricDetailsPage;
 
 public class GoodSalesReportStatisticsTest extends GoodSalesAbstractTest {
 
@@ -135,8 +135,7 @@ public class GoodSalesReportStatisticsTest extends GoodSalesAbstractTest {
             if (type.toString().equals(DataType.ATTRIBUTE.toString())) {
                 objectName = AttributeDetailPage.getInstance(browser).getObjectName();
             } else {
-                waitForFragmentVisible(metricDetailPage);
-                objectName = metricDetailPage.getObjectName();
+                objectName = MetricDetailsPage.getInstance(browser).getObjectName();
             }
             assertEquals(objectName, data);
             browser.close();

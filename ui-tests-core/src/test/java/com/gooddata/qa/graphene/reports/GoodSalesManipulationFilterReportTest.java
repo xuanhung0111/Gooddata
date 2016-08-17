@@ -108,9 +108,7 @@ public class GoodSalesManipulationFilterReportTest extends GoodSalesAbstractTest
     @Test(dependsOnMethods = "editExistingFilter")
     public void checkFilterKeepingAfterDeleteMetricOrAttribute() {
         initMetricPage();
-
-        metricPage.openMetricDetailPage(METRIC_AMOUNT);
-        waitForFragmentVisible(metricDetailPage).deleteObject();
+        metricPage.openMetricDetailPage(METRIC_AMOUNT).deleteObject();
 
         initAttributePage();
         attributePage.initAttribute(ATTR_STAGE_NAME)

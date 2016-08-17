@@ -123,8 +123,7 @@ public class GoodSalesMetricNumberFormatTest extends GoodSalesAbstractAnalyseTes
 
     private String getMetricFormat(String metric) {
         initMetricPage();
-        waitForFragmentVisible(metricPage).openMetricDetailPage(metric);
-        return waitForFragmentVisible(metricDetailPage).getMetricFormat();
+        return waitForFragmentVisible(metricPage).openMetricDetailPage(metric).getMetricFormat();
     }
 
     private void verifyFormatInAdReport(Formatter format, String expectedValue, boolean compareFormat) {
