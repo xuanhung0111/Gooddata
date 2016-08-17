@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.csvuploader;
 
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.model.ModelRestUtils.getProductionProjectModelView;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
@@ -38,6 +37,7 @@ import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
 import com.gooddata.qa.graphene.fragments.manage.DatasetDetailPage;
+import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.google.common.collect.Lists;
 
@@ -123,10 +123,10 @@ public class UploadTest extends AbstractCsvUploaderTest {
 
         final String adReportLink = format(AD_REPORT_LINK, testParams.getHost(), testParams.getProjectId(),
                 getDatasetId(datasetName));
-        assertEquals(datasetsListPage.getDatasetAnalyzeLink(datasetName), adReportLink);
+        assertEquals(DatasetsListPage.getInstance(browser).getDatasetAnalyzeLink(datasetName), adReportLink);
         takeScreenshot(browser, "dataset-uploaded-" + datasetName, getClass());
 
-        assertEquals(waitForFragmentVisible(datasetsListPage)
+        assertEquals(DatasetsListPage.getInstance(browser)
                 .openDatasetDetailPage(datasetName)
                 .getDatasetAnalyzeLink(), adReportLink);
     }
@@ -193,14 +193,14 @@ public class UploadTest extends AbstractCsvUploaderTest {
 
         dataPreviewPage.triggerIntegration();
 
-        final Dataset dataset = waitForFragmentVisible(datasetsListPage)
+        final Dataset dataset = DatasetsListPage.getInstance(browser)
                 .getMyDatasetsTable()
                 .getDataset(getNewDataset(PAYROLL));
         final String datasetName = dataset.getName();
         assertTrue(dataset.getStatus().matches(SUCCESSFUL_STATUS_MESSAGE_REGEX));
         datasetNames.add(datasetName);
 
-        datasetsListPage.openDatasetDetailPage(datasetName);
+        DatasetsListPage.getInstance(browser).openDatasetDetailPage(datasetName);
         checkCsvDatasetDetail(datasetName, customHeaderColumns, PAYROLL.getColumnTypes());
     }
 

@@ -10,6 +10,7 @@ import java.util.UUID;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class ProjectSwitchTest extends AbstractCsvUploaderTest {
@@ -41,7 +42,7 @@ public class ProjectSwitchTest extends AbstractCsvUploaderTest {
         takeScreenshot(browser, "Switch-to-project-" + NEW_PROJECT_NAME, getClass());
         assertThat(browser.getCurrentUrl(), containsString(newProjectId));
 
-        datasetsListPage.switchProject(projectTitle);
+        DatasetsListPage.getInstance(browser).switchProject(projectTitle);
 
         takeScreenshot(browser, "Switch-to-project-" + projectTitle, getClass());
         assertThat(browser.getCurrentUrl(), containsString(currentProjectId));

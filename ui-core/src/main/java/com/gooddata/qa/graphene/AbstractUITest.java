@@ -91,9 +91,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(id = "p-analysisPage")
     protected ReportPage reportPage;
 
-    @FindBy(className = "s-datasets-list")
-    protected DatasetsListPage datasetsListPage;
-
     @FindBy(id = "p-dataPage")
     protected DataPage dataPage;
 
@@ -412,7 +409,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public void uploadCSV(String filePath, Map<String, ColumnType> columnsWithExpectedType) {
         final int datasetCountBeforeUpload = initDataUploadPage().getMyDatasetsCount();
 
-        final DataPreviewPage dataPreviewPage = datasetsListPage.uploadFile(filePath);
+        final DataPreviewPage dataPreviewPage = DatasetsListPage.getInstance(browser).uploadFile(filePath);
         takeScreenshot(browser, "upload-definition", this.getClass());
 
         if (columnsWithExpectedType != null) {
@@ -427,7 +424,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
         final DatasetMessageBar csvDatasetMessageBar = DatasetMessageBar.getInstance(browser);
 
-        if (datasetsListPage.getMyDatasetsCount() == datasetCountBeforeUpload + 1) {
+        if (DatasetsListPage.getInstance(browser).getMyDatasetsCount() == datasetCountBeforeUpload + 1) {
             log.info("Upload succeeds with message: " + csvDatasetMessageBar.waitForSuccessMessageBar().getText());
         } else {
             fail("Upload failed with error message: " + csvDatasetMessageBar.waitForErrorMessageBar().getText());
@@ -454,7 +451,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     public DatasetsListPage initDataUploadPage() {
         openUrl(format(DATA_UPLOAD_PAGE_URI_TEMPLATE, testParams.getProjectId()));
-        return waitForFragmentVisible(datasetsListPage);
+        return DatasetsListPage.getInstance(browser);
     }
 
     public ProjectsPage initProjectsPage() {

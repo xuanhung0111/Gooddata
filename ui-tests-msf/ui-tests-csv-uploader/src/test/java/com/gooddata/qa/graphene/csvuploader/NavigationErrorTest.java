@@ -16,6 +16,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
+import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.InsufficientAccessRightsPage;
 
 public class NavigationErrorTest extends AbstractCsvUploaderTest {
@@ -40,7 +41,7 @@ public class NavigationErrorTest extends AbstractCsvUploaderTest {
     @Test(dependsOnGroups = {"createProject"}, groups = "csv")
     public void showUploadsPageWhenBadUrlAfterExistingProjectId() {
         openUrl(format(CSV_UPLOADER_PROJECT_ROOT_TEMPLATE + "/this/is/bad/url", testParams.getProjectId()));
-        waitForFragmentVisible(datasetsListPage);
+        DatasetsListPage.getInstance(browser);
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = "csv")

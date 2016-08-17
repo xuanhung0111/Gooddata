@@ -61,8 +61,9 @@ public class DatasetsListPage extends AbstractFragment {
         return waitForElementVisible(BY_EMPTY_STATE, browser);
     }
 
-    public WebElement waitForMyDatasetsEmptyStateLoaded() {
-        return waitForElementVisible(BY_MY_DATASETS_EMPTY_STATE, browser);
+    public DatasetsListPage waitForMyDatasetsEmptyStateLoaded() {
+        waitForElementVisible(BY_MY_DATASETS_EMPTY_STATE, browser);
+        return this;
     }
 
     public String getEmptyStateMessage() {

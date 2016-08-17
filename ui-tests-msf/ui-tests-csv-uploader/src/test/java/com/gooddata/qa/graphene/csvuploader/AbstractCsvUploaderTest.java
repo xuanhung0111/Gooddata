@@ -23,6 +23,7 @@ import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
+import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 import com.google.common.collect.Lists;
 
 public class AbstractCsvUploaderTest extends AbstractMSFTest {
@@ -59,15 +60,15 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
     public Dataset uploadCsv(CsvFile csvFile) {
         final int datasetCountBeforeUpload = initDataUploadPage().getMyDatasetsCount();
 
-        datasetsListPage.uploadFile(csvFile.getFilePath())
+        DatasetsListPage.getInstance(browser).uploadFile(csvFile.getFilePath())
             .triggerIntegration();
         Dataset.waitForDatasetLoaded(browser);
 
-        if (datasetsListPage.getMyDatasetsCount() == datasetCountBeforeUpload) {
+        if (DatasetsListPage.getInstance(browser).getMyDatasetsCount() == datasetCountBeforeUpload) {
             throw new RuntimeException("Uploading csv file is FAILED!");
         }
 
-        return datasetsListPage.getMyDatasetsTable().getDataset(getNewDataset(csvFile));
+        return DatasetsListPage.getInstance(browser).getMyDatasetsTable().getDataset(getNewDataset(csvFile));
     }
 
     public DatasetDetailPage updateCsvInDetailPage(CsvFile updateData, Dataset dataset, boolean isOwner) {

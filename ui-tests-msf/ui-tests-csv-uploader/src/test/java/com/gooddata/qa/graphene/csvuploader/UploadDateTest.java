@@ -26,6 +26,7 @@ import com.gooddata.qa.graphene.fragments.csvuploader.DateFormatSelect.DateForma
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;
+import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadDialog;
 
 /**
@@ -94,7 +95,7 @@ public class UploadDateTest extends AbstractCsvUploaderTest {
         dataPreviewPage.triggerIntegration();
         Dataset.waitForDatasetLoaded(browser);
 
-        final Dataset dataset = datasetsListPage.getMyDatasetsTable().getDataset(getNewDataset(fileToUpload));
+        final Dataset dataset = DatasetsListPage.getInstance(browser).getMyDatasetsTable().getDataset(getNewDataset(fileToUpload));
         assertTrue(dataset.getStatus().matches(SUCCESSFUL_STATUS_MESSAGE_REGEX));
 
         final DatasetDetailPage csvDatasetDetailPage = dataset.openDetailPage();
@@ -168,7 +169,7 @@ public class UploadDateTest extends AbstractCsvUploaderTest {
         dataPreviewPage.triggerIntegration();
         Dataset.waitForDatasetLoaded(browser);
 
-        final Dataset dataset = datasetsListPage.getMyDatasetsTable().getDataset(getNewDataset(fileToUpload));
+        final Dataset dataset = DatasetsListPage.getInstance(browser).getMyDatasetsTable().getDataset(getNewDataset(fileToUpload));
         assertTrue(dataset.getStatus().matches(SUCCESSFUL_STATUS_MESSAGE_REGEX));
 
         final DatasetDetailPage csvDatasetDetailPage = dataset.openDetailPage();
@@ -188,7 +189,8 @@ public class UploadDateTest extends AbstractCsvUploaderTest {
         assertTrue(dataset.getStatus().matches(SUCCESSFUL_STATUS_MESSAGE_REGEX));
 
         updateCsv(DATE_YYYY_FILE, datasetName, true);
-        waitForFragmentVisible(datasetsListPage);
+        // wait for data sets page loaded
+        DatasetsListPage.getInstance(browser);
 
         final CsvFile dateInvalidYYYY = CsvFile.loadFile(
                 getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/24dates.yyyy.invalid.csv"));
