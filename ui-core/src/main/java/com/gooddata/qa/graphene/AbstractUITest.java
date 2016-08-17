@@ -112,9 +112,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(id = "new")
     protected MetricPage metricPage;
 
-    @FindBy(id = "p-objectPage")
-    protected FactDetailPage factDetailPage;
-
     /**
      * ----- DISC fragments -----
      */
