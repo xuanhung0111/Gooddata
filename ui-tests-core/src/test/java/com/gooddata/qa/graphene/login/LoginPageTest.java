@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.login;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static org.testng.Assert.assertTrue;
 
 import org.json.JSONException;
@@ -49,18 +50,24 @@ public class LoginPageTest extends AbstractUITest {
 
     @Test
     public void gd_Login_003_SignInWithEmptyPassword() {
+        //add sleep time here to avoid issue when Login page is loaded slowly
+        sleepTightInSeconds(2);
         LoginFragment.getInstance(browser).login(testParams.getUser(), "", false);
         LoginFragment.getInstance(browser).checkPasswordInvalid();
     }
 
     @Test
     public void gd_Login_004_SignInWithInvalidPassword() {
+        //add sleep time here to avoid issue when Login page is loaded slowly
+        sleepTightInSeconds(2);
         LoginFragment.getInstance(browser).login(testParams.getUser(), "abcdefgh", false);
         LoginFragment.getInstance(browser).checkInvalidLogin();
     }
 
     @Test
     public void gd_Login_005_SignInWithInvalidEmail() {
+        //add sleep time here to avoid issue when Login page is loaded slowly
+        sleepTightInSeconds(2);
         LoginFragment.getInstance(browser).login("email_invalid_format", "abcdefgh", false);
         LoginFragment.getInstance(browser).checkEmailInvalid();
     }
