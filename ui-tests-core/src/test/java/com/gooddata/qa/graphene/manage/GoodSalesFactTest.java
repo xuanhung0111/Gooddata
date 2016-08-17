@@ -33,7 +33,7 @@ public class GoodSalesFactTest extends ObjectAbstractTest {
     public void factAggregationsTest() {
         initObject(name);
         for (SimpleMetricTypes metricType : SimpleMetricTypes.values()) {
-            factDetailPage.createSimpleMetric(metricType, name);
+            FactDetailPage.getInstance(browser).createSimpleMetric(metricType, name);
         }
     }
 

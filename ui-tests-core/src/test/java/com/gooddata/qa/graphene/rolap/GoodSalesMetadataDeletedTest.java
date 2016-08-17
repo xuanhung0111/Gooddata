@@ -37,6 +37,7 @@ import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
+import com.gooddata.qa.graphene.fragments.manage.FactDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.utils.http.RestUtils;
@@ -449,7 +450,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     private String createMetricUsing(FactInfo fact, SimpleMetricTypes sum) {
         initFactPage();
         ObjectsTable.getInstance(id(ObjectTypes.FACT.getObjectsTableID()), browser).selectObject(fact.name);
-        return factDetailPage.createSimpleMetric(SimpleMetricTypes.SUM, fact.name);
+        return FactDetailPage.getInstance(browser).createSimpleMetric(SimpleMetricTypes.SUM, fact.name);
     }
 
     private boolean isObjectDeleted(String object, Places place) throws IOException, JSONException {
