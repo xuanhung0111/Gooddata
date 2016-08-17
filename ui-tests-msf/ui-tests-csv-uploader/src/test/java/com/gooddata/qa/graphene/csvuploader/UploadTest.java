@@ -37,6 +37,7 @@ import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
+import com.gooddata.qa.graphene.fragments.manage.DatasetDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.google.common.collect.Lists;
 
@@ -68,7 +69,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
 
         initManagePage();
         ObjectsTable.getInstance(id(ObjectTypes.DATA_SETS.getObjectsTableID()), browser).selectObject(datasetName);
-        waitForFragmentVisible(datasetDetailPage);
+        DatasetDetailPage datasetDetailPage = DatasetDetailPage.getInstance(browser);
         assertThat(datasetDetailPage.getAttributes(), containsInAnyOrder("Lastname", "Firstname", "Education",
                 "Position", "Department", "State", "County", format("Records of %s", datasetName)));
         assertThat(datasetDetailPage.getFacts(), containsInAnyOrder("Amount"));
@@ -84,7 +85,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
 
         initManagePage();
         ObjectsTable.getInstance(id(ObjectTypes.DATA_SETS.getObjectsTableID()), browser).selectObject(firstDatasetUploadName);
-        String latestUploadDate = waitForFragmentVisible(datasetDetailPage).getLatestUploadDate();
+        String latestUploadDate = DatasetDetailPage.getInstance(browser).getLatestUploadDate();
 
         dataset = uploadCsv(PAYROLL);
         final String secondDatasetUploadName = dataset.getName();
@@ -94,7 +95,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
 
         initManagePage();
         ObjectsTable.getInstance(id(ObjectTypes.DATA_SETS.getObjectsTableID()), browser).selectObject(firstDatasetUploadName);
-        assertEquals(waitForFragmentVisible(datasetDetailPage).getLatestUploadDate(), latestUploadDate);
+        assertEquals(DatasetDetailPage.getInstance(browser).getLatestUploadDate(), latestUploadDate);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -304,7 +305,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
     private void deleteDataset(String datasetName) {
         initManagePage();
         ObjectsTable.getInstance(id(ObjectTypes.DATA_SETS.getObjectsTableID()), browser).selectObject(datasetName);
-        datasetDetailPage.deleteObject();
+        DatasetDetailPage.getInstance(browser).deleteObject();
     }
 
     private List<String> getListOfDatasets(JSONObject dataModel) throws JSONException {
