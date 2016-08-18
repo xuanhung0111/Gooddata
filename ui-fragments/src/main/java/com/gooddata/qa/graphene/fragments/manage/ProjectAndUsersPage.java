@@ -26,6 +26,7 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.account.InviteUserDialog;
+import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.utils.mail.ImapClient;
@@ -94,8 +95,9 @@ public class ProjectAndUsersPage extends AbstractFragment {
         return ProjectsPage.getInstance(browser);
     }
 
-    public void openUserManagementPage() {
+    public UserManagementPage openUserManagementPage() {
         waitForElementVisible(userManagementLink).click();
+        return UserManagementPage.getInstance(browser);
     }
     
     public void leaveProject() {
