@@ -273,8 +273,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
                 .build())
             .saveEditModeWithWidgets();
 
-        initMetricPage();
-        waitForFragmentVisible(metricPage).openMetricDetailPage(deletedMetric).deleteObject();
+        initMetricPage().openMetricDetailPage(deletedMetric).deleteObject();
 
         initIndigoDashboardsPageWithWidgets();
         takeScreenshot(browser, "Dashboards after deleting metric using in Kpi", getClass());

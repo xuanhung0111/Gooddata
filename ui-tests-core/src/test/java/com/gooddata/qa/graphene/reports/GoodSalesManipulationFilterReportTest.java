@@ -54,8 +54,7 @@ public class GoodSalesManipulationFilterReportTest extends GoodSalesAbstractTest
 
     @Test(dependsOnGroups = "createProject")
     public void addNumericVariable() {
-        initVariablePage();
-        variablePage.createVariable(new NumericVariable(VARIABLE_NAME).withDefaultNumber(500));
+        initVariablePage().createVariable(new NumericVariable(VARIABLE_NAME).withDefaultNumber(500));
     }
 
     @Test(dependsOnMethods = {"createReport", "addNumericVariable"})
@@ -107,11 +106,9 @@ public class GoodSalesManipulationFilterReportTest extends GoodSalesAbstractTest
 
     @Test(dependsOnMethods = "editExistingFilter")
     public void checkFilterKeepingAfterDeleteMetricOrAttribute() {
-        initMetricPage();
-        metricPage.openMetricDetailPage(METRIC_AMOUNT).deleteObject();
+        initMetricPage().openMetricDetailPage(METRIC_AMOUNT).deleteObject();
 
-        initAttributePage();
-        attributePage.initAttribute(ATTR_STAGE_NAME)
+        initAttributePage().initAttribute(ATTR_STAGE_NAME)
             .deleteObject();
 
         initReport();

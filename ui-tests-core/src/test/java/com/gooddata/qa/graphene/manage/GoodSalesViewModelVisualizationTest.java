@@ -51,8 +51,7 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
     }
 
     private void changeAttributeName(String attributeName, String newName) {
-        initAttributePage();
-        attributePage.renameAttribute(attributeName, newName);
+        initAttributePage().renameAttribute(attributeName, newName);
     }
 
     private File getLDMImageFromGrayPage() throws IOException, ParseException, JSONException {

@@ -51,8 +51,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
      */
     @Test(dependsOnGroups = {"createProject"})
     public void checkForFilteredVariable() {
-        initVariablePage();
-        variablePage.createVariable(new AttributeVariable("Test variable" + System.currentTimeMillis())
+        initVariablePage().createVariable(new AttributeVariable("Test variable" + System.currentTimeMillis())
             .withAttribute(ATTR_MONTH_YEAR_CREATED)
             .withAttributeValues("Jan 2010", "Feb 2010", "Mar 2010"));
     }

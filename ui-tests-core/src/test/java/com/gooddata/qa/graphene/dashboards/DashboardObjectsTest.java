@@ -54,8 +54,7 @@ public class DashboardObjectsTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"uploadDataTest"})
     public void changeStateLabelTest() {
-        initAttributePage();
-        attributePage.configureAttributeLabel("State", AttributeLabelTypes.US_STATE_NAME);
+        initAttributePage().configureAttributeLabel("State", AttributeLabelTypes.US_STATE_NAME);
     }
 
     @Test(dependsOnMethods = {"changeStateLabelTest", "createvariableTest"})

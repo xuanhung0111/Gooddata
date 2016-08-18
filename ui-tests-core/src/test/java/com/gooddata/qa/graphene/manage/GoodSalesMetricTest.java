@@ -83,6 +83,7 @@ import com.gooddata.qa.graphene.entity.metric.CustomMetricUI;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
+import com.gooddata.qa.graphene.fragments.manage.MetricPage;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.utils.Sleeper;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
@@ -127,14 +128,11 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"filter-share-ratio-metric"})
     public void createShareMetric() {
-        initMetricPage();
         String metricName = "Share % " + getCurrentDateString();
-        waitForFragmentVisible(metricPage).createShareMetric(metricName, METRIC_AMOUNT, ATTR_YEAR_SNAPSHOT);
-
         String expectedMaql =
                 "SELECT " + METRIC_AMOUNT + " / (SELECT " + METRIC_AMOUNT + " BY " + ATTR_YEAR_SNAPSHOT + ", ALL OTHER WITHOUT PF)";
-        assertTrue(metricPage.isMetricCreatedSuccessfully(metricName, expectedMaql,
-                DEFAULT_METRIC_NUMBER_FORMAT));
+        assertTrue(initMetricPage().createShareMetric(metricName, METRIC_AMOUNT, ATTR_YEAR_SNAPSHOT)
+                .isMetricCreatedSuccessfully(metricName, expectedMaql, DEFAULT_METRIC_NUMBER_FORMAT));
 
         List<Float> metricValues = asList(0.23f, 0.2f, 0.33f, 0.07f, 0.08f, 0.09f);
         checkMetricValuesInReport(metricName, ATTR_PRODUCT, metricValues, PRODUCT_VALUES);
@@ -142,16 +140,12 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"different-granularity-logical-metric"})
     public void createDifferentMetricTest() {
-        initMetricPage();
         String metricName = "Difference " + getCurrentDateString();
-        waitForFragmentVisible(metricPage).createDifferentMetric(metricName, METRIC_AMOUNT, ATTR_YEAR_SNAPSHOT,
-                YEAR_2010);
-
         String expectedMaql =
                 "SELECT " + METRIC_AMOUNT + " - (SELECT " + METRIC_AMOUNT + " BY ALL " + ATTR_YEAR_SNAPSHOT + " WHERE "
                         + ATTR_YEAR_SNAPSHOT + " IN (" + YEAR_2010 + ") WITHOUT PF)";
-        assertTrue(metricPage.isMetricCreatedSuccessfully(metricName, expectedMaql,
-                DEFAULT_METRIC_NUMBER_FORMAT));
+        assertTrue(initMetricPage().createDifferentMetric(metricName, METRIC_AMOUNT, ATTR_YEAR_SNAPSHOT, YEAR_2010)
+                .isMetricCreatedSuccessfully(metricName, expectedMaql, DEFAULT_METRIC_NUMBER_FORMAT));
 
         List<Float> metricValues =
                 asList(20171686.25f, 16271278.69f, 32627524.67f, 6273858.91f, 7532925.39f, 6825820.63f);
@@ -160,14 +154,10 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"filter-share-ratio-metric"})
     public void createRatioMetricTest() {
-        initMetricPage();
         String metricName = "Ratio " + getCurrentDateString();
-        waitForFragmentVisible(metricPage)
-                .createRatioMetric(metricName, METRIC_NUMBER_OF_WON_OPPS, METRIC_NUMBER_OF_OPEN_OPPS);
-
         String expectedMaql = "SELECT " + METRIC_NUMBER_OF_WON_OPPS + " / " + METRIC_NUMBER_OF_OPEN_OPPS;
-        assertTrue(metricPage.isMetricCreatedSuccessfully(metricName, expectedMaql,
-                DEFAULT_METRIC_NUMBER_FORMAT));
+        assertTrue(initMetricPage().createRatioMetric(metricName, METRIC_NUMBER_OF_WON_OPPS, METRIC_NUMBER_OF_OPEN_OPPS)
+                .isMetricCreatedSuccessfully(metricName, expectedMaql, DEFAULT_METRIC_NUMBER_FORMAT));
 
         checkMetricValuesInReport(metricName, asList(3.61f));
     }
@@ -768,8 +758,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"aggregation-metric"})
     public void checkDrillDownDefine() {
-        initAttributePage();
-        attributePage.initAttribute(ATTR_STAGE_NAME)
+        initAttributePage().initAttribute(ATTR_STAGE_NAME)
             .setDrillToAttribute(ATTR_DEPARTMENT);
 
         String metricName = "RUNSUM-Amount";
@@ -939,19 +928,19 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                 expectedMaql));
 
         if (AGGREGATION.equals(type)) {
-            waitForFragmentVisible(metricPage).createAggregationMetric(metric, customMetricInfo);
+            MetricPage.getInstance(browser).createAggregationMetric(metric, customMetricInfo);
         } else if (NUMERIC.equals(type)) {
-            waitForFragmentVisible(metricPage).createNumericMetric(metric, customMetricInfo);
+            MetricPage.getInstance(browser).createNumericMetric(metric, customMetricInfo);
         } else if (GRANULARITY.equals(type)) {
-            waitForFragmentVisible(metricPage).createGranularityMetric(metric, customMetricInfo);
+            MetricPage.getInstance(browser).createGranularityMetric(metric, customMetricInfo);
         } else if (LOGICAL.equals(type)) {
-            waitForFragmentVisible(metricPage).createLogicalMetric(metric, customMetricInfo);
+            MetricPage.getInstance(browser).createLogicalMetric(metric, customMetricInfo);
         } else {
-            waitForFragmentVisible(metricPage).createFilterMetric(metric, customMetricInfo);
+            MetricPage.getInstance(browser).createFilterMetric(metric, customMetricInfo);
         }
 
-        assertTrue(metricPage.isMetricCreatedSuccessfully(customMetricInfo.getName(), expectedMaql,
-                DEFAULT_METRIC_NUMBER_FORMAT));
+        assertTrue(MetricPage.getInstance(browser)
+                .isMetricCreatedSuccessfully(customMetricInfo.getName(), expectedMaql, DEFAULT_METRIC_NUMBER_FORMAT));
     }
 
     private Metric createLikeMetric(MetricTypes metricLikeType, Attribute attrObj, Metric metricObj , String pattern){

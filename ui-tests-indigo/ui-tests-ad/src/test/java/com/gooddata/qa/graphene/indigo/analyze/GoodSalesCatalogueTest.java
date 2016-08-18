@@ -8,7 +8,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACT
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PERCENT_OF_GOAL;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -30,6 +29,7 @@ import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
+import com.gooddata.qa.graphene.fragments.manage.MetricPage;
 
 public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
 
@@ -99,13 +99,13 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
         String xssAttribute = "<button>" + ATTR_IS_WON + "</button>";
         String xssMetric = "<button>" + METRIC_PERCENT_OF_GOAL + "</button>";
 
-        initAttributePage();
-        waitForFragmentVisible(attributePage).initAttribute(ATTR_IS_WON)
+        initAttributePage()
+            .initAttribute(ATTR_IS_WON)
             .changeName(xssAttribute);
 
         initMetricPage()
-                .openMetricDetailPage(METRIC_PERCENT_OF_GOAL)
-                .changeName(xssMetric);
+            .openMetricDetailPage(METRIC_PERCENT_OF_GOAL)
+            .changeName(xssMetric);
 
         try {
             initAnalysePage();
@@ -139,13 +139,13 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
             assertEquals(analysisPage.getChartReport().getTooltipTextOnTrackerByIndex(0),
                     asList(asList(xssAttribute, "true"), asList(xssMetric, "1,160.9%")));
         } finally {
-            initAttributePage();
-            waitForFragmentVisible(attributePage).initAttribute(xssAttribute)
+            initAttributePage()
+                .initAttribute(xssAttribute)
                 .changeName(ATTR_IS_WON);
 
             initMetricPage()
-                    .openMetricDetailPage(xssMetric)
-                    .changeName(METRIC_PERCENT_OF_GOAL);
+                .openMetricDetailPage(xssMetric)
+                .changeName(METRIC_PERCENT_OF_GOAL);
         }
     }
 
@@ -198,9 +198,9 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
     }
 
     private void deleteMetric(String metric) {
-        initMetricPage();
-        metricPage.openMetricDetailPage(metric)
+        initMetricPage()
+            .openMetricDetailPage(metric)
             .deleteObject();
-        assertFalse(metricPage.isMetricVisible(metric));
+        assertFalse(MetricPage.getInstance(browser).isMetricVisible(metric));
     }
 }

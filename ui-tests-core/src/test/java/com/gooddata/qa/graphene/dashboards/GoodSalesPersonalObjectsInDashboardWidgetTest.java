@@ -39,9 +39,8 @@ public class GoodSalesPersonalObjectsInDashboardWidgetTest extends GoodSalesAbst
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"pre-condition"})
     public void createPersonalMetric() {
-        initMetricPage();
         personalMetric = "[Personal] Share %";
-        waitForFragmentVisible(metricPage).createShareMetric(personalMetric, METRIC_AMOUNT, ATTR_YEAR_SNAPSHOT);
+        waitForFragmentVisible(initMetricPage()).createShareMetric(personalMetric, METRIC_AMOUNT, ATTR_YEAR_SNAPSHOT);
     }
 
     @Test(dependsOnMethods = {"createPersonalMetric"}, groups = {"pre-condition"})

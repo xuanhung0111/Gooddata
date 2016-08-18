@@ -91,18 +91,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(id = "p-analysisPage")
     protected ReportPage reportPage;
 
-    @FindBy(id = "p-dataPage")
-    protected DataPage dataPage;
-
-    @FindBy(id = "p-dataPage")
-    protected AttributePage attributePage;
-
-    @FindBy(css = VariablesPage.CSS_CLASS)
-    protected VariablesPage variablePage;
-
-    @FindBy(id = "new")
-    protected MetricPage metricPage;
-
     /**
      * ----- DISC fragments -----
      */
@@ -470,7 +458,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public AttributePage initAttributePage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
         waitForDataPageLoaded(browser);
-        return waitForFragmentVisible(attributePage);
+        return AttributePage.getInstance(browser);
     }
 
     public void initModelPage() {
@@ -481,7 +469,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public MetricPage initMetricPage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         waitForDataPageLoaded(browser);
-        return waitForFragmentVisible(metricPage);
+        return MetricPage.getInstance(browser);
 
     }
 
@@ -499,7 +487,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public VariablesPage initVariablePage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
         waitForDataPageLoaded(browser);
-        return waitForFragmentVisible(variablePage);
+        return VariablesPage.getInstance(browser);
     }
 
     public void initFactPage() {
@@ -507,9 +495,10 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForDataPageLoaded(browser);
     }
 
-    public void initManagePage() {
+    public DataPage initManagePage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|");
         waitForDataPageLoaded(browser);
+        return DataPage.getInstance(browser);
     }
 
     public ProjectAndUsersPage initProjectsAndUsersPage() {

@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.manage;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -35,9 +34,8 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testNumberFormatEditor() {
-        initMetricPage();
         // don't know why get text of metric format in metric detail page return #,##0 instead of #,##0.00
-        assertTrue(Formatter.DEFAULT.toString().startsWith(waitForFragmentVisible(metricPage)
+        assertTrue(Formatter.DEFAULT.toString().startsWith(initMetricPage()
                 .openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES)
                 .changeMetricFormatButDiscard(Formatter.BARS)
                 .getMetricFormat()));
@@ -162,8 +160,7 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
 
     private void resetMetricFormat() {
         initProjectsPage();
-        initMetricPage();
-        assertEquals(waitForFragmentVisible(metricPage).openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES)
+        assertEquals(initMetricPage().openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES)
                 .changeMetricFormat(Formatter.DEFAULT).getMetricFormat(), Formatter.DEFAULT.toString());
     }
 }

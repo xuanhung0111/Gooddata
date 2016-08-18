@@ -43,6 +43,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 import com.gooddata.qa.graphene.fragments.manage.VariableDetailPage;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
+import com.gooddata.qa.graphene.fragments.manage.VariablesPage;
 import com.gooddata.qa.utils.http.RestApiClient;
 
 public class GoodSalesVariableTest extends GoodSalesAbstractTest {
@@ -78,7 +79,8 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
                 .createVariable(new NumericVariable(variable).withDefaultNumber(NUMERIC_VALUE));
 
         assertTrue(initVariablePage().hasVariable(variable));
-        assertEquals(variablePage.openVariableFromList(variable).getDefaultNumericValue(), NUMERIC_VALUE);
+        assertEquals(VariablesPage.getInstance(browser).openVariableFromList(variable).getDefaultNumericValue(),
+                NUMERIC_VALUE);
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"basic"})
@@ -91,8 +93,8 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
                 .withUserSpecificNumber(userProfileUri, NUMERIC_VALUE));
 
         assertTrue(initVariablePage().hasVariable(NUMERIC_VARIABLE));
-        assertEquals(variablePage.openVariableFromList(NUMERIC_VARIABLE).getUserSpecificNumericValue(userProfileUri),
-                NUMERIC_VALUE);
+        assertEquals(VariablesPage.getInstance(browser).openVariableFromList(NUMERIC_VARIABLE)
+                .getUserSpecificNumericValue(userProfileUri), NUMERIC_VALUE);
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"basic"})
@@ -104,7 +106,8 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
                 .withAttributeValues(ATTRIBUTE_VALUES));
 
         assertTrue(initVariablePage().hasVariable(variable));
-        assertEquals(variablePage.openVariableFromList(variable).getDefaultAttributeValues(), ATTRIBUTE_VALUES);
+        assertEquals(VariablesPage.getInstance(browser).openVariableFromList(variable).getDefaultAttributeValues(),
+                ATTRIBUTE_VALUES);
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"basic"})
@@ -118,8 +121,8 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
                 .withUserSpecificValues(userProfileUri, ATTRIBUTE_VALUES));
 
         assertTrue(initVariablePage().hasVariable(ATTRIBUTE_VARIABLE));
-        assertEquals(variablePage.openVariableFromList(ATTRIBUTE_VARIABLE).getUserSpecificAttributeValues(userProfileUri),
-                ATTRIBUTE_VALUES);
+        assertEquals(VariablesPage.getInstance(browser).openVariableFromList(ATTRIBUTE_VARIABLE)
+                .getUserSpecificAttributeValues(userProfileUri), ATTRIBUTE_VALUES);
     }
 
     @DataProvider(name = "variableProvider")
@@ -235,7 +238,7 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
         initVariablePage()
                 .openVariableFromList(variable)
                 .deleteObject();
-        assertFalse(variablePage.hasVariable(variable), "Variable is not deleted!");
+        assertFalse(VariablesPage.getInstance(browser).hasVariable(variable), "Variable is not deleted!");
 
         initReportsPage().getReportsList().openReport(report.getTitle());
         waitForAnalysisPageLoaded(browser);

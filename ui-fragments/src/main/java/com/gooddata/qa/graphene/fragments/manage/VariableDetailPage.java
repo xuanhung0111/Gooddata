@@ -121,8 +121,7 @@ public class VariableDetailPage extends ObjectPropertiesPage {
 
     public VariablesPage goToVariablesPage() {
         clickDataPageLink();
-        return Graphene.createPageFragment(VariablesPage.class,
-                waitForElementVisible(By.cssSelector(VariablesPage.CSS_CLASS), browser));
+        return VariablesPage.getInstance(browser);
     }
 
     public Collection<String> getDefaultAttributeValues() {

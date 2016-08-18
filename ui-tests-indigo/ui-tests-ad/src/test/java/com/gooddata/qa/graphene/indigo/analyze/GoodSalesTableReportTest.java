@@ -186,9 +186,7 @@ public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testFormat() throws ParseException, JSONException, IOException {
-        initMetricPage();
-
-        String oldFormat = waitForFragmentVisible(metricPage).openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES)
+        String oldFormat = initMetricPage().openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES)
                 .getMetricFormat();
         String metricUri = format("/gdc/md/%s/obj/14636", testParams.getProjectId());
         DashboardsRestUtils.changeMetricFormat(getRestApiClient(), metricUri, oldFormat + "[red]");
@@ -202,8 +200,7 @@ public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
             assertEquals(tableReport.getFormatFromValue(), "color: rgb(255, 0, 0);");
         } finally {
             DashboardsRestUtils.changeMetricFormat(getRestApiClient(), metricUri, oldFormat);
-            initMetricPage();
-            assertEquals(waitForFragmentVisible(metricPage).openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES)
+            assertEquals(initMetricPage().openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES)
                     .getMetricFormat(), oldFormat);
         }
     }

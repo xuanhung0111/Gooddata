@@ -106,14 +106,12 @@ public class AttributeLabelsTest extends AbstractProjectTest {
     @Test(dependsOnMethods = {"initDataTest"})
     public void changeAttributeToHyperlinkTest() {
         changeAttributeLabel(HYPERLINK_ATTRIBUTE, AttributeLabelTypes.HYPERLINK);
-        initAttributePage();
-        attributePage.verifyHyperLink(HYPERLINK_ATTRIBUTE);
+        initAttributePage().verifyHyperLink(HYPERLINK_ATTRIBUTE);
     }
 
     @Test(dependsOnMethods = {"changeAttributeToHyperlinkTest"})
     public void configDrillToExternalPageTest() {
-        initAttributePage();
-        attributePage.configureDrillToExternalPage(HYPERLINK_ATTRIBUTE);
+        initAttributePage().configureDrillToExternalPage(HYPERLINK_ATTRIBUTE);
     }
 
     @Test(dependsOnMethods = {"createTestMetric", "configDrillToExternalPageTest"})
@@ -139,8 +137,7 @@ public class AttributeLabelsTest extends AbstractProjectTest {
     }
 
     private void changeAttributeLabel(String attribute, AttributeLabelTypes label) {
-        initAttributePage();
-        attributePage.configureAttributeLabel(attribute, label);
+        initAttributePage().configureAttributeLabel(attribute, label);
     }
 
 }

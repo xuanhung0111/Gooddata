@@ -60,8 +60,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
     public void changeAttributeToGeoStateTest() {
         int i = 0;
         for (AttributeLabelTypes type : getGeoLabels()) {
-            initAttributePage();
-            attributePage.configureAttributeLabel(attributesList.get(i), type);
+            initAttributePage().configureAttributeLabel(attributesList.get(i), type);
             i++;
         }
     }

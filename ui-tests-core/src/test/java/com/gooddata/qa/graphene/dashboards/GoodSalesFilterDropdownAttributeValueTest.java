@@ -95,9 +95,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
     public void createVariable() {
-        initVariablePage();
-
-        variablePage.createVariable(new AttributeVariable(F_STAGE_NAME).withAttribute(ATTR_STAGE_NAME)
+        initVariablePage().createVariable(new AttributeVariable(F_STAGE_NAME).withAttribute(ATTR_STAGE_NAME)
                 .withAttributeValues("Discovery", "Risk Assessment"));
     }
 

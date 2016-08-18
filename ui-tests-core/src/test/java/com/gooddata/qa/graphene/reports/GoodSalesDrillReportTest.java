@@ -201,8 +201,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createDrillReport"})
     public void drillAttribute() {
-        initAttributePage();
-        assertTrue(attributePage.initAttribute("Opportunity").isDrillToExternalPage());
+        assertTrue(initAttributePage().initAttribute("Opportunity").isDrillToExternalPage());
 
         assertFalse(AttributeDetailPage.getInstance(browser).clearDrillingSetting().isDrillToExternalPage());
 
@@ -238,8 +237,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             browser.close();
             browser.switchTo().window(currentWindowHandle);
 
-            initAttributePage();
-            attributePage.initAttribute("Opportunity")
+            initAttributePage().initAttribute("Opportunity")
                 .setDrillToAttribute("Account");
 
             initDashboardsPage().selectDashboard(TEST_DASHBOAD_NAME);
@@ -256,8 +254,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             initDashboardsPage();
             dashboardsPage.selectDashboard(TEST_DASHBOAD_NAME);
             dashboardsPage.deleteDashboard();
-            initAttributePage();
-            attributePage.initAttribute("Opportunity")
+            initAttributePage().initAttribute("Opportunity")
                 .clearDrillingSetting()
                 .setDrillToExternalPage();
         }
@@ -290,8 +287,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createDrillReport"})
     public void overrideDrilldownAndDrillIn() {
-        initAttributePage();
-        attributePage.initAttribute("Activity")
+        initAttributePage().initAttribute("Activity")
             .setDrillToAttribute("Activity Type");
 
         initReportsPage();
@@ -391,8 +387,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
         } finally {
             dashboardsPage.deleteDashboard();
 
-            initAttributePage();
-            attributePage.initAttribute("Activity")
+            initAttributePage().initAttribute("Activity")
                 .clearDrillingSetting();
         }
     }

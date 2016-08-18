@@ -15,6 +15,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.manage.DataPage;
 
 public class GoodSalesFolderTest extends GoodSalesAbstractTest {
     private String newName;
@@ -63,35 +64,31 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"initialize"}, groups = {"admin-tests"})
     public void verifyFolderListTest() {
         for (String page : pages) {
-            initDataPage(page);
-            dataPage.getObjectFolder().verifyFolderList(page, getFolderList(page));
+            initDataPage(page).getObjectFolder().verifyFolderList(page, getFolderList(page));
         }
     }
 
     @Test(dependsOnMethods = {"verifyFolderListTest"}, groups = {"admin-tests"})
     public void addFolderTest() {
         for (String page : pages) {
-            initDataPage(page);
             initVariables(page);
-            dataPage.getObjectFolder().addFolder(page, newName, null);
+            initDataPage(page).getObjectFolder().addFolder(page, newName, null);
         }
     }
 
     @Test(dependsOnMethods = {"addFolderTest"}, groups = {"admin-tests"})
     public void checkUnicodeNameTest() {
         for (String page : pages) {
-            initDataPage(page);
             initVariables(page);
-            dataPage.getObjectFolder().addFolder(page, unicodeName, null);
+            initDataPage(page).getObjectFolder().addFolder(page, unicodeName, null);
         }
     }
 
     @Test(dependsOnMethods = {"addFolderTest"}, groups = {"admin-tests"})
     public void checkUniqueNameTest() {
         for (String page : pages) {
-            initDataPage(page);
             initVariables(page);
-            dataPage.getObjectFolder().addFolder(page, uniqueName,
+            initDataPage(page).getObjectFolder().addFolder(page, uniqueName,
                     "Folder with that name already exists.");
         }
     }
@@ -99,9 +96,8 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"addFolderTest"}, groups = {"admin-tests"})
     public void editFolderTest() {
         for (String page : pages) {
-            initDataPage(page);
             initVariables(page);
-            dataPage.getObjectFolder().editFolder(oldEditName, newEditName, description);
+            initDataPage(page).getObjectFolder().editFolder(oldEditName, newEditName, description);
             removeFolderFromList(page, oldEditName);
         }
     }
@@ -109,9 +105,8 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"editFolderTest"}, groups = {"admin-tests"})
     public void deleteFolderTest() {
         for (String page : pages) {
-            initDataPage(page);
             initVariables(page);
-            dataPage.getObjectFolder().deleteFolder(deleteName);
+            initDataPage(page).getObjectFolder().deleteFolder(deleteName);
             removeFolderFromList(page, deleteName);
         }
     }
@@ -126,28 +121,24 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
         logout();
         signIn(false, UserRoles.EDITOR);
         for (String page : pages) {
-            initDataPage(page);
-            dataPage.getObjectFolder().checkEditorViewFolderList(page, getFolderList(page));
+            initDataPage(page).getObjectFolder().checkEditorViewFolderList(page, getFolderList(page));
         }
     }
 
     @Test(dependsOnMethods = {"editorVerifyFolderListTest"}, groups = {"editor-tests"})
     public void editorCreateMetricFolderTest() {
-        initDataPage("metrics");
-        dataPage.getObjectFolder().addFolder("metrics", "New Folder 1", null);
+        initDataPage("metrics").getObjectFolder().addFolder("metrics", "New Folder 1", null);
     }
 
     @Test(dependsOnMethods = {"editorVerifyFolderListTest"}, groups = {"editor-tests"})
     public void editorEditMetricFolderTest() {
-        initDataPage("metrics");
-        dataPage.getObjectFolder().editFolder("Sales Figures",
+        initDataPage("metrics").getObjectFolder().editFolder("Sales Figures",
                 "Sales Figures Renamed", "This is a description of folder");
     }
 
     @Test(dependsOnMethods = {"editorVerifyFolderListTest"}, groups = {"editor-tests"})
     public void editorDeleteMetricFolderTest() {
-        initDataPage("metrics");
-        dataPage.getObjectFolder().deleteFolder("Sales Rep");
+        initDataPage("metrics").getObjectFolder().deleteFolder("Sales Rep");
     }
 
     @Test(dependsOnMethods = {"editorVerifyFolderListTest"}, groups = {"editor-tests"})
@@ -158,13 +149,12 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"editorVerifyFolderListTest"}, groups = {"editor-tests"})
     public void editorCannotEditAttributeAndFactFolderTest() {
         for (String page : Arrays.asList("attributes", "facts")) {
-            initDataPage(page);
             String folder;
             if (page.equalsIgnoreCase("attributes"))
                 folder = "Opportunity";
             else
                 folder = "Opp. Snapshot";
-            dataPage.getObjectFolder().checkEditorCannotEditFolder(folder);
+            initDataPage(page).getObjectFolder().checkEditorCannotEditFolder(folder);
         }
     }
 
@@ -193,14 +183,17 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
         }
     }
 
-    private void initDataPage(String page) {
+    private DataPage initDataPage(String page) {
         if (page.equalsIgnoreCase("attributes")) {
-            initAttributePage();
-        } else if (page.equalsIgnoreCase("facts")) {
-            initFactPage();
-        } else {
-            initMetricPage();
+            return initAttributePage();
         }
+
+        if (page.equalsIgnoreCase("facts")) {
+            initFactPage();
+            return DataPage.getInstance(browser);
+        }
+
+        return initMetricPage();
     }
 
     private void createSnDFolder(String folderName) {
@@ -210,8 +203,7 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
         reportPage.initPage()
             .openWhatPanel()
             .createGlobalSimpleMetric(SimpleMetricTypes.SUM, "Amount", folderName);
-        initDataPage("metrics");
-        dataPage.getObjectFolder().checkFolderVisible(folderName);
+        initDataPage("metrics").getObjectFolder().checkFolderVisible(folderName);
     }
 
     private void removeFolderFromList(String page, String folderName) {

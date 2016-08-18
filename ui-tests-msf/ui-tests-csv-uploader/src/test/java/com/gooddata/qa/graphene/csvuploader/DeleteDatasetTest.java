@@ -162,8 +162,7 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
         dashboardsPage.selectDashboard(DASHBOARD1);
         assertTrue(dashboardsPage.isEmptyDashboard(), "Widgets are not removed from Dashboard");
 
-        initMetricPage();
-        assertFalse(metricPage.isMetricVisible(SUM_OF_AMOUNT_METRIC), "Sum of Amount metric is not deleted");
+        assertFalse(initMetricPage().isMetricVisible(SUM_OF_AMOUNT_METRIC), "Sum of Amount metric is not deleted");
     }
 
     private void createObjectsUsingUploadedData() {

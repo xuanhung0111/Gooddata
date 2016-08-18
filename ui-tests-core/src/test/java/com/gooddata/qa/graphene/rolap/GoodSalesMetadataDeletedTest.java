@@ -39,6 +39,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.Das
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
 import com.gooddata.qa.graphene.fragments.manage.FactDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
+import com.gooddata.qa.graphene.fragments.manage.VariablesPage;
 import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
@@ -467,17 +468,14 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
                     return false;
                 return true;
             case METRIC:
-                initMetricPage();
-                return !metricPage.isMetricVisible(object);
+                return !initMetricPage().isMetricVisible(object);
             case ATTRIBUTE:
-                initAttributePage();
-                return !attributePage.isAttributeVisible(object);
+                return !initAttributePage().isAttributeVisible(object);
             case DATASET:
                 initManagePage();
                 return !ObjectsTable.getInstance(id(ObjectTypes.DATA_SETS.getObjectsTableID()), browser).getAllItems().contains(object);
             case VARIABLE:
-                initVariablePage();
-                return !variablePage.hasVariable(object);
+                return !initVariablePage().hasVariable(object);
             case REPORT:
                 initReportsPage();
                 selectReportsDomainFolder("All");
@@ -595,8 +593,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
 
     private String createMetricUsing(AttributeInfo attribute) {
         String name = "Metric " + System.currentTimeMillis();
-        initMetricPage();
-        metricPage.createDifferentMetric(name, WIN_RATE_METRIC, attribute.name, attribute.elements[0].name);
+        initMetricPage().createDifferentMetric(name, WIN_RATE_METRIC, attribute.name, attribute.elements[0].name);
 
         return name;
     }
@@ -606,7 +603,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
         waitForDataPageLoaded(browser);
         sleepTightInSeconds(5);
-        variablePage.createVariable(new AttributeVariable(name).withAttribute(attribute.name)
+        VariablesPage.getInstance(browser).createVariable(new AttributeVariable(name).withAttribute(attribute.name)
                 .withAttributeValues(attribute.elements[0].name));
 
         String url = browser.getCurrentUrl();
