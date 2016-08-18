@@ -142,9 +142,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(css = ".ait-overview-projects-fragment")
     protected OverviewProjects discOverviewProjects;
 
-    @FindBy(css = ".ember-application .main")
-    protected UserManagementPage userManagementPage;
-
     @FindBy(id = IndigoDashboardsPage.MAIN_ID)
     protected IndigoDashboardsPage indigoDashboardsPage;
 
@@ -527,12 +524,12 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     public UserManagementPage initUserManagementPage() {
         openUrl(PAGE_USER_MANAGEMENT);
-        return waitForFragmentVisible(userManagementPage);
+        return UserManagementPage.getInstance(browser);
     }
 
-    public void initUngroupedUsersPage() {
+    public UserManagementPage initUngroupedUsersPage() {
         openUrl(PAGE_USER_MANAGEMENT + "?groupId=GROUP_UNGROUPED");
-        waitForFragmentVisible(userManagementPage);
+        return UserManagementPage.getInstance(browser);
     }
 
     public String getIndigoDashboardsPageUri() {

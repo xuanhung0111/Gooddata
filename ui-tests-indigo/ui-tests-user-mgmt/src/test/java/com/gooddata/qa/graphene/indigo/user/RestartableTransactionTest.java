@@ -13,6 +13,7 @@ import com.gooddata.qa.graphene.AbstractUITest;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.enums.user.UserStates;
+import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class RestartableTransactionTest extends AbstractUITest {
@@ -31,7 +32,7 @@ public class RestartableTransactionTest extends AbstractUITest {
     @Test(dependsOnGroups = {"precondition"})
     public void testRestartableTransaction() {
         initDashboardsPage();
-        initUserManagementPage();
+        UserManagementPage userManagementPage = initUserManagementPage();
 
         for (int i = 0; i < 30; i++) {
             // Need sleep here to increase way the error can happen

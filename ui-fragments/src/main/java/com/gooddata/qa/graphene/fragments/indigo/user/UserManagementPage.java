@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static org.openqa.selenium.By.cssSelector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -90,6 +92,11 @@ public class UserManagementPage extends AbstractFragment {
 
     public static final String ALL_ACTIVE_USERS_GROUP = "All active users";
     public static final String UNGROUPED_USERS = "Ungrouped users";
+
+    public static final UserManagementPage getInstance(SearchContext context) {
+        return Graphene.createPageFragment(UserManagementPage.class,
+                waitForElementVisible(cssSelector(".ember-application .main"), context));
+    }
 
     public UserInvitationDialog openInviteUserDialog() {
         waitForElementVisible(inviteUsersButton).click();
@@ -279,8 +286,9 @@ public class UserManagementPage extends AbstractFragment {
         return waitForElementVisible(stateMessage).getText().trim();
     }
 
-    public void startAddingUser() {
+    public UserManagementPage startAddingUser() {
         waitForElementVisible(startAddingUserButton).click();
+        return waitForFragmentVisible(this);
     }
 
     public String getUserRole(String email) {

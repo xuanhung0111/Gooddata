@@ -108,9 +108,8 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         createUserGroups(GROUP1, GROUP2, GROUP3);
 
         initDashboardsPage();
-        initUserManagementPage();
 
-        userManagementPage.addUsersToGroup(GROUP1, testParams.getUser())
+        initUserManagementPage().addUsersToGroup(GROUP1, testParams.getUser())
             .addUsersToGroup(GROUP2, editorUser)
             .addUsersToGroup(GROUP3, viewerUser);
     }
@@ -122,8 +121,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
 
         try {
             initDashboardsPage();
-            initUserManagementPage();
-            assertTrue(waitForFragmentVisible(userManagementPage).getAllUsernames()
+            assertTrue(initUserManagementPage().getAllUsernames()
                     .stream()
                     .anyMatch(name -> name.startsWith(xssUser)), "Cannot find user with first name: " + xssUser);
         } finally {
@@ -135,12 +133,11 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     public void checkXssInGroupName() {
         final String xssGroup = "<button>group</button>";
         initDashboardsPage();
-        initUserManagementPage();
-        assertTrue(waitForFragmentVisible(userManagementPage).createNewGroup(xssGroup)
+        assertTrue(initUserManagementPage().createNewGroup(xssGroup)
                 .getAllUserGroups()
                 .contains(xssGroup));
 
-        assertFalse(userManagementPage.openSpecificGroupPage(xssGroup)
+        assertFalse(UserManagementPage.getInstance(browser).openSpecificGroupPage(xssGroup)
                 .deleteUserGroup()
                 .getAllUserGroups()
                 .contains(xssGroup));
@@ -149,8 +146,8 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement", "sanity" })
     public void accessFromProjectsAndUsersPage() {
         initProjectsAndUsersPage()
-            .openUserManagementPage();
-        waitForFragmentVisible(userManagementPage).waitForUsersContentLoaded();
+            .openUserManagementPage()
+            .waitForUsersContentLoaded();
     }
 
     @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement", "sanity" })
@@ -161,7 +158,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         dashboardsPage.openPermissionsDialog().openAddGranteePanel().openUserManagementPage();
         Sleeper.sleepTightInSeconds(1);
         BrowserUtils.switchToLastTab(browser);
-        waitForFragmentVisible(userManagementPage).waitForUsersContentLoaded();
+        UserManagementPage.getInstance(browser).waitForUsersContentLoaded();
         BrowserUtils.switchToFirstTab(browser);
     }
 
@@ -184,31 +181,28 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = { "initialize" }, groups = { "verifyUI", "sanity" })
     public void verifyUserManagementUI() throws IOException, JSONException {
         initDashboardsPage();
-        initUserManagementPage();
-        userManagementPage.openInviteUserDialog().cancelInvitation();
-        assertEquals(userManagementPage.getUsersCount(), 4);
-        userManagementPage.selectUsers(testParams.getUser(), editorUser, viewerUser, testParams.getDomainUser());
-        userManagementPage.openGroupDialog(GroupDialog.State.CREATE).closeDialog();
+        initUserManagementPage().openInviteUserDialog().cancelInvitation();
+        assertEquals(UserManagementPage.getInstance(browser).getUsersCount(), 4);
+        UserManagementPage.getInstance(browser)
+            .selectUsers(testParams.getUser(), editorUser, viewerUser, testParams.getDomainUser())
+            .openGroupDialog(GroupDialog.State.CREATE).closeDialog();
     }
 
     @Test(dependsOnGroups = { "initialize" }, groups = { "verifyUI", "sanity" })
     public void verifyUserGroupsList() {
         List<String> groups = asList(GROUP1, GROUP2, GROUP3);
         initDashboardsPage();
-        initUserManagementPage();
 
-        assertEquals(userManagementPage.getAllUserGroups(), groups);
-        assertEquals(userManagementPage.filterUserState(UserStates.DEACTIVATED)
+        assertEquals(initUserManagementPage().getAllUserGroups(), groups);
+        assertEquals(UserManagementPage.getInstance(browser).filterUserState(UserStates.DEACTIVATED)
                 .getAllUserGroups(), groups);
-        assertEquals(userManagementPage.filterUserState(UserStates.INVITED)
+        assertEquals(UserManagementPage.getInstance(browser).filterUserState(UserStates.INVITED)
                 .waitForEmptyGroup()
                 .getStateGroupMessage(), NO_ACTIVE_INVITATIONS_MESSAGE);
 
-        initUserManagementPage();
-
-        assertEquals( userManagementPage.openSpecificGroupPage(GROUP1)
+        assertEquals(initUserManagementPage().openSpecificGroupPage(GROUP1)
                 .getAllUserEmails(), asList(testParams.getUser()));
-        assertEquals(userManagementPage.getAllUserGroups(), groups);
+        assertEquals(UserManagementPage.getInstance(browser).getAllUserGroups(), groups);
     }
 
     @Test(dependsOnMethods = { "verifyUserGroupsList" }, groups = "userManagement")
@@ -217,16 +211,14 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         String groupUri = UserManagementRestUtils.addUserGroup(restApiClient, testParams.getProjectId(), emptyGroup);
         try {
             initDashboardsPage();
-            initUserManagementPage();
-            assertEquals(userManagementPage.openSpecificGroupPage(emptyGroup)
+            assertEquals(initUserManagementPage().openSpecificGroupPage(emptyGroup)
                     .waitForEmptyGroup()
                     .getStateGroupMessage(), EMPTY_GROUP_STATE_MESSAGE);
-            userManagementPage.startAddingUser();
-            waitForFragmentVisible(userManagementPage);
 
             // Check "Active" and "All active users" links of sidebar are selected
-            assertEquals(userManagementPage.getAllSidebarActiveLinks(), asList("Active", "All active users"));
-            assertTrue(compareCollections(userManagementPage.getAllUserEmails(), 
+            assertEquals(UserManagementPage.getInstance(browser).startAddingUser().getAllSidebarActiveLinks(),
+                    asList("Active", "All active users"));
+            assertTrue(compareCollections(UserManagementPage.getInstance(browser).getAllUserEmails(), 
                     asList(testParams.getUser(), editorUser, viewerUser, testParams.getDomainUser())));
         } finally {
             UserManagementRestUtils.deleteUserGroup(restApiClient, groupUri);
@@ -239,8 +231,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         String groupUri = UserManagementRestUtils.addUserGroup(restApiClient, testParams.getProjectId(), group);
         try {
             initDashboardsPage();
-            initUserManagementPage();
-            userManagementPage.addUsersToGroup(group, testParams.getUser())
+            initUserManagementPage().addUsersToGroup(group, testParams.getUser())
                 .openSpecificGroupPage(group)
                 .removeUsersFromGroup(group, testParams.getUser())
                 .waitForEmptyGroup();
@@ -256,11 +247,9 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         removeUserFromGroups(testParams.getUser(), GROUP1, GROUP2, GROUP3);
 
         try {
-            initUngroupedUsersPage();
-            assertTrue(userManagementPage.getAllUserEmails().contains(testParams.getUser()));
+            assertTrue(initUngroupedUsersPage().getAllUserEmails().contains(testParams.getUser()));
         } finally {
-            initUserManagementPage();
-            userManagementPage.addUsersToGroup(GROUP1, testParams.getUser());
+            initUserManagementPage().addUsersToGroup(GROUP1, testParams.getUser());
         }
     }
 
@@ -271,13 +260,13 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         initUserManagementPage();
 
         for (String group : groups) {
-            assertEquals(userManagementPage.addUsersToGroup(group, testParams.getUser(), editorUser, viewerUser)
+            assertEquals(UserManagementPage.getInstance(browser).addUsersToGroup(group, testParams.getUser(), editorUser, viewerUser)
                     .getMessageText(), CHANGE_GROUP_SUCCESSFUL_MESSAGE);
         }
 
         List<String> expectedUsers = asList(testParams.getUser(), editorUser, viewerUser);
         for (String group : groups) {
-            assertTrue(compareCollections(userManagementPage.openSpecificGroupPage(group)
+            assertTrue(compareCollections(UserManagementPage.getInstance(browser).openSpecificGroupPage(group)
                     .getAllUserEmails(), expectedUsers));
         }
     }
@@ -288,12 +277,11 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         initUserManagementPage();
 
         for (String group : asList(GROUP1, GROUP2)) {
-            assertEquals(userManagementPage.removeUsersFromGroup(group, testParams.getUser())
+            assertEquals(UserManagementPage.getInstance(browser).removeUsersFromGroup(group, testParams.getUser())
                     .getMessageText(), CHANGE_GROUP_SUCCESSFUL_MESSAGE);
         }
 
-        initUserManagementPage();
-        assertTrue(userManagementPage.addUsersToGroup(GROUP3, testParams.getUser())
+        assertTrue(initUserManagementPage().addUsersToGroup(GROUP3, testParams.getUser())
                 .openSpecificGroupPage(GROUP3)
                 .getAllUserEmails().contains(testParams.getUser()));
     }
@@ -304,10 +292,9 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         UserManagementRestUtils.addUserGroup(restApiClient, testParams.getProjectId(), groupName);
 
         initDashboardsPage();
-        initUserManagementPage();
-        int userGroupsCount = userManagementPage.getUserGroupsCount();
+        int userGroupsCount = initUserManagementPage().getUserGroupsCount();
 
-        assertEquals(userManagementPage.openSpecificGroupPage(groupName)
+        assertEquals(UserManagementPage.getInstance(browser).openSpecificGroupPage(groupName)
                 .deleteUserGroup()
                 .getUserGroupsCount(), userGroupsCount - 1);
     }
@@ -316,49 +303,45 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     public void changeRoleOfUsers() {
         try {
             initDashboardsPage();
-            initUserManagementPage();
             String adminText = UserRoles.ADMIN.getName();
 
-            userManagementPage.changeRoleOfUsers(UserRoles.ADMIN, editorUser, viewerUser);
+            initUserManagementPage().changeRoleOfUsers(UserRoles.ADMIN, editorUser, viewerUser);
             Predicate<WebDriver> changeRoleSuccessfully = 
                     browser -> String.format(CHANGE_ROLE_SUCCESSFUL_MESSAGE, adminText)
-                        .equals(userManagementPage.getMessageText());
+                        .equals(UserManagementPage.getInstance(browser).getMessageText());
             Graphene.waitGui().until(changeRoleSuccessfully);
 
             for (String email : asList(editorUser, viewerUser)) {
-                assertEquals(userManagementPage.getUserRole(email), adminText);
+                assertEquals(UserManagementPage.getInstance(browser).getUserRole(email), adminText);
             }
         } finally {
-            userManagementPage.changeRoleOfUsers(UserRoles.EDITOR, editorUser);
-            initUserManagementPage();
-            userManagementPage.changeRoleOfUsers(UserRoles.VIEWER, viewerUser);
+            UserManagementPage.getInstance(browser).changeRoleOfUsers(UserRoles.EDITOR, editorUser);
+            initUserManagementPage().changeRoleOfUsers(UserRoles.VIEWER, viewerUser);
         }
     }
 
     @Test(dependsOnMethods = { "verifyUserManagementUI" }, groups = { "userManagement" })
     public void checkUserCannotChangeRoleOfHimself() {
         initDashboardsPage();
-        initUserManagementPage();
-        userManagementPage.changeRoleOfUsers(UserRoles.EDITOR, testParams.getUser());
+        initUserManagementPage().changeRoleOfUsers(UserRoles.EDITOR, testParams.getUser());
 
         Predicate<WebDriver> changeRoleFailed = 
                 browser -> String.format(CHANGE_ROLE_FAILED_MESSAGE, UserRoles.EDITOR.getName())
-                    .equals(userManagementPage.getMessageText());
+                    .equals(UserManagementPage.getInstance(browser).getMessageText());
         Graphene.waitGui().until(changeRoleFailed);
 
-        assertEquals(userManagementPage.getUserRole(testParams.getUser()), UserRoles.ADMIN.getName());
+        assertEquals(UserManagementPage.getInstance(browser).getUserRole(testParams.getUser()), UserRoles.ADMIN.getName());
     }
 
     @Test(dependsOnMethods = { "inviteUserToProject" }, groups = { "userManagement" }, alwaysRun = true)
     public void checkUserCannotChangeRoleOfPendingUser() {
         initDashboardsPage();
-        initUserManagementPage();
 
-        UserInvitationDialog dialog = userManagementPage.openInviteUserDialog();
+        UserInvitationDialog dialog = initUserManagementPage().openInviteUserDialog();
         dialog.invitePeople(UserRoles.ADMIN, "Invite new admin user", INVITED_EMAIL);
         waitForFragmentNotVisible(dialog);
 
-        assertFalse(userManagementPage.filterUserState(UserStates.INVITED)
+        assertFalse(UserManagementPage.getInstance(browser).filterUserState(UserStates.INVITED)
                 .selectUsers(INVITED_EMAIL)
                 .isChangeRoleButtonPresent());
     }
@@ -366,16 +349,14 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = { "verifyUserManagementUI" }, groups = { "userManagement", "sanity" })
     public void inviteUserToProject() throws IOException, MessagingException {
         initDashboardsPage();
-        initUserManagementPage();
-        userManagementPage.openInviteUserDialog().invitePeople(UserRoles.ADMIN, "Invite new admin user", imapUser);
+        initUserManagementPage().openInviteUserDialog().invitePeople(UserRoles.ADMIN, "Invite new admin user", imapUser);
 
-        assertEquals(userManagementPage.getMessageText(), INVITE_USER_SUCCESSFUL_MESSAGE);
-        assertTrue(userManagementPage.filterUserState(UserStates.INVITED)
+        assertEquals(UserManagementPage.getInstance(browser).getMessageText(), INVITE_USER_SUCCESSFUL_MESSAGE);
+        assertTrue(UserManagementPage.getInstance(browser).filterUserState(UserStates.INVITED)
                 .getAllUserEmails().contains(imapUser));
 
         activeEmailUser(projectTitle + " Invitation");
-        initUserManagementPage();
-        assertTrue(userManagementPage.filterUserState(UserStates.ACTIVE)
+        assertTrue(initUserManagementPage().filterUserState(UserStates.ACTIVE)
                 .getAllUserEmails().contains(imapUser));
     }
 
@@ -386,21 +367,19 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         }
 
         initDashboardsPage();
-        initUserManagementPage();
-        userManagementPage.openInviteUserDialog().invitePeople(UserRoles.ADMIN, "Invite existing editor user",
+        initUserManagementPage().openInviteUserDialog().invitePeople(UserRoles.ADMIN, "Invite existing editor user",
                 editorUser);
-        assertEquals(userManagementPage.getMessageText(), EXSITING_USER_MESSAGE,
+        assertEquals(UserManagementPage.getInstance(browser).getMessageText(), EXSITING_USER_MESSAGE,
                 "Confirm message is not correct when adding exsiting user into the project!");
     }
 
     @Test(dependsOnGroups = { "userManagement" }, groups = { "activeUser", "sanity" }, alwaysRun = true)
     public void checkUserCannotDeactivateHimself() {
         initDashboardsPage();
-        initUserManagementPage();
-        assertEquals(userManagementPage.deactivateUsers(testParams.getUser())
+        assertEquals(initUserManagementPage().deactivateUsers(testParams.getUser())
                 .getMessageText(), CAN_NOT_DEACTIVATE_HIMSELF_MESSAGE);
-        assertTrue(userManagementPage.getAllUserEmails().contains(testParams.getUser()));
-        assertEquals(userManagementPage.filterUserState(UserStates.DEACTIVATED)
+        assertTrue(UserManagementPage.getInstance(browser).getAllUserEmails().contains(testParams.getUser()));
+        assertEquals(UserManagementPage.getInstance(browser).filterUserState(UserStates.DEACTIVATED)
                 .waitForEmptyGroup()
                 .getStateGroupMessage(), NO_DEACTIVATED_USER_MESSAGE);
     }
@@ -410,35 +389,31 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         List<String> emailsList = asList(editorUser, viewerUser);
 
         initDashboardsPage();
-        initUserManagementPage();
-        assertEquals(userManagementPage.deactivateUsers(editorUser, viewerUser)
+        assertEquals(initUserManagementPage().deactivateUsers(editorUser, viewerUser)
                 .getMessageText(), DEACTIVATE_SUCCESSFUL_MESSAGE);
-        assertFalse(userManagementPage.getAllUserEmails().containsAll(emailsList));
-        assertTrue(compareCollections( userManagementPage.filterUserState(UserStates.DEACTIVATED)
+        assertFalse(UserManagementPage.getInstance(browser).getAllUserEmails().containsAll(emailsList));
+        assertTrue(compareCollections(UserManagementPage.getInstance(browser).filterUserState(UserStates.DEACTIVATED)
                 .getAllUserEmails(), emailsList));
     }
 
     @Test(dependsOnMethods = { "deactivateUsers" }, groups = { "activeUser", "sanity" }, alwaysRun = true)
     public void activateUsers() {
         initDashboardsPage();
-        initUserManagementPage();
-        assertEquals(userManagementPage.filterUserState(UserStates.DEACTIVATED)
+        assertEquals(initUserManagementPage().filterUserState(UserStates.DEACTIVATED)
                 .activateUsers(editorUser, viewerUser)
                 .getMessageText(), ACTIVATE_SUCCESSFUL_MESSAGE);
-        userManagementPage.waitForEmptyGroup();
+        UserManagementPage.getInstance(browser).waitForEmptyGroup();
 
-        initUserManagementPage();
-        assertTrue(userManagementPage.getAllUserEmails().containsAll(asList(editorUser, viewerUser)));
+        assertTrue(initUserManagementPage().getAllUserEmails().containsAll(asList(editorUser, viewerUser)));
     }
 
     @Test(dependsOnGroups = { "verifyUI" }, groups = { "sanity" })
     public void addNewGroup() {
         String group = "Test add group";
         checkAddingUserGroup(group);
-        initUserManagementPage();
-        userManagementPage.addUsersToGroup(group, testParams.getUser());
+        initUserManagementPage().addUsersToGroup(group, testParams.getUser());
 
-        assertTrue(userManagementPage.openSpecificGroupPage(group)
+        assertTrue(UserManagementPage.getInstance(browser).openSpecificGroupPage(group)
                 .getAllUserEmails().contains(testParams.getUser()));
     }
 
@@ -451,17 +426,15 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = "verifyUI")
     public void cancelAddingNewGroup() {
         initDashboardsPage();
-        initUserManagementPage();
         String group = "Test cancel group";
-        assertFalse(userManagementPage.cancelCreatingNewGroup(group)
+        assertFalse(initUserManagementPage().cancelCreatingNewGroup(group)
                 .getAllUserGroups().contains(group));
     }
 
     @Test(dependsOnGroups = "verifyUI")
     public void addExistingGroupName() {
         initDashboardsPage();
-        initUserManagementPage();
-        GroupDialog groupDialog = userManagementPage.openGroupDialog(GroupDialog.State.CREATE);
+        GroupDialog groupDialog = initUserManagementPage().openGroupDialog(GroupDialog.State.CREATE);
         groupDialog.enterGroupName(GROUP1);
         assertFalse(groupDialog.isSubmitButtonVisible());
         assertEquals(groupDialog.getErrorMessage(), String.format(EXISTING_USER_GROUP_MESSAGE, GROUP1));
@@ -475,16 +448,15 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
 
         try {
             initDashboardsPage();
-            initUserManagementPage();
 
-            GroupDialog editGroupDialog = userManagementPage.openSpecificGroupPage(groupName)
+            GroupDialog editGroupDialog = initUserManagementPage().openSpecificGroupPage(groupName)
                     .openGroupDialog(GroupDialog.State.EDIT);
             assertEquals(editGroupDialog.verifyStateOfDialog(GroupDialog.State.EDIT)
                     .getGroupNameText(), groupName);
 
-            assertTrue(userManagementPage.renameUserGroup(newGroupName)
+            assertTrue(UserManagementPage.getInstance(browser).renameUserGroup(newGroupName)
                     .getAllSidebarActiveLinks().contains(newGroupName));
-            assertEquals(userManagementPage.getUserPageTitle(), newGroupName);
+            assertEquals(UserManagementPage.getInstance(browser).getUserPageTitle(), newGroupName);
         } finally {
             UserManagementRestUtils.deleteUserGroup(restApiClient, groupUri);
         }
@@ -493,9 +465,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = "verifyUI")
     public void renameUserGroupWithExistingName() throws JSONException, IOException {
         initDashboardsPage();
-        initUserManagementPage();
-        userManagementPage.openSpecificGroupPage(GROUP1);
-        GroupDialog editGroupDialog = userManagementPage.openGroupDialog(GroupDialog.State.EDIT);
+        GroupDialog editGroupDialog = initUserManagementPage().openSpecificGroupPage(GROUP1).openGroupDialog(GroupDialog.State.EDIT);
         assertFalse(editGroupDialog.enterGroupName(GROUP2).isSubmitButtonVisible());
         assertEquals(editGroupDialog.getErrorMessage(), String.format(EXISTING_USER_GROUP_MESSAGE, GROUP2));
     }
@@ -504,47 +474,45 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     public void cancelRenamingUserGroup() {
         String group = "Cancel group name";
         initDashboardsPage();
-        initUserManagementPage();
 
-        userManagementPage.openSpecificGroupPage(GROUP1)
+        initUserManagementPage().openSpecificGroupPage(GROUP1)
             .cancelRenamingUserGroup(group)
             .getAllSidebarActiveLinks().contains(GROUP1);
-        assertEquals(userManagementPage.getUserPageTitle(), GROUP1 + " " + userManagementPage.getUsersCount());
-        assertFalse(userManagementPage.getAllUserGroups().contains(group));
+        assertEquals(UserManagementPage.getInstance(browser).getUserPageTitle(), GROUP1 + " " +
+            UserManagementPage.getInstance(browser).getUsersCount());
+        assertFalse(UserManagementPage.getInstance(browser).getAllUserGroups().contains(group));
     }
 
     @Test(dependsOnGroups = { "activeUser" }, groups = { "deleteGroup" })
     public void checkDeleteGroupLinkNotShownInBuiltInGroup() {
         initDashboardsPage();
-        initUserManagementPage();
 
-        assertFalse(userManagementPage.openSpecificGroupPage(UserManagementPage.ALL_ACTIVE_USERS_GROUP)
+        assertFalse(initUserManagementPage().openSpecificGroupPage(UserManagementPage.ALL_ACTIVE_USERS_GROUP)
                 .isDeleteGroupLinkPresent(), "Delete group link is shown in default group");
 
-        assertFalse(userManagementPage.openSpecificGroupPage(UserManagementPage.UNGROUPED_USERS)
+        assertFalse(UserManagementPage.getInstance(browser).openSpecificGroupPage(UserManagementPage.UNGROUPED_USERS)
                 .isDeleteGroupLinkPresent(), "Delete group link is shown in default group");
     }
 
     @Test(dependsOnMethods = { "checkDeleteGroupLinkNotShownInBuiltInGroup" }, groups = { "deleteGroup" })
     public void checkDeleteUserGroup() {
         initDashboardsPage();
-        initUserManagementPage();
 
-        int customGroupCount = userManagementPage.getUserGroupsCount(); 
-        userManagementPage.openSpecificGroupPage(GROUP1);
+        int customGroupCount = initUserManagementPage().getUserGroupsCount(); 
+        UserManagementPage.getInstance(browser).openSpecificGroupPage(GROUP1);
 
-        assertTrue(userManagementPage.isDeleteGroupLinkPresent(), "Delete group link does not show");
-        DeleteGroupDialog dialog = userManagementPage.openDeleteGroupDialog();
+        assertTrue(UserManagementPage.getInstance(browser).isDeleteGroupLinkPresent(), "Delete group link does not show");
+        DeleteGroupDialog dialog = UserManagementPage.getInstance(browser).openDeleteGroupDialog();
         assertEquals(dialog.getTitle(), "Delete group " + GROUP1, "Title of delete group dialog is wrong");
         assertEquals(dialog.getBodyContent(), DELETE_GROUP_DIALOG_CONTENT,
                 "Content of delete group dialog is wrong");
         dialog.cancel();
 
-        assertEquals(userManagementPage.getUserGroupsCount(), customGroupCount);
+        assertEquals(UserManagementPage.getInstance(browser).getUserGroupsCount(), customGroupCount);
 
         List<String> emailsList = asList(testParams.getDomainUser(), testParams.getUser(), editorUser, viewerUser);
-       
-        assertEquals(userManagementPage.openSpecificGroupPage(GROUP1)
+
+        assertEquals(UserManagementPage.getInstance(browser).openSpecificGroupPage(GROUP1)
                 .deleteUserGroup()
                 .getUserGroupsCount(), customGroupCount-1);
         checkUserEmailsStillAvailableAfterDeletingGroup(emailsList);
@@ -556,23 +524,21 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         initUserManagementPage();
 
         List<String> emailsList = asList(testParams.getDomainUser(), testParams.getUser(), editorUser, viewerUser);
-        while (userManagementPage.getUserGroupsCount() > 0) {
-            userManagementPage.openSpecificGroupPage(userManagementPage.getAllUserGroups().get(0))
+        while (UserManagementPage.getInstance(browser).getUserGroupsCount() > 0) {
+            UserManagementPage.getInstance(browser).openSpecificGroupPage(UserManagementPage.getInstance(browser).getAllUserGroups().get(0))
                 .deleteUserGroup();
         }
 
-        assertFalse(userManagementPage.isDefaultGroupsPresent(), "default groups are still shown");
+        assertFalse(UserManagementPage.getInstance(browser).isDefaultGroupsPresent(), "default groups are still shown");
         checkUserEmailsStillAvailableAfterDeletingGroup(emailsList);
     }
 
     @Test(dependsOnMethods = { "checkDeleteAllGroups" }, groups = { "deleteGroup" })
     public void checkCreateANewGroupAfterRemovalOfAllGroups() {
         initDashboardsPage();
-        initUserManagementPage();
 
-        userManagementPage.createNewGroup(GROUP1);
-        assertEquals(userManagementPage.getAllUserGroups(), asList(GROUP1));
-        assertTrue(userManagementPage.isDefaultGroupsPresent(), "default groups are not shown");
+        assertEquals(initUserManagementPage().createNewGroup(GROUP1).getAllUserGroups(), asList(GROUP1));
+        assertTrue(UserManagementPage.getInstance(browser).isDefaultGroupsPresent(), "default groups are not shown");
     }
 
     @Test(dependsOnGroups = { "activeUser", "userManagement", "verifyUI", "initialize", "deleteGroup" },
@@ -589,7 +555,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     }
 
     private void checkUserEmailsStillAvailableAfterDeletingGroup(List<String> emailsList) {
-        assertTrue(userManagementPage.filterUserState(UserStates.ACTIVE)
+        assertTrue(UserManagementPage.getInstance(browser).filterUserState(UserStates.ACTIVE)
                 .getAllUserEmails().containsAll(emailsList), "missing user email");
     }
 
@@ -602,9 +568,8 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
 
     private void checkInvitedEmail(String email, String expectedMessage) {
         initDashboardsPage();
-        initUserManagementPage();
 
-        UserInvitationDialog dialog = userManagementPage.openInviteUserDialog();
+        UserInvitationDialog dialog = initUserManagementPage().openInviteUserDialog();
         dialog.invitePeople(UserRoles.ADMIN, "Invite new admin user", email);
         assertEquals(dialog.getErrorMessage(), expectedMessage);
         dialog.cancelInvitation();
@@ -638,22 +603,21 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
 
     private void removeUserFromGroups(String user, String... groups) {
         for (String group : groups) {
-            userManagementPage.removeUsersFromGroup(group, user);
+            UserManagementPage.getInstance(browser).removeUsersFromGroup(group, user);
         }
     }
 
     private void checkAddingUserGroup(String group) {
         initDashboardsPage();
-        initUserManagementPage();
 
-        GroupDialog createDialog = userManagementPage.openGroupDialog(GroupDialog.State.CREATE);
+        GroupDialog createDialog = initUserManagementPage().openGroupDialog(GroupDialog.State.CREATE);
         createDialog.verifyStateOfDialog(GroupDialog.State.CREATE);
         createDialog.closeDialog();
-        userManagementPage.createNewGroup(group)
+        UserManagementPage.getInstance(browser).createNewGroup(group)
                 .waitForEmptyGroup();
 
-        assertEquals(userManagementPage.getStateGroupMessage(), EMPTY_GROUP_STATE_MESSAGE);
-        assertTrue(userManagementPage.getAllUserGroups().contains(group));
-        assertTrue(userManagementPage.getAllSidebarActiveLinks().contains(group));
+        assertEquals(UserManagementPage.getInstance(browser).getStateGroupMessage(), EMPTY_GROUP_STATE_MESSAGE);
+        assertTrue(UserManagementPage.getInstance(browser).getAllUserGroups().contains(group));
+        assertTrue(UserManagementPage.getInstance(browser).getAllSidebarActiveLinks().contains(group));
     }
 }
