@@ -52,7 +52,10 @@ public class UITestsRegistry {
                     GoodSalesFilterGroupTest.class,
                     DashboardFilterVisualTest.class,
                     DashboardSavedFiltersTest.class,
-                    GoodSalesAdvancedConnectingFilterTest.class,
+                    GoodSalesAdvancedConnectingFilterTest.class
+                ));
+            } else if ("default-filter-feature".equals(suite)) {
+                tests.addAll(asList(
                     GoodSalesDefaultFilterMultipleChoiceTest.class
                 ));
             }
