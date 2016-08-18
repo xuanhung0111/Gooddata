@@ -14,7 +14,7 @@ public class EmbeddedAnalysisPage extends AnalysisPage {
 
     public static EmbeddedAnalysisPage getInstance(final SearchContext context) {
         return Graphene.createPageFragment(EmbeddedAnalysisPage.class,
-                waitForElementVisible(className("adi-editor"), context));
+                waitForElementVisible(className(MAIN_CLASS), context));
     }
 
     /**

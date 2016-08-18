@@ -13,6 +13,7 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -55,6 +56,11 @@ public class AnalysisPage extends AbstractFragment {
     public static final String MAIN_CLASS = "adi-editor";
 
     private static final By BY_TRASH_PANEL = className("s-trash");
+
+    public static AnalysisPage getInstance(SearchContext context) {
+        return Graphene.createPageFragment(AnalysisPage.class,
+                waitForElementVisible(className(MAIN_CLASS), context));
+    }
 
     public AnalysisPage startDrag(WebElement source) {
         WebElement editor = waitForElementVisible(getRoot());
