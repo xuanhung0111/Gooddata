@@ -4,7 +4,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -12,13 +11,13 @@ import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.common.IpeEditor;
 import com.gooddata.qa.graphene.utils.Sleeper;
 import com.google.common.base.Predicate;
 
@@ -167,25 +166,5 @@ public abstract class ObjectPropertiesPage extends AbstractFragment {
         waitForElementNotVisible(By.cssSelector(".t-confirmDelete"));
 
         return deleteButton.getAttribute("class").contains("disabled");
-    }
-
-    public static class IpeEditor extends AbstractFragment {
-
-        @FindBy(tagName = "input")
-        private WebElement input;
-
-        @FindBy(className = "s-ipeSaveButton")
-        private WebElement saveButton;
-
-        public static final IpeEditor getInstance(SearchContext context) {
-            return Graphene.createPageFragment(IpeEditor.class,
-                    waitForElementVisible(cssSelector(".c-ipeEditor[style*='display: block']"), context));
-        }
-
-        public void setText(String text) {
-            waitForElementVisible(input).clear();
-            input.sendKeys(text);
-            waitForElementVisible(saveButton).click();
-        }
     }
 }
