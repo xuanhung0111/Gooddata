@@ -142,9 +142,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(css = ".ait-overview-projects-fragment")
     protected OverviewProjects discOverviewProjects;
 
-    @FindBy(className = AnalysisPage.MAIN_CLASS)
-    protected AnalysisPage analysisPage;
-
     @FindBy(css = ".ember-application .main")
     protected UserManagementPage userManagementPage;
 
@@ -496,7 +493,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     public AnalysisPage initAnalysePage() {
         openUrl(PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/reportId/edit");
-        return waitForFragmentVisible(analysisPage);
+        return AnalysisPage.getInstance(browser);
     }
 
     public AccountPage initAccountPage() {

@@ -5,16 +5,21 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
+import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.common.StartPageContext;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 
 public abstract class AbstractAnalyseTest extends AbstractProjectTest {
 
     protected static final String DATE = "Date";
+
+    @FindBy(className = AnalysisPage.MAIN_CLASS)
+    protected AnalysisPage analysisPage;
 
     @BeforeClass(alwaysRun = true)
     public void initProperties() {
