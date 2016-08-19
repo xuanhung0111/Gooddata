@@ -267,7 +267,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         return getMdService().createObj(getProject(), new Metric(name, expression, format));
     }
 
-    protected Report createReport(ReportDefinition defination) {
+    protected Report createReportViaRest(ReportDefinition defination) {
         defination = getMdService().createObj(getProject(), defination);
         return getMdService().createObj(getProject(), new Report(defination.getTitle(), defination));
     }

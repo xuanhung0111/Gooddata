@@ -93,18 +93,18 @@ public class GoodSalesDefaultFilterMultipleChoiceTest extends AbstractDashboardW
 
         String promptFilterUri = getVariableUri(getRestApiClient(), testParams.getProjectId(), DF_VARIABLE);
 
-        createReport(GridReportDefinitionContent.create(REPORT,
+        createReportViaRest(GridReportDefinitionContent.create(REPORT,
                 singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(stageNameAttribute.getDefaultDisplayForm().getUri())),
                 singletonList(new GridElement(amountMetricUri, METRIC_AMOUNT))));
 
-        createReport(GridReportDefinitionContent.create(REPORT_WITH_ADDITIONAL_ATTRIBUTE,
+        createReportViaRest(GridReportDefinitionContent.create(REPORT_WITH_ADDITIONAL_ATTRIBUTE,
                 singletonList("metricGroup"),
                 asList(new AttributeInGrid(stageNameAttribute.getDefaultDisplayForm().getUri()),
                         new AttributeInGrid(departmentAttribute.getDefaultDisplayForm().getUri())),
                 singletonList(new GridElement(amountMetricUri, METRIC_AMOUNT))));
 
-        createReport(GridReportDefinitionContent.create(REPORT_WITH_PROMPT_FILTER,
+        createReportViaRest(GridReportDefinitionContent.create(REPORT_WITH_PROMPT_FILTER,
                 singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(stageNameAttribute.getDefaultDisplayForm().getUri())),
                 singletonList(new GridElement(amountMetricUri, METRIC_AMOUNT)),
@@ -497,7 +497,7 @@ public class GoodSalesDefaultFilterMultipleChoiceTest extends AbstractDashboardW
         Attribute productAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_PRODUCT));
         String promptFilterUri = getVariableUri(getRestApiClient(), testParams.getProjectId(), MUF_DF_VARIABLE);
 
-        createReport(GridReportDefinitionContent.create(REPORT_MUF,
+        createReportViaRest(GridReportDefinitionContent.create(REPORT_MUF,
                 singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(productAttribute.getDefaultDisplayForm().getUri())),
                 singletonList(new GridElement(amountMetricUri, METRIC_AMOUNT)),
