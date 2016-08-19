@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
 import static com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest.DATE_FILTER_ALL_TIME;
 import static com.gooddata.qa.graphene.utils.UrlParserUtils.replaceInUrl;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 
@@ -31,6 +30,7 @@ import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
@@ -112,9 +112,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
 
             initIndigoDashboardsPage()
                     .getSplashScreen()
-                    .startEditingWidgets();
-
-            waitForFragmentVisible(indigoDashboardsPage)
+                    .startEditingWidgets()
                     .waitForDashboardLoad()
                     .addWidget(kpi)
                     .selectDateFilterByName(DATE_FILTER_ALL_TIME)
@@ -132,7 +130,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
             // metric name is in mail subject and is unique
             checkKpiAlertTriggered(metricName, DATE_FILTER_ALL_TIME, testStartTime);
 
-            waitForFragmentVisible(indigoDashboardsPage)
+            IndigoDashboardsPage.getInstance(browser)
                     .switchToEditMode()
                     .deleteDashboard(true);
 
@@ -244,7 +242,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
         if (testParams.isHostProxy()) {
             replaceInUrl(browser, testParams.getHostProxy(), testParams.getHost());
         }
-        Kpi checkKpi = waitForFragmentVisible(indigoDashboardsPage)
+        Kpi checkKpi = IndigoDashboardsPage.getInstance(browser)
                 .waitForDashboardLoad()
                 .waitForAllKpiWidgetContentLoaded()
                 .getKpiByHeadline(metricName);
@@ -252,6 +250,6 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
         // check that alert is triggered and date filter is reset accordingly
         assertTrue(checkKpi.isAlertTriggered());
         takeScreenshot(browser, "checkKpiAlertEvaluation-alert-triggered-via-email-"+metricName, getClass());
-        assertEquals(indigoDashboardsPage.getDateFilterSelection(), dateFilter);
+        assertEquals(IndigoDashboardsPage.getInstance(browser).getDateFilterSelection(), dateFilter);
     }
 }

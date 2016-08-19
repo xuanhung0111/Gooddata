@@ -23,6 +23,7 @@ import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
 import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
@@ -84,30 +85,44 @@ public class NonProductionDatasetTest extends AbstractProjectTest {
 
     @Test(dependsOnGroups = { "precondition" }, groups = { "basic-test" })
     public void testMeasureOptions() {
-        initIndigoDashboardsPage().getSplashScreen().startEditingWidgets();
-        assertEquals(indigoDashboardsPage.dragAddKpiPlaceholder().getConfigurationPanel().getMetricSelect().getValues(),
-                asList(METRIC_AMOUNT_SUM, METRIC_DEPARTMENT_COUNT), "The measure options are not correct");
+        assertEquals(initIndigoDashboardsPage()
+            .getSplashScreen()
+            .startEditingWidgets()
+            .dragAddKpiPlaceholder()
+            .getConfigurationPanel()
+            .getMetricSelect()
+            .getValues(), asList(METRIC_AMOUNT_SUM, METRIC_DEPARTMENT_COUNT), "The measure options are not correct");
     }
 
     @Test(dependsOnGroups = { "precondition" }, groups = { "basic-test" })
     public void testDatasetOptions() {
-        initIndigoDashboardsPage().getSplashScreen().startEditingWidgets();
-        assertEquals(indigoDashboardsPage.dragAddKpiPlaceholder().getConfigurationPanel()
-                .selectMetricByName(METRIC_AMOUNT_SUM).getDataSets(), singletonList(DATASET_PAYDATE));
+        assertEquals(initIndigoDashboardsPage()
+            .getSplashScreen()
+            .startEditingWidgets()
+            .dragAddKpiPlaceholder()
+            .getConfigurationPanel()
+            .selectMetricByName(METRIC_AMOUNT_SUM)
+            .getDataSets(), singletonList(DATASET_PAYDATE));
     }
 
     @Test(dependsOnGroups = { "basic-test" })
     public void saveKpiUsingNonProductionData() throws JSONException, IOException {
-        initIndigoDashboardsPage().getSplashScreen().startEditingWidgets();
-        indigoDashboardsPage.addWidget(new KpiConfiguration.Builder().metric(METRIC_AMOUNT_SUM)
-                .dataSet(DATASET_PAYDATE).comparison(Kpi.ComparisonType.NO_COMPARISON.toString()).build());
+        final String expectedKpiValue = initIndigoDashboardsPage()
+            .getSplashScreen()
+            .startEditingWidgets()
+            .addWidget(new KpiConfiguration.Builder()
+                .metric(METRIC_AMOUNT_SUM)
+                .dataSet(DATASET_PAYDATE)
+                .comparison(Kpi.ComparisonType.NO_COMPARISON.toString())
+                .build())
+            .selectDateFilterByName("All time")
+            .getKpiByHeadline(METRIC_AMOUNT_SUM)
+            .getValue();
 
-        final String expectedKpiValue = indigoDashboardsPage.selectDateFilterByName("All time")
-                .getKpiByHeadline(METRIC_AMOUNT_SUM).getValue();
-        indigoDashboardsPage.saveEditModeWithWidgets();
+        IndigoDashboardsPage.getInstance(browser).saveEditModeWithWidgets();
         try {
             takeScreenshot(browser, "Test-Save-Kpi-Using-Non-Production-Data", getClass());
-            assertEquals(indigoDashboardsPage.getKpiByHeadline(METRIC_AMOUNT_SUM).getValue(), expectedKpiValue,
+            assertEquals(IndigoDashboardsPage.getInstance(browser).getKpiByHeadline(METRIC_AMOUNT_SUM).getValue(), expectedKpiValue,
                     "The saved kpi value is not correct");
         } finally {
             IndigoRestUtils.deleteAnalyticalDashboard(getRestApiClient(),
