@@ -24,8 +24,9 @@ public class SplashScreen extends AbstractFragment {
         waitForElementVisible(createKpiDashboardButton);
     }
 
-    public void startEditingWidgets() {
+    public IndigoDashboardsPage startEditingWidgets() {
         waitForElementVisible(createKpiDashboardButton).click();
+        return IndigoDashboardsPage.getInstance(browser);
     }
 
     public String getMobileMessage() {

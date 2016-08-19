@@ -31,9 +31,8 @@ public abstract class DashboardsTest extends DashboardsGeneralTest {
 
         initIndigoDashboardsPage()
                 .getSplashScreen()
-                .startEditingWidgets();
-
-        waitForFragmentVisible(indigoDashboardsPage).waitForDashboardLoad();
+                .startEditingWidgets()
+                .waitForDashboardLoad();
         configs.forEach(config -> indigoDashboardsPage.addWidget(config));
         indigoDashboardsPage.saveEditModeWithWidgets();
     }

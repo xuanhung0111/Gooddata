@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.md.Restriction.identifier;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertFalse;
 
@@ -16,6 +15,7 @@ import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class AddKpiWithoutDataSetTest extends AbstractProjectTest {
@@ -48,19 +48,16 @@ public class AddKpiWithoutDataSetTest extends AbstractProjectTest {
 
     @Test(dependsOnGroups = {"nodate-precondition"}, groups = {"nodate-test"})
     public void testAddKpiNotConnectedWithDataSet() {
-        initIndigoDashboardsPage()
+        assertFalse(initIndigoDashboardsPage()
             .getSplashScreen()
-            .startEditingWidgets();
-
-        waitForFragmentVisible(indigoDashboardsPage)
+            .startEditingWidgets()
             .waitForDashboardLoad()
-            .dragAddKpiPlaceholder();
+            .dragAddKpiPlaceholder()
+            .getConfigurationPanel()
+            .selectMetricByName(METRIC_NOT_CONNECT_WITH_DATA_SET)
+            .isDataSetEnabled());
 
-        assertFalse(indigoDashboardsPage.getConfigurationPanel()
-                .selectMetricByName(METRIC_NOT_CONNECT_WITH_DATA_SET)
-                .isDataSetEnabled());
-
-        indigoDashboardsPage.saveEditModeWithWidgets();
+        IndigoDashboardsPage.getInstance(browser).saveEditModeWithWidgets();
 
         takeScreenshot(browser, "add-kpi-not-connect-with-data-set", getClass());
     }
@@ -83,11 +80,11 @@ public class AddKpiWithoutDataSetTest extends AbstractProjectTest {
             .switchToEditMode()
             .selectLastKpi();
 
-        waitForFragmentVisible(indigoDashboardsPage).getConfigurationPanel()
+        IndigoDashboardsPage.getInstance(browser).getConfigurationPanel()
             .selectMetricByName(METRIC_CONNECT_WITH_DATA_SET)
             .selectDataSetByName(DATA_SET);
 
-        indigoDashboardsPage.saveEditModeWithWidgets();
+        IndigoDashboardsPage.getInstance(browser).saveEditModeWithWidgets();
         takeScreenshot(browser, "update-kpi-connect-with-data-set", getClass());
     }
 }

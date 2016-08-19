@@ -11,11 +11,14 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.CssUtils.convertCSSClassTojQuerySelector;
+import static org.openqa.selenium.By.id;
 
 import java.util.List;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -88,6 +91,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
     private static final By SAVE_BUTTON_ENABLED = By.cssSelector("." + SAVE_BUTTON_CLASS_NAME + ":not(.disabled)");
 
     public static final String MAIN_ID = "app-dashboards";
+
+    public static final IndigoDashboardsPage getInstance(SearchContext context) {
+        return Graphene.createPageFragment(IndigoDashboardsPage.class, waitForElementVisible(id(MAIN_ID), context));
+    }
 
     public SplashScreen getSplashScreen() {
         return waitForFragmentVisible(splashScreen);

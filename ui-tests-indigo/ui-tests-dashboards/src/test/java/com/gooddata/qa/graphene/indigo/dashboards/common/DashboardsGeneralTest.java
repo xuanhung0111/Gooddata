@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards.common;
 
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
@@ -8,11 +9,15 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 import org.json.JSONException;
 
 public abstract class DashboardsGeneralTest extends GoodSalesAbstractTest {
+
+    @FindBy(id = IndigoDashboardsPage.MAIN_ID)
+    protected IndigoDashboardsPage indigoDashboardsPage;
 
     private void maximizeWindow() {
         browser.manage().window().maximize();

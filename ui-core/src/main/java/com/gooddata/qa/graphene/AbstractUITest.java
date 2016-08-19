@@ -142,9 +142,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(css = ".ait-overview-projects-fragment")
     protected OverviewProjects discOverviewProjects;
 
-    @FindBy(id = IndigoDashboardsPage.MAIN_ID)
-    protected IndigoDashboardsPage indigoDashboardsPage;
-
     /**
      * Help method which provides verification if login page is present a sign in a demo user if needed
      *
@@ -539,16 +536,13 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public IndigoDashboardsPage initIndigoDashboardsPage() {
         openUrl(getIndigoDashboardsPageUri());
         waitForIndigoDashboardLoading();
-        waitForFragmentVisible(indigoDashboardsPage);
-
-        return indigoDashboardsPage;
+        return IndigoDashboardsPage.getInstance(browser);
     }
 
     public IndigoDashboardsPage initIndigoDashboardsPageWithWidgets() {
         openUrl(getIndigoDashboardsPageUri());
-        waitForFragmentVisible(indigoDashboardsPage);
 
-        return indigoDashboardsPage
+        return IndigoDashboardsPage.getInstance(browser)
                 .waitForDashboardLoad()
                 .waitForAllKpiWidgetsLoaded();
     }

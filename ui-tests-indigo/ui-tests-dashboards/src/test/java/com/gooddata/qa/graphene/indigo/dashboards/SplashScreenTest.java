@@ -64,9 +64,7 @@ public class SplashScreenTest extends DashboardsTest {
     public void checkEnterCreateNewKpiDashboardAndCancel() {
         initIndigoDashboardsPage()
                 .getSplashScreen()
-                .startEditingWidgets();
-
-        waitForFragmentVisible(indigoDashboardsPage)
+                .startEditingWidgets()
                 .waitForDashboardLoad()
                 .addWidget(kpi)
                 .cancelEditMode()
@@ -75,11 +73,10 @@ public class SplashScreenTest extends DashboardsTest {
 
         takeScreenshot(browser, "checkEnterCreateNewKpiDashboardAndCancel", getClass());
 
-        waitForFragmentVisible(indigoDashboardsPage)
+        assertEquals(waitForFragmentVisible(indigoDashboardsPage)
                 .getSplashScreen()
-                .startEditingWidgets();
-
-        assertEquals(indigoDashboardsPage.getKpisCount(), 0);
+                .startEditingWidgets()
+                .getKpisCount(), 0);
     }
 
     @Test(dependsOnGroups = {"empty-state"}, groups = {"desktop"})
@@ -91,8 +88,7 @@ public class SplashScreenTest extends DashboardsTest {
         // this is a test case without page refresh
         waitForFragmentVisible(indigoDashboardsPage)
                 .getSplashScreen()
-                .startEditingWidgets();
-        indigoDashboardsPage
+                .startEditingWidgets()
                 .addWidget(kpi)
                 .saveEditModeWithWidgets();
 
@@ -159,11 +155,11 @@ public class SplashScreenTest extends DashboardsTest {
 
     @Test(dependsOnMethods = {"checkNewProjectWithoutKpisFallsToSplashScreen"}, groups = {"desktop", "empty-state"})
     public void checkDeleteDashboardButtonMissingOnUnsavedDashboard() {
-        initIndigoDashboardsPage()
+        assertFalse(initIndigoDashboardsPage()
                 .getSplashScreen()
-                .startEditingWidgets();
-
-        assertFalse(indigoDashboardsPage.waitForEditingControls().isDeleteButtonVisible());
+                .startEditingWidgets()
+                .waitForEditingControls()
+                .isDeleteButtonVisible());
 
         takeScreenshot(browser, "checkDeleteDashboardButtonMissingOnUnsavedDashboard", getClass());
     }
@@ -215,8 +211,7 @@ public class SplashScreenTest extends DashboardsTest {
     public void checkCannotSaveNewEmptyDashboard() throws JSONException {
         initIndigoDashboardsPage()
                 .getSplashScreen()
-                .startEditingWidgets();
-        waitForFragmentVisible(indigoDashboardsPage)
+                .startEditingWidgets()
                 .selectDateFilterByName(DATE_FILTER_THIS_QUARTER);
 
         takeScreenshot(browser, "checkCannotSaveNewEmptyDashboard", getClass());
