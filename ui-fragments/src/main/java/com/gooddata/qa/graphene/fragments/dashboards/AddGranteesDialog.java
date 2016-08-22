@@ -14,8 +14,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 
 public class AddGranteesDialog extends AbstractFragment {
 
@@ -69,20 +67,33 @@ public class AddGranteesDialog extends AbstractFragment {
         return waitForCollectionIsNotEmpty(getGrantees()).size();
     }
 
-    public void selectItem(final String name) {
+    public void searchAndSelectItem(final String name) {
         final By loginSelector = By.cssSelector(".grantee-email");
         final By groupNameSelector = By.cssSelector(".grantee-name");
-        final By groupSelector = By.cssSelector(".grantee-group");
 
-        Iterables.find(waitForCollectionIsNotEmpty(getGrantees()), new Predicate<WebElement>() {
-            @Override
-            public boolean apply(WebElement e) {
-                boolean isGroup = e.findElements(groupSelector).size() > 0;
-                WebElement nameElement = e.findElement(isGroup ? groupNameSelector : loginSelector);
+        //this make sure the next search is not failed due to caching the previous search result
+        searchForGranteeInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
+        waitForCollectionIsEmpty(getGrantees());
+        searchForGranteeInput.clear();
+        
+        //just search if name is user. UserGroup cannot be searched.
+        if (!isUserGroup(name)) {
+            searchForGranteeInput.sendKeys(name);
+            sleepTightInSeconds(1);
+        }
 
-                return name.equals(nameElement.getText().trim());
-            }
-        }).click();
+        waitForCollectionIsNotEmpty(getGrantees());
+
+        getGrantees().stream()
+            .filter( e -> {
+            WebElement nameElement = e.findElement(isUserGroup(name) ? groupNameSelector : loginSelector);
+            return name.equals(nameElement.getText().trim());
+            }).findFirst().get().click();
+    }
+
+    private boolean isUserGroup(String name) {
+        //regular expression for email format: ([\\w\\d+-.]+)@((?:[\\w]+\\.)+)([a-zA-Z]{2,4})
+        return !(name.matches("([\\w\\d+-.]+)@((?:[\\w]+\\.)+)([a-zA-Z]{2,4})"));
     }
 
     public List<WebElement> getGrantees() {

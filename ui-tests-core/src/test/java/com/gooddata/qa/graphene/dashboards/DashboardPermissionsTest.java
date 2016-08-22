@@ -470,15 +470,12 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
 
         selectCandidatesAndShare(addGranteesDialog, candidates.toArray(new String[0]));
 
-        assertEquals(permissionsDialog.getAddedGrantees().size(), 5);
-
-        permissionsDialog.openAddGranteePanel();
-
         if (testParams.getDomainUser() != null) {
-            assertEquals(addGranteesDialog.getGranteesCount("", true), 1);
+            assertEquals(permissionsDialog.getAddedGrantees().size(), 6);
         } else {
-            assertEquals(addGranteesDialog.getGranteesCount("", false), 0);
+            assertEquals(permissionsDialog.getAddedGrantees().size(), 5);
         }
+        assertEquals(permissionsDialog.openAddGranteePanel().getGranteesCount("", false),0);
     }
 
     @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests"})
@@ -509,15 +506,24 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
             selectDashboard("Dashboard shared to all users and groups");
             final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
 
-            assertEquals(permissionsDialog.getAddedGrantees().size(), 5);
+            if (testParams.getDomainUser() != null) {
+                assertEquals(permissionsDialog.getAddedGrantees().size(), 6);
+            } else {
+                assertEquals(permissionsDialog.getAddedGrantees().size(), 5);
+            }
 
             permissionsDialog.removeUser(viewerLogin);
             permissionsDialog.removeGroup(ALCOHOLICS_ANONYMOUS);
             permissionsDialog.removeGroup(XENOFOBES_XYLOPHONES);
             permissionsDialog.removeUser(editorLogin);
+            if (testParams.getDomainUser() != null) {
+                permissionsDialog.removeUser(testParams.getDomainUser());
+            }
+
             waitForElementPresent(permissionsDialog.getRoot().findElement(ALERT_INFOBOX_CSS_SELECTOR));
 
-            assertTrue(permissionsDialog.checkCannotRemoveOwner(), "There is the delete icon of DB Owner grantee");
+            assertTrue(permissionsDialog.checkCannotRemoveOwner(), 
+                    "There is the delete icon of dashboard owner grantee");
 
             permissionsDialog.undoRemoveUser(editorLogin);
 
@@ -527,12 +533,18 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
             permissionsDialog.submit();
 
             dashboardsPage.openPermissionsDialog();
-
             assertEquals(permissionsDialog.getAddedGrantees().size(), 3);
 
             final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
-            selectCandidatesAndShare(addGranteesDialog, viewerLogin, XENOFOBES_XYLOPHONES);
-            assertEquals(permissionsDialog.getAddedGrantees().size(), 5);
+           
+            if (testParams.getDomainUser() != null) {
+                selectCandidatesAndShare(addGranteesDialog, testParams.getDomainUser(), viewerLogin, 
+                        XENOFOBES_XYLOPHONES);
+                assertEquals(permissionsDialog.getAddedGrantees().size(), 6);
+            } else {
+                selectCandidatesAndShare(addGranteesDialog, viewerLogin, XENOFOBES_XYLOPHONES);
+                assertEquals(permissionsDialog.getAddedGrantees().size(), 5);
+            }
 
             permissionsDialog.publish(PublishType.EVERYONE_CAN_ACCESS);
             permissionsDialog.submit();
@@ -577,7 +589,11 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
                 PermissionType.USE_EXISTING_PERMISSIONS);
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
 
-        assertEquals(permissionsDialog.getAddedGrantees().size(), 5);
+        if (testParams.getDomainUser() != null) {
+            assertEquals(permissionsDialog.getAddedGrantees().size(), 6);
+        } else {
+            assertEquals(permissionsDialog.getAddedGrantees().size(), 5);
+        }
     }
 
     @Test(dependsOnGroups = {"acl-tests"}, groups = {"acl-tests-usergroups", "sanity"}, alwaysRun = true)
@@ -644,7 +660,11 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         permissionsDialog.cancel();
 
         dashboardsPage.openPermissionsDialog();
-        assertEquals(permissionsDialog.getAddedGrantees().size(), 5);
+        if (testParams.getDomainUser() != null) {
+            assertEquals(permissionsDialog.getAddedGrantees().size(), 6); 
+        } else {
+            assertEquals(permissionsDialog.getAddedGrantees().size(), 5); 
+        }
     }
 
     /**
@@ -732,7 +752,8 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
 
     private void selectCandidates(AddGranteesDialog addGranteesDialog, String... candidates) {
         for (String candidate : candidates) {
-            addGranteesDialog.selectItem(candidate);
+            log.info("Select user/usergroup: " + candidate);
+            addGranteesDialog.searchAndSelectItem(candidate);
         }
     }
 
