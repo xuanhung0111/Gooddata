@@ -4,7 +4,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static org.openqa.selenium.By.xpath;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -45,8 +44,7 @@ public class AttributeDetailPage extends ObjectPropertiesPage {
     private static final By BY_EXTERNAL_PAGE_LINK = By.cssSelector("button.s-btn-external_page");
 
     public static final AttributeDetailPage getInstance(SearchContext context) {
-        return Graphene.createPageFragment(AttributeDetailPage.class,
-                waitForElementVisible(xpath(ROOT_XPATH_LOCATOR), context));
+        return Graphene.createPageFragment(AttributeDetailPage.class, waitForElementVisible(LOCATOR, context));
     }
 
     public String getAttributeLabelType() {

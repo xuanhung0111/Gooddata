@@ -23,7 +23,7 @@ public class VariablesPage extends AbstractFragment {
     private ObjectsTable variablesTable;
 
     public String createVariable(AbstractVariable variable) {
-        waitForElementVisible(createVariableButton).click();
+        clickCreateVariableButton();
 
         if (variable instanceof AttributeVariable) 
             return getVariableDetailPage().createFilterVariable((AttributeVariable) variable);
@@ -45,7 +45,12 @@ public class VariablesPage extends AbstractFragment {
                 .isPresent();
     }
 
-    private VariableDetailPage getVariableDetailPage() {
+    public VariablesPage clickCreateVariableButton() {
+        waitForElementVisible(createVariableButton).click();
+        return this;
+    }
+
+    public VariableDetailPage getVariableDetailPage() {
         return VariableDetailPage.getInstance(browser);
     }
 }

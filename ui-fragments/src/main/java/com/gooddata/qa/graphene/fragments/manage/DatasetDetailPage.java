@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.fragments.manage;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static org.openqa.selenium.By.xpath;
 
 import java.util.List;
 
@@ -18,7 +17,7 @@ public class DatasetDetailPage extends ObjectPropertiesPage {
 
     public static final DatasetDetailPage getInstance(SearchContext context) {
         return Graphene.createPageFragment(DatasetDetailPage.class,
-                waitForElementVisible(xpath(ROOT_XPATH_LOCATOR), context));
+                waitForElementVisible(LOCATOR, context));
     }
 
     public String getLatestUploadDate() {

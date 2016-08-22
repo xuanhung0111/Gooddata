@@ -21,18 +21,12 @@ public class AttributePage extends AbstractFragment {
     @FindBy(id = "attributesTable")
     protected ObjectsTable attributesTable;
 
-    @FindBy(xpath = AttributeDetailPage.ROOT_XPATH_LOCATOR)
-    protected AttributeDetailPage attributeDetailPage;
-
-    @FindBy(xpath = "//div[@id='p-objectPage' and contains(@class,'s-displayed')]")
-    protected CreateAttributePage createAttributePage;
-
     @FindBy(css = ".s-attributesAddButton")
     protected WebElement createAttributeButton;
 
     public void configureAttributeLabel(String attributeName, AttributeLabelTypes attributeLabel) {
-        initAttribute(attributeName);
-        assertEquals(attributeDetailPage.getObjectName(), attributeName,
+        AttributeDetailPage attributeDetailPage = initAttribute(attributeName);
+        assertEquals(attributeDetailPage.getName(), attributeName,
                 "Invalid attribute name on detail page");
         attributeDetailPage.selectLabelType(attributeLabel.getlabel());
         sleepTightInSeconds(2);
@@ -41,14 +35,12 @@ public class AttributePage extends AbstractFragment {
     }
 
     public void verifyHyperLink(String attributeName) {
-        initAttribute(attributeName);
-        assertTrue(attributeDetailPage.isHyperLink(),
+        assertTrue(initAttribute(attributeName).isHyperLink(),
                 "Attribute is NOT hyperlink, probably failed in label configuration!");
     }
 
     public void configureDrillToExternalPage(String attributeName) {
-        initAttribute(attributeName);
-        attributeDetailPage.setDrillToExternalPage();
+        initAttribute(attributeName).setDrillToExternalPage();
     }
 
     public AttributeDetailPage initAttribute(String attributeName) {
@@ -58,7 +50,7 @@ public class AttributePage extends AbstractFragment {
         waitForObjectPageLoaded(browser);
         String variableDetailsWindowHandle = browser.getWindowHandle();
         browser.switchTo().window(variableDetailsWindowHandle);
-        return waitForFragmentVisible(attributeDetailPage);
+        return AttributeDetailPage.getInstance(browser);
     }
 
     public CreateAttributePage createAttribute() {
@@ -71,7 +63,7 @@ public class AttributePage extends AbstractFragment {
         if (attributeName.equals(newName))
             return;
 
-        initAttribute(attributeName).changeObjectName(newName);
+        initAttribute(attributeName).changeName(newName);
     }
 
     public List<String> getAllAttributes() {

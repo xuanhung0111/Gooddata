@@ -10,7 +10,6 @@ import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.id;
 import static org.openqa.selenium.By.tagName;
-import static org.openqa.selenium.By.xpath;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -216,7 +215,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
         ObjectsTable.getInstance(id(objectType.getObjectsTableID()), browser).selectObject(selectedObjectName);
         waitForObjectPageLoaded(browser);
         assertEquals(Graphene.createPageFragment(objectType.getDetailPage(),
-                waitForElementVisible(xpath(ObjectPropertiesPage.ROOT_XPATH_LOCATOR), browser)).getObjectName(),
+                waitForElementVisible(ObjectPropertiesPage.LOCATOR, browser)).getName(),
                 selectedObjectName);
     }
 
@@ -235,7 +234,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
         waitForObjectPageLoaded(browser);
         for (String tagName : tagsList) {
             Graphene.createPageFragment(objectType.getDetailPage(),
-                    waitForElementVisible(xpath(ObjectPropertiesPage.ROOT_XPATH_LOCATOR), browser)).addTag(tagName);
+                    waitForElementVisible(ObjectPropertiesPage.LOCATOR, browser)).addTag(tagName);
         }
     }
 
@@ -272,8 +271,8 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
             addTagsToObject(objectType, objectName, taggedObjects.get(objectName));
             sleepTightInSeconds(3);
             Graphene.createPageFragment(objectType.getDetailPage(),
-                    waitForElementVisible(xpath(ObjectPropertiesPage.ROOT_XPATH_LOCATOR), browser))
-                    .getBackDataPageLink().click();
+                    waitForElementVisible(ObjectPropertiesPage.LOCATOR, browser))
+                    .clickDataPageLink();
             waitForDataPageLoaded(browser);
         }
         this.filterObjectByTagList(objectType, filterObjectsList, tagsMap);

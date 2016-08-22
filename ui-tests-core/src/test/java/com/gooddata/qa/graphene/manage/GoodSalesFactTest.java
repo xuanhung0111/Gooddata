@@ -1,20 +1,22 @@
 package com.gooddata.qa.graphene.manage;
 
 import static org.openqa.selenium.By.id;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.testng.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 
-import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.fragments.manage.FactDetailPage;
-import com.gooddata.qa.graphene.fragments.manage.ObjectPropertiesPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 
-public class GoodSalesFactTest extends ObjectAbstractTest {
-
-    private String factFolder;
+public class GoodSalesFactTest extends GoodSalesAbstractTest {
 
     @BeforeClass
     public void setProjectTitle() {
@@ -22,28 +24,38 @@ public class GoodSalesFactTest extends ObjectAbstractTest {
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = { "object-tests" })
-    public void initialize() throws JSONException {
-        name = "Amount";
-        this.factFolder = "Stage History";
-        description = "Graphene test on view and modify Fact";
-        tagName = "Graphene-test";
-    }
-
-    @Test(dependsOnMethods = {"initialize"}, groups = { "object-tests" })
     public void factAggregationsTest() {
-        initObject(name);
+        FactDetailPage factDetailPage = initObject(FACT_AMOUNT);
         for (SimpleMetricTypes metricType : SimpleMetricTypes.values()) {
-            FactDetailPage.getInstance(browser).createSimpleMetric(metricType, name);
+            factDetailPage.createSimpleMetric(metricType, FACT_AMOUNT);
         }
     }
 
-    @Test(dependsOnMethods = {"initialize"}, groups = { "object-tests" })
+    @Test(dependsOnGroups = {"createProject"}, groups = { "object-tests" })
     public void changeFactFolderTest() {
-        initObject(name).changeObjectFolder(factFolder);
+        initObject(FACT_AMOUNT).changeFolder("Stage History");
     }
 
-    @Override
-    public ObjectPropertiesPage initObject(String factName) {
+    @Test(dependsOnGroups = {"object-tests"})
+    public void editFactBasicInfo() {
+        final String editedName = FACT_AMOUNT + " -edited";
+        final String description = "New description";
+        final String tag = "newtag";
+
+        FactDetailPage factDetailPage = initObject(FACT_AMOUNT);
+        factDetailPage
+                .changeName(editedName)
+                .changeDescription(description)
+                .addTag(tag);
+
+        initObject(editedName);
+        takeScreenshot(browser, "Fact-basic-info-changes", getClass());
+        assertEquals(factDetailPage.getName(), editedName);
+        assertEquals(factDetailPage.getDescription(), description);
+        assertThat(factDetailPage.getTags(), hasItem(tag));
+    }
+
+    private FactDetailPage initObject(String factName) {
         initFactPage();
         ObjectsTable.getInstance(id(ObjectTypes.FACT.getObjectsTableID()), browser).selectObject(factName);
         return FactDetailPage.getInstance(browser);

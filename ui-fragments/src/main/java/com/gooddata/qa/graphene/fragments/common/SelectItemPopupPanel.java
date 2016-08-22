@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.common;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.clickElementByVisibleLocator;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -100,13 +101,27 @@ public class SelectItemPopupPanel extends AbstractFragment {
     }
 
     public SelectItemPopupPanel clearAllItems() {
-        Stream.of(By.className("s-btn-none"), By.className("clearVisible"))
-                .filter(by -> isElementPresent(by, getRoot()))
-                .map(by -> waitForElementVisible(by, getRoot()))
-                .findFirst()
-                .get()
-                .click();
+        clickElementByVisibleLocator(getRoot(), By.className("s-btn-none"), By.className("clearVisible"));
         return this;
+    }
+
+    public boolean areAllItemsSelected() {
+        return getAllItemCheckboxes().allMatch(e -> e.isSelected());
+    }
+
+    public SelectItemPopupPanel selectAllItems() {
+        clickElementByVisibleLocator(getRoot(), By.className("s-btn-all"), By.className("selectVisible"));
+        return this;
+    }
+
+    public boolean areAllItemsDeselected() {
+        return getAllItemCheckboxes().allMatch(e -> !e.isSelected());
+    }
+
+    private Stream<WebElement> getAllItemCheckboxes() {
+        return waitForCollectionIsNotEmpty(items)
+                .stream()
+                .map(e -> e.findElement(By.tagName("input")));
     }
 
     // Just use this action when the expected item not visible in list
