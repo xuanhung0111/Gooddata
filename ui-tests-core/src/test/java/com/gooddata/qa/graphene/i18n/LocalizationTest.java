@@ -138,6 +138,15 @@ public class LocalizationTest extends AbstractUITest {
     }
 
     @AfterClass(alwaysRun = true)
+    public void switchBackToOriginalLanguage() throws JSONException {
+        signIn(true, UserRoles.ADMIN);
+
+        initLocalizationPage().selectLanguge("en-US");
+
+        logout();
+    }
+
+    @AfterClass(alwaysRun = true)
     public void deleteProject() {
         String projectId = testParams.getProjectId();
 
