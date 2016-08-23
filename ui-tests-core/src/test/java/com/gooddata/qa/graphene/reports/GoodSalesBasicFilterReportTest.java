@@ -152,8 +152,7 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
                         listAttributeValues)
                 .saveChange();
 
-        initReportsPage();
-        reportsPage.getReportsList().openReport(reportName);
+        initReportsPage().openReport(reportName);
         waitForAnalysisPageLoaded(browser);
 
         assertTrue(reportPage.isReportContains(listAttributeValues),
@@ -195,8 +194,7 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
     private ReportPage initReport(String reportName) {
         createReport(reportName);
 
-        initReportsPage();
-        reportsPage.getReportsList().openReport(reportName);
+        initReportsPage().openReport(reportName);
         waitForAnalysisPageLoaded(browser);
 
         return waitForFragmentVisible(reportPage);

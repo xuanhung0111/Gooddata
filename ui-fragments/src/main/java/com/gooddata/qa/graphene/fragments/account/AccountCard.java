@@ -1,8 +1,11 @@
 package com.gooddata.qa.graphene.fragments.account;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.openqa.selenium.By.cssSelector;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -16,6 +19,11 @@ public class AccountCard extends AbstractFragment {
 
     @FindBy(css = ".contact")
     private WebElement contactInfo;
+
+    public static final AccountCard getInstance(SearchContext context) {
+        return Graphene.createPageFragment(AccountCard.class,
+                waitForElementVisible(cssSelector(".bd div.userInfo"), context));
+    }
 
     public PersonalInfo getUserInfo() {
         String contacts = waitForElementVisible(contactInfo).getText();

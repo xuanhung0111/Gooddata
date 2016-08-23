@@ -408,17 +408,14 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     private void moveReportsToFolder(String folder, String... reports) {
-        initReportsPage();
-        reportsPage.getDefaultFolders().openFolder("All");
-        reportsPage.moveReportsToFolder(folder, reports);
+        initReportsPage().openFolder("All").moveReportsToFolder(folder, reports);
     }
 
     private Pair<String, String> createNewReportFolder() {
         String folderName = "New Folder";
-        initReportsPage();
-        reportsPage.addNewFolder(folderName);
-
-        reportsPage.getCustomFolders().openFolder(folderName);
+        initReportsPage()
+            .addNewFolder(folderName)
+            .openFolder(folderName);
         String url = browser.getCurrentUrl();
         String folderId = url.substring(url.lastIndexOf("/") + 1);
 
@@ -477,9 +474,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
             case VARIABLE:
                 return !initVariablePage().hasVariable(object);
             case REPORT:
-                initReportsPage();
-                selectReportsDomainFolder("All");
-                return !reportsPage.isReportVisible(object);
+                return !initReportsPage().openFolder("All").isReportVisible(object);
             case DASHBOARD_FILTER:
                 initDashboardsPage();
                 dashboardsPage.selectDashboard(DASHBOARD_NAME);
@@ -504,8 +499,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
                 return REQUESTED_DASHBOARD_NOT_EXIST.equals(
                         waitForElementVisible(By.cssSelector("#notFoundPage > p"), browser).getText().trim());
             case REPORT_FOLDER:
-                initReportsPage();
-                return !reportsPage.getCustomFolders().getAllFolderNames().contains(object);
+                return !initReportsPage().getAllFolderNames().contains(object);
             case DASHBOARD:
                 initDashboardsPage();
                 return !dashboardsPage.getDashboardsNames().contains(object);

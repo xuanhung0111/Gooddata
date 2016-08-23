@@ -1,11 +1,7 @@
 package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForReportsPageLoaded;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -25,13 +21,15 @@ import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
+import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
+import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     private int createdReportsCount = 0;
     protected static final int expectedGoodSalesReportsCount = 103;
-    protected static final int expectedGoodSalesReportsCustomFoldersCount = 9;
+    protected static final int expectedGoodSalesReportsFoldersCount = 13;
 
     private static final long expectedLineChartExportPDFSize = 110000L;
     private static final long expectedAreaChartReportExportPNGSize = 43000L;
@@ -49,10 +47,10 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void verifyReportsPage() {
-        initReportsPage();
-        assertEquals(reportsPage.getReportsList().getNumberOfReports(), expectedGoodSalesReportsCount,
+        ReportsPage reportsPage = initReportsPage();
+        assertEquals(reportsPage.getReportsCount(), expectedGoodSalesReportsCount,
                 "Number of expected reports doesn't match");
-        assertEquals(reportsPage.getCustomFolders().getNumberOfFolders(), expectedGoodSalesReportsCustomFoldersCount,
+        assertEquals(reportsPage.getFoldersCount(), expectedGoodSalesReportsFoldersCount,
                 "Number of expected report custom folders doesn't match");
         Screenshots.takeScreenshot(browser, "GoodSales-reports", this.getClass());
     }
@@ -67,9 +65,9 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
         URL maqlResource = getClass().getResource("/comp-attributes/ca-maql-simple.txt");
         postMAQL(IOUtils.toString(maqlResource), 60);
 
-        initReportsPage();
-        reportsPage.startCreateReport();
-        reportPage.initPage()
+        initReportsPage()
+            .startCreateReport()
+            .initPage()
             .openWhatPanel()
             .createGlobalSimpleMetric(SimpleMetricTypes.SUM, "Duration");
 
@@ -281,20 +279,17 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"goodsales-chart", "chart-exports", "tabular-report-exports"})
     public void verifyCreatedReports() {
-        initReportsPage();
-        selectReportsDomainFolder("All");
-        waitForReportsPageLoaded(browser);
+        initReportsPage().openFolder("All");
         sleepTightInSeconds(5);
-        assertEquals(reportsPage.getReportsList().getNumberOfReports(),
+        assertEquals(ReportsPage.getInstance(browser).getReportsCount(),
                 expectedGoodSalesReportsCount + createdReportsCount, "Number of expected reports (all) doesn't match");
         Screenshots.takeScreenshot(browser, "GoodSales-reports", this.getClass());
     }
 
     @Test(dependsOnMethods = {"verifyCreatedReports"})
     public void deleteReport() {
-        initReportPage(SIMPLE_CA_REPORT);
-        reportPage.deleteCurrentReport();
-        assertFalse(waitForFragmentVisible(reportsPage).isReportVisible(SIMPLE_CA_REPORT));
+        initReportPage(SIMPLE_CA_REPORT).deleteCurrentReport();
+        assertFalse(ReportsPage.getInstance(browser).isReportVisible(SIMPLE_CA_REPORT));
     }
 
     private void prepareReport(String reportName, ReportTypes reportType, List<String> what, List<String> how) {
@@ -314,17 +309,15 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
         createdReportsCount++;
     }
 
-    private void initReportPage(String reportName) {
-        initReportsPage();
-        selectReportsDomainFolder("My Reports");
-        reportsPage.getReportsList().openReport(reportName);
-        waitForAnalysisPageLoaded(browser);
-        waitForElementVisible(reportPage.getRoot());
+    private ReportPage initReportPage(String reportName) {
+        return initReportsPage()
+            .openFolder("My Reports")
+            .openReport(reportName);
     }
 
     private void exportReport(String reportName, ExportFormat format) {
-        initReportPage(reportName);
-        reportPage.exportReport(format);
+        initReportPage(reportName)
+            .exportReport(format);
         checkRedBar(browser);
     }
 

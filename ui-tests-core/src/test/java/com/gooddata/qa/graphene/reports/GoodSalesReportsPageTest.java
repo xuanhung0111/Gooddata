@@ -11,6 +11,7 @@ import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 
 public class GoodSalesReportsPageTest extends GoodSalesAbstractTest {
 
@@ -23,71 +24,67 @@ public class GoodSalesReportsPageTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void addTagToReport() {
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).getReportsList().openReport(TAG_REPORT);
+        initReportsPage().openReport(TAG_REPORT);
         waitForAnalysisPageLoaded(browser);
         waitForFragmentVisible(reportPage).addTag(TAG_NAME);
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void verifyReportsPage() {
-        initReportsPage();
-        assertTrue(isEqualCollection(waitForFragmentVisible(reportsPage).getDefaultFolders().getAllFolderNames(),
-                asList(ALL_FOLDER, FAVORITES_FOLDER, "My Reports", "Unsorted")));
-        assertTrue(isEqualCollection(waitForFragmentVisible(reportsPage).getCustomFolders().getAllFolderNames(),
-                asList(ACTIVITY_REPORTS_FOLDER, CURRENT_SALES_FOLDER, "Leaderboards", "Opportunity Historicals",
-                        "Outlook Headlines", "Velocity Reports", "Waterfall Analysis", "What's Changed",
-                        "_Drill Reports")));
+        ReportsPage reportsPage = initReportsPage();
+        assertTrue(isEqualCollection(reportsPage.getAllFolderNames(),
+                asList(ALL_FOLDER, FAVORITES_FOLDER, "My Reports", "Unsorted", ACTIVITY_REPORTS_FOLDER,
+                        CURRENT_SALES_FOLDER, "Leaderboards", "Opportunity Historicals", "Outlook Headlines",
+                        "Velocity Reports", "Waterfall Analysis", "What's Changed", "_Drill Reports")));
         assertTrue(isEqualCollection(reportsPage.getGroupByVisibility(), asList("Time", "Author", "Report Name",
                 "Folders")));
     }
 
     @Test(dependsOnMethods = {"addTagToReport"})
     public void verifyTagReport() {
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder(ALL_FOLDER);
+        ReportsPage reportsPage = initReportsPage();
+        waitForFragmentVisible(reportsPage).openFolder(ALL_FOLDER);
         assertTrue(reportsPage.isTagCloudVisible());
-        assertTrue(reportsPage.getReportsList().getNumberOfReports() > 1);
-        assertEquals(reportsPage.filterByTag(TAG_NAME).getReportsList().getNumberOfReports(), 1);
+        assertTrue(reportsPage.getReportsCount() > 1);
+        assertEquals(reportsPage.filterByTag(TAG_NAME).getReportsCount(), 1);
 
-        reportsPage.getCustomFolders().openFolder(CURRENT_SALES_FOLDER);
+        reportsPage.openFolder(CURRENT_SALES_FOLDER);
         assertFalse(reportsPage.isTagCloudVisible());
-        assertEquals(reportsPage.getReportsList().getNumberOfReports(), 3);
+        assertEquals(reportsPage.getReportsCount(), 3);
 
-        reportsPage.getDefaultFolders().openFolder(ALL_FOLDER);
-        assertTrue(reportsPage.deselectAllTags().getReportsList().getNumberOfReports() > 1);
+        reportsPage.openFolder(ALL_FOLDER);
+        assertTrue(reportsPage.deselectAllTags().getReportsCount() > 1);
     }
 
     @Test(dependsOnMethods = {"verifyTagReport"})
     public void moveReports() {
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).getCustomFolders().openFolder(CURRENT_SALES_FOLDER);
-        assertEquals(reportsPage.getReportsList().getNumberOfReports(), 3);
+        ReportsPage reportsPage = initReportsPage();
+        waitForFragmentVisible(reportsPage).openFolder(CURRENT_SALES_FOLDER);
+        assertEquals(reportsPage.getReportsCount(), 3);
 
-        reportsPage.getDefaultFolders().openFolder(ALL_FOLDER);
+        reportsPage.openFolder(ALL_FOLDER);
         reportsPage.moveReportsToFolder(CURRENT_SALES_FOLDER, TAG_REPORT);
-        reportsPage.getCustomFolders().openFolder(CURRENT_SALES_FOLDER);
+        reportsPage.openFolder(CURRENT_SALES_FOLDER);
 
         //sometimes the tag selection is cached from previous testcase and make checking number of reports failed
         //so we need to deselect all tags for sure
         reportsPage.deselectAllTags();
 
-        assertEquals(reportsPage.getReportsList().getNumberOfReports(), 4);
+        assertEquals(reportsPage.getReportsCount(), 4);
 
         assertEquals(reportsPage.moveReportsToFolderByDragDrop(ACTIVITY_REPORTS_FOLDER, TAG_REPORT)
-                .getReportsList()
-                .getNumberOfReports(), 3);
-        reportsPage.getCustomFolders().openFolder(ACTIVITY_REPORTS_FOLDER);
-        assertEquals(reportsPage.getReportsList().getNumberOfReports(), 6);
+                .getReportsCount(), 3);
+        reportsPage.openFolder(ACTIVITY_REPORTS_FOLDER);
+        assertEquals(reportsPage.getReportsCount(), 6);
     }
 
     @Test(dependsOnMethods = {"addTagToReport"})
     public void favoriteReport() {
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder(ALL_FOLDER);
+        ReportsPage reportsPage = initReportsPage();
+        waitForFragmentVisible(reportsPage).openFolder(ALL_FOLDER);
         waitForFragmentVisible(reportsPage).addFavorite(TAG_REPORT);
 
-        waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder(FAVORITES_FOLDER);
-        assertEquals(reportsPage.getReportsList().getNumberOfReports(), 1);
+        waitForFragmentVisible(reportsPage).openFolder(FAVORITES_FOLDER);
+        assertEquals(reportsPage.getReportsCount(), 1);
     }
 }

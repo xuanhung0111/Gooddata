@@ -57,7 +57,7 @@ public class GoodSalesReportStatisticsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createSimpleReport"})
     public void testReportStatistics() {
-        assertTrue(openReport(SIMPLE_REPORT).showConfiguration().getReportStatistic().contains("0 Filters"));
+        assertTrue(initReportsPage().openReport(SIMPLE_REPORT).showConfiguration().getReportStatistic().contains("0 Filters"));
         reportPage.addFilter(FilterItem.Factory.createAttributeFilter(SALES_REP,
                 "Adam Bradley", "Alejandro Vabiano", "Alexsandr Fyodr"));
         assertTrue(reportPage.getReportStatistic().indexOf("3 Lines") > 0
@@ -80,7 +80,7 @@ public class GoodSalesReportStatisticsTest extends GoodSalesAbstractTest {
         initEmailSchedulesPage().scheduleNewReportEmail(testParams.getUser(), scheduleEmailSubject,
                 "report usage test", SIMPLE_REPORT, ExportFormat.PDF);
 
-        openReport(SIMPLE_REPORT).showConfiguration().showMoreReportInfo();
+        initReportsPage().openReport(SIMPLE_REPORT).showConfiguration().showMoreReportInfo();
         checkReportUsage(new ReportUsage(simpleDashboard, UsageLocation.DASHBOARD));
         checkReportUsage(new ReportUsage(scheduleEmailSubject, UsageLocation.SCHEDULE_EMAIL));
     }
@@ -98,7 +98,7 @@ public class GoodSalesReportStatisticsTest extends GoodSalesAbstractTest {
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
-        openReport(largeReport);
+        initReportsPage().openReport(largeReport);
         assertTrue(browser.findElements(By.className("horizScrollbar")).isEmpty(), "Horizon scroll bar exists");
         reportPage.showConfiguration();
         waitForElementVisible(SIDE_BAR_SELECTOR, browser);

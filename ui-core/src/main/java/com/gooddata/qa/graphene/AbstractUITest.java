@@ -85,9 +85,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(id = "root")
     protected DashboardsPage dashboardsPage;
 
-    @FindBy(id = "p-domainPage")
-    protected ReportsPage reportsPage;
-
     @FindBy(id = "p-analysisPage")
     protected ReportPage reportPage;
 
@@ -314,19 +311,10 @@ public class AbstractUITest extends AbstractGreyPageTest {
         checkRedBar(browser);
     }
 
-    public ReportPage openReport(String reportName) {
-        initReportsPage().getReportsList().openReport(reportName);
-        waitForAnalysisPageLoaded(browser);
-        return reportPage.waitForReportExecutionProgress();
-    }
-
     public ReportPage initReportCreation() {
-        initReportsPage();
-        selectReportsDomainFolder("My Reports");
-        reportsPage.startCreateReport();
-        waitForAnalysisPageLoaded(browser);
-        assertNotNull(reportPage, "Report page not initialized!");
-        return waitForFragmentVisible(reportPage);
+        return initReportsPage()
+            .openFolder("My Reports")
+            .startCreateReport();
     }
 
     public void verifyDashboardExport(String dashboardName, String tabName, long minimalSize) {
@@ -372,13 +360,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
             waitForElementPresent(By.xpath("//img[contains(@src, '" + testParams.getDownloadFolder() + "')]"),
                     browser);
         }
-    }
-
-    public void selectReportsDomainFolder(String folderName) {
-        reportsPage.getDefaultFolders().openFolder(folderName);
-        waitForReportsPageLoaded(browser);
-        assertEquals(reportsPage.getSelectedFolderName(), folderName, "Selected folder name doesn't match: " +
-                reportsPage.getSelectedFolderName());
     }
 
     public void uploadCSV(String filePath) {
@@ -452,7 +433,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public ReportsPage initReportsPage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|domainPage");
         waitForReportsPageLoaded(browser);
-        return waitForFragmentVisible(reportsPage);
+        return ReportsPage.getInstance(browser);
     }
 
     public AttributePage initAttributePage() {

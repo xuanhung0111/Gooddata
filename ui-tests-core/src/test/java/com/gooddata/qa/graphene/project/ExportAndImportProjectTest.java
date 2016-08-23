@@ -111,7 +111,7 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"testExportImportProject"})
     public void createReportOnImportedProject() {
-        initReportsPage().getReportsList().openReport(SIMPLE_REPORT);
+        initReportsPage().openReport(SIMPLE_REPORT);
 
         //use List.equals due to checking attribute order on report
         assertTrue(reportPage.getTableReport()

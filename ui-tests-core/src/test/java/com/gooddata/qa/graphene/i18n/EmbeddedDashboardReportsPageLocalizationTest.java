@@ -66,7 +66,6 @@ public class EmbeddedDashboardReportsPageLocalizationTest extends GoodSalesAbstr
     public void checkOpenExistingReport() {
         initEmbeddedDashboard()
             .openEmbeddedReportsPage()
-            .getReportsList()
             .openReport(REPORT_ACTIVITIES_BY_TYPE);
         EmbeddedReportPage.waitForPageLoaded(browser);
         checkLocalization(browser);

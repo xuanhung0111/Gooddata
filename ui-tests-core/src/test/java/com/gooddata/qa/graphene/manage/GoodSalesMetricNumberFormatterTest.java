@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.manage;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -45,9 +44,9 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
         assertEquals(MetricDetailsPage.getInstance(browser).getMetricFormat(), Formatter.BARS.toString());
 
         try {
-            initReportPage();
-
-            reportPage.initPage()
+            initReportsPage()
+                .startCreateReport()
+                .initPage()
                 .openWhatPanel()
                 .selectMetric(METRIC_NUMBER_OF_ACTIVITIES);
             assertEquals(waitForElementVisible(METRIC_DETAIL_FORMAT_LOCATOR, browser)
@@ -71,8 +70,9 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"})
     public void editFormatInReportPage() {
         try {
-            initReportPage();
-            TableReport report = reportPage.initPage()
+            TableReport report = initReportsPage()
+                    .startCreateReport()
+                    .initPage()
                     .openWhatPanel()
                     .selectMetric(METRIC_NUMBER_OF_ACTIVITIES)
                     .doneSndPanel()
@@ -105,8 +105,9 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void editFormatWhenCreatingNewMetric() {
-        initReportPage();
-        reportPage.initPage()
+        initReportsPage()
+            .startCreateReport()
+            .initPage()
             .openWhatPanel()
             .createSimpleMetric(SimpleMetricTypes.SUM, "Duration");
         WebElement editFormat = waitForElementVisible(METRIC_DETAIL_FORMAT_LOCATOR, browser);
@@ -127,8 +128,9 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"})
     public void editExistFormatInSnDDialog() {
         try {
-            initReportPage();
-            reportPage.initPage()
+            initReportsPage()
+                .startCreateReport()
+                .initPage()
                 .openWhatPanel()
                 .selectMetric(METRIC_NUMBER_OF_ACTIVITIES);
 
@@ -149,13 +151,6 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
         } finally {
             resetMetricFormat();
         }
-    }
-
-    private void initReportPage() {
-        initReportsPage();
-        reportsPage.startCreateReport();
-        waitForAnalysisPageLoaded(browser);
-        waitForElementVisible(reportPage.getRoot());
     }
 
     private void resetMetricFormat() {

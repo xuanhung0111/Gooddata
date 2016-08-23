@@ -240,7 +240,7 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
                 .deleteObject();
         assertFalse(VariablesPage.getInstance(browser).hasVariable(variable), "Variable is not deleted!");
 
-        initReportsPage().getReportsList().openReport(report.getTitle());
+        initReportsPage().openReport(report.getTitle());
         waitForAnalysisPageLoaded(browser);
 
         takeScreenshot(browser, "Variable-filter-is-kept-in-report", getClass());

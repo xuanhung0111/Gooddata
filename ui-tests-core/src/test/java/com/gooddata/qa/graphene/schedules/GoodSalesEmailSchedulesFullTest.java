@@ -298,8 +298,8 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
                 "Scheduled email test - report.", report, ExportFormat.ALL);
 
         try {
-            initReportsPage();
-            waitForFragmentVisible(reportsPage).tryDeleteReports(report);
+            initReportsPage()
+                .tryDeleteReports(report);
             Graphene.waitGui().until(new Predicate<WebDriver>() {
                 @Override
                 public boolean apply(WebDriver browser) {
@@ -312,8 +312,8 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
             waitForElementVisible(BY_DISMISS_BUTTON, browser).click();
         } finally {
             waitForFragmentVisible(initEmailSchedulesPage()).deleteSchedule(title);
-            initReportsPage();
-            waitForFragmentVisible(reportsPage).deleteReports(report);
+            initReportsPage()
+                .deleteReports(report);
         }
     }
 
