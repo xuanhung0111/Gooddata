@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.manage;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForObjectPageLoaded;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.openqa.selenium.By.className;
@@ -26,6 +25,7 @@ import org.openqa.selenium.WebElement;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.fragments.common.IpeEditor;
+import com.gooddata.qa.graphene.fragments.manage.DataPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectPropertiesPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 
@@ -89,8 +89,8 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
     protected static final List<String> variablesList = Arrays.asList("Quota", "Status");
 
     protected void createNewFolder(ObjectTypes objectType, String newFolderName) {
-        dataPage.createNewFolder(newFolderName);
-        assertTrue(dataPage.getFolders().stream()
+        DataPage.getInstance(browser).createNewFolder(newFolderName);
+        assertTrue(DataPage.getInstance(browser).getFolders().stream()
             .map(e -> e.getAttribute("title"))
             .anyMatch(e -> newFolderName.equals(e)));
         takeScreenshot(browser, "create-new-folder-for-"
@@ -98,12 +98,12 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
     }
 
     protected void moveObjectsByTypeFolderName(ObjectTypes objectType, String targetFolder, List<String> objectsList) {
-        dataPage.getMoveObjectsButton().sendKeys(Keys.ENTER);
+        DataPage.getInstance(browser).getMoveObjectsButton().sendKeys(Keys.ENTER);
         IpeEditor.getInstance(browser).setText(targetFolder);
-        assertTrue(dataPage.getProgressMessageBox().contains("Moving"));
+        assertTrue(DataPage.getInstance(browser).getProgressMessageBox().contains("Moving"));
         String message = String.format("Success! %d %s(s) moved to \"%s\" folder.",
                 objectsList.size(), objectType.getName(), targetFolder);
-        assertEquals(dataPage.getStatusMessageOnGreenBar(), message);
+        assertEquals(DataPage.getInstance(browser).getStatusMessageOnGreenBar(), message);
         takeScreenshot(browser,
                 "move-objects-by-enter-folder-name-in-" + objectType.getObjectsTableID(),
                 this.getClass());
@@ -129,7 +129,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
     }
 
     protected void checkDeleteConfirmDialog(ObjectTypes objectType, List<String> deletedObjects) {
-        dataPage.getDeleteObjectsButton().sendKeys(Keys.ENTER);
+        DataPage.getInstance(browser).getDeleteObjectsButton().sendKeys(Keys.ENTER);
         WebElement confirmDialog = waitForElementVisible(className("t-confirmDelete"), browser);
         String deleteConfirmDialogTitle = String.format("Delete %s(s)", objectType.getName());
         String deleteConfirmDialogMessage = String.format(
@@ -150,7 +150,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
         waitForElementVisible(cssSelector(".t-confirmDelete .s-btn-delete"), browser).click();
         String message = String.format("%d %s(s) deleted.", deletedObjects.size(),
                 objectType.getName());
-        assertEquals(dataPage.getStatusMessageOnGreenBar(), message);
+        assertEquals(DataPage.getInstance(browser).getStatusMessageOnGreenBar(), message);
         this.assertRowTitles(objectType, existingObjects);
         takeScreenshot(browser, objectType.getObjectsTableID()
                 + "-after-deleting-selected-objects", this.getClass());
@@ -166,7 +166,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
 
     protected boolean assertMovedObjectsInTargetFolder(String targetFolderName, ObjectsTable objectsTable,
                                                        List<String> movedObjects) {
-        dataPage.getFolders()
+        DataPage.getInstance(browser).getFolders()
             .stream()
             .filter(e -> targetFolderName.equals(e.getAttribute("title")))
             .findFirst()
@@ -190,8 +190,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
     }
 
     protected ObjectsTable openObjectsTable(ObjectTypes objectType) {
-        initManagePage();
-        waitForFragmentVisible(dataPage).openPage(objectType);
+        initManagePage().openPage(objectType);
         takeScreenshot(browser, "open-" + objectType.getObjectsTableID(), this.getClass());
         return ObjectsTable.getInstance(id(objectType.getObjectsTableID()), browser);
     }
@@ -240,27 +239,27 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
 
     protected void filterObjectByTagCloud(ObjectTypes objectType, List<String> filteredObjectTitles,
             Map<String, List<String>> tagsCloud) {
-        if (dataPage.getSwitchTagsDisplayedForm().getText().equals("Show as Cloud"))
-            dataPage.getSwitchTagsDisplayedForm().click();
+        if (DataPage.getInstance(browser).getSwitchTagsDisplayedForm().getText().equals("Show as Cloud"))
+            DataPage.getInstance(browser).getSwitchTagsDisplayedForm().click();
         for (String tagName : tagsCloud.keySet()) {
             String fontSize = tagsCloud.get(tagName).get(1);
-            dataPage.getTagByCloud(tagName, fontSize).click();
+            DataPage.getInstance(browser).getTagByCloud(tagName, fontSize).click();
         }
         assertRowTitles(objectType, filteredObjectTitles);
-        dataPage.deselectAllTags();
+        DataPage.getInstance(browser).deselectAllTags();
         takeScreenshot(browser, objectType.getObjectsTableID() + "-filtered-by-tags-cloud", this.getClass());
     }
 
     protected void filterObjectByTagList(ObjectTypes objectType, List<String> filteredObjectTitles,
             Map<String, List<String>> tagsList) {
-        if (dataPage.getSwitchTagsDisplayedForm().getText().equals("Show as List"))
-            dataPage.getSwitchTagsDisplayedForm().click();
+        if (DataPage.getInstance(browser).getSwitchTagsDisplayedForm().getText().equals("Show as List"))
+            DataPage.getInstance(browser).getSwitchTagsDisplayedForm().click();
         for (String tagName : tagsList.keySet()) {
             String index = tagsList.get(tagName).get(0);
-            dataPage.getTagByList(tagName, index).click();
+            DataPage.getInstance(browser).getTagByList(tagName, index).click();
         }
         assertRowTitles(objectType, filteredObjectTitles);
-        dataPage.deselectAllTags();
+        DataPage.getInstance(browser).deselectAllTags();
         takeScreenshot(browser, objectType.getObjectsTableID() + "-filtered-by-tags-list", this.getClass());
     }
 
@@ -280,12 +279,12 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
     }
 
     protected void checkAllCheckboxes(ObjectsTable objectsTable) {
-        dataPage.getAllAction().click();
+        DataPage.getInstance(browser).getAllAction().click();
         objectsTable.assertCheckboxes(true, true);
     }
 
     protected void checkNoneCheckboxes(ObjectsTable objectsTable) {
-        dataPage.getNoneAction().click();
+        DataPage.getInstance(browser).getNoneAction().click();
         objectsTable.assertCheckboxes(true, false);
     }
 }

@@ -215,8 +215,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void scheduleReportApplyFilteredVariable() {
-        initVariablePage();
-        variablePage.createVariable(new AttributeVariable("FVariable")
+        initVariablePage().createVariable(new AttributeVariable("FVariable")
             .withAttribute("Activity Type").withAttributeValues("Email"));
 
         initReportsPage();
@@ -234,8 +233,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void scheduleReportApplyNumericVariable() {
-        initVariablePage();
-        String variableUri = variablePage.createVariable(new NumericVariable("NVariable").withDefaultNumber(2012));
+        String variableUri = initVariablePage().createVariable(new NumericVariable("NVariable").withDefaultNumber(2012));
 
         String report = "Sum amount in 2012";
         String expression = "SELECT SUM ([/gdc/md/${pid}/obj/1279])"

@@ -54,9 +54,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
     public void createVariable() {
-        initVariablePage();
-
-        variablePage.createVariable(new AttributeVariable(V_STAGE).withAttribute(ATTR_STAGE_NAME));
+        initVariablePage().createVariable(new AttributeVariable(V_STAGE).withAttribute(ATTR_STAGE_NAME));
     }
 
     @Test(dependsOnMethods = {"createVariable"}, groups = {"init"})

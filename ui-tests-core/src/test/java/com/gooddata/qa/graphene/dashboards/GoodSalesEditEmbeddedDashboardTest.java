@@ -196,8 +196,7 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
         waitForFragmentNotVisible(metricEditorDialog);
 
         switchToMainWindow(browser);
-        initMetricPage();
-        assertTrue(metricPage.isMetricVisible(editedMetricName), "There is an error when editing metric name");
+        assertTrue(initMetricPage().isMetricVisible(editedMetricName), "There is an error when editing metric name");
 
         embeddedReportPage = initEmbeddedDashboard(EMBEDDED_DASHBOARD).openEmbeddedReportPage();
 
@@ -210,8 +209,7 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
         confirmDelete();
 
         switchToMainWindow(browser);
-        initMetricPage();
-        assertFalse(metricPage.isMetricVisible(editedMetricName), "Metric is still not deleted");
+        assertFalse(initMetricPage().isMetricVisible(editedMetricName), "Metric is still not deleted");
     }
 
     @Test(dependsOnMethods = "initEmbeddedDashboardWithIframe")

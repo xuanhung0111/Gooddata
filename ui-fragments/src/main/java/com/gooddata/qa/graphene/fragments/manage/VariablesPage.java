@@ -3,24 +3,27 @@ package com.gooddata.qa.graphene.fragments.manage;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.entity.variable.AbstractVariable;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.entity.variable.NumericVariable;
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
-public class VariablesPage extends AbstractFragment {
-
-    public static final String CSS_CLASS = "#p-dataPage.s-displayed";
+public class VariablesPage extends DataPage {
 
     @FindBy(css = ".s-btn-create_variable")
     private WebElement createVariableButton;
 
     @FindBy(id = "variablesTable")
     private ObjectsTable variablesTable;
+
+    public static VariablesPage getInstance(SearchContext context) {
+        return Graphene.createPageFragment(VariablesPage.class, waitForElementVisible(ROOT_LOCATOR, context));
+    }
 
     public String createVariable(AbstractVariable variable) {
         clickCreateVariableButton();

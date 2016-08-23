@@ -50,8 +50,7 @@ public class GoodSalesAdvanceRangeFilterReportTest extends GoodSalesAbstractTest
 
     @Test(dependsOnGroups = {"createProject"})
     public void addNewVariable() {
-        initVariablePage();
-        variablePage.createVariable(new AttributeVariable(VARIABLE_NAME)
+        initVariablePage().createVariable(new AttributeVariable(VARIABLE_NAME)
                 .withAttribute(ATTR_STAGE_NAME)
                 .withAttributeValues("Interest", "Discovery", "Short List", "Negotiation"));
     }

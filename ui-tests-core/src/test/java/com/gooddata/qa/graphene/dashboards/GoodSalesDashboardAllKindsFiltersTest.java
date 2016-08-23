@@ -185,8 +185,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             checkRedBar(browser);
             assertEquals(getFilterWidget("account").getTitle(), "ACCOUNT");
 
-            initAttributePage();
-            attributePage.initAttribute("Account")
+            initAttributePage().initAttribute("Account")
                 .changeName("Account Edit");
 
             initDashboardsPage().selectDashboard(TEST_DASHBOAD_FILTERS);
@@ -203,8 +202,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             assertEquals(getFilterWidget("account_edit").getTitle(), "ACCOUNT EDIT");
         } finally {
             dashboardsPage.deleteDashboard();
-            initAttributePage();
-            attributePage.initAttribute("Account Edit")
+            initAttributePage().initAttribute("Account Edit")
                 .changeName("Account");
         }
     }

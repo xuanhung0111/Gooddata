@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.indigo.analyze;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPEN_OPPS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON_OPPS;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -16,6 +15,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.manage.MetricPage;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 
 public class GoodSalesMetricVisibilityTest extends GoodSalesAbstractAnalyseTest {
@@ -35,12 +35,11 @@ public class GoodSalesMetricVisibilityTest extends GoodSalesAbstractAnalyseTest 
     @Test(dependsOnMethods = {"addUsersWithOtherRolesToProject"}, groups = {"precondition"})
     public void createPrivateMetric() {
         assertTrue(deleteMetric(RATIO_METRIC));
-        initMetricPage();
-        waitForFragmentVisible(metricPage).createRatioMetric(RATIO_METRIC, METRIC_NUMBER_OF_WON_OPPS,
-                METRIC_NUMBER_OF_OPEN_OPPS);
 
         String expectedMaql = "SELECT " + METRIC_NUMBER_OF_WON_OPPS + " / " + METRIC_NUMBER_OF_OPEN_OPPS;
-        assertTrue(metricPage.isMetricCreatedSuccessfully(RATIO_METRIC, expectedMaql, "#,##0.00"));
+        assertTrue(initMetricPage()
+            .createRatioMetric(RATIO_METRIC, METRIC_NUMBER_OF_WON_OPPS, METRIC_NUMBER_OF_OPEN_OPPS)
+            .isMetricCreatedSuccessfully(RATIO_METRIC, expectedMaql, "#,##0.00"));
     }
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"test"})
@@ -69,14 +68,12 @@ public class GoodSalesMetricVisibilityTest extends GoodSalesAbstractAnalyseTest 
     }
 
     private boolean deleteMetric(String metric) {
-        initMetricPage();
-        if (!waitForFragmentVisible(metricPage).isMetricVisible(RATIO_METRIC)) {
+        if (!initMetricPage().isMetricVisible(RATIO_METRIC)) {
             return true;
         }
-        metricPage.openMetricDetailPage(RATIO_METRIC)
+        MetricPage.getInstance(browser).openMetricDetailPage(RATIO_METRIC)
             .deleteObject();
 
-        initMetricPage();
-        return !waitForFragmentVisible(metricPage).isMetricVisible(RATIO_METRIC);
+        return !initMetricPage().isMetricVisible(RATIO_METRIC);
     }
 }

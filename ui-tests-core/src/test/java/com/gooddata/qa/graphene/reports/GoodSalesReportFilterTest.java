@@ -38,8 +38,7 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void createVariableTest() {
-        initVariablePage();
-        variablePage.createVariable(new AttributeVariable(VARIABLE_NAME)
+        initVariablePage().createVariable(new AttributeVariable(VARIABLE_NAME)
                 .withAttribute("Stage Name")
                 .withAttributeValues("Interest", "Discovery", "Short List", "Negotiation"));
     }

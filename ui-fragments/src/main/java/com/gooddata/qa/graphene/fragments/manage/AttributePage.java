@@ -10,19 +10,24 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.List;
 
+import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.enums.AttributeLabelTypes;
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
-public class AttributePage extends AbstractFragment {
+public class AttributePage extends DataPage {
 
     @FindBy(id = "attributesTable")
     protected ObjectsTable attributesTable;
 
     @FindBy(css = ".s-attributesAddButton")
     protected WebElement createAttributeButton;
+
+    public static AttributePage getInstance(SearchContext context) {
+        return Graphene.createPageFragment(AttributePage.class, waitForElementVisible(ROOT_LOCATOR, context));
+    }
 
     public void configureAttributeLabel(String attributeName, AttributeLabelTypes attributeLabel) {
         AttributeDetailPage attributeDetailPage = initAttribute(attributeName);

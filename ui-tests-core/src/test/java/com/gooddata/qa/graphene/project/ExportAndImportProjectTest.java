@@ -26,6 +26,7 @@ import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
+import com.gooddata.qa.graphene.fragments.manage.VariablesPage;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.io.ResourceUtils;
@@ -101,8 +102,9 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
                         PARTIAL_HIGH_SCHOOL)), "There is difference between actual and expected attributes");
         takeScreenshot(browser, "imported-dashboard", getClass());
 
-        assertTrue(initVariablePage().hasVariable(SIMPLE_NUMERIC_VARIABLE) && variablePage
-                .hasVariable(SIMPLE_FILTERED_VARIABLE), "Imported variables are not exist");
+        assertTrue(initVariablePage().hasVariable(SIMPLE_NUMERIC_VARIABLE) &&
+                VariablesPage.getInstance(browser).hasVariable(SIMPLE_FILTERED_VARIABLE),
+                "Imported variables are not exist");
 
         assertTrue(initMetricPage().isMetricVisible(SUM_METRIC), "Imported metric is not exist");
     }

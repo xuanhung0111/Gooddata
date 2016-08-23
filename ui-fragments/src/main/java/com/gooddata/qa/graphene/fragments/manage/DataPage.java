@@ -8,7 +8,9 @@ import static org.openqa.selenium.By.xpath;
 
 import java.util.List;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -53,9 +55,14 @@ public class DataPage extends AbstractFragment {
             "//a[contains(@style, 'font-size: ${fontSize};') and text()='${tagName}']";
 
     private static final By FOLDERS_XPATH_LOCATOR = xpath("//*[contains(@style,'display: block') and ./*[contains(@class,'listList')]]//li/a");
+    protected static final By ROOT_LOCATOR = cssSelector("#p-dataPage.s-displayed");
 
     @FindBy(id = "p-dataPage")
     private ObjectFolder objectFolder;
+
+    public static DataPage getInstance(SearchContext context) {
+        return Graphene.createPageFragment(DataPage.class, waitForElementVisible(ROOT_LOCATOR, context));
+    }
 
     public ObjectFolder getObjectFolder() {
         return objectFolder;
