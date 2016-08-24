@@ -654,7 +654,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                         new GridElement(m4.getUri(), m4.getTitle())));
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
-        openReport(reportName);
+        initReportsPage().openReport(reportName);
         checkReportRenderedWell(reportName);
 
         reportName = "RollingMetric - Month_Year";
@@ -667,7 +667,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                         new GridElement(m4.getUri(), m4.getTitle())));
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
-        openReport(reportName);
+        initReportsPage().openReport(reportName);
         checkReportRenderedWell(reportName);
 
         List<String> firstRow;
@@ -681,7 +681,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         DashboardsRestUtils.changeMetricExpression(getRestApiClient(), m1.getUri(),
                 "SELECT RUNSUM( [" + amount.getUri() + "] ) ROWS BETWEEN 5.5 PRECEDING AND CURRENT ROW");
         try {
-            openReport(reportName);
+            initReportsPage().openReport(reportName);
             takeScreenshot(browser, "checkReportRenderedWell - report not computable", getClass());
             assertThat(reportPage.getInvalidDataReportMessage(), equalTo(REPORT_NOT_COMPUTABLE_MESSAGE));
         } finally {
@@ -821,7 +821,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
-        openReport(reportName);
+        initReportsPage().openReport(reportName);
         List<Float> metricValuesinGrid = reportPage.getTableReport().getMetricElements();
         takeScreenshot(browser, "check-metric" + "-" + metric.getTitle(), this.getClass());
         System.out.println("Actual metric values:   " + metricValuesinGrid);

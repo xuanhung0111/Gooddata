@@ -87,7 +87,7 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
     public void addRunningTotalsToReport(final String type,
             final String runningTotalHeader, final List<Float> runningTotalValues) {
 
-        final TableReport table = openReport(RUNNING_TOTAL).getTableReport();
+        final TableReport table = initReportsPage().openReport(RUNNING_TOTAL).getTableReport();
         table.openContextMenuFromCellValue(YEAR_2011)
                 .aggregateTableData(AggregationType.RUNNING, type);
         assertTrue(table.getMetricsHeader().contains(runningTotalHeader), type + " headers have not been added");
@@ -109,7 +109,7 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = "createRunningTotalReport")
     public void customizeMetricAndAttributeInRunningSumReport() {
-        final TableReport table = openReport(RUNNING_TOTAL).getTableReport();
+        final TableReport table = initReportsPage().openReport(RUNNING_TOTAL).getTableReport();
 
         table.openContextMenuFromCellValue(YEAR_2011)
                 .aggregateTableData(AggregationType.RUNNING, RUNNING_SUM);
@@ -162,7 +162,7 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
-        final TableReport table = openReport(reportName).getTableReport();
+        final TableReport table = initReportsPage().openReport(reportName).getTableReport();
         table.openContextMenuFromCellValue(metricAlias).aggregateTableData(AggregationType.RUNNING, RUNNING_SUM);
 
         reportPage.waitForReportExecutionProgress()
@@ -211,7 +211,7 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
                 .withHows(new HowItem(STATUS, Position.LEFT))
                 .withHows(new HowItem(YEAR_SNAPSHOT, Position.TOP, YEAR_2011)));
 
-        final TableReport table = openReport(reportName).getTableReport();
+        final TableReport table = initReportsPage().openReport(reportName).getTableReport();
         table.openContextMenuFromCellValue(YEAR_2011).aggregateTableData(AggregationType.SUM, "of All Rows");
         reportPage.waitForReportExecutionProgress();
 
@@ -239,7 +239,7 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
                 .withHows(new HowItem(STAGE_NAME, Position.LEFT, INTEREST, DISCOVERY, SHORT_LIST))
                 .withHows(new HowItem(YEAR_SNAPSHOT, Position.TOP)));
 
-        final TableReport table = openReport(reportName).getTableReport();
+        final TableReport table = initReportsPage().openReport(reportName).getTableReport();
         table.openContextMenuFromCellValue(YEAR_2011).aggregateTableData(AggregationType.RUNNING, RUNNING_SUM);
         table.clickOnAttributeToOpenDrillReport(YEAR_2011);
 

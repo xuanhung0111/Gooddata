@@ -41,7 +41,7 @@ public class EmbeddedDashboard extends DashboardsPage {
         editDashboard().clickReportMenuButton();
 
         waitForElementVisible(By.className("s-btn-manage"), browser).click();
-        return Graphene.createPageFragment(ReportsPage.class, waitForElementVisible(ReportsPage.LOCATOR, browser));
+        return ReportsPage.getInstance(browser);
     }
 
     @Override

@@ -7,6 +7,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.openqa.selenium.By.cssSelector;
+import static org.openqa.selenium.By.id;
 import static java.util.stream.Collectors.toList;
 import static java.lang.Integer.parseInt;
 
@@ -16,6 +17,7 @@ import java.util.stream.Stream;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -50,6 +52,10 @@ public class UserProfilePage extends AbstractFragment {
 
     @FindBy(className = "s-btn-save_changes")
     private WebElement saveChangesButton;
+
+    public static final UserProfilePage getInstance(SearchContext context) {
+        return Graphene.createPageFragment(UserProfilePage.class, waitForElementVisible(id("p-profilePage"), context));
+    }
 
     public PersonalInfo getUserInfo() {
         PersonalInfo info = new PersonalInfo()

@@ -101,7 +101,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createReport"}, dataProvider = "rowTotalDataProvider")
     public void addAndRemoveRowTotalOnAttributeHeader(final AggregationType type,
             final List<Float> totalValuesOfAllRows, final List<Float> totalValuesOfEachStage) {
-        final TableReport table = openReport(SIMPLE_REPORT).getTableReport();
+        final TableReport table = initReportsPage().openReport(SIMPLE_REPORT).getTableReport();
 
         table.openContextMenuFromCellValue(YEAR_2011).aggregateTableData(type, OF_ALL_ROWS);
         checkNumberOfTotalHeaders(type, 1);
@@ -156,7 +156,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
             List<Float> totalValuesOfAllColumns) {
 
         //minimize number of metrics to avoid handling scroll bar
-        final TableReport table = openReport(SIMPLE_REPORT)
+        final TableReport table = initReportsPage().openReport(SIMPLE_REPORT)
                 .addFilter(FilterItem.Factory.createAttributeFilter(ATTR_YEAR_SNAPSHOT, YEAR_2011))
                 .waitForReportExecutionProgress()
                 .getTableReport();
@@ -215,7 +215,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
     public void addAndRemoveTotalsForSingleMetric(final AggregationType type,
             final List<Float> otherMetricTotalValues,final List<Float> totalValues) {
 
-        final TableReport table = openReport(SIMPLE_REPORT).getTableReport();
+        final TableReport table = initReportsPage().openReport(SIMPLE_REPORT).getTableReport();
 
         table.openContextMenuFromCellValue(METRIC_AMOUNT).aggregateTableData(AggregationType.SUM, OF_ALL_ROWS);
         //use List.equal() due to checking value order
@@ -246,7 +246,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createReport"})
     public void removeTotalsFromMetric() {
-        final TableReport table = openReport(SIMPLE_REPORT).getTableReport();
+        final TableReport table = initReportsPage().openReport(SIMPLE_REPORT).getTableReport();
 
         table.openContextMenuFromCellValue(YEAR_2011).aggregateTableData(AggregationType.SUM, OF_ALL_ROWS);
         reportPage.waitForReportExecutionProgress();
@@ -268,8 +268,8 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createReport"})
     public void cancelAddingTotals() {
-        openReport(SIMPLE_REPORT).getTableReport().openContextMenuFromCellValue(YEAR_2011);
-        
+        initReportsPage().openReport(SIMPLE_REPORT).getTableReport().openContextMenuFromCellValue(YEAR_2011);
+
         final By contextMenuLocator = By.id("ctxMenu");
         assertTrue(isElementVisible(contextMenuLocator, browser), "The context menu is not displayed");
 
@@ -304,7 +304,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createReport"}, dataProvider = "totalsOfTotalsDataProvider")
     public void addTotalsOfTotals(final AggregationType type, final List<Float> totalValues) {
-        final TableReport table = openReport(SIMPLE_REPORT).getTableReport();
+        final TableReport table = initReportsPage().openReport(SIMPLE_REPORT).getTableReport();
 
         table.openContextMenuFromCellValue(Q1_2011).aggregateTableData(type, OF_ALL_ROWS);
         reportPage.waitForReportExecutionProgress();
@@ -332,7 +332,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createReportForAddingMultipleTotals"})
     public void addMultipleRollupTotals() {
-        final TableReport table = openReport(MULTIPLE_TOTALS_REPORT).getTableReport();
+        final TableReport table = initReportsPage().openReport(MULTIPLE_TOTALS_REPORT).getTableReport();
         table.openContextMenuFromCellValue(MAY_2011).aggregateTableData(AggregationType.ROLLUP, BY_OPPORTUNITY);
         checkNumberOfTotalHeaders(AggregationType.ROLLUP, 3);
 
@@ -379,7 +379,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createReportForAddingMultipleTotals"})
     public void addMultipleMedianTotals() throws FileNotFoundException, IOException {
-        final TableReport table = openReport(MULTIPLE_TOTALS_REPORT).getTableReport();
+        final TableReport table = initReportsPage().openReport(MULTIPLE_TOTALS_REPORT).getTableReport();
         table.openContextMenuFromCellValue(MAY_2011).aggregateTableData(AggregationType.MEDIAN, BY_OPPORTUNITY);
         reportPage.waitForReportExecutionProgress();
 

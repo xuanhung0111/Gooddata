@@ -67,7 +67,7 @@ public class GoodSalesSortByTotalsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createReportContainingOneMetric"})
     public void sortByTotalsInReportContainingOneMetric() {
-        final TableReport table = openReport(REPORT_CONTAINING_ONE_METRIC).getTableReport(); 
+        final TableReport table = initReportsPage().openReport(REPORT_CONTAINING_ONE_METRIC).getTableReport(); 
         table.openContextMenuFromCellValue(METRIC_AMOUNT).aggregateTableData(AggregationType.SUM, OF_ALL_ROWS);
         reportPage.waitForReportExecutionProgress();
         assertEquals(table.getTotalValues(), asList(886.15f, 886.15f, 886.15f, 3318.24f));
@@ -100,7 +100,7 @@ public class GoodSalesSortByTotalsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createReportContainingOneMetric"})
     public void sortByTotalsInReportContainingTwoMetrics() {
-        final TableReport table = openReport(REPORT_CONTAINING_ONE_METRIC).getTableReport();
+        final TableReport table = initReportsPage().openReport(REPORT_CONTAINING_ONE_METRIC).getTableReport();
         table.openContextMenuFromCellValue(METRIC_AMOUNT).aggregateTableData(AggregationType.SUM, OF_ALL_ROWS);
         reportPage.waitForReportExecutionProgress();
 

@@ -101,7 +101,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
-        assertEquals(openReport(INCOMPUTABLE_REPORT).getInvalidDataReportMessage(), REPORT_NOT_COMPUTABLE_MESSAGE,
+        assertEquals(initReportsPage().openReport(INCOMPUTABLE_REPORT).getInvalidDataReportMessage(), REPORT_NOT_COMPUTABLE_MESSAGE,
                 "The created report is not incomputable type");
     }
 

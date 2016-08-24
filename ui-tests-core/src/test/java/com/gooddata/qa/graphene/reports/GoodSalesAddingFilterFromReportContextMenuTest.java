@@ -111,8 +111,7 @@ public class GoodSalesAddingFilterFromReportContextMenuTest extends GoodSalesAbs
     }
 
     private ReportPage initReport() {
-        initReportsPage();
-        reportsPage.getReportsList().openReport(REPORT_NAME);
+        initReportsPage().openReport(REPORT_NAME);
         waitForAnalysisPageLoaded(browser);
 
         return waitForFragmentVisible(reportPage);

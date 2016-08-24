@@ -10,7 +10,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForReportsPageLoaded;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -27,6 +26,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
+import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.google.common.base.Predicate;
 
@@ -62,9 +62,9 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createReport"})
     public void workWithOldVersion() {
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).getReportsList().openReport(VERSION_REPORT);
-        reportPage.initPage()
+        initReportsPage()
+            .openReport(VERSION_REPORT)
+            .initPage()
             .openHowPanel()
             .selectAttribute(ATTR_ACTIVITY_TYPE)
             .doneSndPanel();
@@ -94,13 +94,11 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void leaveUnsavedChangesInNewReport() {
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder(UNSORTED);
-        waitForReportsPageLoaded(browser);
-        int currentReportsCount = reportsPage.getReportsList().getNumberOfReports();
+        int currentReportsCount = initReportsPage().openFolder(UNSORTED).getReportsCount();
 
-        reportsPage.startCreateReport();
-        reportPage.initPage()
+        ReportsPage.getInstance(browser)
+            .startCreateReport()
+            .initPage()
             .openWhatPanel()
             .selectMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .doneSndPanel();
@@ -110,20 +108,15 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         waitForElementVisible(UNSAVED_CHANGES_DONT_SAVE_BUTTON, browser).click();
         waitForDataPageLoaded(browser);
 
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder(UNSORTED);
-        waitForReportsPageLoaded(browser);
-        assertThat(reportsPage.getReportsList().getNumberOfReports(), equalTo(currentReportsCount));
+        assertThat(initReportsPage().openFolder(UNSORTED).getReportsCount(), equalTo(currentReportsCount));
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void cancelLeavingUnsavedChangesInNewReport() {
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder(UNSORTED);
-        waitForReportsPageLoaded(browser);
-
-        reportsPage.startCreateReport();
-        reportPage.initPage()
+        initReportsPage()
+            .openFolder(UNSORTED)
+            .startCreateReport()
+            .initPage()
             .openWhatPanel()
             .selectMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .doneSndPanel();
@@ -136,8 +129,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createReport"})
     public void leaveAndDontSaveOldReport() {
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).getReportsList().openReport(VERSION_REPORT);
+        initReportsPage().openReport(VERSION_REPORT);
         waitForAnalysisPageLoaded(browser);
         int versionCount = waitForFragmentVisible(reportPage).getVersionsCount();
         reportPage.openHowPanel()
@@ -149,21 +141,18 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         waitForElementVisible(UNSAVED_CHANGES_DONT_SAVE_BUTTON, browser).click();
         waitForDataPageLoaded(browser);
 
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).getReportsList().openReport(VERSION_REPORT);
+        initReportsPage().openReport(VERSION_REPORT);
         assertThat(waitForFragmentVisible(reportPage).getVersionsCount(), equalTo(versionCount));
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void leaveAndSaveNewReport() {
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder(UNSORTED);
-        waitForReportsPageLoaded(browser);
-        int currentReportsCount = reportsPage.getReportsList().getNumberOfReports();
-
-        reportsPage.startCreateReport();
+        int currentReportsCount = initReportsPage().openFolder(UNSORTED).getReportsCount();
         String reportName = "Leave & Save";
-        reportPage.initPage()
+
+        ReportsPage.getInstance(browser)
+            .startCreateReport()
+            .initPage()
             .setReportName(reportName)
             .openWhatPanel()
             .selectMetric(METRIC_NUMBER_OF_ACTIVITIES)
@@ -175,21 +164,17 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         waitForElementVisible(CREATE_REPORT_BUTTON, browser).click();
         waitForDataPageLoaded(browser);
 
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder(UNSORTED);
-        waitForReportsPageLoaded(browser);
-        assertThat(reportsPage.getReportsList().getNumberOfReports(), equalTo(currentReportsCount + 1));
-        reportsPage.getReportsList().openReport(reportName);
+        assertThat(initReportsPage().openFolder(UNSORTED).getReportsCount(), equalTo(currentReportsCount + 1));
+        ReportsPage.getInstance(browser).openReport(reportName);
     }
 
     @Test(dependsOnMethods = {"createReport"})
     public void leaveAndSaveOldReport() {
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder(ALL);
-        waitForReportsPageLoaded(browser);
-        waitForFragmentVisible(reportsPage).getReportsList().openReport(TOTAL_LOST);
-        waitForAnalysisPageLoaded(browser);
-        int versionCount = waitForFragmentVisible(reportPage).getVersionsCount();
+        int versionCount = initReportsPage()
+            .openFolder(ALL)
+            .openReport(TOTAL_LOST)
+            .getVersionsCount();
+
         reportPage.openHowPanel()
             .selectAttribute(ATTR_ACCOUNT)
             .doneSndPanel();
@@ -200,16 +185,15 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         waitForElementVisible(WARNING_DIALOG_SAVE_BUTTON, browser).click();
         waitForDataPageLoaded(browser);
 
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).getReportsList().openReport(TOTAL_LOST);
+        initReportsPage().openReport(TOTAL_LOST);
         assertThat(waitForFragmentVisible(reportPage).getVersionsCount(), equalTo(versionCount + 1));
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void cancelComputingInNewReport() {
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).startCreateReport();
-        reportPage.initPage()
+        initReportsPage()
+            .startCreateReport()
+            .initPage()
             .setReportName("R1")
             .openWhatPanel()
             .selectMetric(METRIC_NUMBER_OF_ACTIVITIES)
@@ -226,10 +210,9 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void cancelComputingOldReport() {
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder(ALL);
-        waitForReportsPageLoaded(browser);
-        waitForFragmentVisible(reportsPage).getReportsList().openReport(STAGE_DURATION_DRILL_IN);
+        initReportsPage()
+            .openFolder(ALL)
+            .openReport(STAGE_DURATION_DRILL_IN);
         if (tryCancelReportComputing()) {
             assertThat(reportPage.getExecuteProgressStatus(), equalTo("Report computation canceled."));
             reportPage.recompute();
@@ -238,10 +221,9 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"workWithOldVersion"})
     public void cancelComputingOldVersionOfReport() {
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).getReportsList().openReport(VERSION_REPORT_2);
-        waitForAnalysisPageLoaded(browser);
-        reportPage.openVersion(1);
+        initReportsPage()
+            .openReport(VERSION_REPORT_2)
+            .openVersion(1);
 
         if (tryCancelReportComputing()) {
             assertThat(reportPage.getExecuteProgressStatus(), equalTo("Report computation canceled."));
@@ -250,26 +232,22 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"workWithOldVersion"})
     public void saveAsReport() {
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).getReportsList().openReport(VERSION_REPORT_2);
-        waitForAnalysisPageLoaded(browser);
-        reportPage.saveAsReport();
+        initReportsPage()
+            .openReport(VERSION_REPORT_2)
+            .saveAsReport();
         waitForReportLoading();
         sleepTightInSeconds(2);
 
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).getReportsList().openReport("Copy of " + VERSION_REPORT_2);
+        initReportsPage().openReport("Copy of " + VERSION_REPORT_2);
         assertThat(waitForFragmentVisible(reportPage).getVersionsCount(), equalTo(1));
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void saveReportPlacedOnDashboard() {
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder(ALL);
-        waitForReportsPageLoaded(browser);
-        reportsPage.getReportsList().openReport(TOTAL_LOST);
-        waitForAnalysisPageLoaded(browser);
-        waitForFragmentVisible(reportPage).openHowPanel()
+        initReportsPage()
+            .openFolder(ALL)
+            .openReport(TOTAL_LOST)
+            .openHowPanel()
             .selectAttribute(ATTR_IS_WON)
             .doneSndPanel();
         waitForReportLoading();
@@ -278,31 +256,25 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void saveAsReportPlacedOnDashboard() {
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder(ALL);
-        waitForReportsPageLoaded(browser);
-        reportsPage.getReportsList().openReport(QTD_GOAL);
-        waitForAnalysisPageLoaded(browser);
-        waitForFragmentVisible(reportPage).openHowPanel()
+        initReportsPage()
+            .openFolder(ALL)
+            .openReport(QTD_GOAL)
+            .openHowPanel()
             .selectAttribute(ATTR_IS_WON)
             .doneSndPanel();
         waitForReportLoading();
         reportPage.saveAsReport();
         sleepTightInSeconds(3);
 
-        ApplicationHeaderBar.goToReportsPage(browser);
-        waitForReportsPageLoaded(browser);
-        waitForFragmentVisible(reportsPage).getReportsList().openReport("Copy of " + QTD_GOAL);
+        ApplicationHeaderBar.goToReportsPage(browser).openReport("Copy of " + QTD_GOAL);
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void cancelReportPlacedOnDashboard() {
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder(ALL);
-        waitForReportsPageLoaded(browser);
-        reportsPage.getReportsList().openReport(TOTAL_WON);
-        waitForAnalysisPageLoaded(browser);
-        waitForFragmentVisible(reportPage).openHowPanel()
+        initReportsPage()
+            .openFolder(ALL)
+            .openReport(TOTAL_WON)
+            .openHowPanel()
             .selectAttribute(ATTR_IS_WON)
             .doneSndPanel();
         waitForReportLoading();

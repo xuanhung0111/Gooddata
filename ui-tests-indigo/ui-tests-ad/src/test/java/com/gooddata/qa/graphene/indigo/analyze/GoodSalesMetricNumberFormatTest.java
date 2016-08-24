@@ -176,8 +176,8 @@ public class GoodSalesMetricNumberFormatTest extends GoodSalesAbstractAnalyseTes
                 dashboardsPage.deleteDashboard();
             }
         } finally {
-            initReportsPage();
-            waitForFragmentVisible(reportsPage).deleteReports(reportName);
+            initReportsPage()
+                .deleteReports(reportName);
         }
     }
 }

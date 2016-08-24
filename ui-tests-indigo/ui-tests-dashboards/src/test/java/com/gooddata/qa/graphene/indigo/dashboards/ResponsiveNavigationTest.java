@@ -131,7 +131,6 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
         assertTrue(isElementPresent(className(ApplicationHeaderBar.KPIS_LINK_CLASS), browser));
 
         ApplicationHeaderBar.goToReportsPage(browser);
-        waitForFragmentVisible(reportsPage);
         assertTrue(isElementPresent(className(ApplicationHeaderBar.KPIS_LINK_CLASS), browser));
 
         ApplicationHeaderBar.goToKpisPage(browser);

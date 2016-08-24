@@ -133,7 +133,7 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
         initReportsPage();
 
         takeScreenshot(browser, "Report-" + report + "-is-deleted", getClass());
-        assertFalse(reportsPage.isReportVisible(report), "Report: " + report + " is not deleted");
+        assertFalse(ReportsPage.getInstance(browser).isReportVisible(report), "Report: " + report + " is not deleted");
     }
 
     @Test(dependsOnMethods = "initEmbeddedDashboardWithIframe")
@@ -220,7 +220,7 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
         ReportsPage embeddedReportsPage =
                 initEmbeddedDashboard(EMBEDDED_DASHBOARD).openEmbeddedReportsPage();
 
-        embeddedReportsPage.getReportsList().openReport(report.getTitle());
+        embeddedReportsPage.openReport(report.getTitle());
 
         Graphene.createPageFragment(EmbeddedReportPage.class,
                 waitForElementVisible(EmbeddedReportPage.LOCATOR, browser))
@@ -230,13 +230,13 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
         embeddedReportsPage
                 .addNewFolder(reportFolder)
                 .moveReportsToFolder(reportFolder, report.getTitle())
-                .openCustomFolder(reportFolder);
+                .openFolder(reportFolder);
 
         takeScreenshot(browser, "Moving-report-to-other-folder in-embedded-Domain-page", getClass());
-        assertEquals(embeddedReportsPage.getReportsList().getReports().size(), 1);
+        assertEquals(embeddedReportsPage.getReportsCount(), 1);
         assertTrue(embeddedReportsPage.isReportVisible(report.getTitle()), "There is an error when moving report");
 
-        embeddedReportsPage.getReportsList().openReport(report.getTitle());
+        embeddedReportsPage.openReport(report.getTitle());
 
         Graphene.createPageFragment(EmbeddedReportPage.class,
                 waitForElementVisible(EmbeddedReportPage.LOCATOR, browser))
@@ -244,7 +244,7 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
         waitForFragmentVisible(embeddedReportsPage);
 
         takeScreenshot(browser, "Delete-report-in-embedded-Domain-page", getClass());
-        assertFalse(embeddedReportsPage.openCustomFolder(reportFolder).isReportVisible(report.getTitle()),
+        assertFalse(embeddedReportsPage.openFolder(reportFolder).isReportVisible(report.getTitle()),
                 "Report is still not deleted");
     }
 

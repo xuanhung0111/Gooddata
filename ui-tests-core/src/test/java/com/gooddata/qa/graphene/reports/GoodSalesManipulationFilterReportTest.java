@@ -127,8 +127,7 @@ public class GoodSalesManipulationFilterReportTest extends GoodSalesAbstractTest
     }
 
     private ReportPage initReport() {
-        initReportsPage();
-        reportsPage.getReportsList().openReport(REPORT_NAME);
+        initReportsPage().openReport(REPORT_NAME);
         waitForAnalysisPageLoaded(browser);
 
         return waitForFragmentVisible(reportPage);

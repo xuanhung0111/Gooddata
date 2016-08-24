@@ -17,6 +17,7 @@ import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.fragments.account.PersonalInfoDialog;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
+import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 
 public class UserProfileInformationTest extends GoodSalesAbstractTest {
 
@@ -51,14 +52,12 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = { "initGetUserInformation" })
     public void checkUserProfileInformation() {
-        initReportsPage();
-
-        PersonalInfo personalInfo = reportsPage.getReportOwnerInfoFrom(REPORT_NAME);
+        PersonalInfo personalInfo = initReportsPage().getReportOwnerInfoFrom(REPORT_NAME);
         assertEquals(userInfo.getFullName(), personalInfo.getFullName());
         assertEquals(userInfo.getEmail(), personalInfo.getEmail());
         assertEquals(userInfo.getPhoneNumber(), personalInfo.getPhoneNumber());
 
-        UserProfilePage userProfilePage = reportsPage.openReportOwnerProfilePageFrom(REPORT_NAME);
+        UserProfilePage userProfilePage = ReportsPage.getInstance(browser).openReportOwnerProfilePageFrom(REPORT_NAME);
         assertEquals(userProfilePage.getUserInfo(), userInfo);
 
         assertTrue(userProfilePage.isItemDisplayedInRecentActivity(REPORT_NAME),

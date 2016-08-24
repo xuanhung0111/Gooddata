@@ -196,9 +196,9 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createReportWithComputedAttribute"})
     public void applyListFiltersOnReportWithComputedAttribute() {
-        initReportsPage();
-        reportsPage.getReportsList().openReport(REPORT_NAME);
-        reportPage.initPage()
+        initReportsPage()
+            .openReport(REPORT_NAME)
+            .initPage()
             .addFilter(FilterItem.Factory.createAttributeFilter("Year (Created)", "2011"));
         Screenshots.takeScreenshot(browser, "report-created-with-computed-attribute-and-applied-list-filter",
                 this.getClass());
@@ -290,16 +290,16 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createReportWithComputedAttribute"})
     public void applyMufFiltersOnReportWithComputedAttribute() throws IOException, JSONException {
         try {
-            initReportsPage();
-            reportsPage.getReportsList().openReport(REPORT_NAME);
-            reportPage.initPage().setReportVisible();
+            initReportsPage()
+                .openReport(REPORT_NAME)
+                .initPage()
+                .setReportVisible();
 
             addEditorUserToProject();
             logout();
 
             signInAtUI(testParams.getEditorUser(), testParams.getEditorPassword());
-            initReportsPage();
-            reportsPage.getReportsList().openReport(REPORT_NAME);
+            initReportsPage().openReport(REPORT_NAME);
             Screenshots.takeScreenshot(browser, "editor-user-report-created-with-computed-attribute",
                     this.getClass());
             List<String> attributeHeaders = reportPage.getTableReport().getAttributesHeader();
@@ -321,8 +321,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             logout();
 
             signInAtUI(testParams.getEditorUser(), testParams.getEditorPassword());
-            initReportsPage();
-            reportsPage.getReportsList().openReport(REPORT_NAME);
+            initReportsPage().openReport(REPORT_NAME);
             Screenshots.takeScreenshot(browser, "editor-user-report-created-with-computed-attribute",
                     this.getClass());
             attributeHeaders = reportPage.getTableReport().getAttributesHeader();
@@ -352,8 +351,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         waitForObjectPageLoaded(browser);
         MetricDetailsPage.getInstance(browser).deleteObject();
 
-        initReportsPage();
-        reportsPage.getReportsList().openReport(REPORT_NAME);
+        initReportsPage().openReport(REPORT_NAME);
         Screenshots.takeScreenshot(browser, "delete-metric-and-attribute-used-in-computed-attribute",
                 this.getClass());
         List<String> attributeHeaders = reportPage.getTableReport().getAttributesHeader();
@@ -372,8 +370,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
                 .openVariableFromList(VARIABLE_NAME)
                 .deleteObject();
 
-        initReportsPage();
-        reportsPage.getReportsList().openReport(CA_VARIABLE_REPORT_NAME);
+        initReportsPage().openReport(CA_VARIABLE_REPORT_NAME);
         Screenshots.takeScreenshot(browser, "delete-variable-used-in-computed-attribute-report", this.getClass());
         List<String> attributeHeaders = reportPage.getTableReport().getAttributesHeader();
         List<String> attributeValues = reportPage.getTableReport().getAttributeElements();

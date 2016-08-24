@@ -23,6 +23,7 @@ import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
+import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.google.common.base.Predicate;
 
 public class DeleteDatasetTest extends AbstractCsvUploaderTest {
@@ -154,7 +155,7 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
     }
 
     private void checkObjectsCreatedAfterDatasetRemoved() {
-        initReportsPage();
+        ReportsPage reportsPage = initReportsPage();
         assertFalse(reportsPage.isReportVisible(REPORT1), "Report1 is not deleted");
         assertFalse(reportsPage.isReportVisible(REPORT2), "Report2 is not deleted");
 

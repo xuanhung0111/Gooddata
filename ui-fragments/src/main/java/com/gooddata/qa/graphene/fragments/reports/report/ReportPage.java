@@ -37,6 +37,7 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -135,6 +136,10 @@ public class ReportPage extends AbstractFragment {
             .cssSelector("div.yui3-c-metricaxisconfiguration-content:not(.gdc-hidden)");
 
     private static final By SND_DIALOG_LOADING = By.cssSelector("form.sndFooterForm > .progress.s-loading");
+
+    public static final ReportPage getInstance(SearchContext context) {
+        return Graphene.createPageFragment(ReportPage.class, waitForElementVisible(id("p-analysisPage"), context));
+    }
 
     public ReportPage initPage() {
         waitForAnalysisPageLoaded(browser);

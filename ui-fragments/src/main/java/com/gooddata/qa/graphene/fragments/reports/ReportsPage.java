@@ -4,41 +4,43 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.checkGreenBar;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForReportsPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForUserProfilePageLoaded;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+import static org.openqa.selenium.By.id;
 import static org.testng.Assert.fail;
 
 import java.util.Collection;
-import java.util.Optional;
+import java.util.List;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
 import com.gooddata.qa.graphene.entity.account.PersonalInfo;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.account.AccountCard;
+import com.gooddata.qa.graphene.fragments.common.IpeEditor;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
+import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 
 public class ReportsPage extends AbstractFragment {
 
-    public static final By LOCATOR = By.id("p-domainPage");
-
-    private static final By BY_ADD_FOLDER_INPUT = By.cssSelector("#newDomain input");
-    private static final By BY_ADD_FOLDER_SUBMIT_BUTTON = By.cssSelector("#newDomain button.s-newSpaceButton");
     private static final By BY_TAG_CLOUD = By.cssSelector(".c-spaceCloud[style^='display: block'] .bd");
     private static final By BY_DESELECT_TAGS = By.className("deselect");
+    private static final String REPORT_LIST_ID = "reportList";
 
-    @FindBy(id = "folderDomains")
-    private ReportsFolders defaultFolders;
-
-    @FindBy(id = "sharedDomains")
-    private ReportsFolders customFolders;
+    @FindBy(css = "#domainList li")
+    private List<WebElement> folders;
 
     @FindBy(xpath = "//span[@id='newDomain']/button")
     private WebElement addFolderButton;
@@ -49,8 +51,8 @@ public class ReportsPage extends AbstractFragment {
     @FindBy(xpath = "//div[@id='domain']/div/p[@class='description']")
     private WebElement selectedFolderDescription;
 
-    @FindBy(xpath = "//div[@id='reportList']")
-    private ReportsList reportsList;
+    @FindBy(css = "#" + REPORT_LIST_ID + " .report")
+    private List<ReportEntry> reports;
 
     @FindBy(xpath = "//button[text()='Create Report']")
     private WebElement createReportButton;
@@ -67,20 +69,14 @@ public class ReportsPage extends AbstractFragment {
     @FindBy(className = "s-group_by")
     private Select groupBy;
 
-    public ReportsFolders getDefaultFolders() {
-        return defaultFolders;
+    public static final ReportsPage getInstance(SearchContext context) {
+        return Graphene.createPageFragment(ReportsPage.class, waitForElementVisible(id("p-domainPage"), context));
     }
 
-    public ReportsFolders getCustomFolders() {
-        return customFolders;
-    }
-
-    public ReportsList getReportsList() {
-        return reportsList;
-    }
-
-    public void startCreateReport() {
+    public ReportPage startCreateReport() {
         waitForElementVisible(createReportButton).click();
+        waitForAnalysisPageLoaded(browser);
+        return ReportPage.getInstance(browser);
     }
 
     public ReportsPage clickAddFolderButton() {
@@ -89,18 +85,9 @@ public class ReportsPage extends AbstractFragment {
     }
 
     public ReportsPage addNewFolder(String folderName) {
-        int currentFoldersCount = customFolders.getNumberOfFolders();
-
         waitForElementVisible(addFolderButton).click();
-        WebElement folderInput = waitForElementVisible(BY_ADD_FOLDER_INPUT, browser);
-        folderInput.sendKeys(folderName);
-        waitForElementVisible(BY_ADD_FOLDER_SUBMIT_BUTTON, browser).click();
+        IpeEditor.getInstance(browser).setText(folderName);
         sleepTightInSeconds(2);
-
-        assertEquals(customFolders.getNumberOfFolders(), currentFoldersCount + 1,
-                "Number of folders is not increased");
-        assertTrue(customFolders.getAllFolderNames().contains(folderName),
-                "New folder name is not present in list");
 
         return this;
     }
@@ -115,15 +102,15 @@ public class ReportsPage extends AbstractFragment {
 
     public boolean isReportVisible(String reportName) { 
         if (isEmpty()) return false;
-        return waitForFragmentVisible(reportsList).getAllReportLabels().contains(reportName);
+        return reports.stream().map(ReportEntry::getLabel).collect(toList()).contains(reportName);
     }
 
     public boolean isEmpty() {
-        return !waitForElementPresent(reportsList.getRoot()).isDisplayed();
+        return !waitForElementPresent(id(REPORT_LIST_ID), getRoot()).isDisplayed();
     }
 
     public void selectReportsAndOpenDeleteDialog(String... reports) {
-        waitForFragmentVisible(reportsList).selectReports(reports);
+        selectReports(reports);
         waitForElementVisible(deleteReportButton).click();
     }
 
@@ -138,12 +125,12 @@ public class ReportsPage extends AbstractFragment {
     }
 
     public void selectReportsAndOpenPermissionDialog(String... reports) {
-        waitForFragmentVisible(reportsList).selectReports(reports);
+        selectReports(reports);
         waitForElementVisible(permissionButton).click();
     }
 
     public void selectReportsAndOpenMoveDialog(String... reports) {
-        waitForFragmentVisible(reportsList).selectReports(reports);
+        selectReports(reports);
         waitForElementVisible(moveReportButton).click();
     }
 
@@ -159,11 +146,13 @@ public class ReportsPage extends AbstractFragment {
     }
 
     public ReportsPage moveReportsToFolderByDragDrop(String folderName, String reportName) {
-        WebElement report = waitForFragmentVisible(reportsList)
-                .getReportWebElement(reportName)
-                .orElseThrow(() -> new NoSuchElementException("Cannot find report: " + reportName));
+        WebElement report = reports.stream()
+            .filter(entry -> reportName.equals(entry.getLabel()))
+            .findFirst()
+            .orElseThrow(() -> new NoSuchElementException("Cannot find report: " + reportName))
+            .getRoot();
 
-        new Actions(browser).dragAndDrop(report, getFolderElement(folderName)).perform();
+        getActions().dragAndDrop(report, getFolder(folderName)).perform();
         sleepTightInSeconds(2);
         return this;
     }
@@ -200,34 +189,131 @@ public class ReportsPage extends AbstractFragment {
     }
 
     public ReportsPage addFavorite(String... reports) {
-        waitForFragmentVisible(reportsList).addFavorite(reports);
+        List<String> reportNames = asList(reports);
+
+        for (ReportEntry entry: this.reports) {
+            if (reportNames.contains(entry.getLabel())) {
+                entry.addFavorite();
+            }
+        }
         return this;
     }
 
     public boolean isFolderSelected(String folderName) {
-        return getFolderElement(folderName).getAttribute("class").contains("active");
+        return getFolder(folderName).getAttribute("class").contains("active");
     }
 
     public PersonalInfo getReportOwnerInfoFrom(String reportName) {
-        return waitForFragmentVisible(reportsList).getReportOwnerInfoFrom(reportName);
+        getActions()
+            .moveToElement(reports.stream()
+                .filter(entry -> reportName.equals(entry.getLabel()))
+                .findFirst()
+                .get()
+                .getOwner())
+            .perform();
+
+        return AccountCard.getInstance(browser).getUserInfo();
     }
 
     public UserProfilePage openReportOwnerProfilePageFrom(String reportName) {
-        return waitForFragmentVisible(reportsList).openReportOwnerProfilePageFrom(reportName);
+        reports.stream()
+            .filter(entry -> reportName.equals(entry.getLabel()))
+            .findFirst()
+            .get()
+            .getOwner()
+            .click();
+
+        waitForUserProfilePageLoaded(browser);
+        return UserProfilePage.getInstance(browser);
     }
 
-    public ReportsPage openCustomFolder(String folderName) {
-        getCustomFolders().openFolder(folderName);
+    public ReportsPage openFolder(String folderName) {
+        folders.stream()
+            .map(e -> e.findElement(BY_LINK))
+            .filter(e -> folderName.equals(e.getText()))
+            .findFirst()
+            .orElseThrow(() -> new NoSuchElementException("Folder with given name does not exist!"))
+            .click();
+
+        waitForReportsPageLoaded(browser);
         return this;
     }
 
-    private WebElement getFolderElement(String folderName) {
-        Optional<WebElement> folder = waitForFragmentVisible(defaultFolders)
-                .getFolderWebElement(folderName);
-        if (!folder.isPresent()) {
-            folder = waitForFragmentVisible(customFolders)
-                    .getFolderWebElement(folderName);
+    public List<String> getAllFolderNames() {
+        return folders.stream()
+            .map(e -> e.findElement(BY_LINK))
+            .map(WebElement::getText)
+            .collect(toList());
+    }
+
+    public int getFoldersCount() {
+        return folders.size();
+    }
+
+    public ReportPage openReport(String report) {
+        reports.stream()
+            .filter(entry -> report.equals(entry.getLabel()))
+            .findFirst()
+            .get()
+            .openReport();
+
+        waitForAnalysisPageLoaded(browser);
+        return ReportPage.getInstance(browser).waitForReportExecutionProgress();
+    }
+
+    public int getReportsCount() {
+        return reports.size();
+    }
+
+    private void selectReports(String... reports) {
+        List<String> reportNames = asList(reports);
+
+        for (ReportEntry entry: this.reports) {
+            if (reportNames.contains(entry.getLabel())) {
+                entry.select();
+            }
         }
-        return folder.orElseThrow(() -> new NoSuchElementException("Cannot find folder: " + folderName));
+    }
+
+    private WebElement getFolder(String folderName) {
+        return folders.stream()
+            .filter(element -> folderName.equals(element.findElement(BY_LINK).getText()))
+            .findFirst()
+            .orElseThrow(() -> new NoSuchElementException("Cannot find folder: " + folderName));
+    }
+
+    public static class ReportEntry extends AbstractFragment {
+
+        @FindBy(css = "h3 a")
+        private WebElement label;
+
+        @FindBy(tagName = "input")
+        private WebElement checkbox;
+
+        @FindBy(className = "favorite")
+        private WebElement favorite;
+
+        @FindBy(css = "p a")
+        private WebElement user;
+
+        public void addFavorite() {
+            waitForElementVisible(favorite).click();
+        }
+
+        public String getLabel() {
+            return waitForElementVisible(label).getText();
+        }
+
+        public void select() {
+            waitForElementVisible(checkbox).click();
+        }
+
+        public WebElement getOwner() {
+            return waitForElementVisible(user);
+        }
+
+        public void openReport() {
+            waitForElementVisible(label).sendKeys(Keys.ENTER);
+        }
     }
 }

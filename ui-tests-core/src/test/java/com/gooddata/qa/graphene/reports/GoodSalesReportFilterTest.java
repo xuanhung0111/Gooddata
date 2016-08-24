@@ -103,8 +103,7 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
     }
 
     private void initReport() {
-        initReportsPage();
-        reportsPage.getReportsList().openReport(REPORT_NAME);
+        initReportsPage().openReport(REPORT_NAME);
         waitForAnalysisPageLoaded(browser);
     }
 }

@@ -51,7 +51,7 @@ public class ReportWithEmptyValuesInTimeDimensionTest extends AbstractProjectTes
 
     @Test(dependsOnMethods = {"setupProject"})
     public void testRollupAggregation() {
-        final TableReport table = openReport(SIMPLE_REPORT).getTableReport();
+        final TableReport table = initReportsPage().openReport(SIMPLE_REPORT).getTableReport();
 
         table.openContextMenuFromCellValue(BACHELORS_DEGREE)
                 .aggregateTableData(ContextMenu.AggregationType.ROLLUP, OF_ALL_ROWS);
@@ -69,7 +69,7 @@ public class ReportWithEmptyValuesInTimeDimensionTest extends AbstractProjectTes
 
     @Test(dependsOnMethods = {"setupProject"})
     public void testAverageAggregation() {
-        final TableReport table = openReport(SIMPLE_REPORT).getTableReport();
+        final TableReport table = initReportsPage().openReport(SIMPLE_REPORT).getTableReport();
 
         table.openContextMenuFromCellValue(BACHELORS_DEGREE)
                 .aggregateTableData(ContextMenu.AggregationType.AVERAGE, OF_ALL_ROWS);

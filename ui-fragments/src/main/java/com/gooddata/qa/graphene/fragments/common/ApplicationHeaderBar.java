@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.common;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForReportsPageLoaded;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -10,6 +11,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
+
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 
 public class ApplicationHeaderBar extends AbstractFragment {
@@ -70,8 +73,10 @@ public class ApplicationHeaderBar extends AbstractFragment {
         link.click();
     }
 
-    public static void goToReportsPage(WebDriver browser) {
+    public static ReportsPage goToReportsPage(WebDriver browser) {
         waitForElementVisible(getInstance(browser).reportLink).click();
+        waitForReportsPageLoaded(browser);
+        return ReportsPage.getInstance(browser);
     }
 
     public static void goToManagePage(WebDriver browser) {

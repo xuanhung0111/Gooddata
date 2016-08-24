@@ -215,7 +215,7 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
         DashboardsRestUtils.changeMetricExpression(getRestApiClient(), testMetric.getUri(),
                 "SELECT ["+ amount.getUri() + "]");
 
-        assertThat(openReport(reportName).getInvalidDataReportMessage(),
+        assertThat(initReportsPage().openReport(reportName).getInvalidDataReportMessage(),
                 equalTo(REPORT_NOT_COMPUTABLE_MESSAGE));
     }
 

@@ -234,8 +234,7 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
     }
 
     private TableReport openTableReport(String reportName) {
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).getReportsList().openReport(reportName);
+        initReportsPage().openReport(reportName);
 
         return waitForFragmentVisible(reportPage).waitForReportExecutionProgress().getTableReport();
     }

@@ -3,7 +3,6 @@
  */
 package com.gooddata.qa.graphene.connectors.zendesk;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static java.lang.String.format;
@@ -682,10 +681,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     }
 
     private Map<String, Boolean> parseTagsChangesFromReport(final String ticketIdString) {
-        initReportsPage();
-        reportsPage.getReportsList().openReport(TICKET_TAGS_REPORT_NAME);
-        waitForAnalysisPageLoaded(browser);
-        waitForElementVisible(reportPage.getRoot());
+        initReportsPage().openReport(TICKET_TAGS_REPORT_NAME);
         TableReport report = Graphene.createPageFragment(TableReport.class,
                 browser.findElement(TABLE_REPORT_CONTAINER_LOCATION));
 

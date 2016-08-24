@@ -74,7 +74,7 @@ public class PartialExportAndImportProjectTest extends AbstractProjectTest {
             testParams.setProjectId(targetProjectId);
             importPartialProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
 
-            initReportsPage().getReportsList().openReport(SIMPLE_REPORT);
+            initReportsPage().openReport(SIMPLE_REPORT);
             //use List.equals due to checking attribute & metric order
             assertTrue(reportPage.getTableReport().getAttributeElements().equals(asList(MIDWEST, NORTHEAST, SOUTH, WEST)),
                     "There is difference between actual and expected attributes");
@@ -87,7 +87,7 @@ public class PartialExportAndImportProjectTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"partialExportAndImportReport"})
     public void partialExportAndImportChartReport() throws JSONException {
-        initReportsPage().getReportsList().openReport(SIMPLE_REPORT);
+        initReportsPage().openReport(SIMPLE_REPORT);
         reportPage.waitForReportExecutionProgress();
         final String simpleReportUri = getObjdUri(browser.getCurrentUrl());
         reportPage.selectReportVisualisation(ReportTypes.BAR).saveReport();
@@ -98,7 +98,7 @@ public class PartialExportAndImportProjectTest extends AbstractProjectTest {
             testParams.setProjectId(targetProjectId);
             importPartialProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
 
-            initReportsPage().getReportsList().openReport(SIMPLE_REPORT);
+            initReportsPage().openReport(SIMPLE_REPORT);
             reportPage.waitForReportExecutionProgress();
             assertTrue(isElementVisible(id("chartContainer"), browser), "The bar chart is not displayed");
             takeScreenshot(browser, "Simple-report-in-bar-chart-type", getClass());

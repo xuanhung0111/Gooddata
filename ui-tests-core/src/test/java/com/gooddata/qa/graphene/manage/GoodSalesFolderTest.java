@@ -1,7 +1,5 @@
 package com.gooddata.qa.graphene.manage;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -197,10 +195,9 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
     }
 
     private void createSnDFolder(String folderName) {
-        initReportsPage();
-        reportsPage.startCreateReport();
-        waitForAnalysisPageLoaded(browser);
-        reportPage.initPage()
+        initReportsPage()
+            .startCreateReport()
+            .initPage()
             .openWhatPanel()
             .createGlobalSimpleMetric(SimpleMetricTypes.SUM, "Amount", folderName);
         initDataPage("metrics").getObjectFolder().checkFolderVisible(folderName);

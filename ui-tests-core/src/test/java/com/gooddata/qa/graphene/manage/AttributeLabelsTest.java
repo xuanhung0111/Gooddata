@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.manage;
 
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
@@ -86,7 +85,7 @@ public class AttributeLabelsTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"createImageReports"})
     public void verifyReportWithImageTest() {
-        initReport(IMAGE_REPORT);
+        initReportsPage().openReport(IMAGE_REPORT);
         ReportWithImage report = Graphene.createPageFragment(
                 ReportWithImage.class,
                 browser.findElement(By.id("gridContainerTab")));
@@ -95,7 +94,7 @@ public class AttributeLabelsTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"setSFDCCredentialsTest", "createImageReports"})
     public void verifyReportWithImageSFDCTest() {
-        initReport(IMAGE_SFDC_REPORT);
+        initReportsPage().openReport(IMAGE_SFDC_REPORT);
         ReportWithImage report = Graphene.createPageFragment(
                 ReportWithImage.class,
                 browser.findElement(By.id("gridContainerTab")));
@@ -124,16 +123,10 @@ public class AttributeLabelsTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"createReportWithHyperlinkTest"})
     public void verifyReportWithHyperlinkTest() {
-        initReport(HYPERLINK_REPORT);
+        initReportsPage().openReport(HYPERLINK_REPORT);
         TableReport report = Graphene.createPageFragment(TableReport.class,
                 browser.findElement(By.id("gridContainerTab")));
         report.verifyAttributeIsHyperlinkInReport();
-    }
-
-    private void initReport(String reportName) {
-        initReportsPage();
-        reportsPage.getReportsList().openReport(reportName);
-        waitForAnalysisPageLoaded(browser);
     }
 
     private void changeAttributeLabel(String attribute, AttributeLabelTypes label) {

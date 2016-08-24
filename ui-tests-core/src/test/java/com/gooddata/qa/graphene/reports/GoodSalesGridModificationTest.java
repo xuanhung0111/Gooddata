@@ -101,7 +101,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"setupProject"})
     public void breakDownMetricValue() {
-        openReport(SIMPLE_REPORT).getTableReport()
+        initReportsPage().openReport(SIMPLE_REPORT).getTableReport()
                 .openContextMenuFromCellValue("770,636,605.83")
                 .selectItem("Break Down This Number");
 
@@ -119,7 +119,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"setupProject"})
     public void drillOnGridMenu() {
-        openReport(SIMPLE_REPORT)
+        initReportsPage().openReport(SIMPLE_REPORT)
                 .getTableReport()
                 .openContextMenuFromCellValue(INTEREST)
                 .selectItem("Break Down \"" + INTEREST + "\"");
@@ -136,7 +136,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"setupProject"})
     public void filterOnGridMenu() {
         assertTrue(
-                openReport(SIMPLE_REPORT).getTableReport()
+                initReportsPage().openReport(SIMPLE_REPORT).getTableReport()
                         .showOnly(INTEREST)
                         .getAttributeElements().equals(singletonList(INTEREST)),
                 INTEREST + "is not the only attribute or not displayed");
@@ -149,7 +149,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"setupProject"})
     public void addAttributeUsingGridMenu() {
-        openReport(SIMPLE_REPORT).getTableReport()
+        initReportsPage().openReport(SIMPLE_REPORT).getTableReport()
                 .openContextMenuFromCellValue(INTEREST)
                 .selectItem(ADD_NEW_ATTRIBUTE);
 
@@ -167,7 +167,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
                 .withHows(ATTR_STAGE_NAME));
 
         assertFalse(
-                openReport(REPORT_WITHOUT_METRIC).getTableReport()
+                initReportsPage().openReport(REPORT_WITHOUT_METRIC).getTableReport()
                         .openContextMenuFromCellValue(ATTR_STAGE_NAME)
                         .getGroupNames().contains("Totals"),
                 "Totals group is displayed");
@@ -213,7 +213,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
 
         initAttributePage().initAttribute(ATTR_OPPORTUNITY).clearDrillingSetting().setDrillToAttribute(ATTR_ACCOUNT);
 
-        openReport(hyperlinkReport);
+        initReportsPage().openReport(hyperlinkReport);
         table.drillOnAttributeValue();
         reportPage.waitForReportExecutionProgress();
 
@@ -248,7 +248,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
         reportPage.waitForReportExecutionProgress();
 
         assertNotNull(
-                openReport(headlineReport).openHowPanel()
+                initReportsPage().openReport(headlineReport).openHowPanel()
                         .selectAttribute(ATTR_REGION)
                         .doneSndPanel()
                         .waitForReportExecutionProgress()
@@ -262,7 +262,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
                 simpleMetricUri,
                 "SELECT SUM([" + amountUri + "]+[" + durationUri + "])");
 
-        assertThat(openReport(headlineReport).getInvalidDataReportMessage(),
+        assertThat(initReportsPage().openReport(headlineReport).getInvalidDataReportMessage(),
                 equalTo(REPORT_NOT_COMPUTABLE_MESSAGE));
     }
 

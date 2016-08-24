@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.account;
 
 import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -236,11 +235,9 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
     }
 
     private void createSimpleReport() {
-        initReportsPage();
-        reportsPage.startCreateReport();
-        waitForAnalysisPageLoaded(browser);
-        waitForElementVisible(reportPage.getRoot());
-        reportPage.createReport(new UiReportDefinition().withName("SimpleReport").withHows("Education"));
+        initReportsPage()
+            .startCreateReport()
+            .createReport(new UiReportDefinition().withName("SimpleReport").withHows("Education"));
     }
 
     private String sendDefaultInvitation(String userEmail) throws IOException, JSONException {

@@ -82,7 +82,7 @@ public class CopyReportTableTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"setUpProject"})
     public void copySingleCell() throws HeadlessException, UnsupportedFlavorException, IOException {
-        openReport(SIMPLE_REPORT).getTableReport().copyMetricCell(DEFAULT_FORMAT_VALUE);
+        initReportsPage().openReport(SIMPLE_REPORT).getTableReport().copyMetricCell(DEFAULT_FORMAT_VALUE);
         takeScreenshot(browser, "copy-single-cell-on-report-page", getClass());
         assertEquals(getClipboardContent(), DEFAULT_FORMAT_VALUE);
         clearClipboard();
@@ -103,7 +103,7 @@ public class CopyReportTableTest extends AbstractProjectTest {
 
         changeMetricFormat(getRestApiClient(), amountSumUri, Formatter.COLORS.toString());
         try {
-            openReport(SIMPLE_REPORT).getTableReport().copyMetricCell(CONDITION_FORMAT_VALUE);
+            initReportsPage().openReport(SIMPLE_REPORT).getTableReport().copyMetricCell(CONDITION_FORMAT_VALUE);
             takeScreenshot(browser, "copy-formatted-cell", getClass());
             assertEquals(getClipboardContent(), CONDITION_FORMAT_VALUE);
         } finally {
