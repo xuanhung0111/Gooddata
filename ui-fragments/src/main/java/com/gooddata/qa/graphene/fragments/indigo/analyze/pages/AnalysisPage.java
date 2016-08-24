@@ -226,11 +226,11 @@ public class AnalysisPage extends AbstractFragment {
     }
 
     public boolean isBlankState() {
-        return getFilterBuckets().isEmpty() 
-                && getMetricsBucket().isEmpty() 
+        return getFilterBuckets().isEmpty()
+                && getMetricsBucket().isEmpty()
                 && getAttributesBucket().isEmpty()
-                && getStacksBucket().isEmpty() 
-                && getMainEditor().isEmpty() 
+                && getStacksBucket().isEmpty()
+                && getMainEditor().isEmpty()
                 && getPageHeader().isBlankState();
     }
 
@@ -310,6 +310,10 @@ public class AnalysisPage extends AbstractFragment {
                 .switchProject(name);
 
         return this;
+    }
+
+    public boolean searchInsight(final String insight) {
+        return getPageHeader().expandInsightSelection().searchInsight(insight);
     }
 
     public AnalysisPage openInsight(final String insight) {
