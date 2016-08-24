@@ -3,15 +3,18 @@ package com.gooddata.qa.graphene.fragments.profile;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.clickElementByVisibleLocator;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.id;
 import static java.util.stream.Collectors.toList;
 import static java.lang.Integer.parseInt;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -34,6 +37,8 @@ public class UserProfilePage extends AbstractFragment {
     public static final By USER_PROFILE_PAGE_LOCATOR = By.cssSelector("#p-profilePage");
     private static final By PHONE_LOCATOR = cssSelector(".phone div.value");
     private static final By COMPANY_LOCATOR = cssSelector(".company div.value");
+    private static final By BY_MUF_DESCRIPTION = By.cssSelector(".mufView .description");
+    private static final By BY_SET_MUF_LINK = By.cssSelector(".mufView a");
 
     @FindBy(css = ".fullname")
     private WebElement fullname;
@@ -52,6 +57,12 @@ public class UserProfilePage extends AbstractFragment {
 
     @FindBy(className = "s-btn-save_changes")
     private WebElement saveChangesButton;
+
+    @FindBy(css = "td.col-filtername")
+    private Collection<WebElement> mufs;
+
+    @FindBy(css = "td.col-filterexpression")
+    private Collection<WebElement> mufExpressions;
 
     public static final UserProfilePage getInstance(SearchContext context) {
         return Graphene.createPageFragment(UserProfilePage.class, waitForElementVisible(id("p-profilePage"), context));
@@ -119,6 +130,36 @@ public class UserProfilePage extends AbstractFragment {
         Graphene.waitGui().until(saved);
 
         return this;
+    }
+
+    public boolean isMufSectionDisplayed() {
+        return isElementPresent(BY_MUF_DESCRIPTION, getRoot());
+    }
+
+    public String getMufDescription() {
+        return waitForElementVisible(BY_MUF_DESCRIPTION, getRoot()).getText();
+    }
+
+    public String getSetMufLink() {
+        return waitForElementVisible(BY_SET_MUF_LINK, getRoot()).getAttribute("href");
+    }
+
+    public Collection<String> getAvailableMufs() {
+        return getItemsFromMufTable(mufs);
+    }
+
+    public Collection<String> getAvailableMufExpressions() {
+        return getItemsFromMufTable(mufExpressions);
+    }
+
+    private Collection<String> getItemsFromMufTable(Collection<WebElement> itemElements) {
+        // If user is non-muf user, then the Muf table will not appear in User profile page.
+        // So consider all muf items are empty in this case.
+
+        // If user is muf user, Muf table always shows in User profile page.
+        // Then we should wait for all muf items loaded to make sure no item is missing.
+        if (!isElementPresent(By.className("mufTable"), getRoot())) return Collections.emptyList();
+        return getElementTexts(waitForCollectionIsNotEmpty(itemElements));
     }
 
     public static class UserVariableTable extends AbstractTable {
