@@ -72,7 +72,7 @@ public class ProjectAndUsersPage extends AbstractFragment {
     private static final By BY_LEAVE_PROJECT_DIALOG_BUTTON = By.cssSelector("form .s-btn-leave");
     private static final By PROJECT_NAME_INPUT_LOCATOR = By.cssSelector(".ipeEditor");
     private static final By SAVE_BUTTON_LOCATOR = By.cssSelector(".s-ipeSaveButton");
-    private static final By USER_EMAIL_LOCATOR = By.cssSelector(".email");
+    private static final By USER_EMAIL_LOCATOR = By.cssSelector(".email span");
     private static final By DEACTIVATE_BUTTON_LOCATOR = By.cssSelector(".s-btn-deactivate");
     private static final By RESEND_INVITATION_BUTTON_LOCATOR = By.cssSelector(".s-btn-resend_invitation");
     private static final By CANCEL_INVITATION_BUTTON_LOCATOR = By.cssSelector(".s-btn-cancel_invitation");
@@ -140,7 +140,7 @@ public class ProjectAndUsersPage extends AbstractFragment {
 
     public UserProfilePage openUserProfile(final String userEmail) {
         users.stream()
-                .filter(e -> e.findElement(USER_EMAIL_LOCATOR).getText().equals(userEmail))
+                .filter(e -> e.findElement(USER_EMAIL_LOCATOR).getAttribute("title").equals(userEmail))
                 .map(e -> e.findElement(By.cssSelector(".name")))
                 .findFirst()
                 .get()
@@ -168,7 +168,7 @@ public class ProjectAndUsersPage extends AbstractFragment {
         openActiveUserTab();
         int numberOfUsers = getUsersCount();
         users.stream()
-                .filter(e -> e.findElement(USER_EMAIL_LOCATOR).getText().equals(userEmail))
+                .filter(e -> e.findElement(USER_EMAIL_LOCATOR).getAttribute("title").equals(userEmail))
                 .map(e -> e.findElement(DEACTIVATE_BUTTON_LOCATOR))
                 .findFirst()
                 .get()
@@ -181,7 +181,7 @@ public class ProjectAndUsersPage extends AbstractFragment {
     public boolean isUserDisplayedInList(final String userEmail) {
         return users.stream()
                 .map(e -> e.findElement(USER_EMAIL_LOCATOR))
-                .filter(e -> e.getText().equals(userEmail))
+                .filter(e -> e.getAttribute("title").equals(userEmail))
                 .findFirst()
                 .isPresent();
     }
@@ -217,7 +217,7 @@ public class ProjectAndUsersPage extends AbstractFragment {
         openDeactivatedUserTab();
         int numberOfUsers = getUsersCount();
         users.stream()
-                .filter(e -> e.findElement(USER_EMAIL_LOCATOR).getText().equals(userEmail))
+                .filter(e -> e.findElement(USER_EMAIL_LOCATOR).getAttribute("title").equals(userEmail))
                 .map(e -> e.findElement(ENABLE_BUTTON_LOCATOR))
                 .findFirst()
                 .get()
