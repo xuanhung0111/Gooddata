@@ -85,7 +85,7 @@ public abstract class AbstractDLUINotificationTest extends AbstractAnnieDialogTe
         try {
             System.out.println("Waiting for notification...");
             Message notification = getNotification(imapClient, subject, receivedTime);
-            Document message = Jsoup.parse(ImapClient.getEmailBody(notification));
+            Document message = Jsoup.parse(ImapUtils.getEmailBody(notification));
             System.out.println("Time request: " + notification.getReceivedDate().getTime());
             return message;
         } catch (Exception e) {

@@ -20,6 +20,7 @@ import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.utils.mail.ImapClient;
+import com.gooddata.qa.utils.mail.ImapUtils;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 
@@ -98,7 +99,7 @@ public class InviteUserDialog extends AbstractFragment {
         Collection<Message> messages = waitForMessages(imapClient, GDEmails.INVITATION,
                 emailSubject, expectedMessageCount);
         Message invitationMessage = Iterables.getLast(messages);
-        String messageBody = ImapClient.getEmailBody(invitationMessage);
+        String messageBody = ImapUtils.getEmailBody(invitationMessage);
         int beginIndex = messageBody.indexOf("/p/");
         return messageBody.substring(beginIndex, messageBody.indexOf("\n", beginIndex));
     }

@@ -1,10 +1,12 @@
 /**
  * Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
  */
-package com.gooddata.qa.utils.http;
+package com.gooddata.qa.utils.http.scheduleEmail;
 
 import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
 import static java.lang.String.format;
+
+import com.gooddata.qa.utils.http.RestApiClient;
 
 /**
  * Simple control over fast and standard mode of scheduled emails
@@ -15,24 +17,21 @@ import static java.lang.String.format;
  * Class calls DELETE to /accelerate resource to slow down
  * scheduled emails processing {@link #decelerate()}
  */
-public class ScheduleMailPssClient {
+public class ScheduleEmailRestUtils {
 
     private static final String ACCELERATE_URI = "/gdc/internal/projects/%s/scheduledMails/accelerate";
 
-    private final RestApiClient restApiClient;
-    private final String projectId;
-
-    public ScheduleMailPssClient(RestApiClient restApiClient, String projectId) {
-        this.restApiClient = restApiClient;
-        this.projectId = projectId;
+    private ScheduleEmailRestUtils() {
     }
 
-    public void accelerate() {
+    // Speed up scheduled emails processing
+    public static void accelerate(RestApiClient restApiClient, String projectId) {
         executeRequest(restApiClient,
                 restApiClient.newPutMethod(format(ACCELERATE_URI, projectId), "{\"accelerate\":{}}"));
     }
 
-    public void decelerate() {
+    // Slow down scheduled emails processing
+    public static void decelerate(RestApiClient restApiClient, String projectId) {
         executeRequest(restApiClient,
                 restApiClient.newDeleteMethod(format(ACCELERATE_URI, projectId)));
     }

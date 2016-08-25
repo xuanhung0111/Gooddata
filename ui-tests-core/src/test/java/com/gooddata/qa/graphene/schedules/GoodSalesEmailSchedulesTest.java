@@ -6,7 +6,6 @@ package com.gooddata.qa.graphene.schedules;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import static org.joda.time.DateTime.now;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +15,6 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Part;
 
-import org.apache.commons.lang.math.IntRange;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -24,7 +22,7 @@ import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.ScheduleMailPssClient;
+import com.gooddata.qa.utils.http.scheduleEmail.ScheduleEmailRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;
 
@@ -32,9 +30,6 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
 
     private String reportTitle = "Normal-Report";
     private String dashboardTitle = "UI-Graphene-core-Dashboard";
-
-    private int dashboardScheduleTimeInMinute;
-    private int reportScheduleTimeInMunite;
 
     @BeforeClass
     public void setUp() {
@@ -51,8 +46,6 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
                 "Scheduled email test - dashboard.", "Outlook");
         checkRedBar(browser);
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard", this.getClass());
-
-        dashboardScheduleTimeInMinute = now().getMinuteOfHour();
     }
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
@@ -61,8 +54,6 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
                 "Scheduled email test - report.", "Activities by Type", ExportFormat.ALL);
         checkRedBar(browser);
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-report", this.getClass());
-
-        reportScheduleTimeInMunite = now().getMinuteOfHour();
     }
 
     @Test(dependsOnGroups = {"schedules"})
@@ -81,32 +72,28 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
 
     @Test(dependsOnMethods = {"updateScheduledMailRecurrency"})
     public void waitForMessages() throws MessagingException {
-        ScheduleMailPssClient pssClient = new ScheduleMailPssClient(getRestApiClient(), testParams.getProjectId());
         try (ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword)) {
             System.out.println("ACCELERATE scheduled mails processing");
-            pssClient.accelerate();
+            ScheduleEmailRestUtils.accelerate(getRestApiClient(), testParams.getProjectId());
             checkMailbox(imapClient);
         } finally {
             System.out.println("DECELERATE scheduled mails processing");
-            pssClient.decelerate();
+            ScheduleEmailRestUtils.decelerate(getRestApiClient(), testParams.getProjectId());
         }
     }
 
     private void checkMailbox(ImapClient imapClient) throws MessagingException {
-        List<Message> reportMessages = ImapUtils.waitForMessages(imapClient, GDEmails.NOREPLY, reportTitle);
-        List<Message> dashboardMessages = ImapUtils.waitForMessages(imapClient, GDEmails.NOREPLY, dashboardTitle);
-
-        verifyNumberOfEmail(reportScheduleTimeInMunite, reportMessages.size());
-        verifyNumberOfEmail(dashboardScheduleTimeInMinute, dashboardMessages.size());
+        List<Message> reportMessages = waitForMessages(imapClient, GDEmails.NOREPLY, reportTitle, 1);
+        List<Message> dashboardMessages = waitForMessages(imapClient, GDEmails.NOREPLY, dashboardTitle, 1);
 
         System.out.println("Saving dashboard message ...");
-        ImapClient.saveMessageAttachments(dashboardMessages.get(0), attachmentsDirectory);
+        ImapUtils.saveMessageAttachments(dashboardMessages.get(0), attachmentsDirectory);
 
         System.out.println("Saving report messages ...");
-        ImapClient.saveMessageAttachments(reportMessages.get(0), attachmentsDirectory);
+        ImapUtils.saveMessageAttachments(reportMessages.get(0), attachmentsDirectory);
 
         // REPORT EXPORT
-        List<Part> reportAttachmentParts = ImapClient.getAttachmentParts(reportMessages.get(0));
+        List<Part> reportAttachmentParts = ImapUtils.getAttachmentParts(reportMessages.get(0));
         assertEquals(reportAttachmentParts.size(), 4, "Report message has correct number of attachments.");
 
         Part pdfPart = findPartByContentType(reportAttachmentParts, "application/pdf");
@@ -123,27 +110,11 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
         verifyAttachment(csvPart, "CSV", 120);
 
         // DASHBOARD EXPORT
-        List<Part> dashboardAttachmentParts = ImapClient.getAttachmentParts(dashboardMessages.get(0));
+        List<Part> dashboardAttachmentParts = ImapUtils.getAttachmentParts(dashboardMessages.get(0));
         assertEquals(dashboardAttachmentParts.size(), 1, "Dashboard message has correct number of attachments.");
         assertTrue(dashboardAttachmentParts.get(0).getContentType().contains("application/pdf".toUpperCase()),
                 "Dashboard attachment has PDF content type.");
         verifyAttachment(dashboardAttachmentParts.get(0), "PDF", 67000);
-    }
-
-    private void verifyNumberOfEmail(int scheduleTimeInMinute, int numberOfEmail) {
-        if (numberOfEmail == 1) {
-            return;
-        }
-
-        if (numberOfEmail == 2) {
-            if (new IntRange(20, 29).containsInteger(scheduleTimeInMinute) ||
-                    new IntRange(50, 59).containsInteger(scheduleTimeInMinute)) {
-                log.info("scheduled email is set up so close to the default scheduled time. So we get 2 emails.");
-                return;
-            }
-        }
-
-        throw new RuntimeException("There are many messages arrived instead one.");
     }
 
     private void verifyAttachment(Part attachment, String type, long minimalSize) throws MessagingException {

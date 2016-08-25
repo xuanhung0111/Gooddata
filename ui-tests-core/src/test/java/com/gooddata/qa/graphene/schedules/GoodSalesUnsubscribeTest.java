@@ -9,7 +9,6 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
-import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 import static com.gooddata.qa.utils.mail.ImapUtils.areMessagesArrived;
 
 import java.io.IOException;
@@ -28,8 +27,9 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage.RepeatTime;
-import com.gooddata.qa.utils.http.ScheduleMailPssClient;
+import com.gooddata.qa.utils.http.scheduleEmail.ScheduleEmailRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
+import com.gooddata.qa.utils.mail.ImapUtils;
 
 public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTest {
 
@@ -76,11 +76,9 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
 
     @Test(dependsOnMethods = {"updateScheduledMail"})
     public void waitForMessageAndUnsubscribe() throws MessagingException, IOException {
-        ScheduleMailPssClient pssClient = new ScheduleMailPssClient(getRestApiClient(), testParams.getProjectId());
-        
         try (ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword)) {
             System.out.println("ACCELERATE scheduled mails processing");
-            pssClient.accelerate();
+            ScheduleEmailRestUtils.accelerate(getRestApiClient(), testParams.getProjectId());
 
             // wait for expected messages to arrive
             int expectedMessageCount = 2;
@@ -90,14 +88,14 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
             // get and visit unsubscribe links in each of the received mails
             for (Message message: emailMessages) {
                 assertEquals(message.getAllRecipients().length, 1, "There is exactly one recipient.");
-                String messageBody = ImapClient.getEmailBody(message);
+                String messageBody = ImapUtils.getEmailBody(message);
                 String unsubscribeLink = getUnsubscribeLink(messageBody, UNSUBSCRIBE_PATTERN);
                 visitUnsubscribeLink(unsubscribeLink);
                 takeScreenshot(browser, "Goodsales-schedules-unsubscribe-link-" + message.getAllRecipients()[0],
                     this.getClass());
             }
             updateRecurrencyString(initEmailSchedulesPage().getScheduleMailUriByName(reportTitle));
-            pssClient.accelerate();
+            ScheduleEmailRestUtils.accelerate(getRestApiClient(), testParams.getProjectId());
 
             // check that no more email is sent
             assertFalse(areMessagesArrived(imapClient, GDEmails.NOREPLY, reportTitle, expectedMessageCount + 1),
@@ -105,7 +103,7 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
 
         } finally {
             System.out.println("DECELERATE scheduled mails processing");
-            pssClient.decelerate();
+            ScheduleEmailRestUtils.decelerate(getRestApiClient(), testParams.getProjectId());
         }
     }
 
