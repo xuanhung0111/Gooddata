@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
 import static com.gooddata.qa.graphene.fragments.account.InviteUserDialog.INVITE_USER_DIALOG_LOCATOR;
-import static com.gooddata.qa.graphene.fragments.profile.UserProfilePage.USER_PROFILE_PAGE_LOCATOR;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -145,8 +144,7 @@ public class ProjectAndUsersPage extends AbstractFragment {
                 .findFirst()
                 .get()
                 .click();
-        return Graphene.createPageFragment(UserProfilePage.class,
-                waitForElementVisible(USER_PROFILE_PAGE_LOCATOR, browser));
+        return UserProfilePage.getInstance(browser);
     }
 
     public void clickInviteUserButton() {

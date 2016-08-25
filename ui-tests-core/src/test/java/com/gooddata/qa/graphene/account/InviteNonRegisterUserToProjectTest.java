@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.account;
 
-import static com.gooddata.qa.graphene.fragments.profile.UserProfilePage.USER_PROFILE_PAGE_LOCATOR;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkGreenBar;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
@@ -183,8 +182,7 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
                 .getJSONObject("links")
                 .getString("self");
         openUrl(format(USER_PROFILE_PAGE_URL, projectId, userProfileUri));
-        return Graphene.createPageFragment(UserProfilePage.class,
-                waitForElementVisible(USER_PROFILE_PAGE_LOCATOR, browser));
+        return UserProfilePage.getInstance(browser);
     }
 
     private void deleteUserIfExist(RestApiClient restApiClient, String userEmail)
