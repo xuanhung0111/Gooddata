@@ -1,19 +1,21 @@
 package com.gooddata.qa.graphene.fragments.reports.report;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
-import static org.testng.Assert.assertEquals;
+import static org.openqa.selenium.By.id;
+import static org.openqa.selenium.By.tagName;
 import static org.testng.Assert.assertTrue;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -23,15 +25,11 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
-import org.testng.collections.Sets;
 
 import com.gooddata.qa.graphene.fragments.reports.filter.ContextMenu;
 import com.gooddata.qa.utils.browser.BrowserUtils;
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
 /**
@@ -62,8 +60,6 @@ public class TableReport extends AbstractDashboardReport {
 
     private static final String NO_DATA = "No data";
 
-    private static final String REPORT_NOT_COMPUTABLE = "Report not computable due to improper metric definition.";
-
     private static final By BY_SORT_LOCATOR = className("sort");
     private static final By REPORT_MESSAGE_LOCATOR = className("c-report-message");
 
@@ -93,82 +89,32 @@ public class TableReport extends AbstractDashboardReport {
 
     public List<String> getAttributesHeader() {
         waitForReportLoading();
-        return Lists.newArrayList(Collections2.transform(attributesHeader,
-                new Function<WebElement, String>() {
-            @Override
-            public String apply(WebElement input) {
-                return input.getText().trim();
-            }
-        }));
+        return getElementTexts(attributesHeader);
     }
 
     public Set<String> getMetricsHeader() {
         waitForReportLoading();
-        return Sets.newHashSet(Collections2.transform(metricsHeader,
-                new Function<WebElement, String>() {
-            @Override
-            public String apply(WebElement input) {
-                return input.getText().trim();
-            }
-        }));
+        return new HashSet<>(getElementTexts(metricsHeader));
     }
 
     public List<String> getTotalHeaders() {
         waitForReportLoading();
-        return browser
-                .findElements(By.cssSelector(".containerBody .gridTabPlate .gridTile .totalHeader span.captionWrapper"))
-                .stream().map(WebElement::getText)
-                .collect(Collectors.toList());
+        return getElementTexts(
+            cssSelector(".containerBody .gridTabPlate .gridTile .totalHeader span.captionWrapper"), browser);
     }
 
     public List<Float> getTotalValues() {
         waitForReportLoading();
         return browser
-                .findElements(By.cssSelector(".containerBody .gridTabPlate .gridTile div.total:not(.totalHeader)"))
+                .findElements(cssSelector(".containerBody .gridTabPlate .gridTile div.total:not(.totalHeader)"))
                 .stream().map(e -> e.getAttribute("title"))
                 .map(ReportPage::getNumber)
-                .collect(Collectors.toList());
-    }
-
-    public TableReport changeAliasToAttribute(final String attribute, String alias) {
-        WebElement header = attributesHeader.stream()
-            .filter(e -> attribute.equals(e.getText().trim()))
-            .findFirst()
-            .orElseThrow(() -> new NoSuchElementException("Cannot find attribute: " + attribute))
-            .findElement(BY_PARENT);
-        new Actions(browser).moveToElement(header).doubleClick().doubleClick().perform();
-        WebElement input = waitForElementVisible(className("ipeEditor"), browser);
-        input.clear();
-        input.sendKeys(alias);
-        input.sendKeys(Keys.ENTER);
-        assertEquals(header.getText().trim(), alias);
-        return this;
-    }
-
-    public TableReport changeAliasToMetric(final String metric, String alias) {
-        WebElement header = metricsHeader.stream()
-                .filter(e -> metric.equals(e.getText().trim()))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("Cannot find metric: " + metric))
-                .findElement(BY_PARENT);
-        new Actions(browser).doubleClick(header).perform();
-        WebElement input = waitForElementVisible(className("ipeEditor"), browser);
-        input.clear();
-        input.sendKeys(alias);
-        input.sendKeys(Keys.ENTER);
-        assertEquals(header.getText().trim(), alias);
-        return this;
+                .collect(toList());
     }
 
     public List<String> getAttributeElements() {
         waitForReportLoading();
-        return Lists.newArrayList(Collections2.transform(attributeElementInGrid,
-                new Function<WebElement, String>() {
-            @Override
-            public String apply(WebElement input) {
-                return input.getText().trim();
-            }
-        }));
+        return getElementTexts(attributeElementInGrid);
     }
 
     public TableReport showOnly(String attributeValue) {
@@ -217,24 +163,17 @@ public class TableReport extends AbstractDashboardReport {
 
     public List<Float> getMetricElements() {
         waitForReportLoading();
-        return Lists.newArrayList(Collections2.transform(metricValuesInGrid,
-                new Function<WebElement, Float>() {
-            @Override
-            public Float apply(WebElement input) {
-                return ReportPage.getNumber(input.getAttribute("title"));
-            }
-        }));
+        return metricValuesInGrid.stream()
+            .map(e -> e.getAttribute("title"))
+            .map(ReportPage::getNumber)
+            .collect(toList());
     }
 
     public List<String> getRawMetricElements() {
         waitForReportLoading();
-        return Lists.newArrayList(Collections2.transform(metricValuesInGrid,
-                new Function<WebElement, String>() {
-            @Override
-            public String apply(WebElement input) {
-                return input.getAttribute("title");
-            }
-        }));
+        return metricValuesInGrid.stream()
+            .map(e -> e.getAttribute("title"))
+            .collect(toList());
     }
 
     public void verifyAttributeIsHyperlinkInReport() {
@@ -260,7 +199,7 @@ public class TableReport extends AbstractDashboardReport {
         waitForReportLoading();
 
         try {
-            return browser.findElement(By.cssSelector(".totalHeader")).isDisplayed();
+            return browser.findElement(cssSelector(".totalHeader")).isDisplayed();
         } catch(NoSuchElementException e) {
             return false;
         }
@@ -275,7 +214,7 @@ public class TableReport extends AbstractDashboardReport {
             if (!cssClass.contains("even") && !cssClass.contains("odd"))
                 continue;
 
-            e.findElement(By.cssSelector("span")).click();
+            e.findElement(cssSelector("span")).click();
             return;
         }
         throw new IllegalArgumentException("No metric value to drill on");
@@ -296,7 +235,7 @@ public class TableReport extends AbstractDashboardReport {
             if (!cssClass.contains("even") && !cssClass.contains("odd"))
                 continue;
 
-            spanElement = e.findElement(By.cssSelector("span"));
+            spanElement = e.findElement(cssSelector("span"));
             if (!value.equals(spanElement.getText()))
                 continue;
             return spanElement;
@@ -342,7 +281,7 @@ public class TableReport extends AbstractDashboardReport {
                 sleepTightInSeconds(1);
 
                 try {
-                    return !TableReport.this.getRoot().findElement(By.cssSelector(".c-report"))
+                    return !TableReport.this.getRoot().findElement(cssSelector(".c-report"))
                             .getAttribute("class").contains("reloading");
                 } catch(NoSuchElementException e) {
                     // in Report Page
@@ -355,12 +294,6 @@ public class TableReport extends AbstractDashboardReport {
 
     public boolean isNoData() {
         return waitForElementVisible(REPORT_MESSAGE_LOCATOR, getRoot()).getText().contains(NO_DATA);
-    }
-
-    public boolean isNotComputed() {
-        WebElement reportMessage = waitForElementPresent(REPORT_MESSAGE_LOCATOR, getRoot());
-        return waitForElementVisible(reportMessage.findElement(By.tagName("p"))).getText()
-                .contains(REPORT_NOT_COMPUTABLE);
     }
 
     public void changeAttributeDisplayLabelByRightClick(final String attribute, String label) {
@@ -385,18 +318,11 @@ public class TableReport extends AbstractDashboardReport {
 
     public ContextMenu openContextMenuFromCellValue(final String cellValue) {
         BrowserUtils.contextClick(browser,
-                browser.findElements(By.cssSelector(".containerBody .gridTabPlate .gridTile div.cell"))
+                browser.findElements(cssSelector(".containerBody .gridTabPlate .gridTile div.cell"))
                     .stream()
                     .filter(e -> e.getText().equals(cellValue)).findFirst().get());
 
-        return Graphene.createPageFragment(ContextMenu.class, waitForElementVisible(By.id("ctxMenu"), browser));
-    }
-
-    public List<String> getDrillableElements() {
-        waitForReportLoading();
-        return drillableElements.stream()
-                .map(WebElement::getText)
-                .collect(Collectors.toList());
+        return Graphene.createPageFragment(ContextMenu.class, waitForElementVisible(id("ctxMenu"), browser));
     }
 
     public List<WebElement> getImageElements() {
@@ -406,8 +332,8 @@ public class TableReport extends AbstractDashboardReport {
                 .filter(e -> 
                         Stream.of(e.getAttribute("class").split("\\s+"))
                                 .anyMatch(input -> input.equals("image")))
-                .map(e -> e.findElement(By.tagName("img")))
-                .collect(Collectors.toList());
+                .map(e -> e.findElement(tagName("img")))
+                .collect(toList());
 
         if(images.isEmpty())
             throw new RuntimeException("Cannot find any image element");
@@ -423,7 +349,7 @@ public class TableReport extends AbstractDashboardReport {
                 .filter(e -> e.getAttribute("class").contains("s-grid-" + simplifyText(imageSource)))
                 .findAny()
                 .get()
-                .findElement(By.tagName("img")));
+                .findElement(tagName("img")));
     }
 
     public void copyMetricCell(final String cell) {
@@ -449,7 +375,7 @@ public class TableReport extends AbstractDashboardReport {
     }
 
     private List<WebElement> getAllHeaderElements() {
-        return browser.findElements(By.cssSelector(
+        return browser.findElements(cssSelector(
                 ".containerBody .gridTabPlate .gridTile .cell:not(.element):not(.data) span.captionWrapper"));
     }
 
