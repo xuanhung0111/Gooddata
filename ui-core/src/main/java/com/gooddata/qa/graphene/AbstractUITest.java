@@ -50,7 +50,6 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static org.openqa.selenium.By.className;
 import static org.testng.Assert.*;
-import static com.gooddata.qa.graphene.fragments.profile.UserProfilePage.USER_PROFILE_PAGE_LOCATOR;
 
 public class AbstractUITest extends AbstractGreyPageTest {
 
@@ -562,8 +561,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     public UserProfilePage initUserProfilePage(String userProfile) {
         openUrl(format(USER_PROFILE_PAGE, testParams.getProjectId(), userProfile));
-        return Graphene.createPageFragment(UserProfilePage.class,
-                waitForElementVisible(USER_PROFILE_PAGE_LOCATOR, browser));
+        return UserProfilePage.getInstance(browser);
     }
 
     public <T> T doActionWithImapClient(ImapClientAction<T> action) {

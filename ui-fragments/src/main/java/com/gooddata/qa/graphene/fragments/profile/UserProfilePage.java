@@ -34,7 +34,6 @@ import com.google.common.base.Predicate;
 
 public class UserProfilePage extends AbstractFragment {
 
-    public static final By USER_PROFILE_PAGE_LOCATOR = By.cssSelector("#p-profilePage");
     private static final By PHONE_LOCATOR = cssSelector(".phone div.value");
     private static final By COMPANY_LOCATOR = cssSelector(".company div.value");
     private static final By BY_MUF_DESCRIPTION = By.cssSelector(".mufView .description");
