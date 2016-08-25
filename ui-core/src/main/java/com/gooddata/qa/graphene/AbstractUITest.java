@@ -22,6 +22,7 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage
 import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.graphene.fragments.manage.*;
+import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
@@ -49,6 +50,7 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static org.openqa.selenium.By.className;
 import static org.testng.Assert.*;
+import static com.gooddata.qa.graphene.fragments.profile.UserProfilePage.USER_PROFILE_PAGE_LOCATOR;
 
 public class AbstractUITest extends AbstractGreyPageTest {
 
@@ -77,6 +79,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     protected static final String DATA_UPLOAD_PAGE_URI_TEMPLATE = CSV_UPLOADER_PROJECT_ROOT_TEMPLATE + "/datasets";
 
     private static final String LOCALIZATION_PAGE = "localization.html";
+    private static final String USER_PROFILE_PAGE = PAGE_UI_PROJECT_PREFIX + "%s|profilePage|%s";
 
     /**
      * ----- UI fragmnets -----
@@ -555,6 +558,12 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public LocalizationPage initLocalizationPage() {
         openUrl(LOCALIZATION_PAGE);
         return LocalizationPage.getInstance(browser);
+    }
+
+    public UserProfilePage initUserProfilePage(String userProfile) {
+        openUrl(format(USER_PROFILE_PAGE, testParams.getProjectId(), userProfile));
+        return Graphene.createPageFragment(UserProfilePage.class,
+                waitForElementVisible(USER_PROFILE_PAGE_LOCATOR, browser));
     }
 
     public <T> T doActionWithImapClient(ImapClientAction<T> action) {
