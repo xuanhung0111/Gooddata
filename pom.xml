@@ -61,6 +61,8 @@
         <browserstack.platform.resolution>1600x1200</browserstack.platform.resolution>
         <browserstack.project>local</browserstack.project>
         <browserstack.build>${user.name}</browserstack.build>
+        <browserstack.realMobile>false</browserstack.realMobile>
+        <browserstack.autoWait>0</browserstack.autoWait>
 
         <coreModuleName>ui-core</coreModuleName>
         <corePath>${moduleCorePath}</corePath>
@@ -395,6 +397,14 @@
                                                 <name>user.domain</name>
                                                 <value>${user.domain}</value>
                                             </property>
+                                            <property>
+                                                <name>browserstack.realMobile</name>
+                                                <value>${browserstack.realMobile}</value>
+                                            </property>
+                                            <property>
+                                                <name>browserstack.autoWait</name>
+                                                <value>${browserstack.autoWait}</value>
+                                            </property>
                                         </systemProperties>
                                     </configuration>
                                 </execution>
@@ -506,6 +516,87 @@
                 <browserstack.mobile.browserName>android</browserstack.mobile.browserName>
                 <browserstack.mobile.platform>ANDROID</browserstack.mobile.platform>
                 <browserstack.mobile.device>Samsung Galaxy Tab 4 10.1</browserstack.mobile.device>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>browserstack-mobile-android-samsung-galaxy-note-4</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-mobile-android-samsung-galaxy-note-4</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-mobile-android.xml</arquillian.xml>
+                <browserstack.mobile.browserName>android</browserstack.mobile.browserName>
+                <browserstack.mobile.platform>ANDROID</browserstack.mobile.platform>
+                <browserstack.mobile.device>Samsung Galaxy Note 4</browserstack.mobile.device>
+                <browserstack.realMobile>true</browserstack.realMobile>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-mobile-android-samsung-galaxy-tab-4</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-mobile-android-samsung-galaxy-tab-4</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-mobile-android.xml</arquillian.xml>
+                <browserstack.mobile.browserName>android</browserstack.mobile.browserName>
+                <browserstack.mobile.platform>ANDROID</browserstack.mobile.platform>
+                <browserstack.mobile.device>Samsung Galaxy Tab 4</browserstack.mobile.device>
+                <browserstack.realMobile>true</browserstack.realMobile>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-mobile-android-motorola-motox-2th-gen</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-mobile-android-motorola-motox-2th-gen</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-mobile-android.xml</arquillian.xml>
+                <browserstack.mobile.browserName>android</browserstack.mobile.browserName>
+                <browserstack.mobile.platform>ANDROID</browserstack.mobile.platform>
+                <browserstack.mobile.device>Motorola Moto X 2nd Gen</browserstack.mobile.device>
+                <browserstack.realMobile>true</browserstack.realMobile>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-mobile-android-google-nexus-6</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-mobile-android-google-nexus-6</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-mobile-android.xml</arquillian.xml>
+                <browserstack.mobile.browserName>android</browserstack.mobile.browserName>
+                <browserstack.mobile.platform>ANDROID</browserstack.mobile.platform>
+                <browserstack.mobile.device>Google Nexus 6</browserstack.mobile.device>
+                <browserstack.realMobile>true</browserstack.realMobile>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-mobile-android-google-nexus-9</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-mobile-android-google-nexus-9</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-mobile-android.xml</arquillian.xml>
+                <browserstack.mobile.browserName>android</browserstack.mobile.browserName>
+                <browserstack.mobile.platform>ANDROID</browserstack.mobile.platform>
+                <browserstack.mobile.device>Google Nexus 9</browserstack.mobile.device>
+                <browserstack.realMobile>true</browserstack.realMobile>
             </properties>
         </profile>
         <profile>
