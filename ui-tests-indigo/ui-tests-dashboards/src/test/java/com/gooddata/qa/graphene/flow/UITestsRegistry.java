@@ -68,7 +68,8 @@ public class UITestsRegistry {
                     "testng-mobile-SplashScreen.xml",
                     "testng-mobile-KpiPopChangeValueExceedLimit.xml",
                     "testng-mobile-ProjectSwitch.xml",
-                    "testng-desktop-permissions-InsightOnDashboard.xml"
+                    "testng-desktop-permissions-InsightOnDashboard.xml",
+                    "testng-desktop-EmptyErrorKpiValue.xml"
                 ));
             }
         }
