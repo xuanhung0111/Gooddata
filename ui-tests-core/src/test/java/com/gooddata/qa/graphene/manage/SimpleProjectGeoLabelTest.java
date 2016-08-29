@@ -203,7 +203,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
                         "M60 -74L60 -79L73 -79L73 -82L78 -82L78 -85L95 -85L95 -82L98 -82L98 -79L102 -79L102 -65L96 -65L95 -59L88 -55L77 -55L68 -61L70 -64L60 -64z",
                         "M-72 47L-78 47L-78 44L-81 43L-90 43L-95 49L-101 49L-101 46L-99 45L-97 38L-99 36L-102 36L-102 34L-97 33L-96 26L-93 23L-89 25L-87 23L-85 25L-80 25L-80 22L-62 22L-64 24L-66 32L-69 34L-72 41z"),
                 asList("225,081.00", "10,225.00", "10,236.00", "204,601.00", "10,230.00"),
-                asList("Ada", "Clark", "Valley", "Chouteau", "Baker")),
+                asList("Ada County", "Clark County", "Valley County", "Chouteau County", "Baker County")),
         WORLD_COUNTRIES_NAME(
                 "Countryname",
                 "Sum of Amount",
