@@ -444,14 +444,24 @@ public class DashboardsPage extends AbstractFragment {
         return this;
     }
 
-    public DashboardsPage addAttributeFilterToDashboard(DashAttributeFilterTypes type, String name) {
-        editDashboard().addAttributeFilterToDashboard(type, name);
+    public DashboardsPage addAttributeFilterToDashboard(DashAttributeFilterTypes type, String name, String... label) {
+        editDashboard().addAttributeFilterToDashboard(type, name, label);
         return this;
     }
 
     public DashboardsPage addTimeFilterToDashboard(String dateDimension, DateGranularity dateGranularity,
             String timeLine) {
         editDashboard().addTimeFilterToDashboard(dateDimension, dateGranularity, timeLine);
+        return this;
+    }
+
+    public DashboardsPage groupFiltersOnDashboard(String... filters) {
+        editDashboard().groupFiltersOnDashboard(filters);
+        return this;
+    }
+
+    public DashboardsPage setParentsForFilter(String filter, String... parentFilters) {
+        editDashboard().setParentsFilter(filter, parentFilters);
         return this;
     }
 

@@ -77,16 +77,12 @@ public final class ElementUtils {
             .collect(toList());
     }
 
-    public static String getTooltipFromElement(By locator, WebDriver browser) throws AWTException {
+    public static String getTooltipFromElement(By locator, WebDriver browser) {
         return getTooltipFromElement(waitForElementVisible(locator, browser), browser);
     }
 
-    public static String getTooltipFromElement(WebElement element, WebDriver browser) throws AWTException {
-        // Move mouse to offset (-1,-1) on screen to make sure there is no bubble displayed before
-        // moving to target element 
-        new Robot().mouseMove(-1, -1);
-        waitForElementNotPresent(BY_BUBBLE_CONTENT);
-
+    public static String getTooltipFromElement(WebElement element, WebDriver browser) {
+        makeSureNoPopupVisible();
         new Actions(browser).moveToElement(element).perform();
 
         return getBubbleMessage(browser);
@@ -103,5 +99,17 @@ public final class ElementUtils {
                 .findFirst()
                 .orElseThrow(() -> new NoSuchElementException("No visible element found"))
                 .click();
+    }
+
+    public static void makeSureNoPopupVisible() {
+        // Move mouse to offset (-1,-1) on screen to make sure there is no bubble displayed before
+        // moving to target element
+        try {
+            new Robot().mouseMove(-1, -1);
+            waitForElementNotPresent(BY_BUBBLE_CONTENT);
+
+        } catch (AWTException e) {
+            throw new RuntimeException("There is an error when moving mouse on screen");
+        }
     }
 }
