@@ -17,6 +17,9 @@
         <property name="browserstack.debug">true</property>
         <property name="project">${browserstack.project:local}</property>
         <property name="build">${browserstack.build:unknown}</property>
+        <property name="realMobile">${browserstack.realMobile:false}</property>
+        <!-- turn off auto wait feature in browserstack to avoid session terminated error -->
+        <property name="browserstack.autoWait">${browserstack.autoWait:0}</property>
     </extension>
 
     <extension qualifier="graphene">

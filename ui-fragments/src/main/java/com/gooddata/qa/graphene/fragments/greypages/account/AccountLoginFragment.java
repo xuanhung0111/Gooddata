@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.fragments.greypages.account;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
-import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.WebElement;
@@ -34,7 +33,7 @@ public class AccountLoginFragment extends AbstractGreyPagesFragment {
     public void fillLoginForm(String username, String password) {
         waitForElementVisible(this.username).sendKeys(username);
         waitForElementVisible(this.password).sendKeys(password);
-        Graphene.guardHttp(submitButton).click();
+        waitForElementVisible(submitButton).click();
     }
 
 }
