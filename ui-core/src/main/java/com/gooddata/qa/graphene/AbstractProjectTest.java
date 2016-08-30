@@ -189,7 +189,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         restApiClient = getRestApiClient(testParams.getUser(), testParams.getPassword());
         goodDataClient = getGoodDataClient(testParams.getUser(), testParams.getPassword());
 
-        logoutAndLoginAs(true, UserRoles.ADMIN);
+        logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
     }
 
     @AfterClass(alwaysRun = true)

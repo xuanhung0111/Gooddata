@@ -75,6 +75,13 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     private static final String INVITED_EMAIL = "abc@mail.com";
 
     @BeforeClass(alwaysRun = true)
+    @Override
+    public void enableDynamicUser() {
+        // always turn on dynamic user on this test or we have to fix the test logic to adapt when turn of that feature
+        useDynamicUser = true;
+    }
+
+    @BeforeClass(alwaysRun = true)
     public void setProjectTitle() {
         projectTitle = "User-management-general" + System.currentTimeMillis();
     }
