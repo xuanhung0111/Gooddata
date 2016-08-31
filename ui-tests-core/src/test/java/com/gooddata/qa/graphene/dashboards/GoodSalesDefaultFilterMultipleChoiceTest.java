@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.md.Restriction.title;
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
@@ -35,8 +34,8 @@ import com.gooddata.md.Attribute;
 import com.gooddata.md.Metric;
 import com.gooddata.md.report.AttributeInGrid;
 import com.gooddata.md.report.Filter;
+import com.gooddata.md.report.GridElement;
 import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
 import com.gooddata.qa.graphene.common.AbstractDashboardWidgetTest;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
@@ -74,7 +73,7 @@ public class GoodSalesDefaultFilterMultipleChoiceTest extends AbstractDashboardW
     private static final String PHOENIXSOFT = "PhoenixSoft";
     private static final String ALL = "All";
 
-    private Metric amountMetric;
+    private String amountMetricUri;
 
     @BeforeClass(alwaysRun = true)
     public void addUsers() {
@@ -87,7 +86,7 @@ public class GoodSalesDefaultFilterMultipleChoiceTest extends AbstractDashboardW
                 .withAttribute(ATTR_STAGE_NAME)
                 .withAttributeValues(asList(INTEREST, DISCOVERY, SHORT_LIST, RISK_ASSESSMENT)));
 
-        amountMetric = getMdService().getObj(getProject(), Metric.class, title(METRIC_AMOUNT));
+        amountMetricUri = getMdService().getObjUri(getProject(), Metric.class, title(METRIC_AMOUNT));
 
         Attribute stageNameAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_STAGE_NAME));
         Attribute departmentAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_DEPARTMENT));
@@ -95,20 +94,20 @@ public class GoodSalesDefaultFilterMultipleChoiceTest extends AbstractDashboardW
         String promptFilterUri = getVariableUri(getRestApiClient(), testParams.getProjectId(), DF_VARIABLE);
 
         createReportViaRest(GridReportDefinitionContent.create(REPORT,
-                singletonList(METRIC_GROUP),
+                singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(stageNameAttribute.getDefaultDisplayForm().getUri())),
-                singletonList(new MetricElement(amountMetric))));
+                singletonList(new GridElement(amountMetricUri, METRIC_AMOUNT))));
 
         createReportViaRest(GridReportDefinitionContent.create(REPORT_WITH_ADDITIONAL_ATTRIBUTE,
-                singletonList(METRIC_GROUP),
+                singletonList("metricGroup"),
                 asList(new AttributeInGrid(stageNameAttribute.getDefaultDisplayForm().getUri()),
                         new AttributeInGrid(departmentAttribute.getDefaultDisplayForm().getUri())),
-                singletonList(new MetricElement(amountMetric))));
+                singletonList(new GridElement(amountMetricUri, METRIC_AMOUNT))));
 
         createReportViaRest(GridReportDefinitionContent.create(REPORT_WITH_PROMPT_FILTER,
-                singletonList(METRIC_GROUP),
+                singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(stageNameAttribute.getDefaultDisplayForm().getUri())),
-                singletonList(new MetricElement(amountMetric)),
+                singletonList(new GridElement(amountMetricUri, METRIC_AMOUNT)),
                 singletonList(new Filter(format("[%s]", promptFilterUri)))));
     }
 
@@ -499,9 +498,9 @@ public class GoodSalesDefaultFilterMultipleChoiceTest extends AbstractDashboardW
         String promptFilterUri = getVariableUri(getRestApiClient(), testParams.getProjectId(), MUF_DF_VARIABLE);
 
         createReportViaRest(GridReportDefinitionContent.create(REPORT_MUF,
-                singletonList(METRIC_GROUP),
+                singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(productAttribute.getDefaultDisplayForm().getUri())),
-                singletonList(new MetricElement(amountMetric)),
+                singletonList(new GridElement(amountMetricUri, METRIC_AMOUNT)),
                 singletonList(new Filter(format("[%s]", promptFilterUri)))));
 
         initDashboardsPage()

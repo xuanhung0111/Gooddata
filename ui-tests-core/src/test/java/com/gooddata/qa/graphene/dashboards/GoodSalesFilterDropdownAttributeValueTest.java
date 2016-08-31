@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.md.Restriction.identifier;
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
@@ -39,8 +38,8 @@ import org.testng.annotations.Test;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.Metric;
 import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.GridElement;
 import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
@@ -81,7 +80,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
 
     private Metric metricAvailable;
     private Attribute stageName;
-    private Metric amountMetric;
+    private String amountMetricUri;
 
     @BeforeClass
     public void setProjectTitle() {
@@ -90,7 +89,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
     public void initialization() {
-        amountMetric = getMdService().getObj(getProject(), Metric.class, identifier("ah1EuQxwaCqs"));
+        amountMetricUri = getMdService().getObjUri(getProject(), Metric.class, identifier("ah1EuQxwaCqs"));
         stageName = getMdService().getObj(getProject(), Attribute.class, identifier("attr.stage.name"));
     }
 
@@ -104,14 +103,15 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
     public void prepareMetricAndReports() throws IOException, JSONException {
         // *** create metric available ***
         metricAvailable = getMdService().createObj(getProject(), new Metric(METRIC_AVAILABLE,
-                buildFirstMetricExpression(amountMetric.getUri(), stageName.getUri()), "#,##0.00"));
+                buildFirstMetricExpression(amountMetricUri, stageName.getUri()), "#,##0.00"));
 
         // *** create report 1 ***
         String yearSnapshotUri = getMdService().getObj(getProject(), Attribute.class, identifier("snapshot.year"))
                 .getDefaultDisplayForm().getUri();
-        ReportDefinition definition = GridReportDefinitionContent.create(REPORT_1, singletonList(METRIC_GROUP),
+        ReportDefinition definition = GridReportDefinitionContent.create(REPORT_1, singletonList("metricGroup"),
                 asList(new AttributeInGrid(stageName.getDefaultDisplayForm().getUri()),
-                        new AttributeInGrid(yearSnapshotUri)), singletonList(new MetricElement(amountMetric)));
+                        new AttributeInGrid(yearSnapshotUri)), singletonList(new GridElement(amountMetricUri,
+                                METRIC_AMOUNT)));
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
@@ -220,9 +220,9 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
     @Test(dependsOnGroups = {"init"})
     public void connectFilterWithUseAvailable() {
         // *** create report 3 ***
-        ReportDefinition definition = GridReportDefinitionContent.create(REPORT_3, singletonList(METRIC_GROUP),
+        ReportDefinition definition = GridReportDefinitionContent.create(REPORT_3, singletonList("metricGroup"),
                 asList(new AttributeInGrid(stageName.getDefaultDisplayForm().getUri())),
-                singletonList(new MetricElement(amountMetric)));
+                singletonList(new GridElement(amountMetricUri, "Amount")));
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
@@ -286,7 +286,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
     public void filterOutUseAvailableEmptyFilter() throws IOException, JSONException {
         makeCopyFromDashboard(USE_AVAILABLE_DASHBOARD_2);
         String stageNameUri = stageName.getUri();
-        editMetricExpression(buildSecondMetricExpression(amountMetric.getUri(), stageNameUri));
+        editMetricExpression(buildSecondMetricExpression(amountMetricUri, stageNameUri));
 
         try {
             dashboardsPage.editDashboard();
@@ -312,7 +312,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
                     .isEmpty(), "FStageName filter still has value!");
             fStageNameFilter.getRoot().click();
         } finally {
-            editMetricExpression(buildFirstMetricExpression(amountMetric.getUri(), stageNameUri));
+            editMetricExpression(buildFirstMetricExpression(amountMetricUri, stageNameUri));
             dashboardsPage.deleteDashboard();
         }
     }
@@ -352,10 +352,10 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
             assertEquals(fStageNameFilter.getCurrentValue(), "Risk Assessment",
                     "Current value of StageName filter is not correct!");
 
-            editMetricExpression(buildThridMetricExpression(amountMetric.getUri(), stageNameUri));
+            editMetricExpression(buildThridMetricExpression(amountMetricUri, stageNameUri));
         } finally {
             dashboardsPage.deleteDashboard();
-            editMetricExpression(buildFirstMetricExpression(amountMetric.getUri(), stageNameUri));
+            editMetricExpression(buildFirstMetricExpression(amountMetricUri, stageNameUri));
             addMufToUser(getRestApiClient(), getProject().getId(), testParams.getUser(), "");
         }
     }

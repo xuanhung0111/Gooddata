@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.md.Restriction.title;
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.changeMetricFormat;
 import static java.lang.String.format;
@@ -25,8 +24,8 @@ import com.gooddata.md.Attribute;
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
 import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.GridElement;
 import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.qa.graphene.AbstractProjectTest;
@@ -39,13 +38,14 @@ import com.gooddata.qa.utils.io.ResourceUtils;
 public class CopyReportTableTest extends AbstractProjectTest {
 
     private final static String AMOUNT = "Amount";
+    private final static String AMOUNT_SUM = "Amount[Sum]";
     private final static String POSITION = "Position";
     private final static String SIMPLE_REPORT = "Simple-Report";
     private final static String AMOUNT_METRIC = "Amount-Metric";
     private final static String DEFAULT_FORMAT_VALUE = "476,640.00";
     private final static String CONDITION_FORMAT_VALUE = "$476,640";
 
-    private Metric amountSum;
+    private String amountSumUri;
 
     @BeforeTest
     private void clearClipboard() {
@@ -64,17 +64,18 @@ public class CopyReportTableTest extends AbstractProjectTest {
                 .getObj(getProject(), Fact.class, title(AMOUNT))
                 .getUri();
 
-        amountSum = getMdService()
+        amountSumUri = getMdService()
                 .createObj(getProject(), new Metric(AMOUNT_METRIC,
                         MetricTypes.SUM.getMaql().replaceFirst("__fact__", format("[%s]", amountUri)),
-                        Formatter.DEFAULT.toString()));
+                        Formatter.DEFAULT.toString()))
+                .getUri();
 
         final String positionUri = getMdService().getObj(getProject(), Attribute.class, title(POSITION))
                 .getDefaultDisplayForm().getUri();
 
-        ReportDefinition definition = GridReportDefinitionContent.create(SIMPLE_REPORT, singletonList(METRIC_GROUP),
+        ReportDefinition definition = GridReportDefinitionContent.create(SIMPLE_REPORT, singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(positionUri)),
-                singletonList(new MetricElement(amountSum)));
+                singletonList(new GridElement(amountSumUri, AMOUNT_SUM)));
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
     }
@@ -100,13 +101,13 @@ public class CopyReportTableTest extends AbstractProjectTest {
     public void copyFormattedCell()
             throws HeadlessException, UnsupportedFlavorException, IOException, ParseException, JSONException {
 
-        changeMetricFormat(getRestApiClient(), amountSum.getUri(), Formatter.COLORS.toString());
+        changeMetricFormat(getRestApiClient(), amountSumUri, Formatter.COLORS.toString());
         try {
             initReportsPage().openReport(SIMPLE_REPORT).getTableReport().copyMetricCell(CONDITION_FORMAT_VALUE);
             takeScreenshot(browser, "copy-formatted-cell", getClass());
             assertEquals(getClipboardContent(), CONDITION_FORMAT_VALUE);
         } finally {
-            changeMetricFormat(getRestApiClient(), amountSum.getUri(), Formatter.DEFAULT.toString());
+            changeMetricFormat(getRestApiClient(), amountSumUri, Formatter.DEFAULT.toString());
         }
     }
 

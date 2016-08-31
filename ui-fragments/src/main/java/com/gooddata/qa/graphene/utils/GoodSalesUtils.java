@@ -26,7 +26,6 @@ public final class GoodSalesUtils {
     public static final String METRIC_NUMBER_OF_LOST_OPPS = "# of Lost Opps.";
     public static final String METRIC_NUMBER_OF_OPEN_OPPS = "# of Open Opps.";
     public static final String METRIC_NUMBER_OF_OPPORTUNITIES = "# of Opportunities";
-    public static final String METRIC_NUMBER_OF_OPPORTUNITIES_BOP = "# of Opportunities [BOP]";
     public static final String METRIC_NUMBER_OF_WON_OPPS = "# of Won Opps.";
     public static final String METRIC_NUMBER_OF_WON = "# of Won";
     public static final String METRIC_SNAPSHOT_BOP = "_Snapshot [BOP]";
