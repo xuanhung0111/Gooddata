@@ -33,7 +33,6 @@ import com.gooddata.md.Attribute;
 import com.gooddata.md.Dataset;
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
-import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.enums.GDEmails;
@@ -41,11 +40,12 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;
 import com.google.common.collect.Iterables;
 
-public class KpiAlertNullValueTest extends AbstractProjectTest {
+public class KpiAlertNullValueTest extends AbstractDashboardTest {
 
     private static final String DATASET_NAME = "User";
 
@@ -61,7 +61,7 @@ public class KpiAlertNullValueTest extends AbstractProjectTest {
         imapPassword = testParams.loadProperty("imap.password");
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"precondition"})
     public void initIndigoDashboardWithKpi() throws JSONException, IOException {
         String csvFilePath = new CsvFile(DATASET_NAME)
                 .columns(new CsvFile.Column("firstname"), new CsvFile.Column("number"), new CsvFile.Column("Date"))
@@ -129,7 +129,7 @@ public class KpiAlertNullValueTest extends AbstractProjectTest {
         }
 
         initIndigoDashboardsPageWithWidgets()
-                .getKpiByHeadline(name)
+                .getWidgetByHeadline(Kpi.class, name)
                 .openAlertDialog()
                 .selectTriggeredWhen(triggerCondition)
                 .setThreshold(threshold)
@@ -166,7 +166,7 @@ public class KpiAlertNullValueTest extends AbstractProjectTest {
             signInAtGreyPages(imapUser, imapPassword);
         }
 
-        Kpi kpi = initIndigoDashboardsPageWithWidgets().getKpiByHeadline(name);
+        Kpi kpi = initIndigoDashboardsPageWithWidgets().getWidgetByHeadline(Kpi.class, name);
 
         takeScreenshot(browser, "Kpi-with-name-" + name + "-is-triggered", getClass());
         assertTrue(kpi.isAlertTriggered(), "Kpi with name: " + name + " is not triggered");

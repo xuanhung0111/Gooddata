@@ -2,8 +2,6 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest.DATE_FILTER_LAST_YEAR;
-import static com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest.DATE_FILTER_THIS_YEAR;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
@@ -38,9 +36,9 @@ import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
-import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsGeneralTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 
-public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
+public class KpiPopChangeValueExceedLimitTest extends AbstractDashboardTest {
 
     private static final String METRIC_NUMBER = "Number[Sum]";
 
@@ -50,13 +48,10 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
 
     @BeforeClass(alwaysRun = true)
     public void initProperties() {
-        super.initProperties();
         projectTitle = "Kpi-pop-change-value-exceed-limit-or-infinity-test";
-        // Create data from blank project
-        projectTemplate = "";
     }
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"precondition"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"precondition"})
     public void uploadDatasetFromCsv() throws IOException, JSONException, URISyntaxException {
         // The fixed data in CSV file will be invalid and make this test failed
         // when the time pass to another period.
@@ -68,7 +63,8 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
         }
     }
 
-    @Test(dependsOnMethods = {"uploadDatasetFromCsv"}, groups = {"precondition"})
+    @Test(dependsOnMethods = {"uploadDatasetFromCsv"}, dependsOnGroups = {"dashboardsInit"},
+            groups = {"precondition"})
     public void setupDashboardWithKpi() throws JSONException, IOException {
         String numberFactUri = getMdService().getObjUri(getProject(), Fact.class, title("number"));
         String firstNameAttributeUri = getMdService().getObjUri(getProject(), Attribute.class, title("firstname"));
@@ -96,7 +92,7 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
 
     @Test(dependsOnGroups = "precondition", groups = {"desktop", "mobile"})
     public void testChangeValueExceedLimitOrInfinity() {
-        Kpi kpi = initIndigoDashboardsPageWithWidgets().getLastKpi();
+        Kpi kpi = initIndigoDashboardsPageWithWidgets().getLastWidget(Kpi.class);
 
         waitForFragmentVisible(indigoDashboardsPage).selectDateFilterByName(DATE_FILTER_THIS_YEAR);
 

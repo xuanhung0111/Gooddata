@@ -34,7 +34,6 @@ import com.gooddata.md.Attribute;
 import com.gooddata.md.Dataset;
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
-import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.enums.GDEmails;
@@ -42,11 +41,12 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;
 import com.google.common.collect.Iterables;
 
-public class KpiValueFormatInAlertEmailTest extends AbstractProjectTest {
+public class KpiValueFormatInAlertEmailTest extends AbstractDashboardTest {
 
     private static final String DATASET_NAME = "User";
 
@@ -61,7 +61,7 @@ public class KpiValueFormatInAlertEmailTest extends AbstractProjectTest {
         imapPassword = testParams.loadProperty("imap.password");
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
+    @Test(dependsOnGroups = {"createProject", "dashboardsInit"}, groups = {"precondition"})
     public void initIndigoDashboardWithKpi() throws JSONException, IOException {
         csvFile = new CsvFile(DATASET_NAME)
                 .columns(new CsvFile.Column("firstname"), new CsvFile.Column("number"), new CsvFile.Column("Date"))
@@ -114,7 +114,7 @@ public class KpiValueFormatInAlertEmailTest extends AbstractProjectTest {
 
         for (String kpiName : kpiNames) {
             initIndigoDashboardsPageWithWidgets()
-                    .getKpiByHeadline(kpiName)
+                    .getWidgetByHeadline(Kpi.class, kpiName)
                     .openAlertDialog()
                     .selectTriggeredWhen(TRIGGERED_WHEN_DROPS_BELOW)
                     .setThreshold("15000")
@@ -143,7 +143,7 @@ public class KpiValueFormatInAlertEmailTest extends AbstractProjectTest {
             signInAtGreyPages(imapUser, imapPassword);
         }
 
-        Kpi kpi = initIndigoDashboardsPageWithWidgets().getKpiByHeadline(kpiName);
+        Kpi kpi = initIndigoDashboardsPageWithWidgets().getWidgetByHeadline(Kpi.class, kpiName);
 
         takeScreenshot(browser, "Kpi-with-name-" + kpiName + "-is-triggered", getClass());
 

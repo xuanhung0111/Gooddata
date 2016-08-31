@@ -4,21 +4,32 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.List;
 
+import org.apache.http.ParseException;
+import org.json.JSONException;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.ConfigurationPanel;
-import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
+import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
 
-public class DataSetTest extends DashboardWithWidgetsTest {
+public class DataSetTest extends GoodSalesAbstractDashboardTest {
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    @Override
+    protected void prepareSetupProject() throws ParseException, JSONException, IOException {
+        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
+    }
+
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkAvailableDataSets() {
         ConfigurationPanel cp = initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
@@ -28,6 +39,7 @@ public class DataSetTest extends DashboardWithWidgetsTest {
         cp.selectMetricByName(METRIC_LOST);
 
         List<String> availableDataSetsForLost = asList(DATE_CLOSED, DATE_CREATED, DATE_SNAPSHOT);
+
         assertTrue(isEqualCollection(cp.getDataSets(), availableDataSetsForLost));
 
         takeScreenshot(browser, "checkAvailableDataSets-lostMetric-dateClosed-dateCreated-dateSnapshot", getClass());
@@ -40,11 +52,11 @@ public class DataSetTest extends DashboardWithWidgetsTest {
         takeScreenshot(browser, "checkAvailableDataSets-numOfActivitiesMetric-dateActivity-dateCreated", getClass());
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkDateDataSetConfigured() {
         initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
-            .selectKpi(0);
+            .selectFirstWidget(Kpi.class);
 
         waitForFragmentVisible(indigoDashboardsPage)
             .getConfigurationPanel()
@@ -53,7 +65,7 @@ public class DataSetTest extends DashboardWithWidgetsTest {
         indigoDashboardsPage
             .leaveEditMode()
             .switchToEditMode()
-            .selectKpi(0);
+            .selectFirstWidget(Kpi.class);
 
         String selectedDateDataSet = indigoDashboardsPage
             .getConfigurationPanel()

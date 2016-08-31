@@ -8,7 +8,6 @@ import java.io.IOException;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.GoodData;
@@ -17,9 +16,9 @@ import com.gooddata.md.Metric;
 import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.MetricSelect;
-import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
 
-public class MetricsAccessibilityTest extends DashboardWithWidgetsTest {
+public class MetricsAccessibilityTest extends GoodSalesAbstractDashboardTest {
 
     private static final String PUBLIC_METRIC_OF_ADMIN = "admin-public-metric";
     private static final String PRIVATE_METRIC_OF_ADMIN = "admin-private-metric";
@@ -29,12 +28,7 @@ public class MetricsAccessibilityTest extends DashboardWithWidgetsTest {
 
     private static final String SIMPLE_METRIC_EXPRESSION = "SELECT 1";
 
-    @BeforeClass(alwaysRun = true)
-    public void before() {
-        super.before();
-    }
-
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void prepareMetrics() {
         createPublicMetric(getGoodDataClient(), PUBLIC_METRIC_OF_ADMIN);
         createPrivateMetric(getGoodDataClient(), PRIVATE_METRIC_OF_ADMIN);
@@ -46,8 +40,7 @@ public class MetricsAccessibilityTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"prepareMetrics"}, groups = {"desktop"})
     public void testMetricsAccessibility() {
-        final MetricSelect metricSelect = initIndigoDashboardsPageWithWidgets()
-            .switchToEditMode()
+        final MetricSelect metricSelect = startEditMode()
             .dragAddKpiPlaceholder()
             .getConfigurationPanel()
             .getMetricSelect();

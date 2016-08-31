@@ -13,12 +13,11 @@ import org.testng.annotations.Test;
 
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
-import com.gooddata.qa.graphene.AbstractProjectTest;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 
-public class AddKpiWithoutDataSetTest extends AbstractProjectTest {
+public class AddKpiWithoutDataSetTest extends AbstractDashboardTest {
 
     private static final String METRIC_CONNECT_WITH_DATA_SET = "Connected";
     private static final String METRIC_NOT_CONNECT_WITH_DATA_SET = "NotConnected";
@@ -29,13 +28,7 @@ public class AddKpiWithoutDataSetTest extends AbstractProjectTest {
         projectTitle = "Add-kpi-without-data-set-test";
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
-    public void setupFeatureFlag() throws JSONException {
-        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
-    }
-
-    @Test(dependsOnGroups = {"precondition"}, groups = {"nodate-precondition"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"nodate-precondition"})
     public void setupForNoDate()
             throws JSONException, IOException, URISyntaxException {
         setupMaql("/no-date/no-date-maql.txt");
@@ -78,7 +71,8 @@ public class AddKpiWithoutDataSetTest extends AbstractProjectTest {
         initIndigoDashboardsPage()
             .waitForDashboardLoad()
             .switchToEditMode()
-            .selectLastKpi();
+            .getLastWidget(Kpi.class)
+            .clickOnContent();
 
         IndigoDashboardsPage.getInstance(browser).getConfigurationPanel()
             .selectMetricByName(METRIC_CONNECT_WITH_DATA_SET)

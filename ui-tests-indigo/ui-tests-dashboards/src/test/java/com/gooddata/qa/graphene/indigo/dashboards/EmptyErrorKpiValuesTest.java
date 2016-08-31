@@ -18,14 +18,14 @@ import com.gooddata.md.Metric;
 import com.gooddata.md.Restriction;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
-import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 
-public class EmptyErrorKpiValuesTest extends DashboardWithWidgetsTest {
+public class EmptyErrorKpiValuesTest extends GoodSalesAbstractDashboardTest {
 
     private Metric errorMetric;
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void createEmptyMetric() {
         String amountUri = getMdService().getObjUri(getProject(), Metric.class, Restriction.title(METRIC_AMOUNT));
         errorMetric = getMdService().createObj(getProject(), new Metric("ERROR",
@@ -33,15 +33,15 @@ public class EmptyErrorKpiValuesTest extends DashboardWithWidgetsTest {
     }
 
     @Test(dependsOnMethods = {"createEmptyMetric"}, groups = {"desktop"})
-    public void testEmptyMetricWithoutConditionalFormat() {
-        setupKpi(new KpiConfiguration.Builder()
-            .metric(errorMetric.getTitle())
-            .dataSet(DATE_CREATED)
-            .build());
+    public void testEmptyMetricWithoutConditionalFormat() throws ParseException, JSONException, IOException {
+        startEditMode()
+            .addKpi(new KpiConfiguration.Builder()
+                    .metric(errorMetric.getTitle())
+                    .dataSet(DATE_CREATED)
+                    .build())
+            .saveEditModeWithWidgets();
 
-        Kpi lastKpi = waitForFragmentVisible(indigoDashboardsPage)
-                .waitForAllKpiWidgetContentLoaded()
-                .getLastKpi();
+        Kpi lastKpi = waitForFragmentVisible(indigoDashboardsPage).getLastWidget(Kpi.class);
 
         takeScreenshot(browser, "testEmptyMetricWithoutConditionalFormat", getClass());
 
@@ -55,9 +55,7 @@ public class EmptyErrorKpiValuesTest extends DashboardWithWidgetsTest {
         DashboardsRestUtils.changeMetricFormat(getRestApiClient(), errorMetric.getUri(), "[=NULL]empty;#,##0.00");
 
         try {
-            Kpi lastKpi = initIndigoDashboardsPageWithWidgets()
-                    .waitForAllKpiWidgetContentLoaded()
-                    .getLastKpi();
+            Kpi lastKpi = initIndigoDashboardsPageWithWidgets().getLastWidget(Kpi.class);
 
             takeScreenshot(browser, "testEmptyMetricWithConditionalFormat", getClass());
 
@@ -73,9 +71,7 @@ public class EmptyErrorKpiValuesTest extends DashboardWithWidgetsTest {
         DashboardsRestUtils.changeMetricExpression(getRestApiClient(), errorMetric.getUri(),
                 "SELECT [" + accountUri + "] WHERE 2 = 1");
 
-        Kpi lastKpi = initIndigoDashboardsPageWithWidgets()
-                .waitForAllKpiWidgetContentLoaded()
-                .getLastKpi();
+        Kpi lastKpi = initIndigoDashboardsPageWithWidgets().getLastWidget(Kpi.class);
 
         takeScreenshot(browser, "testEmptyMetricWithoutConditionalFormat", getClass());
 

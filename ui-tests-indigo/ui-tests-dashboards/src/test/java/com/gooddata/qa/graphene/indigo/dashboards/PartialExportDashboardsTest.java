@@ -9,18 +9,17 @@ import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertTrue;
 
-public class PartialExportDashboardsTest extends AbstractProjectTest {
+public class PartialExportDashboardsTest extends AbstractDashboardTest {
 
     @BeforeClass(alwaysRun = true)
     public void initProperties() {
@@ -28,19 +27,13 @@ public class PartialExportDashboardsTest extends AbstractProjectTest {
         projectTemplate = "/projectTemplates/OnboardingWalkMe/3";
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
-    public void setupFeatureFlag() throws JSONException {
-        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
-    }
-
-    @Test(dependsOnMethods = {"setupFeatureFlag"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void createKpiLinkToDashboardTab() {
         initIndigoDashboardsPage()
             .getSplashScreen()
             .startEditingWidgets()
             .waitForDashboardLoad()
-            .addWidget(new KpiConfiguration.Builder()
+            .addKpi(new KpiConfiguration.Builder()
                 .metric("Sales")
                 .dataSet("Date")
                 .comparison(Kpi.ComparisonType.NO_COMPARISON.toString())
@@ -49,7 +42,7 @@ public class PartialExportDashboardsTest extends AbstractProjectTest {
             .saveEditModeWithWidgets();
     }
 
-    @Test(dependsOnMethods = {"setupFeatureFlag"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void exportDashboardsToAnotherProject() throws JSONException, IOException {
         final String oldPid = testParams.getProjectId();
 
@@ -66,8 +59,7 @@ public class PartialExportDashboardsTest extends AbstractProjectTest {
             initIndigoDashboardsPageWithWidgets();
             takeScreenshot(browser, "Imported dashboard", getClass());
 
-            IndigoDashboardsPage.getInstance(browser).getLastKpi()
-                .clickKpiValue();
+            IndigoDashboardsPage.getInstance(browser).getLastWidget(Kpi.class).clickKpiValue();
             waitForDashboardPageLoaded(browser);
 
             takeScreenshot(browser, "Dashboard tab: 'Sales Forecast' is selected", getClass());

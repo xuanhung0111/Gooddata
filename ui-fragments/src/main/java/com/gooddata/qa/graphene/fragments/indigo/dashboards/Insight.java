@@ -1,24 +1,28 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.*;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
-public class Visualization extends Widget {
+public class Insight extends Widget {
     public static final String MAIN_SELECTOR = ".dash-item.type-visualization";
-    public static final String WIDGET_LOADING_CLASS = "widget-loading";
-    public static final String CONTENT_LOADING_CLASS = "content-loading";
 
     private static final By BY_CHART_REPORT = By.className("highcharts-container");
 
-    public static final By IS_WIDGET_LOADING = By.cssSelector(MAIN_SELECTOR + " ." + WIDGET_LOADING_CLASS);
-    public static final By IS_CONTENT_LOADING = By.cssSelector(MAIN_SELECTOR + " ." + CONTENT_LOADING_CLASS);
+    public static Insight getInstance(final WebElement root) {
+        return Graphene.createPageFragment(Insight.class, waitForElementVisible(root));
+    }
 
     public ChartReport getChartReport() {
         return Graphene.createPageFragment(ChartReport.class,
                 waitForElementVisible(BY_CHART_REPORT, browser));
+    }
+
+    public static boolean isInsight(final Widget widget) {
+        return widget.getRoot().getAttribute("class").contains("type-visualization");
     }
 }

@@ -3,9 +3,11 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidget;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidgetWrap;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteAnalyticalDashboard;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAllInsightNames;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAnalyticalDashboards;
@@ -28,19 +30,15 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.visualization.VisualizationMDConfiguration;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.Visualization;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.FilterType;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.InsightItem;
-import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest;
-import static com.gooddata.qa.utils.CssUtils.simplifyText;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidgetWrap;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
+import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
 
-public class InsightOnDashboardTest extends DashboardsTest {
+public class InsightOnDashboardTest extends GoodSalesAbstractDashboardTest {
 
     private static final String TEST_INSIGHT = "Test-Insight";
     private static final String RENAMED_TEST_INSIGHT = "Renamed-Test-Insight";
@@ -54,77 +52,72 @@ public class InsightOnDashboardTest extends DashboardsTest {
         projectTitle += "Insight-On-Dashboard-Test";
     }
 
-    @Test(dependsOnMethods = { "initDashboardTests" }, groups = { "dashboardsInit" })
-    public void enableInsightFlag() throws JSONException, IOException {
-        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS_VISUALIZATIONS, true);
-    }
-
-    @Test(dependsOnMethods = { "enableInsightFlag" }, groups = { "dashboardsInit" })
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"setupDashboardENV"})
     public void testBlankStateInEditMode() {
         initIndigoDashboardsPage().getSplashScreen().startEditingWidgets();
-        //ignore checking existing of insight panel
-        //because below assertions definitely fail in that case
+        // ignore checking existing of insight panel
+        // because below assertions definitely fail in that case
         assertTrue(indigoDashboardsPage.getInsightSelectionPanel().isFilterActive(FilterType.BY_ME),
                 "Created by me tab is not default filter");
         assertTrue(indigoDashboardsPage.getInsightSelectionPanel().isFilterVisible(FilterType.ALL),
                 "All tab is not visible in filter section");
     }
 
-    @Test(dependsOnGroups = { "createProject" }, groups = { "createInsight" })
+    @Test(dependsOnGroups = {"createProject"}, groups = {"createInsight"})
     public void testCreatingSimpleInsightUsingAd() throws JSONException, IOException {
-        //need an insight having real data, so we can't use REST API
+        // need an insight having real data, so we can't use REST API
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing().saveInsight(TEST_INSIGHT);
         assertTrue(getAllInsightNames(getRestApiClient(), testParams.getProjectId()).contains(TEST_INSIGHT),
                 TEST_INSIGHT + " is not created");
     }
 
-    @Test(dependsOnGroups = { "dashboardsInit", "createInsight" })
+    @Test(dependsOnGroups = {"setupDashboardENV", "createInsight"})
     public void testAddInsight() {
         assertTrue(initIndigoDashboardsPage()
             .getSplashScreen()
             .startEditingWidgets()
-            .addInsightToLastPosition(TEST_INSIGHT)
-            .getLastVisualization()
+            .addInsightUsingDoubleClick(TEST_INSIGHT)
+            .getLastWidget(Insight.class)
             .isDeleteButtonVisible(), "Added insight is not focused");
 
-        assertEquals(indigoDashboardsPage.getLastVisualization().getHeadline(), TEST_INSIGHT);
+        assertEquals(indigoDashboardsPage.getLastWidget(Insight.class).getHeadline(), TEST_INSIGHT);
     }
 
-    @Test(dependsOnGroups = { "dashboardsInit", "createInsight" })
+    @Test(dependsOnGroups = {"setupDashboardENV", "createInsight"})
     public void testSavedDashboardContainingInsight() throws JSONException, IOException {
         initIndigoDashboardsPage()
             .getSplashScreen()
             .startEditingWidgets()
-            .addInsightToLastPosition(TEST_INSIGHT)
+            .addInsightUsingDoubleClick(TEST_INSIGHT)
             .saveEditModeWithWidgets();
         try {
-            assertEquals(indigoDashboardsPage.getLastVisualization().getHeadline(), TEST_INSIGHT);
+            assertEquals(indigoDashboardsPage.getLastWidget(Insight.class).getHeadline(), TEST_INSIGHT);
         } finally {
             deleteAnalyticalDashboard(getRestApiClient(),
                     getAnalyticalDashboards(getRestApiClient(), testParams.getProjectId()).get(0));
         }
     }
 
-    @Test(dependsOnGroups = { "dashboardsInit", "createInsight" })
+    @Test(dependsOnGroups = {"setupDashboardENV", "createInsight"})
     public void testRenameInsightOnDashboard() throws JSONException, IOException {
         IndigoDashboardsPage idp = initIndigoDashboardsPage()
             .getSplashScreen()
             .startEditingWidgets()
-            .addInsightToLastPosition(TEST_INSIGHT)
+            .addInsightUsingDoubleClick(TEST_INSIGHT)
             .saveEditModeWithWidgets();
 
-        idp.switchToEditMode()
-                .getLastVisualization()
-                .setHeadline(RENAMED_TEST_INSIGHT);
-        idp.saveEditModeWithWidgets();
-
-        String headline = initIndigoDashboardsPageWithWidgets()
-                .getLastVisualization()
-                .getHeadline();
-
         try {
+            idp.switchToEditMode()
+                    .getLastWidget(Insight.class)
+                    .clickOnContent()
+                    .setHeadline(RENAMED_TEST_INSIGHT);
+            idp.saveEditModeWithWidgets();
+    
+            String headline = initIndigoDashboardsPageWithWidgets()
+                    .getLastWidget(Insight.class)
+                    .getHeadline();
+
             takeScreenshot(browser, "testRenameInsightOnDashboard-renamed", getClass());
             assertEquals(headline, RENAMED_TEST_INSIGHT, "Insight not properly renamed");
         } finally {
@@ -133,7 +126,7 @@ public class InsightOnDashboardTest extends DashboardsTest {
         }
     }
 
-    @Test(dependsOnGroups = { "dashboardsInit", "createInsight" })
+    @Test(dependsOnGroups = {"setupDashboardENV", "createInsight"})
     public void testInsightRenderInViewModeAfterSwitchingPage() throws JSONException, IOException {
         final String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
                 singletonList(
@@ -147,14 +140,14 @@ public class InsightOnDashboardTest extends DashboardsTest {
         try {
             initAnalysePage();
             assertTrue(browser.getCurrentUrl().contains("/reportId/edit"), "AD page is not loaded");
-            checkInsightRender(initIndigoDashboardsPageWithWidgets().waitForAllInsightWidgetContentLoaded().getLastVisualization(),
+            checkInsightRender(initIndigoDashboardsPageWithWidgets().getLastWidget(Insight.class),
                     TEST_INSIGHT, 4);
         } finally {
             deleteAnalyticalDashboard(getRestApiClient(), dashboardUri);
         }
     }
 
-    @Test(dependsOnGroups = { "dashboardsInit", "createInsight" })
+    @Test(dependsOnGroups = {"setupDashboardENV", "createInsight"})
     public void testInsightTitleOnDashboardAfterRenamedInAD() throws JSONException, IOException {
         final String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
                 singletonList(
@@ -167,13 +160,12 @@ public class InsightOnDashboardTest extends DashboardsTest {
                 ));
 
         try {
-            initIndigoDashboardsPageWithWidgets().waitForAllInsightWidgetContentLoaded();
+            initIndigoDashboardsPageWithWidgets();
             takeScreenshot(browser, "testInsightTitleOnDashboardAfterRenamedInAD-beforeRename", getClass());
 
             initAnalysePage().openInsight(TEST_INSIGHT).waitForReportComputing().setInsightTitle(RENAMED_TEST_INSIGHT).saveInsight();
             String insightInsertedBeforeRenameTitle = initIndigoDashboardsPageWithWidgets()
-                .waitForAllInsightWidgetContentLoaded()
-                .getLastVisualization()
+                .getLastWidget(Insight.class)
                 .getHeadline();
 
             takeScreenshot(browser, "testInsightTitleOnDashboardAfterRenamedInAD-afterRename", getClass());
@@ -184,7 +176,7 @@ public class InsightOnDashboardTest extends DashboardsTest {
         }
     }
 
-    @Test(dependsOnGroups = { "dashboardsInit", "createInsight" })
+    @Test(dependsOnGroups = {"setupDashboardENV", "createInsight"})
     public void testInsightTitleOnDashboardAddedAfterRename() throws JSONException, IOException {
         final String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
                 singletonList(
@@ -199,10 +191,9 @@ public class InsightOnDashboardTest extends DashboardsTest {
         try {
             initAnalysePage().openInsight(TEST_INSIGHT).waitForReportComputing().setInsightTitle(RENAMED_TEST_INSIGHT).saveInsight();
             String insightInsertedAfterRenameTitle = initIndigoDashboardsPageWithWidgets()
-                .waitForAllInsightWidgetContentLoaded()
                 .switchToEditMode()
-                .addInsightToLastPosition(RENAMED_TEST_INSIGHT)
-                .getLastVisualization()
+                .addInsightUsingDoubleClick(RENAMED_TEST_INSIGHT)
+                .getLastWidget(Insight.class)
                 .getHeadline();
 
             takeScreenshot(browser, "testInsightTitleOnDashboardAddedAfterRename", getClass());
@@ -213,7 +204,7 @@ public class InsightOnDashboardTest extends DashboardsTest {
         }
     }
 
-    @Test(dependsOnGroups = { "dashboardsInit", "createInsight" })
+    @Test(dependsOnGroups = {"setupDashboardENV", "createInsight"})
     public void testInsightTitleInADAfterRenamedOnDashboard() throws JSONException, IOException {
         final String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
                 singletonList(
@@ -226,10 +217,10 @@ public class InsightOnDashboardTest extends DashboardsTest {
                 ));
 
         try {
-            IndigoDashboardsPage idp = initIndigoDashboardsPageWithWidgets()
-                .waitForAllInsightWidgetContentLoaded();
+            IndigoDashboardsPage idp = initIndigoDashboardsPageWithWidgets();
             idp.switchToEditMode()
-                .getLastVisualization()
+                .getLastWidget(Insight.class)
+                .clickOnContent()
                 .setHeadline(RENAMED_TEST_INSIGHT);
             idp.saveEditModeWithWidgets();
 
@@ -246,7 +237,7 @@ public class InsightOnDashboardTest extends DashboardsTest {
         }
     }
 
-    @Test(dependsOnGroups = { "dashboardsInit" })
+    @Test(dependsOnGroups = {"setupDashboardENV"})
     public void testCreatingInsightsForFilterTest() throws ParseException, IOException, JSONException {
         initProjectsPage();
 
@@ -264,7 +255,7 @@ public class InsightOnDashboardTest extends DashboardsTest {
                         .type(ReportType.BAR_CHART.getLabel())
                         .build());
 
-        //need refresh to make sure the insights are added to working project
+        // need refresh to make sure the insights are added to working project
         browser.navigate().refresh();
         waitForProjectsPageLoaded(browser);
 
@@ -274,7 +265,7 @@ public class InsightOnDashboardTest extends DashboardsTest {
                 2, "The number of created insights is not correct");
     }
 
-    @Test(dependsOnMethods = { "testCreatingInsightsForFilterTest" })
+    @Test(dependsOnMethods = {"testCreatingInsightsForFilterTest"})
     public void testInsightListWithCreatedByMeFilter() {
         final List<InsightItem> insights = initIndigoDashboardsPage()
             .getSplashScreen()
@@ -286,12 +277,12 @@ public class InsightOnDashboardTest extends DashboardsTest {
         assertTrue(insights.stream().anyMatch(e -> e.matchesTitle(INSIGHT_CREATED_BY_MAIN_USER)),
                 INSIGHT_CREATED_BY_MAIN_USER + " does not exist on result list");
 
-        //ONE-1653: List of insights created by me show as all insights on KPIs
+        // ONE-1653: List of insights created by me show as all insights on KPIs
         assertFalse(insights.stream().anyMatch(e -> e.matchesTitle(INSIGHT_CREATED_BY_EDITOR)),
                 INSIGHT_CREATED_BY_EDITOR + " exists on result list");
     }
 
-    @Test(dependsOnMethods = { "testCreatingInsightsForFilterTest" })
+    @Test(dependsOnMethods = {"testCreatingInsightsForFilterTest"})
     public void testInsightListWithAllFilter() throws JSONException, IOException {
         initIndigoDashboardsPage()
             .getSplashScreen()
@@ -306,7 +297,7 @@ public class InsightOnDashboardTest extends DashboardsTest {
                 2, "The expected insights are not displayed");
     }
 
-    @Test(dependsOnGroups = { "dashboardsInit", "createInsight" })
+    @Test(dependsOnGroups = {"setupDashboardENV", "createInsight"})
     public void testNoMatchingSearch() {
         final String nonExistingInsight = "Non-Existing-Insight";
         initIndigoDashboardsPage()
@@ -325,7 +316,7 @@ public class InsightOnDashboardTest extends DashboardsTest {
         };
     }
 
-    @Test(dependsOnGroups = { "dashboardsInit", "createInsight" }, dataProvider = "specialInsightNameProvider")
+    @Test(dependsOnGroups = {"setupDashboardENV", "createInsight"}, dataProvider = "specialInsightNameProvider")
     public void testSearchUsingSpecialValues(final String searchValue) {
         initIndigoDashboardsPage()
             .getSplashScreen()
@@ -335,7 +326,7 @@ public class InsightOnDashboardTest extends DashboardsTest {
                 "No data message is not dispayed");
     }
 
-    @Test(dependsOnGroups = { "dashboardsInit", "createInsight" })
+    @Test(dependsOnGroups = {"setupDashboardENV", "createInsight"})
     public void testClearSearchInput() {
         final String insight = "Test-Clear-Search-Input";
         initIndigoDashboardsPage()
@@ -352,7 +343,7 @@ public class InsightOnDashboardTest extends DashboardsTest {
                 "No data message still exists after clicking on clear icon");
     }
 
-    @Test(dependsOnGroups = { "dashboardsInit", "createInsight" },
+    @Test(dependsOnGroups = {"setupDashboardENV", "createInsight"},
             description = "ONE-1671: Search insights in dashboard always switch to created by me tab after clear search keyword")
     public void testSelectedFilterAfterClearingInput() {
         final String insight = "Test-Selected-Filter-After-Clearing-Search-Input";
@@ -379,7 +370,7 @@ public class InsightOnDashboardTest extends DashboardsTest {
         };
     }
 
-    @Test(dependsOnMethods = { "testCreatingInsightsForFilterTest" }, dataProvider = "filterTypeProvider")
+    @Test(dependsOnMethods = {"testCreatingInsightsForFilterTest"}, dataProvider = "filterTypeProvider")
     public void testInsightListWithFilterAfterClearingSearchInput(FilterType type,
             final List<String> expectedInsights) {
         final String nonExistingInsight = "Non-Existing-Insight";
@@ -411,7 +402,7 @@ public class InsightOnDashboardTest extends DashboardsTest {
         createAndAddUserToProject(UserRoles.EDITOR);
     }
 
-    private void checkInsightRender(final Visualization insight, final String expectedHeadline,
+    private void checkInsightRender(final Insight insight, final String expectedHeadline,
             final int expectedTracker) {
         assertEquals(insight.getHeadline(), expectedHeadline);
         assertEquals(insight.getChartReport().getTrackersCount(), expectedTracker,

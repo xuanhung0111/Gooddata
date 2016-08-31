@@ -4,6 +4,7 @@
         <groups>
             <run>
                 <include name="desktop" />
+                <include name="dashboardsInit" />
                 <include name="precondition" />
                 <include name="createProject" />
                 <include name="arquillian" />
