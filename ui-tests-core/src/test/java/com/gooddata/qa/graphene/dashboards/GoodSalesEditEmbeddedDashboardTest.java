@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.md.Restriction.title;
+import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
@@ -26,8 +27,8 @@ import org.testng.annotations.Test;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.Metric;
 import com.gooddata.md.report.AttributeInGrid;
-import com.gooddata.md.report.GridElement;
 import com.gooddata.md.report.GridReportDefinitionContent;
+import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
@@ -256,14 +257,14 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
     }
 
     private Report createReport(String reportName) {
-        String amountMetricUri = getMdService().getObjUri(getProject(), Metric.class, title(METRIC_AMOUNT));
+        Metric amountMetric = getMdService().getObj(getProject(), Metric.class, title(METRIC_AMOUNT));
         Attribute product = getMdService().getObj(getProject(), Attribute.class, title(ATTR_PRODUCT));
 
         ReportDefinition definition = GridReportDefinitionContent.create(
                 reportName,
-                singletonList("metricGroup"),
+                singletonList(METRIC_GROUP),
                 singletonList(new AttributeInGrid(product.getDefaultDisplayForm().getUri())),
-                singletonList(new GridElement(amountMetricUri, METRIC_AMOUNT)));
+                singletonList(new MetricElement(amountMetric)));
 
         definition = getMdService().createObj(getProject(), definition);
         return getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));

@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.md.Restriction.title;
+import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPPORTUNITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
@@ -32,8 +33,8 @@ import com.gooddata.md.Attribute;
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
 import com.gooddata.md.report.AttributeInGrid;
-import com.gooddata.md.report.GridElement;
 import com.gooddata.md.report.GridReportDefinitionContent;
+import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.qa.browser.BrowserUtils;
@@ -79,21 +80,20 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
                 .getObj(getProject(), Fact.class, title(METRIC_PROBABILITY))
                 .getUri();
 
-        final String amountMetricUri = getMdService()
+        final Metric amountMetric = getMdService()
                 .createObj(getProject(), new Metric(AMOUNT_METRIC,
                         MetricTypes.SUM.getMaql().replaceFirst("__fact__", format("[%s]", amountUri)),
-                        METRIC_FORMAT))
-                .getUri();
+                        METRIC_FORMAT));
 
         final Metric probabilityMetric = getMdService().createObj(getProject(),
                 new Metric(PROBABILITY_METRIC,
                         MetricTypes.SUM.getMaql().replaceFirst("__fact__", format("[%s]", probabilityUri)),
                         METRIC_FORMAT));
 
-        ReportDefinition definition = GridReportDefinitionContent.create(SIMPLE_REPORT, singletonList("metricGroup"),
+        ReportDefinition definition = GridReportDefinitionContent.create(SIMPLE_REPORT, singletonList(METRIC_GROUP),
                 singletonList(new AttributeInGrid(stageNameUri)),
-                asList(new GridElement(amountMetricUri, METRIC_AMOUNT),
-                        new GridElement(probabilityMetric.getUri(), METRIC_PROBABILITY)));
+                asList(new MetricElement(amountMetric),
+                        new MetricElement(probabilityMetric)));
 
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
