@@ -254,10 +254,12 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"init"},
-            description = "CL-9955: Date is changed to unrelated when adding percent for viz")
+            description = "CL-9955: Date is changed to unrelated when adding percent for viz."
+                    + " After this CL-10156, the metric and attribute combination is changed "
+                    + "into # of Activities and Activity Type")
     public void keepDateRelationAfterAddingPercent() {
-        final String expectedDate = "Closed: This quarter";
-        analysisPage.addMetric(ATTR_STAGE_NAME, FieldType.ATTRIBUTE).addAttribute(ATTR_STAGE_NAME)
+        final String expectedDate = "Activity: This quarter";
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC).addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing();
 
         RecommendationContainer recommendationContainer =
@@ -272,7 +274,7 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
         analysisPage.waitForReportComputing();
 
         assertTrue(
-                analysisPage.getMetricsBucket().getMetricConfiguration("% Count of " + ATTR_STAGE_NAME)
+                analysisPage.getMetricsBucket().getMetricConfiguration("% " + METRIC_NUMBER_OF_ACTIVITIES)
                         .expandConfiguration().isShowPercentSelected(),
                 "Percent was not added after using see percent recommendation");
 
