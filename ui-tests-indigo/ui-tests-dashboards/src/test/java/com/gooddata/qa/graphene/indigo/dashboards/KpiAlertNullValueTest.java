@@ -42,6 +42,7 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.utils.mail.ImapClient;
+import com.gooddata.qa.utils.mail.ImapUtils;
 import com.google.common.collect.Iterables;
 
 public class KpiAlertNullValueTest extends AbstractProjectTest {
@@ -186,7 +187,7 @@ public class KpiAlertNullValueTest extends AbstractProjectTest {
     private Document getAlertEmail(ImapClient imapClient, GDEmails from, String subject)
             throws MessagingException, IOException {
         List<Message> messages  = waitForMessages(imapClient, from, subject, 1);
-        return Jsoup.parse(ImapClient.getEmailBody(Iterables.getLast(messages)));
+        return Jsoup.parse(ImapUtils.getEmailBody(Iterables.getLast(messages)));
     }
 
     private boolean doesEmailHaveContent(Document email, String content) {

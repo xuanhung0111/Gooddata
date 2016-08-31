@@ -22,8 +22,6 @@ import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
-import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 
 import java.io.File;
 import java.io.FileReader;
@@ -40,7 +38,6 @@ import javax.mail.MessagingException;
 import javax.mail.Part;
 
 import org.jboss.arquillian.graphene.Graphene;
-import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
 import org.supercsv.io.CsvListReader;
@@ -64,8 +61,9 @@ import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage.RepeatTime;
-import com.gooddata.qa.utils.http.ScheduleMailPssClient;
+import com.gooddata.qa.utils.http.scheduleEmail.ScheduleEmailRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
+import com.gooddata.qa.utils.mail.ImapUtils;
 import com.google.common.base.Predicate;
 
 public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSchedulesTest {
@@ -77,8 +75,6 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     private String filteredVariableReportTitle = "Filtered-Variable-Report";
     private String numericVariableReportTitle = "Numeric-Variable-Report";
     private String mufReportTitle = "MUF-Report";
-
-    private int scheduledTimeInMinute;
 
     private Map<String, List<Message>> messages;
     private Map<String, MessageContent> attachments = new HashMap<String, MessageContent>();
@@ -111,9 +107,6 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
                 "Scheduled email test - empty dashboard.", "First Tab");
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-empty-dashboard", this.getClass());
-        DateTime dateTime = new DateTime();
-        // gets minute of schedule time
-        scheduledTimeInMinute = dateTime.getMinuteOfHour();
     }
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
@@ -382,31 +375,18 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
 
     @Test(dependsOnMethods = {"updateScheduledMailRecurrency"})
     public void waitForScheduleMessages() throws MessagingException, IOException {
-        ScheduleMailPssClient pssClient = new ScheduleMailPssClient(getRestApiClient(), testParams.getProjectId());
         try (ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword)) {
             System.out.println("ACCELERATE scheduled mails processing");
-            pssClient.accelerate();
+            ScheduleEmailRestUtils.accelerate(getRestApiClient(), testParams.getProjectId());
             checkMailbox(imapClient);
         } finally {
             System.out.println("DECELERATE scheduled mails processing");
-            pssClient.decelerate();
+            ScheduleEmailRestUtils.decelerate(getRestApiClient(), testParams.getProjectId());
         }
     }
 
     @Test(dependsOnMethods = {"waitForScheduleMessages"})
     public void verifyEmptyDashboardSchedule() {
-        System.out.println("Email checks ...");
-        int arrivedMessageCount = attachments.get(emptyDashboardTitle).totalMessage;
-        if (arrivedMessageCount == 2) {
-            if ((scheduledTimeInMinute <= 59 && scheduledTimeInMinute >= 50) || 
-                    (scheduledTimeInMinute <= 29 && scheduledTimeInMinute >= 20)) {
-                log.info("scheduled email is set up so close to the default scheduled time. So we get 2 emails.");
-            } else {
-                fail("ERROR: There are two message dashboard message arrived instead one.");
-            }
-        } else {
-            assertEquals(arrivedMessageCount, 1, "ERROR: Dashboard message arrived.");
-        }
         assertEquals(attachments.get(emptyDashboardTitle).savedAttachments.size(), 1,
                 "ERROR: Dashboard message does not have correct number of attachments.");
         assertTrue(attachments.get(emptyDashboardTitle).savedAttachments.get(0).contentType
@@ -475,11 +455,9 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     private void saveMessageAttachments(Map<String, List<Message>> messages) throws MessagingException, IOException {
         for (String title : messages.keySet()) {
             System.out.println("Saving message ...");
-            ImapClient.saveMessageAttachments(messages.get(title).get(0), attachmentsDirectory);
-            attachments.put(title,
-                    new MessageContent().setTotalMessage(messages.get(title).size())
-                        .setBody(ImapClient.getEmailBody(messages.get(title).get(0))));
-            List<Part> attachmentParts = ImapClient.getAttachmentParts(messages.get(title).get(0));
+            ImapUtils.saveMessageAttachments(messages.get(title).get(0), attachmentsDirectory);
+            attachments.put(title, new MessageContent().setBody(ImapUtils.getEmailBody(messages.get(title).get(0))));
+            List<Part> attachmentParts = ImapUtils.getAttachmentParts(messages.get(title).get(0));
             List<SavedAttachment> savedAttachments = new ArrayList<SavedAttachment>();
             for (Part part : attachmentParts) {
                 savedAttachments.add(new SavedAttachment().setContentType(part.getContentType())
@@ -512,7 +490,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
 
     private void getMessagesFromInbox(ImapClient imapClient) throws MessagingException {
         for (String title : messages.keySet()) {
-            messages.put(title, waitForMessages(imapClient, GDEmails.NOREPLY, title));
+            messages.put(title, waitForMessages(imapClient, GDEmails.NOREPLY, title, 1));
         }
     }
 
@@ -543,14 +521,8 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     }
 
     private class MessageContent {
-        private int totalMessage;
         private List<SavedAttachment> savedAttachments;
         private String body;
-
-        public MessageContent setTotalMessage(int totalMessage) {
-            this.totalMessage = totalMessage;
-            return this;
-        }
 
         public MessageContent setSavedAttachments(List<SavedAttachment> savedAttachments) {
             this.savedAttachments = savedAttachments;

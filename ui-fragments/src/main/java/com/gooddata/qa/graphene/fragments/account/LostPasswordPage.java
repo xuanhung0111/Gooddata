@@ -22,6 +22,7 @@ import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.utils.mail.ImapClient;
+import com.gooddata.qa.utils.mail.ImapUtils;
 import com.google.common.collect.Iterables;
 
 public class LostPasswordPage extends AbstractFragment {
@@ -110,7 +111,7 @@ public class LostPasswordPage extends AbstractFragment {
         Collection<Message> messages = waitForMessages(imapClient, GDEmails.REGISTRATION,
                 RESET_PASSWORD_EMAIL_SUBJECT, expectedMessageCount);
         Message resetPasswordMessage = Iterables.getLast(messages);
-        String messageBody = ImapClient.getEmailBody(resetPasswordMessage);
+        String messageBody = ImapUtils.getEmailBody(resetPasswordMessage);
         int beginIndex = messageBody.indexOf("/l/");
         return messageBody.substring(beginIndex, messageBody.indexOf("\n", beginIndex));
     }

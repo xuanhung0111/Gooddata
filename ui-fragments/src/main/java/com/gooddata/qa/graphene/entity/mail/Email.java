@@ -6,7 +6,7 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 
-import com.gooddata.qa.utils.mail.ImapClient;
+import com.gooddata.qa.utils.mail.ImapUtils;
 
 /**
  *This class is used for containing an email content 
@@ -25,7 +25,7 @@ public class Email {
 
     public static Email getInstance(Message message) throws MessagingException, IOException {
         return new Email(InternetAddress.toString(message.getFrom()),
-                message.getSubject(), ImapClient.getEmailBody(message));
+                message.getSubject(), ImapUtils.getEmailBody(message));
     }
 
     public String getFrom() {

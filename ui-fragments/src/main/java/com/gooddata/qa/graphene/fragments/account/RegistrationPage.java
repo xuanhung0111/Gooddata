@@ -27,6 +27,7 @@ import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.utils.mail.ImapClient;
+import com.gooddata.qa.utils.mail.ImapUtils;
 import com.google.common.collect.Iterables;
 
 public class RegistrationPage extends AbstractFragment {
@@ -205,7 +206,7 @@ public class RegistrationPage extends AbstractFragment {
         Collection<Message> messages = waitForMessages(imapClient, GDEmails.REGISTRATION,
                 REGISTRATION_EMAIL_SUBJECT, expectedMessageCount);
         Message activationMessage = Iterables.getLast(messages);
-        String messageBody = ImapClient.getEmailBody(activationMessage);
+        String messageBody = ImapUtils.getEmailBody(activationMessage);
         int beginIndex = messageBody.indexOf("/i/");
         return messageBody.substring(beginIndex, messageBody.indexOf("\n", beginIndex));
     }

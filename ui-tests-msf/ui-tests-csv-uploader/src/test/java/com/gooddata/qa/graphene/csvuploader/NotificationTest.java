@@ -25,6 +25,7 @@ import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
 import com.gooddata.qa.graphene.utils.GoodSalesUtils;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
+import com.gooddata.qa.utils.mail.ImapUtils;
 import com.google.common.collect.Iterables;
 
 public class NotificationTest extends AbstractCsvUploaderTest {
@@ -140,7 +141,7 @@ public class NotificationTest extends AbstractCsvUploaderTest {
             List<Message> notifications = 
                     waitForMessages(imapClient, GDEmails.NO_REPLY, subject, expectedMessageCount);
 
-            return Jsoup.parse(ImapClient.getEmailBody(Iterables.getLast(notifications)));
+            return Jsoup.parse(ImapUtils.getEmailBody(Iterables.getLast(notifications)));
 
         } catch (Exception e) {
             throw new IllegalStateException("There is an exception when checking notification content!", e);

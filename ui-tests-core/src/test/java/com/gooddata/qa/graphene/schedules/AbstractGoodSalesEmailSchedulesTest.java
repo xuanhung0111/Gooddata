@@ -5,6 +5,7 @@ package com.gooddata.qa.graphene.schedules;
 
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
+import static java.lang.String.format;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,9 +14,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Part;
 
+import org.apache.commons.lang.math.IntRange;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,14 +30,14 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.mail.ImapClient;
+import com.gooddata.qa.utils.mail.ImapUtils;
 
 public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
-
-    protected static final int MAILBOX_TIMEOUT_MINUTES = 6;
-    protected static final int MAILBOX_POLL_INTERVAL_MILLIS = 30000;
 
     protected static final String CANNOT_DELETE_DASHBOARD_MESSAGE = "Dashboard cannot be deleted"
             + " because it is linked from a scheduled email or KPI dashboard. Remove all links and retry.";
@@ -73,6 +76,38 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
         InputStream scheduleStream = getScheduleInputStream(scheduleUri);
         String schedule = getBccSchedule(scheduleStream, bccEmails);
         setSchedule(scheduleUri, schedule);
+    }
+
+    // The different here is schedule email use accelerate engine to force email sent immediately
+    // instead of waiting until the exactly period (xx:00, xx:30). So user can save too much time with this technique.
+
+    // But sometimes the schedule is set so close with the default schedule time (xx:29, xx:59).
+    // And when getting email, the time has passed over xx:00, xx:30,
+    // that means the same message will be sent twice (one from the system due to the default
+    // schedule time reached, and one from the accelerate engine).
+
+    // In this situation, ImapUtils#waitForMessages will not adapt because the email number is greater than the expected now.
+    // So use this method as a replacement.
+    protected List<Message> waitForMessages(ImapClient imapClient, GDEmails from, String subject, int expectedMessages)
+            throws MessagingException {
+        List<Message> messages =  ImapUtils.waitForMessages(imapClient, from, subject);
+
+        if (messages.size() == expectedMessages) {
+            return messages;
+        }
+
+        if (messages.size() == expectedMessages + 1) {
+            if (messages.stream()
+                    .map(ImapUtils::getMessageReceiveDate)
+                    .map(DateTime::getMinuteOfHour)
+                    .anyMatch(m -> new IntRange(0, 10).containsInteger(m) || new IntRange(30, 40).containsInteger(m))) {
+                log.info(format("scheduled email is set up so close to the default scheduled time. So we get %s emails.",
+                        messages.size()));
+                return messages;
+            }
+        }
+
+        throw new RuntimeException("There are too many messages than expected: " + expectedMessages);
     }
 
     /**
@@ -132,9 +167,4 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
         System.out.println(" - added bcc to schedule: " + bccEmailsList);
         return mapper.writeValueAsString(rootNode);
     }
-
-    protected int getMailboxMaxPollingLoops() {
-        return 60000 / MAILBOX_POLL_INTERVAL_MILLIS * MAILBOX_TIMEOUT_MINUTES;
-    }
-
 }
