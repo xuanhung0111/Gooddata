@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene;
 
 import static com.gooddata.md.Restriction.title;
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.SQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.ZIP_FILES;
@@ -59,8 +58,8 @@ import com.gooddata.md.Attribute;
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
 import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.GridElement;
 import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
@@ -328,9 +327,9 @@ public class AbstractMSFTest extends AbstractProjectTest {
         final Attribute attr = getMdService().getObj(getProject(), Attribute.class, title(attribute));
         ReportDefinition definition = GridReportDefinitionContent.create(
                 reportName,
-                asList(METRIC_GROUP),
+                asList("metricGroup"),
                 asList(new AttributeInGrid(attr.getDefaultDisplayForm().getUri())),
-                asList(new MetricElement(m)));
+                asList(new GridElement(m.getUri(), metric)));
         definition = getMdService().createObj(getProject(), definition);
         final Report report = getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
         final ByteArrayOutputStream output = new ByteArrayOutputStream();

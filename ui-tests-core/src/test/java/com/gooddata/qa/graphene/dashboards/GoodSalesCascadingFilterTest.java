@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.md.Restriction.identifier;
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
@@ -33,8 +32,8 @@ import com.gooddata.md.Attribute;
 import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
 import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.GridElement;
 import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.project.Project;
@@ -75,7 +74,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
         Project project = goodDataClient.getProjectService().getProjectById(testParams.getProjectId());
         MetadataService mdService = goodDataClient.getMetadataService();
 
-        Metric amountMetric = mdService.getObj(project, Metric.class, identifier("ah1EuQxwaCqs"));
+        String amountMetricUri = mdService.getObjUri(project, Metric.class, identifier("ah1EuQxwaCqs"));
         Attribute account = mdService.getObj(project, Attribute.class, identifier("attr.account.id"));
         Attribute stageName = mdService.getObj(project, Attribute.class, identifier("attr.stage.name"));
         Attribute product = mdService.getObj(project, Attribute.class, identifier("attr.product.id"));
@@ -84,10 +83,10 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
         ReportDefinition definition =
                 GridReportDefinitionContent.create(
                         REPORT_1,
-                        singletonList(METRIC_GROUP),
+                        singletonList("metricGroup"),
                         asList(new AttributeInGrid(account.getDefaultDisplayForm().getUri()), new AttributeInGrid(
-                                stageName.getDefaultDisplayForm().getUri())),
-                        singletonList(new MetricElement(amountMetric)));
+                                stageName.getDefaultDisplayForm().getUri())), singletonList(new GridElement(
+                                amountMetricUri, METRIC_AMOUNT)));
         definition = mdService.createObj(project, definition);
         mdService.createObj(project, new Report(definition.getTitle(), definition));
 
@@ -95,10 +94,10 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
         definition =
                 GridReportDefinitionContent.create(
                         REPORT_2,
-                        singletonList(METRIC_GROUP),
+                        singletonList("metricGroup"),
                         asList(new AttributeInGrid(stageName.getDefaultDisplayForm().getUri()),
                                 new AttributeInGrid(product.getDefaultDisplayForm().getUri())),
-                        singletonList(new MetricElement(amountMetric)));
+                        singletonList(new GridElement(amountMetricUri, METRIC_AMOUNT)));
         definition = mdService.createObj(project, definition);
         mdService.createObj(project, new Report(definition.getTitle(), definition));
 

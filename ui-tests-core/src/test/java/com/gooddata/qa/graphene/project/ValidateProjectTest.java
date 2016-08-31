@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.project;
 
 import static com.gooddata.md.Restriction.title;
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -20,8 +19,8 @@ import com.gooddata.md.Attribute;
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
 import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.GridElement;
 import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
 import com.gooddata.project.ProjectDriver;
 import com.gooddata.qa.graphene.AbstractProjectTest;
@@ -62,13 +61,15 @@ public class ValidateProjectTest extends AbstractProjectTest {
         testParams.setProjectId(projectId);
 
         try {
-            Attribute stageNameAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_STAGE_NAME));
-            Metric amountMetric = getMdService().getObj(getProject(), Metric.class, title(METRIC_AMOUNT));
+            Attribute stageNameAttribute = getMdService().getObj(getProject(), Attribute.class,
+                    title(ATTR_STAGE_NAME));
+            String amountMetricUri = getMdService().getObjUri(getProject(), Metric.class,
+                    title(METRIC_AMOUNT));
 
             Report report = createReportViaRest(GridReportDefinitionContent.create(REPORT,
-                    singletonList(METRIC_GROUP),
+                    singletonList("metricGroup"),
                     singletonList(new AttributeInGrid(stageNameAttribute.getDefaultDisplayForm().getUri())),
-                    singletonList(new MetricElement(amountMetric))));
+                    singletonList(new GridElement(amountMetricUri, METRIC_AMOUNT))));
 
             initDashboardsPage()
                     .addNewDashboard(DASHBOARD)
@@ -110,9 +111,9 @@ public class ValidateProjectTest extends AbstractProjectTest {
                     new Metric("SumOfNumber", expression, "#,##0"));
 
             Report report = createReportViaRest(GridReportDefinitionContent.create(REPORT,
-                    singletonList(METRIC_GROUP),
+                    singletonList("metricGroup"),
                     singletonList(new AttributeInGrid(firstNameAttribute.getDefaultDisplayForm().getUri())),
-                    singletonList(new MetricElement(numberMetric))));
+                    singletonList(new GridElement(numberMetric.getUri(), numberMetric.getTitle()))));
 
             initDashboardsPage()
                     .addNewDashboard(DASHBOARD)

@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.manage;
 
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.entity.metric.CustomMetricUI.buildAttributeValue;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_SNAPSHOT;
@@ -74,8 +73,8 @@ import com.gooddata.md.Attribute;
 import com.gooddata.md.Metric;
 import com.gooddata.md.Restriction;
 import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.GridElement;
 import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
@@ -492,9 +491,9 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         Metric metric = createLikeMetric(metricType, attrObj, metricObj, pattern);
 
         ReportDefinition definition = GridReportDefinitionContent.create("Report for " + metricType.getLabel(),
-                singletonList(METRIC_GROUP),
+                singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(attrObj.getDefaultDisplayForm().getUri())),
-                singletonList(new MetricElement(metric)));
+                singletonList(new GridElement(metric.getUri(), metric.getTitle())));
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
@@ -524,12 +523,12 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         Metric metricWithUnderscorePattern = createLikeMetric(MetricTypes.LIKE, attrObj, metricObj, "Expl__er");
         Metric metricWithWrongUnderscorePattern = createLikeMetric(MetricTypes.LIKE, attrObj, metricObj, "Expl_r");
 
-        ReportDefinition definition = GridReportDefinitionContent.create(reportName, singletonList(METRIC_GROUP),
+        ReportDefinition definition = GridReportDefinitionContent.create(reportName, singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(attrObj.getDefaultDisplayForm().getUri())),
-                asList(new MetricElement(metricWithFullStringPattern),
-                        new MetricElement(metricWithPercentSignPattern),
-                        new MetricElement(metricWithUnderscorePattern),
-                        new MetricElement(metricWithWrongUnderscorePattern)));
+                asList(new GridElement(metricWithFullStringPattern.getUri(), metricWithFullStringPattern.getTitle()),
+                        new GridElement(metricWithPercentSignPattern.getUri(), metricWithPercentSignPattern.getTitle()),
+                        new GridElement(metricWithUnderscorePattern.getUri(), metricWithUnderscorePattern.getTitle()),
+                        new GridElement(metricWithWrongUnderscorePattern.getUri(), metricWithWrongUnderscorePattern.getTitle())));
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
@@ -594,16 +593,16 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         List<Metric> greatestLeastMetrics = createGreatestAndLeastMetric(ATTR_STAGE_NAME, metrics);
         Attribute attrObj = getMdService().getObj(getProject(), Attribute.class, Restriction.title(ATTR_STAGE_NAME));
 
-        List<MetricElement> gridElements = metrics.stream()
+        List<GridElement> gridElements = metrics.stream()
             .map(title -> getMdService().getObj(getProject(), Metric.class, Restriction.title(title)))
-            .map(metric -> new MetricElement(metric))
+            .map(metric -> new GridElement(metric.getUri(), metric.getTitle()))
             .collect(toList());
 
         greatestLeastMetrics.stream()
-            .map(metric -> new MetricElement(metric))
+            .map(metric -> new GridElement(metric.getUri(), metric.getTitle()))
             .forEach(metric -> gridElements.add(metric));
 
-        ReportDefinition definition = GridReportDefinitionContent.create(reportName, singletonList(METRIC_GROUP),
+        ReportDefinition definition = GridReportDefinitionContent.create(reportName, singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(attrObj.getDefaultDisplayForm().getUri())), gridElements);
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
@@ -646,26 +645,26 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                 DEFAULT_METRIC_NUMBER_FORMAT));
 
         String reportName = "RollingMetric - Date";
-        ReportDefinition definition = GridReportDefinitionContent.create(reportName, singletonList(METRIC_GROUP),
+        ReportDefinition definition = GridReportDefinitionContent.create(reportName, singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(date.getDefaultDisplayForm().getUri())),
-                asList(new MetricElement(amount.getUri(), amount.getTitle()),
-                        new MetricElement(m1),
-                        new MetricElement(m2),
-                        new MetricElement(m3),
-                        new MetricElement(m4)));
+                asList(new GridElement(amount.getUri(), amount.getTitle()),
+                        new GridElement(m1.getUri(), m1.getTitle()),
+                        new GridElement(m2.getUri(), m2.getTitle()),
+                        new GridElement(m3.getUri(), m3.getTitle()),
+                        new GridElement(m4.getUri(), m4.getTitle())));
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
         initReportsPage().openReport(reportName);
         checkReportRenderedWell(reportName);
 
         reportName = "RollingMetric - Month_Year";
-        definition = GridReportDefinitionContent.create(reportName, singletonList(METRIC_GROUP),
+        definition = GridReportDefinitionContent.create(reportName, singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(monthYear.getDefaultDisplayForm().getUri())),
-                asList(new MetricElement(amount),
-                        new MetricElement(m1),
-                        new MetricElement(m2),
-                        new MetricElement(m3),
-                        new MetricElement(m4)));
+                asList(new GridElement(amount.getUri(), amount.getTitle()),
+                        new GridElement(m1.getUri(), m1.getTitle()),
+                        new GridElement(m2.getUri(), m2.getTitle()),
+                        new GridElement(m3.getUri(), m3.getTitle()),
+                        new GridElement(m4.getUri(), m4.getTitle())));
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
         initReportsPage().openReport(reportName);
@@ -816,9 +815,9 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     private void checkMetricValuesInReport(Metric metric, Attribute attribute, List<Float> metricValues,
             List<String> attributeValues) {
         String reportName = "report_" + metric.getTitle();
-        ReportDefinition definition = GridReportDefinitionContent.create(reportName, singletonList(METRIC_GROUP),
+        ReportDefinition definition = GridReportDefinitionContent.create(reportName, singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(attribute.getDefaultDisplayForm().getUri())),
-                singletonList(new MetricElement(metric)));
+                singletonList(new GridElement(metric.getUri(), metric.getTitle())));
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 

@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.md.Restriction.title;
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
@@ -49,8 +48,8 @@ import org.testng.annotations.Test;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.Metric;
 import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.GridElement;
 import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
@@ -92,13 +91,13 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
 
     @Test(dependsOnGroups = { "createProject" })
     public void testCreatingIncomputableReport() {
-        final Metric amountMetric = getMdService().getObj(getProject(), Metric.class, title(METRIC_AMOUNT));
+        final String amountUri = getMdService().getObjUri(getProject(), Metric.class, title(METRIC_AMOUNT));
         final String activityUri = getMdService().getObj(getProject(), Attribute.class, title(ATTR_ACTIVITY))
                 .getDefaultDisplayForm().getUri();
         ReportDefinition definition = GridReportDefinitionContent.create(INCOMPUTABLE_REPORT,
-                singletonList(METRIC_GROUP),
+                singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(activityUri)),
-                singletonList(new MetricElement(amountMetric)));
+                singletonList(new GridElement(amountUri, METRIC_AMOUNT)));
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
@@ -227,12 +226,12 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
     }
 
     private void createSimpleReport(final String report, final String metric, final String attribute) {
-        final Metric metricObj = getMdService().getObj(getProject(), Metric.class, title(metric));
+        final String metricUri = getMdService().getObjUri(getProject(), Metric.class, title(metric));
         final String attributeUri = getMdService().getObj(getProject(), Attribute.class, title(attribute))
                 .getDefaultDisplayForm().getUri();
-        ReportDefinition definition = GridReportDefinitionContent.create(report, singletonList(METRIC_GROUP),
+        ReportDefinition definition = GridReportDefinitionContent.create(report, singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(attributeUri)),
-                singletonList(new MetricElement(metricObj)));
+                singletonList(new GridElement(metricUri, metric)));
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
     }

@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.md.Restriction.title;
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
@@ -22,8 +21,8 @@ import com.gooddata.md.Attribute;
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
 import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.GridElement;
 import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
@@ -150,14 +149,15 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
                 .getDefaultDisplayForm().getUri();
         final String amountUri = getMdService().getObjUri(getProject(), Fact.class, title(AMOUNT));
 
-        final Metric amountSum = getMdService()
+        final String amountSumUri = getMdService()
                 .createObj(getProject(), new Metric(metricAlias,
-                        MetricTypes.SUM.getMaql().replaceFirst("__fact__", format("[%s]", amountUri)), "#,##0.00"));
+                        MetricTypes.SUM.getMaql().replaceFirst("__fact__", format("[%s]", amountUri)), "#,##0.00"))
+                .getUri();
 
         final String reportName = "Report-for-testing-running-totals";
-        ReportDefinition definition = GridReportDefinitionContent.create(reportName, singletonList(METRIC_GROUP),
+        ReportDefinition definition = GridReportDefinitionContent.create(reportName, singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(stageNameUri)),
-                singletonList(new MetricElement(amountSum)));
+                singletonList(new GridElement(amountSumUri, metricAlias)));
 
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));

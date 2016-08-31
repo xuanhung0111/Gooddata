@@ -4,7 +4,6 @@
 package com.gooddata.qa.graphene.schedules;
 
 import static com.gooddata.md.Restriction.identifier;
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_DISMISS_BUTTON;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR_WARNING;
@@ -50,8 +49,8 @@ import org.testng.annotations.Test;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.Metric;
 import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.GridElement;
 import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
@@ -156,8 +155,8 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         Metric metric = getMdService().createObj(getProject(), new Metric("NO DATA",
                 expression.replace("${pid}", testParams.getProjectId()), "#,##0"));
         ReportDefinition definition = GridReportDefinitionContent.create(NO_DATA_REPORT,
-                singletonList(METRIC_GROUP), Collections.<AttributeInGrid>emptyList(),
-                singletonList(new MetricElement(metric)));
+                singletonList("metricGroup"), Collections.<AttributeInGrid>emptyList(),
+                singletonList(new GridElement(metric.getUri(), "metric")));
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
@@ -170,12 +169,12 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void scheduleIncomputableReport() {
         initReportsPage();
-        Metric amountMetric = getMdService().getObj(getProject(), Metric.class, identifier("ah1EuQxwaCqs"));
+        String amountMetricUri = getMdService().getObjUri(getProject(), Metric.class, identifier("ah1EuQxwaCqs"));
         Attribute activity = getMdService().getObj(getProject(), Attribute.class, identifier("attr.activity.id"));
         ReportDefinition definition = GridReportDefinitionContent.create(INCOMPUTABLE_REPORT,
-                singletonList(METRIC_GROUP),
+                singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(activity.getDefaultDisplayForm().getUri())),
-                singletonList(new MetricElement(amountMetric)));
+                singletonList(new GridElement(amountMetricUri, "metric")));
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
@@ -193,11 +192,11 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         Attribute activityType =
                 getMdService().getObj(getProject(), Attribute.class, identifier("attr.activity.activitytype"));
         ReportDefinition definition = GridReportDefinitionContent.create(TOO_LARGE_REPORT,
-                singletonList(METRIC_GROUP),
+                singletonList("metricGroup"),
                 asList(new AttributeInGrid(account.getDefaultDisplayForm().getUri()),
                         new AttributeInGrid(activity.getDefaultDisplayForm().getUri()),
                         new AttributeInGrid(activityType.getDefaultDisplayForm().getUri())),
-                Collections.<MetricElement>emptyList());
+                Collections.<GridElement>emptyList());
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
@@ -235,9 +234,9 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         Metric metric = getMdService().createObj(getProject(), new Metric(report,
                 expression.replace("${pid}", testParams.getProjectId()), "#,##0"));
         Attribute yearSnapshot = getMdService().getObj(getProject(), Attribute.class, identifier("snapshot.year"));
-        ReportDefinition definition = GridReportDefinitionContent.create(report, singletonList(METRIC_GROUP),
+        ReportDefinition definition = GridReportDefinitionContent.create(report, singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(yearSnapshot.getDefaultDisplayForm().getUri())),
-                singletonList(new MetricElement(metric)));
+                singletonList(new GridElement(metric.getUri(), "metric")));
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
@@ -251,7 +250,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     public void scheduleMufReport() throws IOException, JSONException {
         initEmailSchedulesPage();
         Attribute product = getMdService().getObj(getProject(), Attribute.class, identifier("attr.product.id"));
-        Metric amountMetric = getMdService().getObj(getProject(), Metric.class, identifier("ah1EuQxwaCqs"));
+        String amountUri = getMdService().getObjUri(getProject(), Metric.class, identifier("ah1EuQxwaCqs"));
         String report = "MUF report";
 
         final String explorerUri = getMdService().getAttributeElements(product).stream()
@@ -263,9 +262,9 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
                 createSimpleMufObjByUri(getRestApiClient(), getProject().getId(), "Product user filter", conditions);
         addMufToUser(getRestApiClient(), getProject().getId(), testParams.getUser(), mufUri);
 
-        ReportDefinition definition = GridReportDefinitionContent.create(report, singletonList(METRIC_GROUP),
+        ReportDefinition definition = GridReportDefinitionContent.create(report, singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(product.getDefaultDisplayForm().getUri())),
-                singletonList(new MetricElement(amountMetric)));
+                singletonList(new GridElement(amountUri, "metric")));
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
@@ -281,10 +280,10 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         String report = "# test report";
 
         initReportsPage();
-        Metric amountMetric = getMdService().getObj(getProject(), Metric.class, identifier("ah1EuQxwaCqs"));
-        ReportDefinition definition = GridReportDefinitionContent.create(report, singletonList(METRIC_GROUP),
+        String amountMetricUri = getMdService().getObjUri(getProject(), Metric.class, identifier("ah1EuQxwaCqs"));
+        ReportDefinition definition = GridReportDefinitionContent.create(report, singletonList("metricGroup"),
                 Collections.<AttributeInGrid>emptyList(),
-                singletonList(new MetricElement(amountMetric)));
+                singletonList(new GridElement(amountMetricUri, "metric")));
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 

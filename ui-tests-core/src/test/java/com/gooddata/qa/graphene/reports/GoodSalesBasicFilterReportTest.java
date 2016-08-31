@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.md.Restriction.title;
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
@@ -31,8 +30,8 @@ import com.gooddata.md.Attribute;
 import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
 import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.GridElement;
 import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.project.Project;
@@ -215,16 +214,16 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
         Project project = goodDataClient.getProjectService().getProjectById(testParams.getProjectId());
         MetadataService mdService = goodDataClient.getMetadataService();
 
-        Metric amountMetric = mdService.getObj(project, Metric.class, title(METRIC_AMOUNT));
+        String amountMetricUri = mdService.getObjUri(project, Metric.class, title(METRIC_AMOUNT));
         Attribute stageName = mdService.getObj(project, Attribute.class, title(ATTR_STAGE_NAME));
         Attribute year = mdService.getObj(project, Attribute.class, title(ATTR_YEAR_SNAPSHOT));
 
         ReportDefinition definition = GridReportDefinitionContent.create(
                 reportName,
-                singletonList(METRIC_GROUP),
+                singletonList("metricGroup"),
                 asList(new AttributeInGrid(stageName.getDefaultDisplayForm().getUri()),
                         new AttributeInGrid(year.getDefaultDisplayForm().getUri())),
-                singletonList(new MetricElement(amountMetric)));
+                singletonList(new GridElement(amountMetricUri, METRIC_AMOUNT)));
 
         definition = mdService.createObj(project, definition);
         mdService.createObj(project, new Report(definition.getTitle(), definition));

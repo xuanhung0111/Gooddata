@@ -6,7 +6,6 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertEquals;
 import static com.gooddata.md.Restriction.title;
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
@@ -34,8 +33,8 @@ import com.gooddata.md.Attribute;
 import com.gooddata.md.Metric;
 import com.gooddata.md.report.AttributeInGrid;
 import com.gooddata.md.report.Filter;
+import com.gooddata.md.report.GridElement;
 import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
@@ -222,14 +221,14 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
                 .withAttribute(ATTR_STAGE_NAME)
                 .withAttributeValues(ATTRIBUTE_VALUES));
 
-        Metric amountMetric = getMdService().getObj(getProject(), Metric.class, title(METRIC_AMOUNT));
+        String amountMetricUri = getMdService().getObjUri(getProject(), Metric.class, title(METRIC_AMOUNT));
         String promptFilterUri = getVariableUri(getRestApiClient(), testParams.getProjectId(), variable);
         Attribute stageNameAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_STAGE_NAME));
 
         Report report = createReportViaRest(GridReportDefinitionContent.create("Report",
-                singletonList(METRIC_GROUP),
+                singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(stageNameAttribute.getDefaultDisplayForm().getUri())),
-                singletonList(new MetricElement(amountMetric)),
+                singletonList(new GridElement(amountMetricUri, METRIC_AMOUNT)),
                 singletonList(new Filter(format("[%s]", promptFilterUri)))));
 
         initVariablePage()
