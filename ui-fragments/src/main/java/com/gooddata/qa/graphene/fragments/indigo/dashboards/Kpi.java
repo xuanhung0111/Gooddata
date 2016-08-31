@@ -9,9 +9,7 @@ import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 /**
@@ -38,16 +36,8 @@ public class Kpi extends Widget {
     public static final By IS_NOT_EDITABLE = By.cssSelector(MAIN_SELECTOR + " .kpi:not(.is-editable)");
     public static final By ALERT_DIALOG = By.className(KPI_ALERT_DIALOG_CLASS);
 
-    public static final By HINT_LOCATOR = By.cssSelector(".gd-editable-label:hover");
-
     @FindBy(className = KPI_ALERT_BUTTON_CLASS)
     private WebElement alertButton;
-
-    @FindBy(css = ".item-headline > h3 .gd-editable-label")
-    private WebElement headlineInplaceEdit;
-
-    @FindBy(css = ".item-headline > h3 textarea")
-    private WebElement headlineTextarea;
 
     @FindBy(className = "kpi-value")
     private WebElement value;
@@ -60,27 +50,6 @@ public class Kpi extends Widget {
 
     @FindBy(className = KPI_CONTENT_CLASS)
     private WebElement content;
-
-    public void clearHeadline() {
-        waitForElementVisible(headlineInplaceEdit).click();
-
-        // hit backspace multiple times, because .clear()
-        // event does not trigger onchange event
-        // https://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#clear%28%29
-        waitForElementVisible(headlineTextarea);
-        int headlineLength = headlineInplaceEdit.getText().length();
-        for (int i = 0; i < headlineLength; i++) {
-            headlineTextarea.sendKeys(Keys.BACK_SPACE);
-        }
-    }
-
-    public void setHeadline(String newHeadline) {
-        clearHeadline();
-        headlineTextarea.sendKeys(newHeadline);
-        headlineTextarea.sendKeys(Keys.ENTER);
-
-        waitForElementVisible(headlineInplaceEdit);
-    }
 
     public String getValue() {
         return waitForElementPresent(value).getText();
@@ -148,7 +117,7 @@ public class Kpi extends Widget {
     }
 
     public Kpi hoverAndClickKpiAlertButton() {
-        // In case after edit Indigo dashboard and save, there should have a piece of time to wait for 
+        // In case after edit Indigo dashboard and save, there should have a piece of time to wait for
         // Kpi until its position is fixed on dashboard.
         // And in that time, any actions like hover may not work properly because the Kpi is still running.
         // Consider this is a work around to wait until the Kpi's position is fixed on dashboard.
@@ -166,12 +135,6 @@ public class Kpi extends Widget {
 
     public void waitForLoading() {
         waitForElementVisible(contentLoading);
-    }
-
-    public String hoverToHeadline() {
-        new Actions(browser).moveToElement(headlineInplaceEdit).perform();
-        return waitForElementVisible(getRoot().findElement(HINT_LOCATOR))
-                .getCssValue("background-color");
     }
 
     public boolean hasHintForEditName() {

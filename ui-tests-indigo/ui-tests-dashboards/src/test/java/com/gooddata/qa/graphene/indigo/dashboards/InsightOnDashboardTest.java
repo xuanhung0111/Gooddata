@@ -29,6 +29,8 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.entity.visualization.VisualizationMDConfiguration;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Visualization;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.FilterType;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.InsightItem;
@@ -97,6 +99,32 @@ public class InsightOnDashboardTest extends DashboardsTest {
             .saveEditModeWithWidgets();
         try {
             checkInsightRender(indigoDashboardsPage.getLastVisualization(), TEST_INSIGHT, 4);
+        } finally {
+            deleteAnalyticalDashboard(getRestApiClient(),
+                    getAnalyticalDashboards(getRestApiClient(), testParams.getProjectId()).get(0));
+        }
+    }
+
+    @Test(dependsOnGroups = { "dashboardsInit", "createInsight" })
+    public void testRenameInsightOnDashboard() throws JSONException, IOException {
+        IndigoDashboardsPage idp = initIndigoDashboardsPage()
+            .getSplashScreen()
+            .startEditingWidgets()
+            .addInsightToLastPosition(TEST_INSIGHT)
+            .saveEditModeWithWidgets();
+
+        idp.switchToEditMode()
+                .getLastVisualization()
+                .setHeadline(RENAMED_TEST_INSIGHT);
+        idp.saveEditModeWithWidgets();
+
+        String headline = initIndigoDashboardsPageWithWidgets()
+                .getLastVisualization()
+                .getHeadline();
+
+        try {
+            takeScreenshot(browser, "testRenameInsightOnDashboard-renamed", getClass());
+            assertEquals(headline, RENAMED_TEST_INSIGHT, "Insight not properly renamed");
         } finally {
             deleteAnalyticalDashboard(getRestApiClient(),
                     getAnalyticalDashboards(getRestApiClient(), testParams.getProjectId()).get(0));
@@ -180,6 +208,39 @@ public class InsightOnDashboardTest extends DashboardsTest {
         } finally {
             deleteAnalyticalDashboard(getRestApiClient(), dashboardUri);
             initAnalysePage().openInsight(RENAMED_TEST_INSIGHT).setInsightTitle(TEST_INSIGHT).saveInsight();
+        }
+    }
+
+    @Test(dependsOnGroups = { "dashboardsInit", "createInsight" })
+    public void testInsightTitleInADAfterRenamedOnDashboard() throws JSONException, IOException {
+        final String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
+                singletonList(
+                        createVisualizationWidgetWrap(
+                                getRestApiClient(),
+                                testParams.getProjectId(),
+                                getInsightUri(TEST_INSIGHT, getRestApiClient(), testParams.getProjectId()),
+                                TEST_INSIGHT
+                        )
+                ));
+
+        try {
+            IndigoDashboardsPage idp = initIndigoDashboardsPageWithWidgets()
+                .waitForAllInsightWidgetContentLoaded();
+            idp.switchToEditMode()
+                .getLastVisualization()
+                .setHeadline(RENAMED_TEST_INSIGHT);
+            idp.saveEditModeWithWidgets();
+
+            takeScreenshot(browser, "testInsightTitleInADAfterRenamedOnDashboard-insightRenamedInDashboards", getClass());
+
+            AnalysisPage ap = initAnalysePage();
+
+            assertTrue(ap.searchInsight(TEST_INSIGHT));
+            takeScreenshot(browser, "testInsightTitleInADAfterRenamedOnDashboard-insightWithOriginalNameFound", getClass());
+            assertFalse(ap.searchInsight(RENAMED_TEST_INSIGHT));
+            takeScreenshot(browser, "testInsightTitleInADAfterRenamedOnDashboard-insightWithNewNameNotFound", getClass());
+        } finally {
+            deleteAnalyticalDashboard(getRestApiClient(), dashboardUri);
         }
     }
 
