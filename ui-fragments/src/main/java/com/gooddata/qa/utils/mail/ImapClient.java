@@ -91,7 +91,9 @@ public class ImapClient implements Closeable {
                     .count();
 
         } finally {
-            inboxFolder.close(false);
+            if (inboxFolder.isOpen()) {
+                inboxFolder.close(false);
+            }
         }
     }
 
