@@ -135,6 +135,8 @@ public class AnalysisPageHeader extends AbstractFragment {
         waitForElementVisible(insightTitle).click();
         final WebElement textArea = waitForElementVisible(insightTitle.findElement(tagName("textarea"))); 
         textArea.sendKeys(title, Keys.ENTER); //make sure the title is applied
+        Predicate<WebDriver> savedButtonEnabled = driver -> isSaveButtonEnabled();
+        Graphene.waitGui().until(savedButtonEnabled);
         return this;
     }
 

@@ -168,7 +168,7 @@ public class InsightOnDashboardTest extends DashboardsTest {
             initIndigoDashboardsPageWithWidgets().waitForAllInsightWidgetContentLoaded();
             takeScreenshot(browser, "testInsightTitleOnDashboardAfterRenamedInAD-beforeRename", getClass());
 
-            initAnalysePage().openInsight(TEST_INSIGHT).setInsightTitle(RENAMED_TEST_INSIGHT).saveInsight();
+            initAnalysePage().openInsight(TEST_INSIGHT).waitForReportComputing().setInsightTitle(RENAMED_TEST_INSIGHT).saveInsight();
             String insightInsertedBeforeRenameTitle = initIndigoDashboardsPageWithWidgets()
                 .waitForAllInsightWidgetContentLoaded()
                 .getLastVisualization()
@@ -195,7 +195,7 @@ public class InsightOnDashboardTest extends DashboardsTest {
                 ));
 
         try {
-            initAnalysePage().openInsight(TEST_INSIGHT).setInsightTitle(RENAMED_TEST_INSIGHT).saveInsight();
+            initAnalysePage().openInsight(TEST_INSIGHT).waitForReportComputing().setInsightTitle(RENAMED_TEST_INSIGHT).saveInsight();
             String insightInsertedAfterRenameTitle = initIndigoDashboardsPageWithWidgets()
                 .waitForAllInsightWidgetContentLoaded()
                 .switchToEditMode()
