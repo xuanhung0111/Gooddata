@@ -133,7 +133,7 @@ public class AnalysisPageHeader extends AbstractFragment {
 
     public AnalysisPageHeader setInsightTitle(final String title) {
         waitForElementVisible(insightTitle).click();
-        final WebElement textArea = waitForElementVisible(insightTitle.findElement(tagName("textarea"))); 
+        final WebElement textArea = waitForElementVisible(insightTitle.findElement(tagName("textarea")));
         textArea.sendKeys(title, Keys.ENTER); //make sure the title is applied
         Predicate<WebDriver> savedButtonEnabled = driver -> isSaveButtonEnabled();
         Graphene.waitGui().until(savedButtonEnabled);
@@ -175,9 +175,13 @@ public class AnalysisPageHeader extends AbstractFragment {
                 && !isUnsavedMessagePresent()
                 && !isSaveAsPresent()
 //                && !isResetButtonEnabled() TODO: CL-9830 Clear button is not reset after clear saved insight
-                && !isSaveButtonEnabled() 
+                && !isSaveButtonEnabled()
                 && !isExportButtonEnabled()
                 && getInsightTitle().equals("Untitled insight");
+    }
+
+    public void waitForOpenEnabled() {
+        waitForElementEnabled(openButton);
     }
 
     private void saveWorkingInsight(final String insight) {
