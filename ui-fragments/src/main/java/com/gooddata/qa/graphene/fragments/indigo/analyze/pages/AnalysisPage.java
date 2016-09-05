@@ -318,6 +318,7 @@ public class AnalysisPage extends AbstractFragment {
 
     public AnalysisPage openInsight(final String insight) {
         getPageHeader().expandInsightSelection().openInsight(insight);
+        getPageHeader().waitForOpenEnabled();
         return this;
     }
 
