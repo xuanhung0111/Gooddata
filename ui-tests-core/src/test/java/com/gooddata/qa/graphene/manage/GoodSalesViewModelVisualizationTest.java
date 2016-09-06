@@ -5,6 +5,7 @@ import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
 import static java.lang.String.format;
 import static org.testng.Assert.assertTrue;
+import static com.gooddata.md.Restriction.title;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,10 +16,14 @@ import java.net.URL;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
+import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
+import org.openqa.selenium.WebDriver;
 import org.testng.annotations.Test;
 
+import com.gooddata.md.Attribute;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.google.common.base.Predicate;
 
 public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
 
@@ -52,6 +57,10 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
 
     private void changeAttributeName(String attributeName, String newName) {
         initAttributePage().renameAttribute(attributeName, newName);
+
+        Predicate<WebDriver> nameChanged = browser ->
+                !getMdService().find(getProject(), Attribute.class, title(newName)).isEmpty();
+        Graphene.waitGui().until(nameChanged);
     }
 
     private File getLDMImageFromGrayPage() throws IOException, ParseException, JSONException {

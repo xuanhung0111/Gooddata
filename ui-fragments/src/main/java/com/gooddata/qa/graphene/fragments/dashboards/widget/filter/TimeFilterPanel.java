@@ -35,11 +35,9 @@ public class TimeFilterPanel extends FilterPanel {
 
     public void changeValueByEnterFromDateAndToDate(String startTime, String endTime) {
         waitForElementVisible(filterTimeFromInput).clear();
-        waitForElementVisible(filterTimeToInput).clear();
         filterTimeFromInput.sendKeys(startTime);
-        filterTimeFromInput.click();
+        waitForElementVisible(filterTimeToInput).clear();
         filterTimeToInput.sendKeys(endTime);
-        filterTimeToInput.click();
         submit();
     }
 
