@@ -20,6 +20,7 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.DropDown;
 import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.GroupConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 
@@ -144,10 +145,12 @@ public class DashboardEditBar extends AbstractFragment {
         return this;
     }
 
-    public DashboardEditBar addAttributeFilterToDashboard(DashAttributeFilterTypes type, String name) {
-        openFilterMenu().select("Attribute");
-        waitForFragmentVisible(dashboardFilter).addAttributeFilter(type, name);
+    public DashboardEditBar addAttributeFilterToDashboard(DashAttributeFilterTypes type, String name, String... label) {
+        if (type == DashAttributeFilterTypes.PROMPT && label.length != 0)
+            throw new UnsupportedOperationException("Label does not support for Prompt filter type");
 
+        openFilterMenu().select("Attribute");
+        waitForFragmentVisible(dashboardFilter).addAttributeFilter(type, name, label);
         return this;
     }
 
@@ -166,6 +169,17 @@ public class DashboardEditBar extends AbstractFragment {
 
     public DashboardEditBar addTimeFilterToDashboard(DateGranularity dateGranularity, String timeLine) {
         return addTimeFilterToDashboard(null, dateGranularity, timeLine);
+    }
+
+    public DashboardEditBar groupFiltersOnDashboard(String... filters) {
+        openFilterMenu().select("Group");
+
+        WidgetConfigPanel configPanel = Graphene.createPageFragment(WidgetConfigPanel.class,
+                waitForElementVisible(WidgetConfigPanel.LOCATOR, browser));
+        configPanel.getTab(WidgetConfigPanel.Tab.GROUP, GroupConfigPanel.class).selectFilters(filters);
+        configPanel.saveConfiguration();
+
+        return this;
     }
 
     public WidgetConfigPanel openGroupConfigPanel() {

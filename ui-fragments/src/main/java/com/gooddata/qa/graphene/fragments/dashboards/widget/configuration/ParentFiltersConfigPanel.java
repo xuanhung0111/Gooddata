@@ -13,7 +13,7 @@ public class ParentFiltersConfigPanel extends AbstractFragment {
     @FindBy(className = "s-btn-add_parent_filter")
     private WebElement addParentFilterButton;
 
-    @FindBy(xpath = "//button[contains(@class, 's-btn-apply')]")
+    @FindBy(xpath = "//div[contains(@class, 'configPanel')]//button[contains(@class, 's-btn-apply')]")
     private WebElement applyButton;
 
     private static final String PARENT_FILTER_LOCATOR =

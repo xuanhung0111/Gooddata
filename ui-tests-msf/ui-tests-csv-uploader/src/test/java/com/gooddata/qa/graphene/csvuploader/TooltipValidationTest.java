@@ -7,7 +7,6 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static org.testng.Assert.assertEquals;
 
-import java.awt.AWTException;
 import java.io.IOException;
 
 import org.openqa.selenium.By;
@@ -33,7 +32,7 @@ public class TooltipValidationTest extends AbstractCsvUploaderTest {
 //    private static final String LIMITED_CHARACTER_MESSAGE = "Header name exceeds the limit of 255 characters.";
 
     @Test(dependsOnGroups = "createProject")
-    public void checkTooltipValidation() throws IOException, AWTException {
+    public void checkTooltipValidation() throws IOException {
         String csvFileFilePath = CsvFile.loadFile(
                 getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/24dates.yyyy.csv"))
                 .getFilePath();
@@ -79,7 +78,7 @@ public class TooltipValidationTest extends AbstractCsvUploaderTest {
     }
 
     @Test(dependsOnGroups = "createProject")
-    public void checkErrorBubbleValidation() throws AWTException, IOException {
+    public void checkErrorBubbleValidation() throws IOException {
         String csvFileFilePath = new CsvFile("Bubble validation")
                 .columns(new CsvFile.Column("Firstname"), new CsvFile.Column("Number"))
                 .rows("Khoa", "99999")
