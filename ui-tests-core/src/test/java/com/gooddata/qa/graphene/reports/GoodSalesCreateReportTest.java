@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.reports;
 
+import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
@@ -29,8 +30,8 @@ import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
 import com.gooddata.md.Restriction;
 import com.gooddata.md.report.AttributeInGrid;
-import com.gooddata.md.report.GridElement;
 import com.gooddata.md.report.GridReportDefinitionContent;
+import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.project.Project;
@@ -206,9 +207,9 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
 
         ReportDefinition definition = GridReportDefinitionContent.create(
                         reportName,
-                        singletonList("metricGroup"),
-                        singletonList(new AttributeInGrid(yearSnapshot.getDefaultDisplayForm().getUri())),
-                        singletonList(new GridElement(testMetric.getUri(), metricName)));
+                        singletonList(METRIC_GROUP),
+                        singletonList(new AttributeInGrid(yearSnapshot.getDefaultDisplayForm().getUri(), yearSnapshot.getTitle())),
+                        singletonList(new MetricElement(testMetric)));
         definition = mdService.createObj(project, definition);
         mdService.createObj(project, new Report(definition.getTitle(), definition));
 

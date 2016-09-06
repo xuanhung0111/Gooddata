@@ -1,7 +1,14 @@
 package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.md.Restriction.title;
+import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPPORTUNITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_LOST_OPPS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPEN_OPPS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPPORTUNITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPPORTUNITIES_BOP;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForSchedulesPageLoaded;
@@ -12,7 +19,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -21,8 +27,8 @@ import org.testng.annotations.Test;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.Metric;
 import com.gooddata.md.report.AttributeInGrid;
-import com.gooddata.md.report.GridElement;
 import com.gooddata.md.report.GridReportDefinitionContent;
+import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.qa.browser.BrowserUtils;
@@ -42,15 +48,12 @@ public class GoodSalesReportStatisticsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void createSimpleReport() {
-        final String amountUri = getMdService()
-                .getObjUri(getProject(), Metric.class, title(METRIC_AMOUNT));
+        final Metric amountMetric = getMdService().getObj(getProject(), Metric.class, title(METRIC_AMOUNT));
+        final Attribute saleRep = getMdService().getObj(getProject(), Attribute.class, title(SALES_REP));
 
-        final String saleRepUri = getMdService()
-                .getObj(getProject(), Attribute.class, title(SALES_REP)).getDefaultDisplayForm().getUri();
-
-        ReportDefinition definition = GridReportDefinitionContent.create(SIMPLE_REPORT, singletonList("metricGroup"),
-                singletonList(new AttributeInGrid(saleRepUri)),
-                singletonList(new GridElement(amountUri, METRIC_AMOUNT)));
+        ReportDefinition definition = GridReportDefinitionContent.create(SIMPLE_REPORT, singletonList(METRIC_GROUP),
+                singletonList(new AttributeInGrid(saleRep.getDefaultDisplayForm().getUri(), saleRep.getTitle())),
+                singletonList(new MetricElement(amountMetric)));
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
     }
@@ -88,13 +91,11 @@ public class GoodSalesReportStatisticsTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"})
     public void switchWideAndNarrowWorkspace() {
         final String largeReport = "Large-Report";
-        final String opportunityUri = getMdService()
-                .getObj(getProject(), Attribute.class, title("Opportunity"))
-                .getDefaultDisplayForm()
-                .getUri();
+        final Attribute opportunity = getMdService().getObj(getProject(), Attribute.class, title(ATTR_OPPORTUNITY));
 
-        ReportDefinition definition = GridReportDefinitionContent.create(largeReport, singletonList("metricGroup"),
-                singletonList(new AttributeInGrid(opportunityUri)), createGridElements());
+        ReportDefinition definition = GridReportDefinitionContent.create(largeReport, singletonList(METRIC_GROUP),
+                singletonList(new AttributeInGrid(opportunity.getDefaultDisplayForm().getUri(), opportunity.getTitle())),
+                createGridElements());
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
@@ -106,24 +107,19 @@ public class GoodSalesReportStatisticsTest extends GoodSalesAbstractTest {
                 "Horizon scroll bar does not exists");
     }
 
-    private List<GridElement> createGridElements() {
+    private List<MetricElement> createGridElements() {
         //different resolution could make the test failed
         //because report width which depends on number of metrics
         //is not enough to display horizon scroll bar
         //or the scroll bar is displayed at the beginning
         //recommended resolution is 1920x1080
-        List<String> metricTitles = asList("# of Activities", "# of Lost Opps.", "# of Open Opps.",
-                "# of Opportunities [BOP]", "# of Opportunities");
+        List<String> metricTitles = asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_LOST_OPPS, METRIC_NUMBER_OF_OPEN_OPPS,
+                METRIC_NUMBER_OF_OPPORTUNITIES_BOP, METRIC_NUMBER_OF_OPPORTUNITIES);
 
-        List<String> metricUris = metricTitles.stream()
-                .map(metricTitle -> getMdService().getObj(getProject(), Metric.class, title(metricTitle)).getUri())
+        return metricTitles.stream()
+                .map(metricTitle -> getMdService().getObj(getProject(), Metric.class, title(metricTitle)))
+                .map(MetricElement::new)
                 .collect(toList());
-
-        List<GridElement> gridElements = new ArrayList<>();
-        for (int i = 0; i < metricUris.size(); i++) {
-            gridElements.add(new GridElement(metricUris.get(i), metricTitles.get(i)));
-        }
-        return gridElements;
     }
 
     private void checkUsedDataLink(final String data, DataType type) {

@@ -13,6 +13,7 @@ import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static com.gooddata.md.Restriction.title;
+import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -27,8 +28,8 @@ import com.gooddata.md.Attribute;
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
 import com.gooddata.md.report.AttributeInGrid;
-import com.gooddata.md.report.GridElement;
 import com.gooddata.md.report.GridReportDefinitionContent;
+import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
 import com.gooddata.qa.graphene.common.AbstractDashboardWidgetTest;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
@@ -84,20 +85,20 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void initReport() {
-        String amountMetricUri = getMdService().getObjUri(getProject(), Metric.class, title(METRIC_AMOUNT));
+        Metric amountMetric = getMdService().getObj(getProject(), Metric.class, title(METRIC_AMOUNT));
         Attribute productAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_PRODUCT));
         Attribute departmentAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_DEPARTMENT));
 
         reportWithSingleAttribute = createReportViaRest(GridReportDefinitionContent.create("Report-single-attribute",
-                singletonList("metricGroup"),
-                singletonList(new AttributeInGrid(productAttribute.getDefaultDisplayForm().getUri())),
-                singletonList(new GridElement(amountMetricUri, METRIC_AMOUNT))));
+                singletonList(METRIC_GROUP),
+                singletonList(new AttributeInGrid(productAttribute.getDefaultDisplayForm().getUri(), productAttribute.getTitle())),
+                singletonList(new MetricElement(amountMetric))));
 
         reportWithMultipleAttribute = createReportViaRest(GridReportDefinitionContent.create("Report-multiple-attribute",
-                singletonList("metricGroup"),
-                asList(new AttributeInGrid(productAttribute.getDefaultDisplayForm().getUri()),
-                        new AttributeInGrid(departmentAttribute.getDefaultDisplayForm().getUri())),
-                singletonList(new GridElement(amountMetricUri, METRIC_AMOUNT))));
+                singletonList(METRIC_GROUP),
+                asList(new AttributeInGrid(productAttribute.getDefaultDisplayForm().getUri(), productAttribute.getTitle()),
+                        new AttributeInGrid(departmentAttribute.getDefaultDisplayForm().getUri(), departmentAttribute.getTitle())),
+                singletonList(new MetricElement(amountMetric))));
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -303,9 +304,9 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
 
             Metric numberMetric = createMetric("numberMetric", format("SELECT SUM([%s])", numberFactUri), "#,##0");
             Report report = createReportViaRest(GridReportDefinitionContent.create("report-simple",
-                    singletonList("metricGroup"),
-                    singletonList(new AttributeInGrid(firstnameAttribute.getDefaultDisplayForm().getUri())),
-                    singletonList(new GridElement(numberMetric.getUri(), numberMetric.getTitle()))));
+                    singletonList(METRIC_GROUP),
+                    singletonList(new AttributeInGrid(firstnameAttribute.getDefaultDisplayForm().getUri(), firstnameAttribute.getTitle())),
+                    singletonList(new MetricElement(numberMetric))));
 
             initDashboardsPage()
                     .addReportToDashboard(report.getTitle())

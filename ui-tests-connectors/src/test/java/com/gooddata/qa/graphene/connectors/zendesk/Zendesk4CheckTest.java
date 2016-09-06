@@ -3,6 +3,7 @@
  */
 package com.gooddata.qa.graphene.connectors.zendesk;
 
+import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static java.lang.String.format;
@@ -47,6 +48,7 @@ import com.gooddata.md.report.AttributeInGrid;
 import com.gooddata.md.report.Filter;
 import com.gooddata.md.report.GridElement;
 import com.gooddata.md.report.GridReportDefinitionContent;
+import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.OneNumberReportDefinitionContent;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.project.Project;
@@ -459,9 +461,9 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     private void createOneNumberReportDefinition(String reportName, Metric metric) {
         if (mdService.find(project, ReportDefinition.class, Restriction.title(reportName)).isEmpty()) {
             ReportDefinition definition = 
-                    OneNumberReportDefinitionContent.create(reportName, singletonList("metricGroup"),
-                            Collections.<AttributeInGrid>emptyList(),
-                            singletonList(new GridElement(metric.getUri(), "")));
+                    OneNumberReportDefinitionContent.create(reportName, asList(METRIC_GROUP),
+                            Collections.<GridElement>emptyList(),
+                            singletonList(new MetricElement(metric)));
             mdService.createObj(project, definition);
         } else {
             System.out.println("Required report definition already exists: " + reportName);
@@ -603,13 +605,13 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
 
         return mdService.createObj(project, GridReportDefinitionContent.create(
                 TICKET_EVENTS_REPORT_NAME + "_by_" + eventId,
-                Collections.<String>emptyList(),
-                asList(new AttributeInGrid(textFieldAttr.getDefaultDisplayForm().getUri()),
-                        new AttributeInGrid(newValAttr.getDefaultDisplayForm().getUri()),
-                        new AttributeInGrid(oldValAttr.getDefaultDisplayForm().getUri()),
-                        new AttributeInGrid(eventAttr.getDefaultDisplayForm().getUri()),
-                        new AttributeInGrid(ticketIdAttr.getDefaultDisplayForm().getUri())),
                 Collections.<GridElement>emptyList(),
+                asList(new AttributeInGrid(textFieldAttr.getDefaultDisplayForm().getUri(), textFieldAttr.getTitle()),
+                        new AttributeInGrid(newValAttr.getDefaultDisplayForm().getUri(), newValAttr.getTitle()),
+                        new AttributeInGrid(oldValAttr.getDefaultDisplayForm().getUri(), oldValAttr.getTitle()),
+                        new AttributeInGrid(eventAttr.getDefaultDisplayForm().getUri(), eventAttr.getTitle()),
+                        new AttributeInGrid(ticketIdAttr.getDefaultDisplayForm().getUri(), ticketIdAttr.getTitle())),
+                Collections.<MetricElement>emptyList(),
                 singletonList(new Filter(String.format("(SELECT [%s]) IN ([%s])", eventAttr.getUri(), eventIdElem.getUri())))));
     }
 
