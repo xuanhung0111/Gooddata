@@ -10,6 +10,15 @@ import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_SALES_REP;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON_OPPS;
+import static com.gooddata.md.Restriction.title;
+import static java.lang.String.format;
+import static java.util.stream.Collectors.joining;
+import static java.util.Arrays.asList;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -29,8 +38,11 @@ import org.testng.annotations.Test;
 
 import com.gooddata.md.Attribute;
 import com.gooddata.md.AttributeElement;
+import com.gooddata.md.Fact;
 import com.gooddata.md.Restriction;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.entity.attribute.ComputedAttributeDefinition;
+import com.gooddata.qa.graphene.entity.attribute.ComputedAttributeDefinition.AttributeBucket;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
@@ -38,6 +50,7 @@ import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
+import com.gooddata.qa.graphene.fragments.manage.AttributePage;
 import com.gooddata.qa.graphene.fragments.manage.CreateAttributePage;
 import com.gooddata.qa.graphene.fragments.manage.MetricDetailsPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
@@ -48,23 +61,11 @@ import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 
 public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
-    @FindBy(css = ".bucket-values")
-    private WebElement bucketValues;
-
-    @FindBy(css = ".buckets .row")
-    private List<WebElement> bucketingRows;
-
-    @FindBy(css = ".s-btn-create_computed_attribute")
-    private WebElement btnCreateComputedAttribute;
-
     @FindBy(css = ".s-attributeBucketName")
     private WebElement attributeBucketName;
 
     @FindBy(css = ".modelThumbContentImage")
     private WebElement modelImage;
-
-    @FindBy(css = ".s-btn-delete")
-    private WebElement btnDelete;
 
     private static final String COMPUTED_ATTRIBUTE_NAME = "A Sales Rep Ranking";
     private static final String REPORT_NAME = "Computed Attribute Report";
@@ -74,6 +75,15 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     private static final String EXPECTED_DELETE_DESCRIPTION = "To delete this computed attribute you must delete "
             + "its data set. Go to its Data Set administration page and click Delete.";
 
+    private static final ComputedAttributeDefinition DEFINITION = new ComputedAttributeDefinition()
+            .withName(COMPUTED_ATTRIBUTE_NAME)
+            .withAttribute(ATTR_SALES_REP)
+            .withMetric(METRIC_NUMBER_OF_WON_OPPS)
+            .withBucket(new AttributeBucket(0, "Poor", "120"))
+            .withBucket(new AttributeBucket(1, "Good", "200"))
+            .withBucket(new AttributeBucket(2, "Great", "250"))
+            .withBucket(new AttributeBucket(3, "Best"));
+
     @BeforeClass
     public void setProjectTitle() {
         projectTitle = "GoodSales-test-computed-attribute";
@@ -81,16 +91,19 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, priority = 0)
     public void createComputedAttributeTest() {
-        createComputedAttribute();
-        CreateAttributePage.getInstance(browser).cancel();
+        CreateAttributePage createAttributePage = initAttributePage().moveToCreateAttributePage();
+        assertFalse(createAttributePage.isCreateComputedAttributeButtonEnable(),
+                "Create computed attribute button is enabled");
+
+        createAttributePage
+                .fillInComputedAttributeForm(DEFINITION)
+                .cancel();
         waitForDataPageLoaded(browser);
         By computedAttributeItem =
                 By.cssSelector(String.format(".s-title-%s a", CssUtils.simplifyText(COMPUTED_ATTRIBUTE_NAME)));
         assertTrue(browser.findElements(computedAttributeItem).isEmpty());
 
-        createComputedAttribute();
-        CreateAttributePage.getInstance(browser).submit();
-
+        AttributePage.getInstance(browser).createComputedAttribute(DEFINITION);
         waitForElementVisible(attributeBucketName);
         Screenshots.takeScreenshot(browser, "computed-attribute-details-page", this.getClass());
 
@@ -107,27 +120,23 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, priority = 0)
     public void checkValidationOfBucketFields() {
-        initAttributePage()
-            .createAttribute();
-        waitForElementVisible(btnCreateComputedAttribute);
-
-        CreateAttributePage.getInstance(browser).selectAttribute("Sales Rep")
-            .selectMetric("# of Won Opps.")
-            .setBucket(0, "Poor", "");
+        CreateAttributePage createAttributePage = initAttributePage()
+                .moveToCreateAttributePage()
+                .selectAttribute(ATTR_SALES_REP)
+                .selectMetric(METRIC_NUMBER_OF_WON_OPPS)
+                .setBucket(0, "Poor", "");
         assertTrue("is not a number".equals(getBubbleMessage(browser)), "error message");
 
-        CreateAttributePage.getInstance(browser).setBucket(0, "", "1000")
-            .setBucket(0, "");
+        createAttributePage.setBucket(0, "", "1000").setBucket(0, "");
         assertTrue("Field is required.".equals(getBubbleMessage(browser)), "error message");
 
-        CreateAttributePage.getInstance(browser).setBucket(0, "Poor", "abc");
+        createAttributePage.setBucket(0, "Poor", "abc");
         assertTrue("is not a number".equals(getBubbleMessage(browser)), "error message");
 
-        CreateAttributePage.getInstance(browser).setBucket(0, "Poor", "3000")
-            .setBucket(1, "Good", "2000");
+        createAttributePage.setBucket(0, "Poor", "3000").setBucket(1, "Good", "2000");
         assertTrue("Value should be greater than 3000".equals(getBubbleMessage(browser)), "error message");
 
-        CreateAttributePage.getInstance(browser).setBucket(0, "This is a long name which is longer than 128 characters. "
+        createAttributePage.setBucket(0, "This is a long name which is longer than 128 characters. "
                 + "So it should show error that the Values is so long. And I am checking it", "1000")
                 .setBucket(0, "This is a long name which is longer than 128 characters. "
                 + "So it should show error that the Values is so long. And I am checking it");
@@ -342,12 +351,12 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         "applyListFiltersOnReportWithComputedAttribute", "computedAttributeReportOnDashboard",
         "applyMufFiltersOnReportWithComputedAttribute"})
     public void deleteAttributeAndMetricUsedInComputedAttribute() {
-        initAttributePage().initAttribute("Sales Rep")
+        initAttributePage().initAttribute(ATTR_SALES_REP)
             .deleteObject();
 
         initMetricPage();
         waitForDataPageLoaded(browser);
-        ObjectsTable.getInstance(id(ObjectTypes.METRIC.getObjectsTableID()), browser).selectObject("# of Won Opps.");
+        ObjectsTable.getInstance(id(ObjectTypes.METRIC.getObjectsTableID()), browser).selectObject(METRIC_NUMBER_OF_WON_OPPS);
         waitForObjectPageLoaded(browser);
         MetricDetailsPage.getInstance(browser).deleteObject();
 
@@ -382,32 +391,39 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
                 "Metric values are incorrrect");
     }
 
-    private void createComputedAttribute() {
-        initAttributePage()
-            .createAttribute();
-        waitForElementVisible(btnCreateComputedAttribute);
-        assertFalse(isCreatedButtonEnabled(), "Create Computed Attribute is Enabled");
+    @Test(dependsOnGroups = {"createProject"})
+    public void renderReportContainComputedAttributeWithoutMetric() {
+        String factAmountUri = getMdService().getObjUri(getProject(), Fact.class, title(FACT_AMOUNT));
+        Attribute stageNameAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_STAGE_NAME));
+        String stageNameValues = getMdService()
+                .getAttributeElements(stageNameAttribute)
+                .subList(0, 2)
+                .stream()
+                .map(AttributeElement::getUri)
+                .map(e -> format("[%s]", e))
+                .collect(joining(","));
 
-        CreateAttributePage.getInstance(browser).selectAttribute("Sales Rep");
-        assertFalse(isCreatedButtonEnabled(), "Create Computed Attribute is Enabled");
+        String expression = format("SELECT SUM([%s]) WHERE [%s] IN (%s)",
+                factAmountUri, stageNameAttribute.getUri(), stageNameValues);
+        String metric = createMetric("New-metric", expression, "#,##0").getTitle();
 
-        CreateAttributePage.getInstance(browser).selectMetric("# of Won Opps.");
-        assertEquals(waitForElementVisible(bucketValues).getText(), "# of Won Opps.");
-        assertTrue(isCreatedButtonEnabled(), "Create Computed Attribute is Enabled");
-        assertEquals(bucketingRows.size(), 3);
+        final String computedAttribute = "Computed-Attribute";
+        final String attributeUri = initAttributePage().createComputedAttribute(new ComputedAttributeDefinition()
+                .withName(computedAttribute)
+                .withAttribute(ATTR_STAGE_NAME)
+                .withMetric(metric));
 
-        CreateAttributePage.getInstance(browser).addBucket();
-        assertEquals(bucketingRows.size(), 4);
-        CreateAttributePage.getInstance(browser).setBucket(0, "Poor", "120")
-            .setBucket(1, "Good", "200")
-            .setBucket(2, "Great", "250")
-            .setBucket(3, "Best")
-            .setComputedAttributeName(COMPUTED_ATTRIBUTE_NAME);
-        Screenshots.takeScreenshot(browser, "computed-attribute-creation-page", this.getClass());
-    }
+        try {
+            createReport(new UiReportDefinition()
+                    .withName("Simple-report")
+                    .withHows(computedAttribute, ATTR_DEPARTMENT),
+                    "Report-renders-well-with-computed-attribute-without-metric");
+            assertEquals(reportPage.getTableReport().getAttributeElements(),
+                    asList("Large", "Direct Sales", "Inside Sales"));
 
-    private boolean isCreatedButtonEnabled() {
-        return !btnCreateComputedAttribute.getAttribute("class").contains("disabled");
+        } finally {
+            getMdService().removeObjByUri(attributeUri);
+        }
     }
 
     // check that delete button is disabled and that there's expected explanation message

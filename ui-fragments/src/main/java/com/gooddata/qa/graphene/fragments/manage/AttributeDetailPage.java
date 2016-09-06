@@ -142,6 +142,10 @@ public class AttributeDetailPage extends ObjectPropertiesPage {
         return waitForElementVisible(BY_BUBBLE_CONTENT, browser).findElement(BY_LINK).getAttribute("href");
     }
 
+    public String getAttributeUri() {
+        return browser.getCurrentUrl().split("objectPage\\|")[1];
+    }
+
     public static class AttributeLabel extends AbstractFragment {
 
         private static final By BY_EDIT_BUTTON = By.className("s-labelEditButton");
@@ -202,5 +206,4 @@ public class AttributeDetailPage extends ObjectPropertiesPage {
             return this;
         }
     }
-
 }

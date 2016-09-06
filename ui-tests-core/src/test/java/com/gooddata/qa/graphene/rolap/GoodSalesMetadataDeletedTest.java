@@ -607,7 +607,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     private String createComputedAttributeUsing(AttributeInfo attribute) {
         String name = "CA " + System.currentTimeMillis();
         initAttributePage()
-            .createAttribute()
+            .moveToCreateAttributePage()
             .selectAttribute(attribute.name)
             .selectMetric(WIN_RATE_METRIC)
             .setComputedAttributeName(name)
