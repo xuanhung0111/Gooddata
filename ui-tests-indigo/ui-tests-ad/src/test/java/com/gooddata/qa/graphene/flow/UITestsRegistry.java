@@ -1,9 +1,7 @@
 package com.gooddata.qa.graphene.flow;
 
-import static java.util.Arrays.asList;
-
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerSanityTest;
 import com.gooddata.qa.graphene.indigo.analyze.CustomDateDimensionsTest;
@@ -49,75 +47,71 @@ import com.gooddata.qa.utils.flow.TestsRegistry;
 public class UITestsRegistry {
 
     public static void main(String[] args) throws Throwable {
-        Set<Object> tests = new HashSet<>();
+        Map<String, Object[]> suites = new HashMap<>();
 
-        for (String suite: args) {
-            if ("e2e".equals(suite)) {
-                tests.addAll(asList(
-                    EmptyCatalogueTest.class,
-                    RecommendationsWithoutDateDimensionTest.class,
-                    AttributeFiltersTest.class,
-                    BucketsTest.class,
-                    ErrorStatesTest.class,
-                    TableTest.class,
-                    UndoTest.class,
-                    AttributeBasedMetricsTest.class,
-                    FactBasedMetricsTest.class,
-                    StackedChartsTest.class,
-                    ResetButtonTest.class,
-                    "testng-ad-e2e-metrics-test.xml",
-                    "testng-ad-e2e-visualization-test.xml",
-                    "testng-ad-e2e-recommendation-test.xml",
-                    "testng-ad-e2e-catalogue-test.xml",
-                    "testng-ad-e2e-date-test.xml"
-                ));
-            } else if ("sanity".equals(suite)) {
-                tests.addAll(asList(
-                    AnalyticalDesignerSanityTest.class
-                ));
-            } else if ("all".equals(suite)) {
-                tests.addAll(asList(
-                    GoodSalesAttributeBasedMetricTest.class,
-                    GoodSalesAttributeBucketTest.class,
-                    GoodSalesAttributeFilterTest.class,
-                    GoodSalesCatalogueTest.class,
-                    GoodSalesChartLegendTest.class,
-                    GoodSalesComparisonRecommendationTest.class,
-                    GoodSalesContributionRecommendationTest.class,
-                    CustomDateDimensionsTest.class,
-                    GoodSalesDateDimensionTest.class,
-                    GoodSalesDateFilterTest.class,
-                    GoodSalesDescriptionTest.class,
-                    GoodSalesDropAttributeTest.class,
-                    GoodSalesVisualizationTest.class,
-                    GoodSalesFactBasedMetricTest.class,
-                    GoodSalesMetricBucketTest.class,
-                    GoodSalesMetricFilterTest.class,
-                    MultipleDatasetsTest.class,
-                    GoodSalesShortcutRecommendationTest.class,
-                    SpecialCasesTest.class,
-                    GoodSalesTableReportTest.class,
-                    GoodSalesTrendingRecommendationTest.class,
-                    GoodSalesUndoTest.class,
-                    GoodSalesUndoRedoSavedInsightTest.class,
-//                  WalkmeTest.class, CL-9704: Walkme is not available on new AD
-                    AnalyticalDesignerSanityTest.class,
-                    NonProductionDatasetInsightTest.class,
-                    GoodSalesNotRenderedInsightTest.class,
-                    WalkmeOnEmbeddedAdTest.class,
-                    GoodSalesRelatedAndUnrelatedDateDimensionsTest.class,
-                    "testng-ad-permissions-MetricVisibility.xml",
-                    "testng-ad-permissions-ProjectNavigation.xml",
-                    "testng-ad-permissions-InsightTest.xml",
-                    "testng-ad-permissions-EmbeddedAd.xml",
-                    "testng-ad-ChartLabelFormat.xml",
-                    "testng-ad-MetricNumberFormat.xml"
-                ));
-            }
-        }
+        suites.put("e2e", new Object[] {
+            EmptyCatalogueTest.class,
+            RecommendationsWithoutDateDimensionTest.class,
+            AttributeFiltersTest.class,
+            BucketsTest.class,
+            ErrorStatesTest.class,
+            TableTest.class,
+            UndoTest.class,
+            AttributeBasedMetricsTest.class,
+            FactBasedMetricsTest.class,
+            StackedChartsTest.class,
+            ResetButtonTest.class,
+            "testng-ad-e2e-metrics-test.xml",
+            "testng-ad-e2e-visualization-test.xml",
+            "testng-ad-e2e-recommendation-test.xml",
+            "testng-ad-e2e-catalogue-test.xml",
+            "testng-ad-e2e-date-test.xml"
+        });
+
+        suites.put("sanity", new Object[] {
+            AnalyticalDesignerSanityTest.class
+        });
+
+        suites.put("all", new Object[] {
+            GoodSalesAttributeBasedMetricTest.class,
+            GoodSalesAttributeBucketTest.class,
+            GoodSalesAttributeFilterTest.class,
+            GoodSalesCatalogueTest.class,
+            GoodSalesChartLegendTest.class,
+            GoodSalesComparisonRecommendationTest.class,
+            GoodSalesContributionRecommendationTest.class,
+            CustomDateDimensionsTest.class,
+            GoodSalesDateDimensionTest.class,
+            GoodSalesDateFilterTest.class,
+            GoodSalesDescriptionTest.class,
+            GoodSalesDropAttributeTest.class,
+            GoodSalesVisualizationTest.class,
+            GoodSalesFactBasedMetricTest.class,
+            GoodSalesMetricBucketTest.class,
+            GoodSalesMetricFilterTest.class,
+            MultipleDatasetsTest.class,
+            GoodSalesShortcutRecommendationTest.class,
+            SpecialCasesTest.class,
+            GoodSalesTableReportTest.class,
+            GoodSalesTrendingRecommendationTest.class,
+            GoodSalesUndoTest.class,
+            GoodSalesUndoRedoSavedInsightTest.class,
+//          WalkmeTest.class, CL-9704: Walkme is not available on new AD
+            AnalyticalDesignerSanityTest.class,
+            NonProductionDatasetInsightTest.class,
+            GoodSalesNotRenderedInsightTest.class,
+            WalkmeOnEmbeddedAdTest.class,
+            GoodSalesRelatedAndUnrelatedDateDimensionsTest.class,
+            "testng-ad-permissions-MetricVisibility.xml",
+            "testng-ad-permissions-ProjectNavigation.xml",
+            "testng-ad-permissions-InsightTest.xml",
+            "testng-ad-permissions-EmbeddedAd.xml",
+            "testng-ad-ChartLabelFormat.xml",
+            "testng-ad-MetricNumberFormat.xml"
+        });
 
         TestsRegistry.getInstance()
-            .register(tests)
+            .register(args, suites)
             .toTextFile();
     }
 }
