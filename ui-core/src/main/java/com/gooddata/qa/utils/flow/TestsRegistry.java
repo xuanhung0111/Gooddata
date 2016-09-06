@@ -1,5 +1,6 @@
 package com.gooddata.qa.utils.flow;
 
+import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.joining;
 
 import java.io.File;
@@ -7,8 +8,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 
@@ -31,14 +34,23 @@ public class TestsRegistry {
     @SuppressWarnings({"rawtypes", "unchecked"})
     public TestsRegistry register(Collection<Object> tests) {
         tests.stream().forEach(test -> {
-            if (test instanceof GdcTest) {
-                register((GdcTest) test);
+            if (test instanceof PredefineParameterTest) {
+                register((PredefineParameterTest) test);
             } else if (test instanceof Class) {
                 register((Class) test);
             } else {
                 register((String) test);
             }
         });
+        return this;
+    }
+
+    public TestsRegistry register(String[] expectedSuites, Map<String, Object[]> suites) {
+        Set<Object> tests = new HashSet<>();
+        for (String suite: expectedSuites) {
+            tests.addAll(asList(suites.getOrDefault(suite, new Object[]{})));
+        }
+        register(tests);
         return this;
     }
 
@@ -52,7 +64,7 @@ public class TestsRegistry {
         return this;
     }
 
-    public TestsRegistry register(GdcTest test) {
+    public TestsRegistry register(PredefineParameterTest test) {
         String clazz = test.getSuite();
         if (clazz == null || clazz.isEmpty()) {
             clazz = test.getClazz().getSimpleName();
