@@ -227,7 +227,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
     public void setCustomHeader() {
         final int datasetCountBeforeUpload = initDataUploadPage().getMyDatasetsCount();
 
-        final DataPreviewPage dataPreviewPage = DatasetsListPage.getInstance(browser).uploadFile(PAYROLL.getFilePath());
+        final DataPreviewPage dataPreviewPage = DatasetsListPage.getInstance(browser).uploadFile(PAYROLL_LESS_COLUMNS.getFilePath());
         dataPreviewPage.selectHeader()
             .getRowSelectionTable()
             .getRow(3)
@@ -236,8 +236,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         final DataPreviewTable dataPreviewTable = dataPreviewPage.getDataPreviewTable();
         assertEquals(dataPreviewTable.getPreHeaderRows().size(), 3);
 
-        final List<String> customHeaderColumns = Lists.newArrayList("Nowmer", "Sheri", "Graduate Degree",
-                "President", "Foodz, Inc.", "Washington", "Spokane", "2006-03-01", "10230");
+        final List<String> customHeaderColumns = Lists.newArrayList("Nowmer", "Sheri", "2006-03-01", "10230");
         assertThat(dataPreviewTable.getHeaderColumns(), contains(customHeaderColumns.toArray()));
 
         dataPreviewPage.triggerIntegration();
@@ -259,18 +258,18 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         customHeaderColumns.set(customHeaderColumns.indexOf("2006-03-01"), "Paydate");
         customHeaderColumns.set(customHeaderColumns.indexOf("10230"), "Amount");
 
-        takeScreenshot(browser, "custom-header-" + PAYROLL.getFileName(), getClass());
+        takeScreenshot(browser, "custom-header-" + PAYROLL_LESS_COLUMNS.getFileName(), getClass());
 
-        checkDataPreview(dataPreviewPage, customHeaderColumns, PAYROLL.getColumnTypes());
+        checkDataPreview(dataPreviewPage, customHeaderColumns, PAYROLL_LESS_COLUMNS.getColumnTypes());
         assertFalse(dataPreviewTable.isColumnNameError("Paydate"), "Error is still shown!");
         assertFalse(dataPreviewTable.isColumnNameError("Amount"), "Error is still shown!");
 
-        takeScreenshot(browser, "saved-custom-header-" + PAYROLL.getFileName(), getClass());
+        takeScreenshot(browser, "saved-custom-header-" + PAYROLL_LESS_COLUMNS.getFileName(), getClass());
 
         dataPreviewPage.triggerIntegration();
         Dataset.waitForDatasetLoaded(browser);
 
-        final String datasetName = getNewDataset(PAYROLL);
+        final String datasetName = getNewDataset(PAYROLL_LESS_COLUMNS);
 
         assertEquals(DatasetsListPage.getInstance(browser).getMyDatasetsCount(), datasetCountBeforeUpload + 1);
 
@@ -279,13 +278,13 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
             .getStatus()
             .matches(SUCCESSFUL_STATUS_MESSAGE_REGEX)); 
 
-        final int numberOfRows = (int) (PAYROLL.getDataRowCount() - 3); // All rows above header shouldn't be added
+        final int numberOfRows = (int) (PAYROLL_LESS_COLUMNS.getDataRowCount() - 3); // All rows above header shouldn't be added
 
         assertTrue(DatasetsListPage.getInstance(browser)
                 .getMyDatasetsTable()
                 .getDataset(datasetName)
                 .getStatus()
-                .equals(format("%s rows, %s data fields", numberOfRows, String.valueOf(PAYROLL_COLUMN_TYPES.length))),
+                .equals(format("%s rows, %s data fields", numberOfRows, String.valueOf(PAYROLL_LESS_COLUMNS_COLUMN_TYPES.length))),
                 "Incorrect row/colum number!");
 
         takeScreenshot(browser, "dataset-uploaded" + datasetName, getClass());
@@ -293,7 +292,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         DatasetsListPage.getInstance(browser).openDatasetDetailPage(datasetName);
         takeScreenshot(browser, DATASET_DETAIL_PAGE_NAME, getClass());
 
-        checkCsvDatasetDetail(datasetName, customHeaderColumns, PAYROLL.getColumnTypes());
+        checkCsvDatasetDetail(datasetName, customHeaderColumns, PAYROLL_LESS_COLUMNS.getColumnTypes());
     }
 
     @Test(dependsOnGroups = {"createProject"})

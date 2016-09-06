@@ -86,7 +86,7 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkNoFactAndNumericColumnNameCsvConfig() {
-        final DataPreviewPage dataPreviewPage = initDataUploadPage().uploadFile(PAYROLL.getFilePath());
+        final DataPreviewPage dataPreviewPage = initDataUploadPage().uploadFile(PAYROLL_LESS_COLUMNS.getFilePath());
 
         final String factColumnName = "Amount";
 
