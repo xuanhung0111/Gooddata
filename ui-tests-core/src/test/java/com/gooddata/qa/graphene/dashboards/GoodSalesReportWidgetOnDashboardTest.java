@@ -47,12 +47,12 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
 
     private static final String VARIABLE_NAME = "variable";
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setProjectTitle() {
         projectTitle = "GoodSales-dashboard-report-widget";
     }
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void addUsers() {
         addUsersWithOtherRoles = true;
     }
