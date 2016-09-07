@@ -61,7 +61,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
     private List<String> attributeValues;
     private List<Float> metricValues;
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setProjectTitle() {
         projectTitle = "GoodSales-embedded-report-test";
     }
