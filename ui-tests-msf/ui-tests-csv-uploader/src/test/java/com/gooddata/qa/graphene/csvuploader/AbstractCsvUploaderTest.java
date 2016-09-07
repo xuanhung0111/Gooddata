@@ -46,6 +46,13 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
             getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/payroll.csv"))
             .setColumnTypes(PAYROLL_COLUMN_TYPES);
 
+    protected static final String[] PAYROLL_LESS_COLUMNS_COLUMN_TYPES = {"Attribute", "Attribute",
+            "Date (Year-Month-Day)", "Measure"};
+
+    protected static final CsvFile PAYROLL_LESS_COLUMNS = CsvFile.loadFile(
+            getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/payroll.less.columns.csv"))
+            .setColumnTypes(PAYROLL_LESS_COLUMNS_COLUMN_TYPES);
+
     protected static final CsvFile PAYROLL_REFRESH = CsvFile.loadFile(
             getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/payroll.refresh.csv"))
             .setColumnTypes(PAYROLL_COLUMN_TYPES);
