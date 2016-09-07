@@ -5,12 +5,15 @@ import java.util.Map;
 
 import com.gooddata.qa.graphene.dashboards.DashboardSavedFiltersTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesCascadingFilterTest;
+import com.gooddata.qa.graphene.dashboards.GoodSalesCellLimitTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesConnectingFilterTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardAllKindsFiltersTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardTest;
+import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardWidgetManipulationTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesFilterDropdownAttributeValueTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesFilterGroupTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesAdvancedConnectingFilterTest;
+import com.gooddata.qa.graphene.dashboards.GoodSalesKeyMetricTest;
 import com.gooddata.qa.graphene.filters.DashboardFilterVisualTest;
 import com.gooddata.qa.graphene.i18n.LocalizationTest;
 import com.gooddata.qa.graphene.project.SimpleProjectEtlTest;
@@ -97,6 +100,26 @@ public class UITestsRegistry {
             DynamicImageTest.class,
             TimeFormattingTest.class,
             "testng-permissions-EmbeddedReport.xml"
+        });
+
+        suites.put("dashboards", new Object[] {
+            GoodSalesDashboardAllKindsFiltersTest.class,
+            GoodSalesFilterDropdownAttributeValueTest.class,
+            GoodSalesCascadingFilterTest.class,
+            GoodSalesConnectingFilterTest.class,
+            GoodSalesAdvancedConnectingFilterTest.class,
+            GoodSalesFilterGroupTest.class,
+            DashboardFilterVisualTest.class,
+            GoodSalesDashboardWidgetManipulationTest.class,
+            DashboardSavedFiltersTest.class,
+            GoodSalesKeyMetricTest.class,
+            "testng-permissions-PersonalObjectsInDashboardWidget.xml",
+            "testng-permissions-EmbeddedDashboard.xml",
+            "testng-permissions-ReportWidgetOnDashboard.xml"
+        });
+
+        suites.put("dashboards-cell-limit", new Object[] {
+            GoodSalesCellLimitTest.class
         });
 
         TestsRegistry.getInstance()
