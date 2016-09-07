@@ -14,7 +14,30 @@ import com.gooddata.qa.graphene.dashboards.GoodSalesAdvancedConnectingFilterTest
 import com.gooddata.qa.graphene.filters.DashboardFilterVisualTest;
 import com.gooddata.qa.graphene.i18n.LocalizationTest;
 import com.gooddata.qa.graphene.project.SimpleProjectEtlTest;
+import com.gooddata.qa.graphene.reports.CopyReportTableTest;
+import com.gooddata.qa.graphene.reports.DynamicImageTest;
+import com.gooddata.qa.graphene.reports.GoodSalesAddingFilterFromReportContextMenuTest;
+import com.gooddata.qa.graphene.reports.GoodSalesAdvanceRangeFilterReportTest;
+import com.gooddata.qa.graphene.reports.GoodSalesBasicFilterReportTest;
+import com.gooddata.qa.graphene.reports.GoodSalesCreateReportTest;
+import com.gooddata.qa.graphene.reports.GoodSalesDrillDownToExportSpecialTest;
+import com.gooddata.qa.graphene.reports.GoodSalesDrillReportInReportPageTest;
+import com.gooddata.qa.graphene.reports.GoodSalesDrillReportTest;
+import com.gooddata.qa.graphene.reports.GoodSalesDrillReportToExportTest;
+import com.gooddata.qa.graphene.reports.GoodSalesGridModificationTest;
+import com.gooddata.qa.graphene.reports.GoodSalesManipulationFilterReportTest;
+import com.gooddata.qa.graphene.reports.GoodSalesReportFilterTest;
+import com.gooddata.qa.graphene.reports.GoodSalesReportStatisticsTest;
+import com.gooddata.qa.graphene.reports.GoodSalesReportsPageTest;
 import com.gooddata.qa.graphene.reports.GoodSalesReportsTest;
+import com.gooddata.qa.graphene.reports.GoodSalesRunningTotalsTest;
+import com.gooddata.qa.graphene.reports.GoodSalesSaveReportTest;
+import com.gooddata.qa.graphene.reports.GoodSalesSortByTotalsTest;
+import com.gooddata.qa.graphene.reports.GoodSalesTotalsInReportTest;
+import com.gooddata.qa.graphene.reports.GoodsalesMufReportTest;
+import com.gooddata.qa.graphene.reports.ReportWithEmptyValuesInTimeDimensionTest;
+import com.gooddata.qa.graphene.reports.SimpleCompAttributesTest;
+import com.gooddata.qa.graphene.reports.TimeFormattingTest;
 import com.gooddata.qa.utils.flow.PredefineParameterTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
@@ -47,6 +70,33 @@ public class UITestsRegistry {
             DashboardFilterVisualTest.class,
             DashboardSavedFiltersTest.class,
             GoodSalesAdvancedConnectingFilterTest.class
+        });
+
+        suites.put("reports", new Object[] {
+            GoodSalesDrillReportTest.class,
+            GoodSalesDrillReportToExportTest.class,
+            GoodSalesDrillDownToExportSpecialTest.class,
+            GoodSalesDrillReportInReportPageTest.class,
+            GoodSalesTotalsInReportTest.class,
+            GoodSalesSortByTotalsTest.class,
+            GoodSalesRunningTotalsTest.class,
+            GoodSalesReportFilterTest.class,
+            GoodSalesBasicFilterReportTest.class,
+            GoodSalesManipulationFilterReportTest.class,
+            GoodSalesAdvanceRangeFilterReportTest.class,
+            GoodSalesAddingFilterFromReportContextMenuTest.class,
+            GoodsalesMufReportTest.class,
+            GoodSalesGridModificationTest.class,
+            SimpleCompAttributesTest.class,
+            GoodSalesReportStatisticsTest.class,
+            CopyReportTableTest.class,
+            GoodSalesReportsPageTest.class,
+            GoodSalesSaveReportTest.class,
+            GoodSalesCreateReportTest.class,
+            ReportWithEmptyValuesInTimeDimensionTest.class,
+            DynamicImageTest.class,
+            TimeFormattingTest.class,
+            "testng-permissions-EmbeddedReport.xml"
         });
 
         TestsRegistry.getInstance()
