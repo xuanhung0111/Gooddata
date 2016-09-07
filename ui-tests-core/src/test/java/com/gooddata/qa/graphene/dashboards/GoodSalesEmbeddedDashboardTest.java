@@ -83,7 +83,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     private String htmlEmbedCode;
     private String additionalProjectId = "";
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setUpData() {
         projectTitle = "GoodSales-embedded-dashboard-test";
         tabularReportDef =
