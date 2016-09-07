@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
@@ -43,7 +44,6 @@ public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
     @BeforeClass(alwaysRun = true)
     public void initialize() {
         projectTitle += "Save-And-Edit-Recent-Insight-Test";
-        addUsersWithOtherRoles = true;
     }
 
     @Test(dependsOnGroups = { "init" })
@@ -521,6 +521,11 @@ public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
                 .getPageHeader().getInsightTitle(), DATE_CREATED_DIMENSION_INSIGHT);
         assertEquals(analysisPage.getAttributesBucket().getSelectedDimensionSwitch(), CREATED,
                 "Selected date dimension of " + DATE_CREATED_DIMENSION_INSIGHT + "was not correct");
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
     }
 
     private void checkRenamedInsight(final int expectedNumberOfInsights, final String oldInsight,

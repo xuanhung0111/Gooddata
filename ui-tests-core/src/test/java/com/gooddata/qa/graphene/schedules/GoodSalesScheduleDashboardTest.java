@@ -73,9 +73,8 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     private DateTimeZone tz = DateTimeZone.getDefault();
 
     @BeforeClass(alwaysRun = true)
-    public void addUsers() {
+    public void setProjectTitle() {
         projectTitle = "GoodSales schedule dashboard test";
-        addUsersWithOtherRoles = true;
     }
 
     // login with defined user role, fail test on error
@@ -105,7 +104,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         try {
             loginAs(UserRoles.VIEWER);
             GoodData goodDataClient = getGoodDataClient(testParams.getViewerUser(), 
-                    testParams.getViewerPassword());
+                    testParams.getPassword());
             String userUri = goodDataClient.getAccountService().getCurrent().getUri();
             initDashboardsPage();
 
@@ -335,16 +334,12 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
 
     @Test(dependsOnGroups = {"prepareTests"})
     public void deleteUserOnPrivateScheduledEmails() throws ParseException, JSONException, IOException {
-        String userA = "qa+test+schedule+a@gooddata.com";
-        String userB = "qa+test+schedule+b@gooddata.com";
+        String scheduleEmail = testParams.getUser().replace("@", "+schedule@");
+        String userA = createDynamicUserFrom(scheduleEmail);
+        String userB = createDynamicUserFrom(scheduleEmail);
         String scheduleUserA = "Schedule with deleted bcc email";
         String scheduleUserB = "Schedule with deleted author";
         RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
-
-        String userAUri = UserManagementRestUtils.createUser(restApiClient, testParams.getUserDomain(), userA,
-                testParams.getPassword());
-        String userBUri = UserManagementRestUtils.createUser(restApiClient, testParams.getUserDomain(), userB,
-                testParams.getPassword());
 
         try {
             String userUri = getGoodDataClient().getAccountService().getCurrent().getUri();
@@ -354,7 +349,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
             initDashboardsPage();
             dashboardsPage.selectDashboard(PIPELINE_ANALYSIS_DASHBOARD);
             createDashboardSchedule(scheduleUserA, asList(userA));
-            UserManagementRestUtils.deleteUserByUri(restApiClient, userAUri);
+            UserManagementRestUtils.deleteUserByEmail(restApiClient, testParams.getUserDomain(), userA);
 
             initEmailSchedulesPage();
             assertDashboardScheduleInfo(scheduleUserA, userUri, asList(userA));
@@ -366,15 +361,19 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
 
             logout();
             signIn(true, UserRoles.ADMIN);
-            UserManagementRestUtils.deleteUserByUri(restApiClient, userBUri);
+            UserManagementRestUtils.deleteUserByEmail(restApiClient, testParams.getUserDomain(), userB);
 
             assertFalse(initEmailSchedulesPage().isPrivateSchedulePresent(scheduleUserB),
                     "Schedule of deleted user was not hidden.");
         } finally {
             loginAs(UserRoles.ADMIN);
-            UserManagementRestUtils.deleteUserByUri(restApiClient, userAUri);
-            UserManagementRestUtils.deleteUserByUri(restApiClient, userBUri);
         }
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
+        createAndAddUserToProject(UserRoles.VIEWER);
     }
 
     private void checkOnlyPublicScheduleVisible() {

@@ -14,6 +14,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 
 import java.io.IOException;
 import java.util.List;
@@ -34,6 +35,7 @@ import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.report.WhatItem;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.EmbeddedWidget;
 import com.gooddata.qa.graphene.fragments.reports.report.EmbeddedReportContainer;
@@ -81,16 +83,9 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         System.out.println("metricValues: " + metricValues);
     }
 
-    @Test(dependsOnMethods = "createReportToShare")
-    public void addEditorAndSignInAsEditor() throws ParseException, IOException, JSONException {
-        addEditorUserToProject();
-
-        logout();
-        signInAtGreyPages(testParams.getEditorUser(), testParams.getEditorPassword());
-    }
-
-    @Test(dependsOnMethods = "addEditorAndSignInAsEditor")
-    public void editorGetEmbedCode() {
+    @Test(dependsOnMethods = {"createReportToShare"})
+    public void editorGetEmbedCode() throws JSONException {
+        logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.EDITOR);
         openReportByUrl(reportUrl);
         reportPage.getTableReport().waitForReportLoading();
         ReportEmbedDialog embedDialog = reportPage.openReportEmbedDialog();
@@ -419,6 +414,11 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         ProjectRestUtils.deleteProject(getEditorGoodDataClient(), additionalProjectId);
     }
 
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
+    }
+
     private void openReportByUrl(String reportUrl) {
         browser.get(reportUrl);
         waitForFragmentVisible(reportPage);
@@ -467,7 +467,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
     private GoodData getEditorGoodDataClient() {
         if (isNull(editorGoodDataClient)) {
-            editorGoodDataClient = getGoodDataClient(testParams.getEditorUser(), testParams.getEditorPassword());
+            editorGoodDataClient = getGoodDataClient(testParams.getEditorUser(), testParams.getPassword());
         }
 
         return editorGoodDataClient;

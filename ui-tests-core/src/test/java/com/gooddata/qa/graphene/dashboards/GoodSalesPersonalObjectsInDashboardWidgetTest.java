@@ -11,8 +11,10 @@ import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.stream.Stream;
 
+import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
@@ -32,7 +34,6 @@ public class GoodSalesPersonalObjectsInDashboardWidgetTest extends GoodSalesAbst
     @BeforeClass(alwaysRun = true)
     public void before() {
         projectTitle = "GoodSales-Personal-Objects-In-Dashboard-Widget";
-        addUsersWithOtherRoles = true;
         personalReport = "[Personal] Report";
         personalMetric = "[Personal] Share %";
     }
@@ -76,6 +77,11 @@ public class GoodSalesPersonalObjectsInDashboardWidgetTest extends GoodSalesAbst
             logout();
             signIn(false, UserRoles.ADMIN);
         }
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
     }
 
     private void checkCannotFindPersonalReport() {

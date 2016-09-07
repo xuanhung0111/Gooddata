@@ -376,8 +376,10 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = "createAdditionalProject")
     public void viewEmbeddedDashboardWithNotAuthorizedAccount() throws ParseException, IOException, JSONException {
+        String otherUser = createDynamicUserFrom(testParams.getUser());
+
         try {
-            signInAtGreyPages(testParams.getViewerUser(), testParams.getViewerPassword());
+            signInAtGreyPages(otherUser, testParams.getPassword());
             browser.get(embedUri);
             String notAuthorizedMessage = LoginFragment.getInstance(browser).getNotAuthorizedMessage();
             log.info("Not authorized message: " + notAuthorizedMessage);
@@ -385,8 +387,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
             assertTrue(notAuthorizedMessage
                     .contains("You are not authorized to access this area. Please contact your administrator."));
         } finally {
-            logout();
-            signIn(false, UserRoles.ADMIN);
+            logoutAndLoginAs(true, UserRoles.ADMIN);
         }
     }
 

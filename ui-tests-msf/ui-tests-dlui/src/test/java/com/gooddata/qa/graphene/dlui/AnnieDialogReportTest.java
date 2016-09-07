@@ -59,27 +59,20 @@ public class AnnieDialogReportTest extends AbstractAnnieDialogTest {
         addMultiFieldsAndCheckReport(UserRoles.ADMIN);
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"basicTest"})
-    public void addEditorUser() throws ParseException, IOException, JSONException {
-        addUserToProject(testParams.getEditorUser(), UserRoles.EDITOR);
-    }
-
-    @Test(dataProvider = "basicFieldData", dependsOnMethods = {"addEditorUser", "prepareMetricsToCheckReport"},
+    @Test(dataProvider = "basicFieldData", dependsOnMethods = {"prepareMetricsToCheckReport"},
             groups = {"editorAddOneField", "basicTest"})
     public void editorCheckReportWithBasicSingleField(AddedFields addedField,
             ReportWithAddedFields reportWithAddedFields) throws JSONException, IOException {
         checkNewAddedDataReportAndCleanAddedData(UserRoles.EDITOR, addedField, reportWithAddedFields);
     }
 
-    @Test(dataProvider = "newFieldData", dependsOnMethods = {"addEditorUser", "prepareMetricsToCheckReport"},
-            groups = {"editorAddOneField"})
+    @Test(dataProvider = "newFieldData", dependsOnMethods = {"prepareMetricsToCheckReport"}, groups = {"editorAddOneField"})
     public void editorCheckReportWithSingleField(AddedFields addedField,
             ReportWithAddedFields reportWithAddedFields) throws JSONException, IOException {
         checkNewAddedDataReportAndCleanAddedData(UserRoles.EDITOR, addedField, reportWithAddedFields);
     }
 
-    @Test(dependsOnMethods = {"addEditorUser", "prepareMetricsToCheckReport"},
-            dependsOnGroups = {"editorAddOneField"})
+    @Test(dependsOnMethods = {"prepareMetricsToCheckReport"}, dependsOnGroups = {"editorAddOneField"})
     public void editorCheckReportWithMultiAddedFields() throws JSONException, IOException {
         addMultiFieldsAndCheckReport(UserRoles.EDITOR);
     }
@@ -87,5 +80,10 @@ public class AnnieDialogReportTest extends AbstractAnnieDialogTest {
     @AfterClass(alwaysRun = true)
     public void cleanUp() throws ParseException, JSONException, IOException {
         getAdsHelper().removeAds(ads);
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
     }
 }

@@ -7,6 +7,7 @@ import com.gooddata.qa.graphene.indigo.dashboards.AddKpiWithoutDataSetTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DataSetTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DragWidgetsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.HeaderTest;
+import com.gooddata.qa.graphene.indigo.dashboards.InsightOnDashboardTest;
 import com.gooddata.qa.graphene.indigo.dashboards.KpiAlertTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ManipulateWidgetsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.MetricsDropdownTest;
@@ -23,9 +24,9 @@ public class UITestsRegistry {
 
         suites.put("sanity", new Object[] {
             ManipulateWidgetsTest.class,
-            "testng-desktop-permissions-EditMode.xml",
+            "testng-desktop-EditMode.xml",
             "testng-desktop-imap-KpiAlertEvaluate.xml",
-            "testng-desktop-permissions-SplashScreen.xml"
+            "testng-desktop-SplashScreen.xml"
         });
 
         suites.put("pull-request", new Object[] {
@@ -40,18 +41,18 @@ public class UITestsRegistry {
             VisualizationsTest.class,
             ReorderInsightTest.class,
             NonProductionDatasetTest.class,
+            InsightOnDashboardTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
-            "testng-desktop-permissions-EditMode.xml",
-            "testng-desktop-permissions-KpiDrillTo.xml",
+            "testng-desktop-EditMode.xml",
+            "testng-desktop-KpiDrillTo.xml",
             "testng-desktop-KpiPop.xml",
-            "testng-desktop-permissions-SplashScreen.xml",
+            "testng-desktop-SplashScreen.xml",
             "testng-desktop-MetricFormatting.xml",
             "testng-desktop-ResponsiveNavigation.xml",
             "testng-desktop-KpiPopChangeValueExceedLimit.xml",
-            "testng-desktop-permissions-MetricsAccessibility.xml",
+            "testng-desktop-MetricsAccessibility.xml",
             "testng-desktop-ProjectSwitch.xml",
-            "testng-desktop-permissions-InsightOnDashboard.xml",
             "testng-desktop-EmptyErrorKpiValue.xml",
             "testng-mobile-AttributeFiltering.xml",
             "testng-mobile-DateFiltering.xml",
@@ -79,20 +80,19 @@ public class UITestsRegistry {
             NonProductionDatasetTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
-            "testng-desktop-permissions-EditMode.xml",
+            "testng-desktop-EditMode.xml",
             "testng-desktop-imap-KpiAlertEvaluate.xml",
-            "testng-desktop-permissions-KpiDrillTo.xml",
+            "testng-desktop-KpiDrillTo.xml",
             "testng-desktop-KpiPop.xml",
-            "testng-desktop-permissions-SplashScreen.xml",
+            "testng-desktop-SplashScreen.xml",
             "testng-desktop-MetricFormatting.xml",
             "testng-desktop-ResponsiveNavigation.xml",
             "testng-desktop-KpiPopChangeValueExceedLimit.xml",
-            "testng-desktop-permissions-MetricsAccessibility.xml",
+            "testng-desktop-MetricsAccessibility.xml",
             "testng-desktop-ProjectSwitch.xml",
             "testng-desktop-imap-KpiAlertNullValue.xml",
             "testng-desktop-imap-KpiValueFormatInAlertEmail.xml",
             "testng-desktop-imap-KpiAlertSpecialCaseTest.xml",
-            "testng-desktop-permissions-InsightOnDashboard.xml",
             "testng-desktop-EmptyErrorKpiValue.xml",
             "testng-mobile-AttributeFiltering.xml",
             "testng-mobile-DateFiltering.xml",

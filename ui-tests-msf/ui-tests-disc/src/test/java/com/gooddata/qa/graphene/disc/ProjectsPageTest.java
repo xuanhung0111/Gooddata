@@ -14,6 +14,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -30,6 +31,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
@@ -37,6 +39,7 @@ import com.gooddata.qa.graphene.enums.disc.ProjectStateFilters;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.google.common.base.Joiner;
 
 public class ProjectsPageTest extends AbstractOverviewProjectsTest {
@@ -195,8 +198,6 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
     @Test(dependsOnGroups = {"createProject"})
     public void checkProjectsNotAdmin() {
         try {
-            addUsersWithOtherRolesToProject();
-
             openUrl(PAGE_PROJECTS);
             logout();
             signIn(false, UserRoles.VIEWER);
@@ -210,9 +211,6 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
             initDISCProjectsPage();
             assertProjectNotAdmin(projectTitle);
         } catch (ParseException e) {
-            System.out.println("There is problem during adding user to project: ");
-            e.printStackTrace();
-        } catch (IOException e) {
             System.out.println("There is problem during adding user to project: ");
             e.printStackTrace();
         } catch (JSONException e) {
@@ -415,15 +413,13 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void checkProjectListAfterLeaveAProject() {
-        String secondAdmin = testParams.getEditorUser();
-        String secondAdminPassword = testParams.getEditorPassword();
+    public void checkProjectListAfterLeaveAProject() throws JSONException, ParseException, IOException {
+        String newAdminUser = createAndAddUserToProject(UserRoles.ADMIN);
         String projectId = "";
 
         try {
-            addUserToProject(secondAdmin, UserRoles.ADMIN);
             logout();
-            signInAtUI(secondAdmin, secondAdminPassword);
+            signInAtUI(newAdminUser, testParams.getPassword());
 
             projectId = createBlankProject("Additional Project");
 
@@ -436,13 +432,11 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
             assertNotNull(discProjectsList.selectProjectWithAdminRole(projectId), "Cannot find project " + projectId);
             assertNull(discProjectsList.selectProjectWithAdminRole(testParams.getProjectId()),
                     "Project is still shown on DIC projects page after user leave it!!");
-        } catch (Exception e) {
-            throw new IllegalStateException("There is exeception when adding user to project!", e);
         } finally {
-            if (!projectId.isEmpty())
-                deleteProjects(projectId);
-            logout();
-            signInAtUI(testParams.getUser(), testParams.getPassword());
+            GoodData gooddataClient = getGoodDataClient(newAdminUser, testParams.getPassword());
+            ProjectRestUtils.deleteProject(gooddataClient, projectId);
+
+            logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
         }
     }
 
@@ -459,6 +453,12 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         waitForFragmentVisible(discOverview);
         discNavigation.clickOnProjectsButton();
         waitForFragmentVisible(discProjectsPage);
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
+        createAndAddUserToProject(UserRoles.VIEWER);
     }
 
     private void assertProjectNotAdmin(String projectName) {

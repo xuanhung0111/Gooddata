@@ -28,11 +28,6 @@ public class GoodSalesMetricVisibilityTest extends GoodSalesAbstractAnalyseTest 
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {"precondition"})
-    public void addUsersWithOtherRolesToProject() throws ParseException, IOException, JSONException {
-        super.addUsersWithOtherRolesToProject();
-    }
-
-    @Test(dependsOnMethods = {"addUsersWithOtherRolesToProject"}, groups = {"precondition"})
     public void createPrivateMetric() {
         assertTrue(deleteMetric(RATIO_METRIC));
 
@@ -65,6 +60,11 @@ public class GoodSalesMetricVisibilityTest extends GoodSalesAbstractAnalyseTest 
             logout();
             signIn(false, UserRoles.ADMIN);
         }
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
     }
 
     private boolean deleteMetric(String metric) {

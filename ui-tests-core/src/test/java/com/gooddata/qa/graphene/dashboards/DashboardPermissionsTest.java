@@ -17,10 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
@@ -40,21 +40,8 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     private static final String XENOFOBES_XYLOPHONES = "Xenofobes & xylophones";
     private static final String ALCOHOLICS_ANONYMOUS = "Alcoholics anonymous";
     private static final String UNCHANGED_DASHBOARD = "Unchanged dashboard";
-    private String viewerLogin;
-    private String editorLogin;
     private String userGroup1Id;
     private String userGroup2Id;
-    private String editorProfileUri;
-    private String viewerProfileUri;
-
-    @BeforeClass(alwaysRun = true)
-    public void before() {
-        addUsersWithOtherRoles = true;
-        viewerLogin = testParams.getViewerUser();
-        editorLogin = testParams.getEditorUser();
-        editorProfileUri = testParams.loadProperty("editorProfileUri");
-        viewerProfileUri = testParams.loadProperty("viewerProfileUri");
-    }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests", "sanity"}, priority = 0)
     public void checkBackToTheOnlyOneVisibileDashboard() throws IOException, JSONException {
@@ -65,7 +52,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
 
             logout();
             signIn(false, UserRoles.EDITOR);
-            createDashboard(getRestApiClient(testParams.getEditorUser(), testParams.getEditorPassword()),
+            createDashboard(getRestApiClient(testParams.getEditorUser(), testParams.getPassword()),
                     "Only one dashboard of Editor");
 
             // Editor loads the dashboard url of Admin
@@ -316,7 +303,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
 
         assertEquals(permissionsDialog.getAddedGrantees().size(), 1);
 
-        selectCandidatesAndShare(addGranteesDialog, viewerLogin);
+        selectCandidatesAndShare(addGranteesDialog, testParams.getViewerUser());
 
         assertEquals(permissionsDialog.getAddedGrantees().size(), 2);
     }
@@ -353,7 +340,8 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         By nameSelector = By.cssSelector(".grantee-name");
         By loginSelector = By.cssSelector(".grantee-email");
         List<String> expectedGrantees =
-                new ArrayList<>(asList(ALCOHOLICS_ANONYMOUS, XENOFOBES_XYLOPHONES, editorLogin, viewerLogin));
+                new ArrayList<>(asList(ALCOHOLICS_ANONYMOUS, XENOFOBES_XYLOPHONES,
+                        testParams.getEditorUser(), testParams.getViewerUser()));
         List<String> actualGrantees =
                 new ArrayList<>(asList(candidates.get(0).findElement(nameSelector).getText().trim(), candidates.get(1)
                         .findElement(nameSelector).getText().trim(), candidates.get(2).findElement(loginSelector)
@@ -374,7 +362,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
         final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
 
-        selectCandidatesAndCancel(addGranteesDialog, viewerLogin, editorLogin, ALCOHOLICS_ANONYMOUS,
+        selectCandidatesAndCancel(addGranteesDialog, testParams.getViewerUser(), testParams.getEditorUser(), ALCOHOLICS_ANONYMOUS,
                 XENOFOBES_XYLOPHONES);
         assertEquals(permissionsDialog.getAddedGrantees().size(), 1);
     }
@@ -387,7 +375,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
         final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
 
-        selectCandidatesAndShare(addGranteesDialog, viewerLogin, editorLogin);
+        selectCandidatesAndShare(addGranteesDialog, testParams.getViewerUser(), testParams.getEditorUser());
 
         assertEquals(permissionsDialog.getAddedGrantees().size(), 3);
     }
@@ -445,13 +433,13 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
         AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
 
-        assertEquals(addGranteesDialog.getGranteesCount(editorLogin, true), 1);
+        assertEquals(addGranteesDialog.getGranteesCount(testParams.getEditorUser(), true), 1);
 
-        selectCandidatesAndShare(addGranteesDialog, editorLogin);
+        selectCandidatesAndShare(addGranteesDialog, testParams.getEditorUser());
 
         addGranteesDialog = permissionsDialog.openAddGranteePanel();
 
-        assertEquals(addGranteesDialog.getGranteesCount(editorLogin, false), 0);
+        assertEquals(addGranteesDialog.getGranteesCount(testParams.getEditorUser(), false), 0);
     }
 
     @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests", "sanity"})
@@ -462,8 +450,8 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
         final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
 
-        List<String> candidates = new ArrayList<>(asList(viewerLogin, editorLogin, ALCOHOLICS_ANONYMOUS,
-                XENOFOBES_XYLOPHONES));
+        List<String> candidates = new ArrayList<>(asList(testParams.getViewerUser(), testParams.getEditorUser(),
+                ALCOHOLICS_ANONYMOUS, XENOFOBES_XYLOPHONES));
         if (testParams.getDomainUser() != null) {
             candidates.add(testParams.getDomainUser());
         }
@@ -485,7 +473,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
         final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
 
-        selectCandidatesAndShare(addGranteesDialog, viewerLogin, ALCOHOLICS_ANONYMOUS);
+        selectCandidatesAndShare(addGranteesDialog, testParams.getViewerUser(), ALCOHOLICS_ANONYMOUS);
         assertEquals(permissionsDialog.getAddedGrantees().size(), 3);
 
         permissionsDialog.publish(PublishType.EVERYONE_CAN_ACCESS);
@@ -512,10 +500,10 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
                 assertEquals(permissionsDialog.getAddedGrantees().size(), 5);
             }
 
-            permissionsDialog.removeUser(viewerLogin);
+            permissionsDialog.removeUser(testParams.getViewerUser());
             permissionsDialog.removeGroup(ALCOHOLICS_ANONYMOUS);
             permissionsDialog.removeGroup(XENOFOBES_XYLOPHONES);
-            permissionsDialog.removeUser(editorLogin);
+            permissionsDialog.removeUser(testParams.getEditorUser());
             if (testParams.getDomainUser() != null) {
                 permissionsDialog.removeUser(testParams.getDomainUser());
             }
@@ -525,7 +513,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
             assertTrue(permissionsDialog.checkCannotRemoveOwner(), 
                     "There is the delete icon of dashboard owner grantee");
 
-            permissionsDialog.undoRemoveUser(editorLogin);
+            permissionsDialog.undoRemoveUser(testParams.getEditorUser());
 
             assertEquals(permissionsDialog.getRoot().findElements(ALERT_INFOBOX_CSS_SELECTOR).size(), 0);
 
@@ -538,11 +526,11 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
             final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
            
             if (testParams.getDomainUser() != null) {
-                selectCandidatesAndShare(addGranteesDialog, testParams.getDomainUser(), viewerLogin, 
+                selectCandidatesAndShare(addGranteesDialog, testParams.getDomainUser(), testParams.getViewerUser(), 
                         XENOFOBES_XYLOPHONES);
                 assertEquals(permissionsDialog.getAddedGrantees().size(), 6);
             } else {
-                selectCandidatesAndShare(addGranteesDialog, viewerLogin, XENOFOBES_XYLOPHONES);
+                selectCandidatesAndShare(addGranteesDialog, testParams.getViewerUser(), XENOFOBES_XYLOPHONES);
                 assertEquals(permissionsDialog.getAddedGrantees().size(), 5);
             }
 
@@ -568,10 +556,10 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
         assertEquals(permissionsDialog.getTitleOfSubmitButton(), "Done");
 
-        permissionsDialog.removeUser(editorLogin);
+        permissionsDialog.removeUser(testParams.getEditorUser());
         assertEquals(permissionsDialog.getTitleOfSubmitButton(), "Save Changes");
 
-        permissionsDialog.undoRemoveUser(editorLogin);
+        permissionsDialog.undoRemoveUser(testParams.getEditorUser());
         assertEquals(permissionsDialog.getTitleOfSubmitButton(), "Done");
 
         permissionsDialog.removeGroup(ALCOHOLICS_ANONYMOUS);
@@ -603,8 +591,12 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         logout();
         signIn(false, UserRoles.ADMIN);
 
-        UserManagementRestUtils.addUsersToUserGroup(getRestApiClient(), userGroup1Id, editorProfileUri);
-        UserManagementRestUtils.addUsersToUserGroup(getRestApiClient(), userGroup2Id, viewerProfileUri);
+        RestApiClient restApiClient = testParams.getDomainUser() == null ? getRestApiClient() : getDomainUserRestApiClient();
+        String editorProfileUri = UserManagementRestUtils.getUserProfileUri(restApiClient, testParams.getUserDomain(), testParams.getEditorUser());
+        String viewerProfileUri = UserManagementRestUtils.getUserProfileUri(restApiClient, testParams.getUserDomain(), testParams.getViewerUser());
+
+        UserManagementRestUtils.addUsersToUserGroup(restApiClient, userGroup1Id, editorProfileUri);
+        UserManagementRestUtils.addUsersToUserGroup(restApiClient, userGroup2Id, viewerProfileUri);
     }
 
     @Test(dependsOnMethods = {"prepareUsergroupTests"}, groups = {"acl-tests-usergroups", "sanity"})
@@ -614,7 +606,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
         final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
 
-        selectCandidatesAndShare(addGranteesDialog, viewerLogin, ALCOHOLICS_ANONYMOUS);
+        selectCandidatesAndShare(addGranteesDialog, testParams.getViewerUser(), ALCOHOLICS_ANONYMOUS);
         assertEquals(permissionsDialog.getAddedGrantees().size(), 3);
 
         permissionsDialog.submit();
@@ -641,7 +633,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         assertEquals(permissionsDialog.getAddedGrantees().size(), 2);
 
         final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
-        selectCandidatesAndShare(addGranteesDialog, editorLogin);
+        selectCandidatesAndShare(addGranteesDialog, testParams.getEditorUser());
         assertEquals(permissionsDialog.getAddedGrantees().size(), 3);
 
         permissionsDialog.removeGroup(ALCOHOLICS_ANONYMOUS);
@@ -699,16 +691,16 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
             waitForElementPresent(permissionsDialog.getRoot().findElement(ALERT_INFOBOX_CSS_SELECTOR));
 
             addGranteesDialog = permissionsDialog.openAddGranteePanel();
-            selectCandidatesAndShare(addGranteesDialog, editorLogin);
+            selectCandidatesAndShare(addGranteesDialog, testParams.getEditorUser());
             assertEquals(permissionsDialog.getRoot().findElements(ALERT_INFOBOX_CSS_SELECTOR).size(), 0);
 
-            permissionsDialog.removeUser(editorLogin);
+            permissionsDialog.removeUser(testParams.getEditorUser());
             waitForElementPresent(permissionsDialog.getRoot().findElement(ALERT_INFOBOX_CSS_SELECTOR));
 
-            permissionsDialog.undoRemoveUser(editorLogin);
+            permissionsDialog.undoRemoveUser(testParams.getEditorUser());
             assertEquals(permissionsDialog.getRoot().findElements(ALERT_INFOBOX_CSS_SELECTOR).size(), 0);
 
-            permissionsDialog.removeUser(editorLogin);
+            permissionsDialog.removeUser(testParams.getEditorUser());
             permissionsDialog.submit();
 
             selectDashboard("Published dashboard");
@@ -721,6 +713,12 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
             logout();
             signIn(false, UserRoles.ADMIN);
         }
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
+        createAndAddUserToProject(UserRoles.VIEWER);
     }
 
     private boolean checkDashboardVisible(String dashboardName) throws JSONException {

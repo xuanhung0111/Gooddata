@@ -26,7 +26,6 @@ import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
 
     private String newAdminUser;
-    private String newAdminPassword;
 
     @Test(dependsOnGroups = {"createProject"}, groups = "csv")
     public void checkMyDataAndNoDataOfOthers() {
@@ -38,15 +37,6 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
     }
 
     @Test(dependsOnMethods = {"checkMyDataAndNoDataOfOthers"}, groups = "csv")
-    public void inviteUsersToProject() throws ParseException, IOException, JSONException {
-        newAdminUser = testParams.getViewerUser();
-        newAdminPassword = testParams.getViewerPassword();
-
-        addUserToProject(newAdminUser, UserRoles.ADMIN);
-        addEditorUserToProject();
-    }
-
-    @Test(dependsOnMethods = {"inviteUsersToProject"}, groups = "csv")
     public void checkNoMyDataButDataOfOthers() throws JSONException {
         try {
             final List<String> projectOwnerDatasetNames = initDataUploadPage()
@@ -54,7 +44,7 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
                     .getDatasetNames();
 
             logout();
-            signInAtGreyPages(newAdminUser, newAdminPassword);
+            signInAtGreyPages(newAdminUser, testParams.getPassword());
 
             initDataUploadPage().waitForMyDatasetsEmptyStateLoaded();
 
@@ -75,7 +65,7 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
                     .getDatasetNames();
 
             logout();
-            signInAtGreyPages(newAdminUser, newAdminPassword);
+            signInAtGreyPages(newAdminUser, testParams.getPassword());
 
             initDataUploadPage().waitForMyDatasetsEmptyStateLoaded();
 
@@ -98,7 +88,7 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
     public void checkAdminCanDeleteDatasetOfOthers() throws JSONException {
         try {
             logout();
-            signInAtGreyPages(newAdminUser, newAdminPassword);
+            signInAtGreyPages(newAdminUser, testParams.getPassword());
 
             final String datasetName = PAYROLL.getDatasetNameOfFirstUpload();
             final int datasetCountBeforeDelete = initDataUploadPage().getOtherDatasetsCount();
@@ -198,5 +188,11 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
         }
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        newAdminUser = createAndAddUserToProject(UserRoles.ADMIN);
+        createAndAddUserToProject(UserRoles.EDITOR);
     }
 }

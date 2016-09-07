@@ -146,11 +146,11 @@ public class AbstractUITest extends AbstractGreyPageTest {
                 break;
             case EDITOR:
                 user = testParams.getEditorUser();
-                password = testParams.getEditorPassword();
+                password = testParams.getPassword();
                 break;
             case VIEWER:
                 user = testParams.getViewerUser();
-                password = testParams.getViewerPassword();
+                password = testParams.getPassword();
                 break;
             default:
                 throw new IllegalArgumentException("Unknow user role " + userRole);

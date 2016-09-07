@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.flow;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.gooddata.qa.graphene.aqe.ValidElementsResourceTest;
 import com.gooddata.qa.graphene.dashboards.DashboardSavedFiltersTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesCascadingFilterTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesCellLimitTest;
@@ -10,17 +11,23 @@ import com.gooddata.qa.graphene.dashboards.GoodSalesConnectingFilterTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardAllKindsFiltersTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDefaultFilterMultipleChoiceTest;
+import com.gooddata.qa.graphene.dashboards.GoodSalesEmbeddedDashboardTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardWidgetManipulationTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesFilterDropdownAttributeValueTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesFilterGroupTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesAdvancedConnectingFilterTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesKeyMetricTest;
+import com.gooddata.qa.graphene.dashboards.GoodSalesPersonalObjectsInDashboardWidgetTest;
+import com.gooddata.qa.graphene.dashboards.GoodSalesReportWidgetOnDashboardTest;
 import com.gooddata.qa.graphene.filters.DashboardFilterVisualTest;
 import com.gooddata.qa.graphene.i18n.LocalizationTest;
 import com.gooddata.qa.graphene.manage.AttributeLabelsTest;
+import com.gooddata.qa.graphene.manage.ComputedAttributesTest;
 import com.gooddata.qa.graphene.manage.GoodSalesFactTest;
+import com.gooddata.qa.graphene.manage.GoodSalesFolderTest;
 import com.gooddata.qa.graphene.manage.GoodSalesManageObjectsTest;
 import com.gooddata.qa.graphene.manage.GoodSalesMetricNumberFormatterTest;
+import com.gooddata.qa.graphene.manage.GoodSalesVariableTest;
 import com.gooddata.qa.graphene.manage.GoodSalesViewModelVisualizationTest;
 import com.gooddata.qa.graphene.manage.SimpleProjectGeoLabelTest;
 import com.gooddata.qa.graphene.project.SimpleProjectEtlTest;
@@ -34,6 +41,7 @@ import com.gooddata.qa.graphene.reports.GoodSalesDrillDownToExportSpecialTest;
 import com.gooddata.qa.graphene.reports.GoodSalesDrillReportInReportPageTest;
 import com.gooddata.qa.graphene.reports.GoodSalesDrillReportTest;
 import com.gooddata.qa.graphene.reports.GoodSalesDrillReportToExportTest;
+import com.gooddata.qa.graphene.reports.GoodSalesEmbeddedReportTest;
 import com.gooddata.qa.graphene.reports.GoodSalesGridModificationTest;
 import com.gooddata.qa.graphene.reports.GoodSalesManipulationFilterReportTest;
 import com.gooddata.qa.graphene.reports.GoodSalesReportFilterTest;
@@ -121,7 +129,7 @@ public class UITestsRegistry {
             ReportWithEmptyValuesInTimeDimensionTest.class,
             DynamicImageTest.class,
             TimeFormattingTest.class,
-            "testng-permissions-EmbeddedReport.xml"
+            GoodSalesEmbeddedReportTest.class
         });
 
         suites.put("dashboards", new Object[] {
@@ -135,9 +143,9 @@ public class UITestsRegistry {
             GoodSalesDashboardWidgetManipulationTest.class,
             DashboardSavedFiltersTest.class,
             GoodSalesKeyMetricTest.class,
-            "testng-permissions-PersonalObjectsInDashboardWidget.xml",
-            "testng-permissions-EmbeddedDashboard.xml",
-            "testng-permissions-ReportWidgetOnDashboard.xml"
+            GoodSalesEmbeddedDashboardTest.class,
+            GoodSalesPersonalObjectsInDashboardWidgetTest.class,
+            GoodSalesReportWidgetOnDashboardTest.class
         });
 
         suites.put("dashboards-cell-limit", new Object[] {
@@ -151,14 +159,14 @@ public class UITestsRegistry {
             GoodSalesMetricNumberFormatterTest.class,
             AttributeLabelsTest.class,
             SimpleProjectGeoLabelTest.class,
+            ComputedAttributesTest.class,
+            GoodSalesFolderTest.class,
+            GoodSalesVariableTest.class,
             "testng-manage-aggregation-metric-test.xml",
             "testng-manage-different-granularity-logical-metric-test.xml",
             "testng-manage-filter-share-ratio-metric-test.xml",
             "testng-manage-numeric-metric-test.xml",
-            "testng-manage-non-UI-metric-test.xml",
-            "testng-permissions-Variable.xml",
-            "testng-permissions-Folder.xml",
-            "testng-permissions-ComputedAttributes.xml"
+            "testng-manage-non-UI-metric-test.xml"
         });
 
         suites.put("schedules", new Object[] {
@@ -175,7 +183,7 @@ public class UITestsRegistry {
 
         suites.put("misc", new Object[] {
             GoodSalesMetadataDeletedTest.class,
-            "testng-permissions-ValidElementsResource.xml"
+            ValidElementsResourceTest.class
         });
 
         TestsRegistry.getInstance()

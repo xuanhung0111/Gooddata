@@ -5,6 +5,7 @@ import static com.gooddata.qa.browser.BrowserUtils.getCurrentBrowserAgent;
 import static com.gooddata.qa.browser.BrowserUtils.maximize;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
+import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.deleteUserByEmail;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,9 +53,6 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     protected String projectTitle = "simple-project";
     protected String projectTemplate = "";
     protected int projectCreateCheckIterations = DEFAULT_PROJECT_CHECK_LIMIT;
-
-    // use to add some users as role editor and viewer
-    protected boolean addUsersWithOtherRoles = false;
 
     // validations are enabled by default on any child class
     protected boolean validateAfterClass = true;
@@ -154,12 +152,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"createProject"})
     public void inviteUsersIntoProject() throws ParseException, IOException, JSONException {
-        if (addUsersWithOtherRoles) {
-            addUsersWithOtherRolesToProject();
-            return;
-        }
-
-        log.warning("This test does not need to invite users into project!");
+        addUsersWithOtherRolesToProject();
     }
 
     @Test(dependsOnMethods = {"inviteUsersIntoProject"}, groups = {"createProject"})
@@ -174,15 +167,11 @@ public abstract class AbstractProjectTest extends AbstractUITest {
             return;
         }
 
-        String dynamicUser = generateDynamicUser(testParams.getUser());
-        UserManagementRestUtils.createUser(getRestApiClient(), testParams.getUserDomain(), dynamicUser, testParams.getPassword());
-        UserManagementRestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), dynamicUser, UserRoles.ADMIN);
+        String dynamicUser = createDynamicUserFrom(testParams.getUser().replace("@", "+dynamic@"));
+        addUserToProject(dynamicUser, UserRoles.ADMIN);
 
         // update domain user
-        if (isCurrentUserDomainUser()) {
-            testParams.setDomainUser(testParams.getUser());
-        }
-
+        testParams.setDomainUser(testParams.getUser());
         testParams.setUser(dynamicUser);
 
         // update REST clients to the correct user because they can be generated and cached
@@ -249,9 +238,11 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     }
 
     @AfterClass(dependsOnMethods = {"deleteProjectTearDown"}, alwaysRun = true)
-    public void deleteDynamicUser() throws ParseException, IOException, JSONException {
-        if (useDynamicUser && testParams.getDomainUser() != null) {
-            UserManagementRestUtils.deleteUserByEmail(getDomainUserRestApiClient(), testParams.getUserDomain(), testParams.getUser());
+    public void deleteUsers() throws ParseException, IOException, JSONException {
+        RestApiClient restApiClient = testParams.getDomainUser() == null ? getRestApiClient() : getDomainUserRestApiClient();
+
+        for (String user : extraUsers) {
+            deleteUserByEmail(restApiClient, testParams.getUserDomain(), user);
         }
     }
 
