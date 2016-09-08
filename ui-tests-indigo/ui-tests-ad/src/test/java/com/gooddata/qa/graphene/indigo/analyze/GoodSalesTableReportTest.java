@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.indigo.analyze;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_LOST_OPPS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPEN_OPPS;
@@ -34,6 +35,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.browser.BrowserUtils;
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
@@ -101,7 +103,6 @@ public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
         BrowserUtils.switchToFirstTab(browser);
     }
 
-    
     @Test(dependsOnGroups = {"init"})
     public void createReportWithManyAttributes() {
         List<List<String>> adReportContent = analysisPage.changeReportType(ReportType.TABLE)
@@ -203,6 +204,20 @@ public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
             assertEquals(initMetricPage().openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES)
                     .getMetricFormat(), oldFormat);
         }
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void makeSureReportRenderWhenSortingTabular() {
+        analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT)
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .waitForReportComputing()
+            .changeReportType(ReportType.TABLE)
+            .waitForReportComputing()
+            .getTableReport()
+            .sortBaseOnHeader(METRIC_NUMBER_OF_ACTIVITIES);
+
+        assertFalse(analysisPage.waitForReportComputing()
+            .isExplorerMessageVisible());
     }
 
     private List<List<String>> getTableContentFromReportPage(
