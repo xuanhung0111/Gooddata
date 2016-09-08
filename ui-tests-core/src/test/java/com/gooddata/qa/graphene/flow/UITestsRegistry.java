@@ -64,6 +64,14 @@ public class UITestsRegistry {
             "testng-imap-project-n-users-sanity-test.xml"
         });
 
+        suites.put("basic-vertica", new Object[] {
+            new PredefineParameterTest(SimpleProjectEtlTest.class)
+                .param("PROJECT_AUTHORIZATION_TOKEN", "$PROJECT_AUTHORIZATION_TOKEN2"),
+
+            GoodSalesDashboardTest.class,
+            GoodSalesReportsTest.class
+        });
+
         suites.put("filters", new Object[] {
             GoodSalesDashboardAllKindsFiltersTest.class,
             GoodSalesFilterDropdownAttributeValueTest.class,
