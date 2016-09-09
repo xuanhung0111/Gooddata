@@ -9,7 +9,9 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import java.util.List;
 import java.util.Objects;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -23,6 +25,10 @@ public class DropDown extends AbstractFragment {
 
     @FindBy(css = ".gd-list-view-item span")
     private List<WebElement> items;
+
+    public static final DropDown getInstance(By root, SearchContext context) {
+        return Graphene.createPageFragment(DropDown.class, waitForElementVisible(root, context));
+    }
 
     public void searchAndSelectItem(String name) {
         if (isElementPresent(BY_SEARCH_FIELD_INPUT, browser)) {

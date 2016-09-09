@@ -4,9 +4,13 @@ import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
+import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getCurrentUserProfile;
 
+import java.io.IOException;
 import java.util.List;
 
+import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -14,6 +18,7 @@ import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.account.PersonalInfo;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.ObjectTypes;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.account.PersonalInfoDialog;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
@@ -29,6 +34,22 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
     @BeforeClass
     public void setProjectTitle() {
         projectTitle = "User-profile-information-test";
+    }
+
+    @Test(dependsOnGroups = { "createProject" })
+    public void changeUserLanguage() throws JSONException, IOException {
+        setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.ENABLE_CHANGE_LANGUAGE, true);
+
+        try {
+            initAccountPage().changeLanguage("Français");
+            assertEquals(getCurrentUserProfile(getRestApiClient()).getString("language"), "fr-FR");
+        } finally {
+            initAccountPage().changeLanguage("English");
+            assertEquals(getCurrentUserProfile(getRestApiClient()).getString("language"), "en-US");
+            setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+                    ProjectFeatureFlags.ENABLE_CHANGE_LANGUAGE, false);
+        }
     }
 
     @Test(dependsOnGroups = { "createProject" })
