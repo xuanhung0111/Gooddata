@@ -30,6 +30,18 @@ public class GoodSalesMetricFilterTest extends GoodSalesAbstractAnalyseTest {
         projectTitle += "Metric-Filter-Test";
     }
 
+    @Test(dependsOnGroups = {"init"},
+            description = "CL-10362 Attribute filter didn't connect with measure")
+    public void makeSureAttributeFilterConnectWithMeasure() {
+        assertTrue(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .getMetricsBucket()
+            .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
+            .expandConfiguration()
+            .clickAddAttributeFilter()
+            .getAllAttributesInViewPort()
+            .size() > 0);
+    }
+
     @Test(dependsOnGroups = {"init"})
     public void testAddFilterToMetric() {
         addFilterToMetric();
