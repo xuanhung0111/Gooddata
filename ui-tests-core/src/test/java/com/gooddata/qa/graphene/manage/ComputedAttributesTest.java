@@ -68,7 +68,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     private static final String EXPECTED_DELETE_DESCRIPTION = "To delete this computed attribute you must delete "
             + "its data set. Go to its Data Set administration page and click Delete.";
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setProjectTitle() {
         projectTitle = "GoodSales-test-computed-attribute";
     }

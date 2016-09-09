@@ -30,12 +30,12 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
     private List<String> metricFolderList;
     private List<String> pages;
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setProjectTitle() {
         projectTitle = "GoodSales-test-folder";
     }
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void addUsers() {
         addUsersWithOtherRoles = true;
     }

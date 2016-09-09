@@ -24,7 +24,7 @@ public class GoodSalesVariableTest extends ObjectAbstractTest {
     private static final Collection<String> ATTRIBUTE_VALUES = asList("Interest", "Discovery");
     private static final int NUMERIC_VALUE = 1234;
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setProjectTitle() {
         projectTitle = "GoodSales-test-variable";
     }
