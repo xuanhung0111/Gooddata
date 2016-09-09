@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.fragments.account;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
 import static org.openqa.selenium.By.id;
 
@@ -38,6 +40,9 @@ public class AccountPage extends AbstractFragment {
 
     @FindBy(css = ".deleteAccount a")
     private WebElement deleteYourAccountLink;
+
+    @FindBy(css = ".changeLanguage a")
+    private WebElement changeLanguageLink;
 
     public static final AccountPage getInstance(SearchContext context) {
         return Graphene.createPageFragment(AccountPage.class, waitForElementVisible(id("accountSettingsMenu"), context));
@@ -77,4 +82,11 @@ public class AccountPage extends AbstractFragment {
         waitForElementVisible(CANCEL_CONFIRMATION_DIALOG_BUTTON_LOCATOR, browser).click();
     }
 
+    public void changeLanguage(String lang) {
+        waitForElementVisible(changeLanguageLink).click();
+        ChangeLanguageDialog.getInstance(browser).selectLanguage(lang).saveChange();
+        // there is a count-down dialog and it will be disappeared in 5 sec, then page will be reloaded
+        sleepTightInSeconds(7);
+        waitForFragmentVisible(this);
+    }
 }
