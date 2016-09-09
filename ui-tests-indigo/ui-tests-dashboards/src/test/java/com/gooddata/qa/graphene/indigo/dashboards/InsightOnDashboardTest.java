@@ -87,7 +87,8 @@ public class InsightOnDashboardTest extends DashboardsTest {
             .addInsightToLastPosition(TEST_INSIGHT)
             .getLastVisualization()
             .isDeleteButtonVisible(), "Added insight is not focused");
-        checkInsightRender(indigoDashboardsPage.getLastVisualization(), TEST_INSIGHT, 4);
+
+        assertEquals(indigoDashboardsPage.getLastVisualization().getHeadline(), TEST_INSIGHT);
     }
 
     @Test(dependsOnGroups = { "dashboardsInit", "createInsight" })
@@ -98,7 +99,7 @@ public class InsightOnDashboardTest extends DashboardsTest {
             .addInsightToLastPosition(TEST_INSIGHT)
             .saveEditModeWithWidgets();
         try {
-            checkInsightRender(indigoDashboardsPage.getLastVisualization(), TEST_INSIGHT, 4);
+            assertEquals(indigoDashboardsPage.getLastVisualization().getHeadline(), TEST_INSIGHT);
         } finally {
             deleteAnalyticalDashboard(getRestApiClient(),
                     getAnalyticalDashboards(getRestApiClient(), testParams.getProjectId()).get(0));
