@@ -84,7 +84,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             .withBucket(new AttributeBucket(2, "Great", "250"))
             .withBucket(new AttributeBucket(3, "Best"));
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setProjectTitle() {
         projectTitle = "GoodSales-test-computed-attribute";
     }
