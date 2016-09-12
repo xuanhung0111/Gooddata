@@ -48,6 +48,8 @@ import com.gooddata.qa.graphene.reports.GoodsalesMufReportTest;
 import com.gooddata.qa.graphene.reports.ReportWithEmptyValuesInTimeDimensionTest;
 import com.gooddata.qa.graphene.reports.SimpleCompAttributesTest;
 import com.gooddata.qa.graphene.reports.TimeFormattingTest;
+import com.gooddata.qa.graphene.schedules.GoodSalesScheduleDialogFiltersTest;
+import com.gooddata.qa.graphene.schedules.GoodSalesScheduleDialogRecurrenceTest;
 import com.gooddata.qa.utils.flow.PredefineParameterTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
@@ -156,6 +158,18 @@ public class UITestsRegistry {
             "testng-permissions-Variable.xml",
             "testng-permissions-Folder.xml",
             "testng-permissions-ComputedAttributes.xml"
+        });
+
+        suites.put("schedules", new Object[] {
+            new PredefineParameterTest("testng-imap-GoodSales-email-schedule-full.xml")
+                .param("GRAPHENE_USER", "gd.scheduledemail@gmail.com")
+                .param("GRAPHENE_PASSWORD", "$CHECKLIST_SCHEDULED_EMAIL_USER_PASSWORD"),
+            new PredefineParameterTest("testng-imap-GoodSales-email-unsubscribe.xml")
+                .param("GRAPHENE_USER", "gd.scheduledemail@gmail.com")
+                .param("GRAPHENE_PASSWORD", "$CHECKLIST_SCHEDULED_EMAIL_USER_PASSWORD"),
+            GoodSalesScheduleDialogRecurrenceTest.class,
+            GoodSalesScheduleDialogFiltersTest.class,
+            "testng-imap-GoodSales-email-schedule-dashboard.xml"
         });
 
         TestsRegistry.getInstance()

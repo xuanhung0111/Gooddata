@@ -72,7 +72,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
             + "and 2 other recipients as a PDF attachment.$";
     private DateTimeZone tz = DateTimeZone.getDefault();
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void addUsers() {
         projectTitle = "GoodSales schedule dashboard test";
         addUsersWithOtherRoles = true;
