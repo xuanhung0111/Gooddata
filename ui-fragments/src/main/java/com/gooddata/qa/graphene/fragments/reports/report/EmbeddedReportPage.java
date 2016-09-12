@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.fragments.reports.report;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 
-import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 
@@ -31,9 +30,7 @@ public class EmbeddedReportPage extends ReportPage {
     public MetricEditorDialog clickEditInSndMetricDetail() {
         waitForElementVisible(BY_SND_EDIT_METRIC_BUTTON, getRoot()).click();
 
-        browser.switchTo().frame(waitForElementVisible(By.tagName("iframe"), getRoot()));
-        return Graphene.createPageFragment(MetricEditorDialog.class,
-                waitForElementVisible(MetricEditorDialog.LOCATOR, browser));
+        return MetricEditorDialog.getInstance(browser);
     }
 
     public void clickDeleteInSndMetricDetail() {

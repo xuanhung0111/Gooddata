@@ -73,4 +73,10 @@ public class MetricDetailsPage extends ObjectPropertiesPage {
         waitForElementVisible(SAVE_PERMISSION_SETTING_BUTTON, browser).click();
         waitForElementNotVisible(checkbox);
     }
+
+    public MetricEditorDialog openMetricEditor() {
+        waitForElementVisible(By.className("metric_editMetric"), getRoot()).click();
+
+        return MetricEditorDialog.getInstance(browser);
+    }
 }

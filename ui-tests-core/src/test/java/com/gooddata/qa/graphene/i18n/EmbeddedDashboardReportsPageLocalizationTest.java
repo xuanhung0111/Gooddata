@@ -7,7 +7,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.cssSelector;
 
 import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.By;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -131,10 +130,7 @@ public class EmbeddedDashboardReportsPageLocalizationTest extends GoodSalesAbstr
         reportPage.clickAddNewSimpleMetric();
         checkLocalization(browser);
 
-        reportPage.clickAddAdvanceMetric();
-        browser.switchTo().frame(waitForElementVisible(By.tagName("iframe"), browser));
-        metricEditorDialog = Graphene.createPageFragment(MetricEditorDialog.class,
-                waitForElementVisible(MetricEditorDialog.LOCATOR, browser));
+        metricEditorDialog = reportPage.clickAddAdvanceMetric();
 
         metricEditorDialog.clickShareMetricLink();
         checkLocalization(browser);
