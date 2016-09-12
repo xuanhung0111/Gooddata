@@ -40,7 +40,7 @@ import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 public class ValidElementsResourceTest extends GoodSalesAbstractTest {
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setProjectTitle() {
         projectTitle = "GoodSales-test-valid-elements-resource";
     }
