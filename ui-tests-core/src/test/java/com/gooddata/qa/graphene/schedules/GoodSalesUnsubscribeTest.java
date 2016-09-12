@@ -47,7 +47,7 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
     @FindBy(css = ".logoArea-big img")
     private WebElement unsubscribedLogo;
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setUp() throws Exception {
         String identification = ": " + testParams.getHost() + " - " + testParams.getTestIdentification();
         reportTitle = reportTitle + identification;

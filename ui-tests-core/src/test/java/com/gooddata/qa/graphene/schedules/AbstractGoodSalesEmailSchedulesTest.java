@@ -44,7 +44,7 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
 
     protected File attachmentsDirectory;
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setUpImap() throws Exception {
         imapHost = testParams.loadProperty("imap.host");
         imapUser = testParams.loadProperty("imap.user");
