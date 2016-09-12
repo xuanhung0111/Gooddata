@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForObjectPageLoaded;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getBubbleMessage;
 import static org.openqa.selenium.By.id;
@@ -13,7 +14,9 @@ import static org.testng.Assert.assertTrue;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_SALES_REP;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_EXPECTED_PERCENT_OF_GOAL;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON_OPPS;
 import static com.gooddata.md.Restriction.title;
 import static java.lang.String.format;
@@ -87,6 +90,24 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     @BeforeClass(alwaysRun = true)
     public void setProjectTitle() {
         projectTitle = "GoodSales-test-computed-attribute";
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, priority = 0,
+            description = "AQE-1684 starjoin_failed when create compute attribute based on complex metric")
+    public void testComputedAttributeInComplexMetric() {
+        final String computedAttr = "AQE-1684";
+        initAttributePage().createComputedAttribute(
+                new ComputedAttributeDefinition()
+                    .withAttribute(ATTR_STAGE_NAME)
+                    .withMetric(METRIC_EXPECTED_PERCENT_OF_GOAL)
+                    .withName(computedAttr));
+        createReport(new UiReportDefinition()
+            .withName("Test computed attr in complex metric")
+            .withHows(computedAttr, ATTR_STATUS), "Test computed attr in complex metric");
+        assertEquals(waitForFragmentVisible(reportPage)
+                .waitForReportExecutionProgress()
+                .getDataReportHelpMessage(),
+                "No data match the filtering criteria");
     }
 
     @Test(dependsOnGroups = {"createProject"}, priority = 0)
