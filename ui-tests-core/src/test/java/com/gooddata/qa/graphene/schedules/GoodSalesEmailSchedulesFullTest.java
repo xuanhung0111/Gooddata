@@ -84,7 +84,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     private static final String INCOMPUTABLE_REPORT = "Incomputable report";
     private static final String TOO_LARGE_REPORT = "Too large report";
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setUp() {
         String identification = ": " + testParams.getHost() + " - " + testParams.getTestIdentification();
         attachmentsDirectory = new File(getProperty("maven.project.build.directory", "./target/attachments"));
