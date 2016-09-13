@@ -10,8 +10,10 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
+import java.io.IOException;
 import java.util.Arrays;
 
+import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.testng.ITestContext;
@@ -36,11 +38,12 @@ public class SplashScreenTest extends DashboardsTest {
         .drillTo(DASH_TAB_OUTLOOK)
         .build();
 
+    private boolean isMobileRunning;
+
     @BeforeClass(alwaysRun = true)
     public void before(ITestContext context) {
         super.before();
-        boolean isMobileRunning = Boolean.parseBoolean(context.getCurrentXmlTest().getParameter("isMobileRunning"));
-        addUsersWithOtherRoles = !isMobileRunning;
+        isMobileRunning = Boolean.parseBoolean(context.getCurrentXmlTest().getParameter("isMobileRunning"));
     }
 
     @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop", "empty-state"})
@@ -216,5 +219,13 @@ public class SplashScreenTest extends DashboardsTest {
 
         takeScreenshot(browser, "checkCannotSaveNewEmptyDashboard", getClass());
         assertFalse(indigoDashboardsPage.isSaveEnabled());
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        if (isMobileRunning) return;
+
+        createAndAddUserToProject(UserRoles.EDITOR);
+        createAndAddUserToProject(UserRoles.VIEWER);
     }
 }

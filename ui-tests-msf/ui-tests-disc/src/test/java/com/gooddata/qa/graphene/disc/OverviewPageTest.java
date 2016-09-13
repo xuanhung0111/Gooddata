@@ -46,26 +46,23 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
     // So we should use a separate user for this test case
     @Test(dependsOnGroups = {"createProject"})
     public void checkOverviewPageShowAfterLogoutAndSignIn() throws ParseException, JSONException, IOException {
-        String newUser = generateEmail(testParams.getUser());
-
-        UserManagementRestUtils.createUser(getRestApiClient(), testParams.getUserDomain(), newUser, testParams.getPassword());
-        addUserToProject(newUser, UserRoles.ADMIN);
+        String newAdminUser = createAndAddUserToProject(UserRoles.ADMIN);
 
         try {
             logout();
-            signInAtGreyPages(newUser, testParams.getPassword());
+            signInAtGreyPages(newAdminUser, testParams.getPassword());
 
             initDISCOverviewPage();
 
             // Use this action to avoid navigating to projects.html before logout.
             // So when sign in, user will be redirected to DISC page again
             logoutInDiscPage();
-            signInAtUI(newUser, testParams.getPassword());
+            signInAtUI(newAdminUser, testParams.getPassword());
             waitForFragmentVisible(discOverviewProjects);
 
         } finally {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
-            UserManagementRestUtils.deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), newUser);
+            UserManagementRestUtils.deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), newAdminUser);
         }
     }
 
@@ -314,6 +311,12 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
     @Test(dependsOnGroups = {"createProject"}, groups = {"project-overview"})
     public void checkProjectsNotAdminInRunningState() throws ParseException, JSONException, IOException {
         checkOverviewProjectWithoutAdminRole(OverviewProjectStates.RUNNING);
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
+        createAndAddUserToProject(UserRoles.VIEWER);
     }
 
     private void accessWorkingProjectDetail(OverviewProjectStates state) {

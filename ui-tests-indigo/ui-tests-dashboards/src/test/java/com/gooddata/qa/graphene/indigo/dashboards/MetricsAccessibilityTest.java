@@ -4,6 +4,10 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.io.IOException;
+
+import org.apache.http.ParseException;
+import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -11,6 +15,7 @@ import com.gooddata.GoodData;
 import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
 import com.gooddata.project.Project;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.MetricSelect;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 
@@ -27,7 +32,6 @@ public class MetricsAccessibilityTest extends DashboardWithWidgetsTest {
     @BeforeClass(alwaysRun = true)
     public void before() {
         super.before();
-        addUsersWithOtherRoles = true;
     }
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
@@ -35,7 +39,7 @@ public class MetricsAccessibilityTest extends DashboardWithWidgetsTest {
         createPublicMetric(getGoodDataClient(), PUBLIC_METRIC_OF_ADMIN);
         createPrivateMetric(getGoodDataClient(), PRIVATE_METRIC_OF_ADMIN);
 
-        final GoodData goodData = getGoodDataClient(testParams.getEditorUser(), testParams.getEditorPassword());
+        final GoodData goodData = getGoodDataClient(testParams.getEditorUser(), testParams.getPassword());
         createPublicMetric(goodData, PUBLIC_METRIC_OF_EDITOR);
         createPrivateMetric(goodData, PRIVATE_METRIC_OF_EDITOR);
     }
@@ -67,6 +71,11 @@ public class MetricsAccessibilityTest extends DashboardWithWidgetsTest {
         takeScreenshot(browser, "admin-can-NOT-see-editor-private-metric", this.getClass());
         assertTrue(metricSelect.getValues().isEmpty());
         assertTrue(metricSelect.isShowingNoMatchingDataMessage());
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
     }
 
     private void createPublicMetric(final GoodData goodData, final String name) {

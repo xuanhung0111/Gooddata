@@ -18,7 +18,6 @@ import static java.lang.String.format;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileUri;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -43,11 +42,6 @@ public class GoodSalesMufOnUserProfileTest extends GoodSalesAbstractTest {
 
     private Attribute stageNameAttribute;
     private AttributeElement stageNameValue;
-
-    @BeforeClass(alwaysRun = true)
-    public void addUsers() {
-        addUsersWithOtherRoles = true;
-    }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
     public void addMufForUser() throws ParseException, JSONException, IOException {
@@ -103,5 +97,10 @@ public class GoodSalesMufOnUserProfileTest extends GoodSalesAbstractTest {
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
         }
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
     }
 }

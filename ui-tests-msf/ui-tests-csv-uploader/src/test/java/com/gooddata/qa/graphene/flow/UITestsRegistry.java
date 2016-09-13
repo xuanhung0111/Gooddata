@@ -3,14 +3,18 @@ package com.gooddata.qa.graphene.flow;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.gooddata.qa.graphene.csvuploader.DataOfOtherUsersTest;
 import com.gooddata.qa.graphene.csvuploader.DataPreviewAfterUploadTest;
 import com.gooddata.qa.graphene.csvuploader.DatasetDetailTest;
 import com.gooddata.qa.graphene.csvuploader.DeleteDatasetTest;
 import com.gooddata.qa.graphene.csvuploader.EmptyStateTest;
+import com.gooddata.qa.graphene.csvuploader.NavigationErrorTest;
 import com.gooddata.qa.graphene.csvuploader.ProjectSwitchTest;
+import com.gooddata.qa.graphene.csvuploader.RefreshTest;
 import com.gooddata.qa.graphene.csvuploader.TooltipValidationTest;
 import com.gooddata.qa.graphene.csvuploader.UploadDateTest;
 import com.gooddata.qa.graphene.csvuploader.UploadErrorTest;
+import com.gooddata.qa.graphene.csvuploader.UploadHistoryInfoTest;
 import com.gooddata.qa.graphene.csvuploader.UploadTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
@@ -29,10 +33,10 @@ public class UITestsRegistry {
             UploadDateTest.class,
             ProjectSwitchTest.class,
             TooltipValidationTest.class,
-            "testng-csv-permissions-DataOfOtherUsers.xml",
-            "testng-csv-permissions-RefreshTest.xml",
-            "testng-csv-permissions-NavigationError.xml",
-            "testng-csv-permissions-UploadHistoryInfo.xml",
+            DataOfOtherUsersTest.class,
+            NavigationErrorTest.class,
+            RefreshTest.class,
+            UploadHistoryInfoTest.class,
             "testng-csv-imap-Notification.xml"
         });
 

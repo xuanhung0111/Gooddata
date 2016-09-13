@@ -18,11 +18,13 @@ import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
 
 public class ManageUserTest extends AbstractProjectTest {
 
+    private String newAdminUser;
+
     @Test(dependsOnGroups = "createProject")
     public void addNewUserToProject() throws ParseException, IOException, JSONException {
-        addUserToProject(testParams.getViewerUser(), UserRoles.ADMIN);
+        newAdminUser = createAndAddUserToProject(UserRoles.ADMIN);
 
-        assertTrue(accessProjectWithAnotherLogin(UserRoles.VIEWER, "viewer-can-access-the-project", true)
+        assertTrue(accessProjectWithAnotherLogin(newAdminUser, testParams.getPassword(), "viewer-can-access-the-project", true)
                 .contains(testParams.getProjectId()));
     }
 
@@ -30,15 +32,15 @@ public class ManageUserTest extends AbstractProjectTest {
     public void disableAddedUser() throws JSONException {
         logoutAndLoginAs(true, UserRoles.ADMIN);
 
-        initProjectsAndUsersPage().disableUser(testParams.getViewerUser());
+        initProjectsAndUsersPage().disableUser(newAdminUser);
 
-        assertFalse(ProjectAndUsersPage.getInstance(browser).isUserDisplayedInList(testParams.getViewerUser()),
-                testParams.getViewerUser() + " has not been deactivated");
+        assertFalse(ProjectAndUsersPage.getInstance(browser).isUserDisplayedInList(newAdminUser),
+                newAdminUser + " has not been deactivated");
 
-        assertTrue(ProjectAndUsersPage.getInstance(browser).openDeactivatedUserTab().isUserDisplayedInList(testParams.getViewerUser()),
-                testParams.getViewerUser() + " does not exist in deactive tab");
+        assertTrue(ProjectAndUsersPage.getInstance(browser).openDeactivatedUserTab().isUserDisplayedInList(newAdminUser),
+                newAdminUser + " does not exist in deactive tab");
 
-        assertTrue(accessProjectWithAnotherLogin(UserRoles.VIEWER, 
+        assertTrue(accessProjectWithAnotherLogin(newAdminUser, testParams.getPassword(), 
                 "Deactivated-user-cannot-access-the-project", false)
                 .contains("#status=notAuthorized"), "Not authorized msg is not displayed ");
     }
@@ -47,24 +49,25 @@ public class ManageUserTest extends AbstractProjectTest {
     public void enableAddedUser() throws JSONException {
         logoutAndLoginAs(true, UserRoles.ADMIN);
 
-        initProjectsAndUsersPage().enableUser(testParams.getViewerUser());
+        initProjectsAndUsersPage().enableUser(newAdminUser);
 
-        assertFalse(ProjectAndUsersPage.getInstance(browser).isUserDisplayedInList(testParams.getViewerUser()),
-                testParams.getViewerUser() + " has not been activated");
+        assertFalse(ProjectAndUsersPage.getInstance(browser).isUserDisplayedInList(newAdminUser),
+                newAdminUser + " has not been activated");
 
-        assertTrue(ProjectAndUsersPage.getInstance(browser).openActiveUserTab().isUserDisplayedInList(testParams.getViewerUser()),
-                testParams.getViewerUser() + " does not exist in active tab");
+        assertTrue(ProjectAndUsersPage.getInstance(browser).openActiveUserTab().isUserDisplayedInList(newAdminUser),
+                newAdminUser + " does not exist in active tab");
         
-        assertTrue(accessProjectWithAnotherLogin(UserRoles.VIEWER, "Viewer-can-access-the-project-again", true)
+        assertTrue(accessProjectWithAnotherLogin(newAdminUser, testParams.getPassword(), "Viewer-can-access-the-project-again", true)
                 .contains(testParams.getProjectId()));
 
         assertFalse(initProjectsAndUsersPage().openActiveUserTab()
-                .isDeactivePermissionAvailable(testParams.getViewerUser()), "Deactive button is displayed");
+                .isDeactivePermissionAvailable(newAdminUser), "Deactive button is displayed");
     }
 
-    private String accessProjectWithAnotherLogin(UserRoles userRole, String screenShotName, boolean isSuccess) 
+    private String accessProjectWithAnotherLogin(String user, String password, String screenShotName, boolean isSuccess) 
             throws JSONException {
-        logoutAndLoginAs(true, userRole);
+        logout();
+        signInAtGreyPages(user, password);
 
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId());
         if (isSuccess) {

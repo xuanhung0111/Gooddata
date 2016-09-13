@@ -27,7 +27,6 @@ import java.io.IOException;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -75,11 +74,6 @@ public class GoodSalesDefaultFilterMultipleChoiceTest extends AbstractDashboardW
     private static final String ALL = "All";
 
     private Metric amountMetric;
-
-    @BeforeClass(alwaysRun = true)
-    public void addUsers() {
-        addUsersWithOtherRoles = true;
-    }
 
     @Test(dependsOnGroups = {"createProject"})
     public void initData() throws JSONException, IOException {
@@ -559,6 +553,12 @@ public class GoodSalesDefaultFilterMultipleChoiceTest extends AbstractDashboardW
         } finally {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
         }
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
+        createAndAddUserToProject(UserRoles.VIEWER);
     }
 
     private void refreshDashboardsPage() {

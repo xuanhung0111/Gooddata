@@ -27,8 +27,8 @@ public class InviteUserInOtherDomainsTest extends AbstractProjectTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void inviteUserInTwoDomains() throws ParseException, IOException, JSONException {
-        final String userA = testParams.getEditorUser();
-        final String userB = testParams.getViewerUser();
+        final String userA = generateEmail(testParams.getUser());
+        final String userB = generateEmail(testParams.getUser());
         final String userC = getUserInOtherDomain(testParams.getHost());
 
         initProjectsAndUsersPage().openInvitedUserTab();

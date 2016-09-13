@@ -46,8 +46,6 @@ public class NavigationErrorTest extends AbstractCsvUploaderTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = "csv")
     public void redirectToErrorPageWhenInsufficientAccessRights() throws ParseException, IOException, JSONException {
-        addViewerUserToProject();
-
         try {
             logoutAndLoginAs(true, UserRoles.VIEWER);
 
@@ -58,5 +56,10 @@ public class NavigationErrorTest extends AbstractCsvUploaderTest {
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
         }
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.VIEWER);
     }
 }

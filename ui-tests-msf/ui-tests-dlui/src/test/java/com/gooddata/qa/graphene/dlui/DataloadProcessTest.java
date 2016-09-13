@@ -131,7 +131,7 @@ public class DataloadProcessTest extends AbstractMSFTest {
 
         logout();
         signIn(true, UserRoles.EDITOR);
-        final RestApiClient editorRestApi = getRestApiClient(testParams.getEditorUser(), testParams.getEditorPassword());
+        final RestApiClient editorRestApi = getRestApiClient(testParams.getEditorUser(), testParams.getPassword());
         final String executionByEditor = executeDataloadProcessSuccessfully(editorRestApi);
         assertTrue(getLogContent(editorRestApi, executionByEditor).contains(
                 String.format("user=%s", technicalUser)));

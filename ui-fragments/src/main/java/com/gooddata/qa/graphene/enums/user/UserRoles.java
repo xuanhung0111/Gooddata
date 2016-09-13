@@ -5,7 +5,7 @@ public enum UserRoles {
     ADMIN("2", "Admin"),
     EDITOR("5", "Editor"),
     VIEWER("4", "Viewer"),
-    DASHBOARD_ONLY("3", "Embedded Dashboard Only"),
+    DASHBOARD_ONLY("3", "DashboardOnly"),
     UNVERIFIED_ADMIN("1");
 
     private final String id;

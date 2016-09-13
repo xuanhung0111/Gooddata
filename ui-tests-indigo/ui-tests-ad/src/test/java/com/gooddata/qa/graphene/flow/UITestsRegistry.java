@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerSanityTest;
 import com.gooddata.qa.graphene.indigo.analyze.CustomDateDimensionsTest;
+import com.gooddata.qa.graphene.indigo.analyze.EmbeddedAdTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesAttributeBasedMetricTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesAttributeBucketTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesAttributeFilterTest;
@@ -17,9 +18,12 @@ import com.gooddata.qa.graphene.indigo.analyze.GoodSalesDateFilterTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesDescriptionTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesDropAttributeTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesFactBasedMetricTest;
+import com.gooddata.qa.graphene.indigo.analyze.GoodSalesInsightTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesMetricBucketTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesMetricFilterTest;
+import com.gooddata.qa.graphene.indigo.analyze.GoodSalesMetricVisibilityTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesNotRenderedInsightTest;
+import com.gooddata.qa.graphene.indigo.analyze.GoodSalesProjectNavigationTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesRelatedAndUnrelatedDateDimensionsTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesShortcutRecommendationTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesTableReportTest;
@@ -102,10 +106,10 @@ public class UITestsRegistry {
             GoodSalesNotRenderedInsightTest.class,
             WalkmeOnEmbeddedAdTest.class,
             GoodSalesRelatedAndUnrelatedDateDimensionsTest.class,
-            "testng-ad-permissions-MetricVisibility.xml",
-            "testng-ad-permissions-ProjectNavigation.xml",
-            "testng-ad-permissions-InsightTest.xml",
-            "testng-ad-permissions-EmbeddedAd.xml",
+            EmbeddedAdTest.class,
+            GoodSalesInsightTest.class,
+            GoodSalesMetricVisibilityTest.class,
+            GoodSalesProjectNavigationTest.class,
             "testng-ad-ChartLabelFormat.xml",
             "testng-ad-MetricNumberFormat.xml"
         });

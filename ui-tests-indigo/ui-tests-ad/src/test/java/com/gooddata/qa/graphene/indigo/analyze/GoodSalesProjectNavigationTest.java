@@ -32,10 +32,7 @@ public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest
     private static final String NEW_PROJECT_NAME = "New-project-navigation-" + UNIQUE_ID;
     private static final String ANALYZE_PAGE_URL = "analyze";
 
-    private String embededDashboardUser;
-    private String embededDashboardUserPassword;
-    private String viewerUser;
-    private String viewerUserPassword;
+    private String embeddedDashboardUser;
 
     private String currentProjectId;
     private String newProjectId;
@@ -46,18 +43,6 @@ public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {"precondition"})
-   public void prepareUserForSwitchingTest() throws ParseException, JSONException, IOException {
-        embededDashboardUser = testParams.getEditorUser();
-        embededDashboardUserPassword = testParams.getEditorPassword();
-
-        viewerUser = testParams.getViewerUser();
-        viewerUserPassword = testParams.getViewerPassword();
-
-        addUserToProject(embededDashboardUser, UserRoles.DASHBOARD_ONLY);
-        addUserToProject(viewerUser, UserRoles.VIEWER);
-    }
-
-    @Test(dependsOnMethods = {"prepareUserForSwitchingTest"}, groups = {"precondition"})
     public void getMoreProject() {
         currentProjectId = testParams.getProjectId();
 
@@ -69,12 +54,12 @@ public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest
     @DataProvider(name = "userRoleProvider")
     public Object[][] userRoleProvider() {
         return new Object[][] {
-            {embededDashboardUser, embededDashboardUserPassword, UserRoles.DASHBOARD_ONLY},
-            {viewerUser, viewerUserPassword, UserRoles.VIEWER}
+            {embeddedDashboardUser, testParams.getPassword(), UserRoles.DASHBOARD_ONLY},
+            {testParams.getViewerUser(), testParams.getPassword(), UserRoles.VIEWER}
         };
     }
 
-    @Test(dependsOnMethods = {"prepareUserForSwitchingTest"}, dataProvider = "userRoleProvider", groups = {"switchProject"})
+    @Test(dependsOnGroups = {"precondition"}, dataProvider = "userRoleProvider", groups = {"switchProject"})
     public void switchProjectWithOtherUserRoles(String user, String password, UserRoles role)
             throws ParseException, IOException, JSONException {
         GoodData goodDataClient = getGoodDataClient(user, password);
@@ -225,5 +210,11 @@ public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest
         takeScreenshot(browser, "Re-open-Analyse-page-of-project-:"
                 + currentProjectId + "after-delete-project-" + newProjectId, getClass());
         assertThat(browser.getCurrentUrl(), containsString(currentProjectId));
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.VIEWER);
+        embeddedDashboardUser = createAndAddUserToProject(UserRoles.DASHBOARD_ONLY);
     }
 }

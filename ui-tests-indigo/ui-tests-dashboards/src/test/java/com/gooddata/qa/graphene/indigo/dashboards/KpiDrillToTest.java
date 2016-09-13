@@ -22,6 +22,7 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 import java.util.stream.Stream;
 
+import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
@@ -54,11 +55,12 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
         .dataSet(DATE_CREATED)
         .build();
 
+    private boolean isMobileRunning;
+
     @BeforeClass(alwaysRun = true)
     public void before(ITestContext context) {
         super.before();
-        boolean isMobileRunning = Boolean.parseBoolean(context.getCurrentXmlTest().getParameter("isMobileRunning"));
-        addUsersWithOtherRoles = !isMobileRunning;
+        isMobileRunning = Boolean.parseBoolean(context.getCurrentXmlTest().getParameter("isMobileRunning"));
     }
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
@@ -362,6 +364,11 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
         takeScreenshot(browser, "checkKpiWithoutDrillToDoesNotRedirect-afterKpiValueClick", getClass());
 
         checkNoNewBrowserTabOrWindowNorRedirected(currentUrl);
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        if (!isMobileRunning) createAndAddUserToProject(UserRoles.EDITOR);
     }
 
     private void checkNoNewBrowserTabOrWindowNorRedirected(String currentUrl) {

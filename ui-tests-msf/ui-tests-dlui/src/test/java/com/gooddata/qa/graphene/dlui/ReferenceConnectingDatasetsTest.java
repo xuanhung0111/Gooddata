@@ -37,7 +37,6 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
     public void initProperties() {
         projectTitle = "Reference-Connecting-Dataset-Test";
         initialLdmMaqlFile = "create-ldm-references.txt";
-        addUsersWithOtherRoles = true;
     }
 
     @Test(dependsOnMethods = {"prepareDataForDLUI"}, groups = {"initialDataForDLUI"})
@@ -136,6 +135,11 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
     @AfterClass(alwaysRun = true)
     public void cleanUp() throws ParseException, JSONException, IOException {
         getAdsHelper().removeAds(ads);
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
     }
 
     private void addNewFieldWithAnnieDialog(DataSource dataSource) {

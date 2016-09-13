@@ -114,17 +114,14 @@ public class RefreshTest extends AbstractCsvUploaderTest {
 
     @Test(dependsOnGroups = "precondition", groups = "csv")
     public void checkAdminUpdateDataOfOthers() throws JSONException, ParseException, IOException {
-        final String newAdminUser = testParams.getEditorUser();
-        final String newAdminPassword = testParams.getEditorPassword();
-
-        addUserToProject(newAdminUser, UserRoles.ADMIN);
+        String newAdminUser = createAndAddUserToProject(UserRoles.ADMIN);
 
         try {
             final String datasetName = PAYROLL.getDatasetNameOfFirstUpload();
             log.info("datasetName by owner: " + datasetName);
 
             logout();
-            signInAtGreyPages(newAdminUser, newAdminPassword);
+            signInAtGreyPages(newAdminUser, testParams.getPassword());
 
             final Dataset dataset = initDataUploadPage()
                     .getOthersDatasetsTable()

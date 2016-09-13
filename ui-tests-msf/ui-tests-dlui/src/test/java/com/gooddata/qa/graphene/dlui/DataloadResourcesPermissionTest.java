@@ -16,6 +16,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.qa.graphene.AbstractMSFTest;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.utils.ads.AdsHelper;
 import com.gooddata.qa.utils.ads.AdsHelper.AdsRole;
 import com.gooddata.qa.utils.http.RestApiClient;
@@ -42,24 +43,26 @@ public class DataloadResourcesPermissionTest extends AbstractMSFTest {
         setUpOutputStageAndCreateCloudConnectProcess();
         enableDataExplorer();
 
-        editorRestApi = getRestApiClient(testParams.getEditorUser(), testParams.getEditorPassword());
-        viewerRestApi = getRestApiClient(testParams.getViewerUser(), testParams.getViewerPassword());
+        editorRestApi = getRestApiClient(testParams.getEditorUser(), testParams.getPassword());
+        viewerRestApi = getRestApiClient(testParams.getViewerUser(), testParams.getPassword());
     }
 
     @Test(dependsOnGroups = { "initialData" })
     public void cannotAccessToProjectMappingResourceOfOtherUser()
             throws ParseException, JSONException, IOException {
+        String otherUser = createDynamicUserFrom(testParams.getUser());
+        RestApiClient otherUserRestApiClient = getRestApiClient(otherUser, testParams.getPassword());
+
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
         deleteDataloadProcessAndCreateNewOne();
-        RestUtils.getResource(editorRestApi,
-                editorRestApi.newGetMethod(format(MAPPING_RESOURCE, testParams.getProjectId())),
+        RestUtils.getResource(otherUserRestApiClient,
+                otherUserRestApiClient.newGetMethod(format(MAPPING_RESOURCE, testParams.getProjectId())),
                 req -> req.setHeader("Accept", ACCEPT_HEADER_VALUE_WITH_VERSION),
                 HttpStatus.FORBIDDEN);
     }
 
     @Test(dependsOnGroups = { "initialData" }, priority = 1)
     private void addUsersToProjects() throws ParseException, IOException, JSONException {
-        addUsersWithOtherRolesToProject();
         getAdsHelper().addUserToAdsInstance(ads, testParams.getEditorUser(), AdsRole.DATA_ADMIN);
         getAdsHelper().addUserToAdsInstance(ads, testParams.getViewerUser(), AdsRole.DATA_ADMIN);
     }
@@ -113,4 +116,9 @@ public class DataloadResourcesPermissionTest extends AbstractMSFTest {
         getAdsHelper().removeAds(ads);
     }
 
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
+        createAndAddUserToProject(UserRoles.VIEWER);
+    }
 }

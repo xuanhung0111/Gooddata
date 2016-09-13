@@ -19,6 +19,7 @@ import static com.gooddata.md.Restriction.title;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.joining;
 import static java.util.Arrays.asList;
+import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -304,10 +305,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
                 .initPage()
                 .setReportVisible();
 
-            addEditorUserToProject();
-            logout();
-
-            signInAtUI(testParams.getEditorUser(), testParams.getEditorPassword());
+            logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.EDITOR);
             initReportsPage().openReport(REPORT_NAME);
             Screenshots.takeScreenshot(browser, "editor-user-report-created-with-computed-attribute",
                     this.getClass());
@@ -329,7 +327,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
                     mufUri);
             logout();
 
-            signInAtUI(testParams.getEditorUser(), testParams.getEditorPassword());
+            signInAtUI(testParams.getEditorUser(), testParams.getPassword());
             initReportsPage().openReport(REPORT_NAME);
             Screenshots.takeScreenshot(browser, "editor-user-report-created-with-computed-attribute",
                     this.getClass());
@@ -424,6 +422,11 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         } finally {
             getMdService().removeObjByUri(attributeUri);
         }
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
     }
 
     // check that delete button is disabled and that there's expected explanation message

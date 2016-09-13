@@ -26,20 +26,9 @@ public class UploadHistoryInfoTest extends AbstractCsvUploaderTest {
 
     private static final String DATE_FORMAT = "Today at \\d+:\\d+ (AM|PM)";
 
-    private String otherAdminUser;
-    private String otherAdminPassword;
-
     private CsvFile csvFile;
 
-    @Test(dependsOnGroups = {"createProject"}, groups = "precondition")
-    public void inviteUser() throws ParseException, IOException, JSONException {
-        otherAdminUser = testParams.getEditorUser();
-        otherAdminPassword = testParams.getEditorPassword();
-
-        addUserToProject(otherAdminUser, UserRoles.ADMIN);
-    }
-
-    @Test(dependsOnGroups = "precondition", groups = "csv")
+    @Test(dependsOnGroups = {"createProject"}, groups = "csv")
     public void checkInfoWhenAddingData() throws IOException {
         csvFile = new CsvFile(DATASET_NAME)
                 .columns(new CsvFile.Column("Firstname"), new CsvFile.Column("Number"))
@@ -72,25 +61,23 @@ public class UploadHistoryInfoTest extends AbstractCsvUploaderTest {
 
     @Test(dependsOnMethods = "checkInfoWhenAddingData", groups = "csv")
     public void checkInfoWhenUpdatingData() throws JSONException, ParseException, IOException {
+        String otherAdminUser = createAndAddUserToProject(UserRoles.ADMIN);
+
         final String adminUserName = getFullNameOf(testParams.getUser());
         final String otherAdminUserName = getFullNameOf(otherAdminUser);
 
         logout();
-        signInAtGreyPages(otherAdminUser, otherAdminPassword);
+        signInAtGreyPages(otherAdminUser, testParams.getPassword());
 
         final Dataset dataset = initDataUploadPage().getOthersDatasetsTable().getDataset(DATASET_NAME);
         takeScreenshot(browser, "Date-format-show-in-Date-Created-column-by-another-user", getClass());
-
         assertTrue(dataset.getCreatedDate().matches(DATE_FORMAT + " by " + adminUserName), "Date format is invalid");
 
-        initDataUploadPage()
-            .updateCsv(dataset, csvFile.getFilePath())
-            .triggerIntegration();
+        initDataUploadPage().updateCsv(dataset, csvFile.getFilePath()).triggerIntegration();
 
         try {
             final String updatingText = Dataset.waitForDatasetLoading(browser).getText();
             takeScreenshot(browser, "Updating-csv-data-progress", getClass());
-
             assertEquals(updatingText, "Updating data ...");
         } catch (NoSuchElementException | TimeoutException e) {
             log.info("Selenium is too slow to capture the updating dataset process");
@@ -99,14 +86,12 @@ public class UploadHistoryInfoTest extends AbstractCsvUploaderTest {
 
         Dataset.waitForDatasetLoaded(browser);
         takeScreenshot(browser, "Date-format-show-in-Date-Updated-column", getClass());
-
         assertTrue(dataset.getUpdatedDate().matches(DATE_FORMAT), "Date format is invalid");
 
         logoutAndLoginAs(true, UserRoles.ADMIN);
 
         initDataUploadPage();
         takeScreenshot(browser, "Date-format-show-in-Date-Updated-column-by-another-user", getClass());
-
         assertTrue(DatasetsListPage.getInstance(browser).getMyDatasetsTable()
                 .getDataset(DATASET_NAME)
                 .getUpdatedDate()

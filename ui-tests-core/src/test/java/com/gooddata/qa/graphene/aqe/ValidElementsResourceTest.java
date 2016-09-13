@@ -35,8 +35,6 @@ import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.Das
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 public class ValidElementsResourceTest extends GoodSalesAbstractTest {
 
@@ -139,9 +137,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"})
     public void checkVariableFilterDashboard() throws ParseException, IOException, JSONException {
         String top5OpenByMoney = "Top 5 Open (by $)";
-        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
-        UserManagementRestUtils.addUserToProject(restApiClient, testParams.getProjectId(), testParams.getEditorUser(),
-                UserRoles.ADMIN);
+        String newAdminUser = createAndAddUserToProject(UserRoles.ADMIN);
 
         initDashboardsPage();
         dashboardsPage.selectDashboard(DASH_PIPELINE_ANALYSIS);
@@ -152,7 +148,9 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
                 .addAttributeFilterToDashboard(DashAttributeFilterTypes.PROMPT, "Status")
                 .saveDashboard();
 
-        signInAsDifferentUser(UserRoles.EDITOR);
+        logout();
+        signInAtGreyPages(newAdminUser, testParams.getPassword());
+
         openDashboardTab(1);
         assertTrue(CollectionUtils.isEqualCollection(getFilterWidget(ATTR_STATUS).getAllAttributeValues(),
                 asList("Open")), "Variable filter is applied incorrecly");
@@ -168,7 +166,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
                 .getMetricElements(), asList(8.6f, 100.0f)),
                 "Metric values in report 'Top 5 Open (by $)' are not properly");
 
-       signInAsDifferentUser(UserRoles.ADMIN);
+       logoutAndLoginAs(true, UserRoles.ADMIN);
     }
 
     // This test is to cover the bug "AQE-1033 - Get 400 bad request when adding filter into report"
@@ -235,11 +233,6 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
         browser.navigate().refresh();
         dashboardsPage.selectDashboard(DASH_PIPELINE_ANALYSIS);
         dashboardsPage.getTabs().openTab(tabindex);
-    }
-
-    private void signInAsDifferentUser(UserRoles role) throws JSONException {
-        logout();
-        signIn(false, role);
     }
 
     private TableReport getDashboardTableReport(String reportName) {

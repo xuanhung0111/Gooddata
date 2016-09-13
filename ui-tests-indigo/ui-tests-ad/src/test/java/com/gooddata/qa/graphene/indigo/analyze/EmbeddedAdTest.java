@@ -15,6 +15,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.io.IOException;
 import java.text.ParseException;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -44,7 +45,6 @@ public class EmbeddedAdTest extends GoodSalesAbstractTest {
     @BeforeClass(alwaysRun = true)
     public void initializeProject() {
         projectTitle += "Embedded-Ad-Test";
-        addUsersWithOtherRoles = true;
     }
 
     @Test(dependsOnGroups = { "createProject" })
@@ -178,6 +178,12 @@ public class EmbeddedAdTest extends GoodSalesAbstractTest {
 
         assertEquals(getEmbeddedAnalysisPage().waitForReportComputing().getChartReport().getTrackersCount(), 4,
                 "Chart does not render correctly");
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws org.apache.http.ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
+        createAndAddUserToProject(UserRoles.VIEWER);
     }
 
     private String getEmbeddedAdUrl() {

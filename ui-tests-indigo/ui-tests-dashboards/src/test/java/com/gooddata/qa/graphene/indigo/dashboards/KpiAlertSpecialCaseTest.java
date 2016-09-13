@@ -39,7 +39,6 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
 
@@ -334,10 +333,7 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
 
     @Test(dependsOnGroups = "precondition", groups = "desktop")
     public void removeUserAfterSettingAlert() throws JSONException, IOException {
-        String newImapUser = generateEmail(imapUser);
-        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
-
-        UserManagementRestUtils.createUser(restApiClient, testParams.getUserDomain(), newImapUser, imapPassword);
+        String newImapUser = createDynamicUserFrom(imapUser);
         addUserToProject(newImapUser, UserRoles.ADMIN);
 
         String kpiName = generateUniqueName();
@@ -347,12 +343,13 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
                 getRestApiClient(), testParams.getProjectId(), singletonList(kpiUri));
 
         try {
-            logoutAndLoginAs(newImapUser, imapPassword);
+            logoutAndLoginAs(newImapUser, testParams.getPassword());
 
             setAlertForKpi(kpiName, TRIGGERED_WHEN_GOES_ABOVE, "10");
 
             logoutAndLoginAs(imapUser, imapPassword);
 
+            RestApiClient restApiClient = testParams.getDomainUser() == null ? getRestApiClient() : getDomainUserRestApiClient();
             deleteUserByEmail(restApiClient, testParams.getUserDomain(), newImapUser);
 
             updateCsvDataset(DATASET_NAME, csvFilePath);
@@ -362,9 +359,6 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
 
         } finally {
             logoutAndLoginAs(imapUser, imapPassword);
-
-            deleteUserByEmail(restApiClient, testParams.getUserDomain(), newImapUser);
-
             getMdService().removeObjByUri(indigoDashboardUri);
         }
     }

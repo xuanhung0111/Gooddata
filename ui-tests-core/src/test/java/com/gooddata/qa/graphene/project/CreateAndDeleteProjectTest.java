@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.project;
 
 import static com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar.getCurrentProjectName;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
@@ -30,16 +29,10 @@ public class CreateAndDeleteProjectTest extends AbstractProjectTest {
     private String fisrtProjectId;
     private String secondProjectId;
 
-    private String invitedAdminUser;
-    private String invitedAdminUserPassword;
-
     @Test(dependsOnGroups = {"createProject"})
     public void initData() {
         fisrtProjectId = testParams.getProjectId();
         projectTitle = "Project-create-and-delete-test";
-
-        invitedAdminUser = testParams.getEditorUser();
-        invitedAdminUserPassword = testParams.getEditorPassword();
     }
 
     @Test(dependsOnMethods = {"initData"})
@@ -56,23 +49,25 @@ public class CreateAndDeleteProjectTest extends AbstractProjectTest {
         ProjectsPage.getInstance(browser).goToProject(fisrtProjectId);
         waitForDashboardPageLoaded(browser);
 
-        assertEquals(initProjectsAndUsersPage().renameProject(FIRST_EDITED_PROJECT_NAME).getProjectName(), FIRST_EDITED_PROJECT_NAME);
+        assertEquals(initProjectsAndUsersPage().renameProject(FIRST_EDITED_PROJECT_NAME).getProjectName(),
+                FIRST_EDITED_PROJECT_NAME);
         assertEquals(getCurrentProjectName(browser), FIRST_EDITED_PROJECT_NAME);
 
         assertEquals(initProjectsPage().getProjectNameFrom(fisrtProjectId), FIRST_EDITED_PROJECT_NAME);
     }
 
     @Test(dependsOnMethods = {"renameProjectByOwner"})
-    public void renameProjectByInvitedAdminUser() throws ParseException, IOException, JSONException {
-        addUserToProject(invitedAdminUser, UserRoles.ADMIN);
-        logout()
-            .login(invitedAdminUser, invitedAdminUserPassword, true);
-        waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
+    public void renameProjectByInvitedAdminUser() throws ParseException, JSONException, IOException {
+        String invitedAdminUser = createAndAddUserToProject(UserRoles.ADMIN);
+
+        logout();
+        signInAtGreyPages(invitedAdminUser, testParams.getPassword());
 
         initProjectsPage().goToProject(fisrtProjectId);
         waitForDashboardPageLoaded(browser);
 
-        assertEquals(initProjectsAndUsersPage().renameProject(SECOND_EDITED_PROJECT_NAME).getProjectName(), SECOND_EDITED_PROJECT_NAME);
+        assertEquals(initProjectsAndUsersPage().renameProject(SECOND_EDITED_PROJECT_NAME).getProjectName(),
+                SECOND_EDITED_PROJECT_NAME);
         assertEquals(getCurrentProjectName(browser), SECOND_EDITED_PROJECT_NAME);
 
         assertEquals(initProjectsPage().getProjectNameFrom(fisrtProjectId), SECOND_EDITED_PROJECT_NAME);
@@ -97,5 +92,4 @@ public class CreateAndDeleteProjectTest extends AbstractProjectTest {
             testParams.setProjectId(secondProjectId);
         }
     }
-
 }

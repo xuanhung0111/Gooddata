@@ -30,9 +30,6 @@ public class ProjectSwitchingTest extends AbstractProjectTest {
     private static final String UNIQUE_ID = UUID.randomUUID().toString().substring(0, 6);
     private static final String NEW_PROJECT_NAME = "New-project-switch-" + UNIQUE_ID;
 
-    private String embededDashboardUser;
-    private String embededDashboardUserPassword;
-
     private String currentProjectId;
     private String newProjectId;
 
@@ -42,15 +39,6 @@ public class ProjectSwitchingTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void inviteUsersToProject() throws ParseException, IOException, JSONException {
-        embededDashboardUser = testParams.getViewerUser();
-        embededDashboardUserPassword = testParams.getViewerPassword();
-
-        addUserToProject(testParams.getEditorUser(), UserRoles.EDITOR);
-        addUserToProject(embededDashboardUser, UserRoles.DASHBOARD_ONLY);
-    }
-
-    @Test(dependsOnMethods = "inviteUsersToProject")
     public void getMoreProject() {
         currentProjectId = testParams.getProjectId();
 
@@ -59,11 +47,12 @@ public class ProjectSwitchingTest extends AbstractProjectTest {
                 testParams.getProjectEnvironment());
     }
 
-    @Test(dependsOnMethods = {"inviteUsersToProject"})
-    public void tryOpenProjectByDashboardOnlyUser() throws JSONException {
+    @Test(dependsOnGroups = {"createProject"})
+    public void tryOpenProjectByDashboardOnlyUser() throws JSONException, ParseException, IOException {
+        String embededDashboardUser = createAndAddUserToProject(UserRoles.DASHBOARD_ONLY);
         try {
             logout();
-            signInAtGreyPages(embededDashboardUser, embededDashboardUserPassword);
+            signInAtGreyPages(embededDashboardUser, testParams.getPassword());
 
             assertTrue(initProjectsPage().isProjectDisplayed(testParams.getProjectId()),
                     "Dashboard-Only user cannot view the project in Projects page");
@@ -75,12 +64,11 @@ public class ProjectSwitchingTest extends AbstractProjectTest {
             assertThat(browser.getCurrentUrl(), containsString("cannotAccessWorkbench"));
 
         } finally {
-            logout();
-            signIn(true, UserRoles.ADMIN);
+            logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
         }
     }
 
-    @Test(dependsOnMethods = {"inviteUsersToProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void tryOpenProjectByDisabledUser() throws JSONException {
         try {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.EDITOR);
@@ -114,7 +102,7 @@ public class ProjectSwitchingTest extends AbstractProjectTest {
         }
     }
 
-    @Test(dependsOnMethods = {"inviteUsersToProject"})
+    @Test(dependsOnMethods = {"getMoreProject"})
     public void switchProjects() throws ParseException, JSONException, IOException {
         try {
             initDashboardsPage();
@@ -132,6 +120,11 @@ public class ProjectSwitchingTest extends AbstractProjectTest {
         } finally {
             ProjectRestUtils.deleteProject(getGoodDataClient(), newProjectId);
         }
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
     }
 
     private void switchProject(String name) {

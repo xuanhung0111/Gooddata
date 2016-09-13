@@ -52,11 +52,6 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
         projectTitle = "GoodSales-dashboard-report-widget";
     }
 
-    @BeforeClass(alwaysRun = true)
-    public void addUsers() {
-        addUsersWithOtherRoles = true;
-    }
-
     @Test(dependsOnGroups = {"createProject"})
     public void workWithHeadlineReport() {
         String reportName = "Headline report";
@@ -281,6 +276,11 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
         } finally {
             dashboardsPage.deleteDashboard();
         }
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
     }
 
     private void refreshDashboardsPage() {

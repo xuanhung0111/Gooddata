@@ -32,10 +32,8 @@ import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
-import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
@@ -95,8 +93,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
             throws URISyntaxException, JSONException, IOException, MessagingException {
 
         Date testStartTime = new Date();
-        String imapUniqueUser = generateImapUniqueUserEmail(imapUser);
-        String userUri = addImapUserToProject(imapUniqueUser, imapPassword);
+        String imapUniqueUser = addUniqueImapUserToProject();
 
         String metricUri = null;
 
@@ -106,7 +103,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
         try {
             switchToAdmin();
             setupData(CSV_PATH, UPLOADINFO_PATH);
-            switchToUser(imapUniqueUser, imapPassword);
+            switchToUser(imapUniqueUser, testParams.getPassword());
 
             metricUri = createMetricFromFact(metricName, factName, metricTemplate, format);
 
@@ -125,7 +122,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
 
             switchToAdmin();
             setupData(CSV_INCREASED_PATH, UPLOADINFO_INCREASED_PATH);
-            switchToUser(imapUniqueUser, imapPassword);
+            switchToUser(imapUniqueUser, testParams.getPassword());
 
             // metric name is in mail subject and is unique
             checkKpiAlertTriggered(metricName, DATE_FILTER_ALL_TIME, testStartTime);
@@ -139,14 +136,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
             if (metricUri != null) {
                 RestUtils.deleteObject(getRestApiClient(), metricUri);
             }
-            RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
-            UserManagementRestUtils.deleteUserByUri(restApiClient, userUri);
         }
-    }
-
-    private String generateImapUniqueUserEmail(String email) {
-        String append = UUID.randomUUID().toString().substring(0, 6);
-        return email.replace("@", "+dashboards_" + append + "@");
     }
 
     private String getDashboardLink(String emailContent) {
@@ -156,14 +146,11 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
         return matcher.find() ? matcher.group(1) : null;
     }
 
-    private String addImapUserToProject(String email, String password) throws ParseException, IOException, JSONException {
-        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
-        String userUri = UserManagementRestUtils.createUser(restApiClient, testParams.getUserDomain(), email,
-                password);
-        UserManagementRestUtils.addUserToProject(restApiClient, testParams.getProjectId(),
-                email, UserRoles.ADMIN);
+    private String addUniqueImapUserToProject() throws ParseException, IOException, JSONException {
+        String uniqueUser = createDynamicUserFrom(imapUser);
+        addUserToProject(uniqueUser, UserRoles.ADMIN);
 
-        return userUri;
+        return uniqueUser;
     }
 
     private String getLastMailContent(String subject, Date arrivedDate) throws IOException, MessagingException {

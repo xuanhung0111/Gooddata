@@ -34,11 +34,6 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
         projectTitle = "GoodSales-test-folder";
     }
 
-    @BeforeClass(alwaysRun = true)
-    public void addUsers() {
-        addUsersWithOtherRoles = true;
-    }
-
     @Test(dependsOnGroups = {"createProject"})
     public void initialize() throws JSONException {
         newName = "New Folder";
@@ -160,6 +155,11 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
     public void finalTest() throws JSONException {
         logout();
         signIn(false, UserRoles.ADMIN);
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
     }
 
     private void initVariables(String page) {

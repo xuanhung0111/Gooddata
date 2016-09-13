@@ -20,9 +20,7 @@ public class TestParameters {
     private String user;
     private String password;
     private String editorUser;
-    private String editorPassword;
     private String viewerUser;
-    private String viewerPassword;
     private String authorizationToken;
     private String authorizationToken2;
     private ProjectDriver projectDriver = ProjectDriver.POSTGRES;
@@ -47,9 +45,7 @@ public class TestParameters {
         user = loadProperty("user");
         password = loadProperty("password");
         editorUser = loadProperty("editorUser");
-        editorPassword = loadProperty("editorPassword");
         viewerUser = loadProperty("viewerUser");
-        viewerPassword = loadProperty("viewerPassword");
         projectDriver = lookup(loadProperty("project.dwhDriver"), ProjectDriver.class, ProjectDriver.POSTGRES, "getValue");
         authorizationToken = loadProperty("project.authorizationToken");
         authorizationToken2 = loadProperty("project.authorizationToken2");
@@ -123,20 +119,20 @@ public class TestParameters {
         this.password = password;
     }
 
+    public void setEditorUser(String editorUser) {
+        this.editorUser = editorUser;
+    }
+
     public String getEditorUser() {
         return editorUser;
     }
 
-    public String getEditorPassword() {
-        return editorPassword;
+    public void setViewerUser(String viewerUser) {
+        this.viewerUser = viewerUser;
     }
 
     public String getViewerUser() {
         return viewerUser;
-    }
-
-    public String getViewerPassword() {
-        return viewerPassword;
     }
 
     public String getAuthorizationToken() {

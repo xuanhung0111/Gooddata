@@ -6,13 +6,13 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
+import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 
 import java.io.IOException;
 import java.util.UUID;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -20,17 +20,11 @@ import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
-import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 public class ProjectSwitchTest extends DashboardWithWidgetsTest {
     private static final String UNIQUE_ID = UUID.randomUUID().toString().substring(0, 10);
     private static final String NEW_PROJECT_NAME = "New-project-switch-" + UNIQUE_ID;
-
-    private String embededDashboardUser;
-    private String embededDashboardUserPassword;
-    private String embededDashboardUserUri;
 
     private String currentProjectId;
     private String newProjectId;
@@ -41,19 +35,7 @@ public class ProjectSwitchTest extends DashboardWithWidgetsTest {
         projectTitle = "Project-switch-" + UNIQUE_ID;
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"precondition"})
-    public void prepareUserForSwitchingTest() throws ParseException, JSONException, IOException {
-        embededDashboardUser = generateEmail(testParams.getUser());
-        embededDashboardUserPassword = testParams.getPassword();
-
-        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
-        embededDashboardUserUri = UserManagementRestUtils.createUser(restApiClient,
-                testParams.getUserDomain(), embededDashboardUser, embededDashboardUserPassword);
-
-        addUserToProject(embededDashboardUser, UserRoles.DASHBOARD_ONLY);
-    }
-
-    @Test(dependsOnMethods = {"prepareUserForSwitchingTest"}, groups = {"precondition"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
     public void getMoreProject() {
         currentProjectId = testParams.getProjectId();
 
@@ -125,9 +107,10 @@ public class ProjectSwitchTest extends DashboardWithWidgetsTest {
         assertThat(browser.getCurrentUrl(), containsString(currentProjectId));
     }
 
-    @Test(dependsOnMethods = {"prepareUserForSwitchingTest"}, groups = {"desktop", "mobile"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop", "mobile"})
     public void switchProjectWithEmbededDashboardUser() throws JSONException, ParseException, IOException {
-        GoodData goodDataClient = getGoodDataClient(embededDashboardUser, embededDashboardUserPassword);
+        String embeddedDashboardUser = createAndAddUserToProject(UserRoles.DASHBOARD_ONLY);
+        GoodData goodDataClient = getGoodDataClient(embeddedDashboardUser, testParams.getPassword());
         String newProjectId = "";
 
         try {
@@ -139,8 +122,7 @@ public class ProjectSwitchTest extends DashboardWithWidgetsTest {
                     ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
 
             logout();
-            signInAtUI(embededDashboardUser, embededDashboardUserPassword);
-
+            signInAtUI(embeddedDashboardUser, testParams.getPassword());
             testParams.setProjectId(newProjectId);
 
             initIndigoDashboardsPage().switchProject(projectTitle);
@@ -151,19 +133,11 @@ public class ProjectSwitchTest extends DashboardWithWidgetsTest {
 
         } finally {
             testParams.setProjectId(currentProjectId);
-
-            logout();
-            signIn(false, UserRoles.ADMIN);
+            logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
 
             if(!newProjectId.isEmpty()) {
                 ProjectRestUtils.deleteProject(goodDataClient, newProjectId);
             }
         }
-    }
-
-    @AfterClass(alwaysRun = true)
-    public void tearDown() throws JSONException {
-        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
-        UserManagementRestUtils.deleteUserByUri(restApiClient, embededDashboardUserUri);
     }
 }
