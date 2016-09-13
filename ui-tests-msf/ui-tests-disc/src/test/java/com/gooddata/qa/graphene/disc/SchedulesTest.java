@@ -7,6 +7,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -1079,10 +1080,10 @@ public class SchedulesTest extends AbstractSchedulesTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkEffectiveUserOfSchedule() throws JSONException, ParseException, IOException {
-        try {
-            addUserToProject(testParams.getEditorUser(), UserRoles.ADMIN);
-            addUserToProject(testParams.getViewerUser(), UserRoles.ADMIN);
+        String firstAdminUser = createAndAddUserToProject(UserRoles.ADMIN);
+        String secondAdminUser = createAndAddUserToProject(UserRoles.ADMIN);
 
+        try {
             openProjectDetailPage(testParams.getProjectId());
 
             String processName = "Check Effective User of Schedule";
@@ -1095,7 +1096,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
                     "Incorrect effective user: " + scheduleDetail.getEffectiveUser());
 
             logout();
-            signInAtGreyPages(testParams.getEditorUser(), testParams.getEditorPassword());
+            signInAtGreyPages(firstAdminUser, testParams.getPassword());
 
             openScheduleViaUrl(scheduleBuilder.getScheduleUrl());
             scheduleDetail.manualRun();
@@ -1107,20 +1108,19 @@ public class SchedulesTest extends AbstractSchedulesTest {
             redeployProcess(processName, DeployPackages.BASIC, "Re-deploy to Check Effective User",
                     scheduleBuilder);
             openScheduleViaUrl(scheduleBuilder.getScheduleUrl());
-            assertTrue(scheduleDetail.getEffectiveUser().contains(testParams.getEditorUser()),
+            assertTrue(scheduleDetail.getEffectiveUser().contains(firstAdminUser),
                     "Incorrect effective user: " + scheduleDetail.getEffectiveUser());
 
             logout();
-            signInAtGreyPages(testParams.getViewerUser(), testParams.getViewerPassword());
+            signInAtGreyPages(secondAdminUser, testParams.getPassword());
 
             openScheduleViaUrl(scheduleBuilder.getScheduleUrl());
             scheduleDetail.manualRun();
             assertSuccessfulExecution();
-            assertTrue(scheduleDetail.getEffectiveUser().contains(testParams.getEditorUser()),
+            assertTrue(scheduleDetail.getEffectiveUser().contains(firstAdminUser),
                     "Incorrect effective user: " + scheduleDetail.getEffectiveUser());
         } finally {
-            logout();
-            signInAtGreyPages(testParams.getUser(), testParams.getPassword());
+            logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
             cleanProcessesInWorkingProject();
         }
     }

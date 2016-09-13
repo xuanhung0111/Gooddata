@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static org.testng.Assert.assertTrue;
+import static java.util.Objects.isNull;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -42,6 +43,7 @@ import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.query.attributes.QueryAttributesFragment;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.model.ModelRestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.webdav.WebDavClient;
@@ -230,23 +232,77 @@ public class AbstractGreyPageTest extends AbstractTest {
         assertTrue(fileSize == expectedSize, "LDM is probably invalid, check the LDM image manually! Current size is " + fileSize + ", but " + expectedSize + " in size was expected");
     }
 
-    protected void addUsersWithOtherRolesToProject() throws ParseException, IOException, JSONException {
-        addEditorUserToProject();
-        addViewerUserToProject();
-    }
-
-    protected void addEditorUserToProject() throws ParseException, IOException, JSONException {
-        addUserToProject(testParams.getEditorUser(), UserRoles.EDITOR);
-    }
-
-    protected void addViewerUserToProject() throws ParseException, IOException, JSONException {
-        addUserToProject(testParams.getViewerUser(), UserRoles.VIEWER);
+    /**
+     * A hook for inviting users from other roles to project.
+     * @throws ParseException
+     * @throws JSONException
+     * @throws IOException
+     */
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        log.warning("This test does not need to invite users into project!");
     }
 
     protected void addUserToProject(String email, UserRoles userRole) throws ParseException, IOException, JSONException {
         UserManagementRestUtils.addUserToProject(
                 testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient(),
                         testParams.getProjectId(), email, userRole);
+    }
+
+    /**
+     * Create and add dynamic user to project with specific role.
+     * This action is mandatory full support for EDITOR and VIEWER. Other roles (DASHBOARD_ONLY, ADMIN) just appear
+     * in rarely case, so they will not be cached in TestParameter and assume the password is same as the main user.
+     * All dynamic user will be automatically deleted after test.
+     * @param role
+     * @return dynamic user email
+     * @throws ParseException
+     * @throws JSONException
+     * @throws IOException
+     */
+    protected String createAndAddUserToProject(UserRoles role) throws ParseException, JSONException, IOException {
+        RestApiClient restApiClient;
+        String domainUser;
+
+        if (isNull(testParams.getDomainUser())) {
+            restApiClient = getRestApiClient();
+            domainUser = testParams.getUser();
+        } else {
+            restApiClient = getDomainUserRestApiClient();
+            domainUser = testParams.getDomainUser();
+        }
+
+        String dynamicUser = createDynamicUserFrom(domainUser.replace("@", "+" + role.getName().toLowerCase() + "@"));
+        UserManagementRestUtils.addUserToProject(restApiClient, testParams.getProjectId(), dynamicUser, role);
+
+        switch (role) {
+            case EDITOR:
+                testParams.setEditorUser(dynamicUser);
+                return dynamicUser;
+            case VIEWER:
+                testParams.setViewerUser(dynamicUser);
+                return dynamicUser;
+            default:
+                return dynamicUser;
+        }
+    }
+
+    /**
+     * Create a dynamic user and automatically delete it after test.
+     * Note: UserManagementRestUtils.createUser() is not automatically delete it.
+     * @param email
+     * @return dynamic user email
+     * @throws ParseException
+     * @throws JSONException
+     * @throws IOException
+     */
+    protected String createDynamicUserFrom(String email) throws ParseException, JSONException, IOException {
+        RestApiClient restApiClient = testParams.getDomainUser() == null ? getRestApiClient() : getDomainUserRestApiClient();
+        String dynamicUser = generateEmail(email);
+
+        UserManagementRestUtils.createUser(restApiClient, testParams.getUserDomain(), dynamicUser, testParams.getPassword());
+        extraUsers.add(dynamicUser);
+
+        return dynamicUser;
     }
 
     private String getLDMImageFile() throws ParseException, IOException, JSONException {

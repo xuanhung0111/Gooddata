@@ -2,6 +2,8 @@ package com.gooddata.qa.graphene;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -50,6 +52,9 @@ public abstract class AbstractTest extends Arquillian {
     protected StartPageContext startPageContext = null;
 
     protected static final Logger log = Logger.getLogger(AbstractTest.class.getName());
+
+    // Store extra dynamic users in tests and will be deleted after test
+    List<String> extraUsers = new ArrayList<>();
 
     @BeforeClass(alwaysRun = true)
     public void loadProperties() {
@@ -154,10 +159,6 @@ public abstract class AbstractTest extends Arquillian {
 
     public String generateEmail(String email) {
         return email.replace("@", "+" + UUID.randomUUID().toString().substring(0, 5) + "@");
-    }
-
-    public String generateDynamicUser(String user) {
-        return user.replace("@", "+dynamic+" + UUID.randomUUID().toString().substring(0, 5) + "@");
     }
 
     public ProjectValidationResults validateProject() {

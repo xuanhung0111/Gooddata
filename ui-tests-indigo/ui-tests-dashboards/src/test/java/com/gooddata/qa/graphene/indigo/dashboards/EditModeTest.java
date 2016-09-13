@@ -12,6 +12,9 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.io.IOException;
+
+import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
@@ -24,6 +27,8 @@ import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTes
 
 public class EditModeTest extends DashboardWithWidgetsTest {
 
+    private boolean isMobileRunning;
+
     private static final KpiConfiguration kpiConfig = new KpiConfiguration.Builder()
         .metric(METRIC_AMOUNT)
         .dataSet(DATE_CREATED)
@@ -32,8 +37,7 @@ public class EditModeTest extends DashboardWithWidgetsTest {
     @BeforeClass(alwaysRun = true)
     public void before(ITestContext context) {
         super.before();
-        boolean isMobileRunning = Boolean.parseBoolean(context.getCurrentXmlTest().getParameter("isMobileRunning"));
-        addUsersWithOtherRoles = !isMobileRunning;
+        isMobileRunning = Boolean.parseBoolean(context.getCurrentXmlTest().getParameter("isMobileRunning"));
     }
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
@@ -229,5 +233,13 @@ public class EditModeTest extends DashboardWithWidgetsTest {
 
         takeScreenshot(browser, "checkNoVisualizationsList", getClass());
         assertFalse(isVisualizationsListPresent);
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        if (isMobileRunning) return;
+
+        createAndAddUserToProject(UserRoles.EDITOR);
+        createAndAddUserToProject(UserRoles.VIEWER);
     }
 }

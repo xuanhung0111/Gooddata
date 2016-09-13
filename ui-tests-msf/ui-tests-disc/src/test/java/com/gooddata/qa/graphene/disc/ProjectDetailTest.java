@@ -26,6 +26,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
 import com.gooddata.qa.graphene.fragments.disc.ExecutablesTable;
 import com.google.common.base.Predicate;
@@ -257,15 +258,19 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
     @Test(dependsOnGroups = {"createProject"})
     public void checkAccessProjectDetailWithNonAdminRole() throws ParseException, IOException, JSONException {
         try {
-            addUsersWithOtherRolesToProject();
-
-            accessProjectDetailWithNonAdminRole(testParams.getEditorUser(), testParams.getEditorPassword());
+            accessProjectDetailWithNonAdminRole(testParams.getEditorUser(), testParams.getPassword());
             logout();
-            accessProjectDetailWithNonAdminRole(testParams.getViewerUser(), testParams.getViewerPassword());
+            accessProjectDetailWithNonAdminRole(testParams.getViewerUser(), testParams.getPassword());
         } finally {
             logout();
             signInAtGreyPages(testParams.getUser(), testParams.getPassword());
         }
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
+        createAndAddUserToProject(UserRoles.VIEWER);
     }
 
     private void assertScheduleStatus(WebElement schedule, ScheduleStatus scheduleStatus) {

@@ -29,6 +29,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.entity.visualization.VisualizationMDConfiguration;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Visualization;
@@ -247,11 +248,10 @@ public class InsightOnDashboardTest extends DashboardsTest {
 
     @Test(dependsOnGroups = { "dashboardsInit" })
     public void testCreatingInsightsForFilterTest() throws ParseException, IOException, JSONException {
-        addEditorUserToProject();
         initProjectsPage();
 
         createVisualizationWidget(
-                getRestApiClient(testParams.getEditorUser(), testParams.getEditorPassword()), testParams.getProjectId(),
+                getRestApiClient(testParams.getEditorUser(), testParams.getPassword()), testParams.getProjectId(),
                 new VisualizationMDConfiguration.Builder()
                         .title(INSIGHT_CREATED_BY_EDITOR)
                         .type(ReportType.BAR_CHART.getLabel())
@@ -404,6 +404,11 @@ public class InsightOnDashboardTest extends DashboardsTest {
                         .collect(toList());
 
         assertEquals(insights.size(), expectedInsights.size(), "The expected insights are not displayed");
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
     }
 
     private void checkInsightRender(final Visualization insight, final String expectedHeadline,

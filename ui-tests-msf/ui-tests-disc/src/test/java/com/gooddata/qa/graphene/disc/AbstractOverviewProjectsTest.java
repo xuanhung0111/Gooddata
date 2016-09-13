@@ -155,7 +155,6 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
         prepareDataForCheckingOverviewState(projectState, overviewProject);
 
         try {
-            addUsersWithOtherRolesToProject();
             openUrl(PAGE_PROJECTS);
             logout();
 

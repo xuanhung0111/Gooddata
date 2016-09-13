@@ -67,11 +67,6 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
         projectTitle = "GoodSales-test-variable";
     }
 
-    @BeforeClass(alwaysRun = true)
-    public void addUsers() {
-        addUsersWithOtherRoles = true;
-    }
-
     @Test(dependsOnGroups = {"createProject"}, groups = {"basic"})
     public void createNumericVariable() {
         final String variable = generateVariableName();
@@ -361,6 +356,11 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
         changeAttributeFilterOperatorTo("isn't");
         takeScreenshot(browser, "Attribute-filter-operator-changes-to-isn't", getClass());
         assertEquals(getAttributeFilterOperator(), "isn't");
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
     }
 
     private String generateVariableName() {

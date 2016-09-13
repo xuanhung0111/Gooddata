@@ -86,11 +86,6 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         projectTitle = "User-management-general" + System.currentTimeMillis();
     }
 
-    @BeforeClass(alwaysRun = true)
-    public void addUsers() {
-        addUsersWithOtherRoles = true;
-    }
-
     @Test(dependsOnGroups = { "createProject" }, groups = { "initialize", "sanity" })
     public void initData() throws JSONException, IOException {
         editorUser = testParams.getEditorUser();
@@ -607,6 +602,12 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     public void turnOffUserManagementFeature() throws IOException, JSONException {
         ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.DISPLAY_USER_MANAGEMENT, false);
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
+        createAndAddUserToProject(UserRoles.VIEWER);
     }
 
     private void checkEditorCannotAccessUserGroupsLinkInDashboardPage(PermissionsDialog permissionsDialog) {

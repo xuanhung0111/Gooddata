@@ -18,9 +18,9 @@ import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import java.io.IOException;
 import java.util.Collection;
 
+import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -77,11 +77,6 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
 
     private Report reportWithSingleAttribute;
     private Report reportWithMultipleAttribute;
-
-    @BeforeClass(alwaysRun = true)
-    public void addUsers() {
-        addUsersWithOtherRoles = true;
-    }
 
     @Test(dependsOnGroups = {"createProject"})
     public void initReport() {
@@ -339,6 +334,11 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
             testParams.setProjectId(currentProjectId);
             ProjectRestUtils.deleteProject(getGoodDataClient(), newProjectId);
         }
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
     }
 
     private void setAttributeLabelType(String attribute, String attributeLabel, AttributeLabelTypes type) {
