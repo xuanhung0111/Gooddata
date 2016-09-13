@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.common;
+package com.gooddata.qa.graphene;
 
 import java.util.UUID;
 
@@ -8,7 +8,7 @@ import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 
-public class AbstractDashboardWidgetTest extends GoodSalesAbstractTest {
+public abstract class AbstractDashboardWidgetTest extends GoodSalesAbstractTest {
 
     protected FilterWidget getFilter(String name) {
         FilterWidget filter = dashboardsPage.getFilterWidgetByName(name);
