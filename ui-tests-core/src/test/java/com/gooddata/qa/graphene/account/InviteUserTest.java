@@ -10,6 +10,7 @@ import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -30,6 +31,7 @@ import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.account.InviteUserDialog;
 import com.gooddata.qa.graphene.fragments.account.RegistrationPage;
+import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
@@ -97,7 +99,23 @@ public class InviteUserTest extends AbstractProjectTest {
 
         logout();
         openUrl(invitationLink);
-        signInAtUI(imapUser, imapPassword);
+        //wait for joining project successfully
+        LoginFragment.getInstance(browser).waitForNotificationMessageDisplayed();
+
+        //workaround for bug WA-6127 Activation/Invitation link is redirected to the back-end link
+        if (isPIEnvironment()) {
+            log.info("This test is run on PI/client-demo so it needs to be redirected to the PI/client-demo's login page");
+            //reload the login page to switch to PI/client-demo server.
+            openUrl(PAGE_LOGIN);
+            //sleep to wait for the page starts loading
+            sleepTightInSeconds(2);
+            LoginFragment.waitForPageLoaded(browser);
+            signInAtUI(imapUser, imapPassword);
+            //must init the dashboard page manually. It cannot be redirected to the correct project because reload the login page above.
+            initDashboardsPage();
+        } else {
+            signInAtUI(imapUser, imapPassword);
+        }
         waitForDashboardPageLoaded(browser);
         assertTrue(browser.getCurrentUrl().contains(testParams.getProjectId()), imapUser + " can't log on to the project");
         takeScreenshot(browser, "registed-user-access-the-project-successfully", getClass());
@@ -110,6 +128,10 @@ public class InviteUserTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"inviteRegistedUser"})
     public void inviteNonRegistedUser() throws Throwable {
+        if (isPIEnvironment()) {
+            log.info("This test cannot be run on PI/client-demo");
+            return;
+        }
         final String nonRegistedUser = generateEmail(imapUser);
 
         loginAndOpenProjectAndUserPage();
@@ -132,6 +154,7 @@ public class InviteUserTest extends AbstractProjectTest {
 
             ++expectedMessageCount;
         } finally {
+            signIn(true, UserRoles.ADMIN);
             RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
             UserManagementRestUtils.deleteUserByEmail(restApiClient, testParams.getUserDomain(), nonRegistedUser);
         }
@@ -203,5 +226,10 @@ public class InviteUserTest extends AbstractProjectTest {
 
     private void dismissStatusBarMessage() {
         waitForElementVisible(className("s-statusbar-dismiss"), browser).click();
+    }
+
+    private boolean isPIEnvironment() {
+        return !testParams.isClusterEnvironment() && !testParams.isProductionEnvironment() &&
+                !testParams.isPerformanceEnvironment();
     }
 }

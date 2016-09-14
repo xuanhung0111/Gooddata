@@ -95,6 +95,11 @@ public class LoginFragment extends AbstractFragment {
         return RegistrationPage.getInstance(browser);
     }
 
+    public LoginFragment waitForNotificationMessageDisplayed() {
+        waitForElementVisible(NOTIFICATION_MESSAGE_LOCATOR, browser);
+        return this;
+    }
+
     public String getNotificationMessage() {
         return waitForElementVisible(NOTIFICATION_MESSAGE_LOCATOR, browser).getText();
     }
