@@ -107,7 +107,7 @@ public class ProjectSwitchTest extends DashboardWithWidgetsTest {
         assertThat(browser.getCurrentUrl(), containsString(currentProjectId));
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop", "mobile"})
+    @Test(dependsOnGroups = {"precondition"}, groups = {"desktop", "mobile"})
     public void switchProjectWithEmbededDashboardUser() throws JSONException, ParseException, IOException {
         String embeddedDashboardUser = createAndAddUserToProject(UserRoles.DASHBOARD_ONLY);
         GoodData goodDataClient = getGoodDataClient(embeddedDashboardUser, testParams.getPassword());
