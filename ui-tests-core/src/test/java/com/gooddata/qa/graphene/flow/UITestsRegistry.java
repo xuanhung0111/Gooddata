@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.gooddata.qa.graphene.aqe.ValidElementsResourceTest;
+import com.gooddata.qa.graphene.dashboards.DashboardPermissionsTest;
 import com.gooddata.qa.graphene.dashboards.DashboardSavedFiltersTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesCascadingFilterTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesCellLimitTest;
@@ -145,7 +146,8 @@ public class UITestsRegistry {
             GoodSalesKeyMetricTest.class,
             GoodSalesEmbeddedDashboardTest.class,
             GoodSalesPersonalObjectsInDashboardWidgetTest.class,
-            GoodSalesReportWidgetOnDashboardTest.class
+            GoodSalesReportWidgetOnDashboardTest.class,
+            DashboardPermissionsTest.class
         });
 
         suites.put("dashboards-cell-limit", new Object[] {
