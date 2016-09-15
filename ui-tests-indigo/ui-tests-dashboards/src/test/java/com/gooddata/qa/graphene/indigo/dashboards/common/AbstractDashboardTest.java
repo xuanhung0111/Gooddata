@@ -66,13 +66,6 @@ public abstract class AbstractDashboardTest extends AbstractProjectTest {
         return IndigoRestUtils.createKpiWidget(getRestApiClient(), testParams.getProjectId(), kpiConfig);
     }
 
-    protected IndigoDashboardsPage startEditMode() {
-        if (!initIndigoDashboardsPage().isSplashScreenPresent())
-            return indigoDashboardsPage.switchToEditMode();
-
-        return indigoDashboardsPage.getSplashScreen().startEditingWidgets();
-    }
-
     protected String addWidgetToWorkingDashboard(final String widgetUri) throws JSONException, IOException {
         final RestApiClient client = getRestApiClient();
         final String projectId = testParams.getProjectId();

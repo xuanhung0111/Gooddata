@@ -63,14 +63,16 @@ public class HeaderTest extends GoodSalesAbstractDashboardTest {
             ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
                     ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
 
-            startEditMode().addKpi(
+            initIndigoDashboardsPage().getSplashScreen()
+                .startEditingWidgets()
+                .addKpi(
                     new KpiConfiguration.Builder()
                         .metric(METRIC_AMOUNT)
                         .dataSet(DATE_CREATED)
                         .comparison(Kpi.ComparisonType.NO_COMPARISON.toString())
                         .drillTo(DASH_TAB_OUTLOOK)
                         .build())
-                    .saveEditModeWithWidgets();
+                .saveEditModeWithWidgets();
 
             // need another try finally block because not deleting kpi affects to other tests.
             try {
