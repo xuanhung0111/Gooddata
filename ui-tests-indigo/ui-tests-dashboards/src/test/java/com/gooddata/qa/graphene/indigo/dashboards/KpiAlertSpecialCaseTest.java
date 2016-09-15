@@ -30,7 +30,6 @@ import com.gooddata.md.Attribute;
 import com.gooddata.md.Dataset;
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
-import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.enums.GDEmails;
@@ -38,9 +37,10 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import com.gooddata.qa.utils.http.RestApiClient;
 
-public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
+public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
 
     private static final String DATASET_NAME = "User";
     private static final String OTHER_DATASET_NAME = "Other User";
@@ -131,7 +131,8 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
         };
     }
 
-    @Test(dependsOnGroups = "precondition", groups = "desktop", dataProvider = "metricProvider")
+    @Test(dependsOnGroups = {"precondition", "dashboardsInit"}, groups = "desktop",
+            dataProvider = "metricProvider")
     public void checkAlertWithSpecialMetricExpression(Metric metric) throws JSONException, IOException {
         final String kpiName = metric.getTitle();
         final String kpiUri = createKpi(kpiName, metric.getUri());
@@ -144,7 +145,7 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
 
             updateCsvDataset(DATASET_NAME, csvFilePath);
 
-            Kpi kpi = initIndigoDashboardsPageWithWidgets().getKpiByHeadline(kpiName);
+            Kpi kpi = initIndigoDashboardsPageWithWidgets().getWidgetByHeadline(Kpi.class, kpiName);
 
             takeScreenshot(browser, "Kpi-" + kpiName + "-alert-triggered", getClass());
             assertTrue(kpi.isAlertTriggered(), "Kpi alert is not triggered");
@@ -158,7 +159,7 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
         }
     }
 
-    @Test(dependsOnGroups = "precondition", groups = "desktop")
+    @Test(dependsOnGroups = {"precondition", "dashboardsInit"}, groups = "desktop")
     public void checkAlertWhenChangeMetricExpression() throws JSONException, IOException {
         String kpiName = generateUniqueName();
         String kpiUri = createKpi(kpiName, sumOfNumberMetricUri);
@@ -176,7 +177,7 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
 
             updateCsvDataset(DATASET_NAME, csvFilePath);
 
-            Kpi kpi = initIndigoDashboardsPageWithWidgets().getKpiByHeadline(kpiName);
+            Kpi kpi = initIndigoDashboardsPageWithWidgets().getWidgetByHeadline(Kpi.class, kpiName);
 
             takeScreenshot(browser, "Kpi-" + kpiName + "-alert-triggered", getClass());
             assertTrue(kpi.isAlertTriggered(), "Kpi alert is not triggered");
@@ -189,7 +190,7 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
         }
     }
 
-    @Test(dependsOnGroups = "precondition", groups = "desktop")
+    @Test(dependsOnGroups = {"precondition", "dashboardsInit"}, groups = "desktop")
     public void checkAlertWhenUploadAnotherDataset() throws JSONException, IOException {
         String kpiName = generateUniqueName();
         String kpiUri = createKpi(kpiName, sumOfNumberMetricUri);
@@ -202,7 +203,7 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
 
             uploadCSV(otherCsvFilePath);
 
-            Kpi kpi = initIndigoDashboardsPageWithWidgets().getKpiByHeadline(kpiName);
+            Kpi kpi = initIndigoDashboardsPageWithWidgets().getWidgetByHeadline(Kpi.class, kpiName);
 
             takeScreenshot(browser, "Kpi-" + kpiName + "-alert-triggered", getClass());
             assertTrue(kpi.isAlertTriggered(), "Kpi alert is not triggered");
@@ -228,7 +229,7 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
 
             updateCsvDataset(OTHER_DATASET_NAME, otherCsvFilePath);
 
-            Kpi kpi = initIndigoDashboardsPageWithWidgets().getKpiByHeadline(kpiName);
+            Kpi kpi = initIndigoDashboardsPageWithWidgets().getWidgetByHeadline(Kpi.class, kpiName);
 
             takeScreenshot(browser, "Kpi-" + kpiName + "-alert-triggered", getClass());
             assertTrue(kpi.isAlertTriggered(), "Kpi alert is not triggered");
@@ -241,7 +242,7 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
         }
     }
 
-    @Test(dependsOnGroups = "precondition", groups = "desktop")
+    @Test(dependsOnGroups = {"precondition", "dashboardsInit"}, groups = "desktop")
     public void checkPlainMailSendWithAlert() throws JSONException, IOException {
         String kpiName = generateUniqueName();
         String kpiUri = createKpi(kpiName, sumOfNumberMetricUri);
@@ -254,7 +255,7 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
 
             updateCsvDataset(DATASET_NAME, csvFilePath);
 
-            Kpi kpi = initIndigoDashboardsPageWithWidgets().getKpiByHeadline(kpiName);
+            Kpi kpi = initIndigoDashboardsPageWithWidgets().getWidgetByHeadline(Kpi.class, kpiName);
 
             takeScreenshot(browser, "Kpi-" + kpiName + "-alert-triggered", getClass());
             assertTrue(kpi.isAlertTriggered(), "Kpi alert is not triggered");
@@ -264,7 +265,7 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
 
             updateCsvDataset(DATASET_NAME, otherCsvFilePath);
 
-            kpi = initIndigoDashboardsPageWithWidgets().getKpiByHeadline(kpiName);
+            kpi = initIndigoDashboardsPageWithWidgets().getWidgetByHeadline(Kpi.class, kpiName);
 
             takeScreenshot(browser, "Kpi-" + kpiName + "-alert-not-triggered", getClass());
             assertFalse(kpi.isAlertTriggered(), "Kpi alert is triggered although the condition is not reached");
@@ -274,7 +275,7 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
 
             updateCsvDataset(DATASET_NAME, csvFilePath);
 
-            kpi = initIndigoDashboardsPageWithWidgets().getKpiByHeadline(kpiName);
+            kpi = initIndigoDashboardsPageWithWidgets().getWidgetByHeadline(Kpi.class, kpiName);
 
             takeScreenshot(browser, "Kpi-" + kpiName + "-alert-triggered-again", getClass());
             assertTrue(kpi.isAlertTriggered(), "Kpi alert is not triggered");
@@ -287,7 +288,7 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
         }
     }
 
-    @Test(dependsOnGroups = "precondition", groups = "desktop")
+    @Test(dependsOnGroups = {"precondition", "dashboardsInit"}, groups = "desktop")
     public void removeKpiAfterSettingAlert() throws JSONException, IOException {
         String kpiName = generateUniqueName();
         String kpiUri = createKpi(kpiName, sumOfNumberMetricUri);
@@ -310,7 +311,7 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
         }
     }
 
-    @Test(dependsOnGroups = "precondition", groups = "desktop")
+    @Test(dependsOnGroups = {"precondition", "dashboardsInit"}, groups = "desktop")
     public void removeDashboardAfterSettingAlert() throws JSONException, IOException {
         String kpiName = generateUniqueName();
         String kpiUri = createKpi(kpiName, sumOfNumberMetricUri);
@@ -331,7 +332,7 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
                 "Alert email is sent to mailbox");
     }
 
-    @Test(dependsOnGroups = "precondition", groups = "desktop")
+    @Test(dependsOnGroups = {"precondition", "dashboardsInit"}, groups = "desktop")
     public void removeUserAfterSettingAlert() throws JSONException, IOException {
         String newImapUser = createDynamicUserFrom(imapUser);
         addUserToProject(newImapUser, UserRoles.ADMIN);
@@ -380,7 +381,7 @@ public class KpiAlertSpecialCaseTest extends AbstractProjectTest {
 
     private void setAlertForKpi(String title, String triggerCondition, String threshold) {
         initIndigoDashboardsPageWithWidgets()
-                .getKpiByHeadline(title)
+                .getWidgetByHeadline(Kpi.class, title)
                 .openAlertDialog()
                 .selectTriggeredWhen(triggerCondition)
                 .setThreshold(threshold)

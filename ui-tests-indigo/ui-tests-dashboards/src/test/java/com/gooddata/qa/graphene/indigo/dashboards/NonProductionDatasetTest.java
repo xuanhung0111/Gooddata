@@ -19,17 +19,15 @@ import org.testng.annotations.Test;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
-import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
-public class NonProductionDatasetTest extends AbstractProjectTest {
+public class NonProductionDatasetTest extends AbstractDashboardTest {
 
     private static final String PAYROLL_CSV_PATH = "/" + UPLOAD_CSV + "/payroll.csv";
     private static final String PAYROLL_DATASET = "Payroll";
@@ -49,19 +47,13 @@ public class NonProductionDatasetTest extends AbstractProjectTest {
         projectTitle += "Non-Production-Dataset-Test";
     }
 
-    @Test(dependsOnGroups = { "createProject" }, groups = { "precondition" })
-    public void setupFeatureFlag() throws JSONException {
-        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
-    }
-
-    @Test(dependsOnGroups = { "createProject" }, groups = { "precondition" })
+    @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
     public void uploadCsvFile() {
         uploadCSV(getFilePathFromResource(PAYROLL_CSV_PATH));
         takeScreenshot(browser, "uploaded-" + PAYROLL_DATASET + "-dataset", getClass());
     }
 
-    @Test(dependsOnMethods = { "uploadCsvFile" }, groups = { "precondition" })
+    @Test(dependsOnMethods = {"uploadCsvFile"}, groups = {"precondition"})
     public void createTestMetrics() {
         final String amountUri = getMdService().getObjUri(getProject(), Fact.class, title(FACT_AMOUNT));
 
@@ -83,7 +75,7 @@ public class NonProductionDatasetTest extends AbstractProjectTest {
                         Formatter.DEFAULT.toString()));
     }
 
-    @Test(dependsOnGroups = { "precondition" }, groups = { "basic-test" })
+    @Test(dependsOnGroups = {"precondition", "dashboardsInit"}, groups = {"basic-test"})
     public void testMeasureOptions() {
         assertEquals(initIndigoDashboardsPage()
             .getSplashScreen()
@@ -94,7 +86,7 @@ public class NonProductionDatasetTest extends AbstractProjectTest {
             .getValues(), asList(METRIC_AMOUNT_SUM, METRIC_DEPARTMENT_COUNT), "The measure options are not correct");
     }
 
-    @Test(dependsOnGroups = { "precondition" }, groups = { "basic-test" })
+    @Test(dependsOnGroups = {"precondition", "dashboardsInit"}, groups = {"basic-test"})
     public void testDatasetOptions() {
         assertEquals(initIndigoDashboardsPage()
             .getSplashScreen()
@@ -105,24 +97,25 @@ public class NonProductionDatasetTest extends AbstractProjectTest {
             .getDataSets(), singletonList(DATASET_PAYDATE));
     }
 
-    @Test(dependsOnGroups = { "basic-test" })
+    @Test(dependsOnGroups = {"basic-test"})
     public void saveKpiUsingNonProductionData() throws JSONException, IOException {
         final String expectedKpiValue = initIndigoDashboardsPage()
             .getSplashScreen()
             .startEditingWidgets()
-            .addWidget(new KpiConfiguration.Builder()
+            .addKpi(new KpiConfiguration.Builder()
                 .metric(METRIC_AMOUNT_SUM)
                 .dataSet(DATASET_PAYDATE)
                 .comparison(Kpi.ComparisonType.NO_COMPARISON.toString())
                 .build())
             .selectDateFilterByName("All time")
-            .getKpiByHeadline(METRIC_AMOUNT_SUM)
+            .getWidgetByHeadline(Kpi.class, METRIC_AMOUNT_SUM)
             .getValue();
 
         IndigoDashboardsPage.getInstance(browser).saveEditModeWithWidgets();
         try {
             takeScreenshot(browser, "Test-Save-Kpi-Using-Non-Production-Data", getClass());
-            assertEquals(IndigoDashboardsPage.getInstance(browser).getKpiByHeadline(METRIC_AMOUNT_SUM).getValue(), expectedKpiValue,
+            assertEquals(IndigoDashboardsPage.getInstance(browser)
+                    .getWidgetByHeadline(Kpi.class, METRIC_AMOUNT_SUM).getValue(), expectedKpiValue,
                     "The saved kpi value is not correct");
         } finally {
             IndigoRestUtils.deleteAnalyticalDashboard(getRestApiClient(),

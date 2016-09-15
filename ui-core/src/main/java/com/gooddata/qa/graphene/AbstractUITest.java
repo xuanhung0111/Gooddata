@@ -507,16 +507,17 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     public IndigoDashboardsPage initIndigoDashboardsPage() {
         openUrl(getIndigoDashboardsPageUri());
-        waitForIndigoDashboardLoading();
+        waitForOpeningIndigoDashboard();
         return IndigoDashboardsPage.getInstance(browser);
     }
 
     public IndigoDashboardsPage initIndigoDashboardsPageWithWidgets() {
         openUrl(getIndigoDashboardsPageUri());
+        waitForOpeningIndigoDashboard();
 
         return IndigoDashboardsPage.getInstance(browser)
                 .waitForDashboardLoad()
-                .waitForAllKpiWidgetsLoaded();
+                .waitForWidgetsLoading();
     }
 
     public EmailSchedulePage initEmailSchedulesPage() {
@@ -568,7 +569,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
         return ImapClientAction.Utils.doActionWithImapClient(imapHost, imapUser, imapPassword, action);
     }
 
-    private void waitForIndigoDashboardLoading() {
+    private void waitForOpeningIndigoDashboard() {
         final By loadingLabel = className(".gd-loading-equalizer");
         try {
             Predicate<WebDriver> isLoadingLabelPresent = browser -> isElementPresent(loadingLabel, browser);

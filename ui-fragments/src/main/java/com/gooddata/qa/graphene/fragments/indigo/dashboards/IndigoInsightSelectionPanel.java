@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.className;
 
@@ -18,7 +20,19 @@ public class IndigoInsightSelectionPanel extends AbstractInsightSelectionPanel {
                 waitForElementVisible(ROOT_LOCATOR, searchContext));
     }
 
-    public void addInsightToLastPosition(final String insight) {
+    /**
+     * Add an insight to last position in dashboard by double click
+     * @param insight
+     */
+    public void addInsightUsingDoubleClick(final String insight) {
         getActions().doubleClick(waitForElementVisible(getInsightItem(insight).getRoot())).perform();
+    }
+
+    public static void waitForNotPresent() {
+        waitForElementNotPresent(ROOT_LOCATOR);
+    }
+
+    public static boolean isPresent(final SearchContext searchContext) {
+        return isElementPresent(ROOT_LOCATOR, searchContext);
     }
 }

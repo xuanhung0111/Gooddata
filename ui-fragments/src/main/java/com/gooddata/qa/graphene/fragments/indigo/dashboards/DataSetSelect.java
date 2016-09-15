@@ -13,4 +13,10 @@ public class DataSetSelect extends AbstractReactDropDown {
     protected String getSearchInputCssSelector() {
         return null;
     }
+
+    @Override
+    protected String getListItemsCssSelector() {
+        // need to remove item headers like RECOMMENDED, OTHER from list of items
+        return ".gd-list-item:not(.is-header):not(.gd-list-item-header)";
+    }
 }

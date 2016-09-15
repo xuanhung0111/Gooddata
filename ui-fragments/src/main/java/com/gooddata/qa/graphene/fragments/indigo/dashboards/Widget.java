@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import static com.gooddata.qa.graphene.fragments.indigo.dashboards.Widget.HINT_LOCATOR;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -15,6 +14,9 @@ import org.openqa.selenium.support.FindBy;
 public class Widget extends AbstractFragment {
 
     public static final By HINT_LOCATOR = By.cssSelector(".gd-editable-label:hover");
+
+    @FindBy(className = "dash-item-content")
+    private WebElement content;
 
     @FindBy(className = "dash-item-action-delete")
     protected WebElement deleteButton;
@@ -67,9 +69,16 @@ public class Widget extends AbstractFragment {
         return isElementVisible(deleteButton);
     }
 
+    public Widget clickOnContent() {
+        waitForElementVisible(content).click();
+
+        return this;
+    }
+
     public static enum DropZone {
         PREV(".dropzone.prev"),
-        NEXT(".dropzone.next");
+        NEXT(".dropzone.next"),
+        LAST(".s-last-drop-position");
 
         private String css;
 

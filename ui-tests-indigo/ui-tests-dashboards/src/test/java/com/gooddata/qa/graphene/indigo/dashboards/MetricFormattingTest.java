@@ -1,10 +1,10 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import static com.gooddata.qa.utils.http.RestUtils.deleteObject;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.addKpiWidgetToAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createKpiWidget;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteKpiWidgetFromAnalyticalDashboard;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.addWidgetToAnalyticalDashboard;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteWidgetsUsingCascase;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAnalyticalDashboards;
+import static java.util.Collections.singletonList;
 
 import java.io.IOException;
 
@@ -21,15 +21,20 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
-import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getDateDataSetCreatedUri;
+import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-public class MetricFormattingTest extends DashboardWithWidgetsTest {
+public class MetricFormattingTest extends GoodSalesAbstractDashboardTest {
 
     private static final String PERCENT_OF_GOAL = "% of Goal";
+
+    @Override
+    protected void prepareSetupProject() throws Throwable {
+        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
+    }
 
     @DataProvider(name = "formattingProvider")
     public Object[][] formattingProvider() {
@@ -43,7 +48,7 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
         };
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, dataProvider = "formattingProvider", groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, dataProvider = "formattingProvider", groups = {"desktop"})
     public void testCustomMetricFormatting(Formatter format, String expectedValue, boolean compareFormat)
             throws ParseException, JSONException, IOException {
         String customFormatMetricName = "Custom format metric";
@@ -51,16 +56,14 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
         Metric customFormatMetric = getMdService().createObj(getProject(),
                 new Metric(customFormatMetricName, customFormatMetricMaql, format.toString()));
 
-        setupKpi(new KpiConfiguration.Builder()
-            .metric(customFormatMetricName)
-            .dataSet(DATE_CREATED)
-            .build()
-        );
+        startEditMode().addKpi(
+                new KpiConfiguration.Builder()
+                    .metric(customFormatMetricName)
+                    .dataSet(DATE_CREATED)
+                    .build()).saveEditModeWithWidgets();
 
         try {
-            Kpi lastKpi = initIndigoDashboardsPageWithWidgets()
-                .waitForAllKpiWidgetContentLoaded()
-                .getLastKpi();
+            Kpi lastKpi = initIndigoDashboardsPageWithWidgets().getLastWidget(Kpi.class);
 
             String screenshot = "testCustomMetricFormatting-" + format.name();
             takeScreenshot(browser, screenshot, getClass());
@@ -73,12 +76,11 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
             }
 
         } finally {
-            teardownKpi();
-            getMdService().removeObj(customFormatMetric);
+            deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(), customFormatMetric.getUri());
         }
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop", "mobile"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "mobile"})
     public void checkXssInMetricName(ITestContext context) throws JSONException, IOException {
         String xssHeadline = "<script>alert('Hi')</script>";
         String xssMetricName = "<button>" + PERCENT_OF_GOAL + "</button>";
@@ -87,21 +89,19 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
         final String projectId = testParams.getProjectId();
         final String dashboardUri = getAnalyticalDashboards(getRestApiClient(), projectId).get(0);
 
-        final String kpiUri = createKpiWidget(getRestApiClient(), projectId,
+        final String kpiUri = createKpiUsingRest(
                 new KpiMDConfiguration.Builder()
                     .title(xssMetricName)
                     .metric(xssMetric.getUri())
-                    .dateDataSet(getDateDataSetCreatedUri(getGoodDataClient(), projectId))
+                    .dateDataSet(getDateDatasetUri(DATE_CREATED))
                     .comparisonType(ComparisonType.NO_COMPARISON)
                     .comparisonDirection(ComparisonDirection.NONE)
                     .build()
         );
-        addKpiWidgetToAnalyticalDashboard(getRestApiClient(), projectId, dashboardUri, kpiUri);
+        addWidgetToAnalyticalDashboard(getRestApiClient(), projectId, dashboardUri, kpiUri);
 
         try {
-            Kpi lastKpi = initIndigoDashboardsPageWithWidgets()
-                .waitForAllKpiWidgetContentLoaded()
-                .getLastKpi();
+            Kpi lastKpi = initIndigoDashboardsPageWithWidgets().getLastWidget(Kpi.class);
 
             takeScreenshot(browser, "xss-in-metric-name", getClass());
             assertEquals(lastKpi.getHeadline(), xssMetricName);
@@ -110,7 +110,7 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
 
             Kpi selectedKpi = indigoDashboardsPage
                 .switchToEditMode()
-                .selectLastKpi();
+                .selectLastWidget(Kpi.class);
 
             selectedKpi.setHeadline(xssHeadline);
 
@@ -118,13 +118,11 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
             assertEquals(selectedKpi.getHeadline(), xssHeadline);
 
         } finally {
-            deleteKpiWidgetFromAnalyticalDashboard(getRestApiClient(), projectId, dashboardUri, kpiUri);
-            deleteObject(getRestApiClient(), kpiUri);
-            getMdService().removeObj(xssMetric);
+            deleteWidgetsUsingCascase(getRestApiClient(), projectId, xssMetric.getUri());
         }
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop", "mobile"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "mobile"})
     public void checkXssInMetricFormat() throws ParseException, JSONException, IOException {
         String xssFormatMetricName = "<button>" + PERCENT_OF_GOAL + "</button>";
         String xssFormatMetricMaql = "SELECT 1";
@@ -133,33 +131,29 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
         final String projectId = testParams.getProjectId();
         final String dashboardUri = getAnalyticalDashboards(getRestApiClient(), projectId).get(0);
 
-        final String kpiUri = createKpiWidget(getRestApiClient(), projectId,
+        final String kpiUri = createKpiUsingRest(
                 new KpiMDConfiguration.Builder()
                     .title(xssFormatMetricName)
                     .metric(xssFormatMetric.getUri())
-                    .dateDataSet(getDateDataSetCreatedUri(getGoodDataClient(), projectId))
+                    .dateDataSet(getDateDatasetUri(DATE_CREATED))
                     .comparisonType(ComparisonType.NO_COMPARISON)
                     .comparisonDirection(ComparisonDirection.NONE)
                     .build()
         );
-        addKpiWidgetToAnalyticalDashboard(getRestApiClient(), projectId, dashboardUri, kpiUri);
+        addWidgetToAnalyticalDashboard(getRestApiClient(), projectId, dashboardUri, kpiUri);
 
         try {
-            Kpi lastKpi = initIndigoDashboardsPageWithWidgets()
-                .waitForAllKpiWidgetContentLoaded()
-                .getLastKpi();
+            Kpi lastKpi = initIndigoDashboardsPageWithWidgets().getLastWidget(Kpi.class);
 
             takeScreenshot(browser, "xss-in-metric-format", getClass());
             assertEquals(lastKpi.getValue(), "<button>1.00</button>");
 
         } finally {
-            deleteKpiWidgetFromAnalyticalDashboard(getRestApiClient(), projectId, dashboardUri, kpiUri);
-            deleteObject(getRestApiClient(), kpiUri);
-            getMdService().removeObj(xssFormatMetric);
+            deleteWidgetsUsingCascase(getRestApiClient(), projectId, xssFormatMetric.getUri());
         }
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop", "mobile"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "mobile"})
     public void checkKpiStateWithNoDataMetric() throws JSONException, IOException {
         String invalidMetricName = "No data metric";
         String invalidMetricMaql = "SELECT 1 where 2 = 3";
@@ -168,29 +162,25 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
         final String projectId = testParams.getProjectId();
         final String dashboardUri = getAnalyticalDashboards(getRestApiClient(), projectId).get(0);
 
-        final String kpiUri = createKpiWidget(getRestApiClient(), projectId,
+        final String kpiUri = createKpiUsingRest(
                 new KpiMDConfiguration.Builder()
                     .title(invalidMetricName)
                     .metric(invalidMetric.getUri())
-                    .dateDataSet(getDateDataSetCreatedUri(getGoodDataClient(), projectId))
+                    .dateDataSet(getDateDatasetUri(DATE_CREATED))
                     .comparisonType(ComparisonType.NO_COMPARISON)
                     .comparisonDirection(ComparisonDirection.NONE)
                     .build()
         );
-        addKpiWidgetToAnalyticalDashboard(getRestApiClient(), projectId, dashboardUri, kpiUri);
+        addWidgetToAnalyticalDashboard(getRestApiClient(), projectId, dashboardUri, kpiUri);
 
         try {
-            Kpi lastKpi = initIndigoDashboardsPageWithWidgets()
-                .waitForAllKpiWidgetContentLoaded()
-                .getLastKpi();
+            Kpi lastKpi = initIndigoDashboardsPageWithWidgets().getLastWidget(Kpi.class);
 
             takeScreenshot(browser, "checkKpiStateWithNoDataMetric", getClass());
             assertTrue(lastKpi.isEmptyValue());
 
         } finally {
-            deleteKpiWidgetFromAnalyticalDashboard(getRestApiClient(), projectId, dashboardUri, kpiUri);
-            deleteObject(getRestApiClient(), kpiUri);
-            getMdService().removeObj(invalidMetric);
+            deleteWidgetsUsingCascase(getRestApiClient(), projectId, invalidMetric.getUri());
         }
     }
 }

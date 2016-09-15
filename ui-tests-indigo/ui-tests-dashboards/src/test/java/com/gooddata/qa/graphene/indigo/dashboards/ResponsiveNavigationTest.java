@@ -4,6 +4,8 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForStringInUrl;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
+import static java.util.Collections.singletonList;
 import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -19,11 +21,16 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.indigo.HamburgerMenu;
-import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
 
-public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
+public class ResponsiveNavigationTest extends GoodSalesAbstractDashboardTest {
 
     private boolean isTestedOnBrowserStack = false;
+
+    @Override
+    protected void prepareSetupProject() throws Throwable {
+        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
+    }
 
     @BeforeClass(alwaysRun = true)
     public void detectExecutionEnvironment() {
@@ -31,7 +38,7 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
         isTestedOnBrowserStack = executionEnv != null && executionEnv.contains("browserstack-mobile");
     }
 
-    @Test(dependsOnGroups = {"dashboardWidgetsInit"}, groups = {"mobile"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"mobile"})
     public void checkHamburgerMenuDisplayed() {
         if (!isDeviceSupportHamburgerMenu()) return;
 
@@ -43,7 +50,7 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
         indigoDashboardsPage.closeHamburgerMenu();
     }
 
-    @Test(dependsOnGroups = {"dashboardWidgetsInit"}, groups = {"mobile"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"mobile"})
     public void checkHamburgerMenuItems() {
         if (!isDeviceSupportHamburgerMenu()) return;
 
@@ -62,7 +69,7 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
         });
     }
 
-    @Test(dependsOnGroups = {"dashboardWidgetsInit"}, groups = {"mobile"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"mobile"})
     public void checkLogout() throws JSONException {
         if (!isDeviceSupportHamburgerMenu()) return;
 
@@ -78,7 +85,7 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardWidgetsInit"}, groups = {"mobile"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"mobile"})
     public void checkLandingPage() throws JSONException {
         String executionEnv = System.getProperty("test.execution.env");
         if (executionEnv == null || !executionEnv.contains("browserstack-mobile")) {
@@ -103,16 +110,16 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
             signIn(false, UserRoles.ADMIN);
             waitForFragmentVisible(indigoDashboardsPage)
                 .waitForDashboardLoad()
-                .waitForAllKpiWidgetsLoaded();
+                .waitForWidgetsLoading();
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardWidgetsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkHamburgerMenuNotPresentInDesktop() {
         assertFalse(initIndigoDashboardsPage().isHamburgerMenuLinkPresent());
     }
 
-    @Test(dependsOnGroups = {"dashboardWidgetsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void testNavigateToIndigoDashboardWithoutLogin() throws JSONException {
         try {
             initDashboardsPage();
@@ -125,7 +132,7 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardWidgetsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void accessDashboardsFromTopMenu() throws JSONException {
         initDashboardsPage();
         assertTrue(isElementPresent(className(ApplicationHeaderBar.KPIS_LINK_CLASS), browser));
@@ -136,7 +143,7 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
         ApplicationHeaderBar.goToKpisPage(browser);
         waitForFragmentVisible(indigoDashboardsPage)
             .waitForDashboardLoad()
-            .waitForAllKpiWidgetsLoaded();
+            .waitForWidgetsLoading();
     }
 
     private boolean isDeviceSupportHamburgerMenu() {

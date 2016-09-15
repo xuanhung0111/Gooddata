@@ -1,32 +1,24 @@
 package com.gooddata.qa.utils.http.indigo;
 
-import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.utils.http.RestUtils.CREATE_AND_GET_OBJ_LINK;
-import static com.gooddata.qa.utils.http.RestUtils.deleteObject;
-import static java.util.Arrays.asList;
+import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascase;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
-import com.gooddata.GoodData;
-import com.gooddata.md.Dataset;
-import com.gooddata.md.MetadataService;
-import com.gooddata.md.Metric;
-import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.VisualizationMDConfiguration;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.utils.http.RestApiClient;
+
 import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static java.lang.String.format;
@@ -36,10 +28,7 @@ import static java.lang.String.format;
  */
 public class IndigoRestUtils {
 
-    private static final String AMOUNT = "Amount";
-    private static final String LOST = "Lost";
-    private static final String NUM_OF_ACTIVITIES = "# of Activities";
-    private static final String DATE_DATA_SET_CREATED = "Date (Created)";
+    private static final Logger log = Logger.getLogger(IndigoRestUtils.class.getName());
 
     private static final Supplier<String> ANALYTICAL_DASHBOARD_BODY = () -> {
         try {
@@ -240,7 +229,7 @@ public class IndigoRestUtils {
     }
 
     /**
-     * Add KPI to analytical dashboard
+     * Add widget to analytical dashboard
      *
      * @param restApiClient
      * @param projectId
@@ -249,43 +238,13 @@ public class IndigoRestUtils {
      * @throws org.json.JSONException
      * @throws java.io.IOException
      */
-    public static void addKpiWidgetToAnalyticalDashboard(final RestApiClient restApiClient, final String projectId,
+    public static void addWidgetToAnalyticalDashboard(final RestApiClient restApiClient, final String projectId,
             final String dashboardUri, final String widgetUri) throws JSONException, IOException {
         final JSONObject dashboard = getJsonObject(restApiClient, dashboardUri);
         dashboard.getJSONObject("analyticalDashboard")
             .getJSONObject("content")
             .getJSONArray("widgets")
             .put(widgetUri);
-
-        executeRequest(restApiClient, restApiClient.newPutMethod(dashboardUri, dashboard.toString()), HttpStatus.OK);
-    }
-
-    /**
-     * Delete KPI from analytical dashboard
-     *
-     * @param restApiClient
-     * @param projectId
-     * @param dashboardUri
-     * @param widgetUri
-     * @throws org.json.JSONException
-     * @throws java.io.IOException
-     */
-    public static void deleteKpiWidgetFromAnalyticalDashboard(final RestApiClient restApiClient, final String projectId,
-            final String dashboardUri, final String widgetUri) throws JSONException, IOException {
-        final JSONObject dashboard = getJsonObject(restApiClient, dashboardUri);
-        final JSONArray widgets = dashboard.getJSONObject("analyticalDashboard")
-            .getJSONObject("content")
-            .getJSONArray("widgets");
-        final JSONArray newWidgets = new JSONArray();
-        for (int i = 0, n = widgets.length(); i < n; i++) {
-            final String uri = widgets.getString(i);
-            if (!widgetUri.equals(uri)) {
-                newWidgets.put(uri);
-            }
-        }
-        dashboard.getJSONObject("analyticalDashboard")
-            .getJSONObject("content")
-            .put("widgets", newWidgets);
 
         executeRequest(restApiClient, restApiClient.newPutMethod(dashboardUri, dashboard.toString()), HttpStatus.OK);
     }
@@ -315,78 +274,6 @@ public class IndigoRestUtils {
     }
 
     /**
-     * A helper method to prepare analytical dashboard with some kpis added
-     *
-     * @param restApiClient
-     * @param goodData
-     * @param projectId
-     * @throws org.json.JSONException
-     * @throws java.io.IOException
-     */
-    public static void prepareAnalyticalDashboardTemplate(final RestApiClient restApiClient,
-            final GoodData goodData, final String projectId) throws JSONException, IOException {
-        // delete all dashboards, if some exist
-        for (String dashboardLink: getAnalyticalDashboards(restApiClient, projectId)) {
-            deleteObject(restApiClient, dashboardLink);
-        }
-
-        final Project project = goodData.getProjectService().getProjectById(projectId);
-        final MetadataService service = goodData.getMetadataService();
-        final String amountMetricUri = service.getObjUri(project, Metric.class, title(AMOUNT));
-        final String lostMetricUri = service.getObjUri(project, Metric.class, title(LOST));
-        final String numOfActivitiesUri = service.getObjUri(project, Metric.class, title(NUM_OF_ACTIVITIES));
-        final String dataSetUri = getDateDataSetCreatedUri(goodData, projectId);
-
-        final String amountWidget = createKpiWidget(restApiClient, projectId, new KpiMDConfiguration.Builder()
-                .title(AMOUNT)
-                .metric(amountMetricUri)
-                .dateDataSet(dataSetUri)
-                .comparisonType(ComparisonType.NO_COMPARISON)
-                .comparisonDirection(ComparisonDirection.NONE)
-                .build());
-        final String lostWidget = createKpiWidget(restApiClient, projectId, new KpiMDConfiguration.Builder()
-                .title(LOST)
-                .metric(lostMetricUri)
-                .dateDataSet(dataSetUri)
-                .comparisonType(Kpi.ComparisonType.LAST_YEAR)
-                .comparisonDirection(Kpi.ComparisonDirection.BAD)
-                .build());
-        final String numOfActivitiesWidget = createKpiWidget(restApiClient, projectId, new KpiMDConfiguration.Builder()
-                .title(NUM_OF_ACTIVITIES)
-                .metric(numOfActivitiesUri)
-                .dateDataSet(dataSetUri)
-                .comparisonType(Kpi.ComparisonType.PREVIOUS_PERIOD)
-                .comparisonDirection(Kpi.ComparisonDirection.GOOD)
-                .build());
-        final String drillToWidget = createKpiWidget(restApiClient, projectId, new KpiMDConfiguration.Builder()
-                .title("DrillTo")
-                .metric(amountMetricUri)
-                .dateDataSet(dataSetUri)
-                .comparisonType(ComparisonType.NO_COMPARISON)
-                .comparisonDirection(ComparisonDirection.NONE)
-                .drillToDashboard("/gdc/md/p8aqohkx4htbrau1wpk6k68crltlojig/obj/916")
-                .drillToDashboardTab("adzD7xEmdhTx")
-                .build());
-
-        final List<String> widgetUris = asList(amountWidget, lostWidget, numOfActivitiesWidget, drillToWidget);
-        createAnalyticalDashboard(restApiClient, projectId, widgetUris);
-    }
-
-    /**
-     * Get date data set created uri
-     *
-     * @param goodData
-     * @param projectId
-     * @return date data set created uri
-     */
-    public static String getDateDataSetCreatedUri(final GoodData goodData, final String projectId) {
-        return goodData.getMetadataService()
-            .getObjUri(goodData.getProjectService().getProjectById(projectId),
-                    Dataset.class,
-                    title(DATE_DATA_SET_CREATED));
-    }
-
-    /**
      * Get all created insight names in a specified project
      *
      * @param restApiClient
@@ -395,7 +282,7 @@ public class IndigoRestUtils {
      */
     public static List<String> getAllInsightNames(final RestApiClient restApiClient, final String projectId)
             throws JSONException, IOException {
-        final JSONArray objects = getAllInsightObjects(restApiClient, projectId);
+        final JSONArray objects = getMdObjects(restApiClient, projectId, "visualizations");
         final List<String> insights = new ArrayList<>();
         for (int i = 0, n = objects.length(); i < n; i++) {
             insights.add(objects.getJSONObject(i).getString("title"));
@@ -414,14 +301,9 @@ public class IndigoRestUtils {
      * @throws JSONException
      * @throws IOException
      */
-    public static String getInsightUri(final String insight, final RestApiClient restApiClient, final String projectId)
-            throws JSONException, IOException {
-        final JSONArray objects = getAllInsightObjects(restApiClient, projectId);
-        for (int i = 0, n = objects.length(); i < n; i++) {
-            if(insight.equals(objects.getJSONObject(i).getString("title")))
-                return objects.getJSONObject(i).getString("link");
-        }
-        throw new RuntimeException("There is no insight named " + insight);
+    public static String getInsightUri(final String insight, final RestApiClient restApiClient,
+            final String projectId) throws JSONException, IOException {
+        return getMdObjectUriByTitle(insight, "visualizations", restApiClient, projectId);
     }
 
     /**
@@ -434,9 +316,72 @@ public class IndigoRestUtils {
         executeRequest(restApiClient, restApiClient.newDeleteMethod(dashboardUri), HttpStatus.NO_CONTENT);
     }
 
-    private static JSONArray getAllInsightObjects(final RestApiClient restApiClient, final String projectId)
+    public static String getKpiUri(final String kpi, final RestApiClient restApiClient, final String projectId)
             throws JSONException, IOException {
-        final String query = "/gdc/md/" + projectId + "/query/visualizations";
+        return getMdObjectUriByTitle(kpi, "kpi", restApiClient, projectId);
+    }
+
+    /**
+     * Delete widget and its dependencies and dashboards will be deleted when it contains no widget.
+     * 
+     * @param restApiClient
+     * @param projectId
+     * @param widgetUris
+     * @throws JSONException
+     * @throws IOException
+     */
+    public static void deleteWidgetsUsingCascase(final RestApiClient restApiClient, final String projectId,
+            final String... widgetUris) throws JSONException, IOException {
+
+        deleteObjectsUsingCascase(restApiClient, projectId, widgetUris);
+
+        // empty dashboard should be deleted right after widgets
+        // this makes UI & automation consistent
+        // if having more than 1 dashboard, the first one will be working project by default
+        final String workingDashboardUri = getAnalyticalDashboards(restApiClient, projectId).get(0);
+
+        if (getDashboardWidgetCount(restApiClient, workingDashboardUri) == 0) {
+            deleteAnalyticalDashboard(restApiClient, workingDashboardUri);
+            log.info("The working dashboard has been deleted");
+        }
+    }
+
+    /**
+     * Delete all dashboards and its dependencies.
+     * Theoretically, we can create many dashboards using REST
+     * This method helps us clean up environment
+     * 
+     * @param restApiClient
+     * @param projectId
+     * @throws JSONException
+     * @throws IOException
+     */
+    public static void deleteDashboardsUsingCascase(final RestApiClient restApiClient, final String projectId)
+            throws JSONException, IOException {
+        final List<String> dashboardUris = getAnalyticalDashboards(restApiClient, projectId);
+        deleteObjectsUsingCascase(restApiClient, projectId,
+                dashboardUris.toArray(new String[dashboardUris.size()]));
+    }
+
+    private static JSONArray getMdObjects(final RestApiClient restApiClient, final String projectId,
+            final String type) throws JSONException, IOException {
+        final String query = "/gdc/md/" + projectId + "/query/" + type;
         return getJsonObject(restApiClient, query).getJSONObject("query").getJSONArray("entries");
+    }
+
+    private static String getMdObjectUriByTitle(final String title, final String type,
+            final RestApiClient restApiClient, final String projectId) throws JSONException, IOException {
+        final JSONArray objects = getMdObjects(restApiClient, projectId, type);
+        for (int i = 0, n = objects.length(); i < n; i++) {
+            if(title.equals(objects.getJSONObject(i).getString("title")))
+                return objects.getJSONObject(i).getString("link");
+        }
+        throw new RuntimeException("There is no " + type + " titled " + title);
+    }
+
+    private static int getDashboardWidgetCount(final RestApiClient restApiClient, final String dashboardUri)
+            throws JSONException, IOException {
+        return getJsonObject(restApiClient, dashboardUri).getJSONObject("analyticalDashboard")
+                .getJSONObject("content").getJSONArray("widgets").length();
     }
 }

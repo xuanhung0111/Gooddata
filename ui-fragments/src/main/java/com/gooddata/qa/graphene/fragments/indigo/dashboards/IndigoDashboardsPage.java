@@ -4,13 +4,16 @@ import static com.gooddata.qa.browser.DragAndDropUtils.dragAndDropWithCustomBack
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.CssUtils.convertCSSClassTojQuerySelector;
+import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.id;
 
 import java.util.List;
@@ -19,7 +22,7 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -29,17 +32,15 @@ import com.gooddata.qa.graphene.fragments.indigo.HamburgerMenu;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Widget.DropZone;
 import com.gooddata.qa.graphene.utils.Sleeper;
-import com.google.common.collect.Iterables;
+import com.google.common.base.Predicate;
 
+@SuppressWarnings("unchecked")
 public class IndigoDashboardsPage extends AbstractFragment {
 
-    @FindBy(css = Kpi.KPI_CSS_SELECTOR)
-    private List<Kpi> kpis;
+    @FindBy(className = "dash-item")
+    private List<Widget> widgets;
 
-    @FindBy(css = Visualization.MAIN_SELECTOR)
-    private List<Visualization> visualizations;
-
-    @FindBy(className = "splashscreen")
+    @FindBy(className = SPLASH_SCREEN_CLASS_NAME)
     private SplashScreen splashScreen;
 
     @FindBy(className = "gd-header")
@@ -60,12 +61,6 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(css = ".dash-nav-right .configuration-panel")
     private ConfigurationPanel configurationPanel;
 
-    @FindBy(className = ADD_KPI_PLACEHOLDER_CLASS_NAME)
-    private WebElement addKpiPlaceholder;
-
-    @FindBy(xpath = "//*[contains(concat(' ', normalize-space(@class), ' '), ' s-dialog ')]")
-    private ConfirmDialog dialog;
-
     @FindBy(className = "dash-filters-date")
     private DateFilter dateFilter;
 
@@ -75,17 +70,14 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(css = ".dash-filters-attribute.are-loaded")
     private AttributeFiltersPanel attributeFiltersPanel;
 
-    @FindBy(className = VISUALIZATIONS_LIST_CLASS_NAME)
-    private VisualizationsList visualizationsList;
-
-    private static final String DASHBOARD_BODY = "dash-section-kpis";
     private static final String EDIT_BUTTON_CLASS_NAME = "s-edit_button";
     private static final String SAVE_BUTTON_CLASS_NAME = "s-save_button";
     private static final String DELETE_BUTTON_CLASS_NAME = "s-delete_dashboard";
     private static final String ALERTS_LOADED_CLASS_NAME = "alerts-loaded";
-    private static final String VISUALIZATIONS_LIST_CLASS_NAME = "gd-visualizations-list";
-    private static final String ADD_KPI_PLACEHOLDER_CLASS_NAME = "add-kpi-placeholder";
-    private static final String LAST_DROPZONE_CLASS_NAME = "s-last-drop-position";
+    private static final String SPLASH_SCREEN_CLASS_NAME = "splashscreen";
+
+    private static final String ADD_KPI_PLACEHOLDER = ".add-kpi-placeholder";
+    private static final String DASHBOARD_BODY = ".dash-section";
 
     private static final By DASHBOARD_LOADED = By.cssSelector(".is-dashboard-loaded");
     private static final By SAVE_BUTTON_ENABLED = By.cssSelector("." + SAVE_BUTTON_CLASS_NAME + ":not(.disabled)");
@@ -98,6 +90,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public SplashScreen getSplashScreen() {
         return waitForFragmentVisible(splashScreen);
+    }
+
+    public boolean isSplashScreenPresent() {
+        return isElementPresent(className(SPLASH_SCREEN_CLASS_NAME), browser);
     }
 
     public ConfigurationPanel getConfigurationPanel() {
@@ -116,8 +112,24 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return waitForKpiEditable();
     }
 
-    public IndigoDashboardsPage cancelEditMode() {
+    public IndigoDashboardsPage cancelEditModeWithoutChange() {
         waitForElementVisible(cancelButton).click();
+        waitForElementNotVisible(cancelButton);
+
+        return this;
+    }
+
+    public IndigoDashboardsPage cancelEditModeWithChanges() {
+        waitForElementVisible(cancelButton).click();
+        ConfirmDialog.getInstance(browser).submitClick();
+        waitForElementNotVisible(cancelButton);
+
+        return this;
+    }
+
+    public IndigoDashboardsPage tryCancelingEditModeWithoutApplying() {
+        waitForElementVisible(cancelButton).click();
+        ConfirmDialog.getInstance(browser).cancelClick();
 
         return this;
     }
@@ -125,15 +137,14 @@ public class IndigoDashboardsPage extends AbstractFragment {
     public IndigoDashboardsPage saveEditModeWithWidgets() {
         waitForElementVisible(enabledSaveButton).click();
         waitForElementVisible(editButton);
-        waitForAllKpiWidgetContentLoaded();
-        waitForAllInsightWidgetContentLoaded();
+        waitForWidgetsLoading();
 
         return this;
     }
 
-    public IndigoDashboardsPage saveEditModeWithoutKpis() {
+    public IndigoDashboardsPage saveEditModeWithoutWidgets() {
         waitForElementVisible(enabledSaveButton).click();
-        this.waitForDialog().submitClick();
+        ConfirmDialog.getInstance(browser).submitClick();
         waitForFragmentVisible(splashScreen);
 
         return this;
@@ -149,111 +160,12 @@ public class IndigoDashboardsPage extends AbstractFragment {
             return saveEditModeWithWidgets();
         }
 
-        return cancelEditMode();
-    }
+        waitForElementVisible(cancelButton).click();
+        if(ConfirmDialog.isPresent(browser))
+            ConfirmDialog.getInstance(browser).submitClick();
 
-    public ConfirmDialog waitForDialog() {
-        waitForElementVisible(dialog.getRoot());
-        return dialog;
-    }
-
-    public int getKpisCount() {
-        return kpis.size();
-    }
-
-    public int getVisualizationsCount() {
-        return visualizations.size();
-    }
-
-    public Kpi selectKpi(int index) {
-        Kpi tempKpi = getKpiByIndex(index);
-        waitForElementPresent(tempKpi.getRoot());
-        tempKpi.clickKpiContent();
-
-        waitForFragmentVisible(configurationPanel).waitForButtonsLoaded();
-        return tempKpi;
-    }
-
-    public Kpi selectLastKpi() {
-        return selectKpi(kpis.size() - 1);
-    }
-
-    public Kpi getFirstKpi() {
-        return getKpiByIndex(0);
-    }
-
-    public Kpi getLastKpi() {
-        return getKpiByIndex(kpis.size() - 1);
-    }
-
-    public Visualization getLastVisualization() {
-        return getVisualizationByIndex(visualizations.size() - 1);
-    }
-
-    public Visualization selectVisualization(int index) {
-        Visualization visualization = getVisualizationByIndex(index);
-        waitForElementPresent(visualization.getRoot()).click();
-        return visualization;
-    }
-
-    public Visualization selectLastVisualization() {
-        return selectVisualization(visualizations.size() - 1);
-    }
-
-    public IndigoDashboardsPage clickLastKpiDeleteButton() {
-        selectLastKpi().clickDeleteButton();
-
+        waitForElementNotVisible(cancelButton);
         return this;
-    }
-
-    public IndigoDashboardsPage deleteKpi(int index) {
-        selectKpi(index).clickDeleteButton();
-
-        return this;
-    }
-
-    public IndigoDashboardsPage deleteKpi(Kpi kpi) {
-        kpi.clickDeleteButton();
-
-        return this;
-    }
-
-    public String getValueFromKpi(final String name) {
-        return Iterables.find(kpis, input -> name.equals(input.getHeadline())).getValue();
-    }
-
-    public Kpi getKpiByIndex(int index) {
-        final Kpi kpi = waitForCollectionIsNotEmpty(kpis).get(index);
-
-        // Indigo DashBoard can load only one Kpi on mobile screen, and the others will present in DOM
-        // and just visible when scrolling down, so the Kpi we need to work with may not be visible and interact.
-        // And selenium script cannot do anything when an element is not visible.
-        // In this stage, java script will be good solution when it can scroll to an element
-        // although the element just present and not visible.
-
-        // And the way java script makes element visible is not like when doing manual,
-        // it just scroll and calculate until it think the element visible.
-        // So in reality view, the element may show full or just a small part of it.
-        if (!isElementVisible(kpi.getRoot())) {
-            scrollElementIntoView(kpi.getRoot(), browser);
-        }
-
-        return waitForFragmentVisible(kpi);
-    }
-
-    public String getKpiTitle(int index) {
-        return getKpiByIndex(index).getHeadline();
-    }
-
-    public Visualization getVisualizationByIndex(int index) {
-        return visualizations.get(index);
-    }
-
-    public Kpi getKpiByHeadline(final String headline) {
-        return kpis.stream()
-            .filter(kpi -> headline.equals(kpi.getHeadline()))
-            .findFirst()
-            .orElseThrow(() -> new NoSuchElementException("Cannot find Kpi with headline: " + headline));
     }
 
     public IndigoDashboardsPage waitForDashboardLoad() {
@@ -262,53 +174,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
-    public IndigoDashboardsPage waitForAllKpiWidgetsLoaded() {
-        waitForElementNotPresent(Kpi.IS_WIDGET_LOADING);
-
-        return this;
-    }
-
-    public IndigoDashboardsPage waitForAllInsightWidgetsLoaded() {
-        waitForElementNotPresent(Visualization.IS_WIDGET_LOADING);
-        return this;
-    }
-
-    public IndigoDashboardsPage waitForAnyKpiWidgetContentLoading() {
-        int KPI_INITIATE_LOAD_TIMEOUT_SECONDS = 2;
-        // wait until the loading is initiated. If not, assume kpi widget
-        // was already reloaded, even before we started waiting
-        try {
-            waitForElementVisible(Kpi.IS_CONTENT_LOADING, browser, KPI_INITIATE_LOAD_TIMEOUT_SECONDS);
-        } catch (TimeoutException ex) { }
-
-        return this;
-    }
-
-    public IndigoDashboardsPage waitForAllKpiWidgetContentLoaded() {
-        waitForAllKpiWidgetsLoaded();
-        waitForElementNotPresent(Kpi.IS_CONTENT_LOADING);
-
-        return this;
-    }
-
-    public IndigoDashboardsPage waitForAllInsightWidgetContentLoaded() {
-        waitForAllInsightWidgetsLoaded();
-        waitForElementNotPresent(Visualization.IS_CONTENT_LOADING);
-        return this;
-    }
-
-    public IndigoDashboardsPage waitForKpiEditable() {
-        waitForElementNotPresent(Kpi.IS_NOT_EDITABLE);
-        return this;
-    }
-
-    public IndigoDashboardsPage dragAddKpiPlaceholder() {
-        waitForElementPresent(addKpiPlaceholder);
-        addKpiWidget();
-        return this;
-    }
-
-    public IndigoDashboardsPage addWidget(KpiConfiguration config) {
+    public IndigoDashboardsPage addKpi(KpiConfiguration config) {
         dragAddKpiPlaceholder();
         configurationPanel
             .selectMetricByName(config.getMetric())
@@ -322,7 +188,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
             configurationPanel.selectDrillToByName(config.getDrillTo());
         }
 
-        return waitForAllKpiWidgetContentLoaded();
+        return waitForWidgetsLoading();
     }
 
     public boolean isEditButtonVisible() {
@@ -335,54 +201,26 @@ public class IndigoDashboardsPage extends AbstractFragment {
     }
 
     public IndigoDashboardsPage selectDateFilterByName(String dateFilterName) {
-        waitForAllKpiWidgetContentLoaded();
+        waitForWidgetsLoading();
 
         waitForFragmentVisible(dateFilter)
             .selectByName(dateFilterName);
 
-        return waitForAllKpiWidgetContentLoaded();
+        return waitForWidgetsLoading();
     }
 
-    public String getDateFilterSelection() {
-        return waitForFragmentVisible(dateFilter).getSelection();
-    }
+    public IndigoDashboardsPage dragWidget(final Widget source, final Widget target, DropZone dropZone) {
+        final String sourceSelector = convertCSSClassTojQuerySelector(source.getRoot().getAttribute("class"));
+        final String targetSelector = convertCSSClassTojQuerySelector(target.getRoot().getAttribute("class"));
+        final String dropZoneSelector = targetSelector + " " + dropZone.getCss();
 
-    public AttributeFiltersPanel waitForAttributeFilters() {
-        return waitForFragmentVisible(attributeFiltersPanel);
-    }
-
-    public IndigoDashboardsPage waitForAlertsLoaded() {
-        waitForElementPresent(By.className(ALERTS_LOADED_CLASS_NAME), browser);
-        return this;
-    }
-
-    public IndigoDashboardsPage deleteDashboard(boolean confirm) {
-        waitForElementVisible(deleteButton).click();
-        ConfirmDialog deleteConfirmDialog = waitForDialog();
-
-        if (confirm) {
-            deleteConfirmDialog.submitClick();
-            waitForElementNotPresent(deleteButton);
-        } else {
-            deleteConfirmDialog.cancelClick();
-        }
+        dragAndDropWithCustomBackend(browser, sourceSelector, targetSelector, dropZoneSelector);
 
         return this;
     }
 
-    public boolean isDeleteButtonVisible() {
-        return isElementPresent(By.className(DELETE_BUTTON_CLASS_NAME), this.getRoot());
-    }
-
-    public IndigoDashboardsPage waitForSplashscreenMissing() {
-        waitForFragmentNotVisible(splashScreen);
-        return this;
-    }
-
-    public IndigoDashboardsPage waitForEditingControls() {
-        waitForElementVisible(saveButton);
-        waitForElementVisible(cancelButton);
-        return this;
+    public boolean searchInsight(final String insight) {
+        return getInsightSelectionPanel().searchInsight(insight);
     }
 
     public void logout() {
@@ -403,7 +241,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     }
 
     public IndigoDashboardsPage switchProject(String name) {
-        System.out.println("Switching to project: " + name);
+        log.info("Switching to project: " + name);
         waitForFragmentVisible(header).switchProject(name);
 
         return this;
@@ -413,46 +251,167 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return waitForFragmentVisible(header).getCurrentProjectName();
     }
 
-    public void waitForVisualizationsListAbsent() {
-        waitForFragmentNotVisible(visualizationsList);
+    public IndigoDashboardsPage deleteDashboard(boolean confirm) {
+        waitForElementVisible(deleteButton).click();
+        ConfirmDialog deleteConfirmDialog = ConfirmDialog.getInstance(browser);
+
+        if (confirm) {
+            deleteConfirmDialog.submitClick();
+            waitForElementNotPresent(deleteButton);
+        } else {
+            deleteConfirmDialog.cancelClick();
+        }
+
+        return this;
     }
 
-    public VisualizationsList getVisualizationsList() {
-        return waitForFragmentVisible(visualizationsList);
+    public boolean isDeleteButtonVisible() {
+        return isElementPresent(By.className(DELETE_BUTTON_CLASS_NAME), this.getRoot());
     }
 
-    public boolean isVisualizationsListPresent() {
-        return isElementPresent(By.className(VISUALIZATIONS_LIST_CLASS_NAME), this.getRoot());
+    public IndigoDashboardsPage waitForSplashscreenMissing() {
+        waitForFragmentNotVisible(splashScreen);
+        return this;
+    }
+
+    public String getDateFilterSelection() {
+        return waitForFragmentVisible(dateFilter).getSelection();
+    }
+
+    public AttributeFiltersPanel waitForAttributeFilters() {
+        return waitForFragmentVisible(attributeFiltersPanel);
+    }
+
+    public IndigoDashboardsPage waitForAlertsLoaded() {
+        waitForElementPresent(By.className(ALERTS_LOADED_CLASS_NAME), browser);
+        return this;
+    }
+
+    public IndigoDashboardsPage waitForEditingControls() {
+        waitForElementVisible(saveButton);
+        waitForElementVisible(cancelButton);
+        return this;
+    }
+
+    public IndigoDashboardsPage waitForWidgetsLoading() {
+        // ensure dots element is present
+        sleepTightInSeconds(1);
+
+        Predicate<WebDriver> isDotsElementPresent = browser -> !isElementPresent(className("gd-loading-dots"), browser);
+        Graphene.waitGui().until(isDotsElementPresent);
+
+        return this;
+    }
+
+    public <T extends Widget> T getWidgetByIndex(final Class<T> clazz, final int index) {
+        return initWidgetObject(clazz, scrollWidgetIntoView(getWidgets().get(index)));
+    }
+
+    public <T extends Widget> T getWidgetByHeadline(final Class<T> clazz, final String headline) {
+        return initWidgetObject(clazz, scrollWidgetIntoView(
+                getWidgets().stream()
+                    .filter(widget -> headline.equals(widget.getHeadline()))
+                    .findFirst()
+                    .orElseThrow(() -> new NoSuchElementException("Cannot find widget with headline: " + headline))));
+    }
+
+    public <T extends Widget> T getLastWidget(final Class<T> clazz) {
+        return getWidgetByIndex(clazz, getWidgets().size() - 1);
+    }
+
+    public <T extends Widget> T getFirstWidget(final Class<T> clazz) {
+        return getWidgetByIndex(clazz, 0);
+    }
+
+    public <T extends Widget> T selectWidget(final Class<T> clazz, final int index) {
+        return (T) getWidgetByIndex(clazz, index).clickOnContent();
+    }
+
+    public <T extends Widget> T selectFirstWidget(final Class<T> clazz) {
+        return selectWidget(clazz, 0);
+    }
+
+    public <T extends Widget> T selectLastWidget(final Class<T> clazz) {
+        return selectWidget(clazz, getWidgets().size() - 1);
+    }
+
+    public int getKpisCount() {
+        return (int) getWidgets().stream().filter(Kpi::isKpi).count();
+    }
+
+    public int getInsightsCount() {
+        return (int) getWidgets().stream().filter(Insight::isInsight).count();
+    }
+
+    public IndigoDashboardsPage dragAddKpiPlaceholder() {
+        // should fetch dashboard elements to avoid caching in view mode
+        waitForElementVisible(cssSelector(ADD_KPI_PLACEHOLDER), getRoot());
+        dragAndDropWithCustomBackend(browser, ADD_KPI_PLACEHOLDER, DASHBOARD_BODY, DropZone.LAST.getCss());
+
+        return this;
+    }
+
+    /**
+     * Add an insight to last position in dashboard by drag and drop mode
+     * @param insight
+     * @return
+     */
+    public IndigoDashboardsPage addInsight(final String insight) {
+        dragAndDropWithCustomBackend(browser,
+                convertCSSClassTojQuerySelector(
+                        getInsightSelectionPanel().getInsightItem(insight).getRoot().getAttribute("class")),
+                DASHBOARD_BODY, DropZone.LAST.getCss());
+
+        return this;
+    }
+
+    public IndigoDashboardsPage addInsightUsingDoubleClick(final String insight) {
+        getInsightSelectionPanel().addInsightUsingDoubleClick(insight);
+        return this;
     }
 
     public IndigoInsightSelectionPanel getInsightSelectionPanel() {
         return IndigoInsightSelectionPanel.getInstance(browser);
     }
 
-    public IndigoDashboardsPage addInsightToLastPosition(final String insight) {
-        getInsightSelectionPanel().addInsightToLastPosition(insight);
+    private IndigoDashboardsPage waitForKpiEditable() {
+        waitForElementNotPresent(Kpi.IS_NOT_EDITABLE);
         return this;
     }
 
-    public IndigoDashboardsPage addKpiWidget() {
-        final String sourceCssSelector = convertCSSClassTojQuerySelector(ADD_KPI_PLACEHOLDER_CLASS_NAME);
-        final String targetCssSelector = convertCSSClassTojQuerySelector(DASHBOARD_BODY);
-        final String dropZoneCssSelector = convertCSSClassTojQuerySelector(LAST_DROPZONE_CLASS_NAME);
+    private Widget scrollWidgetIntoView(final Widget widget) {
+        // Indigo DashBoard can load only one widget on mobile screen, and the others will present in DOM
+        // and just visible when scrolling down, so the widget we need to work with may not be visible and interact.
+        // And selenium script cannot do anything when an element is not visible.
+        // In this stage, java script will be good solution when it can scroll to an element
+        // although the element just present and not visible.
 
-        dragAndDropWithCustomBackend(browser, sourceCssSelector, targetCssSelector, dropZoneCssSelector);
-        return this;
+        // And the way java script makes element visible is not like when doing manual,
+        // it just scroll and calculate until it think the element visible.
+        // So in reality view, the element may show full or just a small part of it.
+        if (!isElementVisible(widget.getRoot())) {
+            scrollElementIntoView(widget.getRoot(), browser);
+        }
+
+        return waitForFragmentVisible(widget);
     }
 
-    public IndigoDashboardsPage reoderWidget(final Widget source, final Widget target, DropZone dropZone) {
-        final String sourceCssSelector = convertCSSClassTojQuerySelector(source.getRoot().getAttribute("class"));
-        final String targetCssSelector = convertCSSClassTojQuerySelector(target.getRoot().getAttribute("class"));
-        final String dropZoneCssSelector = targetCssSelector + " " + dropZone.getCss();
-
-        dragAndDropWithCustomBackend(browser, sourceCssSelector, targetCssSelector, dropZoneCssSelector);
-        return this;
+    private List<Widget> getWidgets() {
+        return waitForDashboardLoad().waitForWidgetsLoading().widgets;
     }
 
-    public boolean searchInsight(final String insight) {
-        return getInsightSelectionPanel().searchInsight(insight);
+    private <T extends Widget> T initWidgetObject(final Class<T> clazz, final Widget widget) {
+        if (clazz.isAssignableFrom(Kpi.class) && Kpi.isKpi(widget)) {
+            return (T) Kpi.getInstance(widget.getRoot());
+        }
+
+        if (clazz.isAssignableFrom(Insight.class) && Insight.isInsight(widget)) {
+            return (T) Insight.getInstance(widget.getRoot());
+        }
+
+        if (clazz.isAssignableFrom(Widget.class))
+            return (T) widget;
+
+        throw new RuntimeException("Widget type is not correct !!!");
     }
 }
