@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import com.gooddata.qa.graphene.entity.visualization.VisualizationMDConfiguration;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -9,30 +10,26 @@ import static org.testng.Assert.assertEquals;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.VisualizationsList;
-import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
 
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidget;
-
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
+import static java.util.Collections.singletonList;
 
 import java.io.IOException;
 
-import com.gooddata.qa.browser.DragAndDropUtils;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
-
-public class VisualizationsTest extends DashboardWithWidgetsTest {
+public class VisualizationsTest extends GoodSalesAbstractDashboardTest {
 
     private final String VISUALIZATION_TITLE = "last_dummy_viz";
     private final String VISUALIZATION_TYPE_BAR = "bar";
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
-    public void setupVisualizations() throws JSONException, IOException {
-        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS_VISUALIZATIONS, true);
+    @Override
+    protected void prepareSetupProject() throws Throwable {
+        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
+    }
 
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    public void setupVisualizations() throws JSONException, IOException {
         createVisualizationWidget(getRestApiClient(), testParams.getProjectId(),
                 new VisualizationMDConfiguration.Builder()
                         .title(VISUALIZATION_TITLE)
@@ -42,31 +39,27 @@ public class VisualizationsTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"setupVisualizations"}, groups = {"desktop"})
     public void addVisualizationToLastPositionUsingDoubleClick() {
-        WebElement visualizationItem = initIndigoDashboardsPageWithWidgets()
+        initIndigoDashboardsPageWithWidgets()
                 .switchToEditMode()
-                .getVisualizationsList()
-                .getVisualizationsListItems()
-                .get(0);
-
-        Actions action = new Actions(browser);
-        action.doubleClick(visualizationItem).perform();
+                .getInsightSelectionPanel()
+                .addInsightUsingDoubleClick(VISUALIZATION_TITLE);
 
         waitForFragmentVisible(indigoDashboardsPage).leaveEditMode();
 
-        int visualizationsCount = indigoDashboardsPage.getVisualizationsCount();
+        int visualizationsCount = indigoDashboardsPage.getInsightsCount();
 
         takeScreenshot(browser, "checkAddVisualizationToLastPositionUsingDoubleClick-added_1_visualization", getClass());
         assertEquals(visualizationsCount, 1);
 
         indigoDashboardsPage
                 .switchToEditMode()
-                .selectLastVisualization()
+                .selectLastWidget(Insight.class)
                 .clickDeleteButton();
 
         indigoDashboardsPage
                 .leaveEditMode();
 
-        visualizationsCount = indigoDashboardsPage.getVisualizationsCount();
+        visualizationsCount = indigoDashboardsPage.getInsightsCount();
 
         takeScreenshot(browser, "checkAddVisualizationToLastPositionUsingDoubleClick-removed_visualization", getClass());
         assertEquals(visualizationsCount, 0);
@@ -76,32 +69,24 @@ public class VisualizationsTest extends DashboardWithWidgetsTest {
     public void checkaddVisualizationFromList() {
         initIndigoDashboardsPageWithWidgets()
                 .switchToEditMode()
-                .getVisualizationsList()
-                .getVisualizationsListItems()
-                .get(0);
-
-        String fromSelector = "." + VisualizationsList.MAIN_CLASS + ".s-" + VISUALIZATION_TITLE;
-        String toSelector = ".dash-item-0";
-        String dropSelector = ".dash-item-0 .dropzone." + DASH_WIDGET_PREV_DROPZONE_CLASS;
-
-        DragAndDropUtils.dragAndDropWithCustomBackend(browser, fromSelector, toSelector, dropSelector);
+                .addInsight(VISUALIZATION_TITLE);
 
         waitForFragmentVisible(indigoDashboardsPage).leaveEditMode();
 
-        int visualizationsCount = indigoDashboardsPage.getVisualizationsCount();
+        int visualizationsCount = indigoDashboardsPage.getInsightsCount();
 
         takeScreenshot(browser, "checkaddVisualizationFromList-added_1_visualization", getClass());
         assertEquals(visualizationsCount, 1);
 
         indigoDashboardsPage
                 .switchToEditMode()
-                .selectLastVisualization()
+                .selectLastWidget(Insight.class)
                 .clickDeleteButton();
 
         indigoDashboardsPage
                 .leaveEditMode();
 
-        visualizationsCount = indigoDashboardsPage.getVisualizationsCount();
+        visualizationsCount = indigoDashboardsPage.getInsightsCount();
 
         takeScreenshot(browser, "checkaddVisualizationFromList-removed_visualization", getClass());
         assertEquals(visualizationsCount, 0);

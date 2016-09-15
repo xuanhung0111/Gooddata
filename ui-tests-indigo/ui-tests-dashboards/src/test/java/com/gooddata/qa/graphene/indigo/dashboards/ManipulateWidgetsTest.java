@@ -4,44 +4,62 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
+import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
+import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 
-import org.testng.annotations.BeforeClass;
+import java.util.List;
+import java.util.UUID;
+
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoInsightSelectionPanel;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.MetricSelect;
-import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
 
-public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
+public class ManipulateWidgetsTest extends GoodSalesAbstractDashboardTest {
 
     private static final String TEST_HEADLINE = "Test headline";
     private static final String HINT_FOR_EDIT_NAME_BORDER_COLOR = "rgba(177, 193, 209, 0.5)";
     private static final String LONG_NAME_METRIC = "# test metric with longer name is shortened";
     private static final String PATTERN_OF_METRIC_NAME = "is shortened";
 
-    @BeforeClass(alwaysRun = true)
     @Override
-    public void before() {
-        super.before();
-        validateAfterClass = true;
+    protected void setDashboardFeatureFlags() {
+        // turn off insight flag is a requirement
+        setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    @Override
+    protected void prepareSetupProject() throws Throwable {
+        final List<String> kpiUris = asList(createAmountKpi(), createLostKpi(), createNumOfActivitiesKpi());
+        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), kpiUris);
+    }
+
+    @Override
+    public void turnOffProjectValidation() {
+        // turning off the validation is not necessary in this test
+    }
+
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkEditModeCancelNoChanges() {
         Kpi selectedKpi = initIndigoDashboardsPageWithWidgets()
             .selectDateFilterByName(DATE_FILTER_ALL_TIME)
             .switchToEditMode()
-            .selectKpi(0);
+            .selectFirstWidget(Kpi.class);
 
         String kpiHeadline = selectedKpi.getHeadline();
         String kpiValue = selectedKpi.getValue();
 
-        waitForFragmentVisible(indigoDashboardsPage).cancelEditMode();
+        waitForFragmentVisible(indigoDashboardsPage).cancelEditModeWithoutChange();
 
         assertEquals(selectedKpi.getHeadline(), kpiHeadline);
         assertEquals(selectedKpi.getValue(), kpiValue);
@@ -49,11 +67,11 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
         takeScreenshot(browser, "checkEditModeCancelNoChanges", getClass());
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkKpiTitleChangeAndDiscard() {
         Kpi selectedKpi = initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
-            .selectKpi(0);
+            .selectFirstWidget(Kpi.class);
 
         String kpiHeadline = selectedKpi.getHeadline();
         String modifiedHeadline = generateUniqueHeadlineTitle();
@@ -62,19 +80,16 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
         assertNotEquals(selectedKpi.getHeadline(), kpiHeadline);
 
-        waitForFragmentVisible(indigoDashboardsPage)
-                .cancelEditMode()
-                .waitForDialog()
-                .submitClick();
+        waitForFragmentVisible(indigoDashboardsPage).cancelEditModeWithChanges();
 
         assertEquals(selectedKpi.getHeadline(), kpiHeadline);
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkKpiTitleChangeAndAbortCancel() {
         Kpi selectedKpi = initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
-            .selectKpi(0);
+            .selectFirstWidget(Kpi.class);
 
         String kpiHeadline = selectedKpi.getHeadline();
         String modifiedHeadline = generateUniqueHeadlineTitle();
@@ -83,20 +98,17 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
         assertNotEquals(selectedKpi.getHeadline(), kpiHeadline);
 
-        waitForFragmentVisible(indigoDashboardsPage)
-                .cancelEditMode()
-                .waitForDialog()
-                .cancelClick();
+        waitForFragmentVisible(indigoDashboardsPage).tryCancelingEditModeWithoutApplying();
 
         assertEquals(selectedKpi.getHeadline(), modifiedHeadline);
         assertNotEquals(selectedKpi.getHeadline(), kpiHeadline);
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkKpiTitleChangeAndSave() {
         Kpi selectedKpi = initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
-            .selectKpi(0);
+            .selectFirstWidget(Kpi.class);
 
         String uniqueHeadline = generateUniqueHeadlineTitle();
         selectedKpi.setHeadline(uniqueHeadline);
@@ -108,11 +120,11 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
         takeScreenshot(browser, "checkKpiTitleChangeAndSave-" + uniqueHeadline, getClass());
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkKpiTitleChangeWhenMetricChange() {
         Kpi selectedKpi = initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
-            .selectKpi(0);
+            .selectFirstWidget(Kpi.class);
 
         selectedKpi.setHeadline("");
 
@@ -130,11 +142,11 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
         assertNotEquals(selectedKpi.getHeadline(), metricHeadline);
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkKpiTitlePersistenceWhenMetricChange() {
         Kpi selectedKpi = initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
-            .selectKpi(0);
+            .selectFirstWidget(Kpi.class);
 
         waitForFragmentVisible(indigoDashboardsPage).getConfigurationPanel()
             .selectMetricByName(METRIC_AMOUNT)
@@ -154,7 +166,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
         takeScreenshot(browser, "checkKpiTitlePersistenceWhenMetricChange-" + TEST_HEADLINE, getClass());
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkDeleteKpiConfirmAndSave() {
         int kpisCount = initIndigoDashboardsPageWithWidgets().getKpisCount();
 
@@ -162,7 +174,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
         waitForFragmentVisible(indigoDashboardsPage)
             .switchToEditMode()
-            .addWidget(new KpiConfiguration.Builder()
+            .addKpi(new KpiConfiguration.Builder()
                 .metric(METRIC_AMOUNT)
                 .dataSet(DATE_CREATED)
                 .build())
@@ -171,58 +183,42 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
         assertEquals(kpisCountAfterAdd, indigoDashboardsPage.getKpisCount());
         assertEquals(kpisCountAfterAdd, initIndigoDashboardsPageWithWidgets().getKpisCount());
 
-        indigoDashboardsPage
-            .switchToEditMode()
-            .clickLastKpiDeleteButton()
-            .waitForDialog()
-            .submitClick();
-
+        indigoDashboardsPage.switchToEditMode().getLastWidget(Kpi.class).delete();
         indigoDashboardsPage.saveEditModeWithWidgets();
 
         assertEquals(kpisCount, initIndigoDashboardsPageWithWidgets().getKpisCount());
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkDeleteKpiConfirmAndDiscard() {
         int kpisCount = initIndigoDashboardsPageWithWidgets().getKpisCount();
 
-        waitForFragmentVisible(indigoDashboardsPage)
-            .switchToEditMode()
-            .deleteKpi(0)
-            .waitForDialog()
-            .submitClick();
+        waitForFragmentVisible(indigoDashboardsPage).switchToEditMode().getFirstWidget(Kpi.class).delete();
 
-        indigoDashboardsPage
-            .cancelEditMode()
-            .waitForDialog()
-            .submitClick();
-
-        assertEquals(kpisCount, indigoDashboardsPage.getKpisCount());
+        assertEquals(kpisCount, indigoDashboardsPage.cancelEditModeWithChanges().getKpisCount());
         assertEquals(kpisCount, initIndigoDashboardsPageWithWidgets().getKpisCount());
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void testCancelAddingWidget() {
         int kpisCount = initIndigoDashboardsPageWithWidgets().getKpisCount();
 
         waitForFragmentVisible(indigoDashboardsPage)
             .switchToEditMode()
-            .addWidget(new KpiConfiguration.Builder()
+            .addKpi(new KpiConfiguration.Builder()
                 .metric(METRIC_AMOUNT)
                 .dataSet(DATE_CREATED)
                 .build())
-            .cancelEditMode()
-            .waitForDialog()
-            .submitClick();
+            .cancelEditModeWithChanges();
 
         assertEquals(indigoDashboardsPage.getKpisCount(), kpisCount);
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkKpiShowHintForEditableName() {
         Kpi kpi = initIndigoDashboardsPageWithWidgets()
                 .switchToEditMode()
-                .selectKpi(0);
+                .selectFirstWidget(Kpi.class);
 
         takeScreenshot(browser, "Kpi does not show hint before hover to headline", this.getClass());
         assertFalse(kpi.hasHintForEditName(), "Kpi shows hint although headline is not hovered");
@@ -232,7 +228,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
         assertEquals(hintColor, HINT_FOR_EDIT_NAME_BORDER_COLOR);
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkMetricWithLongerNameWillBeShortened() {
         createMetric(LONG_NAME_METRIC, "SELECT 1", "#,##0");
 
@@ -260,14 +256,14 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
         assertEquals(metricTooltip, LONG_NAME_METRIC);
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void deleteMetricUsingInKpi() {
         final String deletedMetric = "DELETED_METRIC";
         createMetric(deletedMetric, "SELECT 1", "#,##0");
 
         initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
-            .addWidget(new KpiConfiguration.Builder()
+            .addKpi(new KpiConfiguration.Builder()
                 .metric(deletedMetric)
                 .dataSet(DATE_ACTIVITY)
                 .build())
@@ -278,32 +274,35 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
         initIndigoDashboardsPageWithWidgets();
         takeScreenshot(browser, "Dashboards after deleting metric using in Kpi", getClass());
 
-        waitForFragmentVisible(indigoDashboardsPage).switchToEditMode().selectLastKpi();
+        waitForFragmentVisible(indigoDashboardsPage).switchToEditMode().selectLastWidget(Kpi.class);
         takeScreenshot(browser, "Unlisted measure in metric selection", getClass());
 
         indigoDashboardsPage.getConfigurationPanel().waitForSelectedMetricIsUnlisted();
 
-        indigoDashboardsPage.clickLastKpiDeleteButton()
-            .waitForDialog()
-            .submitClick();
+        indigoDashboardsPage.getLastWidget(Kpi.class).delete();
         indigoDashboardsPage.saveEditModeWithWidgets();
         takeScreenshot(browser, "Dashboards after deleting bad Kpi", getClass());
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop", "mobile"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "mobile"})
     public void checkNoVisualizationOnDashboard() {
-        int visualizationsCount = initIndigoDashboardsPageWithWidgets().getVisualizationsCount();
+        int visualizationsCount = initIndigoDashboardsPageWithWidgets().getInsightsCount();
 
         takeScreenshot(browser, "checkNoVisualizationOnDashboard", getClass());
         assertEquals(visualizationsCount, 0);
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkNoVisualizationListInPanel() {
         initIndigoDashboardsPageWithWidgets()
                 .switchToEditMode();
 
         takeScreenshot(browser, "checkNoVisualizationListInPanel", getClass());
-        waitForFragmentVisible(indigoDashboardsPage).waitForVisualizationsListAbsent();
+        IndigoInsightSelectionPanel.waitForNotPresent();
+    }
+
+    private String generateUniqueHeadlineTitle() {
+        // create unique headline title which fits into headline title (has limited size)
+        return UUID.randomUUID().toString().substring(0, 18);
     }
 }

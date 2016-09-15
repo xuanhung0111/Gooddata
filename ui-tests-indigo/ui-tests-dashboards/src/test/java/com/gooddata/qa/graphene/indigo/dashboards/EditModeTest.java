@@ -2,10 +2,13 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteWidgetsUsingCascase;
+import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
@@ -20,27 +23,34 @@ import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoInsightSelectionPanel;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
-import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
 
-public class EditModeTest extends DashboardWithWidgetsTest {
+public class EditModeTest extends GoodSalesAbstractDashboardTest {
 
     private boolean isMobileRunning;
 
-    private static final KpiConfiguration kpiConfig = new KpiConfiguration.Builder()
-        .metric(METRIC_AMOUNT)
-        .dataSet(DATE_CREATED)
-        .build();
-
     @BeforeClass(alwaysRun = true)
-    public void before(ITestContext context) {
-        super.before();
+    public void addUsersOnDesktopExecution(ITestContext context) {
         isMobileRunning = Boolean.parseBoolean(context.getCurrentXmlTest().getParameter("isMobileRunning"));
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    @Override
+    protected void prepareSetupProject() throws ParseException, JSONException, IOException {
+        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
+    }
+
+    @Override
+    protected void setDashboardFeatureFlags() {
+        //This test only works if insight flag is disabled
+        setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
+    }
+
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkEditButtonPresent() {
         initIndigoDashboardsPageWithWidgets();
 
@@ -49,7 +59,7 @@ public class EditModeTest extends DashboardWithWidgetsTest {
         assertTrue(indigoDashboardsPage.isEditButtonVisible());
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"mobile"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"mobile"})
     public void checkEditButtonMissing() {
         initIndigoDashboardsPageWithWidgets();
 
@@ -58,7 +68,7 @@ public class EditModeTest extends DashboardWithWidgetsTest {
         assertFalse(indigoDashboardsPage.isEditButtonVisible());
     }
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkViewerCannotEditDashboard() throws JSONException {
         try {
             signIn(canAccessGreyPage(browser), UserRoles.VIEWER);
@@ -70,7 +80,7 @@ public class EditModeTest extends DashboardWithWidgetsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkEditorCanEditDashboard() throws JSONException {
         try {
             signIn(canAccessGreyPage(browser), UserRoles.EDITOR);
@@ -82,40 +92,41 @@ public class EditModeTest extends DashboardWithWidgetsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkMessageIsNotShownWhenEditingKpiWithoutAlerts() throws JSONException {
         initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
-            .selectLastKpi();
+            .selectLastWidget(Kpi.class);
 
         waitForFragmentVisible(indigoDashboardsPage)
             .getConfigurationPanel()
             .waitForAlertEditWarningMissing();
     }
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
-    public void checkMessageIsShownWhenEditingKpiWithOwnAlert() throws JSONException {
-        setupKpi(kpiConfig);
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    public void checkMessageIsShownWhenEditingKpiWithOwnAlert() throws JSONException, IOException {
+        String kpiUri = addWidgetToWorkingDashboard(createAmountKpi());
 
         try {
+            initIndigoDashboardsPageWithWidgets();
             setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, "200");
 
             waitForFragmentVisible(indigoDashboardsPage)
                     .switchToEditMode()
-                    .selectLastKpi();
+                    .selectLastWidget(Kpi.class);
 
             takeScreenshot(browser, "checkMessageIsShownWhenEditingKpiWithOwnAlert", getClass());
             indigoDashboardsPage
                     .getConfigurationPanel()
                     .waitForAlertEditWarning();
         } finally {
-            teardownKpi();
+            deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(), kpiUri);
         }
     }
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
-    public void checkMessageIsShownWhenEditingKpiWithOthersAlerts() throws JSONException {
-        setupKpi(kpiConfig);
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    public void checkMessageIsShownWhenEditingKpiWithOthersAlerts() throws JSONException, IOException {
+        String kpiUri = addWidgetToWorkingDashboard(createAmountKpi());
 
         // add alert as different user
         try {
@@ -131,20 +142,20 @@ public class EditModeTest extends DashboardWithWidgetsTest {
         try {
             initIndigoDashboardsPageWithWidgets()
                     .switchToEditMode()
-                    .selectLastKpi();
+                    .selectLastWidget(Kpi.class);
 
             takeScreenshot(browser, "checkMessageIsShownWhenEditingKpiWithOthersAlerts", getClass());
             waitForFragmentVisible(indigoDashboardsPage)
                     .getConfigurationPanel()
                     .waitForAlertEditWarning();
         } finally {
-            teardownKpi();
+            deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(), kpiUri);
         }
     }
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
-    public void checkNumberOfAlertAreSet() throws JSONException {
-        setupKpi(kpiConfig);
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    public void checkNumberOfAlertAreSet() throws JSONException, IOException {
+        String kpiUri = addWidgetToWorkingDashboard(createAmountKpi());
 
         try {
             signIn(canAccessGreyPage(browser), UserRoles.VIEWER);
@@ -164,7 +175,7 @@ public class EditModeTest extends DashboardWithWidgetsTest {
         try {
             initIndigoDashboardsPageWithWidgets()
                     .switchToEditMode()
-                    .selectLastKpi();
+                    .selectLastWidget(Kpi.class);
 
             takeScreenshot(browser, "Check alert message with number of users is shown correctly", getClass());
             assertThat(waitForFragmentVisible(indigoDashboardsPage)
@@ -172,29 +183,30 @@ public class EditModeTest extends DashboardWithWidgetsTest {
                     .getKpiAlertMessage(), containsString("2 alerts"));
 
         } finally {
-            teardownKpi();
+            deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(), kpiUri);
         }
     }
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
-    public void checkKpiAlertKeptAfterEditedByAnotherUser() throws JSONException {
-        setupKpi(kpiConfig);
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    public void checkKpiAlertKeptAfterEditedByAnotherUser() throws JSONException, IOException {
+        String kpiUri = addWidgetToWorkingDashboard(createAmountKpi());
 
         try {
+            initIndigoDashboardsPageWithWidgets();
             setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, "200");
 
             signIn(canAccessGreyPage(browser), UserRoles.EDITOR);
 
             initIndigoDashboardsPageWithWidgets()
                     .switchToEditMode()
-                    .selectLastKpi();
+                    .selectLastWidget(Kpi.class);
 
             waitForFragmentVisible(indigoDashboardsPage)
                     .getConfigurationPanel()
                     .selectMetricByName(METRIC_NUMBER_OF_ACTIVITIES);
 
             indigoDashboardsPage
-                    .waitForAllKpiWidgetContentLoaded()
+                    .waitForWidgetsLoading()
                     .leaveEditMode();
 
         } finally {
@@ -204,7 +216,7 @@ public class EditModeTest extends DashboardWithWidgetsTest {
         try {
             Kpi kpi = initIndigoDashboardsPageWithWidgets()
                     .switchToEditMode()
-                    .selectLastKpi();
+                    .selectLastWidget(Kpi.class);
 
             takeScreenshot(browser, "KPI Alert are kept after updating from another user", getClass());
             waitForFragmentVisible(indigoDashboardsPage)
@@ -213,26 +225,25 @@ public class EditModeTest extends DashboardWithWidgetsTest {
             assertEquals(kpi.getHeadline(), METRIC_NUMBER_OF_ACTIVITIES);
 
         } finally {
-            teardownKpi();
+            deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(), kpiUri);
         }
     }
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop", "mobile"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "mobile"})
     public void checkNoVisualizationOnDashboard() {
-        int visualizationsCount = initIndigoDashboardsPageWithWidgets().getVisualizationsCount();
+        int visualizationsCount = initIndigoDashboardsPageWithWidgets().getInsightsCount();
 
         takeScreenshot(browser, "checkNoVisualizationOnDashboard", getClass());
         assertEquals(visualizationsCount, 0);
     }
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkNoVisualizationsList() {
-        boolean isVisualizationsListPresent = initIndigoDashboardsPageWithWidgets()
-                .switchToEditMode()
-                .isVisualizationsListPresent();
+        initIndigoDashboardsPageWithWidgets()
+                .switchToEditMode();
 
         takeScreenshot(browser, "checkNoVisualizationsList", getClass());
-        assertFalse(isVisualizationsListPresent);
+        assertFalse(IndigoInsightSelectionPanel.isPresent(browser));
     }
 
     @Override

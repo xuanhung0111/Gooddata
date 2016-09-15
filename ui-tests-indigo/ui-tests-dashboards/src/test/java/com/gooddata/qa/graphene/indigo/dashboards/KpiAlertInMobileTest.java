@@ -27,9 +27,9 @@ import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
-import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsGeneralTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 
-public class KpiAlertInMobileTest extends DashboardsGeneralTest {
+public class KpiAlertInMobileTest extends AbstractDashboardTest {
 
     private static final String KPI_ALERT_RESOURCE = "/kpi-alert-mobile/";
     private static final String UNIQUE_NAME = "sumOfNumber-" + UUID.randomUUID().toString().substring(0, 6);
@@ -37,14 +37,11 @@ public class KpiAlertInMobileTest extends DashboardsGeneralTest {
 
     @BeforeClass(alwaysRun = true)
     public void initProperties() {
-        super.initProperties();
         projectTitle = "Kpi-alert-mobile-test";
-        // Create data from blank project
-        projectTemplate = "";
     }
 
-    @Test(dependsOnGroups = "createProject", groups = "precondition")
-    public void initIndigoDashboardWithKpi() throws JSONException, IOException, URISyntaxException {
+    @Override
+    protected void prepareSetupProject() throws Throwable {
         setupMaql(KPI_ALERT_RESOURCE + "user.maql");
 
         // Grey page cannot be accessed on mobile, should use Rest to setup dataset for project here
@@ -69,12 +66,13 @@ public class KpiAlertInMobileTest extends DashboardsGeneralTest {
                 .build());
 
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(kpiUri));
+
     }
 
-    @Test(dependsOnGroups = "precondition", groups = "mobile")
+    @Test(dependsOnGroups = "dashboardsInit", groups = "mobile")
     public void checkAlert() throws JSONException, IOException, URISyntaxException {
         initIndigoDashboardsPageWithWidgets()
-                .getKpiByHeadline(UNIQUE_NAME)
+                .getWidgetByHeadline(Kpi.class, UNIQUE_NAME)
                 .openAlertDialog()
                 .selectTriggeredWhen(TRIGGERED_WHEN_GOES_ABOVE)
                 .setThreshold("5")
@@ -83,7 +81,7 @@ public class KpiAlertInMobileTest extends DashboardsGeneralTest {
         // Grey page cannot be accessed on mobile, should use Rest to setup dataset for project here
         setupDataViaRest(DATASET_ID, new FileInputStream(getResourceAsFile(KPI_ALERT_RESOURCE + "user.csv")));
 
-        Kpi kpi = initIndigoDashboardsPageWithWidgets().getKpiByHeadline(UNIQUE_NAME);
+        Kpi kpi = initIndigoDashboardsPageWithWidgets().getWidgetByHeadline(Kpi.class, UNIQUE_NAME);
 
         takeScreenshot(browser, "Kpi-" + UNIQUE_NAME + "-alert-triggered", getClass());
         assertTrue(kpi.isAlertTriggered(), "Kpi " + UNIQUE_NAME + " alert is not triggered");

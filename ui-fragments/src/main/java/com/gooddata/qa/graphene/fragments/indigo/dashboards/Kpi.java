@@ -2,15 +2,18 @@ package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static org.openqa.selenium.By.className;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+
+import com.google.common.base.Predicate;
 
 /**
  * Kpi - key performance indicator widget
@@ -26,13 +29,7 @@ public class Kpi extends Widget {
     public static final String KPI_IS_EMPTY_VALUE = "is-empty-value";
     public static final String KPI_IS_ERROR_VALUE = "is-error-value";
     public static final String KPI_ALERT_DIALOG_CLASS = "kpi-alert-dialog";
-    public static final String KPI_CONTENT_CLASS = "dash-item-content";
 
-    public static final String WIDGET_LOADING_CLASS = "widget-loading";
-    public static final String CONTENT_LOADING_CLASS = "content-loading";
-
-    public static final By IS_WIDGET_LOADING = By.cssSelector(MAIN_SELECTOR + " ." + WIDGET_LOADING_CLASS);
-    public static final By IS_CONTENT_LOADING = By.cssSelector(MAIN_SELECTOR + " ." + CONTENT_LOADING_CLASS);
     public static final By IS_NOT_EDITABLE = By.cssSelector(MAIN_SELECTOR + " .kpi:not(.is-editable)");
     public static final By ALERT_DIALOG = By.className(KPI_ALERT_DIALOG_CLASS);
 
@@ -45,33 +42,33 @@ public class Kpi extends Widget {
     @FindBy(className = KPI_POP_SECTION_CLASS)
     private KpiPopSection popSection;
 
-    @FindBy(className = CONTENT_LOADING_CLASS)
-    private WebElement contentLoading;
-
-    @FindBy(className = KPI_CONTENT_CLASS)
-    private WebElement content;
+    public static Kpi getInstance(final WebElement root) {
+        return Graphene.createPageFragment(Kpi.class, waitForElementVisible(root));
+    }
 
     public String getValue() {
-        return waitForElementPresent(value).getText();
+        waitForContentLoading();
+        return waitForElementVisible(value).getText();
     }
 
     public String getTooltipOfValue() {
-        return waitForElementPresent(value).getAttribute("title");
+        waitForContentLoading();
+        return waitForElementVisible(value).getAttribute("title");
     }
 
     public Kpi clickKpiValue() {
-        waitForElementPresent(value).click();
+        waitForContentLoading();
+        waitForElementVisible(value).click();
 
         return this;
     }
 
     public boolean hasPopSection() {
-        By thisMetric = By.className(KPI_POP_SECTION_CLASS);
-
-        return isElementPresent(thisMetric, root);
+        return isElementPresent(className(KPI_POP_SECTION_CLASS), getRoot());
     }
 
     public KpiPopSection getPopSection() {
+        waitForContentLoading();
         return waitForFragmentVisible(popSection);
     }
 
@@ -129,16 +126,24 @@ public class Kpi extends Widget {
         return this;
     }
 
-    public void clickKpiContent() {
-        waitForElementVisible(content).click();
-    }
-
-    public void waitForLoading() {
-        waitForElementVisible(contentLoading);
+    public Kpi waitForContentLoading() {
+        Predicate<WebDriver> isContentLoaded = browser -> !waitForElementVisible(className("kpi"), getRoot())
+                .getAttribute("class").contains("content-loading");
+        Graphene.waitGui().until(isContentLoaded);
+        return this;
     }
 
     public boolean hasHintForEditName() {
         return isElementPresent(HINT_LOCATOR, this.getRoot());
+    }
+
+    public void delete() {
+        waitForContentLoading().clickOnContent().clickDeleteButton();
+        ConfirmDialog.getInstance(browser).submitClick();
+    }
+
+    public static boolean isKpi(final Widget widget) {
+        return widget.getRoot().getAttribute("class").contains("type-kpi");
     }
 
     public enum ComparisonType {

@@ -1,9 +1,13 @@
 package com.gooddata.qa.utils.http;
 
+import static java.lang.String.format;
 import static java.util.Objects.isNull;
 
 import java.io.IOException;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -11,9 +15,11 @@ import org.apache.http.ParseException;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
+
 /**
  * General REST utilities for executing request, uri or fetching json object, resource from request
  */
@@ -23,6 +29,19 @@ public final class RestUtils {
     public static final String ACCEPT_HEADER_VALUE_WITH_VERSION = "application/json; version=1";
 
     public static final String CREATE_AND_GET_OBJ_LINK = "/gdc/md/%s/obj?createAndGet=true";
+
+    private static final Supplier<String> DELETE_OBJECT_USING_CASCASE_BODY = () -> {
+        try {
+            return new JSONObject() {{
+                put("delete", new JSONObject() {{
+                    put("items", new JSONArray().put("${objectUris}"));
+                    put("mode", "cascade");
+                }});
+            }}.toString();
+        } catch (JSONException e) {
+            throw new IllegalStateException("There is an exception during json object initialization! ", e);
+        }
+    };
 
     private RestUtils() {
     }
@@ -172,12 +191,22 @@ public final class RestUtils {
     }
 
     /**
-     * Delete object from uri
+     * Delete object and its dependencies
      * 
      * @param restApiClient
-     * @param uri
+     * @param projectId
+     * @param objectUris
+     * @throws JSONException
+     * @throws IOException
      */
-    public static void deleteObject(final RestApiClient restApiClient, final String uri) {
-        executeRequest(restApiClient, restApiClient.newDeleteMethod(uri));
+    public static void deleteObjectsUsingCascase(final RestApiClient restApiClient, final String projectId,
+            final String... objectUris) throws JSONException, IOException {
+        final String deleteObjectUri = format("/gdc/md/%s/objects/delete", projectId);
+        final String widgets = Stream.of(objectUris).map(e -> '"' + e + '"').collect(Collectors.joining(","));
+
+        executeRequest(restApiClient,
+                restApiClient.newPostMethod(deleteObjectUri,
+                        DELETE_OBJECT_USING_CASCASE_BODY.get().replace("\"${objectUris}\"", widgets)),
+                HttpStatus.NO_CONTENT);
     }
 }

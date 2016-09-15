@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
-import static com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest.DATE_FILTER_ALL_TIME;
 import static com.gooddata.qa.graphene.utils.UrlParserUtils.replaceInUrl;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
@@ -25,15 +24,12 @@ import org.testng.annotations.Test;
 
 import com.gooddata.md.Fact;
 import com.gooddata.md.Restriction;
-import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.enums.GDEmails;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
-import com.gooddata.qa.utils.http.RestUtils;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
@@ -44,7 +40,7 @@ import static org.testng.Assert.assertTrue;
  * Need to run on empty project because neither csv upload (upload.html) nor
  * webdav upload work for GoodSales demo project (old template, dli/sli)
  */
-public class KpiAlertEvaluateTest extends AbstractProjectTest {
+public class KpiAlertEvaluateTest extends AbstractDashboardTest {
 
     private static final String KPI_DATE_DIMENSION = "templ:Minimalistic";
     private static final String KPI_LINK_CLASS = "s-kpi-link";
@@ -64,20 +60,10 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
         imapPassword = testParams.loadProperty("imap.password");
     }
 
-    private void setupProjectMaql() throws JSONException, IOException {
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    public void setupProject() throws JSONException, IOException {
         switchToAdmin();
         setupMaql(MAQL_PATH);
-    }
-
-    private void setupFeatureFlag() throws JSONException {
-        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
-    }
-
-    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
-    public void setupProject() throws JSONException, IOException {
-        setupProjectMaql();
-        setupFeatureFlag();
     }
 
     @DataProvider(name = "alertsProvider")
@@ -111,10 +97,10 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
                     .getSplashScreen()
                     .startEditingWidgets()
                     .waitForDashboardLoad()
-                    .addWidget(kpi)
+                    .addKpi(kpi)
                     .selectDateFilterByName(DATE_FILTER_ALL_TIME)
                     .saveEditModeWithWidgets()
-                    .getKpiByHeadline(metricName)
+                    .getWidgetByHeadline(Kpi.class, metricName)
                     .openAlertDialog()
                     .selectTriggeredWhen(TRIGGERED_WHEN_GOES_ABOVE)
                     .setThreshold(threshold)
@@ -134,7 +120,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
         } finally {
             switchToAdmin();
             if (metricUri != null) {
-                RestUtils.deleteObject(getRestApiClient(), metricUri);
+                getMdService().removeObjByUri(metricUri);
             }
         }
     }
@@ -198,9 +184,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
     }
 
     private Kpi initDashboardsPageAndGetKpi(String metricName) {
-        return initIndigoDashboardsPageWithWidgets()
-                .waitForAllKpiWidgetContentLoaded()
-                .getKpiByHeadline(metricName);
+        return initIndigoDashboardsPageWithWidgets().getWidgetByHeadline(Kpi.class, metricName);
     }
 
     private void checkAlertInUI(String metricName) {
@@ -231,8 +215,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
         }
         Kpi checkKpi = IndigoDashboardsPage.getInstance(browser)
                 .waitForDashboardLoad()
-                .waitForAllKpiWidgetContentLoaded()
-                .getKpiByHeadline(metricName);
+                .getWidgetByHeadline(Kpi.class, metricName);
 
         // check that alert is triggered and date filter is reset accordingly
         assertTrue(checkKpi.isAlertTriggered());
