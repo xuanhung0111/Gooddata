@@ -180,7 +180,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         sleepTight(4000);
         Screenshots.takeScreenshot(browser, "project-model", this.getClass());
 
-        verifyLDMModelProject(32473);
+        verifyLDMModelProject(33320);
     }
 
     @Test(dependsOnMethods = {"createComputedAttributeTest"}, priority = 2)
