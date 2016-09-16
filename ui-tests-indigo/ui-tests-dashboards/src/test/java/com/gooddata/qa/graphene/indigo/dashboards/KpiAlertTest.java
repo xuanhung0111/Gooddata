@@ -42,11 +42,8 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
     @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkNewKpiDoesNotHaveAlertSet() throws JSONException, IOException {
         // creating kpi using REST is not recommended for this use case
-        startEditMode().addKpi(
-                new KpiConfiguration.Builder()
-                    .metric(METRIC_AVG_AMOUNT)
-                    .dataSet(DATE_CREATED)
-                    .build())
+        initIndigoDashboardsPageWithWidgets().switchToEditMode()
+                .addKpi(new KpiConfiguration.Builder().metric(METRIC_AVG_AMOUNT).dataSet(DATE_CREATED).build())
                 .saveEditModeWithWidgets();
 
         try {

@@ -99,8 +99,17 @@ public class InsightOnDashboardTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"setupDashboardENV", "createInsight"})
-    public void testRenameInsightOnDashboard() throws JSONException, IOException {
+    @DataProvider(name = "insightNameProvider")
+    public Object[][] insightNameProvider() {
+        return new Object[][]{
+            { RENAMED_TEST_INSIGHT },
+            { "<button>hello</button>" },
+            { "新年快樂" }
+        };
+    }
+
+    @Test(dependsOnGroups = {"setupDashboardENV", "createInsight"}, dataProvider = "insightNameProvider")
+    public void testRenameInsightOnDashboard(String newInsightName) throws JSONException, IOException {
         IndigoDashboardsPage idp = initIndigoDashboardsPage()
             .getSplashScreen()
             .startEditingWidgets()
@@ -111,15 +120,37 @@ public class InsightOnDashboardTest extends GoodSalesAbstractDashboardTest {
             idp.switchToEditMode()
                     .getLastWidget(Insight.class)
                     .clickOnContent()
-                    .setHeadline(RENAMED_TEST_INSIGHT);
+                    .setHeadline(newInsightName);
             idp.saveEditModeWithWidgets();
-    
+
             String headline = initIndigoDashboardsPageWithWidgets()
                     .getLastWidget(Insight.class)
                     .getHeadline();
 
             takeScreenshot(browser, "testRenameInsightOnDashboard-renamed", getClass());
-            assertEquals(headline, RENAMED_TEST_INSIGHT, "Insight not properly renamed");
+            assertEquals(headline, newInsightName, "Insight not properly renamed");
+        } finally {
+            deleteAnalyticalDashboard(getRestApiClient(),
+                    getAnalyticalDashboards(getRestApiClient(), testParams.getProjectId()).get(0));
+        }
+    }
+
+    @Test(dependsOnGroups = {"setupDashboardENV", "createInsight"})
+    public void testInsightNamePlaceholder() throws JSONException, IOException {
+        IndigoDashboardsPage idp = initIndigoDashboardsPage()
+            .getSplashScreen()
+            .startEditingWidgets()
+            .addInsightUsingDoubleClick(TEST_INSIGHT)
+            .saveEditModeWithWidgets();
+
+        try {
+            String headlinePlaceholder = idp.switchToEditMode()
+                .getLastWidget(Insight.class)
+                .clickOnContent()
+                .clearHeadline()
+                .getHeadlinePlaceholder();
+            assertEquals(headlinePlaceholder, TEST_INSIGHT, "Insight placeholder not properly correct."
+                    + "Expected: " + TEST_INSIGHT + " but: " + headlinePlaceholder);
         } finally {
             deleteAnalyticalDashboard(getRestApiClient(),
                     getAnalyticalDashboards(getRestApiClient(), testParams.getProjectId()).get(0));

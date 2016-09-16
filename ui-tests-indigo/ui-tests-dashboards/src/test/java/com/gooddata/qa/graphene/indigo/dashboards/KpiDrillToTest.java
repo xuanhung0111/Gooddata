@@ -43,6 +43,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.ConfigurationPanel;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.DrillToSelect;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
@@ -73,7 +74,7 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
 
     @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkNewlyAddedKpiHasNoDrillTo() throws JSONException, IOException {
-        startEditMode().addKpi(kpiWithoutDrillTo).saveEditModeWithWidgets();
+        startIndigoDashboardEditMode().addKpi(kpiWithoutDrillTo).saveEditModeWithWidgets();
 
         try {
             String currentUrl = browser.getCurrentUrl();
@@ -108,7 +109,7 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
 
     @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkKpiDrillToInViewMode() throws JSONException, IOException {
-        startEditMode().addKpi(kpiWithDrillTo).saveEditModeWithWidgets();
+        startIndigoDashboardEditMode().addKpi(kpiWithDrillTo).saveEditModeWithWidgets();
 
         try {
             String currentUrl = browser.getCurrentUrl();
@@ -131,7 +132,7 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
 
     @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkKpiDrillToInEditMode() throws JSONException, IOException {
-        startEditMode().addKpi(kpiWithDrillTo).saveEditModeWithWidgets();
+        startIndigoDashboardEditMode().addKpi(kpiWithDrillTo).saveEditModeWithWidgets();
 
         try {
             String currentUrl = browser.getCurrentUrl();
@@ -181,7 +182,7 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
 
     @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkDeleteKpiDrillTo() throws JSONException, IOException {
-        startEditMode().addKpi(kpiWithDrillTo).saveEditModeWithWidgets();
+        startIndigoDashboardEditMode().addKpi(kpiWithDrillTo).saveEditModeWithWidgets();
 
         try {
             waitForFragmentVisible(indigoDashboardsPage)
@@ -209,7 +210,7 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
 
     @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkUpdateKpiDrillTo() throws JSONException, IOException {
-        startEditMode().addKpi(kpiWithDrillTo).saveEditModeWithWidgets();
+        startIndigoDashboardEditMode().addKpi(kpiWithDrillTo).saveEditModeWithWidgets();
 
         try {
             waitForFragmentVisible(indigoDashboardsPage)
@@ -241,7 +242,7 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
         addNewTabInNewDashboard(personalDashboard, personalTab);
 
         try {
-            startEditMode()
+            startIndigoDashboardEditMode()
                     .addKpi(new KpiConfiguration.Builder().metric(METRIC_WON).dataSet(DATE_CREATED)
                             .comparison(Kpi.ComparisonType.NO_COMPARISON.toString()).drillTo(personalTab).build())
                     .saveEditModeWithWidgets();
@@ -288,7 +289,7 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
         addNewTabInNewDashboard(newDashboard, newTab);
 
         try {
-            startEditMode()
+            startIndigoDashboardEditMode()
                     .addKpi(new KpiConfiguration.Builder().metric(METRIC_AVG_AMOUNT).dataSet(DATE_CREATED)
                             .comparison(Kpi.ComparisonType.NO_COMPARISON.toString()).drillTo(newTab).build())
                     .saveEditModeWithWidgets();
@@ -409,5 +410,10 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
                 .addNewTab(newTab);
         checkRedBar(browser);
         dashboardsPage.saveDashboard();
+    }
+
+    private IndigoDashboardsPage startIndigoDashboardEditMode() {
+        initIndigoDashboardsPage().getSplashScreen().startEditingWidgets();
+        return waitForFragmentVisible(indigoDashboardsPage);
     }
 }

@@ -4,9 +4,10 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.openqa.selenium.By.tagName;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
-
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
@@ -34,7 +35,11 @@ public class Widget extends AbstractFragment {
         return waitForElementVisible(headline).getText();
     }
 
-    public void clearHeadline() {
+    public String getHeadlinePlaceholder() {
+        return waitForElementVisible(headline).findElement(tagName("textarea")).getAttribute("placeholder");
+    }
+
+    public Widget clearHeadline() {
         waitForElementVisible(headlineInplaceEdit).click();
 
         // hit backspace multiple times, because .clear()
@@ -45,6 +50,7 @@ public class Widget extends AbstractFragment {
         for (int i = 0; i < headlineLength; i++) {
             headlineTextarea.sendKeys(Keys.BACK_SPACE);
         }
+        return this;
     }
 
     public void setHeadline(String newHeadline) {

@@ -40,10 +40,11 @@ public class MetricsAccessibilityTest extends GoodSalesAbstractDashboardTest {
 
     @Test(dependsOnMethods = {"prepareMetrics"}, groups = {"desktop"})
     public void testMetricsAccessibility() {
-        final MetricSelect metricSelect = startEditMode()
-            .dragAddKpiPlaceholder()
-            .getConfigurationPanel()
-            .getMetricSelect();
+        final MetricSelect metricSelect = initIndigoDashboardsPage().getSplashScreen()
+                .startEditingWidgets()
+                .dragAddKpiPlaceholder()
+                .getConfigurationPanel()
+                .getMetricSelect();
 
         metricSelect.searchForText(PUBLIC_METRIC_OF_ADMIN);
         takeScreenshot(browser, "admin-can-see-his-public-metric", this.getClass());
