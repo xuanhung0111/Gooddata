@@ -45,7 +45,7 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
             initAccountPage().changeLanguage("Français");
             assertEquals(getCurrentUserProfile(getRestApiClient()).getString("language"), "fr-FR");
         } finally {
-            initAccountPage().changeLanguage("English");
+            initAccountPage().changeLanguage("English US");
             assertEquals(getCurrentUserProfile(getRestApiClient()).getString("language"), "en-US");
             setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
                     ProjectFeatureFlags.ENABLE_CHANGE_LANGUAGE, false);
