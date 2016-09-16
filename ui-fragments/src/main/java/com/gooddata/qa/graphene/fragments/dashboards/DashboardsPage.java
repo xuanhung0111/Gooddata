@@ -198,13 +198,16 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     public String exportDashboardTab(int tabIndex) {
+        //wait for exporting dashboard tab in maximum 5 minutes
+        int exportingTextDisplayedTimeoutInSeconds = 300;
+
         tabs.openTab(tabIndex);
         waitForDashboardPageLoaded(browser);
         String tabName = tabs.getTabLabel(0);
         openEditExportEmbedMenu().select("Export to PDF");
         waitForElementVisible(BY_EXPORTING_PANEL, browser);
         sleepTightInSeconds(3);
-        waitForElementNotPresent(BY_EXPORTING_PANEL);
+        waitForElementNotPresent(BY_EXPORTING_PANEL, exportingTextDisplayedTimeoutInSeconds);
         sleepTightInSeconds(3);
         System.out.println("Dashboard " + tabName + " exported to PDF...");
         return tabName;
