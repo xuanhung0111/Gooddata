@@ -56,11 +56,12 @@ public class MetricFormattingTest extends GoodSalesAbstractDashboardTest {
         Metric customFormatMetric = getMdService().createObj(getProject(),
                 new Metric(customFormatMetricName, customFormatMetricMaql, format.toString()));
 
-        startEditMode().addKpi(
-                new KpiConfiguration.Builder()
-                    .metric(customFormatMetricName)
-                    .dataSet(DATE_CREATED)
-                    .build()).saveEditModeWithWidgets();
+        initIndigoDashboardsPageWithWidgets().switchToEditMode()
+                .addKpi(new KpiConfiguration.Builder()
+                        .metric(customFormatMetricName)
+                        .dataSet(DATE_CREATED)
+                        .build())
+                .saveEditModeWithWidgets();
 
         try {
             Kpi lastKpi = initIndigoDashboardsPageWithWidgets().getLastWidget(Kpi.class);

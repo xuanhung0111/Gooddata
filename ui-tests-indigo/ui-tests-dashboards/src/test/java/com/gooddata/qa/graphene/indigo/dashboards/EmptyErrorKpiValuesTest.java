@@ -34,7 +34,8 @@ public class EmptyErrorKpiValuesTest extends GoodSalesAbstractDashboardTest {
 
     @Test(dependsOnMethods = {"createEmptyMetric"}, groups = {"desktop"})
     public void testEmptyMetricWithoutConditionalFormat() throws ParseException, JSONException, IOException {
-        startEditMode()
+        initIndigoDashboardsPage().getSplashScreen()
+            .startEditingWidgets()
             .addKpi(new KpiConfiguration.Builder()
                     .metric(errorMetric.getTitle())
                     .dataSet(DATE_CREATED)
