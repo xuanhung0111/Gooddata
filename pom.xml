@@ -62,6 +62,7 @@
         <browserstack.project>local</browserstack.project>
         <browserstack.build>${user.name}</browserstack.build>
         <browserstack.realMobile>false</browserstack.realMobile>
+        <browserstack.emulator>true</browserstack.emulator>
         <browserstack.autoWait>0</browserstack.autoWait>
 
         <coreModuleName>ui-core</coreModuleName>
@@ -402,6 +403,10 @@
                                                 <value>${browserstack.realMobile}</value>
                                             </property>
                                             <property>
+                                                <name>browserstack.emulator</name>
+                                                <value>${browserstack.emulator}</value>
+                                            </property>
+                                            <property>
                                                 <name>browserstack.autoWait</name>
                                                 <value>${browserstack.autoWait}</value>
                                             </property>
@@ -597,6 +602,57 @@
                 <browserstack.mobile.platform>ANDROID</browserstack.mobile.platform>
                 <browserstack.mobile.device>Google Nexus 9</browserstack.mobile.device>
                 <browserstack.realMobile>true</browserstack.realMobile>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-mobile-iphone-6s</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-mobile-iphone-6s</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-mobile-mac.xml</arquillian.xml>
+                <browserstack.mobile.browserName>iPhone</browserstack.mobile.browserName>
+                <browserstack.mobile.platform>MAC</browserstack.mobile.platform>
+                <browserstack.mobile.device>iPhone 6S</browserstack.mobile.device>
+                <browserstack.realMobile>true</browserstack.realMobile>
+                <browserstack.emulator>false</browserstack.emulator>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-mobile-iphone-6s-plus</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-mobile-iphone-6s-plus</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-mobile-mac.xml</arquillian.xml>
+                <browserstack.mobile.browserName>iPhone</browserstack.mobile.browserName>
+                <browserstack.mobile.platform>MAC</browserstack.mobile.platform>
+                <browserstack.mobile.device>iPhone 6S Plus</browserstack.mobile.device>
+                <browserstack.realMobile>true</browserstack.realMobile>
+                <browserstack.emulator>false</browserstack.emulator>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-mobile-ipad-mini-3</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-mobile-ipad-mini-3</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-mobile-mac.xml</arquillian.xml>
+                <browserstack.mobile.browserName>iPad</browserstack.mobile.browserName>
+                <browserstack.mobile.platform>MAC</browserstack.mobile.platform>
+                <browserstack.mobile.device>iPad Mini 3</browserstack.mobile.device>
+                <browserstack.realMobile>true</browserstack.realMobile>
+                <browserstack.emulator>false</browserstack.emulator>
             </properties>
         </profile>
         <profile>
