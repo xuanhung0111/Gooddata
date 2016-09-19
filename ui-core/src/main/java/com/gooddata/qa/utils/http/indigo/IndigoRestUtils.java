@@ -39,7 +39,6 @@ public class IndigoRestUtils {
                     }});
                     put("content", new JSONObject() {{
                         put("widgets", new JSONArray());
-                        put("filters", new JSONArray());
                     }});
                 }});
             }}.toString();
@@ -323,7 +322,7 @@ public class IndigoRestUtils {
 
     /**
      * Delete widget and its dependencies and dashboards will be deleted when it contains no widget.
-     * 
+     *
      * @param restApiClient
      * @param projectId
      * @param widgetUris
@@ -350,7 +349,7 @@ public class IndigoRestUtils {
      * Delete all dashboards and its dependencies.
      * Theoretically, we can create many dashboards using REST
      * This method helps us clean up environment
-     * 
+     *
      * @param restApiClient
      * @param projectId
      * @throws JSONException
