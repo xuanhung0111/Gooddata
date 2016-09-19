@@ -2,6 +2,8 @@ package com.gooddata.qa.graphene.fragments.dashboards.widget.filter;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.util.ArrayList;
@@ -16,7 +18,7 @@ public class AttributeFilterPanel extends FilterPanel {
     @FindBy(className = "yui3-c-simpleColumn-window")
     private WebElement scroller;
 
-    @FindBy(css = ".yui3-c-simpleColumn-underlay > div:not(.gdc-hidden)")
+    @FindBy(css = ".c-checkboxSelectOnly:not(.gdc-hidden)")
     private List<FilterPanelRow> rows;
 
     @FindBy(className = "clearVisible")
@@ -34,7 +36,8 @@ public class AttributeFilterPanel extends FilterPanel {
     private static final String CLEAR_VISIBLE = ":not(.gdc-hidden)>.clearVisible";
     private static final String SELECT_VISIBLE = ":not(.gdc-hidden)>.selectVisible";
 
-    private static final By ATTRIBUTE_LOADED_LOCATOR = By.cssSelector(".yui3-c-simpleColumn-window.loaded");
+    private static final By ATTRIBUTE_LIST_LOADING_LOCATOR = By.cssSelector(".yui3-c-simpleColumn-window.loading");
+    private static final By ATTRIBUTE_LIST_LOADED_LOCATOR = By.cssSelector(".yui3-c-simpleColumn-window.loaded");
     private static final By SHOW_ALL_BUTTON_LOCATOR = By.className("s-btn-show_all");
 
     public AttributeFilterPanel showAllAttributes() {
@@ -65,7 +68,8 @@ public class AttributeFilterPanel extends FilterPanel {
     }
 
     public AttributeFilterPanel waitForValuesToLoad() {
-        waitForElementPresent(ATTRIBUTE_LOADED_LOCATOR, browser);
+        waitForElementNotPresent(ATTRIBUTE_LIST_LOADING_LOCATOR);
+        waitForElementPresent(ATTRIBUTE_LIST_LOADED_LOCATOR, browser);
         return this;
     }
 
@@ -114,8 +118,10 @@ public class AttributeFilterPanel extends FilterPanel {
     private void selectOneValue(String value) {
         waitForElementVisible(search).clear();
         search.sendKeys(value);
+        //sleep 1 second for waiting search starts
+        sleepTightInSeconds(1);
         waitForValuesToLoad();
-        for (FilterPanelRow row : rows) {
+        for (FilterPanelRow row : waitForCollectionIsNotEmpty(rows)) {
             if (!value.equals(row.getLabel().getText())) continue;
             row.getCheckbox().click();
             break;
