@@ -152,7 +152,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
     @Test(dependsOnGroups = "george", groups = {"basicTest"}, alwaysRun = true)
     public void signInWithAnnie() throws JSONException {
         logout();
-        signInAtGreyPages(testParams.getEditorUser(), testParams.getPassword());
+        signInAtGreyPages(imapEditorUser, imapEditorPassword);
     }
 
     @Test(dataProvider = "basicNotificationData", dependsOnMethods = "signInWithAnnie", groups = {
@@ -238,7 +238,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
     protected void addUsersToProject() {
         try {
             addUserToProject(technicalUser, UserRoles.ADMIN);
-            createAndAddUserToProject(UserRoles.EDITOR);
+            addUserToProject(imapEditorUser, UserRoles.EDITOR);
         } catch (Exception e) {
             throw new IllegalStateException("There is an exception when adding users to project!",
                     e);
