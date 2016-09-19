@@ -52,8 +52,6 @@ public class KpiValueFormatInAlertEmailTest extends AbstractDashboardTest {
 
     private List<String> kpiNames = new ArrayList<>();
 
-    private CsvFile csvFile;
-
     @BeforeClass(alwaysRun = true)
     public void initImapUser() throws Exception {
         imapHost = testParams.loadProperty("imap.host");
@@ -63,12 +61,12 @@ public class KpiValueFormatInAlertEmailTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject", "dashboardsInit"}, groups = {"precondition"})
     public void initIndigoDashboardWithKpi() throws JSONException, IOException {
-        csvFile = new CsvFile(DATASET_NAME)
+        String csvFilePath = new CsvFile(DATASET_NAME)
                 .columns(new CsvFile.Column("firstname"), new CsvFile.Column("number"), new CsvFile.Column("Date"))
-                .rows("Khoa", "10000", "2015-09-01");
-        csvFile.saveToDisc(testParams.getCsvFolder());
+                .rows("Khoa", "15000", "2015-09-01")
+                .saveToDisc(testParams.getCsvFolder());
 
-        uploadCSV(csvFile.getFilePath());
+        uploadCSV(csvFilePath);
 
         String numberFactUri = getMdService().getObjUri(getProject(), Fact.class, title("Number"));
         Attribute firstNameAttribute = getMdService().getObj(getProject(), Attribute.class, title("Firstname"));
@@ -137,7 +135,12 @@ public class KpiValueFormatInAlertEmailTest extends AbstractDashboardTest {
         if (updateCsv) {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
 
-            updateCsvDataset(DATASET_NAME, csvFile.getFilePath());
+            String updatedCsvFilePath = new CsvFile("Update")
+                    .columns(new CsvFile.Column("firstname"), new CsvFile.Column("number"), new CsvFile.Column("Date"))
+                    .rows("Khoa", "10000", "2015-09-01")
+                    .saveToDisc(testParams.getCsvFolder());
+
+            updateCsvDataset(DATASET_NAME, updatedCsvFilePath);
 
             logout();
             signInAtGreyPages(imapUser, imapPassword);
