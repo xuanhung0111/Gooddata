@@ -35,6 +35,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends GoodSalesAbs
     private static final String RECOMMENDED = "RECOMMENDED";
     private static final String OTHER = "OTHER";
     private static final String INSIGHT = "Insight";
+    private static final String INSIGHT_NEW = "Insight-new";
 
     private static final String CREATED = "Created";
     private static final String CLOSED = "Closed";
@@ -347,6 +348,35 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends GoodSalesAbs
         }
     }
 
+    @Test(dependsOnMethods = {"initData"}, dataProvider = "metricProvider1")
+    public void checkRecommendedDateDisplayTheMostFrequentUsage(Metric metric1, Metric metric2, String metricType)
+            throws JSONException, IOException {
+        final String kpiUri1 = createKpi(metric1.getTitle(), metric1.getUri(), createdDateUri);
+        final String kpiUri2 = createKpi(metric1.getTitle(), metric1.getUri(), createdDateUri);
+        final String kpiUri3 = createKpi(metric2.getTitle(), metric2.getUri(), closedDateUri);
+
+        final String indigoDashboardUri = createAnalyticalDashboard(
+                getRestApiClient(), testParams.getProjectId(), asList(kpiUri1, kpiUri2, kpiUri3));
+
+        try {
+            analysisPage.addMetric(metric1.getTitle());
+
+            if (!metric1.equals(metric2)) analysisPage.addMetric(metric2.getTitle());
+            analysisPage.addDate();
+
+            DateDimensionGroup recommended = analysisPage
+                    .getAttributesBucket()
+                    .getDateDatasetSelect()
+                    .getDateDimensionGroup(RECOMMENDED);
+
+            takeScreenshot(browser, "Recommended-date-display-by-most-frequent-usage-with-" + metricType, getClass());
+            assertEquals(recommended.getDateDimensions(), asList(CREATED, CLOSED));
+
+        } finally {
+            getMdService().removeObjByUri(indigoDashboardUri);
+        }
+    }
+
     @DataProvider(name = "metricProvider2")
     public Object[][] getMetricProvider2() {
         return new Object[][] {
@@ -416,6 +446,60 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends GoodSalesAbs
         } finally {
             getMdService().removeObjByUri(indigoDashboardUri);
         }
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void checkUnrelatedDateNotHide() throws JSONException, IOException {
+        try {
+            analysisPage
+                    .addMetric(METRIC_AMOUNT)
+                    .addDate()
+                    .saveInsight(INSIGHT)
+                    .saveInsightAs(INSIGHT_NEW)
+                    .openInsight(INSIGHT_NEW)
+                    .waitForReportComputing();
+
+            String hiddenDateDimension = analysisPage
+                    .getAttributesBucket()
+                    .getDateDatasetSelect()
+                    .getHiddenDescription();
+            takeScreenshot(browser, "Unrelated-date-not-hide-on-insight-which-was-save-as-new", getClass());
+            assertEquals(hiddenDateDimension, HIDDEN_DATE_DIMENSION_DESCRIPTION);
+
+        } finally {
+            getMdService().removeObjByUri(getInsightUri(INSIGHT, getRestApiClient(), testParams.getProjectId()));
+            getMdService().removeObjByUri(getInsightUri(INSIGHT_NEW, getRestApiClient(), testParams.getProjectId()));
+        }
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void checkRecommendedAfterSettingShowInPercentForMetric() {
+        analysisPage.addMetric(METRIC_AMOUNT).addDate();
+
+        DateDimensionSelect dateDatasetSelect = analysisPage.getAttributesBucket().getDateDatasetSelect();
+        DateDimensionGroup recommended = dateDatasetSelect.getDateDimensionGroup(RECOMMENDED);
+        DateDimensionGroup other = dateDatasetSelect.getDateDimensionGroup(OTHER);
+
+        assertEquals(recommended.getDateDimensions(), singletonList(CLOSED));
+        assertEquals(other.getDateDimensions(), asList(CREATED, SNAPSHOT));
+        assertEquals(dateDatasetSelect.getHiddenDescription(), HIDDEN_DATE_DIMENSION_DESCRIPTION);
+
+        analysisPage
+                .getMetricsBucket()
+                .getMetricConfiguration(METRIC_AMOUNT)
+                .expandConfiguration()
+                .showPercents();
+
+        dateDatasetSelect = analysisPage
+                .waitForReportComputing()
+                .getAttributesBucket()
+                .getDateDatasetSelect();
+        List<DateDimensionGroup> groups = dateDatasetSelect.getDateDimensionGroups();
+
+        takeScreenshot(browser, "Recommended-date-not-show-after-setting-show-in-percent-for-metric", getClass());
+        assertEquals(groups.size(), 1);
+        assertEquals(groups.get(0).getDateDimensions(), asList(CLOSED, CREATED, SNAPSHOT));
+        assertEquals(dateDatasetSelect.getHiddenDescription(), HIDDEN_DATE_DIMENSION_DESCRIPTION);
     }
 
     private String createKpi(String title, String metricUri, String dateDatasetUri) throws JSONException, IOException {
