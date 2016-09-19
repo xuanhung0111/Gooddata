@@ -38,9 +38,6 @@ public class DataPage extends AbstractFragment {
     @FindBy(css = ".massDelete button")
     private WebElement deleteObjectsButton;
 
-    @FindBy(css = "td.messageBox")
-    private WebElement progressMessageBox;
-
     @FindBy(xpath = "//div[@id='status']/div/div/div[@class='leftContainer']")
     private WebElement statusMessageOnGreenBar;
 
@@ -100,10 +97,6 @@ public class DataPage extends AbstractFragment {
 
     public WebElement getDeleteObjectsButton() {
         return waitForElementVisible(deleteObjectsButton);
-    }
-
-    public String getProgressMessageBox() {
-        return waitForElementVisible(progressMessageBox).getText();
     }
 
     public String getStatusMessageOnGreenBar() {

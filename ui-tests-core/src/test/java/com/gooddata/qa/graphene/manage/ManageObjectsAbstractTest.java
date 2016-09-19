@@ -100,7 +100,6 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
     protected void moveObjectsByTypeFolderName(ObjectTypes objectType, String targetFolder, List<String> objectsList) {
         DataPage.getInstance(browser).getMoveObjectsButton().sendKeys(Keys.ENTER);
         IpeEditor.getInstance(browser).setText(targetFolder);
-        assertTrue(DataPage.getInstance(browser).getProgressMessageBox().contains("Moving"));
         String message = String.format("Success! %d %s(s) moved to \"%s\" folder.",
                 objectsList.size(), objectType.getName(), targetFolder);
         assertEquals(DataPage.getInstance(browser).getStatusMessageOnGreenBar(), message);
