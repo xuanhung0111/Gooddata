@@ -11,6 +11,7 @@ import static org.testng.Assert.assertTrue;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
+import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -65,28 +66,35 @@ public class KpiAlertNullValueTest extends AbstractDashboardTest {
     public void initIndigoDashboardWithKpi() throws JSONException, IOException {
         String csvFilePath = new CsvFile(DATASET_NAME)
                 .columns(new CsvFile.Column("firstname"), new CsvFile.Column("number"), new CsvFile.Column("Date"))
-                .rows("Chi", "10100000", "2015-09-01")
+                .rows("GoodData1", "1000", "2015-09-01")
+                .rows("GoodData2", "-1000", "2015-09-01")
                 .saveToDisc(testParams.getCsvFolder());
 
         uploadCSV(csvFilePath);
 
         String numberFactUri = getMdService().getObjUri(getProject(), Fact.class, title("Number"));
         Attribute firstNameAttribute = getMdService().getObj(getProject(), Attribute.class, title("Firstname"));
-        String firstNameValueUri = getMdService().getAttributeElements(firstNameAttribute)
-                .stream().filter(e -> "Chi".equals(e.getTitle())).findFirst().get().getUri();
+
+        List<String> firstNameValues = getMdService()
+                .getAttributeElements(firstNameAttribute)
+                .stream()
+                .map(e -> e.getUri())
+                .collect(toList());
 
         String dateDatasetUri = getMdService().getObjUri(getProject(), Dataset.class,
                 identifier("date.dataset.dt"));
 
-        String maqlExpression = format("SELECT SUM([%s]) WHERE [%s] = [%s]",
-                numberFactUri, firstNameAttribute.getUri(), firstNameValueUri);
+        String maqlExpression1 = format("SELECT SUM([%s]) WHERE [%s] = [%s]",
+                numberFactUri, firstNameAttribute.getUri(), firstNameValues.get(0));
+        String maqlExpression2 = format("SELECT SUM([%s]) WHERE [%s] = [%s]",
+                numberFactUri, firstNameAttribute.getUri(), firstNameValues.get(1));
 
         List<Metric> metrics = Arrays.asList(
-                new Metric(generateUniqueMetricName(), maqlExpression, "#,##0"),
-                new Metric(generateUniqueMetricName(), maqlExpression, "#,##0"),
-                new Metric(generateUniqueMetricName(), maqlExpression, "[=NULL]empty;#,##0"),
-                new Metric(generateUniqueMetricName(), maqlExpression, "#,##0%"),
-                new Metric(generateUniqueMetricName(), maqlExpression, "#,##0%"));
+                new Metric(generateUniqueMetricName(), maqlExpression1, "#,##0"),
+                new Metric(generateUniqueMetricName(), maqlExpression2, "#,##0"),
+                new Metric(generateUniqueMetricName(), maqlExpression2, "[=NULL]empty;#,##0"),
+                new Metric(generateUniqueMetricName(), maqlExpression1, "#,##0%"),
+                new Metric(generateUniqueMetricName(), maqlExpression2, "#,##0%"));
 
         List<String> kpiUris = new ArrayList<>();
 
