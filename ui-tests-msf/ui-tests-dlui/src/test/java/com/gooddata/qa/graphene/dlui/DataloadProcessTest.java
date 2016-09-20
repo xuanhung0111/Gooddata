@@ -35,7 +35,6 @@ import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.process.ProcessRestUtils;
 import com.gooddata.qa.utils.http.rolap.RolapRestUtils;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.warehouse.Warehouse;
 
 public class DataloadProcessTest extends AbstractMSFTest {
@@ -175,10 +174,9 @@ public class DataloadProcessTest extends AbstractMSFTest {
 
     @Test(dependsOnGroups = {"initialData"}, priority = 2)
     public void addUsersToProjects() throws ParseException, IOException, JSONException {
-        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
-        UserManagementRestUtils.addUserToProject(restApiClient, testParams.getProjectId(), technicalUser, UserRoles.ADMIN);
-        UserManagementRestUtils.addUserToProject(restApiClient, testParams.getProjectId(), testParams.getEditorUser(), 
-                UserRoles.EDITOR);
+        addUserToProject(technicalUser, UserRoles.ADMIN);
+        createAndAddUserToProject(UserRoles.EDITOR);
+
         getAdsHelper().addUserToAdsInstance(ads, technicalUser, AdsRole.DATA_ADMIN);
         getAdsHelper().addUserToAdsInstance(ads, testParams.getEditorUser(), AdsRole.DATA_ADMIN);
     }
