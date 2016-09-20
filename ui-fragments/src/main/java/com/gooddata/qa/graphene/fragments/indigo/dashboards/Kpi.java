@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static org.openqa.selenium.By.className;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -26,6 +27,7 @@ public class Kpi extends Widget {
     public static final String KPI_ALERT_BUTTON_CLASS = "dash-item-action-alert";
     public static final String KPI_HAS_SET_ALERT_BUTTON = "has-set-alert";
     public static final String KPI_IS_ALERT_TRIGGERED = "is-alert-triggered";
+    public static final String KPI_IS_ALERT_EVALUATING = "is-alert-evaluating";
     public static final String KPI_IS_EMPTY_VALUE = "is-empty-value";
     public static final String KPI_IS_ERROR_VALUE = "is-error-value";
     public static final String KPI_ALERT_DIALOG_CLASS = "kpi-alert-dialog";
@@ -105,6 +107,7 @@ public class Kpi extends Widget {
     }
 
     public KpiAlertDialog openAlertDialog() {
+
         if (!hasAlertDialogOpen()) {
             hoverAndClickKpiAlertButton();
         }
@@ -121,6 +124,7 @@ public class Kpi extends Widget {
         sleepTightInSeconds(3);
         // TODO: Find a way to fix this issue that described in https://jira.intgdc.com/browse/CL-10042
 
+        waitForElementNotPresent(By.className(KPI_IS_ALERT_EVALUATING));
         getActions().moveToElement(value).moveToElement(alertButton).click().build().perform();
 
         return this;
