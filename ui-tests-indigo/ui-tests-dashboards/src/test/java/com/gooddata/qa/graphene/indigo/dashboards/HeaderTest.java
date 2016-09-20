@@ -1,29 +1,26 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
-
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_OUTLOOK;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForStringInUrl;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForStringInUrl;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteWidgetsUsingCascase;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getKpiUri;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteDashboardsUsingCascase;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
+import java.io.IOException;
 
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
-
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
-import java.io.IOException;
 
 public class HeaderTest extends GoodSalesAbstractDashboardTest {
 
@@ -46,6 +43,7 @@ public class HeaderTest extends GoodSalesAbstractDashboardTest {
 
             // ensure that feature flag is applied
             initDashboardsPage();
+            browser.navigate().refresh();
             waitForDashboardPageLoaded(browser);
 
             takeScreenshot(browser, "KPI-header-not-display-when-FF-is-off", getClass());
@@ -63,6 +61,8 @@ public class HeaderTest extends GoodSalesAbstractDashboardTest {
             ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
                     ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
 
+            // load old dashboards first to avoid redirect to projects.html
+            initDashboardsPage();
             initIndigoDashboardsPage().getSplashScreen()
                 .startEditingWidgets()
                 .addKpi(
@@ -87,8 +87,7 @@ public class HeaderTest extends GoodSalesAbstractDashboardTest {
                 takeScreenshot(browser, "KPI-header-display-when-FF-is-off-and-there-is-saved-KPI", getClass());
                 assertTrue(ApplicationHeaderBar.isKpisLinkVisible(browser));
             } finally {
-                deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(),
-                        getKpiUri(METRIC_AMOUNT, getRestApiClient(), testParams.getProjectId()));
+                deleteDashboardsUsingCascase(getRestApiClient(), testParams.getProjectId());
             }
 
             initDashboardsPage();
@@ -106,6 +105,8 @@ public class HeaderTest extends GoodSalesAbstractDashboardTest {
     @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkLogout() throws JSONException {
         try {
+            // load old dashboards first to avoid redirect to projects.html
+            initDashboardsPage();
             initIndigoDashboardsPage()
                     .logout();
 
