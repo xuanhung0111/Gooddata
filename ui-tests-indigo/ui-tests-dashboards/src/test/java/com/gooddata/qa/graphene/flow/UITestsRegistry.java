@@ -8,7 +8,6 @@ import com.gooddata.qa.graphene.indigo.dashboards.DataSetTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DragWidgetsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.HeaderTest;
 import com.gooddata.qa.graphene.indigo.dashboards.InsightOnDashboardTest;
-import com.gooddata.qa.graphene.indigo.dashboards.KpiAlertTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ManipulateWidgetsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.MetricsDropdownTest;
 import com.gooddata.qa.graphene.indigo.dashboards.NonProductionDatasetTest;
@@ -32,7 +31,6 @@ public class UITestsRegistry {
         suites.put("pull-request", new Object[] {
             DataSetTest.class,
             HeaderTest.class,
-            KpiAlertTest.class,
             ManipulateWidgetsTest.class,
             DragWidgetsTest.class,
             PartialExportDashboardsTest.class,
@@ -54,6 +52,7 @@ public class UITestsRegistry {
             "testng-desktop-MetricsAccessibility.xml",
             "testng-desktop-ProjectSwitch.xml",
             "testng-desktop-EmptyErrorKpiValue.xml",
+            "testng-desktop-imap-KpiAlert.xml",
             "testng-mobile-AttributeFiltering.xml",
             "testng-mobile-DateFiltering.xml",
             "testng-mobile-EditMode.xml",
@@ -69,7 +68,6 @@ public class UITestsRegistry {
         suites.put("all", new Object[] {
             DataSetTest.class,
             HeaderTest.class,
-            KpiAlertTest.class,
             ManipulateWidgetsTest.class,
             DragWidgetsTest.class,
             PartialExportDashboardsTest.class,
@@ -94,6 +92,7 @@ public class UITestsRegistry {
             "testng-desktop-imap-KpiValueFormatInAlertEmail.xml",
             "testng-desktop-imap-KpiAlertSpecialCaseTest.xml",
             "testng-desktop-EmptyErrorKpiValue.xml",
+            "testng-desktop-imap-KpiAlert.xml",
             "testng-mobile-AttributeFiltering.xml",
             "testng-mobile-DateFiltering.xml",
             "testng-mobile-EditMode.xml",
