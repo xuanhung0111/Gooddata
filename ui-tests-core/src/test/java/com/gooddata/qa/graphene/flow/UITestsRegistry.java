@@ -103,10 +103,6 @@ public class UITestsRegistry {
             GoodSalesDefaultFilterMultipleChoiceTest.class
         });
 
-        suites.put("default-filter-feature", new Object[] {
-            GoodSalesDefaultFilterMultipleChoiceTest.class
-        });
-
         suites.put("reports", new Object[] {
             GoodSalesDrillReportTest.class,
             GoodSalesDrillReportToExportTest.class,
