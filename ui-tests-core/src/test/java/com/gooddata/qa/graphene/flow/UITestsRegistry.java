@@ -99,7 +99,8 @@ public class UITestsRegistry {
             GoodSalesFilterGroupTest.class,
             DashboardFilterVisualTest.class,
             DashboardSavedFiltersTest.class,
-            GoodSalesAdvancedConnectingFilterTest.class
+            GoodSalesAdvancedConnectingFilterTest.class,
+            GoodSalesDefaultFilterMultipleChoiceTest.class
         });
 
         suites.put("default-filter-feature", new Object[] {
