@@ -39,13 +39,13 @@ public class ReorderInsightTest extends AbstractDashboardTest {
                 createBlankInsightWrapUsingRest(THIRD_INSIGHT)
         ));
 
-        initIndigoDashboardsPage().waitForDashboardLoad();
+        initIndigoDashboardsPageWithWidgets();
         checkInsightOrder(FIRST_INSIGHT, SECOND_INSIGHT, THIRD_INSIGHT, "Adding-Insight-To-Dashboard");
     }
 
     @Test(dependsOnMethods = {"testAddingInsightsToDashboard"}, groups = {"reorder-test"})
     public void testMovingInsightToFirstPosition() {
-        initIndigoDashboardsPage().switchToEditMode();
+        initIndigoDashboardsPageWithWidgets().switchToEditMode();
         indigoDashboardsPage.dragWidget(indigoDashboardsPage.getWidgetByIndex(Insight.class, 2),
                 indigoDashboardsPage.getWidgetByIndex(Insight.class, 0), DropZone.PREV);
         checkInsightOrder(THIRD_INSIGHT, FIRST_INSIGHT, SECOND_INSIGHT, "Test-Moving-Insight-To-First-Position");
@@ -53,7 +53,7 @@ public class ReorderInsightTest extends AbstractDashboardTest {
 
     @Test(dependsOnMethods = {"testAddingInsightsToDashboard"}, groups = {"reorder-test"})
     public void testMovingInsightToLastPosition() {
-        initIndigoDashboardsPage().switchToEditMode();
+        initIndigoDashboardsPageWithWidgets().switchToEditMode();
         indigoDashboardsPage.dragWidget(indigoDashboardsPage.getWidgetByIndex(Insight.class, 1),
                 indigoDashboardsPage.getWidgetByIndex(Insight.class, 2), DropZone.NEXT);
         checkInsightOrder(FIRST_INSIGHT, THIRD_INSIGHT, SECOND_INSIGHT, "Test-Moving-Insight-To-Last-Position");
@@ -61,7 +61,7 @@ public class ReorderInsightTest extends AbstractDashboardTest {
 
     @Test(dependsOnMethods = {"testAddingInsightsToDashboard"}, groups = {"reorder-test"})
     public void testMovingInsightToMiddlePosition() {
-        initIndigoDashboardsPage().switchToEditMode();
+        initIndigoDashboardsPageWithWidgets().switchToEditMode();
         indigoDashboardsPage.dragWidget(indigoDashboardsPage.getWidgetByIndex(Insight.class, 0),
                 indigoDashboardsPage.getWidgetByIndex(Insight.class, 1), DropZone.NEXT);
         checkInsightOrder(SECOND_INSIGHT, FIRST_INSIGHT, THIRD_INSIGHT, "Test-Moving-Insight-To-Middle-Position");
@@ -69,7 +69,7 @@ public class ReorderInsightTest extends AbstractDashboardTest {
 
     @Test(dependsOnMethods = {"testAddingInsightsToDashboard"}, dependsOnGroups = {"reorder-test"})
     public void testInsightOrderAfterSaving() throws JSONException, IOException {
-        initIndigoDashboardsPage().switchToEditMode();
+        initIndigoDashboardsPageWithWidgets().switchToEditMode();
         indigoDashboardsPage.dragWidget(indigoDashboardsPage.getWidgetByIndex(Insight.class, 0),
                 indigoDashboardsPage.getWidgetByIndex(Insight.class, 1), DropZone.NEXT);
         checkInsightOrder(SECOND_INSIGHT, FIRST_INSIGHT, THIRD_INSIGHT, "Insight-Order-Before-Saving");
@@ -79,7 +79,7 @@ public class ReorderInsightTest extends AbstractDashboardTest {
 
     @Test(dependsOnMethods = {"testInsightOrderAfterSaving"})
     public void testInsightOrderAfterSwitchingPage() throws JSONException, IOException {
-        initIndigoDashboardsPage().waitForDashboardLoad();
+        initIndigoDashboardsPageWithWidgets();
         checkInsightOrder(SECOND_INSIGHT, FIRST_INSIGHT, THIRD_INSIGHT, "Insight-Order-Before-Switching-Page");
         initAnalysePage();
         assertTrue(browser.getCurrentUrl().contains("/reportId/edit"));
