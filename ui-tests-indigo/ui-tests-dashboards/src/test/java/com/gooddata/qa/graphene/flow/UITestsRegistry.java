@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.gooddata.qa.graphene.indigo.dashboards.AddKpiWithoutDataSetTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DataSetTest;
+import com.gooddata.qa.graphene.indigo.dashboards.DateFilteringOnInsightTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DragWidgetsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.HeaderTest;
 import com.gooddata.qa.graphene.indigo.dashboards.InsightOnDashboardTest;
@@ -42,6 +43,7 @@ public class UITestsRegistry {
             NonProductionDatasetTest.class,
             InsightOnDashboardTest.class,
             RoutingTest.class,
+            DateFilteringOnInsightTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-EditMode.xml",
@@ -79,6 +81,7 @@ public class UITestsRegistry {
             ReorderInsightTest.class,
             NonProductionDatasetTest.class,
             RoutingTest.class,
+            DateFilteringOnInsightTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-EditMode.xml",

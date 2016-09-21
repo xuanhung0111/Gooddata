@@ -10,12 +10,17 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.http.ParseException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
+import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
+import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
+import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.entity.visualization.VisualizationMDConfiguration;
 import com.gooddata.qa.utils.http.RestApiClient;
 
@@ -118,16 +123,7 @@ public class IndigoRestUtils {
      */
     public static List<String> getAnalyticalDashboards(final RestApiClient restApiClient, final String projectId)
             throws JSONException, IOException {
-        final String analyticalDashboardsUri = "/gdc/md/" + projectId + "/query/analyticaldashboard";
-        final JSONArray entries = getJsonObject(restApiClient, analyticalDashboardsUri)
-                .getJSONObject("query")
-                .getJSONArray("entries");
-        final List<String> dashboardLinks = new ArrayList<>();
-        for (int i = 0, n = entries.length(); i < n; i++) {
-            dashboardLinks.add(entries.getJSONObject(i).getString("link"));
-        }
-
-        return dashboardLinks;
+        return getMdObjectValues(restApiClient, projectId, "analyticaldashboard", jsonObj -> jsonObj.getString("link"));
     }
 
     /**
@@ -199,6 +195,26 @@ public class IndigoRestUtils {
                     .getJSONObject("visualization")
                     .getJSONObject("meta")
                     .getString("uri");
+    }
+
+    /**
+     * Create an insight. Currently, the insight could be a combination of measure, view by
+     * and stack by.
+     * 
+     * @param restApiClient
+     * @param projectId
+     * @param insightConfig
+     * @return
+     * @throws ParseException
+     * @throws JSONException
+     * @throws IOException
+     */
+    public static String createInsight(final RestApiClient restApiClient, final String projectId,
+            final InsightMDConfiguration insightConfig) throws ParseException, JSONException, IOException {
+        return getJsonObject(restApiClient,
+                restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId),
+                        initInsightObject(insightConfig).toString())).getJSONObject("visualization")
+                                .getJSONObject("meta").getString("uri");
     }
 
     /**
@@ -281,13 +297,7 @@ public class IndigoRestUtils {
      */
     public static List<String> getAllInsightNames(final RestApiClient restApiClient, final String projectId)
             throws JSONException, IOException {
-        final JSONArray objects = getMdObjects(restApiClient, projectId, "visualizations");
-        final List<String> insights = new ArrayList<>();
-        for (int i = 0, n = objects.length(); i < n; i++) {
-            insights.add(objects.getJSONObject(i).getString("title"));
-        }
-
-        return insights;
+        return getMdObjectValues(restApiClient, projectId, "visualizations", jsonObj -> jsonObj.getString("title"));
     }
 
     /**
@@ -302,7 +312,23 @@ public class IndigoRestUtils {
      */
     public static String getInsightUri(final String insight, final RestApiClient restApiClient,
             final String projectId) throws JSONException, IOException {
-        return getMdObjectUriByTitle(insight, "visualizations", restApiClient, projectId);
+        return getMdObjectValue(restApiClient, projectId, "visualizations",
+                jsonObj -> insight.equals(jsonObj.getString("title")), jsonObj -> jsonObj.getString("link"));
+    }
+
+    /**
+     * get all insight widget titles
+     * 
+     * @param restApiClient
+     * @param projectId
+     * @return list of titles. Otherwise, return empty list
+     * @throws JSONException
+     * @throws IOException
+     */
+    public static List<String> getInsightWidgetTitles(final RestApiClient restApiClient, final String projectId)
+            throws JSONException, IOException {
+        return getMdObjectValues(restApiClient, projectId, "visualizationwidgets",
+                jsonObj -> jsonObj.getString("title"));
     }
 
     /**
@@ -317,7 +343,8 @@ public class IndigoRestUtils {
 
     public static String getKpiUri(final String kpi, final RestApiClient restApiClient, final String projectId)
             throws JSONException, IOException {
-        return getMdObjectUriByTitle(kpi, "kpi", restApiClient, projectId);
+        return getMdObjectValue(restApiClient, projectId, "kpi", jsonObj -> kpi.equals(jsonObj.getString("title")),
+                jsonObj -> jsonObj.getString("link"));
     }
 
     /**
@@ -362,25 +389,113 @@ public class IndigoRestUtils {
                 dashboardUris.toArray(new String[dashboardUris.size()]));
     }
 
-    private static JSONArray getMdObjects(final RestApiClient restApiClient, final String projectId,
-            final String type) throws JSONException, IOException {
-        final String query = "/gdc/md/" + projectId + "/query/" + type;
-        return getJsonObject(restApiClient, query).getJSONObject("query").getJSONArray("entries");
-    }
-
-    private static String getMdObjectUriByTitle(final String title, final String type,
-            final RestApiClient restApiClient, final String projectId) throws JSONException, IOException {
-        final JSONArray objects = getMdObjects(restApiClient, projectId, type);
-        for (int i = 0, n = objects.length(); i < n; i++) {
-            if(title.equals(objects.getJSONObject(i).getString("title")))
-                return objects.getJSONObject(i).getString("link");
-        }
-        throw new RuntimeException("There is no " + type + " titled " + title);
-    }
-
     private static int getDashboardWidgetCount(final RestApiClient restApiClient, final String dashboardUri)
             throws JSONException, IOException {
         return getJsonObject(restApiClient, dashboardUri).getJSONObject("analyticalDashboard")
                 .getJSONObject("content").getJSONArray("widgets").length();
+    }
+
+    private static JSONObject initInsightObject(final InsightMDConfiguration insightConfig) throws JSONException {
+        return new JSONObject() {{
+            put("visualization", new JSONObject() {{
+                put("content", new JSONObject() {{
+                    put("buckets", new JSONObject() {{
+                        put("measures", initMeasureObjects(insightConfig.getMeasureBuckets()));
+                        put("categories", initCategoryObjects(insightConfig.getCategoryBuckets()));
+                        put("filters", new JSONArray());
+                    }}); 
+                    put("type", insightConfig.getType().getLabel());
+                }});
+                put("meta", new JSONObject() {{
+                    put("title", insightConfig.getTitle());
+                }});
+            }});
+        }};
+    }
+
+    private static JSONArray initMeasureObjects(final List<MeasureBucket> measureBuckets) throws JSONException {
+        return new JSONArray() {{
+                if (!CollectionUtils.isEmpty(measureBuckets)) {
+                    for (MeasureBucket bucket : measureBuckets) {
+                        put(new JSONObject() {{
+                            put("measure", new JSONObject() {{
+                                put("measureFilters", new JSONArray());
+                                put("title", bucket.getTitle());
+                                put("showPoP", bucket.hasShowPoP());
+                                put("showInPercent", bucket.hasShowInPercent());
+                                put("type", bucket.getType());
+                                put("objectUri", bucket.getObjectUri());
+                            }});
+                        }});
+                    }
+                }
+        }};
+    }
+
+    private static JSONArray initCategoryObjects(final List<CategoryBucket> categoryBuckets) throws JSONException {
+        return new JSONArray() {{
+                if (!CollectionUtils.isEmpty(categoryBuckets)) {
+                    for (CategoryBucket bucket : categoryBuckets) {
+                        put(new JSONObject() {{
+                            put("category", new JSONObject() {{
+                                put("attribute", bucket.getAttribute());
+                                put("displayForm", bucket.getDisplayForm());
+                                put("collection", bucket.getCollection());
+                                put("type", bucket.getType());
+                            }});
+                        }});
+                    }
+                }
+        }};
+    }
+
+    private static <T> List<T> getMdObjectValues(final RestApiClient restApiClient, final String projectId,
+            final String type, final ThrowingFunction<JSONObject, T> func) {
+        try {
+            JSONArray jsonArray = getMdObjects(restApiClient, projectId, type);
+            List<T> results = new ArrayList<>();
+
+            for (int i = 0, n = jsonArray.length(); i < n; i++) {
+                results.add(func.apply(jsonArray.getJSONObject(i)));
+            }
+
+            return results;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static <T> T getMdObjectValue(final RestApiClient restApiClient, final String projectId,
+            final String type, final ThrowingPredicate<JSONObject> filter,
+            final ThrowingFunction<JSONObject, T> func) {
+        try {
+            JSONArray jsonArray = getMdObjects(restApiClient, projectId, type);
+            JSONObject foundObject = null;
+
+            for (int i = 0, n = jsonArray.length(); i < n; i++) {
+                foundObject = jsonArray.getJSONObject(i);
+
+                if (filter.test(foundObject)) {
+                    return func.apply(foundObject);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        throw new RuntimeException("Can't find the object");
+    }
+
+    private static JSONArray getMdObjects(final RestApiClient restApiClient, final String projectId,
+            final String type) throws JSONException, IOException {
+        return getJsonObject(restApiClient, "/gdc/md/" + projectId + "/query/" + type).getJSONObject("query")
+                .getJSONArray("entries");
+    }
+
+    private interface ThrowingFunction<T, R> {
+        R apply(T t) throws Exception;
+    }
+
+    private interface ThrowingPredicate<T> {
+        boolean test(T t) throws Exception;
     }
 }

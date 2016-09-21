@@ -76,7 +76,7 @@ public class AddKpiWithoutDataSetTest extends AbstractDashboardTest {
 
         IndigoDashboardsPage.getInstance(browser).getConfigurationPanel()
             .selectMetricByName(METRIC_CONNECT_WITH_DATA_SET)
-            .selectDataSetByName(DATA_SET);
+            .selectDateDataSetByName(DATA_SET);
 
         IndigoDashboardsPage.getInstance(browser).saveEditModeWithWidgets();
         takeScreenshot(browser, "update-kpi-connect-with-data-set", getClass());
