@@ -12,6 +12,7 @@ import com.gooddata.qa.graphene.dashboards.GoodSalesConnectingFilterTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardAllKindsFiltersTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDefaultFilterMultipleChoiceTest;
+import com.gooddata.qa.graphene.dashboards.GoodSalesEditEmbeddedDashboardTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesEmbeddedDashboardTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardWidgetManipulationTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesFilterDropdownAttributeValueTest;
@@ -27,9 +28,11 @@ import com.gooddata.qa.graphene.manage.ComputedAttributesTest;
 import com.gooddata.qa.graphene.manage.GoodSalesFactTest;
 import com.gooddata.qa.graphene.manage.GoodSalesFolderTest;
 import com.gooddata.qa.graphene.manage.GoodSalesManageObjectsTest;
+import com.gooddata.qa.graphene.manage.GoodSalesMetricEditorTest;
 import com.gooddata.qa.graphene.manage.GoodSalesMetricNumberFormatterTest;
 import com.gooddata.qa.graphene.manage.GoodSalesVariableTest;
 import com.gooddata.qa.graphene.manage.GoodSalesViewModelVisualizationTest;
+import com.gooddata.qa.graphene.manage.MetricEditorTest;
 import com.gooddata.qa.graphene.manage.SimpleProjectGeoLabelTest;
 import com.gooddata.qa.graphene.project.SimpleProjectEtlTest;
 import com.gooddata.qa.graphene.reports.CopyReportTableTest;
@@ -144,7 +147,8 @@ public class UITestsRegistry {
             GoodSalesEmbeddedDashboardTest.class,
             GoodSalesPersonalObjectsInDashboardWidgetTest.class,
             GoodSalesReportWidgetOnDashboardTest.class,
-            DashboardPermissionsTest.class
+            DashboardPermissionsTest.class,
+            GoodSalesEditEmbeddedDashboardTest.class
         });
 
         suites.put("dashboards-cell-limit", new Object[] {
@@ -161,6 +165,8 @@ public class UITestsRegistry {
             ComputedAttributesTest.class,
             GoodSalesFolderTest.class,
             GoodSalesVariableTest.class,
+            MetricEditorTest.class,
+            GoodSalesMetricEditorTest.class,
             "testng-manage-aggregation-metric-test.xml",
             "testng-manage-different-granularity-logical-metric-test.xml",
             "testng-manage-filter-share-ratio-metric-test.xml",
