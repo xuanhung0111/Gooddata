@@ -3,6 +3,8 @@ package com.gooddata.qa.graphene.indigo.dashboards.common;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.addWidgetToAnalyticalDashboard;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createInsight;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidgetWrap;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAnalyticalDashboards;
 import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
 import static java.util.Collections.singletonList;
@@ -20,6 +22,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
+import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
@@ -105,6 +108,12 @@ public abstract class AbstractDashboardTest extends AbstractProjectTest {
     protected String getWorkingDashboardUri() throws JSONException, IOException {
         // if having more than 1 dashboard, the first one will be working project by default
         return getAnalyticalDashboards(getRestApiClient(), testParams.getProjectId()).get(0);
+    }
+
+    protected String createInsightWidget(InsightMDConfiguration insightConfig) throws JSONException, IOException {
+        return createVisualizationWidgetWrap(getRestApiClient(), testParams.getProjectId(),
+                createInsight(getRestApiClient(), testParams.getProjectId(), insightConfig),
+                insightConfig.getTitle());
     }
 
     protected String convertToUniqueHeadline(final String headline) {

@@ -130,7 +130,7 @@ public class ManipulateWidgetsTest extends GoodSalesAbstractDashboardTest {
 
         waitForFragmentVisible(indigoDashboardsPage).getConfigurationPanel()
             .selectMetricByName(METRIC_AMOUNT)
-            .selectDataSetByName(DATE_CREATED);
+            .selectDateDataSetByName(DATE_CREATED);
 
         String metricHeadline = selectedKpi.getHeadline();
 
@@ -138,7 +138,7 @@ public class ManipulateWidgetsTest extends GoodSalesAbstractDashboardTest {
 
         indigoDashboardsPage.getConfigurationPanel()
             .selectMetricByName(METRIC_LOST)
-            .selectDataSetByName(DATE_CREATED);
+            .selectDateDataSetByName(DATE_CREATED);
         assertNotEquals(selectedKpi.getHeadline(), metricHeadline);
     }
 
@@ -150,7 +150,7 @@ public class ManipulateWidgetsTest extends GoodSalesAbstractDashboardTest {
 
         waitForFragmentVisible(indigoDashboardsPage).getConfigurationPanel()
             .selectMetricByName(METRIC_AMOUNT)
-            .selectDataSetByName(DATE_CREATED);
+            .selectDateDataSetByName(DATE_CREATED);
 
         selectedKpi.setHeadline(TEST_HEADLINE);
         String metricHeadline = selectedKpi.getHeadline();
@@ -159,7 +159,7 @@ public class ManipulateWidgetsTest extends GoodSalesAbstractDashboardTest {
 
         indigoDashboardsPage.getConfigurationPanel()
             .selectMetricByName(METRIC_AMOUNT)
-            .selectDataSetByName(DATE_CREATED);
+            .selectDateDataSetByName(DATE_CREATED);
 
         assertEquals(selectedKpi.getHeadline(), TEST_HEADLINE);
 

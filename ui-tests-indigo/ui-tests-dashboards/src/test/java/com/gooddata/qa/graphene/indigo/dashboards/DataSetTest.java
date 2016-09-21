@@ -60,7 +60,7 @@ public class DataSetTest extends GoodSalesAbstractDashboardTest {
 
         waitForFragmentVisible(indigoDashboardsPage)
             .getConfigurationPanel()
-            .selectDataSetByName(DATE_CLOSED);
+            .selectDateDataSetByName(DATE_CLOSED);
 
         indigoDashboardsPage
             .leaveEditMode()
