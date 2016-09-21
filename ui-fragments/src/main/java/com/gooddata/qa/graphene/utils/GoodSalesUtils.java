@@ -46,6 +46,7 @@ public final class GoodSalesUtils {
     public static final String METRIC_PRODUCTIVE_REPS = "Productive Reps";
     public static final String METRIC_STAGE_VELOCITY = "Stage Velocity";
     public static final String METRIC_EXPECTED_PERCENT_OF_GOAL = "Expected % of Goal";
+    public static final String METRIC_STAGE_DURATION = "Stage Duration";
 
     // attributes
     public static final String ATTR_PRODUCT = "Product";

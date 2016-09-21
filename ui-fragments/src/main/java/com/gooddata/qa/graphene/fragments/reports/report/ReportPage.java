@@ -56,6 +56,7 @@ import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
+import com.gooddata.qa.graphene.fragments.manage.MetricEditorDialog;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
 import com.gooddata.qa.graphene.fragments.reports.filter.AbstractFilterFragment;
@@ -136,6 +137,8 @@ public class ReportPage extends AbstractFragment {
             .cssSelector("div.yui3-c-metricaxisconfiguration-content:not(.gdc-hidden)");
 
     private static final By SND_DIALOG_LOADING = By.cssSelector("form.sndFooterForm > .progress.s-loading");
+
+    private static final By DONE_BUTTON_LOCATOR = By.cssSelector("form.sndFooterForm > button.s-btn-done:not([disabled])");
 
     public static final ReportPage getInstance(SearchContext context) {
         return Graphene.createPageFragment(ReportPage.class, waitForElementVisible(id("p-analysisPage"), context));
@@ -269,9 +272,8 @@ public class ReportPage extends AbstractFragment {
         sleepTightInSeconds(2);
 
         waitForElementNotPresent(SND_DIALOG_LOADING);
-        waitForElementVisible(By.cssSelector("form.sndFooterForm > button.s-btn-done:not([disabled])"), browser)
-            .click();
-        waitForElementNotVisible(By.cssSelector("form.sndFooterForm > button.s-btn-done:not([disabled])"));
+        waitForElementVisible(DONE_BUTTON_LOCATOR, browser).click();
+        waitForElementNotVisible(DONE_BUTTON_LOCATOR);
 
         Predicate<WebDriver> predicate = input -> !waitForElementVisible(filterButton)
                 .getAttribute("class")
@@ -890,8 +892,10 @@ public class ReportPage extends AbstractFragment {
         waitForElementVisible(xpath("//button[contains(@class,'sndCreateMetric')]"), browser).click();
     }
 
-    public void clickAddAdvanceMetric() {
+    public MetricEditorDialog clickAddAdvanceMetric() {
         waitForElementVisible(className("sndCreateAdvancedMetric"), browser).click();
+
+        return MetricEditorDialog.getInstance(browser);
     }
 
     private void initSimpleMetric(SimpleMetricTypes metricOperation, String metricOnFact) {
@@ -908,6 +912,14 @@ public class ReportPage extends AbstractFragment {
     public SimpleMenu openOptionsMenu() {
         waitForElementVisible(optionsButton).click();
         return SimpleMenu.getInstance(browser);
+    }
+
+    public MetricEditorDialog editMetric(String metric) {
+        // waitForSndMetricDetail() does not work on local metric
+        selectMetric(metric, WebElement::click);
+        waitForElementVisible(By.className("c-metricDetailEditButton"), getRoot()).click();
+
+        return MetricEditorDialog.getInstance(browser);
     }
 
     private void setReportVisibleSettings(boolean isVisible) {

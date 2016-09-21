@@ -36,67 +36,42 @@ public class MetricPage extends DataPage {
     }
 
     public MetricPage createShareMetric(String metricName, String usedMetric, String attr) {
-        openMetricEditor();
-        Graphene.createPageFragment(MetricEditorDialog.class,
-                waitForElementVisible(MetricEditorDialog.LOCATOR, browser))
-            .createShareMetric(metricName, usedMetric, attr);
+        openMetricEditor().createShareMetric(metricName, usedMetric, attr);
         return backToMetricsTable();
     }
 
-    public MetricPage createDifferentMetric(String metricName, String usedMetric, String attr,
-            String attrValue) {
-        openMetricEditor();
-        Graphene.createPageFragment(MetricEditorDialog.class,
-                waitForElementVisible(MetricEditorDialog.LOCATOR, browser))
-            .createDifferentMetric(metricName, usedMetric, attr, attrValue);
+    public MetricPage createDifferentMetric(String metricName, String usedMetric, String attr, String attrValue) {
+        openMetricEditor().createDifferentMetric(metricName, usedMetric, attr, attrValue);
         return backToMetricsTable();
     }
 
     public MetricPage createRatioMetric(String metricName, String usedMetric1, String usedMetric2) {
-        openMetricEditor();
-        Graphene.createPageFragment(MetricEditorDialog.class,
-                waitForElementVisible(MetricEditorDialog.LOCATOR, browser))
-            .createRatioMetric(metricName, usedMetric1, usedMetric2);
+        openMetricEditor().createRatioMetric(metricName, usedMetric1, usedMetric2);
         return backToMetricsTable();
     }
 
     public MetricPage createAggregationMetric(MetricTypes metricType, CustomMetricUI metricUI) {
-        openMetricEditor();
-        Graphene.createPageFragment(MetricEditorDialog.class,
-                waitForElementVisible(MetricEditorDialog.LOCATOR, browser))
-            .createAggregationMetric(metricType, metricUI);
+        openMetricEditor().createAggregationMetric(metricType, metricUI);
         return backToMetricsTable();
     }
 
     public MetricPage createNumericMetric(MetricTypes metricType, CustomMetricUI metricUI) {
-        openMetricEditor();
-        Graphene.createPageFragment(MetricEditorDialog.class,
-                waitForElementVisible(MetricEditorDialog.LOCATOR, browser))
-            .createNumericMetric(metricType, metricUI);
+        openMetricEditor().createNumericMetric(metricType, metricUI);
         return backToMetricsTable();
     }
 
     public MetricPage createGranularityMetric(MetricTypes metricType, CustomMetricUI metricUI) {
-        openMetricEditor();
-        Graphene.createPageFragment(MetricEditorDialog.class,
-                waitForElementVisible(MetricEditorDialog.LOCATOR, browser))
-            .createGranularityMetric(metricType, metricUI);
+        openMetricEditor().createGranularityMetric(metricType, metricUI);
         return backToMetricsTable();
     }
 
     public MetricPage createLogicalMetric(MetricTypes metricType, CustomMetricUI metricUI) {
-        openMetricEditor();
-        Graphene.createPageFragment(MetricEditorDialog.class,
-                waitForElementVisible(MetricEditorDialog.LOCATOR, browser))
-            .createLogicalMetric(metricType, metricUI);
+        openMetricEditor().createLogicalMetric(metricType, metricUI);
         return backToMetricsTable();
     }
 
     public MetricPage createFilterMetric(MetricTypes metricType, CustomMetricUI metricUI) {
-        openMetricEditor();
-        Graphene.createPageFragment(MetricEditorDialog.class,
-                waitForElementVisible(MetricEditorDialog.LOCATOR, browser))
-            .createFilterMetric(metricType, metricUI);
+        openMetricEditor().createFilterMetric(metricType, metricUI);
         return backToMetricsTable();
     }
 
@@ -127,9 +102,10 @@ public class MetricPage extends DataPage {
         return !waitForElementPresent(By.id("metricsTable"), browser).isDisplayed();
     }
 
-    private void openMetricEditor() {
+    public MetricEditorDialog openMetricEditor() {
         waitForElementVisible(createMetricButton).click();
-        browser.switchTo().frame(waitForElementVisible(METRIC_EDITOR_LOCATOR, browser));
+
+        return MetricEditorDialog.getInstance(browser);
     }
 
     private MetricPage backToMetricsTable() {
