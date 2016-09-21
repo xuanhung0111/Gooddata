@@ -32,7 +32,6 @@ public class Kpi extends Widget {
     public static final String KPI_IS_ERROR_VALUE = "is-error-value";
     public static final String KPI_ALERT_DIALOG_CLASS = "kpi-alert-dialog";
 
-    public static final By IS_NOT_EDITABLE = By.cssSelector(MAIN_SELECTOR + " .kpi:not(.is-editable)");
     public static final By ALERT_DIALOG = By.className(KPI_ALERT_DIALOG_CLASS);
 
     @FindBy(className = KPI_ALERT_BUTTON_CLASS)

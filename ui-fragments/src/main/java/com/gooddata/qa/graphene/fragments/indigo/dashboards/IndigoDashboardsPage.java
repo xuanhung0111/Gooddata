@@ -11,6 +11,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
 import static com.gooddata.qa.utils.CssUtils.convertCSSClassTojQuerySelector;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
@@ -101,7 +102,8 @@ public class IndigoDashboardsPage extends AbstractFragment {
     }
 
     public IndigoDashboardsPage switchToEditMode() {
-        waitForElementVisible(editButton).click();
+        waitForElementEnabled(waitForElementVisible(editButton)).click();
+
         waitForElementVisible(cancelButton);
 
         // There's an animation switching to edit mode,
@@ -109,7 +111,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
         Sleeper.sleepTight(500);
 
         // wait until editing is allowed
-        return waitForKpiEditable();
+        return waitForWidgetsEditable();
     }
 
     public IndigoDashboardsPage cancelEditModeWithoutChange() {
@@ -374,8 +376,8 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return IndigoInsightSelectionPanel.getInstance(browser);
     }
 
-    private IndigoDashboardsPage waitForKpiEditable() {
-        waitForElementNotPresent(Kpi.IS_NOT_EDITABLE);
+    private IndigoDashboardsPage waitForWidgetsEditable() {
+        waitForElementNotPresent(By.cssSelector(".dash-item-content > div:not(.is-editable)"));
         return this;
     }
 
