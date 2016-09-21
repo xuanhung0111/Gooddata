@@ -11,7 +11,6 @@ import com.gooddata.qa.graphene.dashboards.GoodSalesCellLimitTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesConnectingFilterTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardAllKindsFiltersTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardTest;
-import com.gooddata.qa.graphene.dashboards.GoodSalesDefaultFilterMultipleChoiceTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesEmbeddedDashboardTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardWidgetManipulationTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesFilterDropdownAttributeValueTest;
@@ -100,10 +99,6 @@ public class UITestsRegistry {
             DashboardFilterVisualTest.class,
             DashboardSavedFiltersTest.class,
             GoodSalesAdvancedConnectingFilterTest.class
-        });
-
-        suites.put("default-filter-feature", new Object[] {
-            GoodSalesDefaultFilterMultipleChoiceTest.class
         });
 
         suites.put("reports", new Object[] {
