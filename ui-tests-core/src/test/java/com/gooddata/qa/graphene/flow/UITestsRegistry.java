@@ -173,6 +173,24 @@ public class UITestsRegistry {
             "testng-permissions-ValidElementsResource.xml"
         });
 
+        suites.put("localization", new Object[] {
+            new PredefineParameterTest(LocalizationTest.class)
+                .param("LANGUAGE_CODE", "en-US"),
+            new PredefineParameterTest(LocalizationTest.class)
+                .param("LANGUAGE_CODE", "es-ES"),
+            new PredefineParameterTest(LocalizationTest.class)
+                .param("LANGUAGE_CODE", "fr-FR"),
+            new PredefineParameterTest(LocalizationTest.class)
+                .param("LANGUAGE_CODE", "de-DE"),
+            new PredefineParameterTest(LocalizationTest.class)
+                .param("LANGUAGE_CODE", "nl-NL"),
+            new PredefineParameterTest(LocalizationTest.class)
+                .param("LANGUAGE_CODE", "ja-JP"),
+            new PredefineParameterTest(LocalizationTest.class)
+                .param("LANGUAGE_CODE", "pt-BR"),
+            "testng-embedded-dashboard-localization-test.xml"
+        });
+
         TestsRegistry.getInstance()
             .register(args, suites)
             .toTextFile();
