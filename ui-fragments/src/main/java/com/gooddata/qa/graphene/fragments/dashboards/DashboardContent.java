@@ -147,6 +147,15 @@ public class DashboardContent extends AbstractFragment {
         return Iterables.getLast(getEmbeddedWidgets());
     }
 
+    public DashboardContent applyValuesForGroupFilter() {
+        WebElement applyButton = waitForElementVisible(By.cssSelector(".s-active-tab .s-btn-apply"), getRoot());
+        applyButton.click();
+
+        Predicate<WebDriver> filterApplied = browser -> applyButton.getAttribute("class").contains("disabled");
+        Graphene.waitGui().until(filterApplied);
+        return this;
+    }
+
     private List<EmbeddedWidget> getEmbeddedWidgets() {
         return browser.findElements(BY_EMBEDDED_WIDGET)
                 .stream()

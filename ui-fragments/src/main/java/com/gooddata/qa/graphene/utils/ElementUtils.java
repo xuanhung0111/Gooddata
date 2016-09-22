@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
@@ -21,6 +22,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
 import com.gooddata.qa.utils.browser.BrowserUtils;
+import com.google.common.base.Predicate;
 
 public final class ElementUtils {
 
@@ -93,6 +95,10 @@ public final class ElementUtils {
     }
 
     public static void clickElementByVisibleLocator(SearchContext searchContext, By... bySelectors) {
+        Predicate<WebDriver> visibilityOfElement = browser ->
+                Stream.of(bySelectors).anyMatch(by -> isElementVisible(by, searchContext));
+        Graphene.waitGui().until(visibilityOfElement);
+
         Stream.of(bySelectors)
                 .filter(by -> isElementVisible(by, searchContext))
                 .map(by -> waitForElementVisible(by, searchContext))

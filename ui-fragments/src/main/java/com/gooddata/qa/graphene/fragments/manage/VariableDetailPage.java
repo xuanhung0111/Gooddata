@@ -151,6 +151,11 @@ public class VariableDetailPage extends ObjectPropertiesPage {
         return VariableTypes.NUMERICAL_VARIABLE.canSelect(browser);
     }
 
+    public VariableDetailPage restoreUserSpecificValuesToDefault(String userProfileUri) {
+        waitForFragmentVisible(userSpecificTable).restoreUserSpecificValuesToDefault(userProfileUri);
+        return this;
+    }
+
     private VariableDetailPage selectVariableType(VariableTypes type) {
         final WebElement typeRadio = waitForElementVisible(type.getLocator(), getRoot());
 
@@ -222,6 +227,11 @@ public class VariableDetailPage extends ObjectPropertiesPage {
             waitForElementVisible(By.className("s-btn-set"), getUserRow(userProfileUri)).click();
             IpeEditor.getInstance(browser).setText(String.valueOf(value));
 
+            return this;
+        }
+
+        private UserSpecificTable restoreUserSpecificValuesToDefault(String userProfileUri) {
+            waitForElementVisible(By.className("s-btn-default"), getUserRow(userProfileUri)).click();
             return this;
         }
 

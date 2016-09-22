@@ -332,16 +332,21 @@ public final class DashboardsRestUtils {
      * Add mandatory user filter to specific user
      * 
      * @param restApiClient
-     * @param projectURI
+     * @param projectId
      * @param user
      * @param mufURI
      */
-    public static void addMufToUser(final RestApiClient restApiClient, final String projectURI, final String user,
+    public static void addMufToUser(final RestApiClient restApiClient, final String projectId, final String user,
             final String mufURI) throws ParseException, IOException {
-        final String urserFilter = format(MUF_LINK, projectURI);
+        final String urserFilter = format(MUF_LINK, projectId);
         final String contentBody = USER_FILTER.get().replace("${email}", user).replace("$MUFExpression", mufURI);
 
         executeRequest(restApiClient, restApiClient.newPostMethod(urserFilter, contentBody), HttpStatus.OK);
+    }
+
+    public static void removeAllMufFromUser(RestApiClient restApiClient, String projectId, String user)
+            throws ParseException, IOException {
+        addMufToUser(restApiClient, projectId, user, "");
     }
 
     /**
