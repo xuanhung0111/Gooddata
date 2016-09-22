@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -117,7 +118,7 @@ public class ZendeskHelper {
         return getSetOfActiveZendeskEntities(url, objectType, 1).size();
     }
 
-    public Integer loadLastTicketEventId(int ticketId, DateTime startDateTime)
+    public OptionalInt loadLastTicketEventId(int ticketId, DateTime startDateTime)
             throws JSONException, IOException {
         JSONObject ticketsEventsPageJson;
         JSONArray ticketEventsJson;
@@ -142,7 +143,7 @@ public class ZendeskHelper {
             }
         } while (ticketsEventsPageJson.getInt("count") == 1000 && jsonUrl != null);
 
-        return lastTicketEventId == 0 ? null : lastTicketEventId;
+        return lastTicketEventId == 0 ? OptionalInt.empty() : OptionalInt.of(lastTicketEventId);
     }
 
     private JSONObject retrieveEntitiesJsonFromUrl(String url)

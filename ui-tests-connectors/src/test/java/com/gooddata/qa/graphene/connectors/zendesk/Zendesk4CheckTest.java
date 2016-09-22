@@ -114,9 +114,9 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     private int createdZendeskUserId;
     private int createdZendeskOrganizationId;
     private Map<String, Integer> reportMetricsResults;
-    private Integer afterTicketCreateEventId;
-    private Integer afterTicketUpdateEventId;
-    private Integer afterTicketDeleteEventId;
+    private int afterTicketCreateEventId;
+    private int afterTicketUpdateEventId;
+    private int afterTicketDeleteEventId;
     private int totalEventsBaseCount;
 
     private MetadataService mdService = null;
@@ -293,8 +293,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
             throws IOException, JSONException {
         createTicketTagsReport(createdZendeskTicketId);
 
-        afterTicketCreateEventId = zendeskHelper.loadLastTicketEventId(createdZendeskTicketId,
-                DateTime.now().minusMinutes(10));
+        afterTicketCreateEventId = getLastTicketEventId();
         checkTicketEventsReport(afterTicketCreateEventId, AFTER_TICKET_CREATE_EVENTS);
         checkTicketTagsReport(createdZendeskTicketId, AFTER_TICKET_CREATE_EVENTS.get("tags"));
         Screenshots.takeScreenshot(browser, "ticket-tags-after-create-ticket-report", this.getClass());
@@ -338,8 +337,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     @Test(dependsOnMethods = {"testIncrementalSynchronizationAfterObjectsUpdate"},
             groups = {"zendeskApiTests", "zendeskAfterUpdateTests", "connectorWalkthrough"})
     public void testTicketEventsAfterTicketUpdate() throws IOException, JSONException {
-        afterTicketUpdateEventId = zendeskHelper.loadLastTicketEventId(createdZendeskTicketId,
-                DateTime.now().minusMinutes(10));
+        afterTicketUpdateEventId = getLastTicketEventId();
         checkTicketEventsReport(afterTicketUpdateEventId, AFTER_TICKET_UPDATE_EVENTS);
         checkTicketTagsReport(createdZendeskTicketId, AFTER_TICKET_UPDATE_EVENTS.get("tags"));
         Screenshots.takeScreenshot(browser, "ticket-tags-after-update-ticket-report", this.getClass());
@@ -402,14 +400,19 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     @Test(dependsOnMethods = {"testIncrementalSynchronizationAfterObjectsDeletion"},
             groups = {"zendeskApiTests", "zendeskAfterDeletionTests", "connectorWalkthrough"})
     public void testTicketEventsAfterDeletion() throws IOException, JSONException {
-        afterTicketDeleteEventId = zendeskHelper.loadLastTicketEventId(createdZendeskTicketId,
-                DateTime.now().minusMinutes(10));
+        afterTicketDeleteEventId = getLastTicketEventId();
+
         checkTicketEventsReport(afterTicketDeleteEventId, AFTER_TICKET_DELETE_EVENTS);
 
         assertEquals(getNumberFromGDReport(TICKET_EVENTS_COUNT_REPORT_NAME),
                 totalEventsBaseCount + ticketEventChangesCount(AFTER_TICKET_CREATE_EVENTS,
                         AFTER_TICKET_UPDATE_EVENTS, AFTER_TICKET_DELETE_EVENTS),
                 "Total count of TicketEvents after tests is different than expected.");
+    }
+
+    private int getLastTicketEventId() throws JSONException, IOException {
+        return zendeskHelper.loadLastTicketEventId(createdZendeskTicketId, DateTime.now().minusMinutes(10))
+                .orElseThrow(() -> new IllegalStateException("No ticket event in last 10 minutes!"));
     }
 
     @Test(dependsOnMethods = {"testIncrementalSynchronizationAfterObjectsDeletion"}, groups = {"zendeskApiTests",
