@@ -158,7 +158,11 @@ public abstract class AbstractTest extends Arquillian {
     }
 
     public String generateEmail(String email) {
-        return email.replace("@", "+" + UUID.randomUUID().toString().substring(0, 5) + "@");
+        return email.replace("@", "+" + generateHashString() + "@");
+    }
+
+    public String generateHashString() {
+        return UUID.randomUUID().toString().substring(0, 5);
     }
 
     public ProjectValidationResults validateProject() {

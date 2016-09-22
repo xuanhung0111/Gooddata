@@ -1,14 +1,20 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
+import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_DROPS_BELOW;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_CREATED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteWidgetsUsingCascase;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getKpiUri;
+import static com.gooddata.qa.utils.mail.ImapUtils.areMessagesArrived;
+import static java.lang.String.format;
 import static java.util.Collections.singletonList;
+import static org.joda.time.DateTime.now;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -18,11 +24,15 @@ import java.util.UUID;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.gooddata.md.Attribute;
 import com.gooddata.md.Metric;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
+import com.gooddata.qa.graphene.enums.GDEmails;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog;
 import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
@@ -34,9 +44,21 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
     private static final String KPI_ALERT_DIALOG_HEADER = "Email me when this KPI is";
     private static final String KPI_ALERT_THRESHOLD = "100"; // TODO: consider parsing value from KPI to avoid immediate alert trigger
 
+    @BeforeClass(alwaysRun = true)
+    public void initImapUser() {
+        imapHost = testParams.loadProperty("imap.host");
+        imapUser = testParams.loadProperty("imap.user");
+        imapPassword = testParams.loadProperty("imap.password");
+    }
+
     @Override
     protected void prepareSetupProject() throws ParseException, JSONException, IOException {
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        addUserToProject(imapUser, UserRoles.ADMIN);
     }
 
     @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
@@ -301,6 +323,84 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
             dialog.discardAlert();
         } finally {
             deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(), kpiUri);
+        }
+    }
+
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    public void triggerAlertImmediatelyWhenHitThreshold() throws JSONException, IOException {
+        final Metric numberMetric = createMetric("Metric-" + generateHashString(), "SELECT 100", "#,##0");
+        final String numberKpiUri = createKpiUsingRest(createDefaultKpiConfiguration(numberMetric, DATE_CREATED));
+
+        addWidgetToWorkingDashboard(numberKpiUri);
+        logout();
+        signInAtGreyPages(imapUser, imapPassword);
+
+        try {
+            Kpi numberKpi = initIndigoDashboardsPageWithWidgets().getLastWidget(Kpi.class);
+            setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, "50");
+            takeScreenshot(browser, "Alert-triggered-immediately-right-after-setting", getClass());
+            assertTrue(numberKpi.isAlertTriggered(), "Alert is not triggered");
+
+            if (testParams.isClusterEnvironment()) {
+                assertFalse(doActionWithImapClient(imapClient ->
+                        areMessagesArrived(imapClient, GDEmails.NOREPLY, numberMetric.getTitle(), 1)),
+                        "Alert email is sent to mailbox");
+            }
+
+            setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, "70");
+            takeScreenshot(browser, "Current-alert-still-trigger-if-new-setup-hit-threshold-again", getClass());
+            assertTrue(numberKpi.isAlertTriggered(), "Alert is not triggered");
+
+            if (testParams.isClusterEnvironment()) {
+                assertFalse(doActionWithImapClient(imapClient ->
+                        areMessagesArrived(imapClient, GDEmails.NOREPLY, numberMetric.getTitle(), 1)),
+                        "Alert email is sent to mailbox");
+            }
+
+            setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, "150");
+            takeScreenshot(browser, "Alert-not-trigger-if-new-setup-not-hit-threshold", getClass());
+            assertFalse(numberKpi.isAlertTriggered(), "Alert still triggered although condition is not full-filled");
+
+        } finally {
+            logoutAndLoginAs(true, UserRoles.ADMIN);
+            getMdService().removeObjByUri(numberKpiUri);
+            getMdService().removeObj(numberMetric);
+        }
+    }
+
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    public void updateAlertWhenKpiValueIsEmpty() throws JSONException, IOException {
+        String amountMetricUri = getMdService().getObjUri(getProject(), Metric.class, title(METRIC_AMOUNT));
+        Attribute createdYearAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_YEAR_CREATED));
+        String createdYearValueUri = getMdService()
+                .getAttributeElements(createdYearAttribute)
+                .stream()
+                .filter(e -> String.valueOf(now().getYear()).equals(e.getTitle()))
+                .findFirst()
+                .get()
+                .getUri();
+
+        String expression = format("SELECT SUM([%s]) WHERE [%s] = [%s]",
+                amountMetricUri, createdYearAttribute.getUri(), createdYearValueUri);
+
+        final Metric nullValueMetric = createMetric("Metric-" + generateHashString(), expression, "#,##0");
+        final String nullValueKpiUri = createKpiUsingRest(createDefaultKpiConfiguration(nullValueMetric, DATE_CREATED));
+
+        addWidgetToWorkingDashboard(nullValueKpiUri);
+
+        try {
+            Kpi nullValueKpi = initIndigoDashboardsPageWithWidgets().getLastWidget(Kpi.class);
+            setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, "-1");
+
+            takeScreenshot(browser, "Alert-triggered-for-empty-value-kpi", getClass());
+            assertTrue(nullValueKpi.isAlertTriggered(), "Alert is not triggered");
+
+            setAlertForLastKpi(TRIGGERED_WHEN_DROPS_BELOW, "1");
+            assertTrue(nullValueKpi.isAlertTriggered(), "Alert is not triggered");
+
+        } finally {
+            getMdService().removeObjByUri(nullValueKpiUri);
+            getMdService().removeObj(nullValueMetric);
         }
     }
 
