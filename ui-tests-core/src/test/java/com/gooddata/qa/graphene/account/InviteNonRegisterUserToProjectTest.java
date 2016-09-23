@@ -67,7 +67,7 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
     private RegistrationForm registrationForm;
     private ImapClient imapClient;
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setProjectTitle() {
         projectTitle = "Invite-non-register-user-to-project-test";
     }

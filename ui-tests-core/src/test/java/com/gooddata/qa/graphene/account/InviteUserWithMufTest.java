@@ -61,7 +61,7 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
     //    Use this variable to avoid connecting to inbox many times 
     private int expectedMessageCount;
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void initData() throws IOException, MessagingException {
         final String uniqueString = String.valueOf(System.currentTimeMillis());
         projectTitle += uniqueString;
