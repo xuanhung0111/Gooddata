@@ -502,7 +502,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public String getIndigoDashboardsPageUri() {
-        return PAGE_INDIGO_DASHBOARDS + "#/p/" + testParams.getProjectId();
+        return PAGE_INDIGO_DASHBOARDS + "#/project/" + testParams.getProjectId();
     }
 
     public IndigoDashboardsPage initIndigoDashboardsPage() {
@@ -569,7 +569,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
         return ImapClientAction.Utils.doActionWithImapClient(imapHost, imapUser, imapPassword, action);
     }
 
-    private void waitForOpeningIndigoDashboard() {
+    protected void waitForOpeningIndigoDashboard() {
         final By loadingLabel = className(".gd-loading-equalizer");
         try {
             Predicate<WebDriver> isLoadingLabelPresent = browser -> isElementPresent(loadingLabel, browser);

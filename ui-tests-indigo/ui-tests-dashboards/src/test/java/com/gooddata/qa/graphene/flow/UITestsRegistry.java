@@ -13,6 +13,7 @@ import com.gooddata.qa.graphene.indigo.dashboards.MetricsDropdownTest;
 import com.gooddata.qa.graphene.indigo.dashboards.NonProductionDatasetTest;
 import com.gooddata.qa.graphene.indigo.dashboards.PartialExportDashboardsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ReorderInsightTest;
+import com.gooddata.qa.graphene.indigo.dashboards.RoutingTest;
 import com.gooddata.qa.graphene.indigo.dashboards.VisualizationsTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
@@ -40,6 +41,7 @@ public class UITestsRegistry {
             ReorderInsightTest.class,
             NonProductionDatasetTest.class,
             InsightOnDashboardTest.class,
+            RoutingTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-EditMode.xml",
@@ -76,6 +78,7 @@ public class UITestsRegistry {
             VisualizationsTest.class,
             ReorderInsightTest.class,
             NonProductionDatasetTest.class,
+            RoutingTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-EditMode.xml",
