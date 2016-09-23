@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.flow;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.gooddata.qa.graphene.csvuploader.CsvUploaderSanityTest;
 import com.gooddata.qa.graphene.csvuploader.DataOfOtherUsersTest;
 import com.gooddata.qa.graphene.csvuploader.DataPreviewAfterUploadTest;
 import com.gooddata.qa.graphene.csvuploader.DatasetDetailTest;
@@ -38,6 +39,10 @@ public class UITestsRegistry {
             RefreshTest.class,
             UploadHistoryInfoTest.class,
             "testng-csv-imap-Notification.xml"
+        });
+
+        suites.put("sanity", new Object[] {
+            CsvUploaderSanityTest.class
         });
 
         TestsRegistry.getInstance()
