@@ -241,7 +241,7 @@ public class MetricConfiguration extends AbstractFragment {
         }
 
         public List<String> getAllAttributesInViewPort() {
-            return getElementTexts(getElements(), e -> e.findElement(cssSelector(".attr-field-icon + span")));
+            return getElementTexts(getElements());
         }
 
         public AttributeFilterPicker selectItems(String... items) {
