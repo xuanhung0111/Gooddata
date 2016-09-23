@@ -23,7 +23,7 @@ public class TableReport extends AbstractFragment {
     @FindBy(css = ".public_fixedDataTable_header ." + CELL_CONTENT)
     private List<WebElement> headers;
 
-    @FindBy(css = ".fixedDataTableRowLayout_rowWrapper:not([data-reactid *= '$header'])")
+    @FindBy(className = "public_fixedDataTable_bodyRow")
     private List<WebElement> rows;
 
     private static final String CELL_CONTENT = "public_fixedDataTableCell_cellContent";
