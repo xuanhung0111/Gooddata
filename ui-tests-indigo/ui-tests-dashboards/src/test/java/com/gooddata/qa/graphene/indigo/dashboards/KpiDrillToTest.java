@@ -108,7 +108,7 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
             // check no other tab was opened
             assertTrue(browser.getWindowHandles().size() == 1);
             // check that url is the same, but after refresh it has /dashboard/<id> appended
-            assertTrue(browser.getCurrentUrl().startsWith(currentUrl + "dashboard/"));
+            assertTrue(browser.getCurrentUrl().startsWith(currentUrl));
         } finally {
             deleteDashboardsUsingCascase(getRestApiClient(), testParams.getProjectId());
         }
