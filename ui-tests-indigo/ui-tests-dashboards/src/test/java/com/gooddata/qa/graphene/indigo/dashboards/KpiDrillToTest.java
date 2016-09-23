@@ -77,10 +77,13 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
         startIndigoDashboardEditMode().addKpi(kpiWithoutDrillTo).saveEditModeWithWidgets();
 
         try {
-            String currentUrl = browser.getCurrentUrl();
 
             waitForFragmentVisible(indigoDashboardsPage)
-                .switchToEditMode()
+                .switchToEditMode();
+
+            String currentUrl = browser.getCurrentUrl();
+
+            indigoDashboardsPage
                 .selectLastWidget(Kpi.class)
                 .clickKpiValue();
 
@@ -101,7 +104,11 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
                 .getLastWidget(Kpi.class)
                 .clickKpiValue();
 
-            checkNoNewBrowserTabOrWindowNorRedirected(currentUrl);
+
+            // check no other tab was opened
+            assertTrue(browser.getWindowHandles().size() == 1);
+            // check that url is the same, but after refresh it has /dashboard/<id> appended
+            assertTrue(browser.getCurrentUrl().startsWith(currentUrl + "dashboard/"));
         } finally {
             deleteDashboardsUsingCascase(getRestApiClient(), testParams.getProjectId());
         }
