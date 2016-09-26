@@ -1,130 +1,60 @@
 package com.gooddata.qa.graphene.fragments.dashboards.widget.filter;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-public class AttributeFilterPanel extends FilterPanel {
+import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 
-    @FindBy(className = "yui3-c-simpleColumn-window")
-    private WebElement scroller;
+public class AttributeFilterPanel extends SelectItemPopupPanel {
 
-    @FindBy(css = ".yui3-c-simpleColumn-underlay > div:not(.gdc-hidden)")
-    private List<FilterPanelRow> rows;
-
-    @FindBy(className = "clearVisible")
-    private WebElement deselectAll;
-
-    @FindBy(className = "selectVisible")
-    private WebElement selectAll;
-
-    @FindBy(className = "s-afp-input")
-    private WebElement search;
-
-    @FindBy(css = "div.yui3-c-simpleColumn-underlay .yui3-widget")
+    @FindBy(css = "div.yui3-c-simpleColumn-underlay .yui3-widget:not(.gdc-hidden)")
     private List<WebElement> listAttrValues;
 
-    private static final String CLEAR_VISIBLE = ":not(.gdc-hidden)>.clearVisible";
-    private static final String SELECT_VISIBLE = ":not(.gdc-hidden)>.selectVisible";
+    private static final By LOCATOR = By.className("yui3-listfilterpanel");
 
-    private static final By ATTRIBUTE_LIST_LOADING_LOCATOR = By.cssSelector(".yui3-c-simpleColumn-window.loading");
-    private static final By ATTRIBUTE_LIST_LOADED_LOCATOR = By.cssSelector(".yui3-c-simpleColumn-window.loaded");
     private static final By SHOW_ALL_BUTTON_LOCATOR = By.className("s-btn-show_all");
+
+    public static final AttributeFilterPanel getInstance(SearchContext searchContext) {
+        return getInstance(AttributeFilterPanel.class, LOCATOR, searchContext);
+    }
 
     public AttributeFilterPanel showAllAttributes() {
         waitForElementVisible(SHOW_ALL_BUTTON_LOCATOR, getRoot()).click();
         return this;
     }
 
-    public List<String> getAllAtributeValues() {
-        // wait for attribute values are loaded
-        sleepTightInSeconds(3);
-        List<String> actualFilterElements = new ArrayList<String>();
-        for (WebElement ele : listAttrValues) {
-            actualFilterElements.add(waitForElementVisible(ele).getText());
-        }
-
-        if (!listAttrValues.isEmpty()) {
-            close();
-        }
-        return actualFilterElements;
-    }
-
-    public List<FilterPanelRow> getRows() {
-        return rows;
-    }
-
-    public WebElement getScroller() {
-        return scroller;
-    }
-
-    public AttributeFilterPanel waitForValuesToLoad() {
-        waitForElementNotPresent(ATTRIBUTE_LIST_LOADING_LOCATOR);
-        waitForElementPresent(ATTRIBUTE_LIST_LOADED_LOCATOR, browser);
-        return this;
-    }
-
-    public AttributeFilterPanel selectAll() {
-        waitForElementVisible(selectAll).click();
-        return this;
-    }
-
-    public AttributeFilterPanel deselectAll() {
-        waitForElementVisible(deselectAll).click();
-        return this;
-    }
-
     public void changeValues(String... values) {
-        waitForValuesToLoad();
-        waitForElementVisible(deselectAll).click();
-        for (String value : values) {
-            selectOneValue(value);
-        }
-        submit();
+        boolean singleMode = isOnSingleMode();
+        boolean groupMode = isOnGroupMode();
+
+        if (!singleMode) clearAllItems();
+        searchAndSelectItems(values);
+
+        if (!singleMode && !groupMode)
+            submitPanel();
     }
 
-    public void changeValueInSingleMode(String value) {
-        waitForValuesToLoad();
-        for (FilterPanelRow row: rows) {
-            if (!value.equals(row.getText())) {
-                continue;
-            }
-            row.getRoot().click();
-            return;
-        }
+    public boolean isOnSingleMode() {
+        return !getRoot().getAttribute("class").contains("multiple");
     }
 
-    public AttributeFilterPanel search(String text) {
-        waitForElementVisible(search).sendKeys(text);
-        return this;
+    public List<WebElement> getItemElements() {
+        return listAttrValues;
     }
 
-    public boolean verifyPanelInOneValueMode() {
-        return getRoot().findElements(By.cssSelector(SELECT_VISIBLE)).size() +
-                getRoot().findElements(By.cssSelector(CLEAR_VISIBLE)).size() +
-                getRoot().findElements(By.cssSelector(".s-btn-cancel:not(.gdc-hidden)")).size() +
-                getRoot().findElements(By.cssSelector(".s-btn-apply:not(.gdc-hidden)")).size() == 0;
+    @Override
+    public List<String> getItems() {
+        return getElementTexts(listAttrValues);
     }
 
-    private void selectOneValue(String value) {
-        waitForElementVisible(search).clear();
-        search.sendKeys(value);
-        //sleep 1 second for waiting search starts
-        sleepTightInSeconds(1);
-        waitForValuesToLoad();
-        for (FilterPanelRow row : waitForCollectionIsNotEmpty(rows)) {
-            if (!value.equals(row.getLabel().getText())) continue;
-            row.getCheckbox().click();
-            break;
-        }
+    private boolean isOnGroupMode() {
+        return getRoot().getAttribute("class").contains("inFilterGroup");
     }
 }

@@ -91,7 +91,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
 
             filter.openPanel();
             assertTrue(Graphene.createPageFragment(AttributeFilterPanel.class,
-                    waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser)).verifyPanelInOneValueMode());
+                    waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser)).isOnSingleMode());
         } finally {
             dashboardsPage.deleteDashboard();
         }
@@ -112,7 +112,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             dashboardEditBar.saveDashboard();
             assertTrue(getRowElementsFrom(report).size() > 1);
 
-            getFilterWidget(STAGE_NAME_FILTER).changeAttributeFilterValue("Short List");
+            getFilterWidget(STAGE_NAME_FILTER).changeAttributeFilterValues("Short List");
 
             // reload table report unless will get ArrayIndexOutOfBoundException: Index 1: Size 1
             report = dashboardsPage.getContent().getLatestReport(TableReport.class);
@@ -123,7 +123,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             report.removeFilters(ATTR_STAGE_NAME);
             dashboardEditBar.saveDashboard();
 
-            getFilterWidget(STAGE_NAME_FILTER).changeAttributeFilterValue("Short List");
+            getFilterWidget(STAGE_NAME_FILTER).changeAttributeFilterValues("Short List");
 
             // reload table report
             report = dashboardsPage.getContent().getLatestReport(TableReport.class);
@@ -262,7 +262,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             assertTrue(isEqualCollection(report.openReportInfoViewPanel().getAllFilterNames(),
                     asList("FQuarter/Year", "FStageName")));
 
-            getFilterWidget("fstagename").changeAttributeFilterValue("Short List");
+            getFilterWidget("fstagename").changeAttributeFilterValues("Short List");
             assertTrue(getRowElementsFrom(getReport(REPORT_1, TableReport.class)).size() == 1);
             assertTrue(getRowElementsFrom(getReport(REPORT_2, TableReport.class)).size() > 1);
         } finally {
@@ -283,7 +283,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             filter.changeSelectionToOneValue();
             filter.openPanel();
             assertTrue(Graphene.createPageFragment(AttributeFilterPanel.class,
-                    waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser)).verifyPanelInOneValueMode());
+                    waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser)).isOnSingleMode());
             dashboardsPage.saveDashboard();
 
             assertEquals(filter.getCurrentValue(), "Interest");

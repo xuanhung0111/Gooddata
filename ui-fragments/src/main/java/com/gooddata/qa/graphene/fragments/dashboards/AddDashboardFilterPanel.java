@@ -7,7 +7,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.Select;
 
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.FilterPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 
@@ -35,7 +34,7 @@ public class AddDashboardFilterPanel extends SelectItemPopupPanel {
             waitForElementVisible(By.className("s-btn-next"), getRoot()).click();
         }
 
-        FilterPanel.getPanel(TimeFilterPanel.class, browser)
+        TimeFilterPanel.getInstance(browser)
                 .selectDateGranularity(dateGranularity)
                 .selectTimeLine(timeLine)
                 .submit();

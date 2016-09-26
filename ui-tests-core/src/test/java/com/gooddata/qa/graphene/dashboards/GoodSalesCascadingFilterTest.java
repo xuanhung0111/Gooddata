@@ -50,7 +50,6 @@ import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.GroupConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.AttributeFilterPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.utils.Sleeper;
 
@@ -190,10 +189,8 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
             FilterWidget productFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_PRODUCT));
             FilterWidget accountFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_ACCOUNT));
 
-            regionFilter.changeAttributeFilterValue("East Coast");
-            regionFilter.getRoot().click();
-            departmentFilter.changeAttributeFilterValue("Direct Sales");
-            departmentFilter.getRoot().click();
+            regionFilter.changeAttributeFilterValues("East Coast");
+            departmentFilter.changeAttributeFilterValues("Direct Sales");
 
             assertTrue(groupAButton.getAttribute("class").contains("disabled"));
             assertFalse(groupBButton.getAttribute("class").contains("disabled"));
@@ -205,8 +202,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
             assertTrue(groupAButton.getAttribute("class").contains("disabled"));
             assertTrue(groupBButton.getAttribute("class").contains("disabled"));
 
-            productFilter.changeAttributeFilterValue("Educationly");
-            productFilter.getRoot().click();
+            productFilter.changeAttributeFilterValues("Educationly");
             assertEquals(regionFilter.getCurrentValue(), "All");
             assertEquals(departmentFilter.getCurrentValue(), "All");
             assertEquals(productFilter.getCurrentValue(), "Educationly");
@@ -214,8 +210,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
             assertFalse(groupAButton.getAttribute("class").contains("disabled"));
             assertFalse(groupBButton.getAttribute("class").contains("disabled"));
 
-            regionFilter.changeAttributeFilterValue("West Coast");
-            regionFilter.getRoot().click();
+            regionFilter.changeAttributeFilterValues("West Coast");
             groupAButton.click();
             groupBButton.click();
         } finally {
@@ -244,21 +239,16 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
             FilterWidget accountFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_ACCOUNT));
             FilterWidget stageNameFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_STAGE_NAME));
             FilterWidget productFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_PRODUCT));
-            accountFilter.changeAttributeFilterValue("123 Exteriors", "14 West");
-            accountFilter.getRoot().click();
+            accountFilter.changeAttributeFilterValues("123 Exteriors", "14 West");
             assertFalse(groupButton.getAttribute("class").contains("disabled"));
 
             assertTrue(isEqualCollection(stageNameFilter.getAllAttributeValues(), asList("Closed Won",
                     "Closed Lost")));
-            stageNameFilter.getRoot().click();
             assertTrue(isEqualCollection(productFilter.getAllAttributeValues(), asList("CompuSci", "Educationly",
                     "Explorer", "Grammar Plus", "PhoenixSoft", "WonderKid")));
-            productFilter.getRoot().click();
 
-            stageNameFilter.changeAttributeFilterValue("Closed Won");
-            stageNameFilter.getRoot().click();
-            productFilter.changeAttributeFilterValue("Explorer");
-            productFilter.getRoot().click();
+            stageNameFilter.changeAttributeFilterValues("Closed Won");
+            productFilter.changeAttributeFilterValues("Explorer");
             groupButton.click();
             Sleeper.sleepTightInSeconds(2);
             assertEquals(dashboardContent.getReport("Report1", TableReport.class)
@@ -266,8 +256,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
             assertEquals(dashboardContent.getReport("Report2", TableReport.class)
                     .getAttributeElementsByRow().size(), 1);
 
-            accountFilter.changeAttributeFilterValue("101 Financial");
-            accountFilter.getRoot().click();
+            accountFilter.changeAttributeFilterValues("101 Financial");
             assertEquals(productFilter.getCurrentValue(), "All");
             assertEquals(stageNameFilter.getCurrentValue(), "All");
             assertEquals(dashboardContent.getReport("Report1", TableReport.class)
@@ -302,19 +291,21 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
             FilterWidget accountFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_ACCOUNT));
             FilterWidget stageNameFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_STAGE_NAME));
             FilterWidget productFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_PRODUCT));
-            accountFilter.changeAttributeFilterValue("123 Exteriors", "14 West");
+            accountFilter.changeAttributeFilterValues("123 Exteriors", "14 West");
 
             assertTrue(isEqualCollection(stageNameFilter.getAllAttributeValues(), asList("Closed Won",
                     "Closed Lost")));
             assertTrue(isEqualCollection(productFilter.getAllAttributeValues(), asList("CompuSci", "Educationly",
                     "Explorer", "Grammar Plus", "PhoenixSoft", "WonderKid")));
 
-            stageNameFilter.changeAttributeFilterValue("Closed Won");
+            stageNameFilter.changeAttributeFilterValues("Closed Won");
             assertTrue(isEqualCollection(productFilter.getAllAttributeValues(), asList("CompuSci", "Educationly",
                     "Explorer", "Grammar Plus", "PhoenixSoft", "WonderKid")));
 
-            productFilter.openPanel();
-            productFilter.getPanel(AttributeFilterPanel.class).showAllAttributes().changeValues("TouchAll");
+            productFilter.openPanel()
+                    .getAttributeFilterPanel()
+                    .showAllAttributes()
+                    .changeValues("TouchAll");
             assertEquals(accountFilter.getCurrentValue(), "All");
             assertEquals(stageNameFilter.getCurrentValue(), "All");
         } finally {
@@ -345,10 +336,8 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
 
             assertEquals(accountFilter.getCurrentValue(), "1000Bulbs.com");
             assertTrue(isEqualCollection(stageNameFilter.getAllAttributeValues(), singleton("Closed Lost")));
-            stageNameFilter.getRoot().click();
             assertTrue(isEqualCollection(productFilter.getAllAttributeValues(), asList("CompuSci", "Educationly",
                     "Explorer", "Grammar Plus", "PhoenixSoft", "WonderKid")));
-            productFilter.getRoot().click();
         } finally {
             dashboardsPage.deleteDashboard();
         }
@@ -369,7 +358,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
             FilterWidget yearFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_YEAR_SNAPSHOT));
             FilterWidget quarterFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_QUARTER_YEAR_SNAPSHOT));
             FilterWidget monthFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_MONTH_YEAR_SNAPSHOT));
-            yearFilter.changeAttributeFilterValue("1900");
+            yearFilter.changeAttributeFilterValues("1900");
 
             assertTrue(isEqualCollection(quarterFilter.getAllAttributeValues(), asList("Q1/1900", "Q2/1900",
                     "Q3/1900", "Q4/1900")));
@@ -377,12 +366,14 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
                     "Mar 1900", "Apr 1900", "May 1900", "Jun 1900", "Jul 1900", "Aug 1900", "Sep 1900",
                     "Oct 1900", "Nov 1900", "Dec 1900")));
 
-            quarterFilter.changeAttributeFilterValue("Q1/1900");
+            quarterFilter.changeAttributeFilterValues("Q1/1900");
             assertTrue(isEqualCollection(monthFilter.getAllAttributeValues(), asList("Jan 1900", "Feb 1900",
                     "Mar 1900")));
 
-            monthFilter.openPanel();
-            monthFilter.getPanel(AttributeFilterPanel.class).showAllAttributes().changeValues("Apr 1900");
+            monthFilter.openPanel()
+                    .getAttributeFilterPanel()
+                    .showAllAttributes()
+                    .changeValues("Apr 1900");
             assertEquals(yearFilter.getCurrentValue(), "All");
             assertEquals(quarterFilter.getCurrentValue(), "All");
         } finally {
@@ -405,19 +396,19 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
             FilterWidget accountFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_ACCOUNT));
             FilterWidget stageNameFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_STAGE_NAME));
             FilterWidget productFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_PRODUCT));
-            accountFilter.changeAttributeFilterValue("123 Exteriors", "14 West");
+            accountFilter.changeAttributeFilterValues("123 Exteriors", "14 West");
 
             assertTrue(isEqualCollection(stageNameFilter.getAllAttributeValues(), asList("Closed Won",
                     "Closed Lost")));
             assertTrue(isEqualCollection(productFilter.getAllAttributeValues(), asList("CompuSci", "Explorer")));
 
-            stageNameFilter.changeAttributeFilterValue("Closed Won");
+            stageNameFilter.changeAttributeFilterValues("Closed Won");
             assertTrue(isEqualCollection(productFilter.getAllAttributeValues(), asList("CompuSci", "Explorer")));
 
             assertEquals(accountFilter.getCurrentValue(), "123 Exteriors, 14 West");
             assertEquals(stageNameFilter.getCurrentValue(), "Closed Won");
             assertEquals(productFilter.getCurrentValue(), "All");
-            productFilter.changeAttributeFilterValue("CompuSci");
+            productFilter.changeAttributeFilterValues("CompuSci");
             assertEquals(accountFilter.getCurrentValue(), "123 Exteriors, 14 West");
             assertEquals(stageNameFilter.getCurrentValue(), "Closed Won");
             assertEquals(productFilter.getCurrentValue(), "CompuSci");
@@ -441,7 +432,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
             FilterWidget yearFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_YEAR_SNAPSHOT));
             FilterWidget quarterFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_QUARTER_YEAR_SNAPSHOT));
             FilterWidget monthFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_MONTH_YEAR_SNAPSHOT));
-            yearFilter.changeAttributeFilterValue("1900");
+            yearFilter.changeAttributeFilterValues("1900");
 
             assertTrue(isEqualCollection(quarterFilter.getAllAttributeValues(), asList("Q1/1900", "Q2/1900",
                     "Q3/1900", "Q4/1900")));
@@ -449,7 +440,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
                     "Mar 1900", "Apr 1900", "May 1900", "Jun 1900", "Jul 1900", "Aug 1900", "Sep 1900",
                     "Oct 1900", "Nov 1900", "Dec 1900")));
 
-            quarterFilter.changeAttributeFilterValue("Q1/1900");
+            quarterFilter.changeAttributeFilterValues("Q1/1900");
             assertTrue(isEqualCollection(monthFilter.getAllAttributeValues(), asList("Jan 1900", "Feb 1900",
                     "Mar 1900", "Apr 1900", "May 1900", "Jun 1900", "Jul 1900", "Aug 1900", "Sep 1900",
                     "Oct 1900", "Nov 1900", "Dec 1900")));
@@ -457,7 +448,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
             assertEquals(yearFilter.getCurrentValue(), "1900");
             assertEquals(quarterFilter.getCurrentValue(), "Q1/1900");
             assertEquals(monthFilter.getCurrentValue(), "All");
-            monthFilter.changeAttributeFilterValue("Jan 1900");
+            monthFilter.changeAttributeFilterValues("Jan 1900");
             assertEquals(yearFilter.getCurrentValue(), "1900");
             assertEquals(quarterFilter.getCurrentValue(), "Q1/1900");
             assertEquals(monthFilter.getCurrentValue(), "Jan 1900");
@@ -480,14 +471,14 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
             FilterWidget accountFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_ACCOUNT));
             FilterWidget stageNameFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_STAGE_NAME));
             FilterWidget productFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_PRODUCT));
-            accountFilter.changeAttributeFilterValue("123 Exteriors", "14 West");
+            accountFilter.changeAttributeFilterValues("123 Exteriors", "14 West");
 
             assertTrue(isEqualCollection(stageNameFilter.getAllAttributeValues(), asList("Closed Won",
                     "Closed Lost")));
             assertTrue(isEqualCollection(productFilter.getAllAttributeValues(), asList("CompuSci", "Educationly",
                     "Explorer", "Grammar Plus", "PhoenixSoft", "WonderKid", "TouchAll")));
 
-            stageNameFilter.changeAttributeFilterValue("Closed Won");
+            stageNameFilter.changeAttributeFilterValues("Closed Won");
             assertTrue(isEqualCollection(productFilter.getAllAttributeValues(), asList("CompuSci", "Educationly",
                     "Explorer", "Grammar Plus", "PhoenixSoft", "WonderKid", "TouchAll")));
         } finally {
@@ -510,17 +501,19 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
             FilterWidget accountFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_ACCOUNT));
             FilterWidget stageNameFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_STAGE_NAME));
             FilterWidget productFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_PRODUCT));
-            accountFilter.changeAttributeFilterValue("123 Exteriors", "14 West");
+            accountFilter.changeAttributeFilterValues("123 Exteriors", "14 West");
 
             assertTrue(isEqualCollection(stageNameFilter.getAllAttributeValues(), asList("Closed Won",
                     "Closed Lost")));
             assertTrue(isEqualCollection(productFilter.getAllAttributeValues(), asList("CompuSci", "Explorer")));
 
-            stageNameFilter.changeAttributeFilterValue("Closed Won");
+            stageNameFilter.changeAttributeFilterValues("Closed Won");
             assertTrue(isEqualCollection(productFilter.getAllAttributeValues(), asList("CompuSci", "Explorer")));
 
-            productFilter.openPanel();
-            productFilter.getPanel(AttributeFilterPanel.class).showAllAttributes().changeValues("TouchAll");
+            productFilter.openPanel()
+                    .getAttributeFilterPanel()
+                    .showAllAttributes()
+                    .changeValues("TouchAll");
             assertEquals(accountFilter.getCurrentValue(), "All");
             assertEquals(stageNameFilter.getCurrentValue(), "All");
         } finally {
@@ -566,7 +559,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
                     "Explorer", "Grammar Plus", "PhoenixSoft", "WonderKid", "TouchAll")));
 
             accountFilter = dashboardContent.getFilterWidget(simplifyText(ATTR_ACCOUNT));
-            accountFilter.changeAttributeFilterValue("123 Exteriors", "14 West");
+            accountFilter.changeAttributeFilterValues("123 Exteriors", "14 West");
 
             assertTrue(isEqualCollection(stageNameFilter.getAllAttributeValues(), asList("Closed Won",
                     "Closed Lost")));

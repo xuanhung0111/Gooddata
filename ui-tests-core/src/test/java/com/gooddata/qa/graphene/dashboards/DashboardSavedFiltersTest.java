@@ -301,7 +301,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         // Create saved view 1 "Abundant Foodz"
         sleepTightInSeconds(1);
         FilterWidget departmentFilter = dashboardsPage.getFilterWidget("department");
-        departmentFilter.changeAttributeFilterValue("Abundant Foodz");
+        departmentFilter.changeAttributeFilterValues("Abundant Foodz");
         savedViewWidget.openSavedViewMenu();
         savedViewWidget.saveCurrentView("Abundant Foodz");
 
@@ -312,7 +312,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
                             "Value of 'Department' is not 'Abundant Foodz'!");
 
         // Create saved view 2 "Earthy Foodz"
-        departmentFilter.changeAttributeFilterValue("Earthy Foodz");
+        departmentFilter.changeAttributeFilterValues("Earthy Foodz");
         savedViewWidget.openSavedViewMenu();
         savedViewWidget.saveCurrentView("Earthy Foodz");
 
@@ -336,7 +336,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         //assertEquals(waitForElementVisible(SavedViewWidget.SAVED_VIEW_BUTTON, browser).getText(),
         //                    "Earthy Foodz",
         //                    String.format("Saved view '%s' is not selected!", "Earthy Foodz"));
-        departmentFilter.changeAttributeFilterValue("Family Foodz");
+        departmentFilter.changeAttributeFilterValues("Family Foodz");
         savedViewWidget.openSavedViewMenu();
         allSavedViewNames = savedViewPopupMenu.getAllSavedViewNames();
         assertEquals(allSavedViewNames.size(), 3);
@@ -397,9 +397,9 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
                 .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, "Firstname")
                 .saveDashboard();
 
-        dashboardsPage.getFilterWidget("firstname").changeAttributeFilterValue("Adam");
+        dashboardsPage.getFilterWidget("firstname").changeAttributeFilterValues("Adam");
         dashboardsPage.getTabs().openTab(0);
-        dashboardsPage.getFilterWidget("county").changeAttributeFilterValue("Austin");
+        dashboardsPage.getFilterWidget("county").changeAttributeFilterValues("Austin");
         sleepTightInSeconds(1);
 
         SavedViewWidget savedViewWidget = dashboardsPage.getSavedViewWidget();

@@ -120,7 +120,7 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
 
     private void setupFilters() {
         FilterWidget regionFilter = dashboardsPage.getFilterWidget("region");
-        regionFilter.changeAttributeFilterValue("East Coast");
+        regionFilter.changeAttributeFilterValues("East Coast");
     }
 
     private void setupSchedule(DashboardScheduleDialog dialog) {

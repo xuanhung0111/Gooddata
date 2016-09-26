@@ -207,13 +207,10 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
         setAttributeLabelType(ATTR_PRODUCT, PRODUCT_LABEL, AttributeLabelTypes.HYPERLINK);
 
         try {
-            initDashboardsPage().selectDashboard(dashboard);
-
-            if (MULTIPLE_VALUES.equals(filterSelectionType)) {
-                getFilter(ATTR_PRODUCT).changeAttributeFilterValue(EDUCATIONLY);
-            } else {
-                getFilter(ATTR_PRODUCT).changeAttributeFilterValueInSingleMode(EDUCATIONLY);
-            }
+            initDashboardsPage()
+                    .selectDashboard(dashboard)
+                    .getFilterWidgetByName(ATTR_PRODUCT)
+                    .changeAttributeFilterValues(EDUCATIONLY);
 
             getReport(report.getTitle()).waitForReportLoading();
             takeScreenshot(browser, "Selection-type:" + filterSelectionType + 
@@ -259,8 +256,8 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
 
         try {
             initDashboardsPage().selectDashboard(dashboard);
-            getFilter(ATTR_PRODUCT).changeAttributeFilterValue(EDUCATIONLY);
-            getFilter(ATTR_DEPARTMENT).changeAttributeFilterValue(DIRECT_SALES);
+            getFilter(ATTR_PRODUCT).changeAttributeFilterValues(EDUCATIONLY);
+            getFilter(ATTR_DEPARTMENT).changeAttributeFilterValues(DIRECT_SALES);
 
             if (GROUP_FILTER.equals(filterType)) {
                 applyValuesForGroupFilter();
@@ -309,7 +306,7 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
             DashboardWidgetDirection.LEFT.moveElementToRightPlace(getReport(report.getTitle()).getRoot());
             dashboardsPage.saveDashboard();
 
-            getFilter(ATTR_FIRSTNAME).changeAttributeFilterValue(FIRSTNAME_VALUE);
+            getFilter(ATTR_FIRSTNAME).changeAttributeFilterValues(FIRSTNAME_VALUE);
             assertEquals(getFilter(ATTR_FIRSTNAME).getCurrentValue(), FIRSTNAME_VALUE);
             assertEquals(getReport(report.getTitle()).getAttributeElements(), singletonList(FIRSTNAME_VALUE));
 
@@ -323,7 +320,7 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
             updateCsvDataset(DATASET, updatedCsvFilePath);
 
             initDashboardsPage();
-            getFilter(ATTR_FIRSTNAME).changeAttributeFilterValue(FIRSTNAME_VALUE_UPDATE);
+            getFilter(ATTR_FIRSTNAME).changeAttributeFilterValues(FIRSTNAME_VALUE_UPDATE);
             getReport(report.getTitle()).waitForReportLoading();
 
             takeScreenshot(browser, "Data-updated-correctly-after-changing-attribute-label", getClass());

@@ -1,10 +1,14 @@
 package com.gooddata.qa.graphene.filters;
 
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 
 import java.util.List;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -12,9 +16,10 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.AttributeFilterPanel;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.FilterPanelRow;
 
 public class DashboardFilterVisualTest extends GoodSalesAbstractTest {
+
+    private static final By BY_SELECT_ONLY_LINK = By.className("selectOnly");
 
     @BeforeClass
     public void setProjectTitle() {
@@ -23,131 +28,118 @@ public class DashboardFilterVisualTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testDoesNotDisplayOnlyAnchor() {
-        List<FilterPanelRow> rows = getProductFilterInFirstTab().getPanel(AttributeFilterPanel.class)
-                .getRows();
+        List<WebElement> attributeElements = getProductFilterInFirstTab()
+                .openPanel()
+                .getAttributeFilterPanel()
+                .getItemElements();
 
-        for (int i = 0; i < rows.size(); i++) {
-            FilterPanelRow row = rows.get(i);
-
-            // Move cursor away from element
-            Actions actions = new Actions(browser);
-            actions.moveByOffset(-50, -50).build().perform();
-
-            assertFalse(row.isSelectOnlyDisplayed(), "'Select only' link is displayed");
-        }
+        assertTrue(attributeElements.stream().allMatch(item -> !isSelectOnlyLinkDisplayedOn(item)),
+                "'Select only' link is displayed");
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testDisplaysOnlyAnchorOnHover() {
-        List<FilterPanelRow> rows = getProductFilterInFirstTab().getPanel(AttributeFilterPanel.class)
-                .getRows();
+        List<WebElement> attributeElements = getProductFilterInFirstTab()
+                .openPanel()
+                .getAttributeFilterPanel()
+                .getItemElements();
 
-        for (int i = 0; i < rows.size(); i++) {
-            FilterPanelRow row = rows.get(i);
-
-            // Hover over element
-            Actions actions = new Actions(browser);
-            actions.moveToElement(row.getRoot()).build().perform();
-
-            assertTrue(row.isSelectOnlyDisplayed(), "'Select only' link is displayed on hover");
-        }
+        assertTrue(attributeElements.stream()
+                .allMatch(item -> {
+                    new Actions(browser).moveToElement(item).perform();
+                    return isSelectOnlyLinkDisplayedOn(item);
+                }),
+                "'Select only' link is not displayed on hover");
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testSelectOneValueOnSelectOnlyClick() {
-        List<FilterPanelRow> rows = getProductFilterInFirstTab().getPanel(AttributeFilterPanel.class)
-                .getRows();
-        FilterPanelRow selectedRow = rows.get(0);
+        List<WebElement> attributeElements = getProductFilterInFirstTab()
+                .openPanel()
+                .getAttributeFilterPanel()
+                .getItemElements();
 
-        // Hover over selected row
-        Actions actions = new Actions(browser);
-        actions.moveToElement(selectedRow.getRoot()).build().perform();
+        WebElement valueSelectOnly = attributeElements.get(0);
+        clickSelectOnlyLinkOn(valueSelectOnly);
+        assertTrue(isSelected(valueSelectOnly), "Value is not selected after click on 'Select only' link");
 
-        // Select first value
-        // Due to some weird black magic link does not react to clicks until it is typed to
-        rows.get(0).getSelectOnly().sendKeys("something");
-        rows.get(0).getSelectOnly().click();
-
-        assertTrue(selectedRow.isSelected(), "Row is selected after click on 'Select only' link");
-
-        for (int i = 1; i < rows.size(); i++) {
-            FilterPanelRow row = rows.get(i);
-
-            assertFalse(row.isSelected(), "Only one row is selected after click on 'Select only' link");
-        }
+        assertTrue(attributeElements.subList(1, attributeElements.size())
+                .stream()
+                .allMatch(e -> !isSelected(e)));
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testSelectAllFiltered() {
-        List<FilterPanelRow> rows = getProductFilterInFirstTab().getPanel(AttributeFilterPanel.class)
-                .deselectAll()
-                .search("on")
-                .waitForValuesToLoad()
-                .selectAll()
-                .search("\u0008\u0008\u0008")
-                .waitForValuesToLoad()
-                .getRows();
+        AttributeFilterPanel panel = getProductFilterInFirstTab()
+                .openPanel()
+                .getAttributeFilterPanel();
 
-        for (int i = 1; i < rows.size(); i++) {
-            FilterPanelRow row = rows.get(i);
+        panel.clearAllItems()
+                .searchItem("on")
+                .selectAllItems()
+                .clearSearchInput();
 
-            assertTrue(!row.getLabel().isSelected() || row.getLabel().getText().toLowerCase().contains("on"),
-                    "Row is displayed whan matches search criteria");
-        }
+        List<WebElement> attributeElements = waitForCollectionIsNotEmpty(panel.getItemElements());
+
+        assertTrue(attributeElements.stream()
+                .filter(e -> e.getText().toLowerCase().contains("on"))
+                .allMatch(this::isSelected));
+
+        assertTrue(attributeElements.stream()
+                .filter(e -> !e.getText().toLowerCase().contains("on"))
+                .allMatch(e -> !isSelected(e)));
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testAllValuesAreSelectedByDefault() {
-        List<FilterPanelRow> rows = getProductFilterInFirstTab().getPanel(AttributeFilterPanel.class)
-                .getRows();
+        List<WebElement> attributeElements = getProductFilterInFirstTab()
+                .openPanel()
+                .getAttributeFilterPanel()
+                .getItemElements();
 
-        for (int i = 1; i < rows.size(); i++) {
-            FilterPanelRow row = rows.get(i);
-
-            assertTrue(row.isSelected(), "Row is selected by default");
-        }
+        assertTrue(attributeElements.stream().allMatch(this::isSelected), "All items are not selected by default");
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testDeselectAllValues() {
-        List<FilterPanelRow> rows = getProductFilterInFirstTab().getPanel(AttributeFilterPanel.class)
-                .deselectAll()
-                .getRows();
+        AttributeFilterPanel panel = getProductFilterInFirstTab()
+                .openPanel()
+                .getAttributeFilterPanel();
 
-        for (int i = 1; i < rows.size(); i++) {
-            FilterPanelRow row = rows.get(i);
+        panel.clearAllItems();
 
-            assertFalse(row.isSelected(), "Row is not selected");
-        }
+        assertTrue(panel.getItemElements()
+                .stream()
+                .allMatch(e -> !isSelected(e)),
+                "Some items are still selected after de-select all values");
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testSelectAllValues() {
-        List<FilterPanelRow> rows = getProductFilterInFirstTab().getPanel(AttributeFilterPanel.class)
-                .deselectAll()
-                .selectAll()
-                .getRows();
+        AttributeFilterPanel panel = getProductFilterInFirstTab()
+                .openPanel()
+                .getAttributeFilterPanel();
 
-        for (int i = 1; i < rows.size(); i++) {
-            FilterPanelRow row = rows.get(i);
+        panel.selectAllItems();
 
-            assertTrue(row.isSelected(), "Row is selected");
-        }
+        assertTrue(panel.getItemElements()
+                .stream()
+                .allMatch(this::isSelected),
+                "All items are not selected");
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testValuesAreFileteredCorrectly() {
-        List<FilterPanelRow> rows = getProductFilterInFirstTab().getPanel(AttributeFilterPanel.class)
-                .search("on")
-                .waitForValuesToLoad()
-                .getRows();
+        AttributeFilterPanel panel = getProductFilterInFirstTab()
+                .openPanel()
+                .getAttributeFilterPanel();
 
-        for (int i = 1; i < rows.size(); i++) {
-            FilterPanelRow row = rows.get(i);
+        panel.searchItem("on");
 
-            assertTrue(!row.getLabel().isDisplayed() || row.getLabel().getText().toLowerCase().contains("on"),
-                    "Row is displayed whan matches search criteria");
-        }
+        assertTrue(panel.getItemElements()
+                .stream()
+                .allMatch(e -> e.getText().contains("on") && isSelected(e)),
+                "Items are not displayed properly with search criteria");
     }
 
     private FilterWidget getProductFilterInFirstTab() {
@@ -155,5 +147,18 @@ public class DashboardFilterVisualTest extends GoodSalesAbstractTest {
         dashboardsPage.getTabs().openTab(0);
 
         return dashboardsPage.getContent().getFilterWidget("product").openPanel();
+    }
+
+    private boolean isSelectOnlyLinkDisplayedOn(WebElement element) {
+        return isElementVisible(BY_SELECT_ONLY_LINK, element);
+    }
+
+    private void clickSelectOnlyLinkOn(WebElement element) {
+        new Actions(browser).moveToElement(element).perform();
+        waitForElementVisible(BY_SELECT_ONLY_LINK, element).click();
+    }
+
+    private boolean isSelected(WebElement element) {
+        return waitForElementVisible(By.tagName("input"), element).isSelected();
     }
 }

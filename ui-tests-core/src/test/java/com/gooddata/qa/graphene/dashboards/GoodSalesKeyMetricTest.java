@@ -124,12 +124,12 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
         assertEquals(getKeyMetricValue(), "60,270,072.20USD");
 
         dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_PRODUCT))
-            .changeAttributeFilterValue("TouchAll");
+            .changeAttributeFilterValues("TouchAll");
         waitForKeyMetricUpdateValue();
         assertEquals(getKeyMetricValue(), "60,270,072.20USD");
 
         dashboardsPage.getContent().getFilterWidget(simplifyText(VARIABLE_NAME))
-            .changeAttributeFilterValue("Explorer");
+            .changeAttributeFilterValues("Explorer");
         waitForKeyMetricUpdateValue();
         assertEquals(getKeyMetricValue(), "24,922,645.37USD");
 
@@ -150,7 +150,7 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
         assertEquals(getKeyMetricValue(), "7.00USD");
 
         dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_PRODUCT))
-            .changeAttributeFilterValue("TouchAll");
+            .changeAttributeFilterValues("TouchAll");
         waitForKeyMetricUpdateValue();
         assertEquals(getKeyMetricValue(), "1.00USD");
     }
