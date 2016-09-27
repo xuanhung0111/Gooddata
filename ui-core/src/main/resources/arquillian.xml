@@ -6,7 +6,7 @@
 
     <!-- possible options are listed at https://docs.jboss.org/author/display/ARQ/Drone -->
     <extension qualifier="webdriver">
-        <property name="browser">${browser:firefox}</property>
+        <property name="browser">firefox</property>
         <property name="firefoxUserPreferences">${corePath}/target/classes/firefox-prefs.js</property>
     </extension>
 
