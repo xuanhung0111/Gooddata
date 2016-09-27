@@ -6,8 +6,12 @@
 
     <!-- possible options are listed at https://docs.jboss.org/author/display/ARQ/Drone -->
     <extension qualifier="webdriver">
-        <property name="browser">${browser:chrome}</property>
+        <property name="browser">chrome</property>
         <property name="chromeDriverBinary">${chromeDriverBinaryPath}</property>
+        <property name="chromePrintOptions">true</property>
+        <property name="chromeExperimentalOption">
+            {"prefs": {"download.default_directory": "${browserDownloadFolder}", "download.prompt_for_download": "false"}}
+        </property>
     </extension>
 
     <extension qualifier="graphene">
