@@ -22,6 +22,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.getVariableUri;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileUri;
+import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.removeAllMufFromUser;
 
 import java.io.IOException;
 
@@ -42,6 +43,7 @@ import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.utils.http.RestApiClient;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
 
 public class GoodSalesDefaultFilterMultipleChoiceTest extends AbstractDashboardWidgetTest {
@@ -71,6 +73,7 @@ public class GoodSalesDefaultFilterMultipleChoiceTest extends AbstractDashboardW
     private static final String EDUCATIONLY = "Educationly";
     private static final String EXPLORER = "Explorer";
     private static final String PHOENIXSOFT = "PhoenixSoft";
+    private static final String WONDERKID = "WonderKid";
     private static final String ALL = "All";
 
     private Metric amountMetric;
@@ -418,17 +421,87 @@ public class GoodSalesDefaultFilterMultipleChoiceTest extends AbstractDashboardW
     }
 
     @Test(dependsOnMethods = {"initData"})
+    public void setInitialValueForFilterGroup() {
+        initDashboardsPage()
+                .addNewDashboard(generateDashboardName())
+                .addReportToDashboard(REPORT_WITH_PROMPT_FILTER)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.PROMPT, DF_VARIABLE)
+                .groupFiltersOnDashboard(ATTR_STAGE_NAME, DF_VARIABLE);
+
+        DashboardWidgetDirection.LEFT.moveElementToRightPlace(getReport(REPORT_WITH_PROMPT_FILTER).getRoot());
+        DashboardWidgetDirection.RIGHT.moveElementToRightPlace(getFilter(ATTR_STAGE_NAME).getRoot());
+        DashboardWidgetDirection.DOWN.moveElementToRightPlace(getFilter(DF_VARIABLE).getRoot());
+
+        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValue(INTEREST);
+        getFilter(DF_VARIABLE).changeAttributeFilterValue(DISCOVERY);
+        dashboardsPage.saveDashboard();
+        getReport(REPORT_WITH_PROMPT_FILTER).waitForReportLoading();
+
+        takeScreenshot(browser, "DF-not-applied-for-filter-group", getClass());
+        assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), ALL);
+        assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), ALL);
+        assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(),
+                asList(INTEREST, DISCOVERY, SHORT_LIST, RISK_ASSESSMENT));
+
+        dashboardsPage.editDashboard();
+        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValue(SHORT_LIST);
+        getFilter(DF_VARIABLE).changeAttributeFilterValue(SHORT_LIST);
+        dashboardsPage.applyValuesForGroupFilter().saveDashboard();
+        getReport(REPORT_WITH_PROMPT_FILTER).waitForReportLoading();
+
+        takeScreenshot(browser, "DF-applied-for-filter-group", getClass());
+        assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), SHORT_LIST);
+        assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), SHORT_LIST);
+        assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(SHORT_LIST));
+    }
+
+    @Test(dependsOnMethods = {"initData"})
+    public void setInitialValueForFilterGroupOnSavedView() {
+        initDashboardsPage()
+                .addNewDashboard(generateDashboardName())
+                .addReportToDashboard(REPORT_WITH_PROMPT_FILTER)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.PROMPT, DF_VARIABLE)
+                .groupFiltersOnDashboard(ATTR_STAGE_NAME, DF_VARIABLE)
+                .turnSavedViewOption(true);
+
+        DashboardWidgetDirection.LEFT.moveElementToRightPlace(getReport(REPORT_WITH_PROMPT_FILTER).getRoot());
+        DashboardWidgetDirection.RIGHT.moveElementToRightPlace(getFilter(ATTR_STAGE_NAME).getRoot());
+        DashboardWidgetDirection.DOWN.moveElementToRightPlace(getFilter(DF_VARIABLE).getRoot());
+        dashboardsPage.saveDashboard();
+
+        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValue(INTEREST);
+        dashboardsPage.applyValuesForGroupFilter();
+
+        SavedViewWidget savedViewWidget = dashboardsPage
+                .getSavedViewWidget()
+                .openSavedViewMenu()
+                .saveCurrentView(SAVED_VIEW_WITH_STAGE_NAME_FILTER, DF_VARIABLE);
+
+        dashboardsPage.editDashboard();
+        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValue(DISCOVERY);
+        getFilter(DF_VARIABLE).changeAttributeFilterValue(DISCOVERY);
+        dashboardsPage.applyValuesForGroupFilter().saveDashboard();
+        getReport(REPORT_WITH_PROMPT_FILTER).waitForReportLoading();
+
+        takeScreenshot(browser, "DF-applied-for-filter-group-on-saved-view", getClass());
+        assertEquals(savedViewWidget.getCurrentSavedView(), SAVED_VIEW_WITH_STAGE_NAME_FILTER);
+        assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), INTEREST);
+        assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), DISCOVERY);
+        assertTrue(getReport(REPORT_WITH_PROMPT_FILTER).isNoData(), "Report is not rendered correctly");
+
+        savedViewWidget.openSavedViewMenu().selectSavedView(DEFAULT_VIEW);
+        assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), DISCOVERY);
+        assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), DISCOVERY);
+        assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(DISCOVERY));
+    }
+
+    @Test(dependsOnMethods = {"initData"})
     public void checkViewerDefaultViewUpdatedUponChangedVariableFilter() throws JSONException, ParseException, IOException {
         final String dashboard = generateDashboardName();
 
-        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
-        initVariablePage()
-                .openVariableFromList(DF_VARIABLE)
-                .selectUserSpecificAttributeValues(
-                        getUserProfileUri(restApiClient, testParams.getUserDomain(), testParams.getViewerUser()),
-                        asList(INTEREST, DISCOVERY, SHORT_LIST))
-                .saveChange();
-
+        selectViewerSpecificValuesFrom(DF_VARIABLE, INTEREST, DISCOVERY, SHORT_LIST);
         initDashboardsPage()
                 .addNewDashboard(dashboard)
                 .addReportToDashboard(REPORT_WITH_PROMPT_FILTER)
@@ -462,6 +535,56 @@ public class GoodSalesDefaultFilterMultipleChoiceTest extends AbstractDashboardW
 
         } finally {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
+            restoreViewerSpecificValuesFrom(DF_VARIABLE);
+        }
+    }
+
+    @Test(dependsOnMethods = {"initData"}, description = "Verify saved view of viewer user updated well after"
+            + "admin change permission of variable filter for this user")
+    public void checkViewerSavedViewUpdatedUponChangedVariableFilter() throws JSONException, ParseException, IOException {
+        final String dashboard = generateDashboardName();
+        final String savedView1 = "SavedView1";
+        final String savedView2 = "SavedView2";
+
+        initDashboardsPage()
+                .addNewDashboard(dashboard)
+                .addReportToDashboard(REPORT_WITH_PROMPT_FILTER)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.PROMPT, DF_VARIABLE)
+                .turnSavedViewOption(true)
+                .saveDashboard()
+                .publishDashboard(true);
+
+        try {
+            logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.VIEWER);
+            SavedViewWidget savedViewWidget = initDashboardsPage().selectDashboard(dashboard).getSavedViewWidget();
+
+            getFilter(DF_VARIABLE).changeAttributeFilterValue(INTEREST);
+            savedViewWidget.openSavedViewMenu().saveCurrentView(savedView1);
+            getFilter(DF_VARIABLE).changeAttributeFilterValue(INTEREST, DISCOVERY);
+            savedViewWidget.openSavedViewMenu().saveCurrentView(savedView2);
+
+            logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
+            selectViewerSpecificValuesFrom(DF_VARIABLE, DISCOVERY, SHORT_LIST);
+
+            logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.VIEWER);
+            savedViewWidget = initDashboardsPage()
+                    .selectDashboard(dashboard)
+                    .getSavedViewWidget()
+                    .openSavedViewMenu()
+                    .selectSavedView(savedView1);
+
+            takeScreenshot(browser, "Viewer-saved-view-shows-all-when-value-out-of-range-variable-filter", getClass());
+            assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), ALL);
+            assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), asList(DISCOVERY, SHORT_LIST));
+    
+            savedViewWidget.openSavedViewMenu().selectSavedView(savedView2);
+            takeScreenshot(browser, "Viewer-saved-view-updated-upon-change-of-variable-filter", getClass());
+            assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), DISCOVERY);
+            assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(DISCOVERY));
+
+        } finally {
+            logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
+            restoreViewerSpecificValuesFrom(DF_VARIABLE);
         }
     }
 
@@ -552,6 +675,52 @@ public class GoodSalesDefaultFilterMultipleChoiceTest extends AbstractDashboardW
 
         } finally {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
+            removeAllMufFromUser(getRestApiClient(), testParams.getProjectId(), user);
+        }
+    }
+
+    @Test(dependsOnMethods = {"prepareDashboardForMufUser"}, dataProvider = "mufProvider",
+            description = "Verify saved view of non-admin user updated well after admin assign muf for these user")
+    public void checkMufUserInitialValuesWithSavedView(String user, UserRoles role, String mufObjectUri)
+            throws JSONException, ParseException, IOException {
+        final String savedView1 = "SavedView1";
+        final String savedView2 = "SavedView2";
+
+        try {
+            logoutAndLoginAs(canAccessGreyPage(browser), role);
+            SavedViewWidget savedViewWidget = initDashboardsPage()
+                    .selectDashboard(DASHBOARD_MUF)
+                    .getSavedViewWidget();
+
+            getFilter(ATTR_PRODUCT).changeAttributeFilterValue(WONDERKID);
+            getFilter(MUF_DF_VARIABLE).changeAttributeFilterValue(WONDERKID);
+            savedViewWidget.openSavedViewMenu().saveCurrentView(savedView1);
+
+            getFilter(ATTR_PRODUCT).changeAttributeFilterValue(COMPUSCI, WONDERKID);
+            getFilter(MUF_DF_VARIABLE).changeAttributeFilterValue(COMPUSCI, WONDERKID);
+            savedViewWidget.openSavedViewMenu().saveCurrentView(savedView2);
+
+            addMufToUser(getRestApiClient(), testParams.getProjectId(), user, mufObjectUri);
+
+            savedViewWidget = refreshDashboardsPage()
+                    .getSavedViewWidget()
+                    .openSavedViewMenu()
+                    .selectSavedView(savedView1);
+
+            takeScreenshot(browser, "Saved-view-shows-all-when-value-out-of-range-muf-assigned-for-" + role, getClass());
+            assertEquals(getFilter(ATTR_PRODUCT).getCurrentValue(), ALL);
+            assertEquals(getFilter(MUF_DF_VARIABLE).getCurrentValue(), ALL);
+            assertEquals(getReport(REPORT_MUF).getAttributeElements(), asList(COMPUSCI, EDUCATIONLY, EXPLORER));
+
+            savedViewWidget.openSavedViewMenu().selectSavedView(savedView2);
+            takeScreenshot(browser, "Saved-view-updated-with-muf-assigned-for-" + role, getClass());
+            assertEquals(getFilter(ATTR_PRODUCT).getCurrentValue(), COMPUSCI);
+            assertEquals(getFilter(MUF_DF_VARIABLE).getCurrentValue(), COMPUSCI);
+            assertEquals(getReport(REPORT_MUF).getAttributeElements(), singletonList(COMPUSCI));
+
+        } finally {
+            logoutAndLoginAs(true, UserRoles.ADMIN);
+            removeAllMufFromUser(getRestApiClient(), testParams.getProjectId(), user);
         }
     }
 
@@ -561,8 +730,29 @@ public class GoodSalesDefaultFilterMultipleChoiceTest extends AbstractDashboardW
         createAndAddUserToProject(UserRoles.VIEWER);
     }
 
-    private void refreshDashboardsPage() {
+    private DashboardsPage refreshDashboardsPage() {
         browser.navigate().refresh();
         waitForDashboardPageLoaded(browser);
+        return dashboardsPage;
+    }
+
+    private void selectViewerSpecificValuesFrom(String variable, String... values) 
+            throws ParseException, JSONException, IOException {
+        initVariablePage()
+                .openVariableFromList(variable)
+                .selectUserSpecificAttributeValues(getViewerProfileUri(), asList(values))
+                .saveChange();
+    }
+
+    private void restoreViewerSpecificValuesFrom(String variable) throws ParseException, JSONException, IOException {
+        initVariablePage()
+                .openVariableFromList(variable)
+                .restoreUserSpecificValuesToDefault(getViewerProfileUri())
+                .saveChange();
+    }
+
+    private String getViewerProfileUri() throws ParseException, JSONException, IOException {
+        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
+        return getUserProfileUri(restApiClient, testParams.getUserDomain(), testParams.getViewerUser());
     }
 }

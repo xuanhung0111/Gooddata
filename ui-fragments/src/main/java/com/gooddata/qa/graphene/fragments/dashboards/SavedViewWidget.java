@@ -87,8 +87,9 @@ public class SavedViewWidget extends AbstractFragment{
         dashboardSaveActiveViewDialog.saveCurrentView(name, expectSuccessful, excludeFilters);
     }
 
-    public void saveCurrentView(String name, String... excludeFilters) {
+    public SavedViewWidget saveCurrentView(String name, String... excludeFilters) {
         saveCurrentView(name, true, excludeFilters);
+        return this;
     }
 
     public String getCurrentSavedView() {

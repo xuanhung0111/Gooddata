@@ -477,6 +477,11 @@ public class DashboardsPage extends AbstractFragment {
         return getContent().getReport(name, clazz);
     }
 
+    public DashboardsPage applyValuesForGroupFilter() {
+        getContent().applyValuesForGroupFilter();
+        return this;
+    }
+
     private SimpleMenu openEditExportEmbedMenu() {
         if (waitForElementPresent(editExportEmbedButton).getAttribute("class").contains("gdc-hidden")) {
             throw new RuntimeException("Embed menu is not visible");
