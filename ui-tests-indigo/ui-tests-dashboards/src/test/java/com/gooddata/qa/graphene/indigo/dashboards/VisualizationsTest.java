@@ -38,17 +38,16 @@ public class VisualizationsTest extends GoodSalesAbstractDashboardTest {
     }
 
     @Test(dependsOnMethods = {"setupVisualizations"}, groups = {"desktop"})
-    public void addVisualizationToLastPositionUsingDoubleClick() {
+    public void addVisualizationToLastPosition() {
         initIndigoDashboardsPageWithWidgets()
                 .switchToEditMode()
-                .getInsightSelectionPanel()
-                .addInsightUsingDoubleClick(VISUALIZATION_TITLE);
+                .addInsight(VISUALIZATION_TITLE);
 
         waitForFragmentVisible(indigoDashboardsPage).leaveEditMode();
 
         int visualizationsCount = indigoDashboardsPage.getInsightsCount();
 
-        takeScreenshot(browser, "checkAddVisualizationToLastPositionUsingDoubleClick-added_1_visualization", getClass());
+        takeScreenshot(browser, "checkAddVisualizationToLastPosition-added_1_visualization", getClass());
         assertEquals(visualizationsCount, 1);
 
         indigoDashboardsPage
@@ -61,7 +60,7 @@ public class VisualizationsTest extends GoodSalesAbstractDashboardTest {
 
         visualizationsCount = indigoDashboardsPage.getInsightsCount();
 
-        takeScreenshot(browser, "checkAddVisualizationToLastPositionUsingDoubleClick-removed_visualization", getClass());
+        takeScreenshot(browser, "checkAddVisualizationToLastPosition-removed_visualization", getClass());
         assertEquals(visualizationsCount, 0);
     }
 
