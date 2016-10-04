@@ -20,14 +20,6 @@ public class IndigoInsightSelectionPanel extends AbstractInsightSelectionPanel {
                 waitForElementVisible(ROOT_LOCATOR, searchContext));
     }
 
-    /**
-     * Add an insight to last position in dashboard by double click
-     * @param insight
-     */
-    public void addInsightUsingDoubleClick(final String insight) {
-        getActions().doubleClick(waitForElementVisible(getInsightItem(insight).getRoot())).perform();
-    }
-
     public static void waitForNotPresent() {
         waitForElementNotPresent(ROOT_LOCATOR);
     }

@@ -367,11 +367,6 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
-    public IndigoDashboardsPage addInsightUsingDoubleClick(final String insight) {
-        getInsightSelectionPanel().addInsightUsingDoubleClick(insight);
-        return this;
-    }
-
     public IndigoInsightSelectionPanel getInsightSelectionPanel() {
         return IndigoInsightSelectionPanel.getInstance(browser);
     }

@@ -77,7 +77,7 @@ public class InsightOnDashboardTest extends GoodSalesAbstractDashboardTest {
         assertTrue(initIndigoDashboardsPage()
             .getSplashScreen()
             .startEditingWidgets()
-            .addInsightUsingDoubleClick(TEST_INSIGHT)
+            .addInsight(TEST_INSIGHT)
             .getLastWidget(Insight.class)
             .isDeleteButtonVisible(), "Added insight is not focused");
 
@@ -89,7 +89,7 @@ public class InsightOnDashboardTest extends GoodSalesAbstractDashboardTest {
         initIndigoDashboardsPage()
             .getSplashScreen()
             .startEditingWidgets()
-            .addInsightUsingDoubleClick(TEST_INSIGHT)
+            .addInsight(TEST_INSIGHT)
             .saveEditModeWithWidgets();
         try {
             assertEquals(indigoDashboardsPage.getLastWidget(Insight.class).getHeadline(), TEST_INSIGHT);
@@ -113,7 +113,7 @@ public class InsightOnDashboardTest extends GoodSalesAbstractDashboardTest {
         IndigoDashboardsPage idp = initIndigoDashboardsPage()
             .getSplashScreen()
             .startEditingWidgets()
-            .addInsightUsingDoubleClick(TEST_INSIGHT)
+            .addInsight(TEST_INSIGHT)
             .saveEditModeWithWidgets();
 
         try {
@@ -140,7 +140,7 @@ public class InsightOnDashboardTest extends GoodSalesAbstractDashboardTest {
         IndigoDashboardsPage idp = initIndigoDashboardsPage()
             .getSplashScreen()
             .startEditingWidgets()
-            .addInsightUsingDoubleClick(TEST_INSIGHT)
+            .addInsight(TEST_INSIGHT)
             .saveEditModeWithWidgets();
 
         try {
@@ -223,7 +223,7 @@ public class InsightOnDashboardTest extends GoodSalesAbstractDashboardTest {
             initAnalysePage().openInsight(TEST_INSIGHT).waitForReportComputing().setInsightTitle(RENAMED_TEST_INSIGHT).saveInsight();
             String insightInsertedAfterRenameTitle = initIndigoDashboardsPageWithWidgets()
                 .switchToEditMode()
-                .addInsightUsingDoubleClick(RENAMED_TEST_INSIGHT)
+                .addInsight(RENAMED_TEST_INSIGHT)
                 .getLastWidget(Insight.class)
                 .getHeadline();
 
