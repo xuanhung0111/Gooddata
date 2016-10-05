@@ -62,13 +62,16 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(css = ".dash-nav-right .configuration-panel")
     private ConfigurationPanel configurationPanel;
 
+    @FindBy(className = "s-attribute_select")
+    private AttributeSelect attributeSelect;
+
     @FindBy(className = "dash-filters-date")
     private DateFilter dateFilter;
 
     @FindBy(className = DELETE_BUTTON_CLASS_NAME)
     private WebElement deleteButton;
 
-    @FindBy(css = ".dash-filters-attribute.are-loaded")
+    @FindBy(className = ATTRIBUTE_FITERS_PANEL_CLASS_NAME)
     private AttributeFiltersPanel attributeFiltersPanel;
 
     private static final String EDIT_BUTTON_CLASS_NAME = "s-edit_button";
@@ -76,6 +79,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     private static final String DELETE_BUTTON_CLASS_NAME = "s-delete_dashboard";
     private static final String ALERTS_LOADED_CLASS_NAME = "alerts-loaded";
     private static final String SPLASH_SCREEN_CLASS_NAME = "splashscreen";
+    private static final String ATTRIBUTE_FITERS_PANEL_CLASS_NAME = "dash-filters-attribute";
 
     private static final String ADD_KPI_PLACEHOLDER = ".add-kpi-placeholder";
     private static final String DASHBOARD_BODY = ".dash-section";
@@ -173,6 +177,11 @@ public class IndigoDashboardsPage extends AbstractFragment {
     public IndigoDashboardsPage waitForDashboardLoad() {
         waitForElementVisible(DASHBOARD_LOADED, browser);
 
+        return this;
+    }
+
+    public IndigoDashboardsPage addAttributeFilter(String attributeTitle) {
+        attributeSelect.selectByName(attributeTitle);
         return this;
     }
 
@@ -280,8 +289,9 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return waitForFragmentVisible(dateFilter).getSelection();
     }
 
-    public AttributeFiltersPanel waitForAttributeFilters() {
-        return waitForFragmentVisible(attributeFiltersPanel);
+    public AttributeFiltersPanel getAttributeFiltersPanel() {
+        waitForElementPresent(By.className(ATTRIBUTE_FITERS_PANEL_CLASS_NAME), browser);
+        return attributeFiltersPanel;
     }
 
     public IndigoDashboardsPage waitForAlertsLoaded() {
