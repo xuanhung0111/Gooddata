@@ -113,7 +113,8 @@ public class UITestsRegistry {
             DashboardSavedFiltersTest.class,
             GoodSalesAdvancedConnectingFilterTest.class,
             "testng-dashboard-default-filter-multiple-choice.xml",
-            "testng-dashboard-default-filter-single-choice.xml"
+            "testng-dashboard-default-filter-single-choice.xml",
+            "testng-dashboard-default-filter-misc.xml"
         });
 
         suites.put("reports", new Object[] {

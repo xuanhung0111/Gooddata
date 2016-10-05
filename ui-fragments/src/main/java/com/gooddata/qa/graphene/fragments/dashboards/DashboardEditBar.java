@@ -4,12 +4,14 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
@@ -23,6 +25,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.Das
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.GroupConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
+import com.google.common.base.Predicate;
 
 public class DashboardEditBar extends AbstractFragment {
 
@@ -77,7 +80,7 @@ public class DashboardEditBar extends AbstractFragment {
     @FindBy(xpath = "//div[contains(@class,'yui3-c-dashboardcollectionwidget-content')]/div[contains(@class,'yui3-c-dashboardwidget')]")
     private List<WebElement> listDashboardWidgets;
 
-    @FindBy(xpath = "//span[text()='Filter']")
+    @FindBy(className = "s-btn-filter")
     private WebElement addFilterMenu;
 
     @FindBy(xpath = "//div[contains(@class,'gdc-menu-simple')]//span[text()='Attribute']")
@@ -287,7 +290,12 @@ public class DashboardEditBar extends AbstractFragment {
     }
 
     private SimpleMenu openFilterMenu() {
-        waitForElementVisible(addFilterMenu).click();
+        Predicate<WebDriver> menuOpened = browser -> {
+            waitForElementVisible(addFilterMenu).click();
+            return isElementVisible(SimpleMenu.LOCATOR, browser);
+        };
+
+        Graphene.waitGui().until(menuOpened);
         return SimpleMenu.getInstance(browser);
     }
 }

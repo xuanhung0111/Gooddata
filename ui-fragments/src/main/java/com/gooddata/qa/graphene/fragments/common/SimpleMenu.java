@@ -21,7 +21,7 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class SimpleMenu extends AbstractFragment {
 
-    protected static final By LOCATOR = By.cssSelector(".gdc-menu-simple:not(.yui3-overlay-hidden):not(.hidden)");
+    public static final By LOCATOR = By.cssSelector(".gdc-menu-simple:not(.yui3-overlay-hidden):not(.hidden)");
 
     @FindBy(css = "li:not(.separator)")
     protected List<WebElement> items;
