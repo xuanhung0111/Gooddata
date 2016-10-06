@@ -70,10 +70,6 @@ public class ZendeskHelper {
         return getZendeskEntityCount(ORGANIZATIONS_INC_URL, ZendeskObject.ORGANIZATION);
     }
 
-    public int getNumberOfTicketEvents() throws IOException, JSONException {
-        return getZendeskEntityCount(TICKET_EVENTS_INC_URL, ZendeskObject.TICKET_EVENT);
-    }
-
     public int createNewTicket(String jsonTicket) throws IOException, JSONException {
         return createNewZendeskObject(TICKETS_URL, jsonTicket, ZendeskObject.TICKET);
     }
@@ -102,7 +98,7 @@ public class ZendeskHelper {
         deleteZendeskEntity(ORGANIZATIONS_URL, organizationId);
     }
 
-    public int createNewZendeskObject(String url, String jsonContent, ZendeskObject objectName)
+    private int createNewZendeskObject(String url, String jsonContent, ZendeskObject objectName)
             throws IOException, JSONException {
         final int id = getJsonObject(apiClient, apiClient.newPostMethod(url, jsonContent), HttpStatus.CREATED)
             .getJSONObject(objectName.getName())
@@ -164,7 +160,7 @@ public class ZendeskHelper {
     private Set<Integer> getSetOfActiveZendeskEntities(String url, ZendeskObject objectType, int pageNumber)
             throws JSONException, IOException {
             JSONObject json = retrieveEntitiesJsonFromUrl(url);
-            Set<Integer> nonDeletedObjects = new HashSet<Integer>();
+            Set<Integer> nonDeletedObjects = new HashSet<>();
             int count = json.getInt("count");
             System.out.println(count + " " + objectType.getPluralName() + " returned from " + url);
             int deletedObjects = 0;
@@ -224,7 +220,7 @@ public class ZendeskHelper {
         System.out.println("Deleted object on url " + objectUrl);
     }
 
-    public void updateZendeskObject(String url, String jsonContent, ZendeskObject objectName)
+    private void updateZendeskObject(String url, String jsonContent, ZendeskObject objectName)
             throws IOException, JSONException {
         final int id = getJsonObject(apiClient, apiClient.newPutMethod(url, jsonContent))
             .getJSONObject(objectName.getName()).getInt("id");
