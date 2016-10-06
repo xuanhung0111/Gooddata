@@ -1,11 +1,13 @@
 package com.gooddata.qa.graphene.connectors;
 
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
-import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
-import static java.util.Arrays.asList;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import com.gooddata.qa.utils.http.RestApiClient;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -15,15 +17,11 @@ import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import org.apache.http.client.methods.HttpRequestBase;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.springframework.http.HttpStatus;
-
-import com.gooddata.qa.utils.http.RestApiClient;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.utils.http.RestUtils.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isOneOf;
 
 public class ZendeskHelper {
 
@@ -157,7 +155,7 @@ public class ZendeskHelper {
             sleepTightInSeconds(30);
             retryCounter++;
         }
-        assertEquals(statusCode, 200, "Invalid status code");
+        assertThat("Invalid status code returned from GET on " + url, statusCode, is(200));
         final JSONObject json = getJsonObject(apiClient, url);
         System.out.println("Total " + json.getInt("count") + " entities returned from " + url);
         return json;
@@ -220,9 +218,9 @@ public class ZendeskHelper {
     private void deleteZendeskEntity(String url, int id) throws IOException {
         final String objectUrl = url + "/" + id;
         System.out.println("Going to delete object on url " + objectUrl);
-        assertTrue(asList(204, 200)
-                .contains(executeRequest(apiClient, apiClient.newDeleteMethod(objectUrl))),
-                "Invalid status code");
+        assertThat("Invalid status code returned from DELETE on " + objectUrl,
+                executeRequest(apiClient, apiClient.newDeleteMethod(objectUrl)),
+                isOneOf(204, 200));
         System.out.println("Deleted object on url " + objectUrl);
     }
 
