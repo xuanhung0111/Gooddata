@@ -87,7 +87,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
             dashboardEditBar.setParentsFilter(ATTR_PRODUCT, ATTR_DEPARTMENT);// parentFilteName is Department
             dashboardEditBar.saveDashboard();
 
-            departmentFilter.changeAttributeFilterValue("Direct Sales");
+            departmentFilter.changeAttributeFilterValues("Direct Sales");
             assertTrue(CollectionUtils.isEqualCollection(filteredValuesProduct,
                     productFilter.getAllAttributeValues()), "Cascading filters are not applied correcly");
         } finally {

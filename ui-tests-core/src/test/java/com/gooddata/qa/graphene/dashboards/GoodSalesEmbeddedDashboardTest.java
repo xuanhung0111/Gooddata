@@ -358,7 +358,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         EmbeddedDashboard embeddedDashboard =
                 embedDashboardToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Embed One Tab Dashboard");
 
-        embeddedDashboard.getFirstFilter().changeAttributeFilterValue(filteredAttributeValues);
+        embeddedDashboard.getFirstFilter().changeAttributeFilterValues(filteredAttributeValues);
 
         TableReport tableReport = embeddedDashboard.getReport(tabularReportDef.getName(), TableReport.class);
 
@@ -367,7 +367,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
         embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
 
-        embeddedDashboard.getFirstFilter().changeAttributeFilterValue(filteredAttributeValues);
+        embeddedDashboard.getFirstFilter().changeAttributeFilterValues(filteredAttributeValues);
         tableReport = embeddedDashboard.getReport(tabularReportDef.getName(), TableReport.class);
 
         assertThat(tableReport.getAttributeElements(), is(newArrayList(filteredAttributeValues)));

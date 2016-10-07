@@ -567,7 +567,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         dashboardsPage.selectDashboard(DASHBOARD_NAME);
         browser.navigate().refresh();
         waitForDashboardPageLoaded(browser);
-        dashboardsPage.getContent().getFirstFilter().changeAttributeFilterValue(values);
+        dashboardsPage.getContent().getFirstFilter().changeAttributeFilterValues(values);
         String name = "Saved view " + System.currentTimeMillis();
         SavedViewWidget savedViewWidget = dashboardsPage.getSavedViewWidget();
         savedViewWidget.openSavedViewMenu();

@@ -6,6 +6,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.clickElementByVisibleL
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static java.util.Arrays.asList;
 
 import java.util.Collection;
 import java.util.List;
@@ -40,7 +41,7 @@ public class SelectItemPopupPanel extends AbstractFragment {
     })
     private WebElement searchInput;
 
-    @FindBy(css = ".overlayPlugin-plugged>:not(.gdc-hidden) .s-btn-add,.s-btn-select")
+    @FindBy(css = ".overlayPlugin-plugged>:not(.gdc-hidden) .s-btn-add,.s-btn-select,.s-btn-apply")
     private WebElement submitButton;
 
     @FindBy(css = ".s-btn-cancel")
@@ -53,11 +54,18 @@ public class SelectItemPopupPanel extends AbstractFragment {
     private List<WebElement> items;
 
     public static SelectItemPopupPanel getInstance(SearchContext searchContext) {
-        return Graphene.createPageFragment(SelectItemPopupPanel.class, waitForElementVisible(LOCATOR, searchContext));
+        return getInstance(LOCATOR, searchContext);
     }
 
     public static SelectItemPopupPanel getInstance(By locator, SearchContext searchContext) {
-        return Graphene.createPageFragment(SelectItemPopupPanel.class, waitForElementVisible(locator, searchContext));
+        return getInstance(SelectItemPopupPanel.class, locator, searchContext);
+    }
+
+    public static <T extends SelectItemPopupPanel> T getInstance(Class<T> clazz, By locator, SearchContext searchContext) {
+        WebElement root = waitForElementVisible(locator, searchContext);
+
+        waitForElementVisible(By.cssSelector(".yui3-c-simpleColumn-window.loaded"), root);
+        return Graphene.createPageFragment(clazz, root);
     }
 
     public SelectItemPopupPanel searchAndSelectItem(String item) {
@@ -73,6 +81,11 @@ public class SelectItemPopupPanel extends AbstractFragment {
 
     public SelectItemPopupPanel searchAndSelectItems(Collection<String> items) {
         items.stream().forEach(this::searchAndSelectItem);
+        return this;
+    }
+
+    public SelectItemPopupPanel searchAndSelectItems(String... items) {
+        searchAndSelectItems(asList(items));
         return this;
     }
 
@@ -118,14 +131,8 @@ public class SelectItemPopupPanel extends AbstractFragment {
         return getAllItemCheckboxes().allMatch(e -> !e.isSelected());
     }
 
-    private Stream<WebElement> getAllItemCheckboxes() {
-        return waitForCollectionIsNotEmpty(items)
-                .stream()
-                .map(e -> e.findElement(By.tagName("input")));
-    }
-
     // Just use this action when the expected item not visible in list
-    private SelectItemPopupPanel searchItem(final String searchText) {
+    public SelectItemPopupPanel searchItem(final String searchText) {
         final int currentItems = waitForCollectionIsNotEmpty(items).size();
 
         waitForElementVisible(searchInput).clear();
@@ -144,6 +151,25 @@ public class SelectItemPopupPanel extends AbstractFragment {
         Graphene.waitGui().until(itemFound);
 
         return this;
+    }
+
+    public SelectItemPopupPanel clearSearchInput() {
+        waitForElementVisible(searchInput).clear();
+        searchInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
+        waitForCollectionIsEmpty(items);
+
+        // Sometimes clear() does nothing, so using hot keys instead
+        searchInput.sendKeys(Keys.BACK_SPACE);
+        searchInput.sendKeys(Keys.chord(Keys.CONTROL, "a"));
+        searchInput.sendKeys(Keys.DELETE);
+
+        return this;
+    }
+
+    private Stream<WebElement> getAllItemCheckboxes() {
+        return waitForCollectionIsNotEmpty(items)
+                .stream()
+                .map(e -> e.findElement(By.tagName("input")));
     }
 
     private SelectItemPopupPanel selectItem(final String item) {
@@ -184,17 +210,8 @@ public class SelectItemPopupPanel extends AbstractFragment {
     }
 
     private List<WebElement> getItemListInDefaultStage() {
-        if (waitForElementVisible(searchInput).getAttribute("value").trim().isEmpty())
-            return waitForCollectionIsNotEmpty(items);
-
-        searchInput.clear();
-        searchInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
-        waitForCollectionIsEmpty(items);
-
-        // Sometimes clear() does nothing, so using hot keys instead
-        searchInput.sendKeys(Keys.BACK_SPACE);
-        searchInput.sendKeys(Keys.chord(Keys.CONTROL, "a"));
-        searchInput.sendKeys(Keys.DELETE);
+        if (!waitForElementVisible(searchInput).getAttribute("value").trim().isEmpty())
+            clearSearchInput();
 
         return waitForCollectionIsNotEmpty(items);
     }

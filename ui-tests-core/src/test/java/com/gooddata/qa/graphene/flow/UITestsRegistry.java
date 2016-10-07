@@ -16,7 +16,6 @@ import com.gooddata.qa.graphene.dashboards.GoodSalesCellLimitTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesConnectingFilterTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardAllKindsFiltersTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardTest;
-import com.gooddata.qa.graphene.dashboards.GoodSalesDefaultFilterMultipleChoiceTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesEditEmbeddedDashboardTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesEmbeddedDashboardTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardWidgetManipulationTest;
@@ -113,7 +112,8 @@ public class UITestsRegistry {
             DashboardFilterVisualTest.class,
             DashboardSavedFiltersTest.class,
             GoodSalesAdvancedConnectingFilterTest.class,
-            GoodSalesDefaultFilterMultipleChoiceTest.class
+            "testng-dashboard-default-filter-multiple-choice.xml",
+            "testng-dashboard-default-filter-single-choice.xml"
         });
 
         suites.put("reports", new Object[] {

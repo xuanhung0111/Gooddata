@@ -433,7 +433,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
                 .getCurrentValue(),
                 YEAR_2014);
         assertEquals(getProductFilter()
-                .changeAttributeFilterValue(PRODUCT_COMPUSCI)
+                .changeAttributeFilterValues(PRODUCT_COMPUSCI)
                 .getCurrentValue(),
                 PRODUCT_COMPUSCI);
 
@@ -461,7 +461,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         dashboardsPage.saveDashboard();
 
         getDateCreatedFilter().changeTimeFilterValueByClickInTimeLine(YEAR_2014);
-        getProductFilter().changeAttributeFilterValue(PRODUCT_COMPUSCI);
+        getProductFilter().changeAttributeFilterValues(PRODUCT_COMPUSCI);
 
         dashboardsPage.openTab(0);
         takeScreenshot(browser, "Attribute-filter-and-date-filter-combination-applied-between-same-tabs", getClass());
@@ -492,7 +492,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
 
         dashboardsPage.openTab(0);
         getDateCreatedFilter().changeTimeFilterValueByClickInTimeLine(YEAR_OF_DATA);
-        getProductFilter().changeAttributeFilterValue(PRODUCT_COMPUSCI);
+        getProductFilter().changeAttributeFilterValues(PRODUCT_COMPUSCI);
         assertEquals(getReport().getAttributeElements(), COMBINATION_ATTRIBUTE_FILTER_VALUES);
 
         dashboardsPage.openTab(1);
@@ -526,7 +526,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         dashboardsPage.saveDashboard();
 
         getDateCreatedFilter().changeTimeFilterValueByClickInTimeLine(YEAR_OF_DATA);
-        getProductFilter().changeAttributeFilterValue(PRODUCT_COMPUSCI);
+        getProductFilter().changeAttributeFilterValues(PRODUCT_COMPUSCI);
         assertEquals(getReport().getAttributeElements(), COMBINATION_ATTRIBUTE_FILTER_VALUES);
 
         dashboardsPage.openTab(0);
@@ -560,7 +560,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         dashboardsPage.saveDashboard().openTab(0);
 
         getDateCreatedFilter().changeTimeFilterValueByClickInTimeLine(YEAR_OF_DATA);
-        getProductFilter().changeAttributeFilterValue(PRODUCT_COMPUSCI);
+        getProductFilter().changeAttributeFilterValues(PRODUCT_COMPUSCI);
         assertEquals(getReport().getAttributeElements(), COMBINATION_ATTRIBUTE_FILTER_VALUES);
 
         dashboardsPage.openTab(1);
@@ -597,7 +597,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         assertEquals(getProductFilter().getCurrentValue(), PRODUCT_COMPUSCI);
 
         getDateCreatedFilter().changeTimeFilterValueByClickInTimeLine(YEAR_OF_DATA);
-        getProductFilter().changeAttributeFilterValueInSingleMode("Educationly");
+        getProductFilter().changeAttributeFilterValues("Educationly");
         assertEquals(getReport().getAttributeElements(), asList("Direct Sales", "Inside Sales", "Educationly"));
 
         dashboardsPage.openTab(0);

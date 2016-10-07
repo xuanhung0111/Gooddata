@@ -97,7 +97,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
         try {
             dashboardsPage.getTabs().openTab(0);
             dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME))
-                .changeAttributeFilterValue("Negotiation");
+                .changeAttributeFilterValues("Negotiation");
 
             Sleeper.sleepTightInSeconds(3);
             assertNotEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(V_STAGE)).getCurrentValue(),
@@ -131,7 +131,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
 
             dashboardsPage.getTabs().openTab(0);
             dashboardsPage.getContent().getFilterWidget(simplifyText(V_STAGE))
-                .changeAttributeFilterValue("Conviction");
+                .changeAttributeFilterValues("Conviction");
 
             Sleeper.sleepTightInSeconds(3);
             assertNotEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME)).getCurrentValue(),
@@ -164,7 +164,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
 
             dashboardsPage.getTabs().openTab(0);
             dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME))
-                .changeAttributeFilterValue("Discovery");
+                .changeAttributeFilterValues("Discovery");
             dashboardsPage.getTabs().openTab(1);
             assertNotEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME))
                     .getCurrentValue(), "Discovery");
@@ -176,7 +176,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
 
             dashboardsPage.getTabs().openTab(0);
             dashboardsPage.getContent().getFilterWidget(simplifyText(V_STAGE))
-                .changeAttributeFilterValue("Short List");
+                .changeAttributeFilterValues("Short List");
             dashboardsPage.getTabs().openTab(1);
             assertNotEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(V_STAGE))
                     .getCurrentValue(), "Short List");
@@ -200,7 +200,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
             dashboardsPage.duplicateDashboardTab(0);
             dashboardsPage.getTabs().openTab(0);
             dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME))
-                .changeAttributeFilterValue("Negotiation");
+                .changeAttributeFilterValues("Negotiation");
 
             Sleeper.sleepTightInSeconds(3);
             assertTrue(isEqualCollection(asList("2011", "Negotiation"),
@@ -218,7 +218,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
                     dashboardsPage.getContent().getReport("Report2", TableReport.class).getAttributeElements()));
 
             dashboardsPage.getContent().getFilterWidget(simplifyText(V_STAGE))
-                .changeAttributeFilterValue("Conviction");
+                .changeAttributeFilterValues("Conviction");
             Sleeper.sleepTightInSeconds(3);
             assertTrue(isEqualCollection(asList("2011", "Negotiation"),
                     dashboardsPage.getContent().getReport("Report1", TableReport.class).getAttributeElements()));
@@ -270,13 +270,13 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
             dashboardsPage.selectDashboard(DB2);
             dashboardsPage.getTabs().openTab(1);
             dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME))
-                .changeAttributeFilterValue("Negotiation");
+                .changeAttributeFilterValues("Negotiation");
             dashboardsPage.getTabs().openTab(0);
             assertEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME)).getCurrentValue(),
                     "Negotiation");
 
             dashboardsPage.getContent().getFilterWidget(simplifyText(V_STAGE))
-                .changeAttributeFilterValue("Conviction");
+                .changeAttributeFilterValues("Conviction");
             dashboardsPage.getTabs().openTab(1);
             assertEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(V_STAGE)).getCurrentValue(),
                     "Conviction");

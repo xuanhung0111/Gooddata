@@ -14,7 +14,6 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.SelectionConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.AttributeFilterPanel;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.FilterPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
 
 public class FilterWidget extends AbstractFragment {
@@ -37,7 +36,7 @@ public class FilterWidget extends AbstractFragment {
 
     public void closePanel() {
         if (isOpen()) {
-            FilterPanel.getInstance(browser).close();
+            waitForElementVisible(button).click();
         }
     }
 
@@ -45,55 +44,58 @@ public class FilterWidget extends AbstractFragment {
         return button.getAttribute("class").contains("active");
     }
 
-    public <T extends FilterPanel> T getPanel(Class<T> clazz) {
-        if (isOpen()) {
-            return FilterPanel.getPanel(clazz, browser);
-        }
-
-        return null;
-    }
-
+    /**
+     * Open and get all attribute values in Attribute filter panel.
+     * This action always close the panel in the end.
+     * @return List of attribute values
+     */
     public List<String> getAllAttributeValues() {
-        openPanel();
-        return getPanel(AttributeFilterPanel.class).getAllAtributeValues();
+        try {
+            return openPanel().getAttributeFilterPanel().getItems();
+
+        } finally {
+            closePanel();
+        }
     }
 
-    public FilterWidget changeTimeFilterValueByClickInTimeLine(String dataRange) {
-        openPanel();
-        getPanel(TimeFilterPanel.class).selectTimeLine(dataRange).submit();
-
+    public FilterWidget changeTimeFilterValueByClickInTimeLine(String timeLine) {
+        openPanel()
+            .getTimeFilterPanel()
+            .selectTimeLine(timeLine)
+            .submit();
         return this;
     }
 
-    public void changeTimeFilterByEnterFromAndToDate(String startTime, String endTime) {
-        openPanel();
-        getPanel(TimeFilterPanel.class).changeValueByEnterFromDateAndToDate(startTime, endTime);
-    }
-
-    public FilterWidget changeAttributeFilterValue(String... values) {
-        openPanel();
-        getPanel(AttributeFilterPanel.class).changeValues(values);
-
+    public FilterWidget changeTimeFilterByEnterFromAndToDate(String startTime, String endTime) {
+        openPanel()
+            .getTimeFilterPanel()
+            .changeValueByEnterFromDateAndToDate(startTime, endTime);
         return this;
     }
 
-    public void changeAttributeFilterValueInSingleMode(String value) {
-        openPanel();
-        getPanel(AttributeFilterPanel.class).changeValueInSingleMode(value);
+    /**
+     * Change values by open and select attribute values in Attribute filter panel.
+     * Can use for both single and multiple mode.
+     * @param values
+     * @return
+     */
+    public FilterWidget changeAttributeFilterValues(String... values) {
+        openPanel().getAttributeFilterPanel().changeValues(values);
+
+        closePanel();
+        return this;
     }
 
     public String getCurrentValue() {
         return getRoot().getText().split("\n")[1];
     }
 
-    public void changeSelectionToOneValue() {
-        WidgetConfigPanel configPanel = WidgetConfigPanel.
-                openConfigurationPanelFor(this.getRoot(), browser);
+    public FilterWidget changeSelectionToOneValue() {
+        return switchToOneOrMultipleValuesMode(false);
+    }
 
-        configPanel.getTab(WidgetConfigPanel.Tab.SELECTION,
-                SelectionConfigPanel.class).changeSelectionToOneValue();
-
-        configPanel.saveConfiguration();
+    public FilterWidget changeSelectionToMultipleValues() {
+        return switchToOneOrMultipleValuesMode(true);
     }
 
     public String getTitle() {
@@ -111,5 +113,28 @@ public class FilterWidget extends AbstractFragment {
         inputElement.clear();
         inputElement.sendKeys(title);
         inputElement.sendKeys(Keys.ENTER);
+    }
+
+    public AttributeFilterPanel getAttributeFilterPanel() {
+        return AttributeFilterPanel.getInstance(browser);
+    }
+
+    public TimeFilterPanel getTimeFilterPanel() {
+        return TimeFilterPanel.getInstance(browser);
+    }
+
+    private FilterWidget switchToOneOrMultipleValuesMode(boolean isMultiple) {
+        WidgetConfigPanel configPanel = WidgetConfigPanel.openConfigurationPanelFor(this.getRoot(), browser);
+
+        if (isMultiple) {
+            configPanel.getTab(WidgetConfigPanel.Tab.SELECTION, SelectionConfigPanel.class)
+                    .changeSelectionToMultipleValues();
+        } else {
+            configPanel.getTab(WidgetConfigPanel.Tab.SELECTION, SelectionConfigPanel.class)
+                    .changeSelectionToOneValue();
+        }
+
+        configPanel.saveConfiguration();
+        return this;
     }
 }

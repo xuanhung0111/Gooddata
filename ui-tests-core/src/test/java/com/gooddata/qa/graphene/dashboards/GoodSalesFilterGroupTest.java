@@ -98,14 +98,12 @@ public class GoodSalesFilterGroupTest extends GoodSalesAbstractTest {
         assertEquals(dashboardsPage.getContent().getLatestReport(TableReport.class)
                 .getAttributeElementsByRow().size(), 7);
 
-        isWonFilter.changeAttributeFilterValueInSingleMode("true");
-        isWonFilter.getRoot().click();
+        isWonFilter.changeAttributeFilterValues("true");
         assertEquals(dashboardsPage.getContent().getLatestReport(TableReport.class)
                 .getAttributeElementsByRow().size(), 7);
 
         FilterWidget stageNameFilter = dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME));
-        stageNameFilter.changeAttributeFilterValue("Closed Won");
-        stageNameFilter.getRoot().click();
+        stageNameFilter.changeAttributeFilterValues("Closed Won");
         assertEquals(dashboardsPage.getContent().getLatestReport(TableReport.class)
                 .getAttributeElementsByRow().size(), 7);
 

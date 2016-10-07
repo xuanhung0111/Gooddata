@@ -51,7 +51,7 @@ public class EmbeddedDashboardSavedViewLocalizationTest extends GoodSalesAbstrac
             .saveDashboard();
 
         dashboard.getFirstFilter()
-            .changeAttributeFilterValue("14 West");
+            .changeAttributeFilterValues("14 West");
 
         dashboard.getSavedViewWidget()
             .openSavedViewMenu()

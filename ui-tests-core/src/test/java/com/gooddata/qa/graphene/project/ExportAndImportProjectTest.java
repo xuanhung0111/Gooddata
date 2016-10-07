@@ -166,7 +166,7 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
 
         editBar.addTextToDashboard(TextObject.HEADLINE, "Simple-Text-Obj", "google.com").saveDashboard();
 
-        filterWidget.changeAttributeFilterValue(PARTIAL_HIGH_SCHOOL);
+        filterWidget.changeAttributeFilterValues(PARTIAL_HIGH_SCHOOL);
 
         assertTrue(isEqualCollection(dashboardsPage.getContent()
                 .getReport(SIMPLE_REPORT, TableReport.class)
@@ -210,11 +210,11 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
         takeScreenshot(browser, "added-filters-to-dashboard", getClass());
 
         dashboardsPage.getContent().getFilterWidget(simplifyText(EDUTCATION))
-                .changeAttributeFilterValue(PARTIAL_COLLEGE);
+                .changeAttributeFilterValues(PARTIAL_COLLEGE);
         assertTrue(isEqualCollection(existingObjsTableReport.getAttributeElements(), singletonList(PARTIAL_COLLEGE)),
                 "There is difference between actual and expected attributes");
 
-        dashboardsPage.getContent().getFilterWidget(simplifyText(POSITION)).changeAttributeFilterValue(STORE_MANAGER);
+        dashboardsPage.getContent().getFilterWidget(simplifyText(POSITION)).changeAttributeFilterValues(STORE_MANAGER);
         assertTrue(isEqualCollection(newObjsTableReport.getAttributeElements(), singletonList(STORE_MANAGER)),
                 "There is difference between actual and expected attributes");
     }

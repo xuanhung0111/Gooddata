@@ -274,7 +274,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             browser.navigate().refresh();
             waitForDashboardPageLoaded(browser);
 
-            dashboardsPage.getFirstFilter().changeAttributeFilterValue("Closed Won");
+            dashboardsPage.getFirstFilter().changeAttributeFilterValues("Closed Won");
             sleepTight(2000);
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             List<String> attributeHeaders = tableReport.getAttributesHeader();
@@ -302,7 +302,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             browser.navigate().refresh();
             waitForDashboardPageLoaded(browser);
 
-            dashboardsPage.getFirstFilter().changeAttributeFilterValue("Best", "Great");
+            dashboardsPage.getFirstFilter().changeAttributeFilterValues("Best", "Great");
             sleepTight(2000);
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             List<String> attributeHeaders = tableReport.getAttributesHeader();

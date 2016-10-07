@@ -5,10 +5,17 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmp
 
 import java.util.List;
 
+import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-public class TimeFilterPanel extends FilterPanel {
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+
+public class TimeFilterPanel extends AbstractFragment {
+
+    private static final By LOCATOR = By.cssSelector(".yui3-c-tabtimefilterbase:not(.gdc-hidden)");
 
     @FindBy(css = ".s-granularity span")
     private List<WebElement> dateGranularitys;
@@ -25,6 +32,13 @@ public class TimeFilterPanel extends FilterPanel {
     @FindBy(css = "div.fromInput label.label")
     private WebElement fromLabel;
 
+    @FindBy(css = ".s-btn-apply,.s-btn-add")
+    private WebElement applyButton;
+
+    public static TimeFilterPanel getInstance(SearchContext searchContext) {
+        return Graphene.createPageFragment(TimeFilterPanel.class, waitForElementVisible(LOCATOR, searchContext));
+    }
+
     public TimeFilterPanel selectDateGranularity(final DateGranularity dateGranularity) {
         return selectTimeFilter(dateGranularitys, dateGranularity.toString());
     }
@@ -39,6 +53,10 @@ public class TimeFilterPanel extends FilterPanel {
         waitForElementVisible(filterTimeToInput).clear();
         filterTimeToInput.sendKeys(endTime);
         submit();
+    }
+
+    public void submit() {
+        waitForElementVisible(applyButton).click();
     }
 
     private TimeFilterPanel selectTimeFilter(final List<WebElement> timeFilters, final String time) {
