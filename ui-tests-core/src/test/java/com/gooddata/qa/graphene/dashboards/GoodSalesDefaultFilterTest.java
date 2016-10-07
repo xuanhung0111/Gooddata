@@ -8,6 +8,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_PIPELINE_ANALYSIS;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.addMufToUser;
@@ -47,12 +48,14 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
+import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
 
 public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
 
     private static final String DASHBOARD_WITH_SAVED_VIEW = "Dashboard-with-saved-view";
     private static final String DASHBOARD_MUF = "Muf-Dashboard";
+    private static final String TAB = "new-tab";
 
     private static final String DF_VARIABLE = "DF-Variable";
     private static final String MUF_DF_VARIABLE = "Muf-Df-Variable";
@@ -1001,6 +1004,208 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), String.join(", ", INTEREST, DISCOVERY));
         assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), DISCOVERY);
         assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(DISCOVERY));
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"misc"})
+    public void checkFilterGroupValueWhenSwitchingTabs() {
+        final String dashboard = generateDashboardName();
+
+        initDashboardsPage()
+                .addNewDashboard(dashboard)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_DEPARTMENT)
+                .groupFiltersOnDashboard(ATTR_STAGE_NAME, ATTR_DEPARTMENT)
+                .addNewTab(TAB)
+                .openTab(0);
+
+        DashboardWidgetDirection.LEFT.moveElementToRightPlace(getFilter(ATTR_STAGE_NAME).getRoot());
+        dashboardsPage.saveDashboard();
+
+        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(INTEREST);
+        getFilter(ATTR_DEPARTMENT).changeAttributeFilterValues(DIRECT_SALES);
+
+        dashboardsPage
+                .applyValuesForGroupFilter()
+                .openTab(1)
+                .openTab(0);
+
+        takeScreenshot(browser, "Filter-group-values-are-kept-when-switching-tabs", getClass());
+        assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), INTEREST);
+        assertEquals(getFilter(ATTR_DEPARTMENT).getCurrentValue(), DIRECT_SALES);
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"misc"})
+    public void checkFilterGroupConnectedBetweenSameTabs() {
+        final String dashboard = generateDashboardName();
+
+        initDashboardsPage()
+                .addNewDashboard(dashboard)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_DEPARTMENT)
+                .groupFiltersOnDashboard(ATTR_STAGE_NAME, ATTR_DEPARTMENT)
+                .addNewTab(TAB)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_DEPARTMENT)
+                .groupFiltersOnDashboard(ATTR_STAGE_NAME, ATTR_DEPARTMENT);
+
+        DashboardWidgetDirection.LEFT.moveElementToRightPlace(getFilter(ATTR_STAGE_NAME).getRoot());
+        dashboardsPage.openTab(0);
+        DashboardWidgetDirection.LEFT.moveElementToRightPlace(getFilter(ATTR_STAGE_NAME).getRoot());
+        dashboardsPage.saveDashboard();
+
+        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(INTEREST);
+        getFilter(ATTR_DEPARTMENT).changeAttributeFilterValues(DIRECT_SALES);
+        dashboardsPage.applyValuesForGroupFilter().openTab(1);
+
+        takeScreenshot(browser, "Filter-group-connected-between-same-tabs", getClass());
+        assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), INTEREST);
+        assertEquals(getFilter(ATTR_DEPARTMENT).getCurrentValue(), DIRECT_SALES);
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"misc"})
+    public void checkFilterGroupConnectedBetweenDuplicatedTabs() {
+        final String dashboard = generateDashboardName();
+
+        initDashboardsPage()
+                .addNewDashboard(dashboard)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_DEPARTMENT)
+                .groupFiltersOnDashboard(ATTR_STAGE_NAME, ATTR_DEPARTMENT);
+
+        DashboardWidgetDirection.LEFT.moveElementToRightPlace(getFilter(ATTR_STAGE_NAME).getRoot());
+        dashboardsPage.duplicateDashboardTab(0);
+
+        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(INTEREST);
+        getFilter(ATTR_DEPARTMENT).changeAttributeFilterValues(DIRECT_SALES);
+        dashboardsPage.applyValuesForGroupFilter().openTab(0);
+
+        takeScreenshot(browser, "Filter-group-connected-between-duplicated-tabs", getClass());
+        assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), INTEREST);
+        assertEquals(getFilter(ATTR_DEPARTMENT).getCurrentValue(), DIRECT_SALES);
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"misc"})
+    public void checkFilterGroupValueAfterCopyTab() {
+        final String dashboard = generateDashboardName();
+
+        initDashboardsPage()
+                .addNewDashboard(dashboard)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_DEPARTMENT)
+                .groupFiltersOnDashboard(ATTR_STAGE_NAME, ATTR_DEPARTMENT);
+        DashboardWidgetDirection.LEFT.moveElementToRightPlace(getFilter(ATTR_STAGE_NAME).getRoot());
+
+        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(INTEREST);
+        getFilter(ATTR_DEPARTMENT).changeAttributeFilterValues(DIRECT_SALES);
+        dashboardsPage.applyValuesForGroupFilter().copyDashboardTab(0, DASH_PIPELINE_ANALYSIS);
+
+        takeScreenshot(browser, "Filter-group-value-kept-after-copy-tab", getClass());
+        assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), INTEREST);
+        assertEquals(getFilter(ATTR_DEPARTMENT).getCurrentValue(), DIRECT_SALES);
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"misc"})
+    public void checkFilterResetToDefaultWhenSaveAsDashboard() {
+        final String dashboard = generateDashboardName();
+
+        initDashboardsPage()
+                .addNewDashboard(dashboard)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME)
+                .getFilterWidgetByName(ATTR_STAGE_NAME)
+                .changeAttributeFilterValues(INTEREST);
+        dashboardsPage.saveDashboard();
+
+        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(DISCOVERY);
+        dashboardsPage.saveAsDashboard("new-" + dashboard, PermissionType.USE_EXISTING_PERMISSIONS);
+
+        takeScreenshot(browser, "Filter-reset-to-default-after-save-as-dashboard", getClass());
+        assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), INTEREST);
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"misc"})
+    public void setInitialValueForConnectedFilters() {
+        final String dashboard = generateDashboardName();
+
+        initDashboardsPage()
+                .addNewDashboard(dashboard)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME)
+                .addNewTab(TAB)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME);
+
+        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(INTEREST);
+        dashboardsPage.saveDashboard().openTab(0);
+
+        takeScreenshot(browser, "Initial-value-for-connected-filters-applied", getClass());
+        assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), INTEREST);
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"misc"})
+    public void changeAnotherFilterValueBeforeApplyGroupFilter() {
+        final String dashboard = generateDashboardName();
+
+        initDashboardsPage()
+                .addNewDashboard(dashboard)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_DEPARTMENT)
+                .groupFiltersOnDashboard(ATTR_STAGE_NAME);
+
+        DashboardWidgetDirection.LEFT.moveElementToRightPlace(getFilter(ATTR_STAGE_NAME).getRoot());
+        dashboardsPage.saveDashboard();
+
+        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(INTEREST);
+        getFilter(ATTR_DEPARTMENT).changeAttributeFilterValues(DIRECT_SALES);
+        dashboardsPage.applyValuesForGroupFilter();
+
+        takeScreenshot(browser,
+                "Filter-value-belongs-to-group-applied-correctly-after-change-another-filter-value", getClass());
+        assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), INTEREST);
+    }
+
+    @Test(dependsOnGroups = {"precondition"}, groups = {"misc"}, description = "Verify viewer default view work "
+            + "properly in case the value is out of range of variable filter when switch from saved view to")
+    public void checkViewerDefaultViewInSpecialCase() throws JSONException, ParseException, IOException {
+        final String dashboard = generateDashboardName();
+
+        initDashboardsPage()
+                .addNewDashboard(dashboard)
+                .addReportToDashboard(REPORT_WITH_PROMPT_FILTER)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.PROMPT, DF_VARIABLE)
+                .turnSavedViewOption(true);
+
+        DashboardWidgetDirection.LEFT.moveElementToRightPlace(getReport(REPORT_WITH_PROMPT_FILTER).getRoot());
+        getFilter(DF_VARIABLE).changeAttributeFilterValues(RISK_ASSESSMENT);
+        dashboardsPage.saveDashboard().publishDashboard(true);
+
+        try {
+            logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.VIEWER);
+            SavedViewWidget savedViewWidget = initDashboardsPage()
+                    .selectDashboard(dashboard)
+                    .getSavedViewWidget();
+
+            getFilter(DF_VARIABLE).changeAttributeFilterValues(INTEREST);
+            savedViewWidget.openSavedViewMenu().saveCurrentView("SavedView1");
+            getFilter(DF_VARIABLE).changeAttributeFilterValues(INTEREST, DISCOVERY);
+            savedViewWidget.openSavedViewMenu().saveCurrentView("SavedView2");
+
+            logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
+            selectViewerSpecificValuesFrom(DF_VARIABLE, INTEREST, SHORT_LIST);
+
+            logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.VIEWER);
+            initDashboardsPage()
+                    .selectDashboard(dashboard)
+                    .getSavedViewWidget()
+                    .openSavedViewMenu()
+                    .selectSavedView(DEFAULT_VIEW);
+
+            getReport(REPORT_WITH_PROMPT_FILTER).waitForReportLoading();
+            takeScreenshot(browser, "Viewer-default-view-shows-all-when-out-of-permission", getClass());
+            assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), ALL);
+            assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), asList(INTEREST, SHORT_LIST));
+
+        } finally {
+            logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
+            restoreViewerSpecificValuesFrom(DF_VARIABLE);
+        }
     }
 
     @Override
