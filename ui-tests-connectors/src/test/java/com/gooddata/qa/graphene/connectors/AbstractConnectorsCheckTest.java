@@ -31,26 +31,26 @@ import static org.testng.Assert.assertNotEquals;
 
 public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
 
-    protected static final String PAGE_GDC_CONNECTORS = "gdc/projects/${projectId}/connectors";
+    private static final String PAGE_GDC_CONNECTORS = "gdc/projects/${projectId}/connectors";
 
-    protected static final By BY_GP_CONFIG_LINK = By.partialLinkText("config");
+    private static final By BY_GP_CONFIG_LINK = By.partialLinkText("config");
     protected static final By BY_GP_SETTINGS_LINK = By.partialLinkText("settings");
 
     private static final int DEFAULT_INTEGRATION_PROCESS_CHECK_LIMIT = 180; // 15 minutes
 
     private static final String PROCESS_FULL_LOAD_JSON = "{\"process\":{\"incremental\":false}}";
-    public static final String ANOTHER_PROCESS_IS_ALREADY_RUNNING = "Another process is already running.";
+    private static final String ANOTHER_PROCESS_IS_ALREADY_RUNNING = "Another process is already running.";
 
     protected int integrationProcessCheckLimit = DEFAULT_INTEGRATION_PROCESS_CHECK_LIMIT;
 
-    protected boolean integrationActivated = false;
+    private boolean integrationActivated = false;
 
     protected Connectors connectorType;
 
     protected Map<String, String[]> expectedDashboardsAndTabs;
 
     @FindBy(tagName = "form")
-    protected ConnectorFragment connector;
+    private ConnectorFragment connector;
 
     @Override
     public void configureStartPage() {
@@ -153,7 +153,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
      * ------------------------
      */
 
-    public void initIntegration() throws JSONException {
+    private void initIntegration() throws JSONException {
         openUrl(getConnectorUri());
         waitForElementPresent(BY_GP_PRE_JSON, browser);
         waitForElementPresent(connector.getRoot());
@@ -161,7 +161,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
         integrationActivated = true;
     }
 
-    public String gotoIntegrationSettings() {
+    protected String gotoIntegrationSettings() {
         Graphene.guardHttp(waitForElementVisible(BY_GP_CONFIG_LINK, browser)).click();
         Graphene.guardHttp(waitForElementVisible(BY_GP_SETTINGS_LINK, browser)).click();
         waitForElementVisible(BY_GP_FORM, browser);
@@ -174,7 +174,9 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
      * until fresh process is created by this test.
      */
     protected void scheduleIntegrationProcess(int checkIterations) throws JSONException {
-        while (!scheduleIntegrationProcessOrUseExisting(checkIterations));
+        while (!scheduleIntegrationProcessOrUseExisting(checkIterations)) {
+            // do nothing
+        }
     }
 
     /**
@@ -183,7 +185,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
      *
      * @param checkIterations how many iterations of checks should it do before it fails (there's a 5s pause between checks)
      * @return <code>true</code> if new process has been scheduled, <code>false</code> if existing one has been used
-     * @throws JSONException
+     * @throws JSONException If there is a syntax error in the JSON string or if there is a problem with JSON parsing.
      */
     protected boolean scheduleIntegrationProcessOrUseExisting(int checkIterations) throws JSONException {
         openUrl(getProcessesUri());
@@ -212,7 +214,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
         return false;
     }
 
-    protected void waitForIntegrationProcessSynchronized(WebDriver browser, int checkIterations)
+    private void waitForIntegrationProcessSynchronized(WebDriver browser, int checkIterations)
             throws JSONException {
         String processUrl = browser.getCurrentUrl();
         System.out.println("Waiting for process synchronized: " + processUrl);
@@ -242,7 +244,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
         return json.getJSONObject("process").getJSONObject("status").getString("code");
     }
 
-    protected String getConnectorUri() {
+    private String getConnectorUri() {
         return PAGE_GDC_CONNECTORS.replace("${projectId}", testParams.getProjectId()) + "/" + connectorType.getConnectorId();
     }
 
@@ -250,11 +252,11 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
         return getConnectorUri() + "/integration";
     }
 
-    protected String getProcessesUri() {
+    private String getProcessesUri() {
         return getIntegrationUri() + "/processes";
     }
 
-    protected void verifyConnectorResourceJSON() throws JSONException {
+    private void verifyConnectorResourceJSON() throws JSONException {
         JSONObject json = loadJSON();
         assertThat("Connector resource JSON " + json.toString() + " contains 'connector' key",
                 json.has("connector"),
@@ -275,7 +277,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
                 is("/" + getIntegrationUri()));
     }
 
-    protected void verifyIntegrationResourceJSON() throws JSONException {
+    private void verifyIntegrationResourceJSON() throws JSONException {
         JSONObject json = loadJSON();
         assertThat("Integration resource JSON " + json.toString() + " contains 'integration' key",
                 json.has("integration"),
@@ -306,7 +308,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
                 is("/" + getProcessesUri()));
     }
 
-    protected void verifyProcessesResourceJSON() throws JSONException {
+    private void verifyProcessesResourceJSON() throws JSONException {
         JSONObject json = loadJSON();
         assertThat("Processes resource JSON " + json.toString() + " contains 'processes' key",
                 json.has("processes"),
