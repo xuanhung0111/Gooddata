@@ -354,7 +354,7 @@ public class ScheduleDetail extends ScheduleForm {
     }
 
     public void tryToRun() {
-        waitForElementVisible(manualRunButton).click();
+        waitForElementVisible(manualRunButton).sendKeys(Keys.ENTER);
         waitForElementVisible(manualRunDialog);
         waitForElementVisible(confirmRunButton).click();
     }

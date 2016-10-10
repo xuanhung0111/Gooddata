@@ -27,6 +27,7 @@ import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Fact;
+import com.gooddata.qa.graphene.ADSTables;
 import com.gooddata.qa.graphene.AbstractMSFTest;
 import com.gooddata.qa.graphene.entity.dlui.DataSource;
 import com.gooddata.qa.graphene.entity.dlui.Dataset;

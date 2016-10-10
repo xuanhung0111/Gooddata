@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmp
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertNotNull;
 
 import org.openqa.selenium.By;
@@ -34,17 +35,8 @@ public class ProjectsList extends AbstractTable {
             .cssSelector(".ait-project-list-item-last-loaded-label");
     private static final By BY_EMPTY_STATE = By.cssSelector(".ait-projects-empty-state");
 
-    @FindBy(xpath = "//button[contains(@class, 's-btn-deploy_process')]")
+    @FindBy(className = "s-btn-deploy_process")
     private WebElement deployProcessButton;
-
-    @FindBy(xpath = "//div[@class='error-bar']/div[@class='error-bar-title']")
-    private WebElement errorBar;
-
-    @FindBy(css = ".ait-project-detail-fragment")
-    private WebElement projectDetail;
-
-    @FindBy(css = ".ait-projects-empty-state")
-    private WebElement projectsEmptyState;
 
     public String getProcessesLabel(String projectId) {
         return selectProjectWithAdminRole(projectId).findElement(BY_DISC_PROJECT_DATA_LOADING_PROCESSES).getText();
@@ -88,11 +80,11 @@ public class ProjectsList extends AbstractTable {
     }
 
     public String getEmptyStateMessage() {
-        return waitForElementVisible(projectsEmptyState).getText();
+        return getEmptyState().getText();
     }
 
     public WebElement getEmptyState() {
-        return waitForElementVisible(projectsEmptyState);
+        return waitForElementVisible(BY_EMPTY_STATE, getRoot());
     }
 
     public ProjectsList checkOnProjects(String... projectIds) {
@@ -119,7 +111,7 @@ public class ProjectsList extends AbstractTable {
     }
 
     public WebElement getErrorBar() {
-        return errorBar;
+        return waitForElementVisible(cssSelector(".error-bar .error-bar-title"), getRoot());
     }
 
     public WebElement selectProjectWithNonAdminRole(final String projectName) {
