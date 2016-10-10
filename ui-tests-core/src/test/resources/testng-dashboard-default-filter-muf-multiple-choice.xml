@@ -4,14 +4,17 @@
     <test name="default-filter" enabled="true">
         <groups>
             <run>
-                <include name="misc" />
+                <include name="df-multiple" />
                 <include name="precondition" />
                 <include name="createProject" />
                 <include name="arquillian" />
             </run>
         </groups>
         <classes>
-            <class name="com.gooddata.qa.graphene.dashboards.GoodSalesDefaultFilterTest" />
+            <class name="com.gooddata.qa.graphene.dashboards.GoodSalesDefaultFilterWithMufTest" />
         </classes>
     </test>
+
+    <parameter name="multipleChoice" value="true" />
+
 </suite>

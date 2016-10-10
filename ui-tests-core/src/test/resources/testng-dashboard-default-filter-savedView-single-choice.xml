@@ -5,13 +5,15 @@
         <groups>
             <run>
                 <include name="df-single" />
+                <include name="initSavedView" />
                 <include name="precondition" />
                 <include name="createProject" />
                 <include name="arquillian" />
             </run>
         </groups>
         <classes>
-            <class name="com.gooddata.qa.graphene.dashboards.GoodSalesDefaultFilterTest" />
+            <class name="com.gooddata.qa.graphene.dashboards.GoodSalesDefaultFilterWithSavedViewTest" />
         </classes>
     </test>
+
 </suite>

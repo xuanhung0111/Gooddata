@@ -19,6 +19,7 @@ import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesEditEmbeddedDashboardTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesEmbeddedDashboardTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardWidgetManipulationTest;
+import com.gooddata.qa.graphene.dashboards.GoodSalesDefaultFilterMiscTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesFilterDropdownAttributeValueTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesFilterGroupTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesAdvancedConnectingFilterTest;
@@ -112,9 +113,13 @@ public class UITestsRegistry {
             DashboardFilterVisualTest.class,
             DashboardSavedFiltersTest.class,
             GoodSalesAdvancedConnectingFilterTest.class,
+            GoodSalesDefaultFilterMiscTest.class,
             "testng-dashboard-default-filter-multiple-choice.xml",
             "testng-dashboard-default-filter-single-choice.xml",
-            "testng-dashboard-default-filter-misc.xml"
+            "testng-dashboard-default-filter-savedView-multiple-choice.xml",
+            "testng-dashboard-default-filter-savedView-single-choice.xml",
+            "testng-dashboard-default-filter-muf-multiple-choice.xml",
+            "testng-dashboard-default-filter-muf-single-choice.xml"
         });
 
         suites.put("reports", new Object[] {
