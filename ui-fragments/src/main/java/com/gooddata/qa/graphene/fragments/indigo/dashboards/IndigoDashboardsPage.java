@@ -102,7 +102,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     }
 
     public ConfigurationPanel getConfigurationPanel() {
-        return configurationPanel;
+        return waitForFragmentVisible(configurationPanel);
     }
 
     public IndigoDashboardsPage switchToEditMode() {
@@ -189,7 +189,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
         dragAddKpiPlaceholder();
         configurationPanel
             .selectMetricByName(config.getMetric())
-            .selectDataSetByName(config.getDataSet());
+            .selectDateDataSetByName(config.getDataSet());
 
         if (config.hasComparison()) {
             configurationPanel.selectComparisonByName(config.getComparison());
@@ -337,6 +337,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public <T extends Widget> T selectWidget(final Class<T> clazz, final int index) {
         return (T) getWidgetByIndex(clazz, index).clickOnContent();
+    }
+
+    public <T extends Widget> T selectWidgetByHeadline(final Class<T> clazz, final String headline) {
+        return (T) getWidgetByHeadline(clazz, headline).clickOnContent();
     }
 
     public <T extends Widget> T selectFirstWidget(final Class<T> clazz) {

@@ -27,8 +27,8 @@ public class ConfigurationPanel extends AbstractFragment {
     @FindBy(css = ".s-dataSet_select button")
     private WebElement dataSetSelectLoaded;
 
-    @FindBy(className = "s-dataSet_select")
-    private DataSetSelect dataSetSelect;
+    @FindBy(css = ".s-dataSet_select,.s-viz-filter-date-dropdown")
+    private DataSetSelect dateDataSetSelect;
 
     @FindBy(className = "s-compare_with_select")
     private ComparisonSelect comparisonSelect;
@@ -48,6 +48,9 @@ public class ConfigurationPanel extends AbstractFragment {
     @FindBy(className = "s-unlisted_measure")
     private WebElement unlistedMeasure;
 
+    @FindBy(css = ".s-viz-filters-date input")
+    private WebElement dateFilterCheckbox;
+
     public ConfigurationPanel waitForButtonsLoaded() {
         waitForElementVisible(metricSelectLoaded);
         final Predicate<WebDriver> dataSetLoaded =
@@ -61,8 +64,8 @@ public class ConfigurationPanel extends AbstractFragment {
         return this;
     }
 
-    public ConfigurationPanel selectDataSetByName(String name) {
-        waitForFragmentVisible(dataSetSelect).selectByName(name);
+    public ConfigurationPanel selectDateDataSetByName(String name) {
+        waitForFragmentVisible(dateDataSetSelect).selectByName(name);
         return this;
     }
 
@@ -86,15 +89,15 @@ public class ConfigurationPanel extends AbstractFragment {
     }
 
     public String getSelectedDataSet() {
-        return waitForFragmentVisible(dataSetSelect).getSelection();
+        return waitForFragmentVisible(dateDataSetSelect).getSelection();
     }
 
     public Collection<String> getDataSets() {
-        return waitForFragmentVisible(dataSetSelect).getValues();
+        return waitForFragmentVisible(dateDataSetSelect).getValues();
     }
 
     public boolean isDataSetEnabled() {
-        return !waitForFragmentVisible(dataSetSelect)
+        return !waitForFragmentVisible(dateDataSetSelect)
                 .getDropdownButton()
                 .getAttribute("class")
                 .contains("disabled");
@@ -129,5 +132,21 @@ public class ConfigurationPanel extends AbstractFragment {
 
     public String getKpiAlertMessage() {
         return waitForElementVisible(alertEditWarning).getText();
+    }
+
+    public ConfigurationPanel enableDateFilter() {
+        if (!waitForElementVisible(dateFilterCheckbox).isSelected())
+            dateFilterCheckbox.click();
+        return this;
+    }
+
+    public ConfigurationPanel disableDateFilter() {
+        if (waitForElementVisible(dateFilterCheckbox).isSelected())
+            dateFilterCheckbox.click();
+        return this;
+    }
+
+    public boolean isDateFilterCheckboxEnabled() {
+        return waitForElementVisible(dateFilterCheckbox).isEnabled();
     }
 }
