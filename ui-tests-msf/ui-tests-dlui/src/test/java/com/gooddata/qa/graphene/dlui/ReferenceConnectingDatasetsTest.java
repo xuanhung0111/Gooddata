@@ -17,6 +17,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.ADSTables;
 import com.gooddata.qa.graphene.entity.dlui.DataSource;
 import com.gooddata.qa.graphene.entity.dlui.Dataset;
 import com.gooddata.qa.graphene.entity.dlui.Field;

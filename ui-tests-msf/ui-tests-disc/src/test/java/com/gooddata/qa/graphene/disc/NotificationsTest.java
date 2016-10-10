@@ -126,7 +126,7 @@ public class NotificationsTest extends AbstractDISCTest {
     private String customEventNotificationMessage = "params.CUSTOM=${params.hello}";
     private String notificationSubject = "Notification Subject_";
     private String notificationMessage = "params.PROJECT=${params.PROJECT}";
-    private String userProfileId;
+    private String userProfileId = null;
     private String successProcessUri;
     private String failureProcessUri;
     private String successfulScheduleId;
@@ -138,14 +138,12 @@ public class NotificationsTest extends AbstractDISCTest {
     private ExecutionDetails successfulExecutionDetails = new ExecutionDetails().setStatus(ScheduleStatus.OK);
     private ExecutionDetails failedExecutionDetails = new ExecutionDetails().setStatus(ScheduleStatus.ERROR);
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void initProperties() {
         projectTitle = "Disc-test-notification";
         imapHost = testParams.loadProperty("imap.host");
         imapUser = testParams.loadProperty("imap.user");
         imapPassword = testParams.loadProperty("imap.password");
-        userProfileId = getGoodDataClient().getAccountService().getCurrent().getUri();
-        userProfileId = userProfileId.substring(userProfileId.lastIndexOf("/") + 1);
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"notification"})
@@ -272,7 +270,7 @@ public class NotificationsTest extends AbstractDISCTest {
         NotificationParameters expectedParams =
                 new NotificationParameters()
                         .setProjectId(testParams.getProjectId())
-                        .setUser(userProfileId)
+                        .setUser(getUserProfileId())
                         .setUserEmail(testParams.getUser())
                         .setProcessUri(successProcessUri)
                         .setProcessName(SUCCESS_NOTIFICATION_TEST_PROCESS)
@@ -290,7 +288,7 @@ public class NotificationsTest extends AbstractDISCTest {
         NotificationParameters expectedParams =
                 new NotificationParameters()
                         .setProjectId(testParams.getProjectId())
-                        .setUser(userProfileId)
+                        .setUser(getUserProfileId())
                         .setUserEmail(testParams.getUser())
                         .setProcessUri(successProcessUri)
                         .setProcessName(SUCCESS_NOTIFICATION_TEST_PROCESS)
@@ -308,7 +306,7 @@ public class NotificationsTest extends AbstractDISCTest {
         NotificationParameters expectedParams =
                 new NotificationParameters()
                         .setProjectId(testParams.getProjectId())
-                        .setUser(userProfileId)
+                        .setUser(getUserProfileId())
                         .setUserEmail(testParams.getUser())
                         .setProcessUri(successProcessUri)
                         .setExecutable(
@@ -324,7 +322,7 @@ public class NotificationsTest extends AbstractDISCTest {
         NotificationParameters expectedParams =
                 new NotificationParameters()
                         .setProjectId(testParams.getProjectId())
-                        .setUser(userProfileId)
+                        .setUser(getUserProfileId())
                         .setUserEmail(testParams.getUser())
                         .setProcessUri(failureProcessUri)
                         .setProcessName(FAILURE_NOTIFICATION_TEST_PROCESS)
@@ -829,6 +827,15 @@ public class NotificationsTest extends AbstractDISCTest {
             fail("Exeception in parsing time: " + e);
         }
         return 0;
+    }
+
+    private String getUserProfileId() {
+        if (userProfileId == null) {
+            userProfileId = getGoodDataClient().getAccountService().getCurrent().getUri();
+            userProfileId = userProfileId.substring(userProfileId.lastIndexOf("/") + 1);
+        }
+
+        return userProfileId;
     }
 
     private enum RepeatedDataLoadingFailureNumber {

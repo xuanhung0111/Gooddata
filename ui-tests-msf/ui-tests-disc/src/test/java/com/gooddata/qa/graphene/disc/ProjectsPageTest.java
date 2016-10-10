@@ -29,6 +29,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.gooddata.GoodData;
@@ -49,7 +50,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
     private static final String OVERVIEW_BUTTON_TITLE = "Overview";
     private static final int MINIMUM_NUMBER_OF_PROJECTS = 25;
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void initProperties() {
         // Created time is used to identify the working project in case user has no admin role
         projectTitle = "Disc-test-projects-page-" + System.currentTimeMillis();
@@ -75,43 +76,28 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         assertEquals(ProjectStateFilters.ALL.getOption(), discProjectsPage.getSelectedFilterOption().getText());
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void checkFailedProjectsFilterOption() {
-        checkProjectsFilter(ProjectStateFilters.FAILED);
+    @DataProvider(name = "statesProvider")
+    public Object[][] statesProvider() {
+        return new Object[][] {
+            { ProjectStateFilters.DISABLED },
+            { ProjectStateFilters.FAILED },
+            { ProjectStateFilters.SUCCESSFUL },
+            { ProjectStateFilters.RUNNING },
+            { ProjectStateFilters.UNSCHEDULED },
+            { ProjectStateFilters.SCHEDULED }
+        };
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void checkSuccessfulProjectsFilterOptions() {
-        checkProjectsFilter(ProjectStateFilters.SUCCESSFUL);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void checkRunningProjectsFilterOptions() {
-        checkProjectsFilter(ProjectStateFilters.RUNNING);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void checkScheduledProjectsFilterOptions() {
-        String projectId = createBlankProject("Disc-test-scheduled-filter-option");
-        try {
-            prepareDataForProject(projectId);
-            prepareDataForProjectsPageTest(ProjectStateFilters.SCHEDULED, testParams.getProjectId());
-
-            initDISCProjectsPage();
-            checkProjectFilter(ProjectStateFilters.SCHEDULED, testParams.getProjectId());
-        } finally {
-            deleteProjects(projectId);
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "statesProvider")
+    public void checkProjectsFilterOption(ProjectStateFilters state) {
+        if (state == ProjectStateFilters.SCHEDULED) {
+            log.info("Skip checking SCHEDULED state because it's very difficult to make a schedule in this mode!"
+                + "Now we have to create upto 30 schedules to run parallel to hope that some will be in scheduled queue."
+                + "Please feel free to fix it if there is another better for this situation!");
+            return;
         }
-    }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void checkUnscheduledProjectsFilterOptions() {
-        checkProjectsFilter(ProjectStateFilters.UNSCHEDULED);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void checkDisabledProjectsFilterOptions() {
-        checkProjectsFilter(ProjectStateFilters.DISABLED);
+        checkProjectsFilter(state);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -196,35 +182,21 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void checkProjectsNotAdmin() {
+    public void checkProjectsNotAdmin() throws JSONException {
         try {
             openUrl(PAGE_PROJECTS);
-            logout();
-            signIn(false, UserRoles.VIEWER);
+            logoutAndLoginAs(false, UserRoles.VIEWER);
 
             initDISCProjectsPage();
             assertProjectNotAdmin(projectTitle);
 
             openUrl(PAGE_PROJECTS);
-            logout();
-            signIn(false, UserRoles.EDITOR);
+            logoutAndLoginAs(false, UserRoles.EDITOR);
             initDISCProjectsPage();
             assertProjectNotAdmin(projectTitle);
-        } catch (ParseException e) {
-            System.out.println("There is problem during adding user to project: ");
-            e.printStackTrace();
-        } catch (JSONException e) {
-            System.out.println("There is problem during adding user to project or signIn: ");
-            e.printStackTrace();
         } finally {
             openUrl(PAGE_PROJECTS);
-            logout();
-            try {
-                signIn(false, UserRoles.ADMIN);
-            } catch (JSONException e) {
-                System.out.println("There is problem when signIn: ");
-                e.printStackTrace();
-            }
+            logoutAndLoginAs(false, UserRoles.ADMIN);
         }
     }
 
@@ -349,30 +321,17 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         checkSearchWorkingProjectById();
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void checkSearchProjectInSuccessfulState() {
-        checkSearchProjectInSpecificState(ProjectStateFilters.SUCCESSFUL);
-    }
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "statesProvider")
+    public void checkSearchProject(ProjectStateFilters state) {
+        if (state == ProjectStateFilters.SCHEDULED) {
+            return;
+        }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void checkSearchProjectInFailedState() {
-        checkSearchProjectInSpecificState(ProjectStateFilters.FAILED);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void checkSearchProjectInRunningState() {
-        checkSearchProjectInSpecificState(ProjectStateFilters.RUNNING);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void checkSearchProjectInDisabledState() {
-        checkSearchProjectInSpecificState(ProjectStateFilters.DISABLED);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void checkSearchProjectInUnscheduledState() {
+        if (state != ProjectStateFilters.UNSCHEDULED) {
+            prepareDataForProjectsPageTest(state, testParams.getProjectId());
+        }
         initDISCProjectsPage();
-        searchProjectInSpecificState(ProjectStateFilters.UNSCHEDULED, testParams.getProjectId(), projectTitle);
+        searchProjectInSpecificState(state, testParams.getProjectId(), projectTitle);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -389,7 +348,6 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         } finally {
             deleteProjects(projectId);
         }
-
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -415,13 +373,15 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
     @Test(dependsOnGroups = {"createProject"})
     public void checkProjectListAfterLeaveAProject() throws JSONException, ParseException, IOException {
         String newAdminUser = createAndAddUserToProject(UserRoles.ADMIN);
+        GoodData gooddataClient = getGoodDataClient(newAdminUser, testParams.getPassword());
         String projectId = "";
 
         try {
             logout();
             signInAtUI(newAdminUser, testParams.getPassword());
 
-            projectId = createBlankProject("Additional Project");
+            projectId = ProjectRestUtils.createBlankProject(gooddataClient, "Additional Project",
+                    testParams.getAuthorizationToken(), testParams.getProjectDriver(), testParams.getProjectEnvironment());
 
             initProjectsAndUsersPage()
                 .leaveProject();
@@ -433,9 +393,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
             assertNull(discProjectsList.selectProjectWithAdminRole(testParams.getProjectId()),
                     "Project is still shown on DIC projects page after user leave it!!");
         } finally {
-            GoodData gooddataClient = getGoodDataClient(newAdminUser, testParams.getPassword());
             ProjectRestUtils.deleteProject(gooddataClient, projectId);
-
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
         }
     }
@@ -472,5 +430,11 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         } catch (NoSuchElementException ex) {
             System.out.println("Non-admin user cannot access project detail page!");
         }
+    }
+
+    private void searchProjectInSpecificState(ProjectStateFilters projectFilter, String projectId, String projectName) {
+        discProjectsPage.selectFilterOption(projectFilter);
+        searchProjectByName(projectName);
+        searchProjectById(projectId);
     }
 }

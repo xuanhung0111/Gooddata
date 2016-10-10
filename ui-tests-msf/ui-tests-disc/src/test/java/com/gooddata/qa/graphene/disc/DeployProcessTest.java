@@ -43,7 +43,13 @@ public class DeployProcessTest extends AbstractDISCTest {
     private static final String FAILED_DEPLOY_ERROR_BAR_IN_PROJECTS_PAGE =
             "Failed to deploy the %s process as %s to the projects below. Reasons: Process contains no executables.";
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
+    public void disableDynamicUser() {
+        // deploy ruby script must be done by a special account
+        useDynamicUser = false;
+    }
+
+    @BeforeClass(alwaysRun = true)
     public void initProperties() {
         projectTitle = "Disc-test-deploy-process";
     }

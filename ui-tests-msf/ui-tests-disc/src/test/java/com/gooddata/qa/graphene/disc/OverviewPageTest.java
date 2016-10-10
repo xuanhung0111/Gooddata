@@ -4,16 +4,22 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
-import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.http.ParseException;
+import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
-import org.testng.annotations.AfterMethod;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.disc.OverviewProjectDetails;
@@ -26,47 +32,27 @@ import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
+import com.google.common.base.Predicate;
 
 public class OverviewPageTest extends AbstractOverviewProjectsTest {
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void initProperties() {
         // Created time is used to identify the working project in case user has no admin role
         projectTitle = "Disc-test-overview-page-" + System.currentTimeMillis();
     }
 
-    @AfterMethod(alwaysRun = true)
-    public void afterTest(Method m) {
-        cleanWorkingProjectAfterTest(m);
-    }
-
-    // Due to bootstrap just save the last visited page, and account qa+test is used in many job at the same time,
-    // the expected page will be incorrect in this case after logout and sign in again.
-    // So we should use a separate user for this test case
     @Test(dependsOnGroups = {"createProject"})
     public void checkOverviewPageShowAfterLogoutAndSignIn() throws ParseException, JSONException, IOException {
-        String newAdminUser = createAndAddUserToProject(UserRoles.ADMIN);
-
-        try {
-            logout();
-            signInAtGreyPages(newAdminUser, testParams.getPassword());
-
-            initDISCOverviewPage();
-
-            // Use this action to avoid navigating to projects.html before logout.
-            // So when sign in, user will be redirected to DISC page again
-            logoutInDiscPage();
-            signInAtUI(newAdminUser, testParams.getPassword());
-            waitForFragmentVisible(discOverviewProjects);
-
-        } finally {
-            logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
-            UserManagementRestUtils.deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), newAdminUser);
-        }
+        initDISCOverviewPage();
+        // Use this action to avoid navigating to projects.html before logout.
+        // So when sign in, user will be redirected to DISC page again
+        logoutInDiscPage();
+        signIn(false, UserRoles.ADMIN);
+        waitForFragmentVisible(discOverviewProjects);
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"empty-state"})
     public void checkDefaultOverviewState() {
         initDISCOverviewPage();
         assertTrue(discOverview.isActive(OverviewProjectStates.FAILED));
@@ -75,198 +61,191 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         assertFalse(discOverview.isActive(OverviewProjectStates.SUCCESSFUL));
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void checkEmptyFailedState() {
-        initDISCOverviewPage();
-        checkFilteredOutOverviewProject(OverviewProjectStates.FAILED, testParams.getProjectId());
+    @DataProvider(name = "statesProvider")
+    public Object[][] statesProvider() {
+        return new Object[][] {
+            { OverviewProjectStates.FAILED },
+            { OverviewProjectStates.SUCCESSFUL },
+            { OverviewProjectStates.RUNNING },
+            { OverviewProjectStates.SCHEDULED }
+        };
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void checkEmptyRunningState() {
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "statesProvider", groups = {"empty-state"})
+    public void checkEmptyState(OverviewProjectStates state) {
         initDISCOverviewPage();
-        checkFilteredOutOverviewProject(OverviewProjectStates.RUNNING, testParams.getProjectId());
+        discOverview.selectOverviewState(state);
+        waitForFragmentVisible(discOverviewProjects);
+        assertEquals(discOverview.getStateNumber(state), "0");
+        assertEquals(discOverviewProjects.getOverviewEmptyStateMessage(), state.getOverviewEmptyState(),
+                    "Incorrect overview empty state message!");
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void checkEmptySucessfulState() {
-        initDISCOverviewPage();
-        checkFilteredOutOverviewProject(OverviewProjectStates.SUCCESSFUL, testParams.getProjectId());
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void checkScheduledStateNumber() {
-        OverviewProjectDetails overviewProject = new OverviewProjectDetails();
-        OverviewProcess overviewProcess =
-                overviewProject.newProcess().setProcessName("Check Scheduled State Number");
-        OverviewSchedule overviewSchedule = overviewProcess.newSchedule().setScheduleName("Scheduled schedule");
-        prepareDataForProject(testParams.getProjectId());
-        prepareDataForScheduledProject(overviewProject.addProcess(overviewProcess.addSchedule(overviewSchedule)));
+    @Test(dependsOnGroups = {"empty-state"}, dataProvider = "statesProvider",
+            description = "This test try to check the overview number of each state (except SCHEDULED) in case"
+                    + "there is at least ONE schedule is run. Create and run schedule in case empty state")
+    public void checkState(OverviewProjectStates state) {
+        if (state == OverviewProjectStates.SCHEDULED) {
+            log.info("Skip checking SCHEDULED state because it's very difficult to make a schedule in this mode!"
+                + "Now we have to create upto 30 schedules to run parallel to hope that some will be in scheduled queue."
+                + "Please feel free to fix it if there is another better for this situation!");
+            return;
+        }
 
         initDISCOverviewPage();
-        discOverview.selectOverviewState(OverviewProjectStates.SCHEDULED);
-        assertOverviewStateNumber(OverviewProjectStates.SCHEDULED, discOverviewProjects.getOverviewProjectNumber());
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void checkCombinedStatesNumber() {
-        String processName = "Check Combined States Number";
-        openProjectDetailPage(testParams.getProjectId());
-        deployInProjectDetailPage(DeployPackages.BASIC, processName);
-
-        createSchedule(new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.FAILED_GRAPH)
-                .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23").setMinuteInHour("59"));
-        scheduleDetail.manualRun();
-        assertFailedExecution(Executables.FAILED_GRAPH);
-        scheduleDetail.clickOnCloseScheduleButton();
-
-        createSchedule(new ScheduleBuilder().setProcessName(processName)
-                .setExecutable(Executables.SUCCESSFUL_GRAPH).setCronTime(ScheduleCronTimes.CRON_EVERYDAY)
-                .setHourInDay("23").setMinuteInHour("59"));
-        scheduleDetail.manualRun();
-        assertSuccessfulExecution();
+        discOverview.selectOverviewState(state);
+        waitForFragmentVisible(discOverviewProjects);
+        if (Integer.parseInt(discOverview.getStateNumber(state)) == 0) {
+            OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectId(testParams.getProjectId());
+            OverviewProcess overviewProcess =
+                    overviewProject.newProcess().setProcessName("Check Overview " + state.getOption() + " Project");
+            OverviewSchedule overviewSchedule = overviewProcess.newSchedule().setScheduleName("Failed Schedule");
+            overviewProject.addProcess(overviewProcess.addSchedule(overviewSchedule));
+            prepareDataForCheckingOverviewState(state, overviewProject);
+        }
 
         initDISCOverviewPage();
-        discOverview.selectOverviewState(OverviewProjectStates.FAILED);
-        assertOverviewStateNumber(OverviewProjectStates.FAILED, discOverviewProjects.getOverviewProjectNumber());
-        discOverview.selectOverviewState(OverviewProjectStates.SUCCESSFUL);
-        assertOverviewStateNumber(OverviewProjectStates.SUCCESSFUL,
-                discOverviewProjects.getOverviewProjectNumber());
-        checkFilteredOutOverviewProject(OverviewProjectStates.RUNNING, testParams.getProjectId());
+        discOverview.selectOverviewState(state);
+        waitForFragmentVisible(discOverviewProjects);
+
+        assertEquals(discOverview.getStateNumber(state), String.valueOf(discOverviewProjects.getOverviewProjectNumber()));
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void checkOverviewFailedProjects() {
-        OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectId(testParams.getProjectId());
-        OverviewProcess overviewProcess =
-                overviewProject.newProcess().setProcessName("Check Overview Failed Project");
-        OverviewSchedule overviewSchedule = overviewProcess.newSchedule().setScheduleName("Failed Schedule");
-        overviewProject.addProcess(overviewProcess.addSchedule(overviewSchedule));
-
-        prepareDataForCheckingOverviewState(OverviewProjectStates.FAILED, overviewProject);
-        initDISCOverviewPage();
-        waitForElementVisible(discOverviewProjects.getRoot());
-        assertOverviewProject(OverviewProjectStates.FAILED, overviewProject);
-
-        checkOtherOverviewStates(OverviewProjectStates.FAILED, testParams.getProjectId());
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void checkOverviewSuccessfulProject() {
-        OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectId(testParams.getProjectId());
-        OverviewProcess overviewProcess =
-                overviewProject.newProcess().setProcessName("Check Overview Successful Project");
-        OverviewSchedule overviewSchedule = overviewProcess.newSchedule().setScheduleName("Successful Schedule");
-        overviewProject.addProcess(overviewProcess.addSchedule(overviewSchedule));
-
-        prepareDataForCheckingOverviewState(OverviewProjectStates.SUCCESSFUL, overviewProject);
-        initDISCOverviewPage();
-        waitForElementVisible(discOverview.getRoot());
-        discOverview.selectOverviewState(OverviewProjectStates.SUCCESSFUL);
-        waitForElementVisible(discOverviewProjects.getRoot());
-        assertOverviewProject(OverviewProjectStates.SUCCESSFUL, overviewProject);
-
-        checkOtherOverviewStates(OverviewProjectStates.SUCCESSFUL, testParams.getProjectId());
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void checkOverviewRunningProject() {
-        OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectId(testParams.getProjectId());
-        OverviewProcess overviewProcess =
-                overviewProject.newProcess().setProcessName("Check Overview Running Project");
-        OverviewSchedule overviewSchedule = overviewProcess.newSchedule().setScheduleName("Running Schedule");
-        overviewProject.addProcess(overviewProcess.addSchedule(overviewSchedule));
-
-        prepareDataForCheckingOverviewState(OverviewProjectStates.RUNNING, overviewProject);
-        initDISCOverviewPage();
-        waitForElementVisible(discOverview.getRoot());
-        discOverview.selectOverviewState(OverviewProjectStates.RUNNING);
-        waitForElementVisible(discOverviewProjects.getRoot());
-        assertOverviewProject(OverviewProjectStates.RUNNING, overviewProject);
-
-        checkOtherOverviewStates(OverviewProjectStates.RUNNING, testParams.getProjectId());
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"empty-state"})
     public void accessProjectDetailFromOverviewPage() {
-        String processName = "Check Access Project Detail Page";
-        openProjectDetailPage(testParams.getProjectId());
-        deployInProjectDetailPage(DeployPackages.BASIC, processName);
+        List<Executables> graphs = new ArrayList<>();
 
-        createSchedule(new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.FAILED_GRAPH)
-                .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23").setMinuteInHour("59"));
-        scheduleDetail.manualRun();
-        assertFailedExecution(Executables.FAILED_GRAPH);
-        scheduleDetail.clickOnCloseScheduleButton();
+        initDISCOverviewPage();
+        discOverview.selectOverviewState(OverviewProjectStates.SUCCESSFUL);
+        waitForFragmentVisible(discOverviewProjects);
+        if (Integer.parseInt(discOverview.getStateNumber(OverviewProjectStates.SUCCESSFUL)) == 0) {
+            graphs.add(Executables.SUCCESSFUL_GRAPH);
+        }
+        discOverview.selectOverviewState(OverviewProjectStates.FAILED);
+        waitForFragmentVisible(discOverviewProjects);
+        if (Integer.parseInt(discOverview.getStateNumber(OverviewProjectStates.FAILED)) == 0) {
+            graphs.add(Executables.FAILED_GRAPH);
+        }
 
-        createSchedule(new ScheduleBuilder().setProcessName(processName)
-                .setExecutable(Executables.SUCCESSFUL_GRAPH).setCronTime(ScheduleCronTimes.CRON_EVERYDAY)
-                .setHourInDay("23").setMinuteInHour("59"));
-        scheduleDetail.manualRun();
-        assertSuccessfulExecution();
+        if (!graphs.isEmpty()) {
+            String processName = "Check Access Project Detail Page";
+            openProjectDetailPage(testParams.getProjectId());
+            deployInProjectDetailPage(DeployPackages.BASIC, processName);
+
+            for (Executables graph: graphs) {
+                createSchedule(new ScheduleBuilder().setProcessName(processName).setExecutable(graph)
+                        .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23").setMinuteInHour("59"));
+                scheduleDetail.manualRun();
+                scheduleDetail.waitForExecutionFinish();
+                scheduleDetail.clickOnCloseScheduleButton();
+            }
+        }
 
         accessWorkingProjectDetail(OverviewProjectStates.SUCCESSFUL);
         accessWorkingProjectDetail(OverviewProjectStates.FAILED);
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"empty-state"})
     public void restartFailedProjects() {
+        initDISCOverviewPage();
+        discOverview.selectOverviewState(OverviewProjectStates.FAILED);
+        waitForFragmentVisible(discOverviewProjects);
         OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectId(testParams.getProjectId());
-        OverviewProcess overviewProcess =
-                overviewProject.newProcess().setProcessName("Check Overview Failed Project");
-        OverviewSchedule overviewSchedule = overviewProcess.newSchedule().setScheduleName("Failed Schedule");
-        overviewProject.addProcess(overviewProcess.addSchedule(overviewSchedule));
-        bulkActionsProjectInOverviewPage(OverviewProjectStates.FAILED, overviewProject);
+        if (Integer.parseInt(discOverview.getStateNumber(OverviewProjectStates.FAILED)) == 0) {
+            OverviewProcess overviewProcess =
+                    overviewProject.newProcess().setProcessName("Check Overview Failed Project");
+            OverviewSchedule overviewSchedule = overviewProcess.newSchedule().setScheduleName("Failed Schedule");
+            overviewProject.addProcess(overviewProcess.addSchedule(overviewSchedule));
+            prepareDataForCheckingOverviewState(OverviewProjectStates.FAILED, overviewProject);
+        }
 
-        browser.get(overviewSchedule.getScheduleUrl());
+        initDISCOverviewPage();
+        waitForFragmentVisible(discOverview);
+        discOverview.selectOverviewState(OverviewProjectStates.FAILED);
+        waitForFragmentVisible(discOverviewProjects);
+        discOverviewProjects.checkOnSelectedProjects(overviewProject);
+        discOverviewProjects.bulkAction(OverviewProjectStates.FAILED);
+
+        Predicate<WebDriver> restartFinished = browser -> {
+            browser.navigate().refresh();
+            return Integer.parseInt(discOverview.getStateNumber(OverviewProjectStates.FAILED)) > 0;
+        };
+        Graphene.waitGui().until(restartFinished);
+
+        discOverviewProjects.openScheduleDetail(testParams.getProjectId());
         waitForElementVisible(scheduleDetail.getRoot());
         if (!scheduleDetail.isStarted()) {
-            assertEquals(scheduleDetail.getExecutionItemsNumber(), 2);
+            assertTrue(scheduleDetail.getExecutionItemsNumber() > 1);
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void restartFailedSchedule() {
-        bulkActionsScheduleInOverviewPage(OverviewProjectStates.FAILED);
-    }
+    @Test(dependsOnGroups = {"empty-state"}, dataProvider = "statesProvider")
+    public void disableFailedProjects(OverviewProjectStates state) {
+        if (state == OverviewProjectStates.SCHEDULED) {
+            log.info("Ignore SCHEDULED case!");
+            return;
+        }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void disableFailedProjects() {
-        disableProjectInOverviewPage(OverviewProjectStates.FAILED);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void disableFailedSchedule() {
-        disableScheduleInOverviewPage(OverviewProjectStates.FAILED);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void runSuccessfulProjects() {
+        initDISCOverviewPage();
+        discOverview.selectOverviewState(state);
+        waitForFragmentVisible(discOverviewProjects);
         OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectId(testParams.getProjectId());
-        OverviewProcess overviewProcess =
-                overviewProject.newProcess().setProcessName("Check Run Overview Successful Project");
-        OverviewSchedule overviewSchedule = overviewProcess.newSchedule().setScheduleName("Successful Schedule");
-        overviewProject.addProcess(overviewProcess.addSchedule(overviewSchedule));
-        bulkActionsProjectInOverviewPage(OverviewProjectStates.SUCCESSFUL, overviewProject);
+        if (Integer.parseInt(discOverview.getStateNumber(state)) == 0) {
+            OverviewProcess overviewProcess =
+                    overviewProject.newProcess().setProcessName("Check Overview Failed Project");
+            OverviewSchedule overviewSchedule = overviewProcess.newSchedule().setScheduleName("Failed Schedule");
+            overviewProject.addProcess(overviewProcess.addSchedule(overviewSchedule));
+            prepareDataForCheckingOverviewState(state, overviewProject);
+        }
 
-        browser.get(overviewSchedule.getScheduleUrl());
+        initDISCOverviewPage();
+        waitForFragmentVisible(discOverview);
+        discOverview.selectOverviewState(state);
+        waitForFragmentVisible(discOverviewProjects);
+        discOverviewProjects.checkOnSelectedProjects(overviewProject);
+        discOverviewProjects.getOverviewProjectExpandButton(
+                discOverviewProjects.getOverviewProjectWithAdminRole(testParams.getProjectId())).click();
+        String link = discOverviewProjects.getOverviewScheduleLink(state,
+                discOverviewProjects.getOverviewSchedules(discOverviewProjects.getProcesses().get(0)).get(0));
+        discOverviewProjects.disableAction();
+        browser.navigate().refresh();
+        waitForFragmentVisible(discOverviewProjects);
+        assertEquals(discOverview.getStateNumber(state), "0");
+
+        browser.get(link);
+        waitForFragmentVisible(scheduleDetail);
+        waitForElementVisible(scheduleDetail.getEnableButton());
+    }
+
+    @Test(dependsOnGroups = {"empty-state"})
+    public void runSuccessfulProjects() {
+        initDISCOverviewPage();
+        discOverview.selectOverviewState(OverviewProjectStates.SUCCESSFUL);
+        waitForFragmentVisible(discOverviewProjects);
+        OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectId(testParams.getProjectId());
+        if (Integer.parseInt(discOverview.getStateNumber(OverviewProjectStates.SUCCESSFUL)) == 0) {
+            OverviewProcess overviewProcess =
+                    overviewProject.newProcess().setProcessName("Check Run Overview Successful Project");
+            OverviewSchedule overviewSchedule = overviewProcess.newSchedule().setScheduleName("Successful Schedule");
+            overviewProject.addProcess(overviewProcess.addSchedule(overviewSchedule));
+            prepareDataForCheckingOverviewState(OverviewProjectStates.SUCCESSFUL, overviewProject);
+        }
+
+        initDISCOverviewPage();
+        waitForFragmentVisible(discOverview);
+        discOverview.selectOverviewState(OverviewProjectStates.SUCCESSFUL);
+        waitForFragmentVisible(discOverviewProjects);
+        discOverviewProjects.checkOnSelectedProjects(overviewProject);
+        discOverviewProjects.getOverviewProjectExpandButton(
+                discOverviewProjects.getOverviewProjectWithAdminRole(testParams.getProjectId())).click();
+        String link = discOverviewProjects.getOverviewScheduleLink(OverviewProjectStates.SUCCESSFUL,
+                discOverviewProjects.getOverviewSchedules(discOverviewProjects.getProcesses().get(0)).get(0));
+        browser.get(link);
         waitForElementVisible(scheduleDetail.getRoot());
-        assertTrue(scheduleDetail.isStarted());
+        if (scheduleDetail.isStarted()) {
+            scheduleDetail.waitForExecutionFinish();
+        }
         assertSuccessfulExecution();
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void runSuccessfulSchedule() {
-        bulkActionsScheduleInOverviewPage(OverviewProjectStates.SUCCESSFUL);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void disableSuccessfulProjects() {
-        disableProjectInOverviewPage(OverviewProjectStates.SUCCESSFUL);
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void disableSuccessfulSchedule() {
-        disableScheduleInOverviewPage(OverviewProjectStates.SUCCESSFUL);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -276,41 +255,59 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
                 overviewProject.newProcess().setProcessName("Check Stop Overview Running Project");
         OverviewSchedule overviewSchedule = overviewProcess.newSchedule().setScheduleName("Running Schedule");
         overviewProject.addProcess(overviewProcess.addSchedule(overviewSchedule));
-        bulkActionsProjectInOverviewPage(OverviewProjectStates.RUNNING, overviewProject);
+        prepareDataForCheckingOverviewState(OverviewProjectStates.RUNNING, overviewProject);
+
+        initDISCOverviewPage();
+        waitForFragmentVisible(discOverview);
+        discOverview.selectOverviewState(OverviewProjectStates.RUNNING);
+        waitForFragmentVisible(discOverviewProjects);
+        discOverviewProjects.checkOnSelectedProjects(overviewProject);
+        discOverviewProjects.bulkAction(OverviewProjectStates.RUNNING);
+        browser.navigate().refresh();
+        waitForFragmentVisible(discOverviewProjects);
 
         browser.get(overviewSchedule.getScheduleUrl());
         waitForElementVisible(scheduleDetail.getRoot());
         assertManualStoppedExecution();
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void stopRunningSchedule() {
-        bulkActionsScheduleInOverviewPage(OverviewProjectStates.RUNNING);
-    }
+    @Test(dependsOnGroups = {"createProject"}, groups = {"project-overview"}, dataProvider = "statesProvider")
+    public void checkProjectsNotAdminInState(OverviewProjectStates state)
+            throws ParseException, JSONException, IOException {
+        if (state == OverviewProjectStates.SCHEDULED) {
+            log.info("Ignore SCHEDULED case!");
+            return;
+        }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void disableRunningProjects() {
-        disableProjectInOverviewPage(OverviewProjectStates.RUNNING);
-    }
+        OverviewProjectDetails overviewProject = new OverviewProjectDetails()
+            .setProjectId(testParams.getProjectId())
+            .setProjectName(projectTitle);
+        OverviewProcess overviewProcess =
+                overviewProject.newProcess().setProcessName("Check Overview Project With Non-Admin Role " + state.getOption());
+        OverviewSchedule overviewSchedule = overviewProcess.newSchedule().setScheduleName("Schedule");
+        overviewProcess.addSchedule(overviewSchedule);
+        overviewProject.addProcess(overviewProcess);
+        prepareDataForCheckingOverviewState(state, overviewProject);
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void disableRunningSchedule() {
-        disableScheduleInOverviewPage(OverviewProjectStates.RUNNING);
-    }
+        try {
+            openUrl(PAGE_PROJECTS);
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"project-overview"})
-    public void checkProjectsNotAdminInFailedState() throws ParseException, JSONException, IOException {
-        checkOverviewProjectWithoutAdminRole(OverviewProjectStates.FAILED);
-    }
+            logoutAndLoginAs(false, UserRoles.VIEWER);
+            openUrl(DISC_OVERVIEW_PAGE);
+            discOverview.selectOverviewState(state);
+            waitForFragmentVisible(discOverviewProjects);
+            checkProjectNotAdmin(state, overviewProject);
+            openUrl(PAGE_PROJECTS);
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"project-overview"})
-    public void checkProjectsNotAdminInSucessfulState() throws ParseException, JSONException, IOException {
-        checkOverviewProjectWithoutAdminRole(OverviewProjectStates.SUCCESSFUL);
-    }
-
-    @Test(dependsOnGroups = {"createProject"}, groups = {"project-overview"})
-    public void checkProjectsNotAdminInRunningState() throws ParseException, JSONException, IOException {
-        checkOverviewProjectWithoutAdminRole(OverviewProjectStates.RUNNING);
+            logoutAndLoginAs(false, UserRoles.EDITOR);
+            openUrl(DISC_OVERVIEW_PAGE);
+            discOverview.selectOverviewState(state);
+            waitForFragmentVisible(discOverviewProjects);
+            checkProjectNotAdmin(state, overviewProject);
+        } finally {
+            openUrl(PAGE_PROJECTS);
+            logoutAndLoginAs(false, UserRoles.ADMIN);
+        }
     }
 
     @Override
@@ -332,18 +329,83 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         LoginFragment.waitForPageLoaded(browser);
     }
 
-    private void prepareDataForScheduledProject(OverviewProjectDetails overviewProject) {
-        for (OverviewProcess overviewProcess : overviewProject.getOverviewProcesses()) {
-            openProjectDetailPage(testParams.getProjectId());
-            String processUrl = deployInProjectDetailPage(DeployPackages.BASIC, overviewProcess.getProcessName());
-            overviewProcess.setProcessUrl(processUrl);
-            for (OverviewSchedule overviewSchedule : overviewProcess.getOverviewSchedules()) {
-                createSchedule(new ScheduleBuilder().setProcessName(overviewProcess.getProcessName())
-                        .setExecutable(Executables.LONG_TIME_RUNNING_GRAPH)
-                        .setScheduleName(overviewSchedule.getScheduleName())
-                        .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23").setMinuteInHour("59"));
-                overviewSchedule.setScheduleUrl(browser.getCurrentUrl());
-                scheduleDetail.manualRun();
+    private void checkProjectNotAdmin(OverviewProjectStates projectState,
+            OverviewProjectDetails expectedOverviewProject) {
+        WebElement overviewProject =
+                discOverviewProjects.getOverviewProjectWithoutAdminRole(expectedOverviewProject.getProjectName());
+        assertNotNull(overviewProject, "Cannot find project without admin role!");
+        try {
+            discOverviewProjects.getOverviewProjectName(overviewProject).click();
+            Graphene.waitGui().withTimeout(10, TimeUnit.SECONDS).until().element(projectDetailPage.getRoot()).is()
+                    .visible();
+        } catch (NoSuchElementException ex) {
+            System.out.println("Non-admin user cannot access project detail page!");
+        }
+        waitForFragmentVisible(discOverviewProjects);
+        assertOverviewProjectWithoutAdminRole(projectState, expectedOverviewProject);
+    }
+
+    private void assertOverviewProjectWithoutAdminRole(OverviewProjectStates projectState,
+            OverviewProjectDetails expectedOverviewProject) {
+        WebElement overviewProjectDetail =
+                discOverviewProjects.getOverviewProjectWithoutAdminRole(expectedOverviewProject.getProjectName());
+        assertNotNull(overviewProjectDetail, "Cannot find project without admin role!");
+        WebElement overviewProjectLogLinkElement =
+                discOverviewProjects.getOverviewProjectLog(overviewProjectDetail);
+        int projectScheduleNumber = expectedOverviewProject.getProjectScheduleNumber();
+        String overviewProjectRuntime =
+                discOverviewProjects.getOverviewProjectRuntime(overviewProjectDetail).getText();
+        String overviewProjectDate = discOverviewProjects.getOverviewProjectDate(overviewProjectDetail).getText();
+        if (projectScheduleNumber == 1) {
+            OverviewSchedule expectedOverviewSchedule =
+                    expectedOverviewProject.getOverviewProcesses().get(0).getOverviewSchedules().get(0);
+            if (projectState != OverviewProjectStates.SCHEDULED)
+                assertTrue(overviewProjectLogLinkElement.getAttribute("class").contains("action-unavailable-icon"));
+            assertProjectInfoWithOnlyOneSchedule(projectState, overviewProjectDetail, expectedOverviewSchedule);
+        } else if (projectScheduleNumber > 1) {
+            if (projectState != OverviewProjectStates.SCHEDULED) {
+                assertTrue(overviewProjectRuntime.isEmpty(), "Overview project runtime is not empty!");
+                assertTrue(overviewProjectDate.isEmpty(), "Overview project date is not empty!");
+                if (projectState == OverviewProjectStates.FAILED) {
+                    String errorMessage = String.format("%d schedules", projectScheduleNumber);
+                    assertEquals(discOverviewProjects.getOverviewProjectErrorMessage(overviewProjectDetail)
+                            .getText(), errorMessage, "Incorrect error message");
+                } else if (projectState == OverviewProjectStates.SUCCESSFUL) {
+                    String okInfo = String.format("%d schedules", projectScheduleNumber);
+                    assertEquals(discOverviewProjects.getOverviewProjectOKInfo(overviewProjectDetail).getText(),
+                            okInfo, "Incorrect OK info!");
+                }
+            }
+        }
+    }
+
+    private void assertProjectInfoWithOnlyOneSchedule(OverviewProjectStates projectState,
+            WebElement overviewProjectDetail, OverviewSchedule expectedOverviewSchedule) {
+        if (projectState != OverviewProjectStates.SCHEDULED) {
+            assertTrue(discOverviewProjects.getOverviewProjectLog(overviewProjectDetail).isEnabled(),
+                    "Log link is not enabled!");
+            assertFalse(discOverviewProjects.getOverviewProjectRuntime(overviewProjectDetail).getText().isEmpty(),
+                    "Execution runtime is empty!");
+            System.out.println("Project schedule runtime: "
+                    + discOverviewProjects.getOverviewProjectRuntime(overviewProjectDetail).getText());
+            if (projectState != OverviewProjectStates.RUNNING) {
+                assertEquals(expectedOverviewSchedule.getLastExecutionRunTime(), discOverviewProjects
+                        .getOverviewProjectRuntime(overviewProjectDetail).getText(),
+                        "Incorrect execution runtime!");
+                assertEquals(expectedOverviewSchedule.getOverviewExecutionDateTime(), discOverviewProjects
+                        .getOverviewProjectDate(overviewProjectDetail).getText(), "Incorrect execution date!");
+            } else
+                assertTrue(
+                        expectedOverviewSchedule.getOverviewExecutionDateTime().contains(
+                                discOverviewProjects.getOverviewProjectDate(overviewProjectDetail).getText()),
+                        "Incorrect execution date!");
+            if (projectState == OverviewProjectStates.FAILED) {
+                assertEquals(expectedOverviewSchedule.getExecutionDescription(), discOverviewProjects
+                        .getOverviewProjectErrorMessage(overviewProjectDetail).getText(),
+                        "Incorrect error message!");
+            } else if (projectState == OverviewProjectStates.SUCCESSFUL) {
+                assertEquals("1 schedule", discOverviewProjects.getOverviewProjectOKInfo(overviewProjectDetail)
+                        .getText(), "Incorrect successful info!");
             }
         }
     }
