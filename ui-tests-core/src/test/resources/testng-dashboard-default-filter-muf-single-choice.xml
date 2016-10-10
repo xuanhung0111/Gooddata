@@ -11,7 +11,8 @@
             </run>
         </groups>
         <classes>
-            <class name="com.gooddata.qa.graphene.dashboards.GoodSalesDefaultFilterTest" />
+            <class name="com.gooddata.qa.graphene.dashboards.GoodSalesDefaultFilterWithMufTest" />
         </classes>
     </test>
+
 </suite>
