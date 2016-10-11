@@ -271,6 +271,7 @@ public class DeployProcessTest extends AbstractDISCTest {
         deployForm.deployProcess(gitPath, processName);
         assertEquals(waitForElementVisible(className("dialog-title"), browser).getText().trim(),
                 "Process failed to deploy");
+        //TODO: this failed message will be udpated after the bug MSF-11118 is fixed 
         assertEquals(waitForElementVisible(className("dialog-body"), browser).getText().trim(),
                 "Failed to deploy the process as " + processName +
                 ". Reason: Deployment failed on internal error, error_messsage: Info.json is missing in root application directory .");
@@ -290,6 +291,39 @@ public class DeployProcessTest extends AbstractDISCTest {
                 "Failed to deploy the process as " + processName + ". Reason: Invalid path. Deployment path " +
                         gitPath + " cannot contain relative references..");
         waitForElementVisible(className("s-btn-ok"), browser).click();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void cannotAccessGitPrivateStoreOfAnotherDomain() {
+        String gitRubyPath = "${PRIVATE_APPSTORE}:branch/prodigy-testing:/vietnam/giraffes/ReadFile";
+        openProjectDetailPage(testParams.getProjectId());
+        String processName = "Cannot deploy process";
+        waitForFragmentVisible(projectDetailPage).clickOnDeployProcessButton();
+        deployForm.deployProcess(gitRubyPath, processName);
+        assertEquals(waitForElementVisible(className("dialog-title"), browser).getText().trim(),
+                "Process failed to deploy");
+        //TODO: this failed message will be udpated after the bug MSF-11120 is fixed
+        assertEquals(waitForElementVisible(className("dialog-body"), browser).getText().trim(),
+                "Failed to deploy the process as " + processName + ". Reason: Invalid path. Deployment path " +
+                        "/vietnam/giraffes/ReadFile/" + " not allowed for this domain.");
+        waitForElementVisible(className("s-btn-ok"), browser).click();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void checkFailedMessageOnDeployWrongGitOnProjectsPage() {
+        String gitRubyPath = "${PUBLIC_APPSTORE}:branch/prodigy-testing:/../ReadFile";
+        String processName = "Check Failed Git Deploy Message In Projects Page";
+
+        initDISCProjectsPage();
+        waitForFragmentVisible(discProjectsList).checkOnProjects(testParams.getProjectId())
+            .clickOnDeployProcessButton();
+        waitForFragmentVisible(deployForm).deployProcess(gitRubyPath, processName);
+        waitForFragmentNotVisible(deployForm);
+        assertEquals(waitForElementVisible(className("error-bar"), browser).getText().trim(),
+                "Failed to deploy git process to the projects below. Reasons: Invalid path. Deployment path " +
+                        gitRubyPath + " cannot contain relative references..\nPlease resolve the issue and try "
+                                + "again.\nDismiss");
+        waitForElementVisible(className("s-btn-dismiss"), browser).click();
     }
 
     private void failedDeployInProjectsPage(DeployPackages deployPackage, ProcessTypes processType,
