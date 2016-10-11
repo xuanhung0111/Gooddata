@@ -80,6 +80,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
     private static final String LOCALIZATION_PAGE = "localization.html";
     private static final String USER_PROFILE_PAGE = PAGE_UI_PROJECT_PREFIX + "%s|profilePage|%s";
 
+    private static final String EMBEDDED_INDIGO_DASHBOARD_PAGE_URI = "dashboards/embedded/#/p/%s";
+    private static final String EMBEDDED_IFRAME_WRAPPER_URL = "https://s3.amazonaws.com/gdc-testing/embedding-wrapper.html";
+
     /**
      * ----- UI fragmnets -----
      */
@@ -520,6 +523,14 @@ public class AbstractUITest extends AbstractGreyPageTest {
                 .waitForWidgetsLoading();
     }
 
+    public IndigoDashboardsPage initEmbeddedIndigoDashboardPageByType(EmbeddedType type) {
+        if (type == EmbeddedType.IFRAME) {
+            return initEmbeddedIndigoDashboardPageByIframe();
+        }
+
+        return initEmbeddedIndigoDashboardPageByUrl();
+    }
+
     public EmailSchedulePage initEmailSchedulesPage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|emailSchedulePage");
         waitForSchedulesPageLoaded(browser);
@@ -579,5 +590,28 @@ public class AbstractUITest extends AbstractGreyPageTest {
         }
 
         waitForElementNotPresent(loadingLabel);
+    }
+
+    private IndigoDashboardsPage initEmbeddedIndigoDashboardPageByUrl() {
+        openUrl(getEmbeddedIndigoDashboardPageUri());
+        return IndigoDashboardsPage.getInstance(browser);
+    }
+
+    private IndigoDashboardsPage initEmbeddedIndigoDashboardPageByIframe() {
+        browser.get(EMBEDDED_IFRAME_WRAPPER_URL);
+
+        waitForElementVisible(By.id("url"), browser).sendKeys(getRootUrl() + getEmbeddedIndigoDashboardPageUri());
+        waitForElementVisible(By.cssSelector("input[value='Go']"), browser).click();
+
+        browser.switchTo().frame(waitForElementVisible(BY_IFRAME, browser));
+        return IndigoDashboardsPage.getInstance(browser);
+    }
+
+    private String getEmbeddedIndigoDashboardPageUri() {
+        return format(EMBEDDED_INDIGO_DASHBOARD_PAGE_URI, testParams.getProjectId());
+    }
+
+    public enum EmbeddedType {
+        IFRAME, URL
     }
 }

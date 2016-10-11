@@ -10,21 +10,17 @@ import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createKpiWidget;
 import static java.lang.String.format;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
-import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import javax.mail.Message;
 import javax.mail.MessagingException;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
@@ -42,9 +38,6 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
-import com.gooddata.qa.utils.mail.ImapClient;
-import com.gooddata.qa.utils.mail.ImapUtils;
-import com.google.common.collect.Iterables;
 
 public class KpiValueFormatInAlertEmailTest extends AbstractDashboardTest {
 
@@ -155,28 +148,12 @@ public class KpiValueFormatInAlertEmailTest extends AbstractDashboardTest {
 
         if (!testParams.isClusterEnvironment()) return;
 
-        Document alertEmail = doActionWithImapClient(imapClient ->
-                getAlertEmail(imapClient, GDEmails.NOREPLY, kpiName + " is " + kpiValue));
-
-        assertTrue(doesEmailHaveContent(alertEmail, kpiValue),
+        Document alertEmail = getLastAlertEmailContent(GDEmails.NOREPLY, kpiName + " is " + kpiValue);
+        assertTrue(doesAlertEmailHaveContent(alertEmail, kpiValue),
                 "Kpi value does not appear in alert email or has invalid format");
     }
 
     private String generateUniqueMetricName() {
         return "sumOfNumber-" + UUID.randomUUID().toString().substring(0, 6);
-    }
-
-    private Document getAlertEmail(ImapClient imapClient, GDEmails from, String subject)
-            throws MessagingException, IOException {
-        Collection<Message> messages = waitForMessages(imapClient, from, subject, 1);
-        return Jsoup.parse(ImapUtils.getEmailBody(Iterables.getLast(messages)));
-    }
-
-    private boolean doesEmailHaveContent(Document email, final String content) {
-        return email.getElementsByTag("td")
-                .stream()
-                .filter(e -> e.text().contains(content))
-                .findFirst()
-                .isPresent();
     }
 }
