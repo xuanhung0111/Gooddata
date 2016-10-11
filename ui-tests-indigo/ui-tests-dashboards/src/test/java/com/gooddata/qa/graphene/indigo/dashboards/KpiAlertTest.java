@@ -9,7 +9,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteWidgetsUsingCascase;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteWidgetsUsingCascade;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getKpiUri;
 import static com.gooddata.qa.utils.mail.ImapUtils.areMessagesArrived;
 import static java.lang.String.format;
@@ -72,7 +72,7 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
             takeScreenshot(browser, "checkNewKpiDoesNotHaveAlertSet", getClass());
             assertFalse(getLastKpiAfterAlertsLoaded().hasSetAlert());
         } finally {
-            deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(),
+            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(),
                     getKpiUri(METRIC_AVG_AMOUNT, getRestApiClient(), testParams.getProjectId()));
         }
     }
@@ -118,7 +118,7 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
             takeScreenshot(browser, "checkAddKpiAlert", getClass());
             assertTrue(getLastKpiAfterAlertsLoaded().hasSetAlert());
         } finally {
-            deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
         }
     }
 
@@ -155,7 +155,7 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
             assertEquals(kpiAlertDialog.getTriggeredWhen(), TRIGGERED_WHEN_DROPS_BELOW);
             assertEquals(kpiAlertDialog.getThreshold(), updatedThreshold);
         } finally {
-            deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
         }
     }
 
@@ -174,7 +174,7 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
             takeScreenshot(browser, "checkKpiAlertDialogWithPercentMetric", getClass());
             assertTrue(hasPercentSymbol);
         } finally {
-            deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(), percentMetric.getUri());
+            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), percentMetric.getUri());
         }
     }
 
@@ -203,7 +203,7 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
             assertTrue(isAlertMessageDisplayed);
 
         } finally {
-            deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
         }
     }
 
@@ -228,7 +228,7 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
             assertEquals(dateFilterSelection, DATE_FILTER_THIS_MONTH);
 
         } finally {
-            deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
         }
     }
 
@@ -281,7 +281,7 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
             assertEquals(kpiAlertDialogTextBefore, kpiAlertDialogTextAfter);
 
         } finally {
-            deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
         }
     }
 
@@ -302,7 +302,7 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
         } finally {
             // working dashboard should not be empty after delete the kpi
             // because following method will delete it in that case
-            deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
         }
     }
 
@@ -322,7 +322,7 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
 
             dialog.discardAlert();
         } finally {
-            deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
         }
     }
 

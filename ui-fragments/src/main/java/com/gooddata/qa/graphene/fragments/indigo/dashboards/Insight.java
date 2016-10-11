@@ -19,7 +19,7 @@ public class Insight extends Widget {
 
     public ChartReport getChartReport() {
         return Graphene.createPageFragment(ChartReport.class,
-                waitForElementVisible(BY_CHART_REPORT, browser));
+                waitForElementVisible(BY_CHART_REPORT, getRoot()));
     }
 
     public static boolean isInsight(final Widget widget) {

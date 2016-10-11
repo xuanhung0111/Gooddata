@@ -1,7 +1,7 @@
 package com.gooddata.qa.utils.http.indigo;
 
 import static com.gooddata.qa.utils.http.RestUtils.CREATE_AND_GET_OBJ_LINK;
-import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascase;
+import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -356,10 +356,10 @@ public class IndigoRestUtils {
      * @throws JSONException
      * @throws IOException
      */
-    public static void deleteWidgetsUsingCascase(final RestApiClient restApiClient, final String projectId,
+    public static void deleteWidgetsUsingCascade(final RestApiClient restApiClient, final String projectId,
             final String... widgetUris) throws JSONException, IOException {
 
-        deleteObjectsUsingCascase(restApiClient, projectId, widgetUris);
+        deleteObjectsUsingCascade(restApiClient, projectId, widgetUris);
 
         // empty dashboard should be deleted right after widgets
         // this makes UI & automation consistent
@@ -382,10 +382,10 @@ public class IndigoRestUtils {
      * @throws JSONException
      * @throws IOException
      */
-    public static void deleteDashboardsUsingCascase(final RestApiClient restApiClient, final String projectId)
+    public static void deleteDashboardsUsingCascade(final RestApiClient restApiClient, final String projectId)
             throws JSONException, IOException {
         final List<String> dashboardUris = getAnalyticalDashboards(restApiClient, projectId);
-        deleteObjectsUsingCascase(restApiClient, projectId,
+        deleteObjectsUsingCascade(restApiClient, projectId,
                 dashboardUris.toArray(new String[dashboardUris.size()]));
     }
 

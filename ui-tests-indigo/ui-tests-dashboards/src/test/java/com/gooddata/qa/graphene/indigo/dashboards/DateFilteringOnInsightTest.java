@@ -10,13 +10,13 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createInsight;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteWidgetsUsingCascase;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteWidgetsUsingCascade;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getInsightWidgetTitles;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascase;
+import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
 import java.io.IOException;
 
 import org.apache.http.ParseException;
@@ -89,7 +89,7 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
             takeScreenshot(browser, "default-date-filter-state-test-" + insight.toUpperCase(), getClass());
             assertEquals(panel.isDateFilterCheckboxEnabled(), expectedState, "Date filter state is not correct");
         } finally {
-            deleteObjectsUsingCascase(getRestApiClient(), testParams.getProjectId(), insightUri);
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), insightUri);
         }
     }
 
@@ -118,7 +118,7 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
             assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_CREATED);
 
         } finally {
-            deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(), anotherInsightUri);
+            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), anotherInsightUri);
         }
     }
 
@@ -181,7 +181,7 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
             assertFalse(indigoDashboardsPage.getConfigurationPanel().isDataSetEnabled(),
                     "Date filter is not disabled");
         } finally {
-            deleteObjectsUsingCascase(getRestApiClient(), testParams.getProjectId(), insightUri);
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), insightUri);
         }
     }
 
@@ -203,7 +203,7 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
             assertTrue(indigoDashboardsPage.getConfigurationPanel().isDataSetEnabled(),
                     "Date filter is not enabled");
         } finally {
-            deleteObjectsUsingCascase(getRestApiClient(), testParams.getProjectId(), insightUri);
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), insightUri);
         }
     }
 
@@ -225,7 +225,7 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
             indigoDashboardsPage.saveEditModeWithWidgets().switchToEditMode().selectLastWidget(Insight.class);
             assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_CREATED);
         } finally {
-            deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(), widgetUri);
+            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), widgetUri);
         }
     }
 
@@ -257,7 +257,7 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
                     "New name is not applied to the insight");
 
         } finally {
-            deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(), widgetUri);
+            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), widgetUri);
         }
     }
 
@@ -287,7 +287,7 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
             assertFalse(getInsightWidgetTitles(getRestApiClient(), testParams.getProjectId())
                     .contains(insight), "The expected insight has not been deleted");
         } finally {
-            deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(), widgetUri);
+            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), widgetUri);
         }
     }
 

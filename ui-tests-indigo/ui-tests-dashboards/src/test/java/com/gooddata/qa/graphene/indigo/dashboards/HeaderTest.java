@@ -5,7 +5,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForStringInUrl;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteDashboardsUsingCascase;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteDashboardsUsingCascade;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -87,7 +87,7 @@ public class HeaderTest extends GoodSalesAbstractDashboardTest {
                 takeScreenshot(browser, "KPI-header-display-when-FF-is-off-and-there-is-saved-KPI", getClass());
                 assertTrue(ApplicationHeaderBar.isKpisLinkVisible(browser));
             } finally {
-                deleteDashboardsUsingCascase(getRestApiClient(), testParams.getProjectId());
+                deleteDashboardsUsingCascade(getRestApiClient(), testParams.getProjectId());
             }
 
             initDashboardsPage();
