@@ -24,12 +24,12 @@ import com.google.common.base.Predicate;
 @SuppressWarnings("unchecked")
 public abstract class AbstractInsightSelectionPanel extends AbstractFragment {
 
-    @FindBy(className = "searchfield-input")
+    @FindBy(css = ".gd-input-search input")
     private WebElement searchTextBox;
 
     protected static final By NO_DATA_LOCATOR = className("gd-no-data");
     protected static final By CLEAR_ICON_LOCATOR = className("icon-clear");
-    protected static final By SEARCH_TEXTBOX_LOCATOR = className("searchfield-input");
+    protected static final By SEARCH_TEXTBOX_LOCATOR = className("gd-input-search input");
 
     public List<InsightItem> getInsightItems() {
         waitForLoading();

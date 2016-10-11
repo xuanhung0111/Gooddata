@@ -28,7 +28,7 @@ import static org.testng.Assert.assertEquals;
  */
 public class CataloguePanel extends AbstractFragment {
 
-    @FindBy(className = "searchfield-input")
+    @FindBy(css = ".s-catalogue-search input")
     private WebElement searchInput;
 
     @FindBy(className = "adi-catalogue-item")
@@ -51,7 +51,7 @@ public class CataloguePanel extends AbstractFragment {
     private static final By BY_UNRELATED_ITEMS_HIDDEN = By.cssSelector("footer > div");
     private static final By BY_UNAVAILABLE_ITEMS_MATCHED = By.className("s-unavailable-items-matched");
     private static final By BY_ADD_DATA = By.cssSelector(".csv-link-section .s-btn-add_data");
-    private static final By BY_CLEAR_SEARCH_FIELD = By.className("searchfield-clear");
+    private static final By BY_CLEAR_SEARCH_FIELD = By.className("gd-input-icon-clear");
     private static final By BY_DATASOURCE_DROPDOWN = By.className("data-source-picker-dropdown");
 
     private static final String WEIRD_STRING_TO_CLEAR_ALL_ITEMS = "!@#$%^";

@@ -30,7 +30,7 @@ public abstract class AbstractReactDropDown extends AbstractDropDown {
 
     @Override
     protected String getSearchInputCssSelector() {
-        return ".searchfield-input";
+        return ".gd-input-search input";
     }
 
     @Override
