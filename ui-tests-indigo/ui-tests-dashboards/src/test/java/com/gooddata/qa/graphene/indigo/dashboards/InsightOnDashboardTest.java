@@ -428,6 +428,24 @@ public class InsightOnDashboardTest extends GoodSalesAbstractDashboardTest {
         assertEquals(insights.size(), expectedInsights.size(), "The expected insights are not displayed");
     }
 
+    @Test(dependsOnGroups = {"setupDashboardENV"},
+            description = "CL-10262: Save&Publish button is enabled right when selecting insight")
+    public void disableSaveIfHavingNoChange() throws JSONException, IOException {
+        String insight = "Insight-Created-From-Metric";
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing().saveInsight(insight);
+
+        initIndigoDashboardsPage().getSplashScreen().startEditingWidgets().addInsight(insight)
+                .saveEditModeWithWidgets();
+
+        try {
+            initIndigoDashboardsPageWithWidgets().switchToEditMode().selectLastWidget(Insight.class);
+            assertFalse(indigoDashboardsPage.isSaveEnabled(),
+                    "Save button is enabled when dashboard has no change");
+        } finally {
+            deleteAnalyticalDashboard(getRestApiClient(), getWorkingDashboardUri());
+        }
+    }
+
     @Override
     protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
         createAndAddUserToProject(UserRoles.EDITOR);

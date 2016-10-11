@@ -11,6 +11,7 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.*;
 import static org.testng.Assert.*;
 
@@ -122,6 +123,12 @@ public class FiltersBucket extends AbstractBucket {
         openDatePanelOfFilter(filter).changeDateDimension(switchDimension);
     }
 
+    public FiltersBucket changeDateDimension(String switchDimension) {
+        openDatePanelOfFilter(getDateFilter()).changeDateDimension(switchDimension);
+
+        return this;
+    } 
+
     public boolean isDateFilterVisible() {
         if (filters.isEmpty()) {
             return false;
@@ -141,7 +148,9 @@ public class FiltersBucket extends AbstractBucket {
     }
 
     public DateFilterPickerPanel openDatePanelOfFilter(WebElement filter) {
-        filter.click();
+        if (!isElementPresent(DateFilterPickerPanel.LOCATOR, browser))
+            filter.click();
+
         return Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
     }
