@@ -18,7 +18,7 @@ public class KpiAlertDialog extends AbstractFragment {
     private static final String ALERT_DIALOG_MESSAGE_CLASS = "gd-message";
 
     private static final By ALERT_DIALOG_MESSAGE = By.cssSelector("." + MAIN_CLASS + " ." + ALERT_DIALOG_MESSAGE_CLASS);
-    private static final By ALERT_DIALOG_INPUT_SUFFIX = By.cssSelector("." + MAIN_CLASS + " .input-suffix");
+    private static final By ALERT_DIALOG_INPUT_SUFFIX = By.cssSelector("." + MAIN_CLASS + " .gd-input-suffix");
 
     public static final String TRIGGERED_WHEN_GOES_ABOVE = "above";
     public static final String TRIGGERED_WHEN_DROPS_BELOW = "below";
