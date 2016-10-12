@@ -95,12 +95,13 @@ public class ProjectsList extends AbstractTable {
         return waitForElementVisible(projectsEmptyState);
     }
 
-    public void checkOnProjects(String... projectIds) {
+    public ProjectsList checkOnProjects(String... projectIds) {
         for (String projectId : projectIds) {
             WebElement selectedProject = selectProjectWithAdminRole(projectId);
             assertNotNull(selectedProject, "Project is not found!");
             selectedProject.findElement(BY_PROJECT_CHECKBOX).click();
         }
+        return this;
     }
 
     public void clickOnProjectTitle(String projectId) {
