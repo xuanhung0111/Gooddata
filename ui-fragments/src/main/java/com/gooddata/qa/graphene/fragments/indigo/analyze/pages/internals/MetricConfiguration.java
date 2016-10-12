@@ -180,7 +180,7 @@ public class MetricConfiguration extends AbstractFragment {
         @FindBy(css = ".s-apply:not(.disabled)")
         private WebElement applyButton;
 
-        private static final By CLEAR_SEARCH_TEXT_SHORTCUT = className("searchfield-clear");
+        private static final By CLEAR_SEARCH_TEXT_SHORTCUT = className("gd-input-icon-clear");
 
         @Override
         protected String getListItemsCssSelector() {
@@ -189,7 +189,7 @@ public class MetricConfiguration extends AbstractFragment {
 
         @Override
         protected String getSearchInputCssSelector() {
-            return ".searchfield-input";
+            return ".gd-input-search input";
         }
 
         @Override

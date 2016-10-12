@@ -35,7 +35,7 @@ public class AttributeFilterPickerPanel extends AbstractPicker {
     @FindBy(className = "s-apply")
     private WebElement applyButton;
 
-    private static final By CLEAR_SEARCH_TEXT_SHORTCUT = className("searchfield-clear");
+    private static final By CLEAR_SEARCH_TEXT_SHORTCUT = className("gd-input-icon-clear");
 
     public static AttributeFilterPickerPanel getInstance(SearchContext context) {
         return Graphene.createPageFragment(AttributeFilterPickerPanel.class,
@@ -49,7 +49,7 @@ public class AttributeFilterPickerPanel extends AbstractPicker {
 
     @Override
     protected String getSearchInputCssSelector() {
-        return ".searchfield-input";
+        return ".gd-input-search input";
     }
 
     @Override
