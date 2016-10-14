@@ -62,7 +62,7 @@ public class IndigoRestUtils {
                     put("content", new JSONObject() {{
                         put("comparisonType", "${comparisonType}");
                         put("metric", "${metric}");
-                        put("dateDataset", "${dateDataSet}");
+                        put("dateDataSet", "${dateDataSet}");
                         put("ignoreDashboardFilters", new JSONArray());
                     }});
                 }});
