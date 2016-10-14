@@ -86,8 +86,8 @@
         <version.org.apache.maven.surefire-plugin>2.19.1</version.org.apache.maven.surefire-plugin>
         <json-path.version>0.9.1</json-path.version>
         <gooddata-http-client.version>0.9.3</gooddata-http-client.version>
-        <gooddata-java.version>2.0.0-RC.2</gooddata-java.version>
-        <jackson.version>2.8.0</jackson.version>
+        <gooddata-java.version>2.1.0</gooddata-java.version>
+        <jackson.version>2.8.3</jackson.version>
     </properties>
 
     <dependencyManagement>
