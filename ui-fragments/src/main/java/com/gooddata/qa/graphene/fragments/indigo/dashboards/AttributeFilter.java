@@ -20,6 +20,11 @@ public class AttributeFilter extends AbstractReactDropDown {
     private WebElement buttonText;
 
     @Override
+    protected String getDropdownButtonCssSelector() {
+        return ".attribute-filter-button";
+    }
+
+    @Override
     protected String getDropdownCssSelector() {
         return ".overlay .attributevalues-list";
     }
