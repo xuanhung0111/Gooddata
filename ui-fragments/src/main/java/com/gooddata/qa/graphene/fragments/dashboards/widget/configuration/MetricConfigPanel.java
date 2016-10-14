@@ -14,10 +14,10 @@ import com.google.common.base.Predicate;
 
 public class MetricConfigPanel extends AbstractFragment {
 
-    @FindBy(xpath = "//*[contains(@class,'metricRow')]//*[./*[.='Metric']]/following-sibling::button")
+    @FindBy(xpath = "//*[contains(@class,'metricRow')]/button")
     private WebElement metricSelect;
 
-    @FindBy(xpath = "//*[contains(@class,'metricRow')]//*[./*[.='by']]/following-sibling::button")
+    @FindBy(xpath = "//*[contains(@class,'dateDimensionContainer')]/button")
     private WebElement dateDimensionSelect;
 
     @FindBy(css = ".whenFilter button")
