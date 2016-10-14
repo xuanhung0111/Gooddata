@@ -67,7 +67,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     private static final String ADDITIONAL_PROJECT_TITLE = "GoodSales-project-to-share-dashboard";
     private static final String EMBEDDED_DASHBOARD_NAME = "Embedded Dashboard";
 
-    private static final long EXPECTED_EXPORT_DASHBOARD_SIZE = 1200000L;
+    private static final long EXPECTED_EXPORT_DASHBOARD_SIZE = 112000L;
     private static final long EXPECTED_EXPORT_CHART_SIZE = 28000L;
 
     private UiReportDefinition tabularReportDef;
@@ -121,7 +121,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
                 .addReportToDashboard(headlineReportDef.getName())
                 .addNewTab("other_widgets")
                 .addLineToDashboard()
-                .addWebContentToDashboard("https://www.gooddata.com")
+                .addWebContentToDashboard("https://en.wikipedia.org/wiki/HTTPS")
                 .addWidgetToDashboard(WidgetTypes.KEY_METRIC, METRIC_AMOUNT)
                 .addWidgetToDashboard(WidgetTypes.GEO_CHART, METRIC_AMOUNT)
                 .saveDashboard();
