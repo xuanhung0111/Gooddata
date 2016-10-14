@@ -80,6 +80,7 @@ public class UITestsRegistry {
             VisualizationsTest.class,
             ReorderInsightTest.class,
             NonProductionDatasetTest.class,
+            InsightOnDashboardTest.class,
             RoutingTest.class,
             DateFilteringOnInsightTest.class,
             "testng-desktop-AttributeFiltering.xml",
