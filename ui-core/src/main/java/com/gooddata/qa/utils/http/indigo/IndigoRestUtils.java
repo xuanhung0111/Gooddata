@@ -62,7 +62,8 @@ public class IndigoRestUtils {
                     put("content", new JSONObject() {{
                         put("comparisonType", "${comparisonType}");
                         put("metric", "${metric}");
-                        put("dateDataset", "${dateDataSet}");
+                        put("dateDataSet", "${dateDataSet}");
+                        put("ignoreDashboardFilters", new JSONArray());
                     }});
                 }});
             }}.toString();
@@ -200,7 +201,7 @@ public class IndigoRestUtils {
     /**
      * Create an insight. Currently, the insight could be a combination of measure, view by
      * and stack by.
-     * 
+     *
      * @param restApiClient
      * @param projectId
      * @param insightConfig
@@ -318,7 +319,7 @@ public class IndigoRestUtils {
 
     /**
      * get all insight widget titles
-     * 
+     *
      * @param restApiClient
      * @param projectId
      * @return list of titles. Otherwise, return empty list
@@ -403,7 +404,7 @@ public class IndigoRestUtils {
                         put("measures", initMeasureObjects(insightConfig.getMeasureBuckets()));
                         put("categories", initCategoryObjects(insightConfig.getCategoryBuckets()));
                         put("filters", new JSONArray());
-                    }}); 
+                    }});
                     put("type", insightConfig.getType().getLabel());
                 }});
                 put("meta", new JSONObject() {{
