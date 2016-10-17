@@ -15,7 +15,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoade
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteDashboardsUsingCascase;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteDashboardsUsingCascade;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.not;
@@ -110,7 +110,7 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
             // check that url is the same, but after refresh it has /dashboard/<id> appended
             assertTrue(browser.getCurrentUrl().startsWith(currentUrl));
         } finally {
-            deleteDashboardsUsingCascase(getRestApiClient(), testParams.getProjectId());
+            deleteDashboardsUsingCascade(getRestApiClient(), testParams.getProjectId());
         }
     }
 
@@ -133,7 +133,7 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
 
             assertNotEquals(browser.getCurrentUrl(), currentUrl);
         } finally {
-            deleteDashboardsUsingCascase(getRestApiClient(), testParams.getProjectId());
+            deleteDashboardsUsingCascade(getRestApiClient(), testParams.getProjectId());
         }
     }
 
@@ -183,7 +183,7 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
 
             BrowserUtils.switchToFirstTab(browser);
         } finally {
-            deleteDashboardsUsingCascase(getRestApiClient(), testParams.getProjectId());
+            deleteDashboardsUsingCascade(getRestApiClient(), testParams.getProjectId());
         }
     }
 
@@ -211,7 +211,7 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
             assertNotEquals(drillToValue, drillToPlaceholder);
             assertEquals(drillToPlaceholder, DrillToSelect.PLACEHOLDER);
         } finally {
-            deleteDashboardsUsingCascase(getRestApiClient(), testParams.getProjectId());
+            deleteDashboardsUsingCascade(getRestApiClient(), testParams.getProjectId());
         }
     }
 
@@ -237,7 +237,7 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
             assertFalse(dashboardsPage.getTabs().isTabSelected(0));
             assertTrue(dashboardsPage.getTabs().isTabSelected(1));
         } finally {
-            deleteDashboardsUsingCascase(getRestApiClient(), testParams.getProjectId());
+            deleteDashboardsUsingCascade(getRestApiClient(), testParams.getProjectId());
         }
     }
 
@@ -279,7 +279,7 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
                 logout();
                 signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
 
-                deleteDashboardsUsingCascase(getRestApiClient(), testParams.getProjectId());
+                deleteDashboardsUsingCascade(getRestApiClient(), testParams.getProjectId());
             }
         } finally {
             initDashboardsPage();
@@ -332,7 +332,7 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
                 DashboardTabs tabs = dashboardsPage.getTabs();
                 assertThat(tabs.getAllTabNames(), not(contains(newTab)));
             } finally {
-                deleteDashboardsUsingCascase(getRestApiClient(), testParams.getProjectId());
+                deleteDashboardsUsingCascade(getRestApiClient(), testParams.getProjectId());
             }
         } finally {
             initDashboardsPage();
@@ -368,7 +368,7 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
 
             assertNotEquals(browser.getCurrentUrl(), currentUrl);
         } finally {
-            deleteDashboardsUsingCascase(getRestApiClient(), testParams.getProjectId());
+            deleteDashboardsUsingCascade(getRestApiClient(), testParams.getProjectId());
         }
     }
 
@@ -390,7 +390,7 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
 
             checkNoNewBrowserTabOrWindowNorRedirected(currentUrl);
         } finally {
-            deleteDashboardsUsingCascase(getRestApiClient(), testParams.getProjectId());
+            deleteDashboardsUsingCascade(getRestApiClient(), testParams.getProjectId());
         }
     }
 

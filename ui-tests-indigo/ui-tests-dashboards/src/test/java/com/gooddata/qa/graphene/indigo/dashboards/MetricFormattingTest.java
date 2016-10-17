@@ -2,7 +2,7 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.addWidgetToAnalyticalDashboard;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteWidgetsUsingCascase;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteWidgetsUsingCascade;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAnalyticalDashboards;
 import static java.util.Collections.singletonList;
 
@@ -77,7 +77,7 @@ public class MetricFormattingTest extends GoodSalesAbstractDashboardTest {
             }
 
         } finally {
-            deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(), customFormatMetric.getUri());
+            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), customFormatMetric.getUri());
         }
     }
 
@@ -119,7 +119,7 @@ public class MetricFormattingTest extends GoodSalesAbstractDashboardTest {
             assertEquals(selectedKpi.getHeadline(), xssHeadline);
 
         } finally {
-            deleteWidgetsUsingCascase(getRestApiClient(), projectId, xssMetric.getUri());
+            deleteWidgetsUsingCascade(getRestApiClient(), projectId, xssMetric.getUri());
         }
     }
 
@@ -150,7 +150,7 @@ public class MetricFormattingTest extends GoodSalesAbstractDashboardTest {
             assertEquals(lastKpi.getValue(), "<button>1.00</button>");
 
         } finally {
-            deleteWidgetsUsingCascase(getRestApiClient(), projectId, xssFormatMetric.getUri());
+            deleteWidgetsUsingCascade(getRestApiClient(), projectId, xssFormatMetric.getUri());
         }
     }
 
@@ -181,7 +181,7 @@ public class MetricFormattingTest extends GoodSalesAbstractDashboardTest {
             assertTrue(lastKpi.isEmptyValue());
 
         } finally {
-            deleteWidgetsUsingCascase(getRestApiClient(), projectId, invalidMetric.getUri());
+            deleteWidgetsUsingCascade(getRestApiClient(), projectId, invalidMetric.getUri());
         }
     }
 }

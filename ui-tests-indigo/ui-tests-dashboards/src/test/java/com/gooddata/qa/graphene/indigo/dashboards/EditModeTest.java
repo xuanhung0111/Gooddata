@@ -6,7 +6,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACT
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteWidgetsUsingCascase;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteWidgetsUsingCascade;
 import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -120,7 +120,7 @@ public class EditModeTest extends GoodSalesAbstractDashboardTest {
                     .getConfigurationPanel()
                     .waitForAlertEditWarning();
         } finally {
-            deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
         }
     }
 
@@ -149,7 +149,7 @@ public class EditModeTest extends GoodSalesAbstractDashboardTest {
                     .getConfigurationPanel()
                     .waitForAlertEditWarning();
         } finally {
-            deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
         }
     }
 
@@ -183,7 +183,7 @@ public class EditModeTest extends GoodSalesAbstractDashboardTest {
                     .getKpiAlertMessage(), containsString("2 alerts"));
 
         } finally {
-            deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
         }
     }
 
@@ -225,7 +225,7 @@ public class EditModeTest extends GoodSalesAbstractDashboardTest {
             assertEquals(kpi.getHeadline(), METRIC_NUMBER_OF_ACTIVITIES);
 
         } finally {
-            deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
         }
     }
 

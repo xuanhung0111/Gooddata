@@ -30,7 +30,7 @@ public final class RestUtils {
 
     public static final String CREATE_AND_GET_OBJ_LINK = "/gdc/md/%s/obj?createAndGet=true";
 
-    private static final Supplier<String> DELETE_OBJECT_USING_CASCASE_BODY = () -> {
+    private static final Supplier<String> DELETE_OBJECT_USING_CASCADE_BODY = () -> {
         try {
             return new JSONObject() {{
                 put("delete", new JSONObject() {{
@@ -199,14 +199,14 @@ public final class RestUtils {
      * @throws JSONException
      * @throws IOException
      */
-    public static void deleteObjectsUsingCascase(final RestApiClient restApiClient, final String projectId,
+    public static void deleteObjectsUsingCascade(final RestApiClient restApiClient, final String projectId,
             final String... objectUris) throws JSONException, IOException {
         final String deleteObjectUri = format("/gdc/md/%s/objects/delete", projectId);
         final String widgets = Stream.of(objectUris).map(e -> '"' + e + '"').collect(Collectors.joining(","));
 
         executeRequest(restApiClient,
                 restApiClient.newPostMethod(deleteObjectUri,
-                        DELETE_OBJECT_USING_CASCASE_BODY.get().replace("\"${objectUris}\"", widgets)),
+                        DELETE_OBJECT_USING_CASCADE_BODY.get().replace("\"${objectUris}\"", widgets)),
                 HttpStatus.NO_CONTENT);
     }
 }
