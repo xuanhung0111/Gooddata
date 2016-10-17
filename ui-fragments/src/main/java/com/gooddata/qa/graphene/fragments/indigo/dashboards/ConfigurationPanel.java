@@ -16,6 +16,7 @@ import com.google.common.base.Predicate;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import java.util.List;
 
 public class ConfigurationPanel extends AbstractFragment {
 
@@ -49,8 +50,19 @@ public class ConfigurationPanel extends AbstractFragment {
     @FindBy(className = "s-unlisted_measure")
     private WebElement unlistedMeasure;
 
-    @FindBy(css = ".s-viz-filters-date input")
-    private WebElement dateFilterCheckbox;
+    @FindBy(className = "s-attribute-filter-by-item")
+    private List<FilterByItem> filterByAttributeFilters;
+
+    @FindBy(className = "s-date-filter-by-item")
+    private FilterByItem filterByDateFilter;
+
+    public List<FilterByItem> getFilterByAttributeFilters() {
+        return filterByAttributeFilters;
+    }
+
+    public FilterByItem getFilterByDateFilter() {
+        return filterByDateFilter;
+    }
 
     public ConfigurationPanel waitForButtonsLoaded() {
         waitForElementVisible(metricSelectLoaded);
@@ -136,19 +148,17 @@ public class ConfigurationPanel extends AbstractFragment {
     }
 
     public ConfigurationPanel enableDateFilter() {
-        if (!waitForElementVisible(dateFilterCheckbox).isSelected())
-            dateFilterCheckbox.click();
+        getFilterByDateFilter().setChecked(true);
         return this;
     }
 
     public ConfigurationPanel disableDateFilter() {
-        if (waitForElementVisible(dateFilterCheckbox).isSelected())
-            dateFilterCheckbox.click();
+        getFilterByDateFilter().setChecked(false);
         return this;
     }
 
     public boolean isDateFilterCheckboxEnabled() {
-        return waitForElementVisible(dateFilterCheckbox).isEnabled();
+        return getFilterByDateFilter().isChecked();
     }
 
     public DateDimensionSelect openDateDataset() {
