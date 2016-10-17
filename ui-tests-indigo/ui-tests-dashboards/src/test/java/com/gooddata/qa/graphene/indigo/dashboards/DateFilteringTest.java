@@ -8,7 +8,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteWidgetsUsingCascase;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteWidgetsUsingCascade;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
@@ -131,7 +131,7 @@ public class DateFilteringTest extends GoodSalesAbstractDashboardTest {
                                 .getWidgetByHeadline(Kpi.class, filteredOutMetric.getTitle()).isEmptyValue());
                     });
         } finally {
-            deleteWidgetsUsingCascase(getRestApiClient(), testParams.getProjectId(), attributeFilterKpiUri,
+            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), attributeFilterKpiUri,
                     timeMacrosKpiUri, filteredOutKpiUri);
         }
     }
