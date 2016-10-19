@@ -54,8 +54,8 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
     private static final String REPORT_NAME = "Basic Filter";
     private static final String VARIABLE_NAME = "FVariable";
 
-    private static final String NO_ATTRIBUTE_VALUE_MESSAGE = "No values selected for filtering."
-            + " Select some values or cancel the filter.";
+    private static final String NO_ATTRIBUTE_VALUE_MESSAGE = "No values selected for filtering.\n"
+            + "Select some values or cancel the filter.";
 
     private List<String> listAttributeValues = Lists
             .newArrayList("Interest", "Discovery", "Short List", "Negotiation");
