@@ -38,6 +38,7 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.manage.DatasetDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.utils.Sleeper;
 
 public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
 
@@ -249,6 +250,7 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
                     .selectObject(DATE_SNAPSHOT);
 
             DatasetDetailPage.getInstance(browser).changeName(DATE_SNAPSHOT_RENAMED);
+            Sleeper.sleepTightInSeconds(1);
 
             initIndigoDashboardsPageWithWidgets().switchToEditMode().selectLastWidget(Insight.class);
             ConfigurationPanel panel = indigoDashboardsPage.getConfigurationPanel();
