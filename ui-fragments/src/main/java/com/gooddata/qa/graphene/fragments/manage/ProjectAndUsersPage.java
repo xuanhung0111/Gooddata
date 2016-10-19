@@ -72,7 +72,7 @@ public class ProjectAndUsersPage extends AbstractFragment {
     private static final By PROJECT_NAME_INPUT_LOCATOR = By.cssSelector(".ipeEditor");
     private static final By SAVE_BUTTON_LOCATOR = By.cssSelector(".s-ipeSaveButton");
     private static final By USER_EMAIL_LOCATOR = By.cssSelector(".email span");
-    private static final By DEACTIVATE_BUTTON_LOCATOR = By.cssSelector(".s-btn-deactivate");
+    private static final By DEACTIVATE_BUTTON_LOCATOR = By.cssSelector(".s-btn-_deactivate");
     private static final By RESEND_INVITATION_BUTTON_LOCATOR = By.cssSelector(".s-btn-resend_invitation");
     private static final By CANCEL_INVITATION_BUTTON_LOCATOR = By.cssSelector(".s-btn-cancel_invitation");
     private static final By DISMISS_BUTTON_LOCATOR = By.cssSelector(".s-statusbar-dismiss");
