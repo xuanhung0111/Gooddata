@@ -71,31 +71,31 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     private static final String NOT_FULLY_ACTIVATED_MESSAGE = "Your account has not yet been fully activated. "
             + "Please click the activation link in the confirmation email sent to you.";
 
-    private static final String REGISTRATION_USER = "gd.accregister@gmail.com";
-    private static final String REGISTRATION_USER_PASSWORD = "changeit";
-
     private static final String NEED_ACTIVATE_ACCOUNT_MESSAGE = "Activate your account before inviting users";
 
+    private String registrationUser;
     private String activationLink;
 
     private RegistrationForm registrationForm;
 
     @BeforeClass(alwaysRun = true)
     public void initData() {
+        imapHost = testParams.loadProperty("imap.host");
+        imapUser = testParams.loadProperty("imap.user");
+        imapPassword = testParams.loadProperty("imap.password");
+
+        registrationUser = generateEmail(imapUser);
+
         String registrationString = String.valueOf(System.currentTimeMillis());
         registrationForm = new RegistrationForm()
                 .withFirstName("FirstName " + registrationString)
                 .withLastName("LastName " + registrationString)
-                .withEmail(REGISTRATION_USER)
-                .withPassword(REGISTRATION_USER_PASSWORD)
+                .withEmail(registrationUser)
+                .withPassword(testParams.getPassword())
                 .withPhone(registrationString)
                 .withCompany("Company " + registrationString)
                 .withJobTitle("Title " + registrationString)
                 .withIndustry("Government");
-
-        imapHost = testParams.loadProperty("imap.host");
-        imapUser = REGISTRATION_USER;
-        imapPassword = REGISTRATION_USER_PASSWORD;
     }
 
     /**
@@ -106,7 +106,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
      */
     @Test
     public void checkWalkme() throws ParseException, JSONException, IOException {
-        deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), REGISTRATION_USER);
+        deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), registrationUser);
 
         initRegistrationPage()
             .registerNewUserSuccessfully(registrationForm);
@@ -146,7 +146,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
         RegistrationPage.getInstance(browser)
                 .fillInRegistrationForm(registrationForm)
-                .enterEmail(generateEmail(REGISTRATION_USER))
+                .enterEmail(generateEmail(registrationUser))
                 .enterPassword("aaaaaa")
                 .agreeRegistrationLicense()
                 .submitForm();
@@ -195,7 +195,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     @Test
     public void loginAsUnverifiedUserAfterRegistering()
             throws ParseException, JSONException, IOException, MessagingException {
-        deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), REGISTRATION_USER);
+        deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), registrationUser);
 
         activationLink = doActionWithImapClient(
                 imapClient -> initRegistrationPage().registerNewUserSuccessfully(imapClient, registrationForm));
@@ -213,18 +213,18 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         takeScreenshot(browser, "Need activate account before inviting users", getClass());
         waitForElementVisible(CLOSE_DIALOG_BUTTON_LOCATOR, browser).click();
 
-        UserProfilePage userProfilePage = ProjectAndUsersPage.getInstance(browser).openUserProfile(REGISTRATION_USER);
+        UserProfilePage userProfilePage = ProjectAndUsersPage.getInstance(browser).openUserProfile(registrationUser);
         assertEquals(userProfilePage.getUserRole(), "", "Unverified admin should not show role");
         takeScreenshot(browser, "Unverified user has no role", this.getClass());
 
         logout()
-            .login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, false);
+            .login(registrationUser, testParams.getPassword(), false);
         assertEquals(getPageErrorMessage(), NOT_FULLY_ACTIVATED_MESSAGE);
 
         openUrl(activationLink);
         assertEquals(LoginFragment.getInstance(browser).getNotificationMessage(), ACTIVATION_SUCCESS_MESSAGE);
 
-        LoginFragment.getInstance(browser).login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
+        LoginFragment.getInstance(browser).login(registrationUser, testParams.getPassword(), true);
         waitForDashboardPageLoaded(browser);
 
         assertTrue(initProjectsAndUsersPage().isEmailingDashboardsTabDisplayed(),
@@ -236,7 +236,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         takeScreenshot(browser, "Active user can invite users", getClass());
         inviteUserDialog.cancelInvite();
 
-        userProfilePage =  ProjectAndUsersPage.getInstance(browser).openUserProfile(REGISTRATION_USER);
+        userProfilePage =  ProjectAndUsersPage.getInstance(browser).openUserProfile(registrationUser);
         assertEquals(userProfilePage.getUserRole(), UserRoles.ADMIN.getName());
     }
 
@@ -247,7 +247,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
             log.warning("Register New User is not tested on PI or Production environment");
             return;
         }
-        deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), REGISTRATION_USER);
+        deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), registrationUser);
 
         activationLink = doActionWithImapClient(
                 imapClient -> initRegistrationPage().registerNewUserSuccessfully(imapClient, registrationForm));
@@ -261,7 +261,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         assertEquals(LoginFragment.getInstance(browser).getNotificationMessage(), ACTIVATION_SUCCESS_MESSAGE);
 
         try {
-            LoginFragment.getInstance(browser).login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
+            LoginFragment.getInstance(browser).login(registrationUser, testParams.getPassword(), true);
             waitForDashboardPageLoaded(browser);
 
             openProject(DEMO_PROJECT);
@@ -276,7 +276,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         openUrl(activationLink);
         assertEquals(LoginFragment.getInstance(browser).getNotificationMessage(), ALREADY_ACTIVATED_MESSAGE);
 
-        LoginFragment.getInstance(browser).login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
+        LoginFragment.getInstance(browser).login(registrationUser, testParams.getPassword(), true);
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
     }
 
@@ -284,7 +284,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     public void registerUserWithEmailOfExistingAccount() {
         initRegistrationPage()
                 .fillInRegistrationForm(new RegistrationForm())
-                .enterEmail(generateEmail(REGISTRATION_USER))
+                .enterEmail(generateEmail(registrationUser))
                 .enterSpecialCaptcha()
                 .agreeRegistrationLicense()
                 .submitForm();
@@ -294,7 +294,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         assertFalse(RegistrationPage.getInstance(browser).isCaptchaInputError(), "Captcha input shows error but expected is not");
         assertEquals(RegistrationPage.getInstance(browser).getErrorMessage(), FIELD_MISSING_ERROR_MESSAGE);
 
-        RegistrationPage.getInstance(browser).enterEmail(REGISTRATION_USER).submitForm();
+        RegistrationPage.getInstance(browser).enterEmail(registrationUser).submitForm();
 
         takeScreenshot(browser, "Verification-on-registered-email-show-nothing-when-missing-other-fields", getClass());
         assertFalse(RegistrationPage.getInstance(browser).isEmailInputError(), "Email input shows error but expected is not");
@@ -325,13 +325,13 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         initAccountPage()
             .tryDeleteAccountButDiscard();
         logout()
-            .login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
+            .login(registrationUser, testParams.getPassword(), true);
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
 
         initAccountPage()
             .deleteAccount();
 
-        LoginFragment.getInstance(browser).login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, false);
+        LoginFragment.getInstance(browser).login(registrationUser, testParams.getPassword(), false);
         LoginFragment.getInstance(browser).checkInvalidLogin();
     }
 
@@ -339,7 +339,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     public void tearDown() throws ParseException, JSONException, IOException {
         if (!testParams.isClusterEnvironment() || testParams.isProductionEnvironment() ||
                 testParams.isPerformanceEnvironment()) return;
-        deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), REGISTRATION_USER);
+        deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), registrationUser);
     }
 
     private void openProject(String projectName) {

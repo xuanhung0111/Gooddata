@@ -38,13 +38,9 @@ import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
-import com.gooddata.qa.utils.mail.ImapClient;
 import com.google.common.base.Predicate;
 
 public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
-
-    private static final String INVITATION_USER = "gd.accregister@gmail.com";
-    private static final String INVITATION_USER_PASSWORD = "changeit";
 
     private static final By INVITATION_PAGE_LOCATOR = By.cssSelector(".s-invitationPage");
 
@@ -65,40 +61,35 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
             + "\nYou have successfully joined the project. Please log in below.";
 
     private RegistrationForm registrationForm;
-    private ImapClient imapClient;
+    private String invitationUser;
 
     @BeforeClass(alwaysRun = true)
-    public void setProjectTitle() {
-        projectTitle = "Invite-non-register-user-to-project-test";
-    }
-
-    @Test(dependsOnGroups = "createProject")
     public void initData() {
-        String registrationString = String.valueOf(System.currentTimeMillis());
-
         imapHost = testParams.loadProperty("imap.host");
-        imapUser = INVITATION_USER;
-        imapPassword = INVITATION_USER_PASSWORD;
+        imapUser = testParams.loadProperty("imap.user");
+        imapPassword = testParams.loadProperty("imap.password");
 
-        imapClient = new ImapClient(imapHost, imapUser, imapPassword);
+        invitationUser = generateEmail(imapUser);
+        String registrationString = String.valueOf(System.currentTimeMillis());
 
         registrationForm = new RegistrationForm()
                 .withFirstName("FirstName " + registrationString)
                 .withLastName("LastName " + registrationString)
-                .withEmail(INVITATION_USER)
-                .withPassword(INVITATION_USER_PASSWORD)
+                .withEmail(invitationUser)
+                .withPassword(testParams.getPassword())
                 .withPhone(registrationString)
                 .withCompany("Company " + registrationString)
                 .withJobTitle("Title " + registrationString)
                 .withIndustry("Government");
     }
 
-    @Test(dependsOnMethods = "initData")
+    @Test(dependsOnGroups = {"createProject"})
     public void confirmInvitationRegistrationForm() throws MessagingException, IOException, JSONException {
-        deleteUserIfExist(testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient(), INVITATION_USER);
+        deleteUserIfExist(testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient(), invitationUser);
 
-        String invitationLink = initProjectsAndUsersPage().inviteUsersWithBlankMessage(imapClient,
-                projectTitle + " Invitation", UserRoles.EDITOR, INVITATION_USER);
+        String invitationLink = doActionWithImapClient(imapClient ->
+                initProjectsAndUsersPage().inviteUsersWithBlankMessage(imapClient, projectTitle + " Invitation",
+                        UserRoles.EDITOR, invitationUser));
         checkGreenBar(browser, INVITATION_SUCCESS_MESSAGE);
 
         logout();
@@ -133,16 +124,16 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
         softAssert.assertAll();
 
         invitationPage
-                .enterPassword(INVITATION_USER_PASSWORD)
+                .enterPassword(testParams.getPassword())
                 .submitForm();
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
         assertThat(browser.getCurrentUrl(), containsString(testParams.getProjectId()));
     }
 
-    @Test(dependsOnMethods = "initData")
+    @Test(dependsOnGroups = {"createProject"})
     public void inviteUnverifiedUserToProject()
             throws ParseException, JSONException, IOException, MessagingException {
-        deleteUserIfExist(testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient(), INVITATION_USER);
+        deleteUserIfExist(testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient(), invitationUser);
 
         initRegistrationPage()
             .registerNewUserSuccessfully(registrationForm);
@@ -154,18 +145,19 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
         logout();
         signIn(false, UserRoles.ADMIN);
 
-        String invitationLink = initProjectsAndUsersPage().inviteUsersWithBlankMessage(imapClient,
-                projectTitle + " Invitation", UserRoles.EDITOR, INVITATION_USER);
+        String invitationLink = doActionWithImapClient(imapClient ->
+                initProjectsAndUsersPage().inviteUsersWithBlankMessage(imapClient, projectTitle + " Invitation",
+                        UserRoles.EDITOR, invitationUser));
         checkGreenBar(browser, INVITATION_SUCCESS_MESSAGE);
 
         logout();
         openUrl(invitationLink);
         assertEquals(LoginFragment.getInstance(browser).getNotificationMessage(), JOINED_PROJECT_SUCCESS_MESSAGE);
 
-        LoginFragment.getInstance(browser).login(INVITATION_USER, INVITATION_USER_PASSWORD, true);
+        LoginFragment.getInstance(browser).login(invitationUser, testParams.getPassword(), true);
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
 
-        RestApiClient restApiClientInvitedUser = getRestApiClient(INVITATION_USER, INVITATION_USER_PASSWORD);
+        RestApiClient restApiClientInvitedUser = getRestApiClient(invitationUser, testParams.getPassword());
         UserProfilePage userProfilePage = openUserProfileInProject(restApiClientInvitedUser,
                 testParams.getProjectId());
         assertEquals(userProfilePage.getUserRole(), UserRoles.EDITOR.getName());
@@ -173,7 +165,7 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
 
     @AfterClass(alwaysRun = true)
     public void tearDown() throws ParseException, JSONException, IOException {
-        deleteUserIfExist(testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient(), INVITATION_USER);
+        deleteUserIfExist(testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient(), invitationUser);
     }
 
     private UserProfilePage openUserProfileInProject(RestApiClient restApiClient, String projectId)
