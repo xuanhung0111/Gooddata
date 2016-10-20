@@ -1,22 +1,25 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.md.Restriction.title;
+import static  com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static  com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_LOST_OPPS;
 import static  com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_OPP_FIRST_SNAPSHOT ;
-import static  com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
-import static  com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createInsight;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteWidgetsUsingCascade;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getInsightUri;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getInsightWidgetTitles;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
+
 import java.io.IOException;
 
 import org.apache.http.ParseException;
@@ -32,6 +35,7 @@ import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.ObjectTypes;
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.ConfigurationPanel;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
@@ -290,6 +294,25 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
                     .contains(insight), "The expected insight has not been deleted");
         } finally {
             deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), widgetUri);
+        }
+    }
+
+    @Test(dependsOnGroups = {"dashboardsInit"},
+            description = "CL-10356: List date should not open when selecting Insights")
+    public void collapseDateDatasetWhenEditing() throws JSONException, IOException {
+        String insight = "Insight-Created-From-Fact";
+        initAnalysePage().addMetric(FACT_AMOUNT, FieldType.FACT).waitForReportComputing().saveInsight(insight);
+
+        try {
+            initIndigoDashboardsPageWithWidgets().switchToEditMode().addInsight(insight).waitForWidgetsLoading()
+                    .getConfigurationPanel().selectDateDataSetByName(DATE_CREATED);
+            indigoDashboardsPage.saveEditModeWithWidgets().switchToEditMode().selectLastWidget(Insight.class);
+
+            assertTrue(indigoDashboardsPage.getConfigurationPanel().isDateDatasetSelectCollapsed(),
+                    "Date dataset is not collapsed");
+        } finally {
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(),
+                    getInsightUri(insight, getRestApiClient(), testParams.getProjectId()));
         }
     }
 

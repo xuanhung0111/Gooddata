@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.stream.Collectors.toList;
 
@@ -61,6 +62,11 @@ public class DateDimensionSelect extends AbstractReactDropDown {
         return dateDimensionGroups;
     }
 
+    public boolean isScrollable() {
+        return isElementPresent(By.cssSelector(".configuration-dropdown.dataSets-list .public_Scrollbar_face"),
+                browser);
+    }
+
     @Override
     protected String getDropdownCssSelector() {
         return ".overlay.dropdown-body";
@@ -68,7 +74,7 @@ public class DateDimensionSelect extends AbstractReactDropDown {
 
     @Override
     protected boolean isDropdownOpen() {
-        return getDropdownButton().getAttribute("class").contains("s-expanded");
+        return getDropdownButton().getAttribute("class").contains("is-dropdown-open");
     }
 
     @Override

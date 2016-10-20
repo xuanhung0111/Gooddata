@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_OPP_FIRST_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
@@ -18,6 +19,8 @@ import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.ConfigurationPanel;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
@@ -74,5 +77,23 @@ public class DataSetTest extends GoodSalesAbstractDashboardTest {
         assertEquals(selectedDateDataSet, DATE_CLOSED);
 
         takeScreenshot(browser, "checkDateDataSetConfigured-dateClosed", getClass());
+    }
+
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"},
+            description = "CL-10355: No data available when adding/deleting many kpi")
+    public void renderDateDatasetAfterAddingMultipleKPIs() {
+        initIndigoDashboardsPageWithWidgets().switchToEditMode().addKpi(
+                new KpiConfiguration.Builder().metric(METRIC_OPP_FIRST_SNAPSHOT).dataSet(DATE_SNAPSHOT).build())
+                .waitForWidgetsLoading();
+
+        indigoDashboardsPage.addKpi(
+                new KpiConfiguration.Builder().metric(METRIC_NUMBER_OF_ACTIVITIES).dataSet(DATE_CREATED).build())
+                .waitForWidgetsLoading().saveEditModeWithWidgets();
+
+        indigoDashboardsPage.switchToEditMode().selectWidgetByHeadline(Kpi.class, METRIC_NUMBER_OF_ACTIVITIES);
+        DateDimensionSelect dropDown = indigoDashboardsPage.getConfigurationPanel().openDateDataset();
+        takeScreenshot(browser, "Dataset-After-Adding-Multiple-KPIs", getClass());
+        assertTrue(isEqualCollection(dropDown.getValues(), asList(DATE_CREATED, DATE_ACTIVITY)),
+                "Date dataset renders well");
     }
 }

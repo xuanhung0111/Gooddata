@@ -318,6 +318,17 @@ public class IndigoRestUtils {
     }
 
     /**
+     * Get all insight uris
+     * 
+     * @param restApiClient
+     * @param projectId
+     * @return
+     */
+    public static List<String> getInsightUris(final RestApiClient restApiClient, final String projectId) {
+        return getMdObjectValues(restApiClient, projectId, "visualizations", jsonObj -> jsonObj.getString("link"));
+    }
+
+    /**
      * get all insight widget titles
      *
      * @param restApiClient
