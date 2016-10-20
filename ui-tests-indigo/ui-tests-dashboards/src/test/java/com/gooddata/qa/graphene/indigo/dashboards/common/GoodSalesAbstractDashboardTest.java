@@ -25,6 +25,7 @@ public abstract class GoodSalesAbstractDashboardTest extends AbstractDashboardTe
     protected static final String DATE_CLOSED = "Closed";
     protected static final String DATE_ACTIVITY = "Activity";
     protected static final String DATE_SNAPSHOT = "Snapshot";
+    protected static final String DATE_TIMELINE = "Timeline";
 
     @BeforeClass(alwaysRun = true)
     protected void initProperties() {

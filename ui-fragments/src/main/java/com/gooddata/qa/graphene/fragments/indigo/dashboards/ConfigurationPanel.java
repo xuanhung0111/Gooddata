@@ -10,6 +10,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
 import com.google.common.base.Predicate;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -28,7 +29,7 @@ public class ConfigurationPanel extends AbstractFragment {
     private WebElement dataSetSelectLoaded;
 
     @FindBy(css = ".s-dataSet_select,.s-viz-filter-date-dropdown")
-    private DataSetSelect dateDataSetSelect;
+    private DateDimensionSelect dateDataSetSelect;
 
     @FindBy(className = "s-compare_with_select")
     private ComparisonSelect comparisonSelect;
@@ -148,5 +149,15 @@ public class ConfigurationPanel extends AbstractFragment {
 
     public boolean isDateFilterCheckboxEnabled() {
         return waitForElementVisible(dateFilterCheckbox).isEnabled();
+    }
+
+    public DateDimensionSelect openDateDataset() {
+        waitForFragmentVisible(dateDataSetSelect).ensureDropdownOpen();
+
+        return dateDataSetSelect;
+    }
+
+    public boolean isDateDatasetSelectCollapsed() {
+        return dateDataSetSelect.getDropdownButton().getAttribute("class").contains("s-collapsed");
     }
 }

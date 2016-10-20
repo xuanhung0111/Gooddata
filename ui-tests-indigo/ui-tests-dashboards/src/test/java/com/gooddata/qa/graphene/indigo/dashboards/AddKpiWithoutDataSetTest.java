@@ -21,7 +21,7 @@ public class AddKpiWithoutDataSetTest extends AbstractDashboardTest {
 
     private static final String METRIC_CONNECT_WITH_DATA_SET = "Connected";
     private static final String METRIC_NOT_CONNECT_WITH_DATA_SET = "NotConnected";
-    private static final String DATA_SET = "templ:minimalistic";
+    private static final String DATA_SET = "templ:Minimalistic";
 
     @BeforeClass
     public void initProperties() {
