@@ -17,6 +17,9 @@ import com.gooddata.project.ProjectService;
 import com.gooddata.project.ProjectValidationResults;
 import org.apache.http.HttpHost;
 import org.apache.http.ParseException;
+import org.apache.http.NoHttpResponseException;
+import org.apache.http.client.HttpRequestRetryHandler;
+import org.apache.http.protocol.HttpContext;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.testng.Arquillian;
 import org.json.JSONException;
@@ -29,6 +32,7 @@ import org.testng.annotations.Listeners;
 import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.common.TestParameters;
+import com.gooddata.qa.graphene.utils.Sleeper;
 import com.gooddata.qa.utils.ads.AdsHelper;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.testng.listener.AuxiliaryFailureScreenshotListener;
@@ -187,5 +191,32 @@ public abstract class AbstractTest extends Arquillian {
         final ProjectValidationResults results = service.validateProject(project).get(timeout, TimeUnit.SECONDS);
         System.out.println("Project valid: " + results.isValid());
         return results;
+    }
+
+    /**
+     * Create {@link com.gooddata.qa.utils.http.RestApiClient} for admin user.
+     * The request will be resent if the exception is handled
+     * 
+     * @param maximumTries
+     * @return {@link com.gooddata.qa.utils.http.RestApiClient} client for admin user
+     */
+    public RestApiClient getRepeatableRestApiClient(int maximumTries) {
+        return new RestApiClient(testParams.getHost(), testParams.getUser(), testParams.getPassword(), true, false,
+                new HttpRequestRetryHandler() {
+                    @Override
+                    public boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
+                        if (executionCount > maximumTries) {
+                            return false;
+                        }
+
+                        if (exception instanceof NoHttpResponseException) {
+                            log.info("Catch NoHttpResponseException: retry count = " + executionCount);
+                            Sleeper.sleepTightInSeconds(2);
+                            return true;
+                        }
+
+                        return false;
+                    }
+                });
     }
 }
