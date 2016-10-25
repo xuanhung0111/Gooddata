@@ -60,6 +60,14 @@ public class ConfigurationPanel extends AbstractFragment {
         return filterByAttributeFilters;
     }
 
+    public FilterByItem getFilterByAttributeFilter(String filterTitle) {
+        return getFilterByAttributeFilters()
+                .stream()
+                .filter(filter -> filter.getTitle().equalsIgnoreCase(filterTitle))
+                .findFirst()
+                .get();
+    }
+
     public FilterByItem getFilterByDateFilter() {
         return filterByDateFilter;
     }
