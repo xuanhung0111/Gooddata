@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.reports;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.stream.Collectors.toList;
@@ -21,11 +22,19 @@ import com.gooddata.qa.graphene.utils.WaitUtils;
 
 public class ChartReport extends AbstractFragment {
 
+    public static final String LEGEND_ITEM = ".viz-legend .series .series-item";
+    public static final String LEGEND_ITEM_NAME = LEGEND_ITEM + " .series-name";
+    public static final String LEGEND_ITEM_ICON = LEGEND_ITEM + " .series-icon";
+    private static final String LEGEND_COLOR_ATTRIBUTE = "style";
+
     @FindBy(css = ".highcharts-series *")
     private List<WebElement> trackers;
 
-    @FindBy(className = "highcharts-legend-item")
-    private List<WebElement> legends;
+    @FindBy(css = LEGEND_ITEM_ICON)
+    private List<WebElement> legendIcons;
+
+    @FindBy(css = LEGEND_ITEM_NAME)
+    private List<WebElement> legendNames;
 
     @FindBy(css = "div.highcharts-tooltip")
     private WebElement tooltip;
@@ -68,31 +77,27 @@ public class ChartReport extends AbstractFragment {
     }
 
     public boolean isLegendVisible() {
-        return !legends.isEmpty();
+        return !legendNames.isEmpty();
     }
 
     public boolean areLegendsHorizontal() {
-        List<String[]> values = getTransformValueFormLegend();
-        final String y = values.get(0)[1];
-
-        return values.stream().allMatch(input -> y.equals(input[1]));
+        return isElementVisible(By.cssSelector(".viz-legend.position-top"), browser);
     }
 
     public boolean areLegendsVertical() {
-        List<String[]> values = getTransformValueFormLegend();
-        final String x = values.get(0)[0];
-
-        return values.stream().allMatch(input -> x.equals(input[0]));
+        return isElementVisible(By.cssSelector(".viz-legend.position-right"), browser);
     }
 
     public List<String> getLegends() {
-        return getElementTexts(waitForCollectionIsNotEmpty(legends), e -> e.findElement(By.cssSelector("tspan")));
+        return waitForCollectionIsNotEmpty(legendNames).stream()
+            .map(e -> e.getText())
+            .collect(toList());
     }
 
     public List<String> getLegendColors() {
-        return waitForCollectionIsNotEmpty(legends).stream()
-            .map(e -> e.findElement(By.tagName("rect")))
-            .map(e -> e.getCssValue("fill"))
+        return waitForCollectionIsNotEmpty(legendIcons).stream()
+            .map(e -> e.getAttribute(LEGEND_COLOR_ATTRIBUTE))
+            .map(e -> e.replaceAll(".*background-color: (.*);.*", "$1").replace(" ", ""))
             .collect(toList());
     }
 
@@ -114,15 +119,6 @@ public class ChartReport extends AbstractFragment {
                 .map(e -> e.replace("s-visualization-", ""))
                 .findFirst()
                 .get();
-    }
-
-    private List<String[]> getTransformValueFormLegend() {
-        return waitForCollectionIsNotEmpty(legends).stream()
-            .map(e -> e.getAttribute("transform"))
-            .map(e -> e.replace("translate(", ""))
-            .map(e -> e.replace(")", ""))
-            .map(e -> e.split(","))
-            .collect(toList());
     }
 
     private void checkIndex(int index) {
