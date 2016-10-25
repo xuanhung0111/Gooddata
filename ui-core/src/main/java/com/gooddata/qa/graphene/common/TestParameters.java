@@ -44,8 +44,6 @@ public class TestParameters {
         host = loadProperty("host");
         user = loadProperty("user");
         password = loadProperty("password");
-        editorUser = loadProperty("editorUser");
-        viewerUser = loadProperty("viewerUser");
         projectDriver = lookup(loadProperty("project.dwhDriver"), ProjectDriver.class, ProjectDriver.POSTGRES, "getValue");
         authorizationToken = loadProperty("project.authorizationToken");
         authorizationToken2 = loadProperty("project.authorizationToken2");

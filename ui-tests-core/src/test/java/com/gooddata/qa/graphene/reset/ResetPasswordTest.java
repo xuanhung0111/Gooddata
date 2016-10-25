@@ -7,6 +7,8 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static com.gooddata.qa.graphene.fragments.account.LostPasswordPage.PASSWORD_HINT;
+import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.updateUserPassword;
+import static com.gooddata.qa.utils.http.project.ProjectRestUtils.createBlankProject;
 
 import java.io.IOException;
 import java.util.List;
@@ -16,15 +18,15 @@ import javax.mail.MessagingException;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
+import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.AbstractUITest;
 import com.gooddata.qa.graphene.fragments.account.LostPasswordPage;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
-import com.gooddata.qa.utils.mail.ImapClient;
 
 public class ResetPasswordTest extends AbstractUITest {
 
@@ -54,24 +56,25 @@ public class ResetPasswordTest extends AbstractUITest {
     private static final String INVALID_EMAIL = "johndoe@yahoocom";
     private static final String NON_REGISTERED_EMAIL = "gooddata@mailinator.com";
 
-    private String user;
-    private String oldPassword;
+    private String testUser;
 
-    private ImapClient imapClient;
-
-    @Test
-    public void init() {
-        user = testParams.getUser();
-        oldPassword = testParams.getPassword();
-
+    @BeforeClass(alwaysRun = true)
+    public void initImapUser() {
         imapHost = testParams.loadProperty("imap.host");
         imapUser = testParams.loadProperty("imap.user");
         imapPassword = testParams.loadProperty("imap.password");
-
-        imapClient = new ImapClient(imapHost, imapUser, imapPassword);
     }
 
-    @Test(dependsOnMethods = {"init"})
+    @Test
+    public void prepareUserForTest() throws ParseException, JSONException, IOException {
+        testUser = createDynamicUserFrom(imapUser);
+
+        GoodData goodDataClient = getGoodDataClient(testUser, testParams.getPassword());
+        testParams.setProjectId(createBlankProject(goodDataClient, "Reset-password-test",
+                testParams.getAuthorizationToken(), testParams.getProjectDriver(), testParams.getProjectEnvironment()));
+    }
+
+    @Test(dependsOnMethods = {"prepareUserForTest"})
     public void resetPasswordWithInvalidEmail() {
         assertEquals(initLostPasswordPage()
             .resetPassword(INVALID_EMAIL, false)
@@ -89,9 +92,10 @@ public class ResetPasswordTest extends AbstractUITest {
 
     @Test(dependsOnMethods = {"resetPasswordWithInvalidEmail"})
     public void resetWithValidAndInvalidPassword() throws MessagingException, IOException, JSONException {
-        String resetPasswordLink = LoginFragment.getInstance(browser)
-                .openLostPasswordPage()
-                .resetPassword(imapClient, user);
+        String resetPasswordLink = doActionWithImapClient(imapClient ->
+                LoginFragment.getInstance(browser)
+                        .openLostPasswordPage()
+                        .resetPassword(imapClient, testUser));
         assertEquals(LostPasswordPage.getPageLocalMessage(browser), PASSWORD_PAGE_LOCAL_MESSAGE);
 
         openUrl(resetPasswordLink);
@@ -111,21 +115,14 @@ public class ResetPasswordTest extends AbstractUITest {
         softAssert.assertAll();
 
         try {
-            testParams.setPassword(NEW_PASSWORD);
-
             resetPasswordPage.setNewPassword(NEW_PASSWORD);
             assertEquals(LoginFragment.getInstance(browser).getNotificationMessage(), RESET_PASSWORD_SUCCESS_MESSAGE);
 
-            LoginFragment.getInstance(browser).login(user, NEW_PASSWORD, true);
+            LoginFragment.getInstance(browser).login(testUser, NEW_PASSWORD, true);
             waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
 
-        } catch(Exception e) {
-            takeScreenshot(browser, "Fail to reset password", this.getClass());
-            throw e;
-
         } finally {
-            UserManagementRestUtils.updateCurrentUserPassword(getRestApiClient(), NEW_PASSWORD, oldPassword);
-            testParams.setPassword(oldPassword);
+            updateUserPassword(getRestApiClient(), testParams.getUserDomain(), testUser, NEW_PASSWORD, testParams.getPassword());
         }
     }
 
@@ -146,7 +143,7 @@ public class ResetPasswordTest extends AbstractUITest {
     @Test(dependsOnMethods = { "openOneProject" }, enabled = false)
     public void checkSectionManagementVulnerability() throws ParseException, JSONException, IOException {
         initDashboardsPage();
-        UserManagementRestUtils.updateCurrentUserPassword(getRestApiClient(), oldPassword, NEW_PASSWORD);
+        updateUserPassword(getRestApiClient(), testParams.getUserDomain(), testUser, testParams.getPassword(), NEW_PASSWORD);
 
         try {
             sleepTightInSeconds(600);
@@ -155,21 +152,8 @@ public class ResetPasswordTest extends AbstractUITest {
             LoginFragment.waitForPageLoaded(browser);
             takeScreenshot(browser, "Out of section after reset password", this.getClass());
 
-        } catch(Exception e) {
-            takeScreenshot(browser, "Login section is still kept after reset password", this.getClass());
-            throw e;
-
         } finally {
-            LoginFragment.getInstance(browser).login(user, NEW_PASSWORD, true);
-            waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
-
-            testParams.setPassword(NEW_PASSWORD);
-            UserManagementRestUtils.updateCurrentUserPassword(getRestApiClient(), NEW_PASSWORD, oldPassword);
-
-            testParams.setPassword(oldPassword);
-            logout()
-                .login(user, oldPassword, true);
-            waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
+            updateUserPassword(getRestApiClient(), testParams.getUserDomain(), testUser, NEW_PASSWORD, testParams.getPassword());
         }
     }
 }

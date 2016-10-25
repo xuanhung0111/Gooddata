@@ -245,15 +245,20 @@ public final class UserManagementRestUtils {
     }
 
     /**
-     * Update password of current user
+     * Update password of an user
      * 
      * @param restApiClient
+     * @param userDomain
+     * @param email
      * @param oldPassword
      * @param newPassword
+     * @throws ParseException
+     * @throws JSONException
+     * @throws IOException
      */
-    public static void updateCurrentUserPassword(final RestApiClient restApiClient, final String oldPassword,
-            final String newPassword) throws ParseException, JSONException, IOException {
-        final JSONObject userProfile = getCurrentUserProfile(restApiClient);
+    public static void updateUserPassword(final RestApiClient restApiClient, final String userDomain, final String email,
+            final String oldPassword, final String newPassword) throws ParseException, JSONException, IOException {
+        final JSONObject userProfile = getUserProfileByEmail(restApiClient, userDomain, email);
         final String userProfileUri = userProfile.getJSONObject("links").getString("self");
         final String content = UPDATE_USER_INFO_CONTENT_BODY.get()
                 .replace("${firstName}", userProfile.get("firstName").toString())
