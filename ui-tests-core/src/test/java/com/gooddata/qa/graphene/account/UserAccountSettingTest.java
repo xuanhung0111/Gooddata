@@ -12,26 +12,25 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.utils.http.project.ProjectRestUtils.createBlankProject;
 
-import java.util.List;
+import java.io.IOException;
 
+import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
+import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.AbstractUITest;
 import com.gooddata.qa.graphene.entity.account.PersonalInfo;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.account.AccountPage;
 import com.gooddata.qa.graphene.fragments.account.ChangePasswordDialog;
 import com.gooddata.qa.graphene.fragments.account.PersonalInfoDialog;
 import com.gooddata.qa.graphene.fragments.account.RegionalNumberFormattingDialog;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
-import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 
 public class UserAccountSettingTest extends AbstractUITest {
-
-    private static final String PROJECT_NAME = "GoodSales";
 
     private static final String NEW_PASSWORD = "Gooddata12345";
     private static final String SHORT_PASSWORD = "aaaaa";
@@ -64,80 +63,52 @@ public class UserAccountSettingTest extends AbstractUITest {
     private static final String SHOULD_NOT_EMPTY = "Should not be empty";
     private static final String INVALID_PHONE_NUMBER = "This is not a valid phone number";
 
-    private static final String NEW_INFO_STRING = String.valueOf(System.currentTimeMillis());
-
-    private String oldPassword;
-    private String user;
-
     private PersonalInfo personalInfo;
-    private PersonalInfo personalInfoOrigin;
+
+    private String accountSettingUser;
 
     @Test
-    public void initLoginAndData() throws JSONException {
-        signIn(false, UserRoles.ADMIN);
+    public void prepareDataForTest() throws ParseException, JSONException, IOException {
+        accountSettingUser = createDynamicUserFrom(testParams.getUser());
 
-        user = testParams.getUser();
-        oldPassword = testParams.getPassword();
+        GoodData goodDataClient = getGoodDataClient(accountSettingUser, testParams.getPassword());
+        testParams.setProjectId(createBlankProject(goodDataClient, "Account-setting-test",
+                testParams.getAuthorizationToken(), testParams.getProjectDriver(), testParams.getProjectEnvironment()));
 
+        signInAtGreyPages(accountSettingUser, testParams.getPassword());
+
+        String newInfoString = String.valueOf(System.currentTimeMillis());
         personalInfo = new PersonalInfo()
-                .withEmail(testParams.getUser())
-                .withFirstName("Firstname " + NEW_INFO_STRING)
-                .withLastName("Lastname " + NEW_INFO_STRING)
-                .withCompany("Company " + NEW_INFO_STRING)
-                .withPhoneNumber(NEW_INFO_STRING);
+                .withEmail(accountSettingUser)
+                .withFirstName("Firstname " + newInfoString)
+                .withLastName("Lastname " + newInfoString)
+                .withCompany("Company " + newInfoString)
+                .withPhoneNumber(newInfoString);
     }
 
-    @Test(dependsOnMethods = {"initLoginAndData"})
-    public void openOneProject() {
-        List<String> projectIds = initProjectsPage().getProjectsIds(PROJECT_NAME);
-        assertFalse(projectIds.isEmpty(), "Project Ids are empty");
-
-        ProjectsPage.getInstance(browser).goToProject(projectIds.get(0));
-        waitForDashboardPageLoaded(browser);
-
-        testParams.setProjectId(projectIds.get(0));
-    }
-
-    @Test(dependsOnMethods = {"openOneProject"})
-    public void getUserInformation() {
-        PersonalInfoDialog personalInfoDialog = initAccountPage().openPersonalInfoDialog();
-        personalInfoOrigin = personalInfoDialog.getUserInfo();
-    }
-
-    @Test(dependsOnMethods = { "getUserInformation" })
+    @Test(dependsOnMethods = { "prepareDataForTest" })
     public void editUserInformation() {
-        try {
-            PersonalInfoDialog personalInfoDialog = initAccountPage().openPersonalInfoDialog();
-            assertFalse(personalInfoDialog.isEmailInputFieldEditable());
+        PersonalInfoDialog personalInfoDialog = initAccountPage().openPersonalInfoDialog();
+        assertFalse(personalInfoDialog.isEmailInputFieldEditable());
 
-            personalInfoDialog.fillInfoFrom(personalInfo);
-            assertEquals(personalInfoDialog.getUserInfo(), personalInfo);
+        PersonalInfo personalInfoOrigin = personalInfoDialog.getUserInfo();
+        personalInfoDialog.fillInfoFrom(personalInfo);
+        assertEquals(personalInfoDialog.getUserInfo(), personalInfo);
 
-            personalInfoDialog.discardChange();
-            AccountPage.getInstance(browser).openPersonalInfoDialog();
-            assertEquals(personalInfoDialog.getUserInfo(), personalInfoOrigin);
+        personalInfoDialog.discardChange();
+        AccountPage.getInstance(browser).openPersonalInfoDialog();
+        assertEquals(personalInfoDialog.getUserInfo(), personalInfoOrigin);
 
-            personalInfoDialog.fillInfoFrom(personalInfo)
-                    .saveChange();
-            checkGreenBar(browser, format(SUCCESS_MESSAGE, "account", " information"));
+        personalInfoDialog.fillInfoFrom(personalInfo)
+                .saveChange();
+        checkGreenBar(browser, format(SUCCESS_MESSAGE, "account", " information"));
 
-            refreshAccountPage()
-                .openPersonalInfoDialog();
-            assertEquals(personalInfoDialog.getUserInfo(), personalInfo);
-
-        } catch(Exception e) {
-            takeScreenshot(browser, "Fail to edit user information", this.getClass());
-            throw e;
-
-        } finally {
-            PersonalInfoDialog personalInformationDialog = initAccountPage().openPersonalInfoDialog();
-            personalInformationDialog.fillInfoFrom(personalInfoOrigin)
-                    .saveChange();
-            checkGreenBar(browser, format(SUCCESS_MESSAGE, "account", " information"));
-        }
+        refreshAccountPage()
+            .openPersonalInfoDialog();
+        assertEquals(personalInfoDialog.getUserInfo(), personalInfo);
     }
 
-    @Test(dependsOnMethods = { "getUserInformation" })
+    @Test(dependsOnMethods = { "prepareDataForTest" })
     public void editUserInformationWithEmptyData() {
         PersonalInfoDialog personalInfoDialog = initAccountPage().openPersonalInfoDialog();
         assertFalse(personalInfoDialog.isEmailInputFieldEditable());
@@ -150,29 +121,29 @@ public class UserAccountSettingTest extends AbstractUITest {
         assertThat(personalInfoDialog.getPhoneNumberErrorMessage(), equalTo(INVALID_PHONE_NUMBER));
     }
 
-    @Test(dependsOnMethods = { "openOneProject" })
+    @Test(dependsOnMethods = {"prepareDataForTest"})
     public void editUserPassword() throws JSONException {
         try {
             ChangePasswordDialog changePasswordDialog = initAccountPage().openChangePasswordDialog();
-            changePasswordDialog.enterOldPassword(oldPassword).enterNewPassword(NEW_PASSWORD)
+            changePasswordDialog.enterOldPassword(testParams.getPassword()).enterNewPassword(NEW_PASSWORD)
                     .enterConfirmPassword(NEW_PASSWORD);
             assertTrue(changePasswordDialog.areAllInputsFilled());
 
             changePasswordDialog.discardChange();
             logout()
-                .login(user, NEW_PASSWORD, false);
+                .login(accountSettingUser, NEW_PASSWORD, false);
             LoginFragment.getInstance(browser).checkInvalidLogin();
 
-            LoginFragment.getInstance(browser).login(user, oldPassword, true);
+            LoginFragment.getInstance(browser).login(accountSettingUser, testParams.getPassword(), true);
             waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
 
-            changePassword(oldPassword, NEW_PASSWORD);
+            changePassword(testParams.getPassword(), NEW_PASSWORD);
 
             logout()
-                .login(user, oldPassword, false);
+                .login(accountSettingUser, testParams.getPassword(), false);
             LoginFragment.getInstance(browser).checkInvalidLogin();
 
-            LoginFragment.getInstance(browser).login(user, NEW_PASSWORD, true);
+            LoginFragment.getInstance(browser).login(accountSettingUser, NEW_PASSWORD, true);
             waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
 
         } catch(Exception e) {
@@ -180,11 +151,11 @@ public class UserAccountSettingTest extends AbstractUITest {
             throw e;
 
         } finally {
-            changePassword(NEW_PASSWORD, oldPassword);
+            changePassword(NEW_PASSWORD, testParams.getPassword());
         }
     }
 
-    @Test(dependsOnMethods = { "openOneProject" })
+    @Test(dependsOnMethods = {"prepareDataForTest"})
     public void editUserPasswordWithInvalidValue() {
         final SoftAssert softAssert = new SoftAssert();
 
@@ -193,7 +164,7 @@ public class UserAccountSettingTest extends AbstractUITest {
                 .saveChange();
         softAssert.assertEquals(changePasswordDialog.getErrorMessage(), SHORT_PASSWORD_ERROR_MESSAGE);
 
-        changePasswordDialog.enterOldPassword(oldPassword)
+        changePasswordDialog.enterOldPassword(testParams.getPassword())
                 .enterNewPassword(SHORT_PASSWORD)
                 .saveChange();
         softAssert.assertEquals(changePasswordDialog.getErrorMessage(), SHORT_PASSWORD_ERROR_MESSAGE);
@@ -201,16 +172,16 @@ public class UserAccountSettingTest extends AbstractUITest {
         changePasswordDialog.changePassword("", "");
         softAssert.assertEquals(changePasswordDialog.getErrorMessage(), FIELD_REQUIRED_ERROR_MESSAGE);
 
-        changePasswordDialog.changePassword(oldPassword, "12345678");
+        changePasswordDialog.changePassword(testParams.getPassword(), "12345678");
         softAssert.assertEquals(changePasswordDialog.getErrorMessage(), COMMONLY_PASSWORD_ERROR_MESSAGE);
 
-        changePasswordDialog.changePassword(oldPassword, "aaaaaaaa");
+        changePasswordDialog.changePassword(testParams.getPassword(), "aaaaaaaa");
         softAssert.assertEquals(changePasswordDialog.getErrorMessage(), SEQUENTIAL_PASSWORD_ERROR_MESSAGE);
 
         changePasswordDialog.changePassword(WRONG_PASSWORD, NEW_PASSWORD);
         softAssert.assertEquals(changePasswordDialog.getErrorMessage(), WRONG_PASSWORD_ERROR_MESSAGE);
 
-        changePasswordDialog.enterOldPassword(oldPassword)
+        changePasswordDialog.enterOldPassword(testParams.getPassword())
                 .enterNewPassword(NEW_PASSWORD)
                 .enterConfirmPassword("")
                 .saveChange();
@@ -218,7 +189,7 @@ public class UserAccountSettingTest extends AbstractUITest {
         softAssert.assertAll();
     }
 
-    @Test(dependsOnMethods = { "openOneProject" })
+    @Test(dependsOnMethods = {"prepareDataForTest"})
     public void editRegionalNumberFormat() {
         try {
             RegionalNumberFormattingDialog numberFormattingDialog = initAccountPage()
@@ -249,7 +220,7 @@ public class UserAccountSettingTest extends AbstractUITest {
         }
     }
 
-    @Test(dependsOnMethods = { "openOneProject" })
+    @Test(dependsOnMethods = {"prepareDataForTest"})
     public void goToActiveProjects() {
         initAccountPage()
             .openActiveProjectsPage()
