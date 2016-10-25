@@ -39,11 +39,15 @@ public class FilteringWidgetsTest extends GoodSalesAbstractDashboardTest {
     protected void prepareSetupProject() throws ParseException, JSONException, IOException {
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
                 singletonList(createAmountKpi()));
+    }
+
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "mobile"})
+    public void setupAttributeFiltersFeatureFlag() throws JSONException {
         setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.ENABLE_ATTRIBUTE_FILTERS, true);
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"setupFilters", "desktop"})
+    @Test(dependsOnMethods = {"setupAttributeFiltersFeatureFlag"}, groups = {"setupFilters", "desktop"})
     public void setupFilters() {
         initIndigoDashboardsPage()
                 .switchToEditMode()
@@ -106,6 +110,59 @@ public class FilteringWidgetsTest extends GoodSalesAbstractDashboardTest {
             List<Boolean> actualValues = getFilterByCheckValues();
 
             takeScreenshot(browser, "kpi-attribute-filter-ignore-persisted", getClass());
+            assertThat(actualValues, is(expectedAfterPersist));
+
+            indigoDashboardsPage.leaveEditMode();
+
+            //refresh page and check again the ignored attribute filters settings
+            browser.navigate().refresh();
+            initIndigoDashboardsPage()
+                    .switchToEditMode()
+                    .selectLastWidget(Kpi.class);
+
+            actualValues = getFilterByCheckValues();
+
+            takeScreenshot(browser, "kpi-attribute-filter-ignore-persisted-after-refreshing-page", getClass());
+            assertThat(actualValues, is(expectedAfterPersist));
+
+            indigoDashboardsPage.leaveEditMode();
+        } finally {
+            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
+        }
+    }
+
+    @Test(dependsOnGroups = {"setupFilters"}, groups = {"desktop"})
+    public void testIgnoreAttributeFilterIsNotPersistedAfterCancelSavingDashboard() 
+            throws JSONException, IOException {
+        String kpiUri = addWidgetToWorkingDashboard(createAmountKpi());
+
+        try {
+            initIndigoDashboardsPage()
+                    .switchToEditMode()
+                    .selectLastWidget(Kpi.class);
+
+            // all checked at the beginning
+            List<Boolean> expected = Arrays.asList(new Boolean[] {true, true});
+            assertThat(getFilterByCheckValues(), is(expected));
+
+            // uncheck first filter ( = is ignored)
+            indigoDashboardsPage
+                    .getConfigurationPanel()
+                    .getFilterByAttributeFilters()
+                    .get(0)
+                    .setChecked(false);
+
+            indigoDashboardsPage.cancelEditModeWithChanges();
+
+            initIndigoDashboardsPage()
+                    .switchToEditMode()
+                    .selectLastWidget(Kpi.class);
+
+            List<Boolean> expectedAfterPersist = Arrays.asList(new Boolean[] {true, true});
+            List<Boolean> actualValues = getFilterByCheckValues();
+
+            takeScreenshot(browser, "kpi-attribute-filter-ignore-not-persisted-if-cancel-dashboard-saving",
+                    getClass());
             assertThat(actualValues, is(expectedAfterPersist));
 
             indigoDashboardsPage.leaveEditMode();

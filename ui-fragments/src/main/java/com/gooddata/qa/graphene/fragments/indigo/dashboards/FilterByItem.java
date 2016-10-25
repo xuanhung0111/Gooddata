@@ -22,7 +22,7 @@ public class FilterByItem extends AbstractFragment {
     }
 
     public FilterByItem setChecked(boolean checked) {
-        if ((this.isChecked() && checked) || !this.isChecked() && !checked) {
+        if (this.isChecked() == checked) {
             return this;
         }
 
