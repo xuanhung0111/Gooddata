@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene;
 
+import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.deleteUserByEmail;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,9 +16,12 @@ import com.gooddata.project.ProjectDriver;
 import com.gooddata.project.ProjectService;
 import com.gooddata.project.ProjectValidationResults;
 import org.apache.http.HttpHost;
+import org.apache.http.ParseException;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.testng.Arquillian;
+import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
@@ -81,6 +86,15 @@ public abstract class AbstractTest extends Arquillian {
         }
         openUrl(startPageContext.getStartPage());
         startPageContext.waitForStartPageLoaded();
+    }
+
+    @AfterClass(alwaysRun = true)
+    public void deleteUsers() throws ParseException, IOException, JSONException {
+        RestApiClient restApiClient = testParams.getDomainUser() == null ? getRestApiClient() : getDomainUserRestApiClient();
+
+        for (String user : extraUsers) {
+            deleteUserByEmail(restApiClient, testParams.getUserDomain(), user);
+        }
     }
 
     private String getUrlWithoutHash(String url) {

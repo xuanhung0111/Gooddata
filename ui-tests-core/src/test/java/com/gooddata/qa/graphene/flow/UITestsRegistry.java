@@ -228,35 +228,18 @@ public class UITestsRegistry {
         suites.put("project-and-user", new Object[] {
             CreateAndDeleteProjectTest.class,
             UserProfileInformationTest.class,
-
-            // Need use this user for test user account section include changing user info,
-            // password, reset password.
-            // This will not affect the other test when there are some failure
-            new PredefineParameterTest(UserAccountSettingTest.class)
-                .param("GRAPHENE_USER", "gd.accsetting@gmail.com")
-                .param("GRAPHENE_PASSWORD", "$CHECKLIST_SCHEDULED_EMAIL_USER_PASSWORD"),
-
-            "testng-imap-register-and-delete-user.xml",
             ProjectSwitchingTest.class,
             ManageUserTest.class,
-            "testng-imap-invite-user-basic.xml",
-            "testng-imap-invite-user-with-muf.xml",
             InviteUserInOtherDomainsTest.class,
             ExportAndImportProjectTest.class,
             PartialExportAndImportProjectTest.class,
             ValidateProjectTest.class,
-            GoodSalesMufOnUserProfileTest.class
-        });
-
-        suites.put("extended-project-and-user", new Object[] {
-            // Need use this user for test user account section include changing user info,
-            // password, reset password.
-            // This will not affect the other test when there are some failure
-            new PredefineParameterTest("testng-imap-reset-password.xml")
-                .param("GRAPHENE_USER", "gd.accsetting@gmail.com")
-                .param("GRAPHENE_PASSWORD", "$CHECKLIST_SCHEDULED_EMAIL_USER_PASSWORD")
-                .param("IMAP_USER", "gd.accsetting@gmail.com"),
-
+            GoodSalesMufOnUserProfileTest.class,
+            UserAccountSettingTest.class,
+            "testng-imap-register-and-delete-user.xml",
+            "testng-imap-invite-user-basic.xml",
+            "testng-imap-invite-user-with-muf.xml",
+            "testng-imap-reset-password.xml",
             "testng-imap-invite-non-register-user.xml"
         });
 

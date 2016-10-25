@@ -48,8 +48,8 @@ public class LoginFragment extends AbstractFragment {
         return waitForFragmentVisible(instance);
     }
 
-    public static final void waitForPageLoaded(SearchContext context) {
-        getInstance(context);
+    public static final LoginFragment waitForPageLoaded(SearchContext context) {
+        return getInstance(context);
     }
 
     public void login(String username, String password, boolean validLogin) {

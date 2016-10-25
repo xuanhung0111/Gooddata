@@ -5,7 +5,6 @@ import static com.gooddata.qa.browser.BrowserUtils.getCurrentBrowserAgent;
 import static com.gooddata.qa.browser.BrowserUtils.maximize;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.deleteUserByEmail;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -234,15 +233,6 @@ public abstract class AbstractProjectTest extends AbstractUITest {
             }
         } else {
             System.out.println("No project created -> no delete...");
-        }
-    }
-
-    @AfterClass(dependsOnMethods = {"deleteProjectTearDown"}, alwaysRun = true)
-    public void deleteUsers() throws ParseException, IOException, JSONException {
-        RestApiClient restApiClient = testParams.getDomainUser() == null ? getRestApiClient() : getDomainUserRestApiClient();
-
-        for (String user : extraUsers) {
-            deleteUserByEmail(restApiClient, testParams.getUserDomain(), user);
         }
     }
 
