@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.indigo;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -9,6 +10,7 @@ import static org.openqa.selenium.By.cssSelector;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -23,8 +25,18 @@ public class Header extends AbstractFragment {
 
     public static final By HAMBURGER_LINK = cssSelector(".hamburger-icon");
 
+    private static final By LOCATOR = By.className("gd-header");
+
     @FindBy(className = "gd-header-project-wrapper")
     private ReactProjectSwitch projectSwitch;
+
+    public static final Header getInstance(SearchContext searchContext) {
+        return Graphene.createPageFragment(Header.class, waitForElementVisible(LOCATOR, searchContext));
+    }
+
+    public static final boolean isVisible(SearchContext searchContext) {
+        return isElementVisible(LOCATOR, searchContext);
+    }
 
     public void switchProject(String projectName) {
          waitForFragmentVisible(projectSwitch)
