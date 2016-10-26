@@ -476,6 +476,11 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         ProjectRestUtils.deleteProject(getGoodDataClient(), additionalProjectId);
     }
 
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.VIEWER);
+    }
+
     private EmbeddedDashboard embedDashboardToOtherProjectDashboard(String embedCode, String projectToShare,
             String dashboardName) {
         openUrl(PAGE_UI_PROJECT_PREFIX + projectToShare + DASHBOARD_PAGE_SUFFIX);
