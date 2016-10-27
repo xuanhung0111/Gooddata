@@ -49,6 +49,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
             asList("Direct Sales", "Inside Sales", "CompuSci");
 
     private static final String PRODUCT_COMPUSCI = "CompuSci";
+    private static final String PRODUCT_EDUCATIONLY = "Educationly";
 
     private static final String SAVED_VIEW = "New saved view";
     private static final String UN_SAVED_VIEW = "* Unsaved View";
@@ -646,6 +647,45 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         takeScreenshot(browser, "Selected-saved-view-is-applied-for-all-tabs", getClass());
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_2014);
         assertEquals(saveViewWidget.getCurrentSavedView(), SAVED_VIEW);
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, description = "This test case covered for bug 'ONE-1720 Browser is"
+            + " freezing when opening GD dashboard'")
+    public void checkSingleFilterWorkCorrectlyWhenSwitchingTabs() {
+        initDashboardsPage()
+                .addNewDashboard(generateDashboard())
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_PRODUCT)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_DEPARTMENT)
+                .setParentsForFilter(ATTR_PRODUCT, ATTR_DEPARTMENT);
+
+        moveElementToRightPlace(getProductFilter().getRoot(), DashboardWidgetDirection.LEFT);
+        getProductFilter().changeSelectionToOneValue();
+        getDepartmentFilter().changeSelectionToOneValue();
+
+        dashboardsPage
+                .addNewTab(DASHBOARD_TAB)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
+
+        getProductFilter().changeSelectionToOneValue();
+        dashboardsPage
+                .openTab(0)
+                .turnSavedViewOption(true)
+                .saveDashboard();
+
+        getProductFilter().changeAttributeFilterValues(PRODUCT_EDUCATIONLY);
+        SavedViewWidget savedViewWidget = dashboardsPage.getSavedViewWidget()
+                .openSavedViewMenu()
+                .saveCurrentView(SAVED_VIEW);
+
+        dashboardsPage.openTab(1);
+        takeScreenshot(browser, "Single-filter-works-correctly-in-new-tab", getClass());
+        assertEquals(savedViewWidget.getCurrentSavedView(), SAVED_VIEW);
+        assertEquals(getProductFilter().getCurrentValue(), PRODUCT_EDUCATIONLY);
+
+        dashboardsPage.openTab(0);
+        takeScreenshot(browser, "Single-filter-works-correctly-in-old-tab", getClass());
+        assertEquals(savedViewWidget.getCurrentSavedView(), SAVED_VIEW);
+        assertEquals(getProductFilter().getCurrentValue(), PRODUCT_EDUCATIONLY);
     }
 
     private String generateDashboard() {
