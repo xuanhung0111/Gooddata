@@ -164,7 +164,14 @@ public class UITestsRegistry {
             GoodSalesPersonalObjectsInDashboardWidgetTest.class,
             GoodSalesReportWidgetOnDashboardTest.class,
             DashboardPermissionsTest.class,
-            GoodSalesEditEmbeddedDashboardTest.class
+            GoodSalesEditEmbeddedDashboardTest.class,
+            GoodSalesDefaultFilterMiscTest.class,
+            "testng-dashboard-default-filter-multiple-choice.xml",
+            "testng-dashboard-default-filter-single-choice.xml",
+            "testng-dashboard-default-filter-savedView-multiple-choice.xml",
+            "testng-dashboard-default-filter-savedView-single-choice.xml",
+            "testng-dashboard-default-filter-muf-multiple-choice.xml",
+            "testng-dashboard-default-filter-muf-single-choice.xml"
         });
 
         suites.put("dashboards-cell-limit", new Object[] {
