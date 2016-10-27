@@ -145,6 +145,10 @@ public class Kpi extends Widget {
         ConfirmDialog.getInstance(browser).submitClick();
     }
 
+    public boolean isDrillable() {
+        return isElementPresent(By.className("kpi-link"), getRoot());
+    }
+
     public static boolean isKpi(final Widget widget) {
         return widget.getRoot().getAttribute("class").contains("type-kpi");
     }

@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static org.testng.Assert.assertTrue;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
-import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
@@ -19,12 +18,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import javax.mail.Message;
 import javax.mail.MessagingException;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
@@ -42,9 +39,6 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
-import com.gooddata.qa.utils.mail.ImapClient;
-import com.gooddata.qa.utils.mail.ImapUtils;
-import com.google.common.collect.Iterables;
 
 public class KpiAlertNullValueTest extends AbstractDashboardTest {
 
@@ -181,28 +175,12 @@ public class KpiAlertNullValueTest extends AbstractDashboardTest {
 
         if (!testParams.isClusterEnvironment()) return;
 
-        try (ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword)) {
-            Document alertEmail = getAlertEmail(imapClient, GDEmails.NOREPLY, name + emailSubject);
-            assertTrue(doesEmailHaveContent(alertEmail, name + " " + emailContent),
-                    "Alert email contains invalid content");
-        }
+        Document alertEmail = getLastAlertEmailContent(GDEmails.NOREPLY, name + emailSubject);
+        assertTrue(doesAlertEmailHaveContent(alertEmail, name + " " + emailContent),
+                "Alert email contains invalid content");
     }
 
     private String generateUniqueMetricName() {
         return "sumOfNumber-" + UUID.randomUUID().toString().substring(0, 6);
-    }
-
-    private Document getAlertEmail(ImapClient imapClient, GDEmails from, String subject)
-            throws MessagingException, IOException {
-        List<Message> messages  = waitForMessages(imapClient, from, subject, 1);
-        return Jsoup.parse(ImapUtils.getEmailBody(Iterables.getLast(messages)));
-    }
-
-    private boolean doesEmailHaveContent(Document email, String content) {
-        return email.getElementsByTag("td")
-                .stream()
-                .filter(e -> e.text().contains(content))
-                .findFirst()
-                .isPresent();
     }
 }

@@ -21,6 +21,7 @@ import java.util.UUID;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
+import org.jsoup.nodes.Document;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -33,12 +34,15 @@ import com.gooddata.md.ObjNotFoundException;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.enums.GDEmails;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import com.gooddata.qa.utils.http.RestApiClient;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
 
@@ -63,7 +67,7 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
         imapPassword = testParams.loadProperty("imap.password");
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"precondition"})
     public void inviteUserToProject() throws ParseException, IOException, JSONException {
         addUserToProject(imapUser, UserRoles.ADMIN);
         logoutAndLoginAs(imapUser, imapPassword);
@@ -131,7 +135,7 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
         };
     }
 
-    @Test(dependsOnGroups = {"precondition", "dashboardsInit"}, groups = "desktop",
+    @Test(dependsOnGroups = {"precondition"}, groups = "desktop",
             dataProvider = "metricProvider")
     public void checkAlertWithSpecialMetricExpression(Metric metric, boolean checkEmail) throws JSONException, IOException {
         final String kpiName = metric.getTitle();
@@ -169,7 +173,7 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"precondition", "dashboardsInit"}, groups = "desktop")
+    @Test(dependsOnGroups = {"precondition"}, groups = "desktop")
     public void checkAlertWhenChangeMetricExpression() throws JSONException, IOException {
         String kpiName = generateUniqueName();
         String kpiUri = createKpi(kpiName, sumOfNumberMetricUri);
@@ -201,7 +205,7 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"precondition", "dashboardsInit"}, groups = "desktop")
+    @Test(dependsOnGroups = {"precondition"}, groups = "desktop")
     public void checkPlainMailSendWithAlert() throws JSONException, IOException {
         String kpiName = generateUniqueName();
         String kpiUri = createKpi(kpiName, sumOfNumberMetricUri);
@@ -248,7 +252,7 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"precondition", "dashboardsInit"}, groups = "desktop")
+    @Test(dependsOnGroups = {"precondition"}, groups = "desktop")
     public void removeKpiAfterSettingAlert() throws JSONException, IOException {
         String kpiName = generateUniqueName();
         String kpiUri = createKpi(kpiName, sumOfNumberMetricUri);
@@ -272,7 +276,7 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"precondition", "dashboardsInit"}, groups = "desktop")
+    @Test(dependsOnGroups = {"precondition"}, groups = "desktop")
     public void removeDashboardAfterSettingAlert() throws JSONException, IOException {
         String kpiName = generateUniqueName();
         String kpiUri = createKpi(kpiName, sumOfNumberMetricUri);
@@ -301,7 +305,7 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"precondition", "dashboardsInit"}, groups = "desktop")
+    @Test(dependsOnGroups = {"precondition"}, groups = "desktop")
     public void removeUserAfterSettingAlert() throws JSONException, IOException {
         String newImapUser = createDynamicUserFrom(imapUser);
         addUserToProject(newImapUser, UserRoles.ADMIN);
@@ -330,6 +334,54 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
         } finally {
             logoutAndLoginAs(imapUser, imapPassword);
             getMdService().removeObjByUri(indigoDashboardUri);
+            updateCsvDataset(DATASET_NAME, csvFilePath);
+        }
+    }
+
+    @DataProvider(name = "embeddedTypeProvider")
+    public Object[][] getEmbeddedTypeProvider() {
+        return new Object[][] {
+            {EmbeddedType.IFRAME},
+            {EmbeddedType.URL}
+        };
+    }
+
+    @Test(dependsOnGroups = {"precondition"}, dataProvider = "embeddedTypeProvider", groups = "desktop")
+    public void setAlertInEmbeddedDashboard(EmbeddedType type) throws JSONException, IOException {
+        String kpiName = generateUniqueName();
+        String kpiUri = createKpi(kpiName, sumOfNumberMetricUri);
+
+        String indigoDashboardUri = createAnalyticalDashboard(
+                getRestApiClient(), testParams.getProjectId(), singletonList(kpiUri));
+
+        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.HIDE_KPI_ALERT_LINK, true);
+
+        try {
+            initEmbeddedIndigoDashboardPageByType(type)
+                    .waitForDashboardLoad()
+                    .waitForWidgetsLoading();
+
+            setAlertForLastKpi(TRIGGERED_WHEN_DROPS_BELOW, NUMBER_VALUE);
+            updateCsvDataset(DATASET_NAME, otherCsvFilePath);
+
+            IndigoDashboardsPage indigoDashboardsPage = initEmbeddedIndigoDashboardPageByType(type)
+                    .waitForDashboardLoad()
+                    .waitForWidgetsLoading();
+
+            takeScreenshot(browser, "Kpi-alert-triggered-in-embedded-dashboard-with-" + type, getClass());
+            assertTrue(indigoDashboardsPage.getLastWidget(Kpi.class).isAlertTriggered(), "Kpi alert is not triggered");
+
+            Document alertEmail = getLastAlertEmailContent(GDEmails.NOREPLY, kpiName);
+            assertFalse(doesAlertEmailHaveContent(alertEmail, "View on dashboard"),
+                    "The link to Embedded Kpi dashboard is not disabled");
+
+        } finally {
+            getMdService().removeObjByUri(indigoDashboardUri);
+
+            ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+                    ProjectFeatureFlags.HIDE_KPI_ALERT_LINK, false);
+
             updateCsvDataset(DATASET_NAME, csvFilePath);
         }
     }

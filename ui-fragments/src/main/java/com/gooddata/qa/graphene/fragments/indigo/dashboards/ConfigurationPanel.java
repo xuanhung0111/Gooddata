@@ -1,10 +1,12 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 
 import java.util.Collection;
 
 import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -20,6 +22,8 @@ import java.util.List;
 
 public class ConfigurationPanel extends AbstractFragment {
 
+    private static final By BY_DRILL_TO_SELECT = By.className("s-drill_to_select");
+
     @FindBy(className = "s-metric_select")
     private MetricSelect metricSelect;
 
@@ -34,9 +38,6 @@ public class ConfigurationPanel extends AbstractFragment {
 
     @FindBy(className = "s-compare_with_select")
     private ComparisonSelect comparisonSelect;
-
-    @FindBy(className = "s-drill_to_select")
-    private DrillToSelect drillToSelect;
 
     @FindBy(className = "s-button-remove-drill-to")
     private WebElement removeDrillToButton;
@@ -88,12 +89,12 @@ public class ConfigurationPanel extends AbstractFragment {
     }
 
     public ConfigurationPanel selectDrillToByName(String name) {
-        waitForFragmentVisible(drillToSelect).selectByName(name);
+        getDrillToSelect().selectByName(name);
         return this;
     }
 
     public String getDrillToValue() {
-        return waitForFragmentVisible(drillToSelect).getSelection();
+        return getDrillToSelect().getSelection();
     }
 
     public ConfigurationPanel clickRemoveDrillToButton() {
@@ -169,5 +170,13 @@ public class ConfigurationPanel extends AbstractFragment {
 
     public boolean isDateDatasetSelectCollapsed() {
         return dateDataSetSelect.getDropdownButton().getAttribute("class").contains("s-collapsed");
+    }
+
+    public boolean isDrillToSelectVisible() {
+        return isElementVisible(BY_DRILL_TO_SELECT, getRoot());
+    }
+
+    private DrillToSelect getDrillToSelect() {
+        return Graphene.createPageFragment(DrillToSelect.class, waitForElementVisible(BY_DRILL_TO_SELECT, getRoot()));
     }
 }

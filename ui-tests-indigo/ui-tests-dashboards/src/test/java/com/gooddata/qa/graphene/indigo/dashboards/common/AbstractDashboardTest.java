@@ -7,12 +7,20 @@ import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createInsight;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidgetWrap;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAnalyticalDashboards;
 import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
+import static com.gooddata.qa.utils.mail.ImapUtils.getEmailBody;
+import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
+import static com.google.common.collect.Iterables.getLast;
 import static java.util.Collections.singletonList;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
+import javax.mail.Message;
+
 import org.json.JSONException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.BeforeClass;
@@ -23,6 +31,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
+import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
@@ -118,6 +127,21 @@ public abstract class AbstractDashboardTest extends AbstractProjectTest {
 
     protected String convertToUniqueHeadline(final String headline) {
         return UUID.randomUUID().toString().substring(0, 6);
+    }
+
+    protected Document getLastAlertEmailContent(GDEmails from, String subject) {
+        return doActionWithImapClient(imapClient -> {
+                List<Message> messages = waitForMessages(imapClient, GDEmails.NOREPLY, subject);
+                return Jsoup.parse(getEmailBody(getLast(messages)));
+        });
+    }
+
+    protected boolean doesAlertEmailHaveContent(Document email, String content) {
+        return email.getElementsByTag("td")
+                .stream()
+                .filter(e -> e.text().contains(content))
+                .findFirst()
+                .isPresent();
     }
 
     private void setWindowSize(final int width, final int height) {

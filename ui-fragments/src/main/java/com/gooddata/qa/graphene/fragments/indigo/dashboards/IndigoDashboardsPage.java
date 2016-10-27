@@ -385,6 +385,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return IndigoInsightSelectionPanel.getInstance(browser);
     }
 
+    public boolean isOnEditMode() {
+        return isElementPresent(By.className("edit-mode-on"), getRoot());
+    }
+
     private IndigoDashboardsPage waitForWidgetsEditable() {
         waitForElementNotPresent(By.cssSelector(".dash-item-content > div:not(.is-editable)"));
         return this;
