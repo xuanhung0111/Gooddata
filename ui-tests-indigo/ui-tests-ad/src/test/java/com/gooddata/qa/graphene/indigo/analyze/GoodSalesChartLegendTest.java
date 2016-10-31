@@ -48,7 +48,7 @@ public class GoodSalesChartLegendTest extends GoodSalesAbstractAnalyseTest {
         assertFalse(metricConfiguration.isShowPercentEnabled());
         assertFalse(metricConfiguration.isShowPercentSelected());
 
-        assertEquals(report.getLegendColors(), asList("rgb(20, 178, 226)", "rgb(0, 193, 141)"));
+        assertEquals(report.getLegendColors(), asList("rgb(20,178,226)", "rgb(0,193,141)"));
         checkingOpenAsReport("checkShowPercentAndLegendColor");
     }
 

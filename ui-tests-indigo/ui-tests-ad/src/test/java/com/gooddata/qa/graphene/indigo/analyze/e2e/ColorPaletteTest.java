@@ -6,12 +6,11 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACT
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_LOST_OPPS;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toList;
-import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
 
 import java.util.List;
 
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -46,8 +45,6 @@ public class ColorPaletteTest extends AbstractAdE2ETest {
             "rgb(239,197,194)"
     );
 
-    private static final String LEGEND_COLOR_ATTRIBUTE = "fill";
-
     @BeforeClass(alwaysRun = true)
     public void initialize() {
         projectTitle = "Color-Palette-E2E-Test";
@@ -63,14 +60,14 @@ public class ColorPaletteTest extends AbstractAdE2ETest {
             .getChartReport()
             .getLegends(), expectedLegend);
 
-        List<String> legendColors = newArrayList(COLOR_PALETTE.subList(0, expectedLegend.size()));
+        List<String> expectedLegendColors = newArrayList(COLOR_PALETTE.subList(0, expectedLegend.size()));
 
         assertEquals(analysisPage.changeReportType(ReportType.BAR_CHART)
             .waitForReportComputing()
             .getChartReport()
             .getLegends(), expectedLegend);
 
-        expectElementAttributes(".highcharts-legend-item [fill^='rgb']", LEGEND_COLOR_ATTRIBUTE, legendColors);
+        expectColors(expectedLegendColors);
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -83,14 +80,14 @@ public class ColorPaletteTest extends AbstractAdE2ETest {
             .getChartReport()
             .getLegends(), expectedLegend);
 
-        List<String> legendColors = newArrayList(COLOR_PALETTE.subList(0, expectedLegend.size()));
+        List<String> expectedLegendColors = newArrayList(COLOR_PALETTE.subList(0, expectedLegend.size()));
 
         assertEquals(analysisPage.changeReportType(ReportType.LINE_CHART)
             .waitForReportComputing()
             .getChartReport()
             .getLegends(), expectedLegend);
 
-        expectElementAttributes(".highcharts-legend-item [fill^='rgb']", LEGEND_COLOR_ATTRIBUTE, legendColors);
+        expectColors(expectedLegendColors);
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -102,19 +99,17 @@ public class ColorPaletteTest extends AbstractAdE2ETest {
             .getChartReport()
             .getLegends(), expectedLegend);
 
-        List<String> legendColors = newArrayList(COLOR_PALETTE.subList(0, expectedLegend.size()));
+        List<String> expectedLegendColors = newArrayList(COLOR_PALETTE.subList(0, expectedLegend.size()));
 
         assertEquals(analysisPage.changeReportType(ReportType.BAR_CHART)
             .waitForReportComputing()
             .getChartReport()
             .getLegends(), expectedLegend);
-        expectElementAttributes(".highcharts-legend-item [fill^='rgb']", LEGEND_COLOR_ATTRIBUTE, legendColors);
+        expectColors(expectedLegendColors);
     }
 
-    private void expectElementAttributes(String elementCssLocators, String attribute, List<String> values) {
-        assertEquals(browser.findElements(cssSelector(elementCssLocators))
-            .stream()
-            .map(e -> e.getAttribute(attribute))
-            .collect(toList()), values);
+    private void expectColors(List<String> expectedLegendColors) {
+        ChartReport chartReport = analysisPage.getChartReport();
+        assertEquals(chartReport.getLegendColors(), expectedLegendColors);
     }
 }

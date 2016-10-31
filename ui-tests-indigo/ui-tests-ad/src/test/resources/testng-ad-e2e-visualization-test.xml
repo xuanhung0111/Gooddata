@@ -1,12 +1,6 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="GD_UI_Selenium_Tests">
 
-    <test name="chart-legend" enabled="true">
-        <classes>
-            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.ChartLegendTest" />
-        </classes>
-    </test>
-
     <test name="color-palette" enabled="true">
         <classes>
             <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.ColorPaletteTest" />

@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
+import static com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport.LEGEND_ITEM_NAME;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
@@ -38,8 +39,6 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing();
 
-        assertFalse(isElementPresent(cssSelector(
-                ".adi-chart-container .highcharts-series [fill=\"rgb(172,220,254)\"]"), browser));
 
         Graphene.createPageFragment(RecommendationContainer.class,
             waitForElementVisible(RecommendationContainer.LOCATOR, browser))
@@ -47,11 +46,8 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
 
         analysisPage.waitForReportComputing();
 
-        assertThat(waitForElementVisible(cssSelector(
-                ".adi-chart-container .highcharts-legend-item tspan"), browser).getText(),
+        assertThat(waitForElementVisible(cssSelector(LEGEND_ITEM_NAME), browser).getText(),
                 containsString("# of Activities - previous year"));
-        assertTrue(isElementPresent(cssSelector(
-                ".adi-chart-container .highcharts-series [fill=\"rgb(20,178,226)\"]"), browser));
 
         assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
     }
@@ -83,17 +79,12 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
         container.<TrendingRecommendation>getRecommendation(RecommendationStep.SEE_TREND).apply();
 
         analysisPage.waitForReportComputing();
-        assertFalse(isElementPresent(cssSelector(
-                ".adi-chart-container .highcharts-series [fill=\"rgb(172,220,254)\"]"), browser));
 
         container.<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).apply();
 
         analysisPage.waitForReportComputing();
-        assertThat(waitForElementVisible(cssSelector(
-                ".adi-chart-container .highcharts-legend-item tspan"), browser).getText(),
+        assertThat(waitForElementVisible(cssSelector(LEGEND_ITEM_NAME), browser).getText(),
                 containsString(METRIC_NUMBER_OF_ACTIVITIES + " - previous year"));
-        assertTrue(isElementPresent(cssSelector(
-                ".adi-chart-container .highcharts-series [fill=\"rgb(20,178,226)\"]"), browser));
 
         assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-with-period"), browser));
     }
