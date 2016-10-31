@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -139,7 +140,7 @@ public class ProjectDetailPage extends AbstractFragment {
     }
 
     public void clickOnNewScheduleButton() {
-        waitForElementVisible(newScheduleButton).click();
+        waitForElementVisible(newScheduleButton).sendKeys(Keys.ENTER);
     }
 
     public int getNumberOfProcesses() {

@@ -23,6 +23,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.ADSTables;
 import com.gooddata.qa.graphene.AbstractMSFTest;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.warehouse.Warehouse;

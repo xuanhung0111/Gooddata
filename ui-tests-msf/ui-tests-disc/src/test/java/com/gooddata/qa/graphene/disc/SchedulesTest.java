@@ -44,7 +44,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     private static final String RESCHEDULE_FORM_MESSAGE =
             "Restart every minutes until success (or 30th consecutive failure)";
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void initProperties() {
         projectTitle = "Disc-test-schedule";
     }
@@ -883,7 +883,9 @@ public class SchedulesTest extends AbstractSchedulesTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void createScheduleWithCustomNameForRubyScript() {
+    public void createScheduleWithCustomNameForRubyScript() throws JSONException {
+        logout();
+        signInAtGreyPages(testParams.getDomainUser(), testParams.getPassword());
         try {
             openProjectDetailPage(testParams.getProjectId());
 
@@ -896,6 +898,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
             createAndAssertSchedule(scheduleBuilder);
         } finally {
             cleanProcessesInWorkingProject();
+            logoutAndLoginAs(true, UserRoles.ADMIN);
         }
     }
 
