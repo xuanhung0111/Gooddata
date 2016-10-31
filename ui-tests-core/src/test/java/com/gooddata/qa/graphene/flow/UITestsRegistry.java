@@ -78,8 +78,9 @@ import com.gooddata.qa.utils.flow.TestsRegistry;
 
 public class UITestsRegistry {
 
+    @SuppressWarnings("serial")
     public static void main(String[] args) throws Throwable {
-        Map<String, Object[]> suites = new HashMap<>();
+        Map<String, Object> suites = new HashMap<>();
 
         suites.put("basic", new Object[] {
             SimpleProjectEtlTest.class,
@@ -149,34 +150,35 @@ public class UITestsRegistry {
             GoodSalesEmbeddedReportTest.class
         });
 
-        suites.put("dashboards", new Object[] {
-            GoodSalesDashboardAllKindsFiltersTest.class,
-            GoodSalesFilterDropdownAttributeValueTest.class,
-            GoodSalesCascadingFilterTest.class,
-            GoodSalesConnectingFilterTest.class,
-            GoodSalesAdvancedConnectingFilterTest.class,
-            GoodSalesFilterGroupTest.class,
-            DashboardFilterVisualTest.class,
-            GoodSalesDashboardWidgetManipulationTest.class,
-            DashboardSavedFiltersTest.class,
-            GoodSalesKeyMetricTest.class,
-            GoodSalesEmbeddedDashboardTest.class,
-            GoodSalesPersonalObjectsInDashboardWidgetTest.class,
-            GoodSalesReportWidgetOnDashboardTest.class,
-            DashboardPermissionsTest.class,
-            GoodSalesEditEmbeddedDashboardTest.class,
-            GoodSalesDefaultFilterMiscTest.class,
-            "testng-dashboard-default-filter-multiple-choice.xml",
-            "testng-dashboard-default-filter-single-choice.xml",
-            "testng-dashboard-default-filter-savedView-multiple-choice.xml",
-            "testng-dashboard-default-filter-savedView-single-choice.xml",
-            "testng-dashboard-default-filter-muf-multiple-choice.xml",
-            "testng-dashboard-default-filter-muf-single-choice.xml"
-        });
-
-        suites.put("dashboards-cell-limit", new Object[] {
-            GoodSalesCellLimitTest.class
-        });
+        suites.put("dashboards", new HashMap<String, Object[]>() {{
+            put("phaseDashboardMainFunctions", new Object[] {
+                    GoodSalesDashboardAllKindsFiltersTest.class,
+                    GoodSalesFilterDropdownAttributeValueTest.class,
+                    GoodSalesCascadingFilterTest.class,
+                    GoodSalesConnectingFilterTest.class,
+                    GoodSalesAdvancedConnectingFilterTest.class,
+                    GoodSalesFilterGroupTest.class,
+                    DashboardFilterVisualTest.class,
+                    GoodSalesDashboardWidgetManipulationTest.class,
+                    DashboardSavedFiltersTest.class,
+                    GoodSalesKeyMetricTest.class,
+                    GoodSalesEmbeddedDashboardTest.class,
+                    GoodSalesPersonalObjectsInDashboardWidgetTest.class,
+                    GoodSalesReportWidgetOnDashboardTest.class,
+                    DashboardPermissionsTest.class,
+                    GoodSalesEditEmbeddedDashboardTest.class,
+                    GoodSalesDefaultFilterMiscTest.class,
+                    "testng-dashboard-default-filter-multiple-choice.xml",
+                    "testng-dashboard-default-filter-single-choice.xml",
+                    "testng-dashboard-default-filter-savedView-multiple-choice.xml",
+                    "testng-dashboard-default-filter-savedView-single-choice.xml",
+                    "testng-dashboard-default-filter-muf-multiple-choice.xml",
+                    "testng-dashboard-default-filter-muf-single-choice.xml"
+            });
+            put("phaseCellLimitTest", new Object[] {
+                    GoodSalesCellLimitTest.class
+            });
+        }});
 
         suites.put("manage", new Object[] {
             GoodSalesManageObjectsTest.class,
