@@ -45,6 +45,21 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
     }
 
     @Test(dependsOnMethods = {"checkDashboardWithNoAttributeFilters"}, groups = {"desktop"})
+    public void checkAttributeFilterCancellingAfterDrag() throws JSONException {
+        initIndigoDashboardsPage()
+                .switchToEditMode()
+                .dragAddAttributeFilterPlaceholder()
+                .clickDashboardBody();
+        
+        final AttributeFiltersPanel attributeFiltersPanel =
+                indigoDashboardsPage.getAttributeFiltersPanel();
+        
+        takeScreenshot(browser, "checkAttributeFilterCancellingAfterDrag", getClass());
+        
+        assertEquals(attributeFiltersPanel.getAttributeFilters().size(), 0);
+    }
+
+    @Test(dependsOnMethods = {"checkAttributeFilterCancellingAfterDrag"}, groups = {"desktop"})
     public void setupAttributeFilters() throws JSONException {
         initIndigoDashboardsPage().switchToEditMode().addAttributeFilter(ATTR_ACCOUNT).saveEditModeWithWidgets();
     }

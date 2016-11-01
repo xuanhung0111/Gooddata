@@ -84,6 +84,9 @@ public class IndigoDashboardsPage extends AbstractFragment {
     private static final String ADD_KPI_PLACEHOLDER = ".add-kpi-placeholder";
     private static final String DASHBOARD_BODY = ".dash-section";
 
+    private static final String ADD_ATTRIBUTE_FILTER_PLACEHOLDER = ".add-attribute-filter-placeholder";
+    private static final String ADD_ATTRIBUTE_FILTER_DROPZONE = ".s-last-filter-drop-position";
+
     private static final By DASHBOARD_LOADED = By.cssSelector(".is-dashboard-loaded");
     private static final By SAVE_BUTTON_ENABLED = By.cssSelector("." + SAVE_BUTTON_CLASS_NAME + ":not(.disabled)");
 
@@ -103,6 +106,11 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public ConfigurationPanel getConfigurationPanel() {
         return waitForFragmentVisible(configurationPanel);
+    }
+
+    public IndigoDashboardsPage clickDashboardBody() {
+        waitForElementPresent(cssSelector(DASHBOARD_BODY), getRoot()).click();
+        return this;
     }
 
     public IndigoDashboardsPage switchToEditMode() {
@@ -181,6 +189,8 @@ public class IndigoDashboardsPage extends AbstractFragment {
     }
 
     public IndigoDashboardsPage addAttributeFilter(String attributeTitle) {
+        dragAddAttributeFilterPlaceholder();
+        
         attributeSelect.selectByName(attributeTitle);
         return this;
     }
@@ -363,6 +373,13 @@ public class IndigoDashboardsPage extends AbstractFragment {
         // should fetch dashboard elements to avoid caching in view mode
         waitForElementVisible(cssSelector(ADD_KPI_PLACEHOLDER), getRoot());
         dragAndDropWithCustomBackend(browser, ADD_KPI_PLACEHOLDER, DASHBOARD_BODY, DropZone.LAST.getCss());
+
+        return this;
+    }
+
+    public IndigoDashboardsPage dragAddAttributeFilterPlaceholder() {
+        waitForElementVisible(cssSelector(ADD_ATTRIBUTE_FILTER_PLACEHOLDER), getRoot());
+        dragAndDropWithCustomBackend(browser, ADD_ATTRIBUTE_FILTER_PLACEHOLDER, ADD_ATTRIBUTE_FILTER_DROPZONE, ADD_ATTRIBUTE_FILTER_DROPZONE);
 
         return this;
     }
