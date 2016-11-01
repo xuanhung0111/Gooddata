@@ -15,6 +15,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -52,8 +53,15 @@ public class RestApiClient {
     private final HttpClient httpClient;
 
     public RestApiClient(String host, String user, String password, boolean useSST, boolean useApiProxy) {
+        // use DefaultHttpRequestRetryHandler.INSTANCE
+        this(host, user, password, useSST, useApiProxy, null);
+    }
+
+    public RestApiClient(String host, String user, String password, boolean useSST, boolean useApiProxy,
+            HttpRequestRetryHandler retryHandler) {
         httpHost = parseHost(host);
-        httpClient = getGooddataHttpClient(httpHost, user, password, useSST, useApiProxy);
+        // use custom HttpRequestRetryHandler
+        httpClient = getGooddataHttpClient(httpHost, user, password, useSST, useApiProxy, retryHandler);
     }
 
     public static HttpHost parseHost(String host) {
@@ -133,9 +141,10 @@ public class RestApiClient {
     }
 
     @SuppressWarnings("deprecation")
-    protected HttpClient getGooddataHttpClient(HttpHost hostGoodData, String user, String password,
-            boolean useSST, boolean useApiProxy) throws RuntimeException {
+    protected HttpClient getGooddataHttpClient(HttpHost hostGoodData, String user, String password, boolean useSST,
+            boolean useApiProxy, HttpRequestRetryHandler retryHandler) throws RuntimeException {
         final HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+        httpClientBuilder.setRetryHandler(retryHandler);
         httpClientBuilder.setHostnameVerifier(SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
         if (hostGoodData.getHostName().equals("localhost")) {
             // disable SSL certificate validation if running through Grizzly on dev machine
