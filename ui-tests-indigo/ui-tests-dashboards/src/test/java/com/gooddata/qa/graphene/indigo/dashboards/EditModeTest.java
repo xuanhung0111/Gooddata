@@ -28,8 +28,11 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoInsightSelectionPanel;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.utils.http.RestApiClient;
 
 public class EditModeTest extends GoodSalesAbstractDashboardTest {
+
+    private static final int MAXIMUM_TRIES = 2;
 
     private boolean isMobileRunning;
 
@@ -48,6 +51,12 @@ public class EditModeTest extends GoodSalesAbstractDashboardTest {
         //This test only works if insight flag is disabled
         setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
+    }
+
+    @Override
+    public RestApiClient getRestApiClient() {
+        // see https://jira.intgdc.com/browse/QA-6170
+        return getRepeatableRestApiClient(MAXIMUM_TRIES);
     }
 
     @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
