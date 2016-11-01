@@ -130,7 +130,9 @@ public class ZendeskHelper {
                 JSONObject ticketEventJson = ticketEventsJson.getJSONObject(i);
 
                 if (ticketEventJson.getInt("ticket_id") == ticketId
-                        && ticketEventJson.getLong("timestamp") > lastEventTimestamp) {
+                        && ticketEventJson.getLong("timestamp") > lastEventTimestamp
+                        // Ignore ticketEvents from automatic updates
+                        && ticketEventJson.getLong("updater_id") != -1) {
                     lastTicketEventId = ticketEventJson.getInt("id");
                     lastEventTimestamp = ticketEventJson.getLong("timestamp");
                 }
