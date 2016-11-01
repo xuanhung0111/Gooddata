@@ -17,6 +17,7 @@ import org.json.JSONException;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFiltersPanel;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.FilterByItem;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
@@ -132,7 +133,7 @@ public class FilteringWidgetsTest extends GoodSalesAbstractDashboardTest {
     }
 
     @Test(dependsOnGroups = {"setupFilters"}, groups = {"desktop"})
-    public void testIgnoreAttributeFilterIsNotPersistedAfterCancelSavingDashboard() 
+    public void testIgnoreAttributeFilterIsNotPersistedAfterCancelSavingDashboard()
             throws JSONException, IOException {
         String kpiUri = addWidgetToWorkingDashboard(createAmountKpi());
 
@@ -253,12 +254,67 @@ public class FilteringWidgetsTest extends GoodSalesAbstractDashboardTest {
 
     }
 
+    @Test(dependsOnGroups = {"setupFilters"}, groups = {"desktop"})
+    public void testAttributeFiltersForKpiCorrectlyApplied() throws JSONException, IOException {
+        String kpiUri = addWidgetToWorkingDashboard(createAmountKpi());
+        String notFiltered = "$116,625,456.54";
+        String filtered = "$80,406,324.96";
+        String DIRECT_SALES_DEPARTMENT = "Direct Sales";
+
+        try {
+            initIndigoDashboardsPageWithWidgets();
+
+            takeScreenshot(browser, "testAttributeFiltersForKpiCorrectlyApplied-valueNotFiltered", getClass());
+            assertEquals(getLastKpiValue(), notFiltered);
+
+            setFilterValues(ATTR_DEPARTMENT, DIRECT_SALES_DEPARTMENT);
+
+            takeScreenshot(browser, "testAttributeFiltersForKpiCorrectlyApplied-valueFiltered", getClass());
+            assertEquals(getLastKpiValue(), filtered);
+
+            indigoDashboardsPage
+                    .switchToEditMode()
+                    .selectLastWidget(Kpi.class);
+            setFilterByChecked(ATTR_DEPARTMENT, false);
+            indigoDashboardsPage.saveEditModeWithWidgets();
+
+            setFilterValues(ATTR_DEPARTMENT, DIRECT_SALES_DEPARTMENT);
+
+            // check value is not filtered
+            takeScreenshot(browser, "testAttributeFiltersForKpiCorrectlyApplied-valueNotFiltered-filterIgnored", getClass());
+            assertEquals(getLastKpiValue(), notFiltered);
+        } finally {
+            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
+        }
+    }
+
     private List<Boolean> getFilterByCheckValues() {
         return indigoDashboardsPage
                 .getConfigurationPanel()
                 .getFilterByAttributeFilters()
                 .stream()
-                .map(filter -> filter.isChecked())
+                .map(FilterByItem::isChecked)
                 .collect(toList());
+    }
+
+    private String getLastKpiValue() {
+        return indigoDashboardsPage
+                .getLastWidget(Kpi.class)
+                .getValue();
+    }
+
+    private void setFilterValues(String attributeName, String... values) {
+        indigoDashboardsPage
+                .getAttributeFiltersPanel()
+                .getAttributeFilter(attributeName)
+                .clearAllCheckedValues()
+                .selectByNames(values);
+    }
+
+    private void setFilterByChecked(String attributeName, boolean checked) {
+        indigoDashboardsPage
+                .getConfigurationPanel()
+                .getFilterByAttributeFilter(attributeName)
+                .setChecked(checked);
     }
 }
