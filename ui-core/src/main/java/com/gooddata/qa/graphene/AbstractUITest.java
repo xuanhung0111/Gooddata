@@ -580,6 +580,16 @@ public class AbstractUITest extends AbstractGreyPageTest {
         return ImapClientAction.Utils.doActionWithImapClient(imapHost, imapUser, imapPassword, action);
     }
 
+    public IndigoDashboardsPage initEmbeddedIndigoDashboardPageByIframe() {
+        browser.get(EMBEDDED_IFRAME_WRAPPER_URL);
+
+        waitForElementVisible(By.id("url"), browser).sendKeys(getRootUrl() + getEmbeddedIndigoDashboardPageUri());
+        waitForElementVisible(By.cssSelector("input[value='Go']"), browser).click();
+
+        browser.switchTo().frame(waitForElementVisible(BY_IFRAME, browser));
+        return IndigoDashboardsPage.getInstance(browser);
+    }
+
     protected void waitForOpeningIndigoDashboard() {
         final By loadingLabel = className(".gd-loading-equalizer");
         try {
@@ -594,16 +604,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     private IndigoDashboardsPage initEmbeddedIndigoDashboardPageByUrl() {
         openUrl(getEmbeddedIndigoDashboardPageUri());
-        return IndigoDashboardsPage.getInstance(browser);
-    }
-
-    private IndigoDashboardsPage initEmbeddedIndigoDashboardPageByIframe() {
-        browser.get(EMBEDDED_IFRAME_WRAPPER_URL);
-
-        waitForElementVisible(By.id("url"), browser).sendKeys(getRootUrl() + getEmbeddedIndigoDashboardPageUri());
-        waitForElementVisible(By.cssSelector("input[value='Go']"), browser).click();
-
-        browser.switchTo().frame(waitForElementVisible(BY_IFRAME, browser));
         return IndigoDashboardsPage.getInstance(browser);
     }
 
