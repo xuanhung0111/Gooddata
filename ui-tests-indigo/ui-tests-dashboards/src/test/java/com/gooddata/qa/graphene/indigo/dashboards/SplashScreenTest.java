@@ -5,9 +5,12 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_OUTLOOK;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForStringMissingInUrl;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteAnalyticalDashboard;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
@@ -16,8 +19,6 @@ import java.io.IOException;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
-import org.testng.ITestContext;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
@@ -38,12 +39,7 @@ public class SplashScreenTest extends GoodSalesAbstractDashboardTest {
         .drillTo(DASH_TAB_OUTLOOK)
         .build();
 
-    private boolean isMobileRunning;
-
-    @BeforeClass(alwaysRun = true)
-    public void addUsersOnDesktopExecution(ITestContext context) {
-        isMobileRunning = Boolean.parseBoolean(context.getCurrentXmlTest().getParameter("isMobileRunning"));
-    }
+    private String dashboardOnlyUser;
 
     @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "empty-state"})
     public void checkNewProjectWithoutKpisFallsToSplashScreen() {
@@ -190,7 +186,7 @@ public class SplashScreenTest extends GoodSalesAbstractDashboardTest {
         takeScreenshot(browser, "checkCreateNewKpiDashboardNotAvailableOnMobile", getClass());
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "empty-state"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "mobile", "empty-state"})
     public void checkViewerCannotCreateDashboard() throws JSONException {
         try {
             signIn(canAccessGreyPage(browser), UserRoles.VIEWER);
@@ -205,6 +201,26 @@ public class SplashScreenTest extends GoodSalesAbstractDashboardTest {
 
         } finally {
             signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
+        }
+    }
+
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "mobile"})
+    public void checkDashboardOnlyUserCannotAccessDashboard() throws JSONException {
+        logout();
+        signInAtUI(dashboardOnlyUser, testParams.getPassword());
+
+        try {
+            openUrl(getIndigoDashboardsPageUri());
+
+            // With Dashboard Only role, user cannot access to Indigo dashboard
+            // page of project and automatically directed to Projects.html page
+            waitForProjectsPageLoaded(browser);
+
+            takeScreenshot(browser, "Dashboard-only-user-cannot-access-Kpi-dashboard", getClass());
+            assertThat(browser.getCurrentUrl(), containsString("cannotAccessWorkbench"));
+
+        } finally {
+            logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
         }
     }
 
@@ -235,9 +251,8 @@ public class SplashScreenTest extends GoodSalesAbstractDashboardTest {
 
     @Override
     protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
-        if (isMobileRunning) return;
-
         createAndAddUserToProject(UserRoles.EDITOR);
         createAndAddUserToProject(UserRoles.VIEWER);
+        dashboardOnlyUser = createAndAddUserToProject(UserRoles.DASHBOARD_ONLY);
     }
 }
