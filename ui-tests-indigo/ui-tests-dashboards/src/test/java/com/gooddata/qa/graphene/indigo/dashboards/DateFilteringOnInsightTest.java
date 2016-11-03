@@ -37,6 +37,7 @@ import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.ConfigurationPanel;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.manage.DatasetDetailPage;
@@ -310,6 +311,28 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
 
             assertTrue(indigoDashboardsPage.getConfigurationPanel().isDateDataSetSelectCollapsed(),
                     "Date dataset is not collapsed");
+        } finally {
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(),
+                    getInsightUri(insight, getRestApiClient(), testParams.getProjectId()));
+        }
+    }
+
+    @Test(dependsOnGroups = {"dashboardsInit"})
+    public void addInsightUsingDateFilter() throws JSONException, IOException {
+        String insight = "Insight-Using-Date-Filter";
+        AnalysisPage page =
+                initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDateFilter().waitForReportComputing();
+        page.getFilterBuckets().changeDateDimension(DATE_CREATED);
+        page.saveInsight(insight);
+
+        try {
+            assertTrue(page.getFilterBuckets().getDateFilterText().contains(DATE_CREATED),
+                    "Date filter is not added correctly");
+
+            ConfigurationPanel panel = initIndigoDashboardsPageWithWidgets().switchToEditMode().addInsight(insight)
+                    .waitForWidgetsLoading().getConfigurationPanel();
+            assertEquals(panel.getSelectedDataSet(), DATE_CREATED, "Selected date dataset is not correct");
+            assertTrue(panel.isDateDataSetSelectCollapsed(), "Date dataset is not selected automatically");
         } finally {
             deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(),
                     getInsightUri(insight, getRestApiClient(), testParams.getProjectId()));
