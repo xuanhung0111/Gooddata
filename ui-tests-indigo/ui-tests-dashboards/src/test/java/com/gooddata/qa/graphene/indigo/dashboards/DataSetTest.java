@@ -91,7 +91,7 @@ public class DataSetTest extends GoodSalesAbstractDashboardTest {
                 .waitForWidgetsLoading().saveEditModeWithWidgets();
 
         indigoDashboardsPage.switchToEditMode().selectWidgetByHeadline(Kpi.class, METRIC_NUMBER_OF_ACTIVITIES);
-        DateDimensionSelect dropDown = indigoDashboardsPage.getConfigurationPanel().openDateDataset();
+        DateDimensionSelect dropDown = indigoDashboardsPage.getConfigurationPanel().openDateDataSet();
         takeScreenshot(browser, "Dataset-After-Adding-Multiple-KPIs", getClass());
         assertTrue(isEqualCollection(dropDown.getValues(), asList(DATE_CREATED, DATE_ACTIVITY)),
                 "Date dataset renders well");

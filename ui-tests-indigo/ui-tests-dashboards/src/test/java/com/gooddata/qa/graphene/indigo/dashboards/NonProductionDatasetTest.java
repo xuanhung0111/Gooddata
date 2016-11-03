@@ -150,7 +150,7 @@ public class NonProductionDatasetTest extends AbstractDashboardTest {
             initIndigoDashboardsPage().getSplashScreen().startEditingWidgets().addInsight(insight);
             assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), "Paydate",
                     "The only date dimension is not selected");
-            assertTrue(indigoDashboardsPage.getConfigurationPanel().isDateDatasetSelectCollapsed(),
+            assertTrue(indigoDashboardsPage.getConfigurationPanel().isDateDataSetSelectCollapsed(),
                     "The date dataset is not collapsed");
         } finally {
             deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(),
@@ -170,7 +170,7 @@ public class NonProductionDatasetTest extends AbstractDashboardTest {
 
         try {
             DateDimensionSelect dropDown = initIndigoDashboardsPage().getSplashScreen().startEditingWidgets()
-                    .addInsight(insight).getConfigurationPanel().openDateDataset();
+                    .addInsight(insight).getConfigurationPanel().openDateDataSet();
 
             assertTrue(dropDown.getValues().size() > 10, "The number of dimensions is not correct");
             assertTrue(dropDown.isScrollable(), "The scroll bar is not present");

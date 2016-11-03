@@ -67,13 +67,17 @@ public class DateDimensionSelect extends AbstractReactDropDown {
                 browser);
     }
 
+    public String getSelectionColor() {
+        return waitForElementVisible(By.tagName("span"), getDropdownButton()).getCssValue("color");
+    }
+
     @Override
     protected String getDropdownCssSelector() {
         return ".overlay.dropdown-body";
     }
 
     @Override
-    protected boolean isDropdownOpen() {
+    public boolean isDropdownOpen() {
         return getDropdownButton().getAttribute("class").contains("is-dropdown-open");
     }
 

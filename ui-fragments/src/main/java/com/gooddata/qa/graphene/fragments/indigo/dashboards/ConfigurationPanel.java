@@ -16,6 +16,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
 import com.google.common.base.Predicate;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import java.util.List;
@@ -72,6 +73,8 @@ public class ConfigurationPanel extends AbstractFragment {
     public FilterByItem getFilterByDateFilter() {
         return filterByDateFilter;
     }
+
+    private static final By DATE_DATASET_ERROR_LOCATOR = By.cssSelector(".gd-message.error");
 
     public ConfigurationPanel waitForButtonsLoaded() {
         waitForElementVisible(metricSelectLoaded);
@@ -170,14 +173,26 @@ public class ConfigurationPanel extends AbstractFragment {
         return getFilterByDateFilter().isChecked();
     }
 
-    public DateDimensionSelect openDateDataset() {
+    public DateDimensionSelect openDateDataSet() {
         waitForFragmentVisible(dateDataSetSelect).ensureDropdownOpen();
 
         return dateDataSetSelect;
     }
 
-    public boolean isDateDatasetSelectCollapsed() {
-        return dateDataSetSelect.getDropdownButton().getAttribute("class").contains("s-collapsed");
+    public boolean isDateDataSetSelectCollapsed() {
+        return !dateDataSetSelect.isDropdownOpen();
+    }
+
+    public String getDateDataSetError() {
+        return waitForElementVisible(DATE_DATASET_ERROR_LOCATOR, getRoot()).getText();
+    }
+
+    public String getSelectedDataSetColor() {
+        return waitForFragmentVisible(dateDataSetSelect).getSelectionColor();
+    }
+
+    public boolean isDateDataSetErrorPresent() {
+        return isElementPresent(DATE_DATASET_ERROR_LOCATOR, getRoot());
     }
 
     public boolean isDrillToSelectVisible() {

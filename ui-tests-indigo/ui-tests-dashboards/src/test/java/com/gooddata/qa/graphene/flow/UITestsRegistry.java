@@ -14,6 +14,7 @@ import com.gooddata.qa.graphene.indigo.dashboards.EmbeddingDashboardPostMessageT
 import com.gooddata.qa.graphene.indigo.dashboards.EmbeddingSingleDashboardTest;
 import com.gooddata.qa.graphene.indigo.dashboards.HeaderTest;
 import com.gooddata.qa.graphene.indigo.dashboards.InsightOnDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.InvalidDateDataSetTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ManipulateWidgetsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.MetricsDropdownTest;
 import com.gooddata.qa.graphene.indigo.dashboards.NonProductionDatasetTest;
@@ -54,6 +55,7 @@ public class UITestsRegistry {
             FilteringWidgetsTest.class,
             EmbeddingSingleDashboardTest.class,
             EmbeddingDashboardPostMessageTest.class,
+            InvalidDateDataSetTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-EditMode.xml",
@@ -98,6 +100,7 @@ public class UITestsRegistry {
             FilteringWidgetsTest.class,
             EmbeddingSingleDashboardTest.class,
             EmbeddingDashboardPostMessageTest.class,
+            InvalidDateDataSetTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-EditMode.xml",
