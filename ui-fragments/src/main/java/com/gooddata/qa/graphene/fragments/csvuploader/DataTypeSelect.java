@@ -54,7 +54,7 @@ public class DataTypeSelect extends AbstractReactDropDown {
     }
 
     @Override
-    protected boolean isDropdownOpen() {
+    public boolean isDropdownOpen() {
         return getDropdownButton().getAttribute("class").contains("is-dropdown-open");
     }
 

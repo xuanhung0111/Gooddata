@@ -68,7 +68,7 @@ public class DateDatasetRecommendationTest extends GoodSalesAbstractDashboardTes
         takeScreenshot(browser, "Select-Most-Relevant-Date-Dimension", getClass());
         assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_ACTIVITY,
                 "Most relevant date dimension is not selected");
-        assertTrue(indigoDashboardsPage.getConfigurationPanel().isDateDatasetSelectCollapsed(),
+        assertTrue(indigoDashboardsPage.getConfigurationPanel().isDateDataSetSelectCollapsed(),
                 "Date dataset select is not collapsed");
     }
 
@@ -87,7 +87,7 @@ public class DateDatasetRecommendationTest extends GoodSalesAbstractDashboardTes
         initIndigoDashboardsPage().getSplashScreen().startEditingWidgets().addInsight(INSIGHT_WITHOUT_DATE_FILTER)
                 .waitForWidgetsLoading();
 
-        DateDimensionSelect dropDown = indigoDashboardsPage.getConfigurationPanel().openDateDataset();
+        DateDimensionSelect dropDown = indigoDashboardsPage.getConfigurationPanel().openDateDataSet();
         takeScreenshot(browser, "Order-Of-Recommended-Date-Dimensions", getClass());
         assertEquals(dropDown.getDateDimensionGroup("RECOMMENDED").getDateDimensions(),
                 asList(DATE_SNAPSHOT, DATE_CLOSED), "The recommended dimensions are not sorted by most relevant");
@@ -103,7 +103,7 @@ public class DateDatasetRecommendationTest extends GoodSalesAbstractDashboardTes
 
         List<String> otherDimensions = initIndigoDashboardsPage().getSplashScreen().startEditingWidgets()
                 .addInsight(INSIGHT_WITHOUT_DATE_FILTER).waitForWidgetsLoading().getConfigurationPanel()
-                .openDateDataset().getDateDimensionGroup("OTHER").getDateDimensions();
+                .openDateDataSet().getDateDimensionGroup("OTHER").getDateDimensions();
 
         takeScreenshot(browser, "Order-Of-Other-Date-Dimensions", getClass());
         assertTrue(Ordering.natural().isOrdered(otherDimensions),
@@ -126,7 +126,7 @@ public class DateDatasetRecommendationTest extends GoodSalesAbstractDashboardTes
         initIndigoDashboardsPage().getSplashScreen().startEditingWidgets().addInsight(INSIGHT_WITHOUT_DATE_FILTER)
                 .waitForWidgetsLoading();
 
-        DateDimensionSelect dateDimensionSelect = indigoDashboardsPage.getConfigurationPanel().openDateDataset();
+        DateDimensionSelect dateDimensionSelect = indigoDashboardsPage.getConfigurationPanel().openDateDataSet();
         takeScreenshot(browser, "Maximum-Number-Of-Recommendations", getClass());
         assertEquals(dateDimensionSelect.getDateDimensionGroup("RECOMMENDED").getDateDimensions(),
                 asList(DATE_ACTIVITY, DATE_CLOSED, DATE_CREATED), "The recommended dimensions are not correct");
@@ -142,9 +142,9 @@ public class DateDatasetRecommendationTest extends GoodSalesAbstractDashboardTes
 
         initIndigoDashboardsPage().getSplashScreen().startEditingWidgets().addInsight(INSIGHT_WITHOUT_DATE_FILTER)
                 .waitForWidgetsLoading();
-        assertFalse(indigoDashboardsPage.getConfigurationPanel().isDateDatasetSelectCollapsed(),
+        assertFalse(indigoDashboardsPage.getConfigurationPanel().isDateDataSetSelectCollapsed(),
                 "The date dataset is not expanded");
-        DateDimensionSelect dropDown = indigoDashboardsPage.getConfigurationPanel().openDateDataset();
+        DateDimensionSelect dropDown = indigoDashboardsPage.getConfigurationPanel().openDateDataSet();
         takeScreenshot(browser, "Date-Dateset-Having-No-Group", getClass());
         assertTrue(
                 isEqualCollection(dropDown.getDateDimensionGroup("DEFAULT").getDateDimensions(),

@@ -308,7 +308,7 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
                     .getConfigurationPanel().selectDateDataSetByName(DATE_CREATED);
             indigoDashboardsPage.saveEditModeWithWidgets().switchToEditMode().selectLastWidget(Insight.class);
 
-            assertTrue(indigoDashboardsPage.getConfigurationPanel().isDateDatasetSelectCollapsed(),
+            assertTrue(indigoDashboardsPage.getConfigurationPanel().isDateDataSetSelectCollapsed(),
                     "Date dataset is not collapsed");
         } finally {
             deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(),
