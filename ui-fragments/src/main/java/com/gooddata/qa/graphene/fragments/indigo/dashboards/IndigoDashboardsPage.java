@@ -62,7 +62,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(css = ".dash-nav-right .configuration-panel")
     private ConfigurationPanel configurationPanel;
 
-    @FindBy(className = "s-attribute_select")
+    @FindBy(className = ATTRIBUTE_FITERS_SELECT_CLASS_NAME)
     private AttributeSelect attributeSelect;
 
     @FindBy(className = "dash-filters-date")
@@ -80,6 +80,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     private static final String ALERTS_LOADED_CLASS_NAME = "alerts-loaded";
     private static final String SPLASH_SCREEN_CLASS_NAME = "splashscreen";
     private static final String ATTRIBUTE_FITERS_PANEL_CLASS_NAME = "dash-filters-attribute";
+    private static final String ATTRIBUTE_FITERS_SELECT_CLASS_NAME = "s-attribute_select";
 
     private static final String ADD_KPI_PLACEHOLDER = ".add-kpi-placeholder";
     private static final String DASHBOARD_BODY = ".dash-section";
@@ -387,6 +388,15 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public boolean isOnEditMode() {
         return isElementPresent(By.className("edit-mode-on"), getRoot());
+    }
+
+    public boolean isAttributeFilterVisible() {
+        return isElementVisible(By.className(ATTRIBUTE_FITERS_SELECT_CLASS_NAME), browser);
+    }
+
+    public AttributeSelect openAttributeSelect() {
+        waitForFragmentVisible(attributeSelect).ensureDropdownOpen();
+        return attributeSelect;
     }
 
     private IndigoDashboardsPage waitForWidgetsEditable() {
