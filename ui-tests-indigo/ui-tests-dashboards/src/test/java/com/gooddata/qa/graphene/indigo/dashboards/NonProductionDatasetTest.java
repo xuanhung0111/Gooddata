@@ -6,7 +6,6 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAnalyticalDashboards;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getInsightUri;
-import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -28,11 +27,9 @@ import com.gooddata.md.Restriction;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeSelect;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
@@ -65,13 +62,13 @@ public class NonProductionDatasetTest extends AbstractDashboardTest {
         projectTitle += "Non-Production-Dataset-Test";
     }
 
-    @Override
-    protected void prepareSetupProject() throws Throwable {
+    @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
+    public void uploadCsvFile() {
         uploadCSV(getFilePathFromResource(PAYROLL_CSV_PATH));
         takeScreenshot(browser, "uploaded-" + PAYROLL_DATASET + "-dataset", getClass());
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"create-metrics"})
+    @Test(dependsOnMethods = {"uploadCsvFile"}, groups = {"precondition"})
     public void createTestMetrics() {
         final String amountUri = getMdService().getObjUri(getProject(), Fact.class, title(FACT_AMOUNT));
 
@@ -93,7 +90,7 @@ public class NonProductionDatasetTest extends AbstractDashboardTest {
                         Formatter.DEFAULT.toString()));
     }
 
-    @Test(dependsOnGroups = {"create-metrics"}, groups = {"basic-test"})
+    @Test(dependsOnGroups = {"precondition", "dashboardsInit"}, groups = {"basic-test"})
     public void testMeasureOptions() {
         assertEquals(initIndigoDashboardsPage()
             .getSplashScreen()
@@ -104,7 +101,7 @@ public class NonProductionDatasetTest extends AbstractDashboardTest {
             .getValues(), asList(METRIC_AMOUNT_SUM, METRIC_DEPARTMENT_COUNT), "The measure options are not correct");
     }
 
-    @Test(dependsOnGroups = {"create-metrics"}, groups = {"basic-test"})
+    @Test(dependsOnGroups = {"precondition", "dashboardsInit"}, groups = {"basic-test"})
     public void testDatasetOptions() {
         assertEquals(initIndigoDashboardsPage()
             .getSplashScreen()
@@ -212,23 +209,6 @@ public class NonProductionDatasetTest extends AbstractDashboardTest {
             initDataUploadPage().getMyDatasetsTable().getDataset(WITHOUT_DATE_DATASET).clickDeleteButton()
                     .clickDelete();
             Dataset.waitForDatasetLoaded(browser);
-        }
-    }
-
-    @Test(dependsOnGroups = {"dashboardsInit"})
-    public void testAttributesListedOnAttributeFilter() {
-        try {
-            setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                    ProjectFeatureFlags.ENABLE_ATTRIBUTE_FILTERS, true);
-
-            assertEquals(
-                    initIndigoDashboardsPage().getSplashScreen().startEditingWidgets().openAttributeSelect()
-                            .getValues(),
-                    asList("County", "Department", "Education", "Firstname", "Lastname", "Position", "State"),
-                    "The attributes which are not relate to Date are not fully displayed on attribute filter");
-        } finally {
-            setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                    ProjectFeatureFlags.ENABLE_ATTRIBUTE_FILTERS, false);
         }
     }
 }
