@@ -144,12 +144,6 @@ public class ScheduleDetail extends ScheduleForm {
     @FindBy(css = ".ait-schedule-run-btn")
     private WebElement manualRunButton;
 
-    @FindBy(css = ".dialog-main.ait-schedule-run")
-    private WebElement manualRunDialog;
-
-    @FindBy(css = ".ait-schedule-run-confirm-btn")
-    private WebElement confirmRunButton;
-
     @FindBy(className = "ait-schedule-stop-btn")
     private WebElement manualStopButton;
 
@@ -355,8 +349,9 @@ public class ScheduleDetail extends ScheduleForm {
 
     public void tryToRun() {
         waitForElementVisible(manualRunButton).sendKeys(Keys.ENTER);
-        waitForElementVisible(manualRunDialog);
-        waitForElementVisible(confirmRunButton).click();
+        //the Run dialog is separated to ScheduleDetail. So search it from root browser.
+        waitForElementVisible(By.cssSelector(".dialog-main.ait-schedule-run"), browser);
+        waitForElementVisible(By.cssSelector(".ait-schedule-run-confirm-btn"), browser).click();
     }
 
     public void manualStop() {
