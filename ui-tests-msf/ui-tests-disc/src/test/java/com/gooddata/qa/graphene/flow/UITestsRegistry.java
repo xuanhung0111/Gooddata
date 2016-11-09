@@ -8,13 +8,14 @@ import com.gooddata.qa.graphene.disc.DeployProcessTest;
 import com.gooddata.qa.graphene.disc.OverviewPageTest;
 import com.gooddata.qa.graphene.disc.ProjectDetailTest;
 import com.gooddata.qa.graphene.disc.ProjectsPageTest;
+import com.gooddata.qa.graphene.disc.SanityTest;
 import com.gooddata.qa.graphene.disc.SchedulesTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 public class UITestsRegistry {
 
     public static void main(String[] args) throws Throwable {
-        Map<String, Object[]> suites = new HashMap<>();
+        Map<String, Object> suites = new HashMap<>();
 
         suites.put("all", new Object[] {
             OverviewPageTest.class,
@@ -27,6 +28,10 @@ public class UITestsRegistry {
             "testng-disc-auto-run.xml",
             "testng-disc-disabled-schedule.xml",
             "testng-disc-repeated-failures.xml"
+        });
+
+        suites.put("sanity", new Object[] {
+            SanityTest.class
         });
 
         TestsRegistry.getInstance()
