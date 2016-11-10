@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -117,6 +118,7 @@ public class DateFilterPickerPanel extends AbstractFragment {
 
         waitForElementVisible(toDate).clear();
         toDate.sendKeys(to);
+        toDate.sendKeys(Keys.TAB);
 
         waitForElementVisible(apply ? applyButton : cancelButton).click();
         waitForFragmentNotVisible(this);
