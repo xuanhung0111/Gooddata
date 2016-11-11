@@ -1,19 +1,20 @@
 package com.gooddata.qa.utils.flow;
 
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.toList;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.gooddata.qa.graphene.AbstractTest;
 
@@ -21,50 +22,97 @@ public class TestsRegistry {
 
     public static final String TESTS_REGISTRY_FILE = "tests_registry.txt";
 
-    private List<String> tests;
+    private List<Set<String>> testPhases;
 
     private TestsRegistry() {
-        tests = new ArrayList<>();
+        testPhases = new ArrayList<>();
     }
 
     public static TestsRegistry getInstance() {
         return new TestsRegistry();
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public TestsRegistry register(Collection<Object> tests) {
-        tests.stream().forEach(test -> {
-            if (test instanceof PredefineParameterTest) {
-                register((PredefineParameterTest) test);
-            } else if (test instanceof Class) {
-                register((Class) test);
-            } else {
-                register((String) test);
-            }
-        });
-        return this;
-    }
-
-    public TestsRegistry register(String[] expectedSuites, Map<String, Object[]> suites) {
-        Set<Object> tests = new HashSet<>();
+    @SuppressWarnings("unchecked")
+    public TestsRegistry register(String[] expectedSuites, Map<String, Object> suites) {
         for (String suite: expectedSuites) {
-            tests.addAll(asList(suites.getOrDefault(suite, new Object[]{})));
+            Object tests = suites.get(suite);
+
+            if (tests instanceof Map) {
+                registerTests((Map<String, Object[]>) tests);
+            } else {
+                registerTests((Object[]) tests);
+            }
         }
-        register(tests);
         return this;
     }
 
-    public TestsRegistry register(String suite) {
-        tests.add(suite);
-        return this;
+    /**
+     * Build tests_registry.txt file, the value of file is a json that contains all test phases.
+     * The phase name defined in UITestRegistry is skipped.
+     * Each phase is defined in as following [TestA, TestB, TestC].
+     * Many phases are separated by comma.
+     * If any test is duplicated in test phases, it will be removed in priority from the first and keep in the next phase.
+     * Json format: 
+     *  + For one phase in a suite : {phases: [[testA, testB, ...]]}
+     *  + For many phases in a suite : {phases: [[testA, testB, ...], [testC, testD, ...], ...]}
+     * 
+     * @return
+     * @throws IOException
+     * @throws JSONException
+     */
+    public File toTextFile() throws IOException, JSONException {
+        return toTextFile(new File(System.getProperty("user.dir")));
     }
 
-    public TestsRegistry register(Class<? extends AbstractTest> testClass) {
-        tests.add(testClass.getSimpleName());
-        return this;
+    private File toTextFile(File dir) throws IOException, JSONException {
+        File flowFile = new File(dir, TESTS_REGISTRY_FILE);
+
+        try (FileWriter writer = new FileWriter(flowFile)) {
+            writer.append("TESTS_REGISTRY=")
+                .append(new JSONObject() {{
+                    put("phases", removeDuplicatedTests(testPhases));
+                }}.toString());
+        }
+
+        System.out.println(TESTS_REGISTRY_FILE + " path: " + flowFile.getAbsolutePath());
+        System.out.println("Content: ");
+        FileUtils.readLines(flowFile).stream().forEach(System.out::println);
+
+        return flowFile;
     }
 
-    public TestsRegistry register(PredefineParameterTest test) {
+    private void registerTests(Map<String, Object[]> phases) {
+        for (String phase : phases.keySet()) {
+            registerTests(phases.get(phase));
+        }
+    }
+
+    private void registerTests(Object[] tests) {
+        testPhases.add(parseTests(tests));
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private Set<String> parseTests(Object[] tests) {
+        return Stream.of(tests).map(test -> {
+                if (test instanceof Class) {
+                    return parseTest((Class) test);
+                }
+                if (test instanceof PredefineParameterTest) {
+                    return parseTest((PredefineParameterTest) test);
+                }
+                return parseTest((String) test);
+        }).collect(toSet());
+    }
+
+    private String parseTest(String testSuite) {
+        return testSuite;
+    }
+
+    private String parseTest(Class<? extends AbstractTest> testClass) {
+        return testClass.getSimpleName();
+    }
+
+    private String parseTest(PredefineParameterTest test) {
         String clazz = test.getSuite();
         if (clazz == null || clazz.isEmpty()) {
             clazz = test.getClazz().getSimpleName();
@@ -81,26 +129,24 @@ public class TestsRegistry {
                 .append(entry.getValue());
         }
 
-        tests.add(clazz + "->" + params.toString());
-        return this;
+        return clazz + "->" + params.toString();
     }
 
-    public File toTextFile(File dir) throws IOException {
-        File flowFile = new File(dir, TESTS_REGISTRY_FILE);
+    private List<Set<String>> removeDuplicatedTests(List<Set<String>> testPhases) {
+        for (Set<String> testPhase : testPhases) {
+            Set<String> duplicatedList = testPhases.stream()
+                    .filter(p -> !p.equals(testPhase))
+                    .flatMap(p -> p.stream())
+                    .collect(toSet());
 
-        try (FileWriter writer = new FileWriter(flowFile)) {
-            writer.append("TESTS_REGISTRY=")
-                .append(tests.stream().collect(joining(",")));
+            for (String test : duplicatedList) {
+                if (testPhase.contains(test)) {
+                    testPhase.remove(test);
+                }
+            }
         }
-
-        System.out.println(TESTS_REGISTRY_FILE + " path: " + flowFile.getAbsolutePath());
-        System.out.println("Content: ");
-        FileUtils.readLines(flowFile).stream().forEach(System.out::println);
-
-        return flowFile;
-    }
-
-    public File toTextFile() throws IOException {
-        return toTextFile(new File(System.getProperty("user.dir")));
+        return testPhases.stream()
+                .filter(phase -> !phase.isEmpty())
+                .collect(toList());
     }
 }
