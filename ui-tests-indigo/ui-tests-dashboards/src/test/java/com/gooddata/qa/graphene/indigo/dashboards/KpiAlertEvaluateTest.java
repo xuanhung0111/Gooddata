@@ -4,6 +4,9 @@ import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialo
 import static com.gooddata.qa.graphene.utils.UrlParserUtils.replaceInUrl;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteAnalyticalDashboard;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAnalyticalDashboards;
+import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -113,14 +116,12 @@ public class KpiAlertEvaluateTest extends AbstractDashboardTest {
             // metric name is in mail subject and is unique
             checkKpiAlertTriggered(metricName, DATE_FILTER_ALL_TIME, testStartTime);
 
-            IndigoDashboardsPage.getInstance(browser)
-                    .switchToEditMode()
-                    .deleteDashboard(true);
-
         } finally {
             switchToAdmin();
             if (metricUri != null) {
-                getMdService().removeObjByUri(metricUri);
+                deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), metricUri);
+                deleteAnalyticalDashboard(restApiClient, 
+                        getAnalyticalDashboards(restApiClient, testParams.getProjectId()).get(0));
             }
         }
     }
