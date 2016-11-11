@@ -33,8 +33,8 @@ public class UITestsRegistry {
         suites.put("sanity", new Object[] {
             ManipulateWidgetsTest.class,
             "testng-desktop-EditMode.xml",
-            "testng-desktop-imap-KpiAlertEvaluate.xml",
-            "testng-desktop-SplashScreen.xml"
+            "testng-desktop-imap-KpiAlertEvaluate.xml"
+            //"testng-desktop-SplashScreen.xml" CL-10808 - disabled due to instability in EU checklist
         });
 
         suites.put("pull-request", new Object[] {
