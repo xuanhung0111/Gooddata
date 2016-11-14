@@ -44,7 +44,7 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
     private static final long expectedDownloadedProcessSize = 64000L;
     private String downloadFolder;
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void initProperties() {
         downloadFolder = testParams.loadProperty("browserDownloadFolder") + testParams.getFolderSeparator();
         projectTitle = "Disc-test-project-detail";

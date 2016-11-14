@@ -112,6 +112,13 @@ public class OverviewProjects extends AbstractFragment {
         .findFirst().orElse(null);
     }
 
+    public void openScheduleDetail(String projectId) {
+        WebElement overviewProjectDetail = getOverviewProjectWithAdminRole(projectId);
+        if (!overviewProjectDetail.getAttribute("class").contains("expanded-border"))
+            overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_EXPAND_BUTTON).click();
+        overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_ERROR_SCHEDULE_LINK).click();
+    }
+
     public void checkAllProjects() {
         waitForElementVisible(checkAllProjects).click();
         Graphene.waitGui().until().element(disableButton).is().enabled();
@@ -242,6 +249,10 @@ public class OverviewProjects extends AbstractFragment {
                 overviewState == OverviewProjectStates.FAILED ? XPATH_OVERVIEW_ERROR_SCHEDULE_TITLE
                         : XPATH_OVERVIEW_SCHEDULE_TITLE;
         return overviewProject.findElement(By.xpath(xpathScheduleTitle.replace("${scheduleUrl}", scheduleUrl)));
+    }
+
+    public List<WebElement> getProcesses() {
+        return overviewProcesses;
     }
 
     private void checkOnSelectedSchedules(final WebElement overviewProcess, List<OverviewSchedule> selectedSchedules) {

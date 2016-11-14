@@ -27,12 +27,14 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.ADSTables;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail.Confirmation;
 import com.gooddata.qa.utils.ads.AdsHelper.AdsRole;
+import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.google.common.collect.Lists;
@@ -48,7 +50,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
 
     private static final String SCHEDULE_DETAIL_URI = "/gdc/projects/%s/schedules/%s";
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void initProperties() {
         projectTitle = "Disc-test-dataload-schedule";
     }
@@ -232,7 +234,8 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
             assertTrue(getScheduleDetail(schedule.getScheduleUrl()).contains(scheduleOwner),
                     "Schedule owner is not admin user");
 
-            UserManagementRestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), technicalUser,
+            RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
+            UserManagementRestUtils.addUserToProject(restApiClient, testParams.getProjectId(), technicalUser,
                     UserRoles.ADMIN);
             getAdsHelper().addUserToAdsInstance(ads, technicalUser, AdsRole.DATA_ADMIN);
 

@@ -13,7 +13,6 @@ import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -22,11 +21,9 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 
 import org.jboss.arquillian.graphene.Graphene;
-import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
-import org.testng.annotations.BeforeClass;
 
 import com.gooddata.qa.graphene.AbstractMSFTest;
 import com.gooddata.qa.graphene.entity.disc.NotificationBuilder;
@@ -38,6 +35,7 @@ import com.gooddata.qa.graphene.enums.disc.NotificationEvents;
 import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.fragments.disc.NotificationRule;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -45,11 +43,6 @@ import com.google.common.collect.Iterables;
 public abstract class AbstractDISCTest extends AbstractMSFTest {
 
     private static final String OK_GROUP_DESCRIPTION_FORMAT = "OK %d×";
-
-    @BeforeClass(alwaysRun = true)
-    public void disableDynamicUser() {
-        useDynamicUser = false;
-    }
 
     protected void cleanWorkingProjectAfterTest(Method m) {
         if (!m.getDeclaringClass().equals(this.getClass()))
@@ -322,22 +315,14 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
     }
 
     protected String createBlankProject(String projectName) {
-        openUrl(PAGE_GDC_PROJECTS);
-        waitForElementVisible(gpProject.getRoot());
-        try {
-            return gpProject.createProject(projectName, projectName,
-                    null, testParams.getAuthorizationToken(), testParams.getProjectDriver(),
-                    testParams.getProjectEnvironment(), projectCreateCheckIterations);
-        } catch (JSONException e) {
-            fail("There is problem when creating new project: " + e);
-        }
-        return "";
+        return ProjectRestUtils.createBlankProject(getGoodDataClient(), projectName,
+                testParams.getAuthorizationToken(), testParams.getProjectDriver(), testParams.getProjectEnvironment());
     }
 
     protected void deleteProjects(String... projectIds) {
         for (String projectId : projectIds) {
             cleanProcessesInProject(projectId);
-            deleteProject(projectId);
+            ProjectRestUtils.deleteProject(getGoodDataClient(), projectId);
         }
     }
 

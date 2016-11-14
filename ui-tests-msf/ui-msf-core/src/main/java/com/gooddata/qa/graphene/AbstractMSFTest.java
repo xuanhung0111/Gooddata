@@ -30,7 +30,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -65,9 +64,6 @@ import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.entity.dlui.DataSource;
-import com.gooddata.qa.graphene.entity.dlui.Dataset;
-import com.gooddata.qa.graphene.entity.dlui.Field;
-import com.gooddata.qa.graphene.entity.dlui.Field.FieldTypes;
 import com.gooddata.qa.graphene.enums.DatasetElements;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.utils.ads.AdsHelper;
@@ -161,11 +157,11 @@ public class AbstractMSFTest extends AbstractProjectTest {
 
     protected DataSource prepareADSTable(final ADSTables adsTable) {
         createUpdateADSTable(adsTable);
-        return new DataSource().withName(adsTable.datasourceName).withDatasets(adsTable.getDatasets());
+        return new DataSource().withName(adsTable.getDatasourceName()).withDatasets(adsTable.getDatasets());
     }
 
     protected void createUpdateADSTable(final ADSTables adsTable) {
-        createUpdateADSTableBySQLFiles(adsTable.createTableSqlFile, adsTable.copyTableSqlFile, ads);
+        createUpdateADSTableBySQLFiles(adsTable.getCreateTableSqlFile(), adsTable.getCopyTableSqlFile(), ads);
     }
 
     protected Map<String, String> prepareHiddenParamsToUpdateADS() {
@@ -375,118 +371,5 @@ public class AbstractMSFTest extends AbstractProjectTest {
 
     private String sendRequestToUpdateModel(final String maql) throws ParseException, JSONException, IOException {
         return executeMAQL(getRestApiClient(), testParams.getProjectId(), maql);
-    }
-
-    protected enum AdditionalDatasets {
-
-        PERSON_WITH_NEW_FIELDS("person", new Field("Position", FieldTypes.ATTRIBUTE)),
-        PERSON_WITH_NEW_DATE_FIELD(
-                "person",
-                new Field("Position", FieldTypes.ATTRIBUTE),
-                new Field("Date", FieldTypes.DATE)),
-        OPPORTUNITY_WITH_NEW_FIELDS(
-                "opportunity",
-                new Field("Title2", FieldTypes.ATTRIBUTE),
-                new Field("Label", FieldTypes.LABEL_HYPERLINK),
-                new Field("Totalprice2", FieldTypes.FACT)),
-        OPPORTUNITY_WITH_NEW_DATE_FIELD(
-                "opportunity",
-                new Field("Title2", FieldTypes.ATTRIBUTE),
-                new Field("Label", FieldTypes.LABEL_HYPERLINK),
-                new Field("Totalprice2", FieldTypes.FACT),
-                new Field("Date", FieldTypes.DATE)),
-        ARTIST_WITH_NEW_FIELD("artist", new Field("Artisttitle", FieldTypes.ATTRIBUTE)),
-        AUTHOR_WITH_NEW_FIELD("author", new Field("Authorname", FieldTypes.ATTRIBUTE)),
-        TRACK_WITH_NEW_FIELD("track", new Field("Trackname", FieldTypes.ATTRIBUTE));
-
-        private String name;
-        private List<Field> additionalFields;
-
-        private AdditionalDatasets(String name, Field... additionalFields) {
-            this.name = name;
-            this.additionalFields = Lists.newArrayList(additionalFields);
-        }
-
-        public Dataset getDataset() {
-            List<Field> fields = Lists.newArrayList();
-            for (Field additionalField : additionalFields) {
-                fields.add(additionalField.clone());
-            }
-            return new Dataset().withName(name).withFields(fields);
-        }
-    }
-
-    protected enum ADSTables {
-
-        WITHOUT_ADDITIONAL_FIELDS("createTable.txt", "copyTable.txt", "Unknown data source"),
-        WITH_ADDITIONAL_FIELDS(
-                "createTableWithAdditionalFields.txt",
-                "copyTableWithAdditionalFields.txt",
-                "Unknown data source",
-                AdditionalDatasets.PERSON_WITH_NEW_FIELDS,
-                AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS),
-        WITH_ADDITIONAL_DATE(
-                "createTableWithAdditionalDate.txt",
-                "copyTableWithAdditionalDate.txt",
-                "Unknown data source",
-                AdditionalDatasets.PERSON_WITH_NEW_DATE_FIELD,
-                AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS),
-        WITH_ERROR_MAPPING("createTableWithErrorMapping.txt", "copyTableWithErrorMapping.txt"),
-        WITH_ADDITIONAL_FIELDS_LARGE_DATA(
-                "createTableWithAdditionalFields.txt",
-                "copyTableWithAdditionalFieldsLargeData.txt",
-                "Unknown data source",
-                AdditionalDatasets.PERSON_WITH_NEW_FIELDS,
-                AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS),
-        WITH_ADDITIONAL_FIELDS_AND_REFERECES(
-                "createTableWithReferences.txt",
-                "copyTableWithReferences.txt",
-                "Unknown data source",
-                AdditionalDatasets.ARTIST_WITH_NEW_FIELD,
-                AdditionalDatasets.TRACK_WITH_NEW_FIELD),
-        WITH_ADDITIONAL_FIELDS_AND_MULTI_REFERECES(
-                "createTableWithMultiReferences.txt",
-                "copyTableWithMultiReferences.txt",
-                "Unknown data source",
-                AdditionalDatasets.TRACK_WITH_NEW_FIELD,
-                AdditionalDatasets.ARTIST_WITH_NEW_FIELD,
-                AdditionalDatasets.AUTHOR_WITH_NEW_FIELD),
-        WITH_ADDITIONAL_CONNECTION_POINT(
-                "createTableWithAdditionalConnectionPoint.txt",
-                "copyTableWithAdditionalConnectionPoint.txt",
-                "Unknown data source",
-                AdditionalDatasets.PERSON_WITH_NEW_FIELDS,
-                AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS),
-        WITH_ADDITIONAL_LABEL_OF_NEW_FIELD(
-                "createTableWithAdditionalLabelOfNewField.txt",
-                "copyTableWithAdditionalLabelOfNewField.txt",
-                "Unknown data source",
-                AdditionalDatasets.PERSON_WITH_NEW_FIELDS,
-                AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS);
-
-        private String createTableSqlFile;
-        private String copyTableSqlFile;
-        private String datasourceName;
-        private List<AdditionalDatasets> additionalDatasets = Lists.newArrayList();
-
-        private ADSTables(String createTableSqlFile, String copyTableSqlFile) {
-            this(createTableSqlFile, copyTableSqlFile, "");
-        }
-
-        private ADSTables(String createTableSqlFile, String copyTableSqlFile,
-                String datasourceName, AdditionalDatasets... datasets) {
-            this.createTableSqlFile = createTableSqlFile;
-            this.copyTableSqlFile = copyTableSqlFile;
-            this.datasourceName = datasourceName;
-            this.additionalDatasets = Arrays.asList(datasets);
-        }
-
-        public List<Dataset> getDatasets() {
-            List<Dataset> datasets = Lists.newArrayList();
-            for (AdditionalDatasets additionalDataset : this.additionalDatasets) {
-                datasets.add(additionalDataset.getDataset());
-            }
-            return datasets;
-        }
     }
 }
