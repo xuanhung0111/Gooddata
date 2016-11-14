@@ -50,12 +50,12 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
                 .switchToEditMode()
                 .dragAddAttributeFilterPlaceholder()
                 .clickDashboardBody();
-        
+
         final AttributeFiltersPanel attributeFiltersPanel =
                 indigoDashboardsPage.getAttributeFiltersPanel();
-        
+
         takeScreenshot(browser, "checkAttributeFilterCancellingAfterDrag", getClass());
-        
+
         assertEquals(attributeFiltersPanel.getAttributeFilters().size(), 0);
     }
 
@@ -108,5 +108,41 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
         assertEquals(attributeFiltersPanel.getAttributeFilters().size(), 1);
         assertEquals(attributeFiltersPanel.getAttributeFilter(ATTR_ACCOUNT).getSelectedItems(), join(", ", attributeElements));
         assertEquals(attributeFiltersPanel.getAttributeFilter(ATTR_ACCOUNT).getSelectedItemsCount(), "(4)");
+    }
+
+    @Test(dependsOnMethods = {"setupAttributeFilters"}, groups = {"desktop"})
+    public void deleteAttributeFilterDiscarded() {
+        initIndigoDashboardsPageWithWidgets()
+                .switchToEditMode()
+                .deleteAttributeFilter()
+                .cancelEditModeWithChanges();
+
+        final AttributeFiltersPanel attributeFiltersPanel =
+                indigoDashboardsPage.getAttributeFiltersPanel();
+        takeScreenshot(browser, "deleteAttributeFilterDiscarded-Without_Reload", getClass());
+        assertEquals(attributeFiltersPanel.getAttributeFilters().size(), 1);
+
+        final AttributeFiltersPanel attributeFiltersPanelWithReload =
+                initIndigoDashboardsPage().getAttributeFiltersPanel();
+        takeScreenshot(browser, "deleteAttributeFilterDiscarded-With_Reload", getClass());
+        assertEquals(attributeFiltersPanelWithReload.getAttributeFilters().size(), 1);
+    }
+
+    @Test(dependsOnMethods = {"deleteAttributeFilterDiscarded"}, groups = {"desktop"})
+    public void deleteAttributeFilter() {
+        initIndigoDashboardsPageWithWidgets()
+                .switchToEditMode()
+                .deleteAttributeFilter()
+                .saveEditModeWithWidgets();
+
+        final AttributeFiltersPanel attributeFiltersPanel =
+                indigoDashboardsPage.getAttributeFiltersPanel();
+        takeScreenshot(browser, "deleteAttributeFilter-Without_Reload", getClass());
+        assertEquals(attributeFiltersPanel.getAttributeFilters().size(), 0);
+
+        final AttributeFiltersPanel attributeFiltersPanelWithReload =
+                initIndigoDashboardsPage().getAttributeFiltersPanel();
+        takeScreenshot(browser, "deleteAttributeFilter-With_Reload", getClass());
+        assertEquals(attributeFiltersPanel.getAttributeFilters().size(), 0);
     }
 }
