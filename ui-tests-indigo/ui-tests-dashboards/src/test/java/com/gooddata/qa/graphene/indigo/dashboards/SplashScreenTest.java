@@ -13,6 +13,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.io.IOException;
 
@@ -26,6 +27,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.DateFilter;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.SplashScreen;
+import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
 
 public class SplashScreenTest extends GoodSalesAbstractDashboardTest {
@@ -211,14 +213,20 @@ public class SplashScreenTest extends GoodSalesAbstractDashboardTest {
 
         try {
             openUrl(getIndigoDashboardsPageUri());
+            //after signInAtUI method, the projects.html is displaying, and openUrl(getIndigoDashboardsPageUri()) 
+            //is expected to redirected to projects.html as well. So we need to sleep in seconds to be sure the 
+            //correct projects page displayed.
+            sleepTightInSeconds(3);
 
             // With Dashboard Only role, user cannot access to Indigo dashboard
             // page of project and automatically directed to Projects.html page
             waitForProjectsPageLoaded(browser);
 
             takeScreenshot(browser, "Dashboard-only-user-cannot-access-Kpi-dashboard", getClass());
-            assertThat(browser.getCurrentUrl(), containsString("cannotAccessWorkbench"));
-
+            assertThat(ProjectsPage.getInstance(browser).getAlertMessage(), 
+                    containsString("You have been invited to a dashboard. Your access privileges only extend to "
+                            + "external, embedded dashboards. Please contact your administrator to get the "
+                            + "dashboard web address."));
         } finally {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
         }
