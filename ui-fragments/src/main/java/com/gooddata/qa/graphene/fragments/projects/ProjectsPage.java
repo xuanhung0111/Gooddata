@@ -75,6 +75,11 @@ public class ProjectsPage extends AbstractFragment {
                 .isPresent();
     }
 
+    public String getAlertMessage() {
+        return waitForElementVisible(By.cssSelector(".info.messageAlert[style*='display: block']"), getRoot())
+                .getText();
+    }
+
     private String getProjectIdFrom(WebElement project) {
         String gdcLink = project.getAttribute("gdc:link");
         return gdcLink.substring(gdcLink.lastIndexOf("/") + 1);
