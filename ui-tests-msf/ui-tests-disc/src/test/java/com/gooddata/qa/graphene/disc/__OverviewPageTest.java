@@ -15,6 +15,8 @@ import java.io.IOException;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -273,6 +275,21 @@ public class __OverviewPageTest extends __AbstractDISCTest {
         }
     }
 
+    @Test(dependsOnGroups = {"createProject"})
+    public void checkHeaderBar() {
+        __initDiscOverviewPage();
+
+        assertEquals(getHeaderTitle(), "Data Integration Console");
+        assertEquals(getOverviewButton().getText(), "Overview");
+        assertEquals(getProjectsButton().getText(), "Projects");
+
+        getProjectsButton().click();
+        waitForFragmentVisible(projectsPage).waitForPageLoaded();
+
+        getOverviewButton().click();
+        waitForFragmentVisible(overviewPage).waitForPageLoaded();
+    }
+
     @Override
     protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
         createAndAddUserToProject(UserRoles.EDITOR);
@@ -283,5 +300,17 @@ public class __OverviewPageTest extends __AbstractDISCTest {
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser).click();
         waitForElementVisible(BY_LOGOUT_LINK, browser).click();
         LoginFragment.waitForPageLoaded(browser);
+    }
+
+    private WebElement getOverviewButton() {
+        return waitForElementVisible(By.className("ait-header-overview-btn"), browser);
+    }
+
+    private WebElement getProjectsButton() {
+        return waitForElementVisible(By.className("ait-header-projects-btn"), browser);
+    }
+
+    private String getHeaderTitle() {
+        return waitForElementVisible(By.className("app-title"), browser).getText();
     }
 }
