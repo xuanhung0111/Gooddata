@@ -168,7 +168,11 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName)
                             .setExecutable(Executables.SHORT_TIME_FAILED_GRAPH)
-                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
+                            .setCronTime(ScheduleCronTimes.CRON_EXPRESSION)
+                            //cron time expression which rarely happen - Feb 29
+                            //so that it don't happen the case 
+                            //where scheduled run and manual run happen at the same time
+                            .setCronTimeExpression("*/30 * 29 2 *");
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
             // scheduleDetail.checkRepeatedFailureSchedule(scheduleBuilder.getCronTimeBuilder(),
@@ -184,7 +188,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
             assertEquals(String.format(AUTO_DISABLED_SCHEDULE_MESSAGE, scheduleDetail.getExecutionItemsNumber()),
                     scheduleDetail.getAutoDisabledScheduleMessage());
             assertEquals(AUTO_DISABLED_SCHEDULE_MORE_INFO, scheduleDetail.getAutoDisabledScheduleMoreInfo());
-            assertTrue(scheduleDetail.isDisabledSchedule(scheduleBuilder.getCronTimeBuilder()));
+            assertTrue(scheduleDetail.isScheduleDisabledInUI());
         } finally {
             cleanProcessesInWorkingProject();
         }
