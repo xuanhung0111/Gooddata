@@ -167,7 +167,7 @@ public class EmailSchedulePage extends AbstractFragment {
     }
 
     public List<WebElement> getPrivateScheduleTitles() {
-        return waitForElementPresent(privateSchedulesTable).findElements(BY_SCHEDULE_EMAIL_TITLES);
+        return waitForElementVisible(privateSchedulesTable).findElements(BY_SCHEDULE_EMAIL_TITLES);
     }
 
     public int getNumberOfGlobalSchedules() {
