@@ -2,11 +2,13 @@ package com.gooddata.qa.graphene.fragments.disc;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.BY_BUBBLE_CONTENT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 
 import java.util.Collections;
 import java.util.List;
@@ -252,6 +254,7 @@ public class ScheduleDetail extends ScheduleForm {
 
     public void clickOnCloseScheduleButton() {
         waitForElementVisible(closeButton).click();
+        waitForFragmentNotVisible(this);
     }
 
     public void tryToWaitForAutoRun(CronTimeBuilder cronTimebuilder) {
@@ -382,6 +385,10 @@ public class ScheduleDetail extends ScheduleForm {
             return false;
         System.out.println("Schedule is disabled successfully!");
         return true;
+    }
+
+    public boolean isScheduleDisabledInUI() {
+        return isElementVisible(enableScheduleButton);
     }
 
     public void changeExecutable(Executables newExecutable, Confirmation saveChange) {
@@ -753,6 +760,13 @@ public class ScheduleDetail extends ScheduleForm {
 
     public void saveSelectedSynchronizeDatasets() {
         waitForElementVisible(datasetDialog).findElement(By.className("button-positive")).click();
+    }
+
+    /**
+     * check the status of save button in selected synchronized dataset drop-down menu
+     */
+    public boolean isSelectedSynchronziedSavedButtonEnabled() {
+        return waitForElementVisible(datasetDialog).findElement(By.className("button-positive")).isEnabled();
     }
 
     public boolean isCorrectScheduleParameters(List<Parameter> expectedParams) {

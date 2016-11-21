@@ -26,4 +26,9 @@ public class ChangeLanguageDialog extends AbstractDialog {
         DropDown.getInstance(className("language-dropdown"), browser).selectItem(lang);
         return this;
     }
+
+    @Override
+    public void saveChange() {
+        waitForElementVisible(className("submit-button"), getRoot()).click();
+    }
 }

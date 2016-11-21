@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.Calendar;
 
 import org.apache.http.ParseException;
+import org.json.JSONException;
 import org.springframework.http.HttpStatus;
 
 import javax.mail.MessagingException;
@@ -20,6 +21,7 @@ import com.gooddata.qa.graphene.entity.disc.NotificationBuilder;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.enums.disc.NotificationEvents;
 import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.enums.disc.ProjectStateFilters;
@@ -110,7 +112,13 @@ public class SanityTest extends AbstractOverviewProjectsTest {
      * @throws ParseException 
      */
     @Test(dependsOnGroups = {"createProject"}, groups = {"schedule"})
-    public void checkRubyExecution() throws ParseException, IOException {
+    public void checkRubyExecution() throws ParseException, IOException, JSONException {
+        logout();
+        if (useDynamicUser) {
+            signInAtGreyPages(testParams.getDomainUser(), testParams.getPassword());
+        } else {
+            signInAtGreyPages(testParams.getUser(), testParams.getPassword());
+        }
         try {
             openProjectDetailPage(testParams.getProjectId());
 
@@ -127,6 +135,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
                     containsString("Hello World"));
         } finally {
             cleanProcessesInWorkingProject();
+            logoutAndLoginAs(true, UserRoles.ADMIN);
         }
     }
 
