@@ -73,7 +73,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createScheduleWithCustomInput() {
         try {
             openProjectDetailPage(testParams.getProjectId());
@@ -286,7 +286,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
                     new Parameter().setParamName("secure param").setParamValue("secure value").setSecureParam();
             List<Parameter> paramList = Arrays.asList(param1, param2);
             ScheduleBuilder scheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.DWHS2)
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.DWHS1)
                             .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).setParameters(paramList);
             createAndAssertSchedule(scheduleBuilder);
 
@@ -315,7 +315,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
                             new Parameter().setParamName("secure param").setParamValue("secure value")
                                     .setSecureParam());
             ScheduleBuilder scheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.DWHS2)
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.DWHS1)
                             .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).setParameters(paramList)
                             .setConfirmed(true);
             createAndAssertSchedule(scheduleBuilder);

@@ -8,7 +8,6 @@ import com.gooddata.qa.graphene.disc.DeployProcessTest;
 import com.gooddata.qa.graphene.disc.OverviewPageTest;
 import com.gooddata.qa.graphene.disc.ProjectDetailTest;
 import com.gooddata.qa.graphene.disc.ProjectsPageTest;
-import com.gooddata.qa.graphene.disc.SanityTest;
 import com.gooddata.qa.graphene.disc.SchedulesTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
@@ -31,7 +30,7 @@ public class UITestsRegistry {
         });
 
         suites.put("sanity", new Object[] {
-            SanityTest.class
+            "testng-imap-sanity.xml"
         });
 
         TestsRegistry.getInstance()

@@ -132,9 +132,9 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
             assertTrue(scheduleDetail.isSelectedDatasetsChecked(Collections.<String>emptyList()),
                     "There are some checked datasets when none dataset option is selected");
 
-            scheduleDetail.saveSelectedSynchronizeDatasets();
+            assertFalse(scheduleDetail.isSelectedSynchronziedSavedButtonEnabled(), 
+                    "The saved button is still enabled when no synchronized dataset");
 
-            scheduleBuilder.setDatasetsToSynchronize(Collections.<String>emptyList());
             assertSchedule(scheduleBuilder);
             
         } finally {
@@ -177,13 +177,13 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
         ScheduleBuilder schedule1 =
                 new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
                         .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHasDataloadProcess(true)
-                        .setDatasetsToSynchronize(asList(OPPORTUNITY_DATASET))
-                        .setScheduleName(OPPORTUNITY_DATASET + " (1)");
+                        .setDatasetsToSynchronize(asList(PERSON_DATASET))
+                        .setScheduleName(PERSON_DATASET + " (1)");
         ScheduleBuilder schedule2 =
                 new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
                         .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHasDataloadProcess(true)
-                        .setDatasetsToSynchronize(asList(OPPORTUNITY_DATASET))
-                        .setScheduleName(OPPORTUNITY_DATASET + " (2)");
+                        .setDatasetsToSynchronize(asList(PERSON_DATASET))
+                        .setScheduleName(PERSON_DATASET + " (2)");
         try {
             openProjectDetailPage(testParams.getProjectId());
             createSchedule(schedule1);
@@ -202,7 +202,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
             openScheduleViaUrl(schedule2.getScheduleUrl());
             scheduleDetail.tryToRun();
             takeScreenshot(browser, "Concurrent-Dataload-Schedule-Schedule2-Failed", getClass());
-            assertConcurrentDataloadScheduleFailed();
+            assertConcurrentDataloadScheduleFailed(schedule2);
 
             openScheduleViaUrl(schedule1.getScheduleUrl());
             takeScreenshot(browser, "Concurrent-Dataload-Schedule-Schedule1-Successful", getClass());
@@ -235,14 +235,16 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
                     "Schedule owner is not admin user");
 
             RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
-            UserManagementRestUtils.addUserToProject(restApiClient, testParams.getProjectId(), technicalUser,
+            
+            String dataAdmin = createDynamicUserFrom(testParams.getUser());
+            UserManagementRestUtils.addUserToProject(restApiClient, testParams.getProjectId(), dataAdmin,
                     UserRoles.ADMIN);
-            getAdsHelper().addUserToAdsInstance(ads, technicalUser, AdsRole.DATA_ADMIN);
+            getAdsHelper().addUserToAdsInstance(ads, dataAdmin, AdsRole.DATA_ADMIN);
 
             logout();
-            signInAtGreyPages(technicalUser, technicalUserPassword);
+            signInAtGreyPages(dataAdmin, testParams.getPassword());
 
-            redeployDataLoadProcess(getRestApiClient(technicalUser, technicalUserPassword));
+            redeployDataLoadProcess(getRestApiClient(dataAdmin, testParams.getPassword()));
 
             assertTrue(getScheduleDetail(schedule.getScheduleUrl()).contains(scheduleOwner),
                     "Schedule owner is changed after re-deployed dataload process.");
@@ -582,10 +584,10 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    private void assertConcurrentDataloadScheduleFailed() {
-        browser.navigate().refresh();
-        waitForElementVisible(scheduleDetail.getRoot());
-        scheduleDetail.waitForExecutionFinish();
+    private void assertConcurrentDataloadScheduleFailed(ScheduleBuilder scheduleBuilder) {
+        scheduleDetail.clickOnCloseScheduleButton();
+        browser.get(scheduleBuilder.getScheduleUrl());
+        waitForFragmentVisible(scheduleDetail).waitForExecutionFinish();
         assertTrue(scheduleDetail.isSchedulerErrorIconVisible(), "Scheduler error icon is not shown!");
         assertEquals(scheduleDetail.getExecutionErrorDescription(), CONCURRENT_DATA_LOAD_MESSAGE, "Incorrect concurrent data load message!");
         assertEquals(scheduleDetail.getLastExecutionLogTitle(), NO_LOG_AVAILABLE_TITLE, "Incorrect no log available!");
