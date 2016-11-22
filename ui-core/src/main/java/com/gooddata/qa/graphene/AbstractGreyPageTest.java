@@ -300,6 +300,7 @@ public class AbstractGreyPageTest extends AbstractTest {
         String dynamicUser = generateEmail(email);
 
         UserManagementRestUtils.createUser(restApiClient, testParams.getUserDomain(), dynamicUser, testParams.getPassword());
+        log.info(String.format("User %s is created successfully", dynamicUser));
         extraUsers.add(dynamicUser);
 
         return dynamicUser;
