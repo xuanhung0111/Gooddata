@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.fragments.dashboards;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,9 +83,7 @@ public class SavedViewWidget extends AbstractFragment{
      * @return
      */
     public void saveCurrentView(String name, boolean expectSuccessful, String... excludeFilters) {
-        getSavedViewPopupMenu().getSavedCurrentViewButton().click();
-        waitForElementVisible(dashboardSaveActiveViewDialog.getRoot());
-        dashboardSaveActiveViewDialog.saveCurrentView(name, expectSuccessful, excludeFilters);
+        openSaveActiveViewDialog().saveCurrentView(name, expectSuccessful, excludeFilters);
     }
 
     public SavedViewWidget saveCurrentView(String name, String... excludeFilters) {
@@ -99,6 +98,11 @@ public class SavedViewWidget extends AbstractFragment{
     public SavedViewWidget selectSavedView(String savedView) {
         getSavedViewPopupMenu().selectSavedView(savedView);
         return this;
+    }
+
+    public DashboardSaveActiveViewDialog openSaveActiveViewDialog() {
+        getSavedViewPopupMenu().getSavedCurrentViewButton().click();
+        return waitForFragmentVisible(dashboardSaveActiveViewDialog);
     }
 
     /**
