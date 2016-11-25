@@ -82,20 +82,23 @@ public class UITestsRegistry {
     public static void main(String[] args) throws Throwable {
         Map<String, Object> suites = new HashMap<>();
 
-        suites.put("basic", new Object[] {
-            SimpleProjectEtlTest.class,
-            GoodSalesDashboardTest.class,
-            GoodSalesReportsTest.class,
+        suites.put("basic", new HashMap<String, Object[]>() {{
+            put("basicTest", new Object[] {
+                    SimpleProjectEtlTest.class,
+                    GoodSalesDashboardTest.class,
+                    GoodSalesReportsTest.class,
 
-            new PredefineParameterTest("testng-imap-GoodSales-email-schedule.xml")
-                .param("GRAPHENE_USER", "gd.scheduledemail@gmail.com")
-                .param("GRAPHENE_PASSWORD", "$CHECKLIST_SCHEDULED_EMAIL_USER_PASSWORD"),
-
-            new PredefineParameterTest(LocalizationTest.class)
-                .param("LANGUAGE_CODE", "fr-FR"),
-
-            "testng-imap-project-n-users-sanity-test.xml"
-        });
+                    new PredefineParameterTest("testng-imap-GoodSales-email-schedule.xml")
+                        .param("GRAPHENE_USER", "gd.scheduledemail@gmail.com")
+                        .param("GRAPHENE_PASSWORD", "$CHECKLIST_SCHEDULED_EMAIL_USER_PASSWORD"),
+                   "testng-imap-project-n-users-sanity-test.xml"
+            });
+            //separate localization test into one phase so it does not affect to other tests
+            put("localization", new Object[] {
+                    new PredefineParameterTest(LocalizationTest.class)
+                        .param("LANGUAGE_CODE", "fr-FR")
+            });
+        }});
 
         suites.put("basic-vertica", new Object[] {
             new PredefineParameterTest(SimpleProjectEtlTest.class)
