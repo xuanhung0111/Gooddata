@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
 import com.gooddata.GoodData;
+import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.ProcessExecutionDetail;
 import com.gooddata.qa.utils.http.RestApiClient;
 
@@ -112,5 +113,9 @@ public final class ProcessRestUtils {
         return responseObject.getJSONObject("executionTask")
                 .getJSONObject("links")
                 .getString("poll");
+    }
+
+    public static void deteleProcess(GoodData goodDataClient, DataloadProcess process) {
+        goodDataClient.getProcessService().removeProcess(process);
     }
 }
