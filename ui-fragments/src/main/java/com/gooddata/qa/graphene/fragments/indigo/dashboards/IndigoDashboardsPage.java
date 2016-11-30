@@ -303,7 +303,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public AttributeFiltersPanel getAttributeFiltersPanel() {
         waitForElementPresent(By.className(ATTRIBUTE_FITERS_PANEL_CLASS_NAME), browser);
-        return attributeFiltersPanel;
+        return attributeFiltersPanel.waitForAttributeFiltersLoaded();
     }
 
     public IndigoDashboardsPage waitForAlertsLoaded() {
