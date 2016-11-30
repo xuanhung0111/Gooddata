@@ -77,6 +77,7 @@ public final class GoodSalesUtils {
     public static final String ATTR_MONTH_YEAR_CREATED = "Month/Year (Created)";
     public static final String ATTR_DATE_CREATED = "Date (Created)";
     public static final String ATTR_YEAR_CREATED = "Year (Created)";
+    public static final String ATTR_PRIORITY = "Priority";
 
     // facts
     public static final String FACT_AMOUNT = "Amount";
