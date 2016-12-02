@@ -37,6 +37,12 @@ public class DateFilterPickerPanel extends AbstractFragment {
     @FindBy(css = ".adi-date-input-to > input")
     private WebElement toDate;
 
+    @FindBy(css = ".adi-date-input-from > span")
+    private WebElement fromDateCalendarIcon;
+
+    @FindBy(css = ".adi-date-input-to > span")
+    private WebElement toDateCalendarIcon;
+
     @FindBy(className = "s-date-range-cancel")
     private WebElement cancelButton;
 
@@ -118,7 +124,7 @@ public class DateFilterPickerPanel extends AbstractFragment {
 
         waitForElementVisible(toDate).clear();
         toDate.sendKeys(to);
-        toDate.sendKeys(Keys.TAB);
+        waitForElementVisible(toDateCalendarIcon).click();
 
         waitForElementVisible(apply ? applyButton : cancelButton).click();
         waitForFragmentNotVisible(this);
