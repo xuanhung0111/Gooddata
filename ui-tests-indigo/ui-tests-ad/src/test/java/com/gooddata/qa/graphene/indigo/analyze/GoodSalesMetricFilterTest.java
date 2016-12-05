@@ -79,21 +79,6 @@ public class GoodSalesMetricFilterTest extends GoodSalesAbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void replaceMetricHasAttributeFilter() {
-        addFilterToMetric();
-        analysisPage.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT)
-            .waitForReportComputing();
-        assertTrue(analysisPage.getMetricsBucket()
-                .getMetricConfiguration(METRIC_AMOUNT)
-                .expandConfiguration()
-                .canAddAnotherFilter());
-        ChartReport report = analysisPage.getChartReport();
-        assertEquals(report.getTrackersCount(), 1);
-        assertEquals(report.getYaxisTitle(), METRIC_AMOUNT);
-        checkingOpenAsReport("replaceMetricHasAttributeFilter");
-    }
-
-    @Test(dependsOnGroups = {"init"})
     public void addAttributeFilterForMultipleMetrics() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()

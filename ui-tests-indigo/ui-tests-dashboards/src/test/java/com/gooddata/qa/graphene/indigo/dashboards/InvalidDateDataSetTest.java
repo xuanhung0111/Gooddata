@@ -37,7 +37,8 @@ public class InvalidDateDataSetTest extends GoodSalesAbstractDashboardTest {
         indigoDashboardsPage.saveEditModeWithWidgets();
 
         initAnalysePage().openInsight(INSIGHT_USING_DATE_FILTER).waitForReportComputing()
-                .replaceMetric(METRIC_OPP_FIRST_SNAPSHOT, METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing()
+                .removeMetric(METRIC_OPP_FIRST_SNAPSHOT)
+                .addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing()
                 .saveInsight();
 
         initIndigoDashboardsPageWithWidgets().switchToEditMode().selectLastWidget(Insight.class);
