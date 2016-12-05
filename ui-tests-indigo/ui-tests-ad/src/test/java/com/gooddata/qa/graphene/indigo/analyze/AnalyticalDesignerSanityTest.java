@@ -276,42 +276,6 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void replaceMetricByNewOne() {
-        final MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
-
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
-        assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(METRIC_NUMBER_OF_ACTIVITIES)));
-
-        analysisPage.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT).waitForReportComputing();
-        assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(METRIC_AMOUNT)));
-
-        analysisPage.changeReportType(ReportType.BAR_CHART).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                .waitForReportComputing();
-        assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT)));
-
-        analysisPage.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, EXPECTED).waitForReportComputing();
-        assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(EXPECTED, METRIC_AMOUNT)));
-
-        analysisPage.changeReportType(ReportType.TABLE).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                .waitForReportComputing();
-        assertTrue(isEqualCollection(metricsBucket.getItemNames(),
-                asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT, EXPECTED)));
-
-        analysisPage.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, REMAINING_QUOTA).waitForReportComputing();
-        assertTrue(isEqualCollection(metricsBucket.getItemNames(),
-                asList(REMAINING_QUOTA, METRIC_AMOUNT, EXPECTED)));
-
-        analysisPage.undo().waitForReportComputing();
-        assertTrue(isEqualCollection(metricsBucket.getItemNames(),
-                asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT, EXPECTED)));
-
-        analysisPage.redo().waitForReportComputing();
-        assertTrue(isEqualCollection(metricsBucket.getItemNames(),
-                asList(REMAINING_QUOTA, METRIC_AMOUNT, EXPECTED)));
-        checkingOpenAsReport("replaceMetricByNewOne");
-    }
-
-    @Test(dependsOnGroups = {"init"})
     public void dropAttributeToReportHaveOneMetric() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE);
         assertEquals(analysisPage.waitForReportComputing().getChartReport().getTrackersCount(), 4);

@@ -285,19 +285,16 @@ public class BucketsTest extends AbstractAdE2ETest {
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void should_be_possible_to_replace_metrics() {
-        assertEquals(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+    public void should_be_possible_to_add_metric_after_another_one() {
+        assertEquals(analysisPage
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addMetric(METRIC_NUMBER_OF_LOST_OPPS)
             .getMetricsBucket()
             .getItemNames(), asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_LOST_OPPS));
 
-        assertEquals(analysisPage.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPEN_OPPS)
+        assertEquals(analysisPage.addMetricAfter(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPEN_OPPS)
             .getMetricsBucket()
-            .getItemNames(), asList(METRIC_NUMBER_OF_OPEN_OPPS, METRIC_NUMBER_OF_LOST_OPPS));
-
-        assertEquals(analysisPage.replaceMetric(METRIC_NUMBER_OF_LOST_OPPS, METRIC_NUMBER_OF_ACTIVITIES)
-            .getMetricsBucket()
-            .getItemNames(), asList(METRIC_NUMBER_OF_OPEN_OPPS, METRIC_NUMBER_OF_ACTIVITIES));
+            .getItemNames(), asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPEN_OPPS, METRIC_NUMBER_OF_LOST_OPPS));
     }
 
     @Test(dependsOnGroups = {"init"})

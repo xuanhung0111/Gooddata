@@ -126,7 +126,9 @@ public class GoodSalesMetricBucketTest extends GoodSalesAbstractAnalyseTest {
         assertTrue(metricConfiguration.isPopSelected());
         assertTrue(metricConfiguration.isShowPercentSelected());
 
-        metricConfiguration = analysisPage.replaceMetric("% " + METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT)
+        metricConfiguration = analysisPage
+                .removeMetric("% " + METRIC_NUMBER_OF_ACTIVITIES)
+                .addMetric(METRIC_AMOUNT)
                 .getMetricsBucket()
                 .getMetricConfiguration(METRIC_AMOUNT)
                 .expandConfiguration();
@@ -136,7 +138,9 @@ public class GoodSalesMetricBucketTest extends GoodSalesAbstractAnalyseTest {
         assertFalse(metricConfiguration.isShowPercentSelected());
 
         metricConfiguration.collapseConfiguration();
-        metricConfiguration = analysisPage.replaceMetric(METRIC_AMOUNT, METRIC_NUMBER_OF_ACTIVITIES)
+        metricConfiguration = analysisPage
+            .removeMetric(METRIC_AMOUNT)
+            .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
@@ -184,41 +188,5 @@ public class GoodSalesMetricBucketTest extends GoodSalesAbstractAnalyseTest {
         assertFalse(metricConfiguration.isPopSelected());
         assertEquals(analysisPage.getAttributesBucket().getItemNames(), Arrays.asList(ATTR_ACTIVITY_TYPE));
         checkingOpenAsReport("uncheckSelectedPopWhenReplaceAttribute");
-    }
-
-    @Test(dependsOnGroups = {"init"})
-    public void replaceMetricByNewOne() {
-        final MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
-
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES);
-        assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(METRIC_NUMBER_OF_ACTIVITIES)));
-
-        analysisPage.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT);
-        assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(METRIC_AMOUNT)));
-
-        analysisPage.changeReportType(ReportType.BAR_CHART);
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES);
-        assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT)));
-
-        analysisPage.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, EXPECTED);
-        assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(EXPECTED, METRIC_AMOUNT)));
-
-        analysisPage.changeReportType(ReportType.TABLE);
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES);
-        assertTrue(isEqualCollection(metricsBucket.getItemNames(),
-                asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT, EXPECTED)));
-
-        analysisPage.replaceMetric(METRIC_NUMBER_OF_ACTIVITIES, REMAINING_QUOTA);
-        assertTrue(isEqualCollection(metricsBucket.getItemNames(),
-                asList(REMAINING_QUOTA, METRIC_AMOUNT, EXPECTED)));
-
-        analysisPage.undo();
-        assertTrue(isEqualCollection(metricsBucket.getItemNames(),
-                asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_AMOUNT, EXPECTED)));
-
-        analysisPage.redo();
-        assertTrue(isEqualCollection(metricsBucket.getItemNames(),
-                asList(REMAINING_QUOTA, METRIC_AMOUNT, EXPECTED)));
-        checkingOpenAsReport("replaceMetricByNewOne");
     }
 }
