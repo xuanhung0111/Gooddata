@@ -143,7 +143,7 @@ public class ScheduleDetail extends ScheduleForm {
     @FindBy(css = ".datasets-messages")
     private WebElement dataloadDatasetsMessages;
 
-    @FindBy(css = ".ait-schedule-run-btn")
+    @FindBy(css = ".ait-schedule-run-btn:not(.disabled)")
     private WebElement manualRunButton;
 
     @FindBy(className = "ait-schedule-stop-btn")
