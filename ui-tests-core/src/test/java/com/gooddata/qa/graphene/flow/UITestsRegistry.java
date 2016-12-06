@@ -46,6 +46,7 @@ import com.gooddata.qa.graphene.project.PartialExportAndImportProjectTest;
 import com.gooddata.qa.graphene.project.ProjectSwitchingTest;
 import com.gooddata.qa.graphene.project.SimpleProjectEtlTest;
 import com.gooddata.qa.graphene.project.ValidateProjectTest;
+import com.gooddata.qa.graphene.project.LeaveProjectTest;
 import com.gooddata.qa.graphene.reports.CopyReportTableTest;
 import com.gooddata.qa.graphene.reports.DynamicImageTest;
 import com.gooddata.qa.graphene.reports.GoodSalesAddingFilterFromReportContextMenuTest;
@@ -251,6 +252,7 @@ public class UITestsRegistry {
             ValidateProjectTest.class,
             GoodSalesMufOnUserProfileTest.class,
             UserAccountSettingTest.class,
+            LeaveProjectTest.class,
             "testng-imap-register-and-delete-user.xml",
             "testng-imap-invite-user-basic.xml",
             "testng-imap-invite-user-with-muf.xml",
