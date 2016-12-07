@@ -32,47 +32,33 @@ public class LeaveProjectTest extends AbstractProjectTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testProjectHavingOneAdmin() {
-        String workingProjectID = testParams.getProjectId();
-
-        String anotherProject = "Project-Having-One-Admin";
-        testParams.setProjectId(createBlankProject(anotherProject));
+        String blankProjectID = createBlankProject("Project-Having-One-Admin");
         try {
-            ProjectsPage page = initProjectsPage().leaveProject(anotherProject);
+            ProjectsPage page = initProjectsPage().leaveProject(blankProjectID);
             assertEquals(page.getPopupDialog().getMessage(), ERROR_MESSAGE, "The error msg is not correct");
         } finally {
-            ProjectRestUtils.deleteProject(getGoodDataClient(), testParams.getProjectId());
-            testParams.setProjectId(workingProjectID);
+            ProjectRestUtils.deleteProject(getGoodDataClient(), blankProjectID);
         }
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testProjectHavingMultipleAdmins() throws IOException, JSONException {
-        String currentProjectID = testParams.getProjectId();
-        String currentUser = testParams.getUser();
-
-        String anotherProject = "Project-Having-Two-Admins";
-        testParams.setProjectId(createBlankProject(anotherProject));
+        String workingProjectID = testParams.getProjectId();
+        testParams.setProjectId(createBlankProject("Project-Having-Two-Admins"));
         try {
-            // the test needs to use another user which is different from domain user
-            String anotherUser = createDynamicUserFrom(testParams.getUser().replace("@", "+" + UserRoles.ADMIN
-                    .getName().toLowerCase() + "@"));
-            UserManagementRestUtils.addUserToProject(getRestApiClient(testParams.getUser(), testParams.getPassword())
-                    , testParams.getProjectId(), anotherUser, UserRoles.ADMIN);
+            String anotherUser = createAndAddUserToProject(UserRoles.ADMIN);
 
-            testParams.setUser(anotherUser);
-            logoutAndLoginAs(true, UserRoles.ADMIN);
+            logout();
+            signInAtGreyPages(anotherUser, testParams.getPassword());
 
-            initProjectsPage().leaveProject(anotherProject);
+            initProjectsPage().leaveProject(testParams.getProjectId());
             assertFalse(initProjectsPage().isProjectDisplayed(testParams.getProjectId()), "The project is not removed" +
                     " from list");
         } finally {
             // switch to domain user because the new user which is created in this test has just left created project
-            testParams.setUser(currentUser);
             logoutAndLoginAs(true, UserRoles.ADMIN);
-
-            ProjectRestUtils.deleteProject(getGoodDataClient(testParams.getUser(), testParams.getPassword()),
-                    testParams.getProjectId());
-            testParams.setProjectId(currentProjectID);
+            ProjectRestUtils.deleteProject(getGoodDataClient(), testParams.getProjectId());
+            testParams.setProjectId(workingProjectID);
         }
     }
 
