@@ -82,8 +82,8 @@ public class ProjectsPage extends AbstractFragment {
                 .getText();
     }
 
-    public ProjectsPage leaveProject(String name) {
-        waitForElementVisible(findProject(name)).findElement(className("leaveProject")).click();
+    public ProjectsPage leaveProject(String projectId) {
+        waitForElementVisible(findProject(getProjectNameFrom(projectId))).findElement(className("leaveProject")).click();
         getPopupDialog().leaveProject();
 
         return this;
