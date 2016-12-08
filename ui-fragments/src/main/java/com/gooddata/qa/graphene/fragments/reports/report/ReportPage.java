@@ -291,9 +291,8 @@ public class ReportPage extends AbstractFragment {
     }
 
     public ReportPage confirmCreateReportInDialog() {
-        WebElement confirmDialogCreateButton = waitForElementVisible(xpath(
-                "//div[contains(@class, 's-saveReportDialog')]//footer[@class='buttons']"
-                + "//button[contains(@class, 's-btn-create')]"), browser);
+        WebElement confirmDialogCreateButton = waitForElementVisible(cssSelector(
+                ".s-saveReportDialog .s-btn-create"), browser);
         waitForElementVisible(confirmDialogCreateButton).click();
         waitForElementNotVisible(confirmDialogCreateButton);
 
@@ -451,7 +450,10 @@ public class ReportPage extends AbstractFragment {
     }
 
     public ReportPage clickSaveReport() {
-        waitForElementVisible(createReportButton).click();
+        Predicate<WebDriver> createReportButtonEnabled = 
+                input -> waitForElementVisible(createReportButton).isEnabled();
+        Graphene.waitGui().until(createReportButtonEnabled);
+        createReportButton.click();
         return this;
     }
 
