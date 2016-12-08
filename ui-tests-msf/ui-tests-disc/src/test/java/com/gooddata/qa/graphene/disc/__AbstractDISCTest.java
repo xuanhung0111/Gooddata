@@ -1,27 +1,25 @@
 package com.gooddata.qa.graphene.disc;
 
-import static com.gooddata.qa.graphene.enums.ResourceDirectory.ZIP_FILES;
-import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
 import static java.lang.String.format;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-
-import java.io.File;
 
 import org.joda.time.DateTime;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.dataload.processes.DataloadProcess;
-import com.gooddata.dataload.processes.ProcessType;
 import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.qa.graphene.AbstractProjectTest;
-import com.gooddata.qa.graphene.enums.disc.__PackageFile;
 import com.gooddata.qa.graphene.enums.disc.__Executable;
 import com.gooddata.qa.graphene.fragments.disc.overview.__DiscOverviewPage;
+import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
+import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
+import com.gooddata.qa.graphene.fragments.disc.projects.__ProjectDetailPage;
 import com.gooddata.qa.graphene.fragments.disc.projects.__ProjectsPage;
 import com.gooddata.qa.graphene.fragments.disc.schedule.__ScheduleDetailFragment;
 
 public class __AbstractDISCTest extends AbstractProjectTest {
 
+    public static final String PROJECT_DETAIL_PAGE_URL = "admin/disc/#/projects/%s";
     private static final String SCHEDULT_DETAIL_URL = "admin/disc/#/projects/%s/processes/%s/schedules/%s";
 
     @FindBy(className = "l-page")
@@ -29,6 +27,9 @@ public class __AbstractDISCTest extends AbstractProjectTest {
 
     @FindBy(className = "ait-projects-fragment")
     protected __ProjectsPage projectsPage;
+
+    @FindBy(className = "ait-project-detail-fragment")
+    protected __ProjectDetailPage projectDetailPage;
 
     protected __DiscOverviewPage __initDiscOverviewPage() {
         openUrl(DISC_OVERVIEW_PAGE);
@@ -40,27 +41,35 @@ public class __AbstractDISCTest extends AbstractProjectTest {
         return waitForFragmentVisible(projectsPage).waitForPageLoaded();
     }
 
+    protected __ProjectDetailPage __initDiscProjectDetailPage() {
+        openUrl(format(PROJECT_DETAIL_PAGE_URL, testParams.getProjectId()));
+        return waitForFragmentVisible(projectDetailPage);
+    }
+
     protected __ScheduleDetailFragment initScheduleDetail(Schedule schedule) {
         openUrl(format(SCHEDULT_DETAIL_URL, testParams.getProjectId(), schedule.getProcessId(), schedule.getId()));
         return __ScheduleDetailFragment.getInstance(browser);
     }
 
     protected DataloadProcess createProcessWithBasicPackage(String processName) {
-        return getGoodDataClient().getProcessService()
-                .createProcess(getProject(), new DataloadProcess(processName, ProcessType.GRAPH),
-                        loadPackage(__PackageFile.BASIC));
+        log.info("Create process: " + processName);
+        return getGoodDataClient().getProcessService().createProcess(getProject(),
+                new DataloadProcess(processName, ProcessType.CLOUD_CONNECT.getValue()), PackageFile.BASIC.loadFile());
     }
 
     protected Schedule createSchedule(DataloadProcess process, __Executable executable, String crontimeExpression) {
-        return getGoodDataClient().getProcessService()
-                .createSchedule(getProject(), new Schedule(process, executable.getValue(), crontimeExpression));
+        String expectedExecutable = process.getExecutables()
+                .stream().filter(e -> e.contains(executable.getValue())).findFirst().get();
+
+        return getGoodDataClient().getProcessService().createSchedule(getProject(),
+                new Schedule(process, expectedExecutable, crontimeExpression));
     }
 
     protected String parseDateToCronExpression(DateTime dateTime) {
         return format("%d * * * *", dateTime.getMinuteOfHour());
     }
 
-    private File loadPackage(__PackageFile packageFile) {
-        return getResourceAsFile("/" + ZIP_FILES + "/" + packageFile.getName());
+    protected String generateProcessName() {
+        return "Process-" + generateHashString();
     }
 }

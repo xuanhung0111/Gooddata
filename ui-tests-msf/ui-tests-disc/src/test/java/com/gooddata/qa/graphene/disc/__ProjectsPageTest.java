@@ -33,7 +33,6 @@ import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class __ProjectsPageTest extends __AbstractDISCTest {
 
-    private static final String BASIC_PROCESS = "basic-process";
     private static final String EMPTY_STATE_MESSAGE = "No %sprojects matching \"%s\"";
 
     @Override
@@ -63,7 +62,7 @@ public class __ProjectsPageTest extends __AbstractDISCTest {
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "filterProvider")
     public void checkFilterWorkCorrectly(FilterOption filterOption, __Executable executable) {
-        DataloadProcess process = createProcessWithBasicPackage(BASIC_PROCESS);
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
             Schedule schedule = createSchedule(process, executable, __ScheduleCronTime.EVERY_30_MINUTE.getExpression());
@@ -99,7 +98,7 @@ public class __ProjectsPageTest extends __AbstractDISCTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkProcessesInfoOnProject() {
-        DataloadProcess process = createProcessWithBasicPackage(BASIC_PROCESS);
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
             createSchedule(process, __Executable.SUCCESSFUL_GRAPH, __ScheduleCronTime.EVERY_30_MINUTE.getExpression());
@@ -115,7 +114,7 @@ public class __ProjectsPageTest extends __AbstractDISCTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkLastSuccessfulExecution() {
-        DataloadProcess process = createProcessWithBasicPackage(BASIC_PROCESS);
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
             Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
@@ -137,7 +136,7 @@ public class __ProjectsPageTest extends __AbstractDISCTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkLastSuccessfulAutoExecution() {
-        DataloadProcess process = createProcessWithBasicPackage(BASIC_PROCESS);
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
             DateTime autoExecutionStartTime = DateTime.now().plusMinutes(2);

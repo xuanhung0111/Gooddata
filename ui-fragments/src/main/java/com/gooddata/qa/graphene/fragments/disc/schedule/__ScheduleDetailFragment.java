@@ -20,9 +20,12 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.Select;
 
 import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
+import com.gooddata.qa.graphene.enums.disc.__Executable;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.disc.ConfirmationDialog;
 import com.google.common.base.Predicate;
 
 public class __ScheduleDetailFragment extends AbstractFragment {
@@ -35,6 +38,12 @@ public class __ScheduleDetailFragment extends AbstractFragment {
 
     @FindBy(className = "execution-history-item")
     private List<__ExecutionHistoryItem> executionHistoryItems;
+
+    @FindBy(className = "ait-schedule-executable-select-btn")
+    private Select executableSelect;
+
+    @FindBy(className = "button-positive")
+    private WebElement saveButton;
 
     public static final __ScheduleDetailFragment getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(__ScheduleDetailFragment.class, waitForElementVisible(LOCATOR, searchContext))
@@ -54,10 +63,18 @@ public class __ScheduleDetailFragment extends AbstractFragment {
         int executionItems = executionHistoryItems.size();
 
         waitForElementVisible(runButton).click();
-        waitForElementVisible(By.className("ait-schedule-run-confirm-btn"), browser).click();
+        ConfirmationDialog.getInstance(browser).confirm();
 
         Predicate<WebDriver> scheduleExecuted = browser -> executionHistoryItems.size() == executionItems + 1;
         Graphene.waitGui().until(scheduleExecuted);
+        return this;
+    }
+
+    public __ScheduleDetailFragment waitForStatus(ScheduleStatus status) {
+        Predicate<WebDriver> statusReached = browser ->
+                getLastExecutionHistoryItem().getStatusDescription().equals(status.toString());
+        Graphene.waitGui().until(statusReached);
+
         return this;
     }
 
@@ -82,6 +99,12 @@ public class __ScheduleDetailFragment extends AbstractFragment {
         };
 
         Graphene.waitGui().until(executionFinished);
+        return this;
+    }
+
+    public __ScheduleDetailFragment editExecutable(__Executable executable) {
+        waitForElementVisible(executableSelect).selectByVisibleText(executable.getValue());
+        waitForElementVisible(saveButton).click();
         return this;
     }
 

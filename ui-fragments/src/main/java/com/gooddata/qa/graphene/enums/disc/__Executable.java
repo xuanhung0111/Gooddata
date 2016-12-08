@@ -2,10 +2,10 @@ package com.gooddata.qa.graphene.enums.disc;
 
 public enum __Executable {
 
-    SUCCESSFUL_GRAPH("Basic/graph/successfulGraph.grf"),
-    ERROR_GRAPH("Basic/graph/errorGraph.grf"),
-    LONG_TIME_RUNNING_GRAPH("Basic/graph/longTimeRunningGraph.grf"),
-    SHORT_TIME_ERROR_GRAPH("Basic/graph/shortTimeErrorGraph.grf");
+    SUCCESSFUL_GRAPH("/graph/successfulGraph.grf"),
+    ERROR_GRAPH("/graph/errorGraph.grf"),
+    LONG_TIME_RUNNING_GRAPH("/graph/longTimeRunningGraph.grf"),
+    SHORT_TIME_ERROR_GRAPH("/graph/shortTimeErrorGraph.grf");
 
     private String value;
 
