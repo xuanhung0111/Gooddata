@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -24,5 +25,10 @@ public class Insight extends Widget {
 
     public static boolean isInsight(final Widget widget) {
         return widget.getRoot().getAttribute("class").contains("type-visualization");
+    }
+
+    public boolean isEmptyValue() {
+        return isElementPresent(By.className("gd-state-icon"), getRoot()) && isElementPresent(By.className
+                ("gd-state-text"), getRoot());
     }
 }
