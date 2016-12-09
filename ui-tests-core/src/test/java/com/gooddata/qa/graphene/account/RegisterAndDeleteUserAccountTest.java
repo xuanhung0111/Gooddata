@@ -65,8 +65,10 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     private static final String ACTIVATION_SUCCESS_MESSAGE = "Account Activated"
             + "\nYour account has been successfully activated!";
 
-    private static final String ALREADY_ACTIVATED_MESSAGE = "Already activated"
-            + "\nThis registration has already been activated. Please log in below.";
+    // due to cl-10948, change message when re-click on activation account link
+    private static final String ALREADY_ACTIVATED_MESSAGE = "This activation link is not valid."
+            + "\nRegister again or log in to your account.";
+    private static final By LOG_IN_YOUR_ACCOUNT_LINK = By.cssSelector(".login-message a");
 
     private static final String NOT_FULLY_ACTIVATED_MESSAGE = "Your account has not yet been fully activated. "
             + "Please click the activation link in the confirmation email sent to you.";
@@ -274,7 +276,11 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     @Test(dependsOnMethods = {"registerNewUser"})
     public void openAtivationLinkAfterRegistration() {
         openUrl(activationLink);
-        assertEquals(LoginFragment.getInstance(browser).getNotificationMessage(), ALREADY_ACTIVATED_MESSAGE);
+
+        String messageInfoLoginPage = waitForElementVisible(By.cssSelector(".login-message"), browser).getText();
+        assertEquals(messageInfoLoginPage, ALREADY_ACTIVATED_MESSAGE);
+
+        waitForElementVisible(LOG_IN_YOUR_ACCOUNT_LINK, browser).click();
 
         LoginFragment.getInstance(browser).login(registrationUser, testParams.getPassword(), true);
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
