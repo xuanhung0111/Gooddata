@@ -39,12 +39,11 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -87,6 +86,7 @@ import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.manage.MetricPage;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.utils.Sleeper;
+import com.gooddata.qa.utils.http.InvalidStatusCodeException;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.gooddata.report.ReportExportFormat;
 import com.gooddata.report.ReportService;
@@ -678,17 +678,25 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
             firstRow = reader.read();
         }
         assertNull(firstRow.get(3));
+    }
 
-        DashboardsRestUtils.changeMetricExpression(getRestApiClient(), m1.getUri(),
-                "SELECT RUNSUM( [" + amount.getUri() + "] ) ROWS BETWEEN 5.5 PRECEDING AND CURRENT ROW");
+    @Test(dependsOnMethods = {"testRollingWindowMetrics"}, groups = {"non-UI-metric"})
+    public void testRollingWindowMetricsWithInvalidMetricExpression() 
+            throws ParseException, JSONException, IOException {
+        Metric amount = getMdService().getObj(getProject(), Metric.class, Restriction.title(METRIC_AMOUNT));
+        Metric m1 = getMdService().getObj(getProject(), Metric.class, Restriction.title("M1"));
+        String metricExpression = 
+                "SELECT RUNSUM( [" + amount.getUri() + "] ) ROWS BETWEEN 5.5 PRECEDING AND CURRENT ROW";
         try {
-            initReportsPage().openReport(reportName);
-            takeScreenshot(browser, "checkReportRenderedWell - report not computable", getClass());
-            assertThat(reportPage.getInvalidDataReportMessage(), equalTo(REPORT_NOT_COMPUTABLE_MESSAGE));
-        } finally {
-            DashboardsRestUtils.changeMetricExpression(getRestApiClient(), m1.getUri(),
-                    "SELECT RUNSUM( [" + amount.getUri() + "] ) ROWS BETWEEN 5 PRECEDING AND CURRENT ROW");
+            DashboardsRestUtils.changeMetricExpression(getRestApiClient(), m1.getUri(), metricExpression);
+        } catch (InvalidStatusCodeException e) {
+            //expected the invalid status code exception should be thrown
+            //when editing metric expression into invalid
+            assertTrue(e.getMessage().contains("expected code [200], but got [400]"), 
+                    "Invalid metric expression is accepted");
+            return;
         }
+        fail(String.format("Invalid metric expression: %s MUST be forbidden", metricExpression));
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"non-UI-metric"})
