@@ -224,12 +224,16 @@ public class AbstractGreyPageTest extends AbstractTest {
     public void verifyLDMModelProject(long expectedSize) throws ParseException, IOException, JSONException {
         //download folder is not created automatically
         new File(testParams.getDownloadFolder()).mkdir();
-        File imageFileName = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator() + getLDMImageFile());
-        replaceContentInSVGFile(imageFileName, Pair.of(testParams.getHost(), HOST_NAME), Pair.of(testParams.getProjectId(), PROJECT_ID));
+        File imageFileName = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator() + 
+                getLDMImageFile());
+        String hostname = testParams.isHostProxy()? testParams.getHostProxy(): testParams.getHost();
+        replaceContentInSVGFile(imageFileName, Pair.of(hostname, HOST_NAME), 
+                Pair.of(testParams.getProjectId(), PROJECT_ID));
         System.out.println("imageFileName = " + imageFileName);
         long fileSize = imageFileName.length();
         System.out.println("File size: " + fileSize);
-        assertTrue(fileSize == expectedSize, "LDM is probably invalid, check the LDM image manually! Current size is " + fileSize + ", but " + expectedSize + " in size was expected");
+        assertTrue(fileSize == expectedSize, "LDM is probably invalid, check the LDM image manually! "
+                + "Current size is " + fileSize + ", but " + expectedSize + " in size was expected");
     }
 
     /**
