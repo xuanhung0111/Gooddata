@@ -22,17 +22,17 @@ public class Widget extends AbstractFragment {
     @FindBy(className = "dash-item-action-delete")
     protected WebElement deleteButton;
 
-    @FindBy(css = ".item-headline .item-headline-inner")
+    @FindBy(css = ".item-headline .s-headline")
     protected WebElement headline;
 
-    @FindBy(css = ".item-headline  .item-headline-inner .gd-editable-label")
+    @FindBy(css = ".item-headline .s-editable-label")
     private WebElement headlineInplaceEdit;
 
-    @FindBy(css = ".item-headline .item-headline-inner textarea")
+    @FindBy(css = ".item-headline .s-editable-label textarea")
     private WebElement headlineTextarea;
 
     public String getHeadline() {
-        return waitForElementVisible(headline).getText();
+        return waitForElementVisible(headline).getText().replace("\n", " ");
     }
 
     public String getHeadlinePlaceholder() {
