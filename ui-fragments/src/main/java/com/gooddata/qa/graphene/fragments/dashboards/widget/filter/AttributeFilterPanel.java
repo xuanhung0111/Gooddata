@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.fragments.dashboards.widget.filter;
 
-import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import java.util.List;
@@ -45,13 +44,9 @@ public class AttributeFilterPanel extends SelectItemPopupPanel {
         return !getRoot().getAttribute("class").contains("multiple");
     }
 
+    @Override
     public List<WebElement> getItemElements() {
         return listAttrValues;
-    }
-
-    @Override
-    public List<String> getItems() {
-        return getElementTexts(listAttrValues);
     }
 
     private boolean isOnGroupMode() {

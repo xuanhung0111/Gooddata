@@ -110,7 +110,11 @@ public class SelectItemPopupPanel extends AbstractFragment {
     }
 
     public List<String> getItems() {
-        return getElementTexts(items);
+        return getElementTexts(getItemElements());
+    }
+
+    public List<WebElement> getItemElements() {
+        return items;
     }
 
     public SelectItemPopupPanel clearAllItems() {
@@ -156,7 +160,7 @@ public class SelectItemPopupPanel extends AbstractFragment {
     public SelectItemPopupPanel clearSearchInput() {
         waitForElementVisible(searchInput).clear();
         searchInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
-        waitForCollectionIsEmpty(items);
+        waitForCollectionIsEmpty(getItemElements());
 
         // Sometimes clear() does nothing, so using hot keys instead
         searchInput.sendKeys(Keys.BACK_SPACE);
