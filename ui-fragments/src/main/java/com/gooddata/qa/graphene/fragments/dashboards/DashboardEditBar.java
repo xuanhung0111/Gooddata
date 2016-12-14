@@ -276,8 +276,9 @@ public class DashboardEditBar extends AbstractFragment {
         return savedViewDisabledNotification;
     }
 
-    public void setParentsFilter(String filter, String... parentFilterNames) {
+    public DashboardEditBar setParentsFilter(String filter, String... parentFilterNames) {
         dashboardEditFilter.addParentFilters(filter, parentFilterNames);
+        return this;
     }
 
     public void setParentsFilterUsingDataset(String filter, String linkedDataset, String... parentFilterNames) {
