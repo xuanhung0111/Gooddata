@@ -245,6 +245,9 @@ public class ScheduleForm extends AbstractFragment {
 
     private void setDatasetsToSynchronize(List<String> datasetsToSynchronize) {
         waitForElementVisible(selectSynchronizeSelectedDatasets).click();
+        if (datasetsToSynchronize == null || datasetsToSynchronize.isEmpty()) {
+            return;
+        }
         waitForElementVisible(openDatasetPickerButton).click();
 
         List<WebElement> items =
