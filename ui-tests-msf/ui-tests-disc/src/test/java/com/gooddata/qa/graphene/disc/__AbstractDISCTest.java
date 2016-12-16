@@ -7,6 +7,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 
 import java.io.File;
 
+import org.joda.time.DateTime;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.dataload.processes.DataloadProcess;
@@ -16,6 +17,7 @@ import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.disc.__PackageFile;
 import com.gooddata.qa.graphene.enums.disc.__Executable;
 import com.gooddata.qa.graphene.fragments.disc.overview.__DiscOverviewPage;
+import com.gooddata.qa.graphene.fragments.disc.projects.__ProjectsPage;
 import com.gooddata.qa.graphene.fragments.disc.schedule.__ScheduleDetailFragment;
 
 public class __AbstractDISCTest extends AbstractProjectTest {
@@ -25,9 +27,17 @@ public class __AbstractDISCTest extends AbstractProjectTest {
     @FindBy(className = "l-page")
     protected __DiscOverviewPage overviewPage;
 
+    @FindBy(className = "ait-projects-fragment")
+    protected __ProjectsPage projectsPage;
+
     protected __DiscOverviewPage __initDiscOverviewPage() {
         openUrl(DISC_OVERVIEW_PAGE);
         return waitForFragmentVisible(overviewPage).waitForPageLoaded();
+    }
+
+    protected __ProjectsPage __initDiscProjectsPage() {
+        openUrl(DISC_PROJECTS_PAGE_URL);
+        return waitForFragmentVisible(projectsPage).waitForPageLoaded();
     }
 
     protected __ScheduleDetailFragment initScheduleDetail(Schedule schedule) {
@@ -44,6 +54,10 @@ public class __AbstractDISCTest extends AbstractProjectTest {
     protected Schedule createSchedule(DataloadProcess process, __Executable executable, String crontimeExpression) {
         return getGoodDataClient().getProcessService()
                 .createSchedule(getProject(), new Schedule(process, executable.getValue(), crontimeExpression));
+    }
+
+    protected String parseDateToCronExpression(DateTime dateTime) {
+        return format("%d * * * *", dateTime.getMinuteOfHour());
     }
 
     private File loadPackage(__PackageFile packageFile) {
