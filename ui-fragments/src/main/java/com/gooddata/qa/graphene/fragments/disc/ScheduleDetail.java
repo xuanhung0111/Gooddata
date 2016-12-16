@@ -227,7 +227,7 @@ public class ScheduleDetail extends ScheduleForm {
     @FindBy(css = ".searchfield-input")
     private WebElement searchDatasetInput;
 
-    @FindBy(css = ".gd-list-view-item span:not(.ember-view)")
+    @FindBy(css = ".gd-list-view-item span.dataset-title")
     private List<WebElement> datasets;
 
     @FindBy(css = ".ait-schedule-title-section .icon-edit")
