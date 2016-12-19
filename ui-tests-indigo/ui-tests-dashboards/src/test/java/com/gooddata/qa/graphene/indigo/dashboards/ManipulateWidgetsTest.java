@@ -284,23 +284,6 @@ public class ManipulateWidgetsTest extends GoodSalesAbstractDashboardTest {
         takeScreenshot(browser, "Dashboards after deleting bad Kpi", getClass());
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "mobile"})
-    public void checkNoVisualizationOnDashboard() {
-        int visualizationsCount = initIndigoDashboardsPageWithWidgets().getInsightsCount();
-
-        takeScreenshot(browser, "checkNoVisualizationOnDashboard", getClass());
-        assertEquals(visualizationsCount, 0);
-    }
-
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
-    public void checkNoVisualizationListInPanel() {
-        initIndigoDashboardsPageWithWidgets()
-                .switchToEditMode();
-
-        takeScreenshot(browser, "checkNoVisualizationListInPanel", getClass());
-        IndigoInsightSelectionPanel.waitForNotPresent();
-    }
-
     private String generateUniqueHeadlineTitle() {
         // create unique headline title which fits into headline title (has limited size)
         return UUID.randomUUID().toString().substring(0, 18);
