@@ -15,6 +15,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.Select
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.AttributeFilterPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.DashboardEditWidgetToolbarPanel;
 
 public class FilterWidget extends AbstractFragment {
 
@@ -74,7 +75,22 @@ public class FilterWidget extends AbstractFragment {
     }
 
     /**
-     * Change values by open and select attribute values in Attribute filter panel.
+     * Change values permanently by click pencil icon to open and
+     * Select attribute values in default Attribute filter panel.
+     * Can use for both single and multiple mode.
+     * @param values
+     * @return
+     */
+    public FilterWidget editAttributeFilterValues(String... values) {
+        DashboardEditWidgetToolbarPanel.openEditPanelFor(this.getRoot(), browser);
+        getAttributeFilterPanel().changeValues(values);
+
+        closePanel();
+        return this;
+    }
+
+    /**
+     * change values temporarily by open and select attribute values in review Attribute filter panel.
      * Can use for both single and multiple mode.
      * @param values
      * @return

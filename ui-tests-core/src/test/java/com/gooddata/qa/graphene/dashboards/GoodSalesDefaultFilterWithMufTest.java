@@ -169,8 +169,8 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
 
         try {
             initDashboardsPage().selectDashboard(DASHBOARD_MUF).editDashboard();
-            getFilter(ATTR_PRODUCT).changeAttributeFilterValues(PHOENIXSOFT);
-            getFilter(MUF_DF_VARIABLE).changeAttributeFilterValues(PHOENIXSOFT);
+            getFilter(ATTR_PRODUCT).editAttributeFilterValues(PHOENIXSOFT);
+            getFilter(MUF_DF_VARIABLE).editAttributeFilterValues(PHOENIXSOFT);
 
             dashboardsPage.saveDashboard();
             assertEquals(getReport(REPORT_MUF).getAttributeElements(), singletonList(PHOENIXSOFT));
