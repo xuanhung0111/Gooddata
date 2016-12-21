@@ -58,7 +58,7 @@ public class __ProjectsDetailTest extends __AbstractDISCTest {
             __initDiscProjectDetailPage();
             assertEquals(projectDetailPage.getTitle(), projectTitle);
             assertEquals(projectDetailPage.getProjectIdMetadata(), testParams.getProjectId());
-            assertTrue(projectDetailPage.hasProcess(process.getId()));
+            assertTrue(projectDetailPage.hasProcess(process.getName()));
 
         } finally {
             deteleProcess(getGoodDataClient(), process);
@@ -71,7 +71,7 @@ public class __ProjectsDetailTest extends __AbstractDISCTest {
 
         try {
             ProcessDetail processDetail = __initDiscProjectDetailPage()
-                    .getProcess(process.getId())
+                    .getProcess(process.getName())
                     .openTab(Tab.SCHEDULE);
             assertTrue(processDetail.isTabActive(Tab.SCHEDULE), "Tab is not active");
             assertTrue(processDetail.hasNoSchedule(), "Clean process should have no schedule");
@@ -108,7 +108,7 @@ public class __ProjectsDetailTest extends __AbstractDISCTest {
         File downloadedFile = null;
 
         try {
-            __initDiscProjectDetailPage().downloadProcess(process.getId());
+            __initDiscProjectDetailPage().downloadProcess(process.getName());
             downloadedFile = waitForProcessDownloaded(process.getId(), 64000L);
 
         } finally {
@@ -128,8 +128,8 @@ public class __ProjectsDetailTest extends __AbstractDISCTest {
             assertEquals(projectDetailPage.getProcessNames(), listProcessNameInOrder);
 
             String newProcessName = "Z-process";
-            projectDetailPage.getProcess(processes.get(0).getId())
-                    .redeployWithZipFile(newProcessName, ProcessType.CLOUD_CONNECT, PackageFile.BASIC);
+            projectDetailPage.getProcess(processes.get(0).getName())
+                    .redeployWithZipFile(newProcessName, ProcessType.CLOUD_CONNECT, PackageFile.BASIC.loadFile());
 
             takeScreenshot(browser, "processes-sorted-again-after-redeploy", getClass());
             assertEquals(getLast(projectDetailPage.getProcessNames()), newProcessName);
@@ -145,7 +145,7 @@ public class __ProjectsDetailTest extends __AbstractDISCTest {
 
         try {
             ConfirmationDialog dialog = __initDiscProjectDetailPage()
-                    .getProcess(process.getId())
+                    .getProcess(process.getName())
                     .clickDeleteButton();
 
             takeScreenshot(browser, "Delete-confirmation-dialog-shows", getClass());
@@ -153,8 +153,8 @@ public class __ProjectsDetailTest extends __AbstractDISCTest {
             assertEquals(dialog.getMessage(), format("Are you sure you want to delete process \"%s\"?", process.getName()));
 
             dialog.discard();
-            assertTrue(projectDetailPage.hasProcess(process.getId()));
-            assertFalse(projectDetailPage.deleteProcess(process.getId()).hasProcess(process.getId()),
+            assertTrue(projectDetailPage.hasProcess(process.getName()));
+            assertFalse(projectDetailPage.deleteProcess(process.getName()).hasProcess(process.getName()),
                     "Process is not deleted successfully");
 
         } finally {
@@ -174,7 +174,7 @@ public class __ProjectsDetailTest extends __AbstractDISCTest {
             createSchedule(process, __Executable.SUCCESSFUL_GRAPH, __ScheduleCronTime.EVERY_30_MINUTE.getExpression());
 
             ProcessDetail processDetail = __initDiscProjectDetailPage()
-                    .getProcess(process.getId())
+                    .getProcess(process.getName())
                     .openTab(Tab.EXECUTABLE);
 
             assertEquals(processDetail.getScheduleInfoFrom(__Executable.SUCCESSFUL_GRAPH), "Scheduled 1 time");
@@ -196,7 +196,7 @@ public class __ProjectsDetailTest extends __AbstractDISCTest {
                     __ScheduleCronTime.EVERY_30_MINUTE.getExpression());
 
             ProcessDetail processDetail = __initDiscProjectDetailPage()
-                    .getProcess(process.getId())
+                    .getProcess(process.getName())
                     .openTab(Tab.SCHEDULE);
             assertEquals(processDetail.getScheduleStatus(schedule.getId()), ScheduleStatus.UNSCHEDULED);
 
