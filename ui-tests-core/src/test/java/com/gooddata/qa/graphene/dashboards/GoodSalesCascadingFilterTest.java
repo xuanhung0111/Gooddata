@@ -13,6 +13,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.util.Arrays.asList;
@@ -45,10 +46,12 @@ import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardContent;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditFilter;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.GroupConfigPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.ParentFiltersConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.utils.Sleeper;
@@ -60,6 +63,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
     private static final String REPORT_3 = "Report3";
 
     private static final String ATTRIBUTE_TEST_DASHBOARD = "AttributeTestDashboard";
+    private static final String ATTRIBUTE_TEST_CASCADING_FILTER_DASHBOARD = "AttributeTestCascadingFilterDashboard";
     private static final String DATE_TEST_DASHBOARD = "DateTestDashboard";
     private static final String TMP_DASHBOARD = "TmpDashboard";
 
@@ -148,6 +152,44 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
         addListAttributeFilterToDashboardAndMoveToRightPlace(ATTR_MONTH_YEAR_SNAPSHOT, DashboardWidgetDirection.DOWN);
 
         dashboardEditBar.saveDashboard();
+    }
+
+    @Test(dependsOnMethods = {"createReports"}, groups = {"init"}, description =
+            "This test is cover the follow bug: CL-10656 Parent filter setting isn't remained after refreshing page")
+    public void checkCascadingFilterForTwoAttributes() {
+        initDashboardsPage();
+
+        try {
+            DashboardEditBar dashboardEditBar = dashboardsPage.addNewDashboard(ATTRIBUTE_TEST_CASCADING_FILTER_DASHBOARD)
+                .editDashboard();
+            addReportToDashboardAndMoveToRightPlace(REPORT_1, DashboardWidgetDirection.LEFT);
+
+            addListAttributeFilterToDashboardAndMoveToRightPlace(ATTR_REGION, DashboardWidgetDirection.UP);
+
+            addListAttributeFilterToDashboardAndMoveToRightPlace(ATTR_PRODUCT, DashboardWidgetDirection.DOWN);
+
+            dashboardEditBar.saveDashboard();
+
+            browser.navigate().refresh();
+            waitForDashboardPageLoaded(browser);
+
+            dashboardsPage.editDashboard().setParentsFilter(ATTR_PRODUCT, ATTR_REGION).saveDashboard();
+
+            browser.navigate().refresh();
+            waitForDashboardPageLoaded(browser);
+
+            DashboardEditFilter dashboardEditFitler = dashboardsPage.editDashboard().getDashboardEditFilter();
+
+            WidgetConfigPanel.
+                openConfigurationPanelFor(dashboardEditFitler.getAttributeFilter(ATTR_PRODUCT), browser)
+                    .getTab(WidgetConfigPanel.Tab.PARENT_FILTERS, ParentFiltersConfigPanel.class);
+
+            String parentFiltersRowContent = waitForElementVisible(By.className("parentFiltersRow"), browser)
+                .getText();
+            assertEquals(parentFiltersRowContent, "Region\n- linked using data of\nOpp. Snapshot");
+        } finally {
+            dashboardsPage.deleteDashboard();
+        }
     }
 
     @Test(dependsOnGroups = {"init"})

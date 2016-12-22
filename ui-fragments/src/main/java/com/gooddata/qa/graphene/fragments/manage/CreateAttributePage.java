@@ -90,7 +90,7 @@ public class CreateAttributePage extends AbstractFragment {
         fillInComputedAttributeForm(definition).submit();
         waitForElementNotPresent(submitButton);
 
-        return AttributeDetailPage.getInstance(browser).getAttributeUri();
+        return AttributeDetailPage.getInstance(browser).waitForCreatingComputedAttribute().getAttributeUri();
     }
 
     public CreateAttributePage selectAttribute(String name) {

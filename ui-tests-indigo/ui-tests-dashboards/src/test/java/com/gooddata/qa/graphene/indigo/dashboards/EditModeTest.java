@@ -51,6 +51,8 @@ public class EditModeTest extends GoodSalesAbstractDashboardTest {
         //This test only works if insight flag is disabled
         setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
+        setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.ANALYTICAL_DESIGNER, false);
     }
 
     @Override
@@ -236,14 +238,6 @@ public class EditModeTest extends GoodSalesAbstractDashboardTest {
         } finally {
             deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
         }
-    }
-
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "mobile"})
-    public void checkNoVisualizationOnDashboard() {
-        int visualizationsCount = initIndigoDashboardsPageWithWidgets().getInsightsCount();
-
-        takeScreenshot(browser, "checkNoVisualizationOnDashboard", getClass());
-        assertEquals(visualizationsCount, 0);
     }
 
     @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})

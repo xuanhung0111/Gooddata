@@ -19,35 +19,32 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.EmbeddedAnalysisP
 
 public class WalkmeOnEmbeddedAdTest extends AbstractUITest {
 
-    private static final String REGISTRATION_USER = "gd.accregister@gmail.com";
-    private static final String REGISTRATION_USER_PASSWORD = "changeit";
-
     private static final String GOODDATA_PRODUCT_TOUR_PROJECT = "GoodData Product Tour";
     private static final String EMBEDDED_URI = "analyze/embedded/#/%s/reportId/edit";
 
     @Test
     public void testNoWalkmeOnEmbeddedAd() throws ParseException, IOException, JSONException {
         browser.manage().deleteAllCookies();
-        registerNewUser();
-
-        testParams.setProjectId(getProductTourProjectId());
+        String newUserEmail = generateEmail(testParams.getUser());
         try {
+            registerNewUser(newUserEmail);
+
+            testParams.setProjectId(getProductTourProjectId());
             openUrl(format(EMBEDDED_URI, testParams.getProjectId()));
-            assertTrue(EmbeddedAnalysisPage.getInstance(browser).isEmbeddedPage(),
-                    "Embedded AD page was not loaded");
+            assertTrue(EmbeddedAnalysisPage.getInstance(browser).isEmbeddedPage(), "Embedded AD page was not loaded");
             assertFalse(WalkmeDialog.isPresent(browser), "Walkme dialog was loaded");
         } finally {
-            deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), REGISTRATION_USER);
+            deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), newUserEmail);
         }
     }
 
-    private void registerNewUser() {
+    private void registerNewUser(String email) {
         String uniqueSuffix = String.valueOf(System.currentTimeMillis());
         initRegistrationPage().registerNewUserSuccessfully(new RegistrationForm()
                 .withFirstName("FirstName " + uniqueSuffix)
                 .withLastName("LastName " + uniqueSuffix)
-                .withEmail(REGISTRATION_USER)
-                .withPassword(REGISTRATION_USER_PASSWORD)
+                .withEmail(email)
+                .withPassword(testParams.getPassword())
                 .withPhone(uniqueSuffix)
                 .withCompany("Company " + uniqueSuffix)
                 .withJobTitle("Title " + uniqueSuffix)

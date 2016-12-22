@@ -142,6 +142,12 @@ public class AttributeDetailPage extends ObjectPropertiesPage {
         return waitForElementVisible(BY_BUBBLE_CONTENT, browser).findElement(BY_LINK).getAttribute("href");
     }
 
+    public AttributeDetailPage waitForCreatingComputedAttribute() {
+        waitForElementVisible(By.className("s-attributeBucketsTable"), browser);
+
+        return this;
+    }
+
     public String getAttributeUri() {
         return browser.getCurrentUrl().split("objectPage\\|")[1];
     }

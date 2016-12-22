@@ -14,6 +14,7 @@ import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.util.List;
 
@@ -129,6 +130,9 @@ public class GoodSalesMetricEditorTest extends GoodSalesAbstractTest {
                 ATTR_ACTIVITY_TYPE);
 
         switchToMainWindow(browser);
+        //sleep for 2 seconds because of QA-6239
+        //the metric details page is reloaded in a moment after metric is created
+        sleepTightInSeconds(2);
 
         assertTrue(MetricDetailsPage.getInstance(browser).openMetricEditor().getElementValues().size() > 0,
                 "The elements values are not loaded");

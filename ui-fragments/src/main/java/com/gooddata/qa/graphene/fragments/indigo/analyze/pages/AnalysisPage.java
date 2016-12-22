@@ -154,9 +154,9 @@ public class AnalysisPage extends AbstractFragment {
         return drag(source, target);
     }
 
-    public AnalysisPage replaceMetric(String oldMetric, String newMetric) {
+    public AnalysisPage addMetricAfter(String metric, String newMetric) {
         WebElement source = getCataloguePanel().searchAndGet(newMetric, FieldType.METRIC);
-        WebElement target = getMetricsBucket().get(oldMetric);
+        WebElement target = getMetricsBucket().get(metric);
         return drag(source, target);
     }
 

@@ -26,6 +26,7 @@ import com.gooddata.qa.graphene.dashboards.GoodSalesAdvancedConnectingFilterTest
 import com.gooddata.qa.graphene.dashboards.GoodSalesKeyMetricTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesPersonalObjectsInDashboardWidgetTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesReportWidgetOnDashboardTest;
+import com.gooddata.qa.graphene.dashboards.GoodSalesSavedViewWithAllValuesTest;
 import com.gooddata.qa.graphene.filters.DashboardFilterVisualTest;
 import com.gooddata.qa.graphene.i18n.LocalizationTest;
 import com.gooddata.qa.graphene.manage.AttributeLabelsTest;
@@ -45,6 +46,7 @@ import com.gooddata.qa.graphene.project.PartialExportAndImportProjectTest;
 import com.gooddata.qa.graphene.project.ProjectSwitchingTest;
 import com.gooddata.qa.graphene.project.SimpleProjectEtlTest;
 import com.gooddata.qa.graphene.project.ValidateProjectTest;
+import com.gooddata.qa.graphene.project.LeaveProjectTest;
 import com.gooddata.qa.graphene.reports.CopyReportTableTest;
 import com.gooddata.qa.graphene.reports.DynamicImageTest;
 import com.gooddata.qa.graphene.reports.GoodSalesAddingFilterFromReportContextMenuTest;
@@ -82,20 +84,23 @@ public class UITestsRegistry {
     public static void main(String[] args) throws Throwable {
         Map<String, Object> suites = new HashMap<>();
 
-        suites.put("basic", new Object[] {
-            SimpleProjectEtlTest.class,
-            GoodSalesDashboardTest.class,
-            GoodSalesReportsTest.class,
+        suites.put("basic", new HashMap<String, Object[]>() {{
+            put("basicTest", new Object[] {
+                    SimpleProjectEtlTest.class,
+                    GoodSalesDashboardTest.class,
+                    GoodSalesReportsTest.class,
 
-            new PredefineParameterTest("testng-imap-GoodSales-email-schedule.xml")
-                .param("GRAPHENE_USER", "gd.scheduledemail@gmail.com")
-                .param("GRAPHENE_PASSWORD", "$CHECKLIST_SCHEDULED_EMAIL_USER_PASSWORD"),
-
-            new PredefineParameterTest(LocalizationTest.class)
-                .param("LANGUAGE_CODE", "fr-FR"),
-
-            "testng-imap-project-n-users-sanity-test.xml"
-        });
+                    new PredefineParameterTest("testng-imap-GoodSales-email-schedule.xml")
+                        .param("GRAPHENE_USER", "gd.scheduledemail@gmail.com")
+                        .param("GRAPHENE_PASSWORD", "$CHECKLIST_SCHEDULED_EMAIL_USER_PASSWORD"),
+                   "testng-imap-project-n-users-sanity-test.xml"
+            });
+            //separate localization test into one phase so it does not affect to other tests
+            put("localization", new Object[] {
+                    new PredefineParameterTest(LocalizationTest.class)
+                        .param("LANGUAGE_CODE", "fr-FR")
+            });
+        }});
 
         suites.put("basic-vertica", new Object[] {
             new PredefineParameterTest(SimpleProjectEtlTest.class)
@@ -115,6 +120,7 @@ public class UITestsRegistry {
             DashboardSavedFiltersTest.class,
             GoodSalesAdvancedConnectingFilterTest.class,
             GoodSalesDefaultFilterMiscTest.class,
+            GoodSalesSavedViewWithAllValuesTest.class,
             "testng-dashboard-default-filter-multiple-choice.xml",
             "testng-dashboard-default-filter-single-choice.xml",
             "testng-dashboard-default-filter-savedView-multiple-choice.xml",
@@ -168,6 +174,7 @@ public class UITestsRegistry {
                     DashboardPermissionsTest.class,
                     GoodSalesEditEmbeddedDashboardTest.class,
                     GoodSalesDefaultFilterMiscTest.class,
+                    GoodSalesSavedViewWithAllValuesTest.class,
                     "testng-dashboard-default-filter-multiple-choice.xml",
                     "testng-dashboard-default-filter-single-choice.xml",
                     "testng-dashboard-default-filter-savedView-multiple-choice.xml",
@@ -245,6 +252,7 @@ public class UITestsRegistry {
             ValidateProjectTest.class,
             GoodSalesMufOnUserProfileTest.class,
             UserAccountSettingTest.class,
+            LeaveProjectTest.class,
             "testng-imap-register-and-delete-user.xml",
             "testng-imap-invite-user-basic.xml",
             "testng-imap-invite-user-with-muf.xml",

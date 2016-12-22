@@ -32,7 +32,7 @@ public class DashboardEditBar extends AbstractFragment {
     @FindBy(css = ".s-btn-save")
     private WebElement saveButton;
 
-    @FindBy(css = ".s-btn-cancel")
+    @FindBy(css = ".s-btn-cancel:not(.disabled)")
     private WebElement cancelButton;
 
     @FindBy(css = ".s-btn-actions")
@@ -231,8 +231,7 @@ public class DashboardEditBar extends AbstractFragment {
     }
 
     public void cancelDashboard() {
-        waitForElementVisible(cancelButton);
-        Graphene.guardAjax(cancelButton).click();
+        waitForElementVisible(cancelButton).click();
         waitForElementNotVisible(this.getRoot());
     }
 
@@ -277,8 +276,9 @@ public class DashboardEditBar extends AbstractFragment {
         return savedViewDisabledNotification;
     }
 
-    public void setParentsFilter(String filter, String... parentFilterNames) {
+    public DashboardEditBar setParentsFilter(String filter, String... parentFilterNames) {
         dashboardEditFilter.addParentFilters(filter, parentFilterNames);
+        return this;
     }
 
     public void setParentsFilterUsingDataset(String filter, String linkedDataset, String... parentFilterNames) {

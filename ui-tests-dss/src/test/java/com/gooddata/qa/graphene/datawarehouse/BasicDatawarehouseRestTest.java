@@ -178,31 +178,31 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
 
     @Test(dependsOnMethods = {"gpInstanceFormsAvailable"})
     public void createInstanceWithoutTitle() throws JSONException {
-        createInvalidStorage(null, STORAGE_DESCRIPTION, authorizationToken, "title must not be empty");
+        createInvalidStorage(null, STORAGE_DESCRIPTION, authorizationToken, "title cannot be empty");
     }
 
     @Test(dependsOnMethods = {"gpInstanceFormsAvailable"})
     public void createInstanceWithoutAuthToken() throws JSONException {
-        createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, null, "token must not be empty");
+        createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, null, "token cannot be empty");
     }
 
     @Test(dependsOnMethods = {"gpInstanceFormsAvailable"})
     public void createStorageWithNonexistentAuthToken() throws JSONException {
         createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, "nonexistentAuthToken",
-                "Project group with name 'nonexistentAuthToken' does not exists.");
+                "Project group 'nonexistentAuthToken' does not exists.");
     }
 
     @Test(dependsOnMethods = {"gpInstanceFormsAvailable"})
     public void createStorageWithInvalidAuthToken() throws JSONException {
         // use non-datawarehouse-enabled authorization token to create a new datawarehouse
         createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, testParams.getAuthorizationToken(),
-                "Project group with name '" + testParams.getAuthorizationToken() +
+                "Project group '" + testParams.getAuthorizationToken() +
                         "' does not have valid connection information");
     }
 
     @Test(dependsOnMethods = {"createInstance"})
     public void updateStorageWithEmptyTitle() throws JSONException {
-        invalidUpdateOfStorage(null, STORAGE_DESCRIPTION, "title must not be empty");
+        invalidUpdateOfStorage(null, STORAGE_DESCRIPTION, "title cannot be empty");
     }
 
     /**
@@ -289,14 +289,13 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
 
     @Test(dependsOnMethods = {"verifyInstanceEnabled"})
     public void addUserWithEmptyProfileAndLogin() throws JSONException {
-        invalidUserAssignment(null, null, NEW_USER_ROLE, "One (and only one) of 'profile' or 'login' must be " +
-                "provided.");
+        invalidUserAssignment(null, null, NEW_USER_ROLE, "Provide either 'profile' or 'login', not both.");
     }
 
     @Test(dependsOnMethods = {"verifyInstanceEnabled"})
     public void addUserWithBothProfileAndLogin() throws JSONException {
         invalidUserAssignment(getTestUserProfileUri(), testUserLogin, NEW_USER_ROLE,
-                "One (and only one) of 'profile' or 'login' must be provided.");
+                "Provide either 'profile' or 'login', not both.");
     }
 
     @Test(dependsOnMethods = {"verifyInstanceEnabled"})
@@ -328,7 +327,7 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
 
     @Test(dependsOnMethods = {"verifyInstanceEnabled"})
     public void addExistingUserToStorage() throws JSONException {
-        invalidUserAssignment(userCreatedByUrl, null, NEW_USER_ROLE, "User '" + userCreatedById + "' already exists");
+        invalidUserAssignment(userCreatedByUrl, null, NEW_USER_ROLE, "User '" + userCreatedById + "' has already been added to Data Warehouse instance");
     }
 
     /**

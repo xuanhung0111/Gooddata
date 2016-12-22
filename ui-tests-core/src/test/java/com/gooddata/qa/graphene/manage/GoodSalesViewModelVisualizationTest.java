@@ -35,7 +35,8 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"})
     public void checkLDMImageTest() throws IOException, JSONException {
         File tmpImage = getLDMImageFromGrayPage();
-        replaceContentInSVGFile(tmpImage, Pair.of(testParams.getHost(), HOST_NAME), 
+        String hostname = testParams.isHostProxy()? testParams.getHostProxy(): testParams.getHost();
+        replaceContentInSVGFile(tmpImage, Pair.of(hostname, HOST_NAME), 
                 Pair.of(testParams.getProjectId(), PROJECT_ID));
         assertTrue(compareTwoFile(getResourceAsFile("/" + IMAGES + "/" + MODEL_IMAGE_FILE), tmpImage));
     }
@@ -45,7 +46,8 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
     public void checkLDMImageAfterChangeAttributeNameTest() throws ParseException, IOException, JSONException {
         changeAttributeName("Account", "Acsount");
         File tmpImage = getLDMImageFromGrayPage();
-        replaceContentInSVGFile(tmpImage, Pair.of(testParams.getHost(), HOST_NAME), 
+        String hostname = testParams.isHostProxy()? testParams.getHostProxy(): testParams.getHost();
+        replaceContentInSVGFile(tmpImage, Pair.of(hostname, HOST_NAME), 
                 Pair.of(testParams.getProjectId(), PROJECT_ID));
         try {
             assertTrue(compareTwoFile(getResourceAsFile("/" + IMAGES + "/"

@@ -6,17 +6,28 @@ import java.util.Objects;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import org.openqa.selenium.By;
 
 /**
  * Panel holding {@link AttributeFilter}s
  */
 public class AttributeFiltersPanel extends AbstractFragment {
 
-    @FindBy(css = ".s-attribute-filter")
+    private static final String ATTRIBUTE_FILTER_SELECTOR = ".s-attribute-filter";
+    private static final String ATTRIBUTE_FILTER_LOADING_SELECTOR = ATTRIBUTE_FILTER_SELECTOR + " .s-loading";
+
+    @FindBy(css = ATTRIBUTE_FILTER_SELECTOR)
     private List<AttributeFilter> attributeFilters;
 
     public List<AttributeFilter> getAttributeFilters() {
         return attributeFilters;
+    }
+
+    public AttributeFiltersPanel waitForAttributeFiltersLoaded() {
+        waitForElementNotPresent(By.cssSelector(ATTRIBUTE_FILTER_LOADING_SELECTOR));
+
+        return this;
     }
 
     public AttributeFilter getAttributeFilter(String title) {
