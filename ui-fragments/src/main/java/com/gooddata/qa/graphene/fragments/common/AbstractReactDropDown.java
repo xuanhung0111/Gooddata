@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.common;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -9,7 +10,11 @@ import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static org.openqa.selenium.By.cssSelector;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import com.gooddata.qa.graphene.utils.Sleeper;
+import com.gooddata.qa.utils.browser.BrowserUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -103,6 +108,30 @@ public abstract class AbstractReactDropDown extends AbstractDropDown {
     public boolean isShowingNoMatchingDataMessage() {
         waitForPickerLoaded();
         return isElementPresent(cssSelector(getNoMatchingDataMessageCssSelector()), getPanelRoot());
+    }
+
+    /**
+     * get all values on dropdown in case having scrollbar
+     * @return list of value names
+     */
+    public List<String> getValuesWithScrollbar() {
+        // does not work if value list is empty
+        waitForElementVisible(cssSelector(getSearchInputCssSelector()), getPanelRoot());
+
+        // add a break to handle lazy load (< 20 values)
+        // for larger number of values, it should be managed by scrolling (use js) to the end of scrollbar.
+        Sleeper.sleepTightInSeconds(1);
+
+        // use javascript which is not affected by scrollbar to get all attributes
+        List<WebElement> elements = (List<WebElement>) BrowserUtils.runScript(
+                browser, "return document.querySelectorAll(\"" + getListItemsCssSelector() + "\")");
+
+        return elements.stream()
+                .map(e -> {
+                    scrollElementIntoView(e, browser);// return empty value if the element is not in viewport
+                    return e.getText();
+                })
+                .collect(Collectors.toList());
     }
 
     protected String getNoMatchingDataMessageCssSelector() {

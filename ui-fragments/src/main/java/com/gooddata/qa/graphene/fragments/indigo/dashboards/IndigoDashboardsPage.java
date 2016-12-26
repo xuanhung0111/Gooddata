@@ -421,6 +421,12 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return waitForFragmentVisible(attributeSelect);
     }
 
+    public boolean hasAttributeFilterPlaceholder() {
+        waitForElementVisible(className("add-item-panel"), browser);
+
+        return isElementVisible(cssSelector(ADD_ATTRIBUTE_FILTER_PLACEHOLDER), browser);
+    }
+
     private IndigoDashboardsPage waitForWidgetsEditable() {
         waitForElementNotPresent(By.cssSelector(".dash-item-content > div:not(.is-editable)"));
         return this;

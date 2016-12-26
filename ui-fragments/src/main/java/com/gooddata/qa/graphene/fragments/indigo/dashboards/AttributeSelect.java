@@ -30,6 +30,13 @@ public class AttributeSelect extends AbstractReactDropDown {
         return ElementUtils.getTooltipFromElement(getSearchElement(attribute), browser);
     }
 
+    public boolean hasAttribute(String name) {
+        waitForPickerLoaded();
+        searchForText(name);
+
+        return !isShowingNoMatchingDataMessage();
+    }
+
     private WebElement getSearchElement(String name) {
         waitForPickerLoaded();
         searchForText(name);

@@ -13,7 +13,6 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
@@ -24,10 +23,7 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
-
-import com.gooddata.md.Attribute;
-import com.gooddata.md.Fact;
-import com.gooddata.md.Metric;
+import com.gooddata.md.*;
 import com.gooddata.qa.graphene.entity.attribute.ComputedAttributeDefinition;
 import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
@@ -272,8 +268,9 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
                 .getSelection(), "All");
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
-    public void testTooltipOnLongAttributeName() {
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"},
+            description = "ONE-1981: Attribute filter have long name that is not shorten")
+    public void shortenLongAttributeNameOnFilter() {
         String longNameAttribute = "Attribute-Having-Long-Name" + UUID.randomUUID().toString().substring(0, 10);
 
         // below code is the only way to create an attribute which has long name for now
@@ -286,13 +283,17 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
                 .withBucket(new ComputedAttributeDefinition.AttributeBucket(3, "Best")));
 
         try {
-            assertEquals(
-                    initIndigoDashboardsPageWithWidgets()
-                            .switchToEditMode()
-                            .dragAddAttributeFilterPlaceholder()
-                            .getAttributeSelect()
-                            .getTooltipOnAttribute(longNameAttribute),
-                    longNameAttribute, "The attribute name is not shortened or the tooltip is not correct");
+            AttributeSelect dropdown = initIndigoDashboardsPageWithWidgets()
+                    .switchToEditMode()
+                    .dragAddAttributeFilterPlaceholder()
+                    .getAttributeSelect();
+            assertEquals(dropdown.getTooltipOnAttribute(longNameAttribute), longNameAttribute,
+                    "The attribute name is not shortened or the tooltip is not correct");
+
+            dropdown.selectByName(longNameAttribute);
+            indigoDashboardsPage.getAttributeFiltersPanel().getLastFilter().selectAllValues();
+            assertTrue(indigoDashboardsPage.getAttributeFiltersPanel().getLastFilter()
+                    .getTitle().length() < longNameAttribute.length(), "long name attribute is not shortened");
         } finally {
             getMdService().removeObjByUri(
                     getMdService().getObjUri(getProject(), Attribute.class, title(longNameAttribute)));
@@ -320,22 +321,6 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
                 "The empty state on Kpi is not correct");
         assertTrue(indigoDashboardsPage.getWidgetByHeadline(Insight.class, TEST_INSIGHT).isEmptyValue(),
                 "The empty state on Insight is not correct");
-    }
-
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"},
-            description = "ONE-2019: Arrow icon of attribute filter sometimes show wrong when open/close drop-down")
-    public void expandAndCollapseFilter() {
-        initIndigoDashboardsPageWithWidgets().switchToEditMode().addAttributeFilter(ATTR_OPPORTUNITY);
-
-        AttributeFilter filter = indigoDashboardsPage.getAttributeFiltersPanel().getAttributeFilter(ATTR_OPPORTUNITY);
-
-        // these checks are based on the fix applied for this bug
-        // see https://github.com/gooddata/gdc-dashboards/pull/651
-        filter.ensureDropdownOpen();
-        assertTrue(filter.isActive(), "The attribute filter is not active");
-
-        filter.ensureDropdownClosed();
-        assertFalse(filter.isActive(), "The attribute filter is active");
     }
 
     @Test(dependsOnGroups = "dashboardsInit", groups = {"desktop"},
@@ -385,6 +370,30 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
             ProjectRestUtils.deleteProject(getGoodDataClient(), testParams.getProjectId());
             testParams.setProjectId(workingProject);
         }
+    }
+
+    @Test(dependsOnGroups = "dashboardsInit", groups = {"desktop"})
+    public void testAddAttributePlaceHolderExistence() {
+        assertTrue(initIndigoDashboardsPageWithWidgets().switchToEditMode().hasAttributeFilterPlaceholder(),
+                "The attribute filter placeholder is not displayed");
+    }
+
+    @Test(dependsOnGroups = "dashboardsInit", groups = {"desktop"})
+    public void testListOfAttributesAndValuesOnFilter() {
+        AttributeSelect dropdown = initIndigoDashboardsPageWithWidgets().switchToEditMode()
+                .dragAddAttributeFilterPlaceholder().getAttributeSelect();
+
+        assertEquals(dropdown.getValuesWithScrollbar(), asList(ATTR_ACCOUNT, ATTR_ACTIVITY, ATTR_ACTIVITY_TYPE,
+                ATTR_DEPARTMENT, ATTR_FORECAST_CATEGORY, ATTR_IS_ACTIVE, ATTR_IS_CLOSED, ATTR_IS_CLOSED,
+                ATTR_IS_TASK, ATTR_IS_WON, ATTR_OPP_SNAPSHOT, ATTR_OPPORTUNITY, ATTR_PRIORITY, ATTR_PRODUCT,
+                ATTR_REGION, ATTR_SALES_REP, ATTR_STAGE_HISTORY, ATTR_STAGE_NAME, ATTR_STATUS, ATTR_STATUS),
+                "Available attributes are not correct");
+
+        dropdown.selectByName(ATTR_DEPARTMENT);
+
+        assertEquals(indigoDashboardsPage.getAttributeFiltersPanel().getAttributeFilter(ATTR_DEPARTMENT)
+                        .getValues(), asList("Direct Sales", "Inside Sales"),
+                "List of values is not correct");
     }
 
     private IndigoDashboardsPage addAttributeFilterToDashboard(String attribute) {

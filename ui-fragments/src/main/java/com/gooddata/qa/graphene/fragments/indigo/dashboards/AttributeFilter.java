@@ -33,6 +33,11 @@ public class AttributeFilter extends AbstractReactDropDown {
         return ".overlay .attributevalues-list";
     }
 
+    @Override
+    protected String getNoMatchingDataMessageCssSelector() {
+        return ".gd-list-noResults";
+    }
+
     public AttributeFilter selectByNames(String... names) {
         Stream.of(names).forEach(name -> {
             selectByName(name);

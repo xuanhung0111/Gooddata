@@ -35,6 +35,10 @@ public class AttributeFiltersPanel extends AbstractFragment {
                 .orElseThrow(() -> new IllegalArgumentException("Attribute filter button with title '" + title + "' not found!"));
     }
 
+    public AttributeFilter getLastFilter() {
+        return waitForAttributeFiltersLoaded().attributeFilters.get(attributeFilters.size() -1);
+    }
+
     public boolean isFilterVisible(String title) {
         return waitForAttributeFiltersLoaded().attributeFilters.stream()
                 .anyMatch(e -> title.equals(e.getTitle()));
