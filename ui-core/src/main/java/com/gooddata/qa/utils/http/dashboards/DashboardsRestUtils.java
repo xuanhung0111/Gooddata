@@ -355,10 +355,11 @@ public final class DashboardsRestUtils {
      * @param restApiClient
      * @param projectID
      * @param dashboardID
+     * @param drillToObjects
      */
     public static void setDrillReportTargetAsPopup(final RestApiClient restApiClient, final String projectID,
-            final String dashboardID) throws JSONException, IOException {
-        setDrillReportTarget(restApiClient, projectID, dashboardID, TARGET_POPUP, null);
+            final String dashboardID, final DrillToObjects drillToObjects) throws JSONException, IOException {
+        setDrillReportTarget(restApiClient, projectID, dashboardID, drillToObjects, TARGET_POPUP, null);
     }
 
     /**
@@ -367,16 +368,22 @@ public final class DashboardsRestUtils {
      * @param restApiClient
      * @param projectID
      * @param dashboardID
+     * @param drillToObjects
      * @param exportFormat
      */
     public static void setDrillReportTargetAsExport(final RestApiClient restApiClient, final String projectID,
-            final String dashboardID, final String exportFormat) throws JSONException, IOException {
-        setDrillReportTarget(restApiClient, projectID, dashboardID, TARGET_EXPORT, exportFormat);
+            final String dashboardID, final DrillToObjects drillToObjects, final String exportFormat) 
+                    throws JSONException, IOException {
+        setDrillReportTarget(restApiClient, projectID, dashboardID, drillToObjects, TARGET_EXPORT, exportFormat);
     }
 
+    /**
+     * Specification of DrillDefinition metadata: 
+     * https://github.com/gooddata/gdc-bear/blob/develop/resources/specification/md/obj.res
+     */
     private static void setDrillReportTarget(final RestApiClient restApiClient, final String projectID,
-            final String dashboardID, final String target, final String exportFormat)
-                    throws JSONException, IOException {
+            final String dashboardID, final DrillToObjects drillToObjects, final String target, 
+            final String exportFormat) throws JSONException, IOException {
         final String dashboardEditModeURI = format(DASHBOARD_EDIT_MODE_LINK, projectID, dashboardID);
         final JSONObject json = getJsonObject(restApiClient, restApiClient.newGetMethod(dashboardEditModeURI));
         final JSONObject drills = json.getJSONObject("projectDashboard")
@@ -389,7 +396,8 @@ public final class DashboardsRestUtils {
                 .getJSONArray("drills")
                 .getJSONObject(0)
                 .getJSONArray("definition")
-                .getJSONObject(0);
+                .getJSONObject(0)
+                .getJSONObject(drillToObjects.getName());
 
         drills.put("target", target);
 
@@ -404,5 +412,21 @@ public final class DashboardsRestUtils {
         executeRequest(restApiClient,
                 restApiClient.newPostMethod(dashboardEditModeURI, json.toString()),
                 HttpStatus.OK);
+    }
+
+    public enum DrillToObjects {
+        DRILL_TO_ATTRIBUTEDF("drillToAttributeDFs"),
+        DRILL_TO_REPORTS("drillToReports"),
+        DRILL_TO_TABS("drillToTabs");
+
+        private String name;
+
+        private DrillToObjects(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
 }

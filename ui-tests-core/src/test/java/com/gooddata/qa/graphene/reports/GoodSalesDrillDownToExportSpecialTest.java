@@ -26,6 +26,7 @@ import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
+import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.DrillToObjects.DRILL_TO_REPORTS;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -62,6 +63,7 @@ import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.utils.UrlParserUtils;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.DrillToObjects;
 import com.google.common.base.Predicate;
 
 public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest {
@@ -129,7 +131,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
         final String dashboard = "Dashboard-For-Export-Large-Report-Using-" + format.getLabel();
         createDashboardForExportTest(dashboard, SALES_SEASONALITY, METRIC_NUMBER_OF_WON, TOO_LARGE_REPORT);
         try {
-            setDrillReportTargetAsExport(format.getName());
+            setDrillReportTargetAsExport(DRILL_TO_REPORTS, format.getName());
             dashboardsPage.getContent().getLatestReport(TableReport.class).drillOnMetricValue(DRILL_DOWN_VALUE);
             checkRebBarVisible();
         } finally {
@@ -142,7 +144,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
         final String dashboard = "Dashboard-For-Export-Incomputable-Report-Using-" + format.getLabel();
         createDashboardForExportTest(dashboard, SALES_SEASONALITY, METRIC_NUMBER_OF_WON, INCOMPUTABLE_REPORT);
         try {
-            setDrillReportTargetAsExport(format.getName());
+            setDrillReportTargetAsExport(DRILL_TO_REPORTS, format.getName());
             dashboardsPage.getContent().getLatestReport(TableReport.class).drillOnMetricValue(DRILL_DOWN_VALUE);
             checkRebBarVisible();
         } finally {
@@ -155,7 +157,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
         final String dashboard = "Dashboard-For-Export-Empty-Report-Using-" + format.getLabel();
         createDashboardForExportTest(dashboard, SALES_SEASONALITY, METRIC_NUMBER_OF_WON, EMPTY_REPORT);
         try {
-            setDrillReportTargetAsExport(format.getName());
+            setDrillReportTargetAsExport(DRILL_TO_REPORTS, format.getName());
             dashboardsPage.getContent().getLatestReport(TableReport.class).drillOnMetricValue(DRILL_DOWN_VALUE);
             checkRedBar(browser);
         } finally {
@@ -172,7 +174,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
         createSimpleReport(drillDownReport, METRIC_NUMBER_OF_WON_OPPS, ATTR_REGION);
         createDashboardForExportTest(dashboard, report, METRIC_NUMBER_OF_ACTIVITIES, drillDownReport);
         try {
-            setDrillReportTargetAsExport(RAW_FORMAT);
+            setDrillReportTargetAsExport(DRILL_TO_REPORTS, RAW_FORMAT);
             dashboardsPage.getContent().getLatestReport(TableReport.class).drillOnMetricValue();
             final File exportFile = new File(testParams.getDownloadFolder(), "Email.csv");
             waitForExportReport(exportFile, 69);
@@ -191,7 +193,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
         createSimpleReport(report, METRIC_PRODUCTIVE_REPS, ATTR_PRODUCT);
         createDashboardForExportTest(dashboard, report, METRIC_PRODUCTIVE_REPS, TOO_LARGE_REPORT);
         try {
-            setDrillReportTargetAsExport(RAW_FORMAT);
+            setDrillReportTargetAsExport(DRILL_TO_REPORTS, RAW_FORMAT);
             dashboardsPage.getContent().getLatestReport(TableReport.class).drillOnMetricValue();
             final File exportFile = new File(testParams.getDownloadFolder(), "CompuSci.csv");
             waitForExportReport(exportFile, 2042960);
@@ -235,10 +237,11 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
     }
 
-    private void setDrillReportTargetAsExport(final String format) throws JSONException, IOException {
+    private void setDrillReportTargetAsExport(final DrillToObjects drillToObjects, final String format) 
+            throws JSONException, IOException {
         final String workingDashboard = dashboardsPage.getDashboardName();
         DashboardsRestUtils.setDrillReportTargetAsExport(getRestApiClient(), testParams.getProjectId(),
-                UrlParserUtils.getObjId(browser.getCurrentUrl()), format);
+                UrlParserUtils.getObjId(browser.getCurrentUrl()), drillToObjects, format);
         //refresh to make sure drill settings are applied 
         browser.navigate().refresh();
         waitForDashboardPageLoaded(browser);
