@@ -58,11 +58,11 @@ public class __AbstractDISCTest extends AbstractProjectTest {
     }
 
     protected Schedule createSchedule(DataloadProcess process, __Executable executable, String crontimeExpression) {
-        String expectedExecutable = process.getExecutables()
-                .stream().filter(e -> e.contains(executable.getValue())).findFirst().get();
+        return createScheduleWithTriggerType(process, executable, crontimeExpression);
+    }
 
-        return getGoodDataClient().getProcessService().createSchedule(getProject(),
-                new Schedule(process, expectedExecutable, crontimeExpression));
+    protected Schedule createSchedule(DataloadProcess process, __Executable executable, Schedule dependentSchedule) {
+        return createScheduleWithTriggerType(process, executable, dependentSchedule);
     }
 
     protected String parseDateToCronExpression(DateTime dateTime) {
@@ -71,5 +71,21 @@ public class __AbstractDISCTest extends AbstractProjectTest {
 
     protected String generateProcessName() {
         return "Process-" + generateHashString();
+    }
+
+    private Schedule createScheduleWithTriggerType(DataloadProcess process, __Executable executable,
+            Object triggerType) {
+        String expectedExecutable = process.getExecutables()
+                .stream().filter(e -> e.contains(executable.getValue())).findFirst().get();
+
+        Schedule schedule = null;
+
+        if (triggerType instanceof String) {
+            schedule = new Schedule(process, expectedExecutable, (String) triggerType);
+        } else {
+            schedule = new Schedule(process, expectedExecutable, (Schedule) triggerType);
+        }
+
+        return getGoodDataClient().getProcessService().createSchedule(getProject(), schedule);
     }
 }
