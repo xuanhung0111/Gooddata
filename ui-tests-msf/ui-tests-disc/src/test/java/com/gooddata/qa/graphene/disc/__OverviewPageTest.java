@@ -32,12 +32,16 @@ import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 
 public class __OverviewPageTest extends __AbstractDISCTest {
 
-    private static final String BASIC_PROCESS = "basic-process";
-
     private static final String FAILED_EMPTY_STATE_MESSAGE = "No failed data loading processes. Good job!";
     private static final String RUNNING_EMPTY_STATE_MESSAGE = "No data loading processes are running right now.";
     private static final String SCHEDULED_EMPTY_STATE_MESSAGE = "No data loading processes are scheduled to run.";
     private static final String SUCCESSFUL_EMPTY_STATE_MESSAGE = "No data loading processes have successfully finished.";
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
+        createAndAddUserToProject(UserRoles.VIEWER);
+    }
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkOverviewPageShowAfterLogoutAndSignIn() throws ParseException, JSONException, IOException {
@@ -90,7 +94,7 @@ public class __OverviewPageTest extends __AbstractDISCTest {
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "specificStatesProvider")
     public void checkSpecificState(OverviewState state, __Executable executable) {
-        DataloadProcess process = createProcessWithBasicPackage(BASIC_PROCESS);
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
             Schedule schedule = createSchedule(process, executable, __ScheduleCronTime.EVERY_30_MINUTE.getExpression());
@@ -111,7 +115,7 @@ public class __OverviewPageTest extends __AbstractDISCTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void accessProjectDetailFromOverviewPage() {
-        DataloadProcess process = createProcessWithBasicPackage(BASIC_PROCESS);
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
             Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
@@ -123,6 +127,7 @@ public class __OverviewPageTest extends __AbstractDISCTest {
                     .selectState(OverviewState.SUCCESSFUL)
                     .getOverviewProject(projectTitle)
                     .openDetailPage();
+            waitForFragmentVisible(projectDetailPage);
 
             takeScreenshot(browser, "Project-detail-page-shows", getClass());
             assertThat(browser.getCurrentUrl(), containsString(testParams.getProjectId()));
@@ -134,7 +139,7 @@ public class __OverviewPageTest extends __AbstractDISCTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void restartFailedScheduleFromProject() {
-        DataloadProcess process = createProcessWithBasicPackage(BASIC_PROCESS);
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
             Schedule schedule = createSchedule(process, __Executable.ERROR_GRAPH,
@@ -162,7 +167,7 @@ public class __OverviewPageTest extends __AbstractDISCTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void disableFailedScheduleFromProject() {
-        DataloadProcess process = createProcessWithBasicPackage(BASIC_PROCESS);
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
             Schedule schedule = createSchedule(process, __Executable.ERROR_GRAPH,
@@ -188,7 +193,7 @@ public class __OverviewPageTest extends __AbstractDISCTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void runSuccessfulScheduleFromProject() {
-        DataloadProcess process = createProcessWithBasicPackage(BASIC_PROCESS);
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
             Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
@@ -216,7 +221,7 @@ public class __OverviewPageTest extends __AbstractDISCTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void stopRunningScheduleFromProject() {
-        DataloadProcess process = createProcessWithBasicPackage(BASIC_PROCESS);
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
             Schedule schedule = createSchedule(process, __Executable.LONG_TIME_RUNNING_GRAPH,
@@ -252,7 +257,7 @@ public class __OverviewPageTest extends __AbstractDISCTest {
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "userProvider")
     public void checkProjectDisabledWithNonAdminRole(UserRoles role) throws JSONException {
-        DataloadProcess process = createProcessWithBasicPackage(BASIC_PROCESS);
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
             Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
@@ -288,12 +293,6 @@ public class __OverviewPageTest extends __AbstractDISCTest {
 
         getOverviewButton().click();
         waitForFragmentVisible(overviewPage).waitForPageLoaded();
-    }
-
-    @Override
-    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
-        createAndAddUserToProject(UserRoles.EDITOR);
-        createAndAddUserToProject(UserRoles.VIEWER);
     }
 
     private void logoutInDiscPage() {
