@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.fragments.dashboards.widget;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.util.List;
@@ -37,12 +39,13 @@ public class FilterWidget extends AbstractFragment {
 
     public void closePanel() {
         if (isOpen()) {
-            waitForElementVisible(button).click();
+            waitForElementVisible(titleContainer).click();
         }
+        waitForElementNotPresent(AttributeFilterPanel.LOCATOR);
     }
 
     public boolean isOpen() {
-        return button.getAttribute("class").contains("active");
+        return isElementPresent(AttributeFilterPanel.LOCATOR, browser);
     }
 
     /**

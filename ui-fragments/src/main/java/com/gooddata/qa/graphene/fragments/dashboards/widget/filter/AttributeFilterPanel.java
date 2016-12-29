@@ -16,7 +16,7 @@ public class AttributeFilterPanel extends SelectItemPopupPanel {
     @FindBy(css = "div.yui3-c-simpleColumn-underlay .yui3-widget:not(.gdc-hidden)")
     private List<WebElement> listAttrValues;
 
-    private static final By LOCATOR = By.className("yui3-listfilterpanel");
+    public static final By LOCATOR = By.className("yui3-listfilterpanel");
 
     private static final By SHOW_ALL_BUTTON_LOCATOR = By.className("s-btn-show_all");
 

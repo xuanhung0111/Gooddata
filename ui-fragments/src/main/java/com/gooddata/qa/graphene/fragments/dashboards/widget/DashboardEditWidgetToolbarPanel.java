@@ -20,7 +20,7 @@ public class DashboardEditWidgetToolbarPanel extends AbstractFragment {
 
     @FindBy(className = "yui3-toolbar-icon-remove")
     private WebElement removeButton;
-    
+
     @FindBy(className = "yui3-toolbar-icon-addLink")
     private WebElement addLinkButton;
 
