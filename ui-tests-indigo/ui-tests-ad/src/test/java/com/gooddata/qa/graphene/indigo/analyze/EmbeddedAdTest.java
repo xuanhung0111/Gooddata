@@ -176,8 +176,11 @@ public class EmbeddedAdTest extends GoodSalesAbstractTest {
                 waitForElementVisible(RecommendationContainer.LOCATOR, browser))
                 .getRecommendation(RecommendationStep.SEE_TREND).apply();
 
-        assertEquals(getEmbeddedAnalysisPage().waitForReportComputing().getChartReport().getTrackersCount(), 4,
+        assertTrue(getEmbeddedAnalysisPage().waitForReportComputing().getChartReport().getTrackersCount() >= 1,
                 "Chart does not render correctly");
+        assertEquals(getEmbeddedAnalysisPage().getFilterBuckets().getDateFilterText(),"Activity: Last 4 quarters");
+        assertEquals(getEmbeddedAnalysisPage().getAttributesBucket().getSelectedDimensionSwitch(),"Activity");
+        assertEquals(getEmbeddedAnalysisPage().getAttributesBucket().getSelectedGranularity(),"Quarter");
     }
 
     @Override

@@ -374,7 +374,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         takeScreenshot(browser, "Multiple-date-filters-do-not-connected-between-tabs", getClass());
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_OF_DATA);
         assertEquals(getDateClosedFilter().getCurrentValue(), CURRENT_YEAR);
-        assertTrue(getReport().isNoData(), "Report is not rendered correctly");
+        assertEquals(getReport().getAttributeElements(), asList("Inside Sales", "CompuSci"));
     }
 
     @Test(dependsOnGroups = {"precondition"})
@@ -408,7 +408,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         takeScreenshot(browser, "Multiple-date-filters-with-difference-value-do-not-connect-between-tabs", getClass());
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_OF_DATA);
         assertEquals(getDateClosedFilter().getCurrentValue(), CURRENT_YEAR);
-        assertTrue(getReport().isNoData(), "Report is not rendered correctly");
+        assertEquals(getReport().getAttributeElements(), asList("Inside Sales", "CompuSci"));
     }
 
     @Test(dependsOnGroups = {"precondition"})
