@@ -236,9 +236,9 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
         assertEquals(analysisPage.getChartReport().getTrackersCount(), 4);
         assertEquals(filtersBucket.getDateFilterText(), "Activity: All time");
 
-        filtersBucket.configDateFilter("This year");
+        filtersBucket.configDateFilter("Last year");
         analysisPage.waitForReportComputing();
-        assertEquals(filtersBucket.getFilterText("Activity"), "Activity: This year");
+        assertEquals(filtersBucket.getFilterText("Activity"), "Activity: Last year");
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
         checkingOpenAsReport("filterOnDateAttribute");
     }
