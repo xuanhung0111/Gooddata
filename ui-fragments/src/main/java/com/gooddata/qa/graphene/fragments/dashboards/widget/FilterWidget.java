@@ -37,6 +37,13 @@ public class FilterWidget extends AbstractFragment {
         return this;
     }
 
+    public FilterWidget openEditPanel() {
+        if (!isOpen()) {
+            DashboardEditWidgetToolbarPanel.openEditPanelFor(this.getRoot(), browser);
+        }
+        return this;
+    }
+
     public void closePanel() {
         if (isOpen()) {
             waitForElementVisible(titleContainer).click();
@@ -85,8 +92,7 @@ public class FilterWidget extends AbstractFragment {
      * @return
      */
     public FilterWidget editAttributeFilterValues(String... values) {
-        DashboardEditWidgetToolbarPanel.openEditPanelFor(this.getRoot(), browser);
-        getAttributeFilterPanel().changeValues(values);
+        openEditPanel().getAttributeFilterPanel().changeValues(values);
 
         closePanel();
         return this;

@@ -313,7 +313,7 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
                 .addNewDashboard(dashboard)
                 .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME)
                 .getFilterWidgetByName(ATTR_STAGE_NAME)
-                .changeAttributeFilterValues(INTEREST);
+                .editAttributeFilterValues(INTEREST);
 
         if (!multipleChoice) {
             getFilter(ATTR_STAGE_NAME).changeSelectionToOneValue();
