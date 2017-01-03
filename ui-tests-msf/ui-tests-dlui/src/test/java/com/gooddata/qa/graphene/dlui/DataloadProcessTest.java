@@ -109,12 +109,12 @@ public class DataloadProcessTest extends AbstractMSFTest {
 
         // Delete old dataload process and create new one to ensure that
         // execution result isn't influenced by others
-        deleteDataloadProcessAndCreateNewOne();
+        final DataloadProcess dataloadProcess = deleteDataloadProcessAndCreateNewOne();
 
         assertTrue(getProcessService().listUserProcesses()
               .stream()
               .anyMatch(process -> DEFAULT_DATAlOAD_PROCESS_NAME.equals(process.getName())));
-        final ProcessExecutionDetail executionDetail = executeProcess(getDataloadProcess().get(), "", SYNCHRONIZE_ALL_PARAM);
+        final ProcessExecutionDetail executionDetail = executeProcess(dataloadProcess, "", SYNCHRONIZE_ALL_PARAM);
         assertTrue(ProcessRestUtils.getExecutionLog(getGoodDataClient(), executionDetail)
             .contains(format("user=%s", testParams.getUser())));
 
@@ -142,8 +142,8 @@ public class DataloadProcessTest extends AbstractMSFTest {
     @Test(dependsOnGroups = {"initialData"}, priority = 3)
     public void checkSuccessfulExecutionLog() throws ParseException, JSONException, IOException {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
-        deleteDataloadProcessAndCreateNewOne();
-        final ProcessExecutionDetail executionDetail = executeProcess(getDataloadProcess().get(), "", SYNCHRONIZE_ALL_PARAM);
+        final DataloadProcess dataloadProcess = deleteDataloadProcessAndCreateNewOne();
+        final ProcessExecutionDetail executionDetail = executeProcess(dataloadProcess, "", SYNCHRONIZE_ALL_PARAM);
         assertContentLogFile(ProcessRestUtils.getExecutionLog(getGoodDataClient(), executionDetail),
                 "execution_log_successful.txt");
     }
