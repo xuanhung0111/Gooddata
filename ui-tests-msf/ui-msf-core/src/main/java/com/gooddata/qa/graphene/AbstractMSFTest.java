@@ -24,7 +24,6 @@ import static java.util.Collections.unmodifiableMap;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -146,15 +145,6 @@ public class AbstractMSFTest extends AbstractProjectTest {
     protected void setDefaultSchemaForOutputStage(final Warehouse ads)
             throws ParseException, JSONException, IOException {
         getAdsHelper().associateAdsWithProject(ads, testParams.getProjectId());
-
-        int MAXIMUM_WAIT_TIME_IN_SECONDS = 180; //3 minutes
-
-        for (int i =0; i < MAXIMUM_WAIT_TIME_IN_SECONDS / 10; i++) {
-            if (!getAdsHelper().isAdsAssociatedWithProject(ads, testParams.getProjectId())){
-                getAdsHelper().associateAdsWithProject(ads, testParams.getProjectId());
-                sleepTightInSeconds(10);
-            }
-        }
     }
 
     protected void createUpdateADSTableBySQLFiles(final String createTableFile, final String copyTableFile,
@@ -289,7 +279,7 @@ public class AbstractMSFTest extends AbstractProjectTest {
 
     protected boolean isExecutionSuccessful(final RestApiClient restApiClient, final String executionUri)
             throws JSONException, IOException {
-        assertEquals(waitingForAsyncTask(restApiClient, executionUri), HttpStatus.NO_CONTENT.value());
+        waitingForAsyncTask(restApiClient, executionUri);
         return "OK".equals(getExecutionStatus(restApiClient, executionUri));
     }
 

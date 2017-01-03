@@ -102,29 +102,6 @@ public final class AdsHelper {
                 HttpStatus.OK);
     }
 
-    public boolean isAdsAssociatedWithProject(final Warehouse adsInstance, final String projectId)
-            throws ParseException, JSONException, IOException {
-        String outputStageUri = format(OUTPUT_STAGE_URI, projectId);
-        try {
-
-            String schemaDefaultUri = new JSONObject(
-                    getResource(restApiClient, restApiClient.newGetMethod(outputStageUri),
-                            req -> req.setHeader("Accept", ACCEPT_HEADER_VALUE_WITH_VERSION), HttpStatus.OK))
-                                    .getJSONObject("outputStage").getString("schema");
-            if (schemaDefaultUri != null && !schemaDefaultUri.isEmpty()
-                    && schemaDefaultUri.contains(adsInstance.getId())) {
-                return true;
-            }
-        } catch (JSONException e) {
-            //return false when this outputStage is not set Ads
-            //otherwise, throw exception
-            if (!e.getMessage().contains("JSONObject[\"schema\"] not found")) {
-                throw e;
-            }
-        }
-        return false;
-    }
-
     public void resetOutputStageOfProject(final String projectId)
             throws JSONException, ParseException, IOException {
         final JSONObject outputStageObj = new JSONObject() {{
