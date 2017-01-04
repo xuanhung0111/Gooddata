@@ -86,8 +86,8 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
         assertEquals(report.getTrackersCount(), 4);
         assertEquals(filtersBucketReact.getFilterText("Activity"), "Activity: All time");
 
-        assertEquals(filtersBucketReact.configDateFilter("This year")
-                .getFilterText("Activity"), "Activity: This year");
+        assertEquals(filtersBucketReact.configDateFilter("Last year")
+                .getFilterText("Activity"), "Activity: Last year");
         analysisPage.waitForReportComputing();
         assertTrue(report.getTrackersCount() >= 1);
         checkingOpenAsReport("filterOnDateAndAttribute");
