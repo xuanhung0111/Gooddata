@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.stream.Collectors.toList;
 
@@ -78,7 +79,7 @@ public class DateDimensionSelect extends AbstractReactDropDown {
 
     @Override
     public boolean isDropdownOpen() {
-        return getDropdownButton().getAttribute("class").contains("is-dropdown-open");
+        return waitForElementEnabled(getDropdownButton()).getAttribute("class").contains("is-dropdown-open");
     }
 
     @Override

@@ -104,7 +104,7 @@ public class Dataset extends AbstractFragment {
 
         // loading progress is too fast, cannot catch it. So return if final message (successful or error) is shown
         if (isElementVisible(message, searchContext)) {
-            waitForElementNotPresent(cssSelector(".gd-message.progress"));
+            waitForElementNotPresent(cssSelector(".gd-message.progress"), uploadTimeout);
             log.info("Dataset progress is disappeared. It's too fast, cannot catch it. But final message is shown.");
             return;
         }
