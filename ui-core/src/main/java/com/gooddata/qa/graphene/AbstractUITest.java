@@ -372,7 +372,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void uploadCSV(String filePath, Map<String, ColumnType> columnsWithExpectedType) {
-        final int datasetCountBeforeUpload = initDataUploadPage().getMyDatasetsCount();
+        initDataUploadPage().waitForHeaderVisible();
+        final int datasetCountBeforeUpload = DatasetsListPage.getInstance(browser).getMyDatasetsCount();
+        log.info("Number of dataset before upload is " + datasetCountBeforeUpload);
 
         final DataPreviewPage dataPreviewPage = DatasetsListPage.getInstance(browser).uploadFile(filePath);
         takeScreenshot(browser, "upload-definition", this.getClass());
@@ -389,7 +391,10 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
         final DatasetMessageBar csvDatasetMessageBar = DatasetMessageBar.getInstance(browser);
 
-        if (DatasetsListPage.getInstance(browser).getMyDatasetsCount() == datasetCountBeforeUpload + 1) {
+        final int datasetCountAfterUpload = DatasetsListPage.getInstance(browser).getMyDatasetsCount();
+        log.info("Number of dataset after upload is " + datasetCountAfterUpload);
+
+        if (datasetCountAfterUpload == datasetCountBeforeUpload + 1) {
             log.info("Upload succeeds with message: " + csvDatasetMessageBar.waitForSuccessMessageBar().getText());
         } else {
             fail("Upload failed with error message: " + csvDatasetMessageBar.waitForErrorMessageBar().getText());
