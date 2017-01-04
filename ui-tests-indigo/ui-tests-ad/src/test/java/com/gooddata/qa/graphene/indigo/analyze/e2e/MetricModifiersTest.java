@@ -27,7 +27,7 @@ public class MetricModifiersTest extends AbstractAdE2ETest {
             .addDate()
             .waitForReportComputing();
 
-        analysisPage.getFilterBuckets().configDateFilter("This year");
+        analysisPage.getFilterBuckets().configDateFilter("Last year");
 
         Graphene.createPageFragment(RecommendationContainer.class,
             waitForElementVisible(RecommendationContainer.LOCATOR, browser))
