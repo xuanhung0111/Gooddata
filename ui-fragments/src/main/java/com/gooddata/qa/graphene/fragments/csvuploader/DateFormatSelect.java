@@ -15,7 +15,7 @@ public class DateFormatSelect extends AbstractReactDropDown {
 
     @Override
     protected String getDropdownButtonCssSelector() {
-        return "button.button-dropdown[data-reactid*=date-format]";
+        return "button.button-dropdown.s-format-dropdown";
     }
 
     @Override
@@ -39,8 +39,15 @@ public class DateFormatSelect extends AbstractReactDropDown {
         if (isNull(type)) {
             throw new IllegalArgumentException("Unknown date format type: " + name);
         }
-        getElement(format("[data-reactid*='%s']", type.getDataReactId())).click();
+        getElement(".s-" + type.getKey()).click();
         waitForSelectionIsApplied(name);
+        return this;
+    }
+
+    public AbstractReactDropDown selectFormat(DateFormat format) {
+        ensureDropdownOpen();
+        getElement(".s-" + format.getKey()).click();
+        waitForSelectionIsApplied(format.getVisibleText());
         return this;
     }
 
@@ -49,25 +56,28 @@ public class DateFormatSelect extends AbstractReactDropDown {
     }
 
     public static enum DateFormat {
-        DAY_MONTH_YEAR_SEPARATED_BY_DOT("Day.Month.Year", "dd=1MM=1yy"),
-        MONTH_DAY_YEAR_SEPARATED_BY_DOT("Month.Day.Year", "MM=1dd=1yy"),
-        YEAR_MONTH_DAY_SEPARATED_BY_DOT("Year.Month.Day", "yy=1MM=1dd"),
-        DAY_MONTH_YEAR_SEPARATED_BY_SLASH("Day/Month/Year", "dd/MM/yy"),
-        MONTH_DAY_YEAR_SEPARATED_BY_SLASH("Month/Day/Year", "MM/dd/yy"),
-        YEAR_MONTH_DAY_SEPARATED_BY_SLASH("Year/Month/Day", "yy/MM/dd"),
-        DAY_MONTH_YEAR_SEPARATED_BY_HYPHEN("Day-Month-Year", "dd-MM-yy"),
-        MONTH_DAY_YEAR_SEPARATED_BY_HYPHEN("Month-Day-Year", "MM-dd-yy"),
-        YEAR_MONTH_DAY_SEPARATED_BY_HYPHEN("Year-Month-Day", "yy-MM-dd"),
-        DAY_MONTH_YEAR_SEPARATED_BY_SPACE("Day Month Year", "dd MM yy"),
-        MONTH_DAY_YEAR_SEPARATED_BY_SPACE("Month Day Year", "MM dd yy"),
-        YEAR_MONTH_DAY_SEPARATED_BY_SPACE("Year Month Day", "yy MM dd");
+        DAY_MONTH_YEAR_SEPARATED_BY_DOT("Day.Month.Year", "dddotMMdotyy"),
+        DAY_MONTH_FULL_YEAR_SEPARATED_BY_DOT("Day.Month.Year", "dddotMMdotyyyy"),
+        MONTH_DAY_YEAR_SEPARATED_BY_DOT("Month.Day.Year", "MMdotdddotyy"),
+        YEAR_MONTH_DAY_SEPARATED_BY_DOT("Year.Month.Day", "yydotMMdotdd"),
+        DAY_MONTH_YEAR_SEPARATED_BY_SLASH("Day/Month/Year", "ddslashMMslashyy"),
+        DAY_MONTH_FULL_YEAR_SEPARATED_BY_SLASH("Day/Month/Year", "ddslashMMslashyyyy"),
+        MONTH_DAY_YEAR_SEPARATED_BY_SLASH("Month/Day/Year", "MMslashddslashyy"),
+        YEAR_MONTH_DAY_SEPARATED_BY_SLASH("Year/Month/Day", "yyslashMMslashdd"),
+        DAY_MONTH_YEAR_SEPARATED_BY_HYPHEN("Day-Month-Year", "dddashMMdashyy"),
+        DAY_MONTH_FULL_YEAR_SEPARATED_BY_HYPHEN("Day-Month-Year", "dddashMMdashyyyy"),
+        MONTH_DAY_YEAR_SEPARATED_BY_HYPHEN("Month-Day-Year", "MMdashdddashyy"),
+        YEAR_MONTH_DAY_SEPARATED_BY_HYPHEN("Year-Month-Day", "yydashMMdashdd"),
+        DAY_MONTH_YEAR_SEPARATED_BY_SPACE("Day Month Year", "ddspaceMMspaceyy"),
+        MONTH_DAY_YEAR_SEPARATED_BY_SPACE("Month Day Year", "MMspaceddspaceyy"),
+        YEAR_MONTH_DAY_SEPARATED_BY_SPACE("Year Month Day", "yyspaceMMspacedd");
 
         private String formatByVisibleText;
-        private String dataReactId;
+        private String key;
 
-        private DateFormat(String formatByVisibleText, String dataReactId) {
+        private DateFormat(String formatByVisibleText, String key) {
             this.formatByVisibleText = formatByVisibleText;
-            this.dataReactId = dataReactId;
+            this.key = key;
         }
 
         public String getVisibleText() {
@@ -78,8 +88,8 @@ public class DateFormatSelect extends AbstractReactDropDown {
             return format("Date (%s)", getVisibleText());
         }
 
-        public String getDataReactId() {
-            return dataReactId;
+        public String getKey() {
+            return key;
         }
     }
 }

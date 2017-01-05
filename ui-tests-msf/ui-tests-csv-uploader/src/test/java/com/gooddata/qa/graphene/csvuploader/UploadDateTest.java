@@ -37,26 +37,33 @@ public class UploadDateTest extends AbstractCsvUploaderTest {
 
     private static final CsvFile DATE_YYYY_FILE = CsvFile.loadFile(
             getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/24dates.yyyy.csv"))
-            .setColumnTypes("Date (Month.Day.Year)", "Date (Day.Month.Year)", "Date (Year.Month.Day)",
+            .setColumnTypes(
+                    "Date (Month.Day.Year)", "Date (Day.Month.Year)", "Date (Year.Month.Day)",
                     "Date (Month/Day/Year)", "Date (Day/Month/Year)", "Date (Year/Month/Day)",
-                    "Date (Month-Day-Year)", "Date (Day-Month-Year)", "Date (Year-Month-Day)", "Date (Month Day Year)",
-                    "Date (Day Month Year)", "Date (Year Month Day)", "Date (Month.Day.Year)", "Date (Day.Month.Year)",
-                    "Date (Year.Month.Day)", "Date (Month/Day/Year)", "Date (Day/Month/Year)", "Date (Year/Month/Day)",
-                    "Date (Month-Day-Year)", "Date (Day-Month-Year)", "Date (Year-Month-Day)", "Date (Month Day Year)",
-                    "Date (Day Month Year)", "Date (Year Month Day)", "Measure");
+                    "Date (Month-Day-Year)", "Date (Day-Month-Year)", "Date (Year-Month-Day)",
+                    "Date (Month Day Year)", "Date (Day Month Year)", "Date (Year Month Day)",
+                    "Date (Month.Day.Year)", "Date (Day.Month.Year)", "Date (Year.Month.Day)",
+                    "Date (Month/Day/Year)", "Date (Day/Month/Year)", "Date (Year/Month/Day)",
+                    "Date (Month-Day-Year)", "Date (Day-Month-Year)", "Date (Year-Month-Day)",
+                    "Date (Month Day Year)", "Date (Day Month Year)", "Date (Year Month Day)",
+                    "Measure"
+            );
 
     @DataProvider(name = "dateDataProvider")
     public Object[][] dateDataProvider() {
         final CsvFile datesYY = CsvFile.loadFile(
                 getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/24dates.yyyy.csv"))
-                .setColumnTypes("Date (Month.Day.Year)", "Date (Day.Month.Year)", "Date (Year.Month.Day)",
+                .setColumnTypes(
+                        "Date (Month.Day.Year)", "Date (Day.Month.Year)", "Date (Year.Month.Day)",
                         "Date (Month/Day/Year)", "Date (Day/Month/Year)", "Date (Year/Month/Day)",
                         "Date (Month-Day-Year)", "Date (Day-Month-Year)", "Date (Year-Month-Day)",
                         "Date (Month Day Year)", "Date (Day Month Year)", "Date (Year Month Day)", 
                         "Date (Month.Day.Year)", "Date (Day.Month.Year)", "Date (Year.Month.Day)",
                         "Date (Month/Day/Year)", "Date (Day/Month/Year)", "Date (Year/Month/Day)",
                         "Date (Month-Day-Year)", "Date (Day-Month-Year)", "Date (Year-Month-Day)",
-                        "Date (Month Day Year)", "Date (Day Month Year)", "Date (Year Month Day)", "Measure");
+                        "Date (Month Day Year)", "Date (Day Month Year)", "Date (Year Month Day)",
+                        "Measure"
+                );
 
         final CsvFile dateYYYY = CsvFile.loadFile(
                 getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/date.yyyymmdd.yymmdd.csv"))
@@ -75,7 +82,6 @@ public class UploadDateTest extends AbstractCsvUploaderTest {
                         "Date (Year.Month.Day)", "Date (Year Month Day)", "Measure");
 
         return new Object[][]{
-                {DATE_YYYY_FILE},
                 {datesYY},
                 {dateYYYY},
                 {unsupportedDateFormats},
@@ -127,9 +133,9 @@ public class UploadDateTest extends AbstractCsvUploaderTest {
                         DateFormat.DAY_MONTH_YEAR_SEPARATED_BY_HYPHEN),
                  2},
                 {dateMonth,
-                 asList(DateFormat.DAY_MONTH_YEAR_SEPARATED_BY_DOT,
-                        DateFormat.DAY_MONTH_YEAR_SEPARATED_BY_HYPHEN,
-                        DateFormat.DAY_MONTH_YEAR_SEPARATED_BY_SLASH,
+                 asList(DateFormat.DAY_MONTH_FULL_YEAR_SEPARATED_BY_DOT,
+                        DateFormat.DAY_MONTH_FULL_YEAR_SEPARATED_BY_HYPHEN,
+                        DateFormat.DAY_MONTH_FULL_YEAR_SEPARATED_BY_SLASH,
                         DateFormat.MONTH_DAY_YEAR_SEPARATED_BY_DOT,
                         DateFormat.MONTH_DAY_YEAR_SEPARATED_BY_HYPHEN,
                         DateFormat.MONTH_DAY_YEAR_SEPARATED_BY_SLASH),

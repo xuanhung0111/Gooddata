@@ -12,7 +12,7 @@ public class DataTypeSelect extends AbstractReactDropDown {
 
     @Override
     protected String getDropdownButtonCssSelector() {
-        return "button.button-dropdown:not([data-reactid*=date-format])";
+        return "button.button-dropdown.s-type-dropdown";
     }
 
     @Override
@@ -50,7 +50,7 @@ public class DataTypeSelect extends AbstractReactDropDown {
         }
 
         ensureDropdownOpen();
-        return getElement(format("[data-reactid*='%s']", type.getValue()));
+        return getElement("." + type.getSeleniumClass());
     }
 
     @Override
@@ -79,6 +79,10 @@ public class DataTypeSelect extends AbstractReactDropDown {
 
         public String getValue() {
             return this.name();
+        }
+
+        public String getSeleniumClass() {
+            return "s-" + this.typeByVisibleText.toLowerCase();
         }
     }
 }
