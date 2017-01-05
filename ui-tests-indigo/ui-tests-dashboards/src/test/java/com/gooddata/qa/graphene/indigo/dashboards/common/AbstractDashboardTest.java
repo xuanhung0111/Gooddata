@@ -110,8 +110,6 @@ public abstract class AbstractDashboardTest extends AbstractProjectTest {
     protected void setDashboardFeatureFlags() {
         setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
-        setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS_VISUALIZATIONS, true);
     }
 
     protected String getWorkingDashboardUri() throws JSONException, IOException {
