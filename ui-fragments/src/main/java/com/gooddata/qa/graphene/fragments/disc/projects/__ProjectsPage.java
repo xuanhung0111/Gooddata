@@ -4,17 +4,21 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm;
+import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 
 public class __ProjectsPage extends AbstractFragment {
 
@@ -37,6 +41,12 @@ public class __ProjectsPage extends AbstractFragment {
 
     @FindBy(className = "all-projects-link")
     private WebElement allProjectsLink;
+
+    @FindBy(className = "s-btn-deploy_process")
+    private WebElement deployProcessButton;
+
+    @FindBy(className = "error-bar-title")
+    private WebElement errorBarMessage;
 
     @FindBy(className = "ait-project-list-item")
     private Collection<WebElement> projectItems;
@@ -137,6 +147,25 @@ public class __ProjectsPage extends AbstractFragment {
                 .contains("not-admin");
     }
 
+    public __ProjectsPage markProjectCheckbox(String title) {
+        WebElement checkbox = findProjectElement(title).get().findElement(By.tagName("input"));
+
+        if (!checkbox.isSelected()) {
+            checkbox.click();
+        }
+        return this;
+    }
+
+    public __ProjectsPage deployProcessWithZipFile(String processName, ProcessType processType, File packageFile) {
+        clickDeployButton().deployProcessWithZipFile(processName, processType, packageFile);
+        return this;
+    }
+
+    public __ProjectsPage deployProcessWithGitStorePath(String processName, String gitStorePath) {
+        clickDeployButton().deployProcessWithGitStorePath(processName, gitStorePath);
+        return this;
+    }
+
     public Collection<String> getPagingOptions() {
         return getElementTexts(waitForElementVisible(pagingOptionSelect).getOptions());
     }
@@ -179,6 +208,15 @@ public class __ProjectsPage extends AbstractFragment {
         return goToPage(pages.size());
     }
 
+    public String getErrorBarMessage() {
+        return waitForElementVisible(errorBarMessage).getText();
+    }
+
+    private DeployProcessForm clickDeployButton() {
+        waitForElementVisible(deployProcessButton).sendKeys(Keys.ENTER);
+        return DeployProcessForm.getInstance(By.className("gd-dialog"), browser);
+    }
+
     private __ProjectsPage goToPage(int pageNumber) {
         getPageLinkElement(pageNumber).click();
         waitForPageLoaded();
@@ -194,9 +232,20 @@ public class __ProjectsPage extends AbstractFragment {
     }
 
     private Optional<WebElement> findProjectElement(String title) {
-        return projectItems.stream()
-                .filter(p -> title.equals(p.findElement(BY_PROJECT_TITLE).getText()))
-                .findFirst();
+        while (true) {
+            Optional<WebElement> project = projectItems.stream()
+                    .filter(p -> title.equals(p.findElement(BY_PROJECT_TITLE).getText()))
+                    .findFirst();
+
+            if (project.isPresent()) {
+                return project;
+            }
+
+            if (!hasNextPage()) break;
+            goToNextPage();
+        }
+
+        return Optional.ofNullable(null);
     }
 
     public enum FilterOption {

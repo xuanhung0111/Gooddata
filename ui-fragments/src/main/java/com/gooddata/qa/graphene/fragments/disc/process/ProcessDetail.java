@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static java.util.stream.Collectors.toList;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.stream.Stream;
 
@@ -16,7 +17,6 @@ import com.gooddata.qa.graphene.enums.disc.__Executable;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.disc.ConfirmationDialog;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
-import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
 import com.gooddata.qa.graphene.fragments.disc.schedule.__ScheduleDetailFragment;
 
 public class ProcessDetail extends AbstractFragment {
@@ -53,6 +53,10 @@ public class ProcessDetail extends AbstractFragment {
         return waitForElementVisible(tab.getLocator(), getRoot()).getAttribute("class").contains("active");
     }
 
+    public String getTabTitle(Tab tab) {
+        return waitForElementVisible(tab.getLocator(), getRoot()).getText();
+    }
+
     public boolean hasNoSchedule() {
         return isElementPresent(BY_CREATE_NEW_SCHEDULE_LINK, getRoot());
     }
@@ -82,7 +86,7 @@ public class ProcessDetail extends AbstractFragment {
         return waitForElementVisible(title).getText();
     }
 
-    public void redeployWithZipFile(String processName, ProcessType processType, PackageFile packageFile) {
+    public void redeployWithZipFile(String processName, ProcessType processType, File packageFile) {
         waitForElementVisible(redeployButton).click();
         DeployProcessForm.getInstance(browser).deployProcessWithZipFile(processName, processType, packageFile);
     }

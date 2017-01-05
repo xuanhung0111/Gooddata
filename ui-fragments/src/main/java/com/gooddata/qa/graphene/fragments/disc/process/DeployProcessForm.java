@@ -24,38 +24,90 @@ public class DeployProcessForm extends AbstractFragment {
     @FindBy(css = "input[value='ZIP']")
     private WebElement zipFileOption;
 
+    @FindBy(css = ".git-radio input")
+    private WebElement gitOption;
+
     @FindBy(css = ".select-zip .fileInput")
     private WebElement packageInput;
 
     @FindBy(tagName = "select")
     private Select processType;
 
+    @FindBy(xpath = ".//*[text()='FULL PATH TO INFO.JSON']/following::input[1]")
+    private WebElement gitPathInput;
+
     @FindBy(xpath = ".//*[text()='PROCESS NAME']/following::input")
     private WebElement processNameInput;
 
-    @FindBy(className = "ait-deploy-process-confirm-btn")
+    @FindBy(css = "button:first-child")
     private WebElement deployButton;
 
     public static final DeployProcessForm getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(DeployProcessForm.class, waitForElementVisible(LOCATOR, searchContext));
     }
 
-    public void deployProcessWithZipFile(String processName, ProcessType processType, PackageFile packageFile) {
+    public static final DeployProcessForm getInstance(By locator, SearchContext searchContext) {
+        return Graphene.createPageFragment(DeployProcessForm.class, waitForElementVisible(locator, searchContext));
+    }
+
+    public void deployProcessWithZipFile(String processName, ProcessType processType, File packageFile) {
         selectZipFileOption()
-                .inputPackage(packageFile)
+                .inputPackageFile(packageFile)
                 .selectProcessType(processType)
                 .enterProcessName(processName)
                 .submit();
         waitForFragmentNotVisible(this);
     }
 
-    private DeployProcessForm selectZipFileOption() {
-        waitForElementVisible(zipFileOption).click();
+    public void deployProcessWithGitStorePath(String processName, String gitStorePath) {
+        selectGitOption()
+                .enterGitPath(gitStorePath)
+                .enterProcessName(processName)
+                .submit();
+        waitForFragmentNotVisible(this);
+    }
+
+    public DeployProcessForm selectGitOption() {
+        waitForElementVisible(gitOption).click();
         return this;
     }
 
-    private DeployProcessForm inputPackage(PackageFile packageFile) {
-        waitForElementPresent(packageInput).sendKeys(packageFile.loadFile().getAbsolutePath());
+    public DeployProcessForm inputPackageFile(File packageFile) {
+        waitForElementPresent(packageInput).sendKeys(packageFile.getAbsolutePath());
+        return this;
+    }
+
+    public DeployProcessForm enterGitPath(String gitPath) {
+        waitForElementVisible(gitPathInput).clear();
+        gitPathInput.sendKeys(gitPath);
+        return this;
+    }
+
+    public DeployProcessForm enterProcessName(String name) {
+        waitForElementVisible(processNameInput).clear();
+        processNameInput.sendKeys(name);
+        return this;
+    }
+
+    public boolean isPackageInputError() {
+        return waitForElementVisible(By.cssSelector(".select-zip .input-text"), getRoot())
+                .getAttribute("class").contains("has-error");
+    }
+
+    public boolean isProcessNameInputError() {
+        return waitForElementVisible(processNameInput).getAttribute("class").contains("has-error");
+    }
+
+    public boolean isGitPathInputError() {
+        return waitForElementVisible(gitPathInput).getAttribute("class").contains("has-error");
+    }
+
+    public void submit() {
+        waitForElementVisible(deployButton).click();
+    }
+
+    private DeployProcessForm selectZipFileOption() {
+        waitForElementVisible(zipFileOption).click();
         return this;
     }
 
@@ -64,19 +116,10 @@ public class DeployProcessForm extends AbstractFragment {
         return this;
     }
 
-    private DeployProcessForm enterProcessName(String name) {
-        waitForElementVisible(processNameInput).clear();
-        processNameInput.sendKeys(name);
-        return this;
-    }
-
-    private void submit() {
-        waitForElementVisible(deployButton).click();
-    }
-
     public enum PackageFile {
 
-        BASIC("Basic.zip");
+        BASIC("Basic.zip"),
+        RUBY("ruby.zip");
 
         private String name;
 
