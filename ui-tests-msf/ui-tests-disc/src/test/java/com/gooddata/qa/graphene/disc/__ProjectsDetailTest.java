@@ -171,7 +171,7 @@ public class __ProjectsDetailTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            createSchedule(process, __Executable.SUCCESSFUL_GRAPH, __ScheduleCronTime.EVERY_30_MINUTE.getExpression());
+            createSchedule(process, __Executable.SUCCESSFUL_GRAPH, __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             ProcessDetail processDetail = __initDiscProjectDetailPage()
                     .getProcess(process.getName())
@@ -193,26 +193,29 @@ public class __ProjectsDetailTest extends __AbstractDISCTest {
 
         try {
             Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTE.getExpression());
+                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             ProcessDetail processDetail = __initDiscProjectDetailPage()
                     .getProcess(process.getName())
                     .openTab(Tab.SCHEDULE);
-            assertEquals(processDetail.getScheduleStatus(schedule.getId()), ScheduleStatus.UNSCHEDULED);
+            assertEquals(processDetail.getScheduleStatus(schedule.getName()), ScheduleStatus.UNSCHEDULED);
 
-            __ScheduleDetailFragment scheduleDetail = processDetail.openSchedule(schedule.getId())
+            __ScheduleDetailFragment scheduleDetail = processDetail.openSchedule(schedule.getName())
                     .executeSchedule()
                     .waitForStatus(ScheduleStatus.RUNNING);
-            assertEquals(processDetail.getScheduleStatus(schedule.getId()), ScheduleStatus.RUNNING);
+            assertEquals(processDetail.getScheduleStatus(schedule.getName()), ScheduleStatus.RUNNING);
 
             scheduleDetail.waitForExecutionFinish();
-            assertEquals(processDetail.getScheduleStatus(schedule.getId()), ScheduleStatus.OK);
+            assertEquals(processDetail.getScheduleStatus(schedule.getName()), ScheduleStatus.OK);
 
-            scheduleDetail.editExecutable(__Executable.ERROR_GRAPH).executeSchedule().waitForExecutionFinish();
-            assertEquals(processDetail.getScheduleStatus(schedule.getId()), ScheduleStatus.ERROR);
+            ((__ScheduleDetailFragment) scheduleDetail.selectExecutable(__Executable.ERROR_GRAPH))
+                    .saveChanges().executeSchedule().waitForExecutionFinish();
+            assertEquals(processDetail.getScheduleStatus(__Executable.ERROR_GRAPH.getName()),
+                    ScheduleStatus.ERROR);
 
             scheduleDetail.disableSchedule();
-            assertEquals(processDetail.getScheduleStatus(schedule.getId()), ScheduleStatus.DISABLED);
+            assertEquals(processDetail.getScheduleStatus(__Executable.ERROR_GRAPH.getName()),
+                    ScheduleStatus.DISABLED);
 
         } finally {
             deteleProcess(getGoodDataClient(), process);

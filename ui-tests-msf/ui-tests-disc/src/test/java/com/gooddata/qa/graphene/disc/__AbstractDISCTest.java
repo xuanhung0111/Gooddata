@@ -3,7 +3,8 @@ package com.gooddata.qa.graphene.disc;
 import static java.lang.String.format;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 
-import org.joda.time.DateTime;
+import java.time.LocalTime;
+
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.dataload.processes.DataloadProcess;
@@ -61,12 +62,12 @@ public class __AbstractDISCTest extends AbstractProjectTest {
         return createScheduleWithTriggerType(process, executable, crontimeExpression);
     }
 
-    protected Schedule createSchedule(DataloadProcess process, __Executable executable, Schedule dependentSchedule) {
-        return createScheduleWithTriggerType(process, executable, dependentSchedule);
+    protected Schedule createSchedule(DataloadProcess process, __Executable executable, Schedule triggeringSchedule) {
+        return createScheduleWithTriggerType(process, executable, triggeringSchedule);
     }
 
-    protected String parseDateToCronExpression(DateTime dateTime) {
-        return format("%d * * * *", dateTime.getMinuteOfHour());
+    protected String parseTimeToCronExpression(LocalTime time) {
+        return format("%d * * * *", time.getMinute());
     }
 
     protected String generateProcessName() {
@@ -76,7 +77,7 @@ public class __AbstractDISCTest extends AbstractProjectTest {
     private Schedule createScheduleWithTriggerType(DataloadProcess process, __Executable executable,
             Object triggerType) {
         String expectedExecutable = process.getExecutables()
-                .stream().filter(e -> e.contains(executable.getValue())).findFirst().get();
+                .stream().filter(e -> e.contains(executable.getPath())).findFirst().get();
 
         Schedule schedule = null;
 

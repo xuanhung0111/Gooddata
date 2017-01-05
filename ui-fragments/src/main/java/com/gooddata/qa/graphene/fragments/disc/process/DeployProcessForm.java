@@ -119,6 +119,7 @@ public class DeployProcessForm extends AbstractFragment {
     public enum PackageFile {
 
         BASIC("Basic.zip"),
+        ONE_GRAPH("One_Graph.zip"),
         RUBY("ruby.zip");
 
         private String name;

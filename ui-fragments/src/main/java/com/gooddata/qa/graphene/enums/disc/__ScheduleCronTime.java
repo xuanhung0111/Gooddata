@@ -7,7 +7,7 @@ public enum __ScheduleCronTime {
             return expression;
         }
     },
-    EVERY_30_MINUTE("*/30 * * * *") {
+    EVERY_30_MINUTES("*/30 * * * *") {
         @Override
         public String getExpression() {
             return expression;

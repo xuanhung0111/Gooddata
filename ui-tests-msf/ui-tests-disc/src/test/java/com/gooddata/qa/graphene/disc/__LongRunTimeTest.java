@@ -6,7 +6,8 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 
-import org.joda.time.DateTime;
+import java.time.LocalTime;
+
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -39,8 +40,8 @@ public class __LongRunTimeTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            DateTime autoExecutionStartTime = DateTime.now().plusMinutes(2);
-            Schedule schedule = createSchedule(process, executable, parseDateToCronExpression(autoExecutionStartTime));
+            LocalTime autoExecutionStartTime = LocalTime.now().plusMinutes(2);
+            Schedule schedule = createSchedule(process, executable, parseTimeToCronExpression(autoExecutionStartTime));
 
             __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule)
                     .waitForAutoExecute(autoExecutionStartTime)
@@ -60,13 +61,14 @@ public class __LongRunTimeTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            DateTime autoExecutionStartTime = DateTime.now().plusMinutes(2);
+            LocalTime autoExecutionStartTime = LocalTime.now().plusMinutes(2);
             Schedule schedule = createSchedule(process, __Executable.ERROR_GRAPH,
-                    parseDateToCronExpression(autoExecutionStartTime));
+                    parseTimeToCronExpression(autoExecutionStartTime));
 
             int retryInMinute = 15;
             __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule)
                     .addRetryDelay(retryInMinute)
+                    .saveChanges()
                     .waitForAutoExecute(autoExecutionStartTime)
                     .waitForExecutionFinish();
 
@@ -74,7 +76,7 @@ public class __LongRunTimeTest extends __AbstractDISCTest {
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
                     ScheduleStatus.ERROR.toString());
 
-            scheduleDetail.waitForAutoExecute(DateTime.now().plusMinutes(retryInMinute)).waitForExecutionFinish();
+            scheduleDetail.waitForAutoExecute(LocalTime.now().plusMinutes(retryInMinute)).waitForExecutionFinish();
             takeScreenshot(browser, "Schedule-auto-retry-after-" + retryInMinute + "-minutes", getClass());
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 2);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
@@ -90,9 +92,9 @@ public class __LongRunTimeTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            DateTime autoExecutionStartTime = DateTime.now().plusMinutes(2);
+            LocalTime autoExecutionStartTime = LocalTime.now().plusMinutes(2);
             Schedule schedule = createSchedule(process, __Executable.LONG_TIME_RUNNING_GRAPH,
-                    parseDateToCronExpression(autoExecutionStartTime));
+                    parseTimeToCronExpression(autoExecutionStartTime));
 
             __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule)
                     .waitForAutoExecute(autoExecutionStartTime)
@@ -113,7 +115,7 @@ public class __LongRunTimeTest extends __AbstractDISCTest {
 
         try {
             Schedule schedule = createSchedule(process, __Executable.LONG_TIME_RUNNING_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTE.getExpression());
+                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule)
                     .executeSchedule()
@@ -132,9 +134,9 @@ public class __LongRunTimeTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            DateTime autoExecutionStartTime = DateTime.now().plusMinutes(2);
+            LocalTime autoExecutionStartTime = LocalTime.now().plusMinutes(2);
             Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    parseDateToCronExpression(autoExecutionStartTime));
+                    parseTimeToCronExpression(autoExecutionStartTime));
 
             __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule).disableSchedule();
             takeScreenshot(browser, "Schedule-is-disabled", getClass());
@@ -149,9 +151,10 @@ public class __LongRunTimeTest extends __AbstractDISCTest {
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
                     ScheduleStatus.OK.toString());
 
-            autoExecutionStartTime = DateTime.now().plusMinutes(2);
-            scheduleDetail.enableSchedule()
-                    .setRunTimeByCronExpression(parseDateToCronExpression(autoExecutionStartTime))
+            autoExecutionStartTime = LocalTime.now().plusMinutes(2);
+            ((__ScheduleDetailFragment) scheduleDetail.enableSchedule()
+                    .selectRunTimeByCronExpression(parseTimeToCronExpression(autoExecutionStartTime)))
+                    .saveChanges()
                     .waitForAutoExecute(autoExecutionStartTime)
                     .waitForExecutionFinish();
 
@@ -169,9 +172,9 @@ public class __LongRunTimeTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            DateTime executionStartTime = DateTime.now().plusHours(1);
+            LocalTime executionStartTime = LocalTime.now().plusHours(1);
             Schedule schedule = createSchedule(process, __Executable.SHORT_TIME_ERROR_GRAPH,
-                    parseDateToCronExpression(executionStartTime));
+                    parseTimeToCronExpression(executionStartTime));
 
             __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule);
             executeScheduleWithSpecificTimes(scheduleDetail, 5);
@@ -192,13 +195,13 @@ public class __LongRunTimeTest extends __AbstractDISCTest {
 
         try {
             Schedule schedule1 = createSchedule(process, __Executable.ERROR_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTE.getExpression());
+                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
             Schedule schedule2 = createSchedule(process, __Executable.SUCCESSFUL_GRAPH, schedule1);
 
             initScheduleDetail(schedule1).executeSchedule().waitForExecutionFinish();
 
             __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule2);
-            assertFalse(scheduleDetail.canAutoTriggered(DateTime.now()), "Schedule is still triggered");
+            assertFalse(scheduleDetail.canAutoTriggered(LocalTime.now()), "Schedule is still triggered");
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 0);
 
         } finally {
@@ -213,15 +216,15 @@ public class __LongRunTimeTest extends __AbstractDISCTest {
 
         try {
             Schedule schedule1 = createSchedule(process1, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTE.getExpression());
+                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
             Schedule schedule2 = createSchedule(process1, __Executable.SUCCESSFUL_GRAPH, schedule1);
             Schedule schedule3 = createSchedule(process2, __Executable.ERROR_GRAPH, schedule2);
 
             initScheduleDetail(schedule1).executeSchedule().waitForExecutionFinish();
-            initScheduleDetail(schedule2).waitForAutoExecute(DateTime.now()).waitForExecutionFinish();
+            initScheduleDetail(schedule2).waitForAutoExecute(LocalTime.now()).waitForExecutionFinish();
 
             __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule3)
-                    .waitForAutoExecute(DateTime.now())
+                    .waitForAutoExecute(LocalTime.now())
                     .waitForExecutionFinish();
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(), ScheduleStatus.ERROR.toString());
@@ -238,14 +241,14 @@ public class __LongRunTimeTest extends __AbstractDISCTest {
 
         try {
             Schedule schedule1 = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTE.getExpression());
+                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
             Schedule schedule2 = createSchedule(process, __Executable.ERROR_GRAPH, schedule1);
 
             initScheduleDetail(schedule2).disableSchedule();
             initScheduleDetail(schedule1).executeSchedule().waitForExecutionFinish();
 
             __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule2);
-            assertFalse(scheduleDetail.canAutoTriggered(DateTime.now()), "Schedule is still triggered");
+            assertFalse(scheduleDetail.canAutoTriggered(LocalTime.now()), "Schedule is still triggered");
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 0);
 
         } finally {

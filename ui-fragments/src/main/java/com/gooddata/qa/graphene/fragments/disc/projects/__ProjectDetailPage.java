@@ -16,12 +16,16 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
+import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.google.common.base.Predicate;
 
 public class __ProjectDetailPage extends AbstractFragment {
 
     @FindBy(className = "ait-project-title")
     private WebElement title;
+
+    @FindBy(className = "ait-project-new-schedule-btn")
+    private WebElement newScheduleButton;
 
     @FindBy(className = "s-btn-deploy_process")
     private WebElement deployProcessButton;
@@ -99,6 +103,11 @@ public class __ProjectDetailPage extends AbstractFragment {
 
     public Collection<String> getProcessNames() {
         return processes.stream().map(p -> p.getTitle()).collect(toList());
+    }
+
+    public CreateScheduleForm openCreateScheduleForm() {
+        waitForElementVisible(newScheduleButton).click();
+        return CreateScheduleForm.getInstance(browser);
     }
 
     private Optional<ProcessDetail> findProcess(String processName) {
