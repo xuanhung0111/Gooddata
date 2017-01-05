@@ -42,6 +42,7 @@ public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest 
     private static final String SHORT_LIST = "Short List";
     private static final String RISK_ASSESSMENT = "Risk Assessment";
     private static final String DIRECT_SALES = "Direct Sales";
+    private static final String ALL = "All";
 
     @Test(dependsOnGroups = {"createProject"})
     public void initData() throws JSONException, IOException {
@@ -87,8 +88,9 @@ public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest 
         getFilter(ATTR_STAGE_NAME).changeSelectionToMultipleValues();
         dashboardsPage.saveDashboard();
 
-        assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), String.join(", ", INTEREST, DISCOVERY));
-        assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), asList(INTEREST, DISCOVERY));
+        assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), ALL);
+        assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(),
+                asList(INTEREST, DISCOVERY, SHORT_LIST, RISK_ASSESSMENT));
     }
 
     @DataProvider(name = "filterCombinationProvider")
