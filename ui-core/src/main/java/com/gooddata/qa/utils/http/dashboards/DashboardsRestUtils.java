@@ -123,7 +123,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Create dashboard
-     *
+     * 
      * @param restApiClient
      * @param projectId
      * @param title
@@ -142,7 +142,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Delete dashboard tab
-     *
+     * 
      * @param restApiClient
      * @param dashboardUri
      * @param tabName
@@ -170,7 +170,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Add comment for object
-     *
+     * 
      * @param restApiClient
      * @param projectId
      * @param comment
@@ -195,7 +195,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Create filter variable
-     *
+     * 
      * @param restApiClient
      * @param projectId
      * @param name           variable name
@@ -257,7 +257,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Change metric format
-     *
+     * 
      * @param restApiClient
      * @param metricUri
      * @param newFormat
@@ -272,7 +272,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Change metric expression
-     *
+     * 
      * @param restApiClient
      * @param metricUri
      * @param newExpression
@@ -287,7 +287,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Create mandatory user filter object with simple expression '%s IN (%s)'using uri
-     *
+     * 
      * @param restApiClient
      * @param projectID
      * @param mufTitle
@@ -311,7 +311,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Create mandatory user filter object with complex expression using uri
-     *
+     * 
      * @param restApiClient
      * @param projectID
      * @param mufTitle
@@ -330,7 +330,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Add mandatory user filter to specific user
-     *
+     * 
      * @param restApiClient
      * @param projectId
      * @param user
@@ -351,7 +351,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Set drill report as popup for specific dashboard
-     *
+     * 
      * @param restApiClient
      * @param projectID
      * @param dashboardID
@@ -363,7 +363,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Set drill report as export for specific dashboard
-     *
+     * 
      * @param restApiClient
      * @param projectID
      * @param dashboardID
@@ -387,10 +387,7 @@ public final class DashboardsRestUtils {
                 .getJSONObject(0)
                 .getJSONObject("reportItem")
                 .getJSONArray("drills")
-                .getJSONObject(0)
-                .getJSONArray("definition")
                 .getJSONObject(0);
-
         drills.put("target", target);
 
         if (TARGET_POPUP.equals(target)) {
