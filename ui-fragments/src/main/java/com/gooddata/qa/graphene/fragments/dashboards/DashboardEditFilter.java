@@ -42,29 +42,27 @@ public class DashboardEditFilter extends AbstractFragment{
     }
 
     /**
-     * return attribute filter in dashboard base on its name
+     * return filter in dashboard base on its name. It should work for Attribute & Date filter
      * 
-     * @param attribute
+     * @param name
      * @return
      */
-    public WebElement getAttributeFilter(String attribute) {
+    public WebElement getFilter(String name) {
         for (WebElement filter : filters) {
-            if (filter.getAttribute("class").contains("s-" + CssUtils.simplifyText(attribute)))
+            if (filter.getAttribute("class").contains("s-" + CssUtils.simplifyText(name)))
                 return filter;
         }
         return null;
     }
 
     /**
-     * delete filter in dashboard
-     * 
-     * @param timeOrAttribute
+     * delete first time filter
+     *
      */
-    public void deleteFilter(String timeOrAttribute) {
-        WebElement filter = "time".equals(timeOrAttribute) ? getTimeFilter() : getAttributeFilter(timeOrAttribute);
-        DashboardEditWidgetToolbarPanel.removeWidget(filter, browser);
+    public void deleteTimeFilter() {
+        DashboardEditWidgetToolbarPanel.removeWidget(getTimeFilter(), browser);
         sleepTightInSeconds(1);
-        Assert.assertFalse(isDashboardContainsFilter(timeOrAttribute));
+        Assert.assertFalse(isDashboardContainsFilter("time"));
     }
 
     /**
@@ -101,19 +99,28 @@ public class DashboardEditFilter extends AbstractFragment{
      * @param parentFilterNames
      */
     public void addParentFilters(String filterName, String... parentFilterNames) {
-        WidgetConfigPanel configPanel = WidgetConfigPanel.
-                openConfigurationPanelFor(getAttributeFilter(filterName), browser);
-
-        configPanel.getTab(WidgetConfigPanel.Tab.PARENT_FILTERS, ParentFiltersConfigPanel.class)
+        openWidgetConfigPanel(filterName).getTab(WidgetConfigPanel.Tab.PARENT_FILTERS, ParentFiltersConfigPanel.class)
             .addParentsFilter(parentFilterNames);
     }
- 
-    public void addParentFiltersUsingDataset(String filterName, String linkedDataset, String... parentFilterNames) {
-        WidgetConfigPanel configPanel = WidgetConfigPanel.
-                openConfigurationPanelFor(getAttributeFilter(filterName), browser);
 
-        configPanel.getTab(WidgetConfigPanel.Tab.PARENT_FILTERS, ParentFiltersConfigPanel.class)
+    public void addParentFiltersUsingDataset(String filterName, String linkedDataset, String... parentFilterNames) {
+        openWidgetConfigPanel(filterName).getTab(WidgetConfigPanel.Tab.PARENT_FILTERS, ParentFiltersConfigPanel.class)
             .addParentsFilterUsingDataset(linkedDataset, parentFilterNames);
+    }
+
+    public WidgetConfigPanel openWidgetConfigPanel(String filterName) {
+        return WidgetConfigPanel.openConfigurationPanelFor(getFilter(filterName), browser);
+    }
+
+    public DashboardEditFilter focusOnFilter(String filterName) {
+        if (!isFilterSelected(filterName))
+            getFilter(filterName).click();
+
+        return this;
+    }
+
+    private boolean isFilterSelected(String filterName) {
+        return getFilter(filterName).getAttribute("class").contains("yui3-c-filterdashboardwidget-selected");
     }
 
     /**

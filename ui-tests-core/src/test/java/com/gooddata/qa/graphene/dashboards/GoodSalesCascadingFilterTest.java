@@ -181,7 +181,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
             DashboardEditFilter dashboardEditFitler = dashboardsPage.editDashboard().getDashboardEditFilter();
 
             WidgetConfigPanel.
-                openConfigurationPanelFor(dashboardEditFitler.getAttributeFilter(ATTR_PRODUCT), browser)
+                openConfigurationPanelFor(dashboardEditFitler.getFilter(ATTR_PRODUCT), browser)
                     .getTab(WidgetConfigPanel.Tab.PARENT_FILTERS, ParentFiltersConfigPanel.class);
 
             String parentFiltersRowContent = waitForElementVisible(By.className("parentFiltersRow"), browser)

@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmp
 
 import java.util.List;
 
+import com.gooddata.qa.graphene.utils.ElementUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -57,6 +58,14 @@ public class TimeFilterPanel extends AbstractFragment {
 
     public void submit() {
         waitForElementVisible(applyButton).click();
+    }
+
+    public boolean isDateRangeVisible() {
+        // ensure that the panel is loaded completely
+        waitForElementVisible(applyButton);
+
+        return ElementUtils.isElementVisible(filterTimeFromInput)
+                && ElementUtils.isElementVisible(filterTimeToInput);
     }
 
     private TimeFilterPanel selectTimeFilter(final List<WebElement> timeFilters, final String time) {
