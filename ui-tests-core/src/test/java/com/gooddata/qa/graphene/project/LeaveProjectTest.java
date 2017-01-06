@@ -4,7 +4,6 @@ import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
