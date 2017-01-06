@@ -6,8 +6,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoade
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.DrillToObjects.DRILL_TO_ATTRIBUTEDF;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.DrillToObjects.DRILL_TO_REPORTS;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -25,7 +23,6 @@ import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.DrillToObjects;
 
 public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
     
@@ -56,7 +53,7 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.addDrilling(Pair.of(Arrays.asList("Stage Name"), "Account"));
             dashboardsPage.saveDashboard();
-            setDrillReportTargetAsExport(DRILL_TO_ATTRIBUTEDF, ExportFormat.CSV.getName());
+            setDrillReportTargetAsExport(ExportFormat.CSV.getName());
             tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.drillOnAttributeValue();
             sleepTight(4000);
@@ -76,7 +73,7 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
                 .withName(targetReportName)
                 .withWhats("# of Activities")
                 .withHows("Activity Type");
-            createReport(reportDefinition, targetReportName);
+            createReport(reportDefinition, REPORT_NAME);
             checkRedBar(browser);
             
             addReportToNewDashboard(REPORT_NAME, TEST_DASHBOAD_NAME);
@@ -84,13 +81,14 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.addDrilling(Pair.of(Arrays.asList("Stage Name"), targetReportName), "Reports");
             dashboardsPage.saveDashboard();
-            setDrillReportTargetAsExport(DRILL_TO_REPORTS, ExportFormat.EXCEL_XLSX.getName());
+            setDrillReportTargetAsExport(ExportFormat.EXCEL_XLSX.getName());
             tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.drillOnAttributeValue("Discovery");
             sleepTight(6000);
             verifyReportExport(ExportFormat.EXCEL_XLSX, "Discovery", 5510);
             checkRedBar(browser);
-            setDrillReportTargetAsExport(DRILL_TO_REPORTS, ExportFormat.CSV.getName());
+            
+            setDrillReportTargetAsExport(ExportFormat.CSV.getName());
             tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.drillOnAttributeValue("Short List");
             sleepTight(4000);
@@ -107,7 +105,8 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
             sleepTight(4000);
             verifyReportExport(ExportFormat.CSV, "Risk Assessment", 1295);
             checkRedBar(browser);
-            setDrillReportTargetAsPopup(DRILL_TO_ATTRIBUTEDF);
+            
+            setDrillReportTargetAsPopup();
             drillReportToPopupDialog("Conviction");
         } finally {
             dashboardsPage.deleteDashboard();
@@ -122,7 +121,7 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.addDrilling(Pair.of(Arrays.asList("Stage Name"), "Account"));
             dashboardsPage.saveDashboard();
-            setDrillReportTargetAsExport(DRILL_TO_ATTRIBUTEDF, ExportFormat.CSV.getName());
+            setDrillReportTargetAsExport(ExportFormat.CSV.getName());
             dashboardsPage.editDashboard();
             tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.deleteDrilling(Arrays.asList("Stage Name"));
@@ -134,17 +133,16 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
         }
     }
     
-    private void setDrillReportTargetAsPopup(final DrillToObjects drillToObjects) throws JSONException, IOException {
+    private void setDrillReportTargetAsPopup() throws JSONException, IOException {
         DashboardsRestUtils.setDrillReportTargetAsPopup(getRestApiClient(), testParams.getProjectId(),
-                getDashboardID(), drillToObjects);
+                getDashboardID());
         browser.navigate().refresh();
         waitForDashboardPageLoaded(browser);
     }
     
-    private void setDrillReportTargetAsExport(final DrillToObjects drillToObjects, String exportFormat) 
-            throws JSONException, IOException {
+    private void setDrillReportTargetAsExport(String exportFormat) throws JSONException, IOException {
         DashboardsRestUtils.setDrillReportTargetAsExport(getRestApiClient(), testParams.getProjectId(),
-                getDashboardID(), drillToObjects, exportFormat);
+                getDashboardID(), exportFormat);
         browser.navigate().refresh();
         waitForDashboardPageLoaded(browser);
     }
