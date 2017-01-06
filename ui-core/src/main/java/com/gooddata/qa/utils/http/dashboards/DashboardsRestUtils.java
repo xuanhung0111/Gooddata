@@ -123,7 +123,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Create dashboard
-     *
+     * 
      * @param restApiClient
      * @param projectId
      * @param title
@@ -142,7 +142,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Delete dashboard tab
-     *
+     * 
      * @param restApiClient
      * @param dashboardUri
      * @param tabName
@@ -170,7 +170,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Add comment for object
-     *
+     * 
      * @param restApiClient
      * @param projectId
      * @param comment
@@ -195,7 +195,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Create filter variable
-     *
+     * 
      * @param restApiClient
      * @param projectId
      * @param name           variable name
@@ -257,7 +257,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Change metric format
-     *
+     * 
      * @param restApiClient
      * @param metricUri
      * @param newFormat
@@ -272,7 +272,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Change metric expression
-     *
+     * 
      * @param restApiClient
      * @param metricUri
      * @param newExpression
@@ -287,7 +287,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Create mandatory user filter object with simple expression '%s IN (%s)'using uri
-     *
+     * 
      * @param restApiClient
      * @param projectID
      * @param mufTitle
@@ -311,7 +311,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Create mandatory user filter object with complex expression using uri
-     *
+     * 
      * @param restApiClient
      * @param projectID
      * @param mufTitle
@@ -330,7 +330,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Add mandatory user filter to specific user
-     *
+     * 
      * @param restApiClient
      * @param projectId
      * @param user
@@ -351,39 +351,32 @@ public final class DashboardsRestUtils {
 
     /**
      * Set drill report as popup for specific dashboard
-     *
+     * 
      * @param restApiClient
      * @param projectID
      * @param dashboardID
-     * @param drillToObjects
      */
     public static void setDrillReportTargetAsPopup(final RestApiClient restApiClient, final String projectID,
-            final String dashboardID, final DrillToObjects drillToObjects) throws JSONException, IOException {
-        setDrillReportTarget(restApiClient, projectID, dashboardID, drillToObjects, TARGET_POPUP, null);
+            final String dashboardID) throws JSONException, IOException {
+        setDrillReportTarget(restApiClient, projectID, dashboardID, TARGET_POPUP, null);
     }
 
     /**
      * Set drill report as export for specific dashboard
-     *
+     * 
      * @param restApiClient
      * @param projectID
      * @param dashboardID
-     * @param drillToObjects
      * @param exportFormat
      */
     public static void setDrillReportTargetAsExport(final RestApiClient restApiClient, final String projectID,
-            final String dashboardID, final DrillToObjects drillToObjects, final String exportFormat) 
-                    throws JSONException, IOException {
-        setDrillReportTarget(restApiClient, projectID, dashboardID, drillToObjects, TARGET_EXPORT, exportFormat);
+            final String dashboardID, final String exportFormat) throws JSONException, IOException {
+        setDrillReportTarget(restApiClient, projectID, dashboardID, TARGET_EXPORT, exportFormat);
     }
 
-    /**
-     * Specification of DrillDefinition metadata: 
-     * https://github.com/gooddata/gdc-bear/blob/develop/resources/specification/md/obj.res
-     */
     private static void setDrillReportTarget(final RestApiClient restApiClient, final String projectID,
-            final String dashboardID, final DrillToObjects drillToObjects, final String target, 
-            final String exportFormat) throws JSONException, IOException {
+            final String dashboardID, final String target, final String exportFormat)
+                    throws JSONException, IOException {
         final String dashboardEditModeURI = format(DASHBOARD_EDIT_MODE_LINK, projectID, dashboardID);
         final JSONObject json = getJsonObject(restApiClient, restApiClient.newGetMethod(dashboardEditModeURI));
         final JSONObject drills = json.getJSONObject("projectDashboard")
@@ -394,11 +387,7 @@ public final class DashboardsRestUtils {
                 .getJSONObject(0)
                 .getJSONObject("reportItem")
                 .getJSONArray("drills")
-                .getJSONObject(0)
-                .getJSONArray("definition")
-                .getJSONObject(0)
-                .getJSONObject(drillToObjects.getName());
-
+                .getJSONObject(0);
         drills.put("target", target);
 
         if (TARGET_POPUP.equals(target)) {
@@ -412,21 +401,5 @@ public final class DashboardsRestUtils {
         executeRequest(restApiClient,
                 restApiClient.newPostMethod(dashboardEditModeURI, json.toString()),
                 HttpStatus.OK);
-    }
-
-    public enum DrillToObjects {
-        DRILL_TO_ATTRIBUTEDF("drillToAttributeDFs"),
-        DRILL_TO_REPORTS("drillToReports"),
-        DRILL_TO_TABS("drillToTabs");
-
-        private String name;
-
-        private DrillToObjects(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
     }
 }
