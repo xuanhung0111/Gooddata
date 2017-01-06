@@ -42,13 +42,7 @@ public class FilteringWidgetsTest extends GoodSalesAbstractDashboardTest {
                 singletonList(createAmountKpi()));
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "mobile"})
-    public void setupAttributeFiltersFeatureFlag() throws JSONException {
-        setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.ENABLE_ATTRIBUTE_FILTERS, true);
-    }
-
-    @Test(dependsOnMethods = {"setupAttributeFiltersFeatureFlag"}, groups = {"setupFilters", "desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"setupFilters", "desktop"})
     public void setupFilters() {
         initIndigoDashboardsPage()
                 .switchToEditMode()

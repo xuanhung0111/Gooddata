@@ -9,9 +9,7 @@ public enum ProjectFeatureFlags {
     NPS_STATUS("npsStatus"),
     ANALYTICAL_DESIGNER("analyticalDesigner"),
     ENABLE_CSV_UPLOADER("enableCsvUploader"),
-    ENABLE_ATTRIBUTE_FILTERS("enableAttributeFilters"),
     ENABLE_ANALYTICAL_DASHBOARDS("enableAnalyticalDashboards"),
-    ENABLE_ANALYTICAL_DASHBOARDS_VISUALIZATIONS("enableAnalyticalDashboardsVisualizations"),
     DISABLE_SAVED_FILTERS("disableSavedFilters"),
     ENABLE_CHANGE_LANGUAGE("enableChangeLanguage"),
     HIDE_KPI_ALERT_LINK("hideKPIAlertLinks");
