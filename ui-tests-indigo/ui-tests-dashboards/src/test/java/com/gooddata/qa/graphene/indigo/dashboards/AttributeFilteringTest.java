@@ -35,16 +35,6 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
     }
 
-    @Override
-    protected void setDashboardFeatureFlags() {
-        setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
-        setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS_VISUALIZATIONS, true);
-        setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.ENABLE_ATTRIBUTE_FILTERS, true);
-    }
-
     @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "mobile"})
     public void checkDashboardWithNoAttributeFilters() {
         final AttributeFiltersPanel attributeFiltersPanel =
