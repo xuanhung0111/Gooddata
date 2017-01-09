@@ -386,8 +386,11 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
-    public IndigoDashboardsPage deleteAttributeFilter() {
-        dragAndDropWithCustomBackend(browser, FIRST_ATTRIBUTE_FILTER, DASHBOARD_BODY, DELETE_DROPZONE);
+    public IndigoDashboardsPage deleteAttributeFilter(String attribute) {
+        String targetFilter = convertCSSClassTojQuerySelector(
+                getAttributeFiltersPanel().getAttributeFilter(attribute).getRoot().getAttribute("class"));
+
+        dragAndDropWithCustomBackend(browser, targetFilter, DASHBOARD_BODY, DELETE_DROPZONE);
 
         return this;
     }

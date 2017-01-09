@@ -8,7 +8,6 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
 
 import java.io.IOException;
 
@@ -16,8 +15,6 @@ import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFiltersPanel;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.FilterByItem;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
@@ -277,6 +274,18 @@ public class FilteringWidgetsTest extends GoodSalesAbstractDashboardTest {
             // check value is not filtered
             takeScreenshot(browser, "testAttributeFiltersForKpiCorrectlyApplied-valueNotFiltered-filterIgnored", getClass());
             assertEquals(getLastKpiValue(), notFiltered);
+
+            indigoDashboardsPage
+                    .switchToEditMode()
+                    .selectLastWidget(Kpi.class);
+            setFilterByChecked(ATTR_DEPARTMENT, true);
+            indigoDashboardsPage.saveEditModeWithWidgets();
+
+            setFilterValues(ATTR_DEPARTMENT, DIRECT_SALES_DEPARTMENT);
+
+            // check value is filtered again
+            takeScreenshot(browser, "testAttributeFiltersForKpiCorrectlyApplied-valueNotFiltered-valueFilteredAgain", getClass());
+            assertEquals(getLastKpiValue(), filtered);
         } finally {
             deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
         }
