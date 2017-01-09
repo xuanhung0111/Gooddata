@@ -183,7 +183,6 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
 
         if (scheduleBuilder.isDataloadProcess()) {
             assertTrue(scheduleDetail.isCorrectDataloadOption(), "Incorrect dataload options!");
-            assertTrue(scheduleDetail.isCorrectInlineBubbleHelp(), "Incorrect inline bubble help!");
             if (scheduleBuilder.isSynchronizeAllDatasets()) {
                 assertTrue(scheduleDetail.isCorrectAllDatasetSelected(), "All datasets are not selected!");
             } else {

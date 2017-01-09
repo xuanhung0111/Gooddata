@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.fragments.disc;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
-import static com.gooddata.qa.graphene.utils.ElementUtils.BY_BUBBLE_CONTENT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
@@ -50,9 +49,8 @@ public class ScheduleDetail extends ScheduleForm {
     private static final String BROKEN_SCHEDULE_MESSAGE =
             "The graph %s doesn't exist because it has been changed (renamed or deleted). "
                     + "It isn't possible to execute this schedule because there is no graph to execute.";
-    private static final String SELECT_SYNCHRONIZE_ALL_DATASETS_TEXT = "All datasets in the project";
-    private static final String SELECT_SYNCHRONIZE_SELECTED_DATASETS_TEXT = "Only selected";
-    private static final String UPLOAD_DATA_HELP_TEXT = "Data will be uploaded using full load.";
+    private static final String SELECT_SYNCHRONIZE_ALL_DATASETS_TEXT = "All mapped datasets at runtime";
+    private static final String SELECT_SYNCHRONIZE_SELECTED_DATASETS_TEXT = "Selected";
 
     private static final By BY_EXECUTION_STATUS = By.cssSelector(".execution-status");
     private static final By BY_EXECUTION_DESCRIPTION = By.cssSelector(".ait-execution-history-item-description");
@@ -728,13 +726,6 @@ public class ScheduleDetail extends ScheduleForm {
             return false;
         return waitForElementVisible(selectSynchronizeSelectedDatasets).findElement(BY_PARENT).getText().trim()
                 .contains(SELECT_SYNCHRONIZE_SELECTED_DATASETS_TEXT);
-    }
-
-    public boolean isCorrectInlineBubbleHelp() {
-        Actions action = new Actions(browser);
-        action.moveToElement(scheduleTitle).perform();
-        action.moveToElement(inlineBubbleHelp).perform();
-        return UPLOAD_DATA_HELP_TEXT.equals(waitForElementVisible(BY_BUBBLE_CONTENT, browser).getText().trim());
     }
 
     public boolean isCorrectAllDatasetSelected() {
