@@ -65,7 +65,7 @@ public class DataPreviewTable extends FixedDataTable {
 
     public void changeColumnDateFormat(int fieldIndex, DateFormat type) {
         final DateFormatSelect selectedColumnType = columnTypes.get(fieldIndex).getDateFormatSelect();
-        selectedColumnType.selectByName(type.getVisibleText());
+        selectedColumnType.selectFormat(type);
         final Predicate<WebDriver> formatIsSelected =
                 input -> type.getVisibleText().equals(selectedColumnType.getFormatSelection());
         Graphene.waitGui(browser)

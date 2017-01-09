@@ -39,6 +39,7 @@ import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFiltersPanel;
 import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
 
 import java.util.*;

@@ -29,7 +29,10 @@ public class InviteUserInOtherDomainsTest extends AbstractProjectTest {
     public void inviteUserInTwoDomains() throws ParseException, IOException, JSONException {
         final String userA = generateEmail(testParams.getUser());
         final String userB = generateEmail(testParams.getUser());
-        final String userC = getUserInOtherDomain(testParams.getHost());
+
+        String host = (testParams.getHostProxy() != null && !testParams.getHostProxy().isEmpty())?
+                testParams.getHostProxy() : testParams.getHost();
+        final String userC = getUserInOtherDomain(host);
 
         initProjectsAndUsersPage().openInvitedUserTab();
         inviteUsersAsViewerRole(userA);
