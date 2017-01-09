@@ -1,37 +1,72 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_SALES_REP;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON_OPPS;
+import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.UPLOAD_CSV;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.*;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
+import static com.gooddata.qa.utils.http.project.ProjectRestUtils.createBlankProject;
+import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
+import static java.lang.String.format;
 import static java.lang.String.join;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
+import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
+import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Attribute;
-import com.gooddata.md.Restriction;
+import com.gooddata.md.Fact;
+import com.gooddata.md.Metric;
 import com.gooddata.qa.graphene.entity.attribute.ComputedAttributeDefinition;
-import com.gooddata.qa.graphene.entity.attribute.ComputedAttributeDefinition.AttributeBucket;
+import com.gooddata.qa.graphene.enums.ObjectTypes;
+import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.*;
+import com.gooddata.qa.graphene.fragments.manage.DatasetDetailPage;
+import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
+import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
+
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFiltersPanel;
 import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
 
+    private static String TEST_INSIGHT = "Test-Insight";
+    private static final String WITHOUT_DATE_CSV_PATH = "/" + UPLOAD_CSV + "/without.date.csv";
+    private static final String WITHOUT_DATE_DATASET = "Without Date";
+
+    @BeforeClass(alwaysRun = true)
+    public void setTitle() {
+        projectTitle += "Attribute-Filtering-Test";
+    }
+
     @Override
     protected void prepareSetupProject() throws ParseException, JSONException, IOException {
-        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
+        String insightWidget = createInsightWidget(new InsightMDConfiguration(TEST_INSIGHT, ReportType.COLUMN_CHART)
+                .setMeasureBucket(singletonList(MeasureBucket.getSimpleInstance(getMdService().getObj(getProject(),
+                        Metric.class, title(METRIC_NUMBER_OF_ACTIVITIES))))));
+
+        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
+                asList(createAmountKpi(), insightWidget));
     }
+
+
 
     @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "mobile"})
     public void checkDashboardWithNoAttributeFilters() {
@@ -43,88 +78,199 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
         assertEquals(attributeFiltersPanel.getAttributeFilters().size(), 0);
     }
 
-    @Test(dependsOnMethods = {"checkDashboardWithNoAttributeFilters"}, groups = {"desktop"})
-    public void checkAttributeFilterCancellingAfterDrag() throws JSONException {
-        initIndigoDashboardsPageWithWidgets()
-                .switchToEditMode()
-                .dragAddAttributeFilterPlaceholder()
-                .clickDashboardBody();
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    public void testMakingNoAffectOnWidgetsWhenUsingUnconnectedFilter() {
+        initIndigoDashboardsPageWithWidgets().switchToEditMode()
+                .addAttributeFilter(ATTR_PRIORITY)
+                .getAttributeFiltersPanel()
+                .getAttributeFilter(ATTR_PRIORITY)
+                .clearAllCheckedValues()
+                .selectByNames("NORMAL");
 
-        final AttributeFiltersPanel attributeFiltersPanel =
-                indigoDashboardsPage.getAttributeFiltersPanel();
 
-        takeScreenshot(browser, "checkAttributeFilterCancellingAfterDrag", getClass());
+        indigoDashboardsPage.waitForWidgetsLoading().selectWidgetByHeadline(Kpi.class, METRIC_AMOUNT);
+        indigoDashboardsPage.getConfigurationPanel().disableDateFilter();
+        assertEquals(indigoDashboardsPage.waitForWidgetsLoading().getWidgetByHeadline(Kpi.class, METRIC_AMOUNT)
+                .getValue(), "$116,625,456.54", "Unconnected filter make impact to kpi");
 
-        assertEquals(attributeFiltersPanel.getAttributeFilters().size(), 0);
+        indigoDashboardsPage.selectWidgetByHeadline(Insight.class, TEST_INSIGHT);
+        indigoDashboardsPage.getConfigurationPanel().disableDateFilter();
+        assertEquals(
+                indigoDashboardsPage.getWidgetByHeadline(Insight.class, TEST_INSIGHT)
+                        .getChartReport()
+                        .getDataLabels(),
+                singletonList("62,136"), "Unconnected filter make impact to insight");
     }
 
-    @Test(dependsOnMethods = {"checkAttributeFilterCancellingAfterDrag"}, groups = {"desktop"})
-    public void setupAttributeFilters() throws JSONException {
-        initIndigoDashboardsPageWithWidgets().switchToEditMode().addAttributeFilter(ATTR_ACCOUNT)
-                .saveEditModeWithWidgets();
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    public void keepFilterValuesAfterSave() throws IOException, JSONException {
+        List<String> selectedItems = asList("236349", "236350", "236351");
+
+        addAttributeFilterToDashboard(ATTR_OPP_SNAPSHOT).switchToEditMode().getAttributeFiltersPanel()
+                .getAttributeFilter(ATTR_OPP_SNAPSHOT)
+                .clearAllCheckedValues()
+                .selectByNames(selectedItems.toArray(new String[0]));
+
+        indigoDashboardsPage.saveEditModeWithWidgets();
+        takeScreenshot(browser, "keepFilterValuesAfterSave", getClass());
+
+        try {
+            assertEquals(
+                    indigoDashboardsPage.getAttributeFiltersPanel()
+                            .getAttributeFilter(ATTR_OPP_SNAPSHOT)
+                            .getSelectedItems(),
+                    join(", ", selectedItems), "Selected items of attribute value are not correct after save");
+            assertEquals(indigoDashboardsPage.getWidgetByHeadline(Kpi.class, METRIC_AMOUNT).getValue(),
+                    "$33,622.95", "Kpi value is not correct");
+            assertEquals(initIndigoDashboardsPageWithWidgets().getWidgetByHeadline(Kpi.class, METRIC_AMOUNT)
+                            .getValue(),
+                    "$33,622.95", "Kpi value is not correct after refresh");
+        } finally {
+            IndigoRestUtils.deleteAttributeFilterIfExist(getRestApiClient(), testParams.getProjectId(),
+                    getAttributeDisplayFormUri(ATTR_OPP_SNAPSHOT));
+        }
     }
 
-    @Test(dependsOnMethods = {"setupAttributeFilters"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    public void revertFilterValuesAfterCancelling() throws IOException, JSONException {
+        addAttributeFilterToDashboard(ATTR_OPP_SNAPSHOT);
+        try {
+            indigoDashboardsPage.switchToEditMode().getAttributeFiltersPanel()
+                    .getAttributeFilter(ATTR_OPP_SNAPSHOT)
+                    .clearAllCheckedValues()
+                    .selectByNames("236352");
+
+            indigoDashboardsPage.cancelEditModeWithChanges().waitForWidgetsLoading();
+            takeScreenshot(browser, "revertFilterValuesAfterCancelling", getClass());
+            assertEquals(
+                    indigoDashboardsPage.getAttributeFiltersPanel()
+                            .getAttributeFilter(ATTR_OPP_SNAPSHOT)
+                            .getSelectedItems(),
+                    "All", "Selected items of attribute filter are not reverted correctly");
+
+            assertEquals(indigoDashboardsPage.getWidgetByHeadline(Kpi.class, METRIC_AMOUNT).getValue(),
+                    "$116,625,456.54", "Kpi value is not reverted");
+            assertEquals(initIndigoDashboardsPageWithWidgets().getWidgetByHeadline(Kpi.class, METRIC_AMOUNT)
+                            .getValue(),
+                    "$116,625,456.54", "Kpi value is not correct after refresh");
+        } finally {
+            IndigoRestUtils.deleteAttributeFilterIfExist(getRestApiClient(), testParams.getProjectId(),
+                    getAttributeDisplayFormUri(ATTR_OPP_SNAPSHOT));
+        }
+    }
+
+    @DataProvider
+    public Object[][] booleanProvider() {
+        return new Object[][]{{true}, {false}};
+    }
+
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"}, dataProvider = "booleanProvider")
+    public void applyMultipleFiltersOnKpi(boolean isSaved) throws IOException, JSONException {
+        Collection<String> filters = asList(ATTR_STAGE_NAME, ATTR_PRODUCT, ATTR_PRIORITY);
+        initIndigoDashboardsPageWithWidgets().switchToEditMode();
+        addMultipleFilters(filters);
+
+        AttributeFiltersPanel panel = indigoDashboardsPage.getAttributeFiltersPanel();
+        panel.getAttributeFilter(ATTR_STAGE_NAME).clearAllCheckedValues().selectByNames("Interest", "Closed Lost");
+        panel.getAttributeFilter(ATTR_PRIORITY).clearAllCheckedValues().selectByNames("LOW");
+        indigoDashboardsPage.selectWidgetByHeadline(Kpi.class, METRIC_AMOUNT);
+
+        assertEquals(
+                indigoDashboardsPage.getConfigurationPanel().getFilterByAttributeFilters().stream()
+                        .map(FilterByItem::getTitle)
+                        .collect(Collectors.toList()),
+                filters, "Added attribute filters are not displayed on configuration panel");
+        assertTrue(
+                indigoDashboardsPage.getConfigurationPanel()
+                        .getFilterByAttributeFilters()
+                        .stream()
+                        .allMatch(FilterByItem::isChecked),
+                "There are some unchecked items");
+
+        if (isSaved) indigoDashboardsPage.saveEditModeWithWidgets();
+
+        try {
+            assertEquals(indigoDashboardsPage.waitForWidgetsLoading().selectWidgetByHeadline(Kpi.class,
+                    METRIC_AMOUNT)
+                    .getValue(), "$60,917,837.30", "The Kpi value is not correct");
+        } finally {
+            deleteAttributeFilters(filters);
+        }
+    }
+
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"}, dataProvider = "booleanProvider")
+    public void applyMultipleFiltersOnInsight(boolean isSaved) throws IOException, JSONException {
+        List<String> filters = asList(ATTR_DEPARTMENT, ATTR_PRODUCT, ATTR_PRIORITY);
+        initIndigoDashboardsPageWithWidgets().switchToEditMode();
+        addMultipleFilters(filters);
+
+        indigoDashboardsPage.getAttributeFiltersPanel().getAttributeFilter(ATTR_DEPARTMENT)
+                .clearAllCheckedValues().selectByNames("Inside Sales");
+        indigoDashboardsPage.selectWidgetByHeadline(Insight.class, TEST_INSIGHT);
+
+        assertEquals(
+                indigoDashboardsPage.getConfigurationPanel()
+                        .getFilterByAttributeFilters()
+                        .stream()
+                        .map(FilterByItem::getTitle)
+                        .collect(Collectors.toList()),
+                asList(ATTR_DEPARTMENT, ATTR_PRODUCT, ATTR_PRIORITY),
+                "Added attribute filters are not displayed on configuration panel");
+
+        assertTrue(
+                indigoDashboardsPage.waitForWidgetsLoading()
+                        .getConfigurationPanel()
+                        .getFilterByAttributeFilters()
+                        .stream()
+                        .allMatch(FilterByItem::isChecked),
+                "There are some unchecked items");
+
+        if (isSaved) indigoDashboardsPage.saveEditModeWithWidgets();
+
+        try {
+            assertEquals(
+                    indigoDashboardsPage.selectWidgetByHeadline(Insight.class, TEST_INSIGHT)
+                            .getChartReport().getDataLabels(),
+                    singletonList("53,217"), "The Insight value is not correct");
+        } finally {
+            deleteAttributeFilters(filters);
+        }
+    }
+
+    @DataProvider
+    public Object[][] testWidgets() {
+        return new Object[][] {
+                {TEST_INSIGHT, Insight.class},
+                {METRIC_AMOUNT, Kpi.class}
+        };
+    }
+
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"}, dataProvider = "testWidgets")
+    public void testAddingIgnoredCheckboxesOnConfigurationPanel(String widgetHeadline, Class widgetClass) {
+        initIndigoDashboardsPage().switchToEditMode()
+                .addAttributeFilter(ATTR_STAGE_NAME)
+                .addAttributeFilter(ATTR_STAGE_HISTORY)
+                .waitForWidgetsLoading()
+                .selectWidgetByHeadline(Widget.class, widgetHeadline);
+
+        takeScreenshot(browser, "testAddingIgnoreCheckboxesOnKpi - " + widgetClass.toString(), getClass());
+        assertEquals(
+                indigoDashboardsPage.getConfigurationPanel().getFilterByAttributeFilters()
+                        .stream()
+                        .map(FilterByItem::getTitle)
+                        .collect(Collectors.toList()),
+                asList(ATTR_STAGE_NAME, ATTR_STAGE_HISTORY),
+                "List of ignored checkboxes is not correct");
+    }
+
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkAttributeFilterDefaultState() {
-        final AttributeFiltersPanel attributeFiltersPanel =
-                initIndigoDashboardsPageWithWidgets().getAttributeFiltersPanel();
+        initIndigoDashboardsPageWithWidgets().switchToEditMode().
+                addAttributeFilter(ATTR_ACTIVITY_TYPE).waitForWidgetsLoading();
 
         takeScreenshot(browser, "checkAttributeFilterDefaultState-All", getClass());
-
-        assertEquals(attributeFiltersPanel.getAttributeFilters().size(), 1);
-        assertEquals(attributeFiltersPanel.getAttributeFilter(ATTR_ACCOUNT).getSelection(), "All");
-    }
-
-    @Test(dependsOnMethods = {"checkAttributeFilterDefaultState"}, groups = {"desktop"})
-    public void checkAttributeFilterChangeValue() {
-        String attributeFilterSourceConsulting = "14 West";
-        String attributeFilterAgileThought = "1-800 Postcards";
-        String attributeFilterVideo = "1-800 We Answer";
-        String attributeFilterShoppingCart = "1-888-OhioComp";
-
-        AttributeFiltersPanel attributeFiltersPanel =
-                initIndigoDashboardsPageWithWidgets().getAttributeFiltersPanel();
-
-        attributeFiltersPanel.getAttributeFilter(ATTR_ACCOUNT)
-            .clearAllCheckedValues()
-            .selectByNames(
-                    attributeFilterSourceConsulting,
-                    attributeFilterAgileThought,
-                    attributeFilterVideo,
-                    attributeFilterShoppingCart
-            );
-
-        takeScreenshot(browser, "checkAttributeFilterDefaultState-West_Coast", getClass());
-
-        List<String> attributeElements = new ArrayList<>();
-
-        attributeElements.add(attributeFilterSourceConsulting);
-        attributeElements.add(attributeFilterVideo);
-        attributeElements.add(attributeFilterShoppingCart);
-        attributeElements.add(attributeFilterAgileThought);
-
-        Collections.sort(attributeElements);
-
-        assertEquals(attributeFiltersPanel.getAttributeFilters().size(), 1);
-        assertEquals(attributeFiltersPanel.getAttributeFilter(ATTR_ACCOUNT).getSelectedItems(), join(", ", attributeElements));
-        assertEquals(attributeFiltersPanel.getAttributeFilter(ATTR_ACCOUNT).getSelectedItemsCount(), "(4)");
-    }
-
-    @Test(dependsOnMethods = {"setupAttributeFilters"}, groups = {"desktop"})
-    public void allowAddingOneFilterPerAttribute() {
-        assertEquals(
-                initIndigoDashboardsPageWithWidgets()
-                        .switchToEditMode()
-                        .getAttributeFiltersPanel()
-                        .getAttributeFilters().stream().filter(e -> ATTR_ACCOUNT.equals(e.getTitle())).count(),
-                1, "There is more than 1 attribute filter named " + ATTR_ACCOUNT);
-
-        indigoDashboardsPage.addAttributeFilter(ATTR_ACCOUNT);
-        takeScreenshot(browser, "Allow-Adding-One-Filter-Per-Attribute", getClass());
-        assertEquals(
-                indigoDashboardsPage.getAttributeFiltersPanel().getAttributeFilters().stream()
-                        .filter(e -> ATTR_ACCOUNT.equals(e.getTitle())).count(),
-                1, "There is more than 1 attribute filter named " + ATTR_ACCOUNT);
+        assertEquals(indigoDashboardsPage.getAttributeFiltersPanel().getAttributeFilter(ATTR_ACTIVITY_TYPE)
+                .getSelection(), "All");
     }
 
     @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
@@ -135,9 +281,10 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
         // renaming existing one is not a recommended option.
         initAttributePage().createComputedAttribute(new ComputedAttributeDefinition().withName(longNameAttribute)
                 .withAttribute(ATTR_SALES_REP).withMetric(METRIC_NUMBER_OF_WON_OPPS)
-                .withBucket(new AttributeBucket(0, "Poor", "120"))
-                .withBucket(new AttributeBucket(1, "Good", "200"))
-                .withBucket(new AttributeBucket(2, "Great", "250")).withBucket(new AttributeBucket(3, "Best")));
+                .withBucket(new ComputedAttributeDefinition.AttributeBucket(0, "Poor", "120"))
+                .withBucket(new ComputedAttributeDefinition.AttributeBucket(1, "Good", "200"))
+                .withBucket(new ComputedAttributeDefinition.AttributeBucket(2, "Great", "250"))
+                .withBucket(new ComputedAttributeDefinition.AttributeBucket(3, "Best")));
 
         try {
             assertEquals(
@@ -149,43 +296,114 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
                     longNameAttribute, "The attribute name is not shortened or the tooltip is not correct");
         } finally {
             getMdService().removeObjByUri(
-                    getMdService().getObjUri(getProject(), Attribute.class, Restriction.title(longNameAttribute)));
+                    getMdService().getObjUri(getProject(), Attribute.class, title(longNameAttribute)));
         }
     }
 
-    @Test(dependsOnMethods = {"setupAttributeFilters"}, groups = {"desktop"})
-    public void deleteAttributeFilterDiscarded() {
-        initIndigoDashboardsPageWithWidgets()
-                .switchToEditMode()
-                .deleteAttributeFilter()
-                .cancelEditModeWithChanges();
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    public void testEmptyStateWhenFilterOut() {
+        initIndigoDashboardsPageWithWidgets().switchToEditMode()
+                .addAttributeFilter(ATTR_OPPORTUNITY)
+                .getAttributeFiltersPanel()
+                .getAttributeFilter(ATTR_OPPORTUNITY)
+                .clearAllCheckedValues()
+                .selectByNames("1000Bulbs.com > Educationly");
 
-        final AttributeFiltersPanel attributeFiltersPanel =
-                indigoDashboardsPage.getAttributeFiltersPanel();
-        takeScreenshot(browser, "deleteAttributeFilterDiscarded-Without_Reload", getClass());
-        assertEquals(attributeFiltersPanel.getAttributeFilters().size(), 1);
+        indigoDashboardsPage.addAttributeFilter(ATTR_ACCOUNT)
+                .getAttributeFiltersPanel()
+                .getAttributeFilter(ATTR_ACCOUNT)
+                .clearAllCheckedValues()
+                .selectByNames("(add)ventures");
 
-        final AttributeFiltersPanel attributeFiltersPanelWithReload =
-                initIndigoDashboardsPageWithWidgets().getAttributeFiltersPanel();
-        takeScreenshot(browser, "deleteAttributeFilterDiscarded-With_Reload", getClass());
-        assertEquals(attributeFiltersPanelWithReload.getAttributeFilters().size(), 1);
+        indigoDashboardsPage.waitForWidgetsLoading();
+        takeScreenshot(browser, "testEmptyStateWhenFilterOut", getClass());
+        assertTrue(indigoDashboardsPage.getWidgetByHeadline(Kpi.class, METRIC_AMOUNT).isEmptyValue(),
+                "The empty state on Kpi is not correct");
+        assertTrue(indigoDashboardsPage.getWidgetByHeadline(Insight.class, TEST_INSIGHT).isEmptyValue(),
+                "The empty state on Insight is not correct");
     }
 
-    @Test(dependsOnMethods = {"deleteAttributeFilterDiscarded"}, groups = {"desktop"})
-    public void deleteAttributeFilter() {
-        initIndigoDashboardsPageWithWidgets()
-                .switchToEditMode()
-                .deleteAttributeFilter()
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"},
+            description = "ONE-2019: Arrow icon of attribute filter sometimes show wrong when open/close drop-down")
+    public void expandAndCollapseFilter() {
+        initIndigoDashboardsPageWithWidgets().switchToEditMode().addAttributeFilter(ATTR_OPPORTUNITY);
+
+        AttributeFilter filter = indigoDashboardsPage.getAttributeFiltersPanel().getAttributeFilter(ATTR_OPPORTUNITY);
+
+        // these checks are based on the fix applied for this bug
+        // see https://github.com/gooddata/gdc-dashboards/pull/651
+        filter.ensureDropdownOpen();
+        assertTrue(filter.isActive(), "The attribute filter is not active");
+
+        filter.ensureDropdownClosed();
+        assertFalse(filter.isActive(), "The attribute filter is active");
+    }
+
+    @Test(dependsOnGroups = "dashboardsInit", groups = {"desktop"},
+            description = "ONE-2044: Cannot delete dataset if there are filters in KPIs")
+    public void deleteDatasetUsedByFilter() {
+        String workingProject = testParams.getProjectId();
+        String attributeName = "Name";
+
+        testParams.setProjectId(createBlankProject(getGoodDataClient(),
+                "Delete-Dataset-Having-KPI-Attribute-Filter", testParams.getAuthorizationToken(),
+                testParams.getProjectDriver(), testParams.getProjectEnvironment()));
+        try {
+            setDashboardFeatureFlags();
+
+            uploadCSV(getFilePathFromResource(WITHOUT_DATE_CSV_PATH));
+            takeScreenshot(browser, "uploaded-" + WITHOUT_DATE_DATASET + "-dataset", getClass());
+
+            initIndigoDashboardsPage().getSplashScreen()
+                    .startEditingWidgets()
+                    .addAttributeFilter(attributeName)
+                    .getAttributeFiltersPanel()
+                    .getAttributeFilter(attributeName)
+                    .selectAllValues();
+
+            String metric = "Metric-Using-Dataset-Without-Date";
+            getMdService().createObj(getProject(), new Metric(metric,
+                    MetricTypes.SUM.getMaql().replaceFirst("__fact__", format("[%s]",
+                            getMdService().getObjUri(getProject(), Fact.class, title("Censusarea")))),
+                    "#,##0.00"));
+
+            // can't use addKpi() because Using dataset has no date;
+            indigoDashboardsPage.dragAddKpiPlaceholder().getConfigurationPanel().selectMetricByName(metric);
+            indigoDashboardsPage.saveEditModeWithWidgets();
+
+            // this will open Data Sets tab by default
+            initManagePage();
+            ObjectsTable datasetTable = ObjectsTable
+                    .getInstance(id(ObjectTypes.DATA_SETS.getObjectsTableID()), browser);
+            datasetTable.selectObject(WITHOUT_DATE_DATASET);
+            DatasetDetailPage page = DatasetDetailPage.getInstance(browser);
+            page.deleteObject();
+
+            assertEquals(datasetTable.getAllItems().size(), 0, "The dataset is not deleted");
+            assertEquals(initIndigoDashboardsPage().getAttributeFiltersPanel().getAttributeFilters().size(),
+                    0, "Attribute filter is not deleted");
+        } finally {
+            ProjectRestUtils.deleteProject(getGoodDataClient(), testParams.getProjectId());
+            testParams.setProjectId(workingProject);
+        }
+    }
+
+    private IndigoDashboardsPage addAttributeFilterToDashboard(String attribute) {
+        initIndigoDashboardsPageWithWidgets().switchToEditMode().addAttributeFilter(attribute)
                 .saveEditModeWithWidgets();
 
-        final AttributeFiltersPanel attributeFiltersPanel =
-                indigoDashboardsPage.getAttributeFiltersPanel();
-        takeScreenshot(browser, "deleteAttributeFilter-Without_Reload", getClass());
-        assertEquals(attributeFiltersPanel.getAttributeFilters().size(), 0);
+        return indigoDashboardsPage;
+    }
 
-        final AttributeFiltersPanel attributeFiltersPanelWithReload =
-                initIndigoDashboardsPageWithWidgets().getAttributeFiltersPanel();
-        takeScreenshot(browser, "deleteAttributeFilter-With_Reload", getClass());
-        assertEquals(attributeFiltersPanel.getAttributeFilters().size(), 0);
+    private void deleteAttributeFilters(Collection<String> attributes) throws IOException, JSONException {
+        for (String att : attributes) {
+            IndigoRestUtils.deleteAttributeFilterIfExist(getRestApiClient(), testParams.getProjectId(),
+                    getAttributeDisplayFormUri(att));
+        }
+    }
+
+    private void addMultipleFilters(Collection<String> filters) {
+        filters.forEach(att -> indigoDashboardsPage.addAttributeFilter(att)
+                .getAttributeFiltersPanel().getAttributeFilter(att).ensureDropdownClosed());
     }
 }

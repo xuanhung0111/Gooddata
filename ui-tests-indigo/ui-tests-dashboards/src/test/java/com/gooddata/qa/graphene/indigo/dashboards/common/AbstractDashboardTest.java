@@ -18,6 +18,8 @@ import java.util.UUID;
 
 import javax.mail.Message;
 
+import com.gooddata.md.Attribute;
+import com.gooddata.md.Restriction;
 import org.json.JSONException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -140,6 +142,13 @@ public abstract class AbstractDashboardTest extends AbstractProjectTest {
                 .filter(e -> e.text().contains(content))
                 .findFirst()
                 .isPresent();
+    }
+
+    protected String getAttributeDisplayFormUri(String attribute) {
+        return getMdService()
+                .getObj(getProject(), Attribute.class, Restriction.title(attribute))
+                .getDefaultDisplayForm()
+                .getUri();
     }
 
     private void setWindowSize(final int width, final int height) {

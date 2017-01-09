@@ -274,6 +274,18 @@ public class FilteringWidgetsTest extends GoodSalesAbstractDashboardTest {
             // check value is not filtered
             takeScreenshot(browser, "testAttributeFiltersForKpiCorrectlyApplied-valueNotFiltered-filterIgnored", getClass());
             assertEquals(getLastKpiValue(), notFiltered);
+
+            indigoDashboardsPage
+                    .switchToEditMode()
+                    .selectLastWidget(Kpi.class);
+            setFilterByChecked(ATTR_DEPARTMENT, true);
+            indigoDashboardsPage.saveEditModeWithWidgets();
+
+            setFilterValues(ATTR_DEPARTMENT, DIRECT_SALES_DEPARTMENT);
+
+            // check value is filtered again
+            takeScreenshot(browser, "testAttributeFiltersForKpiCorrectlyApplied-valueNotFiltered-valueFilteredAgain", getClass());
+            assertEquals(getLastKpiValue(), filtered);
         } finally {
             deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
         }

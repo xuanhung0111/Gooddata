@@ -401,6 +401,41 @@ public class IndigoRestUtils {
                 dashboardUris.toArray(new String[dashboardUris.size()]));
     }
 
+    /**
+     * Delete attribute filter on Indigo dashboard
+     * @param restApiClient
+     * @param projectId
+     * @param attributeDisplayFormUri
+     * @throws IOException
+     * @throws JSONException
+     */
+    public static void deleteAttributeFilterIfExist(final RestApiClient restApiClient, final String projectId,
+                                                    final String attributeDisplayFormUri) throws IOException, JSONException {
+        // dashboard is now containing 1 filter context
+        String targetUri = getFilterContextUris(restApiClient, projectId).get(0);
+
+        JSONObject filterContext = getJsonObject(restApiClient, targetUri);
+        JSONArray filtersArray = filterContext.getJSONObject("filterContext")
+                .getJSONObject("content").getJSONArray("filters");
+
+        JSONArray newArray = new JSONArray();
+        for (int i = 0; i < filtersArray.length(); i++) {
+            JSONObject obj = filtersArray.getJSONObject(i);
+
+            if (obj.has("attributeFilter") && attributeDisplayFormUri.equals(obj.getJSONObject("attributeFilter")
+                    .getString("displayForm")))
+                continue;
+
+            newArray.put(obj);
+        }
+
+        filterContext.getJSONObject("filterContext")
+                .getJSONObject("content")
+                .put("filters", newArray);
+
+        executeRequest(restApiClient, restApiClient.newPutMethod(targetUri, filterContext.toString()), HttpStatus.OK);
+    }
+
     private static int getDashboardWidgetCount(final RestApiClient restApiClient, final String dashboardUri)
             throws JSONException, IOException {
         return getJsonObject(restApiClient, dashboardUri).getJSONObject("analyticalDashboard")
@@ -509,5 +544,9 @@ public class IndigoRestUtils {
 
     private interface ThrowingPredicate<T> {
         boolean test(T t) throws Exception;
+    }
+
+    private static List<String> getFilterContextUris(final RestApiClient restApiClient, final String projectId) {
+        return getMdObjectValues(restApiClient, projectId, "filtercontexts", jsonObj -> jsonObj.getString("link"));
     }
 }
