@@ -167,6 +167,62 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
     }
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"df-single", "df-multiple"})
+    public void setInitialDashViewForAttribute() throws JSONException {
+        final String dashBoard = generateDashboardName();
+
+        initDashboardsPage()
+                .addNewDashboard(dashBoard)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_DEPARTMENT);
+
+        DashboardWidgetDirection.LEFT.moveElementToRightPlace(getFilter(ATTR_STAGE_NAME).getRoot());
+
+        if (!multipleChoice) {
+            getFilter(ATTR_STAGE_NAME).changeSelectionToOneValue();
+            getFilter(ATTR_DEPARTMENT).changeSelectionToOneValue();
+        }
+
+        getFilter(ATTR_STAGE_NAME).editAttributeFilterValues(DISCOVERY);
+        getFilter(ATTR_DEPARTMENT).editAttributeFilterValues(DIRECT_SALES);
+        dashboardsPage.saveDashboard();
+
+        takeScreenshot(browser, "Attribute-default-filter-combination-applied", getClass());
+        assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), DISCOVERY);
+        assertEquals(getFilter(ATTR_DEPARTMENT).getCurrentValue(), DIRECT_SALES);
+    }
+
+    @Test(dependsOnGroups = {"precondition"}, groups = {"df-single", "df-multiple"})
+    public void notApplyValueDashViewForAttributeInPreviewMode() throws JSONException {
+        final String dashBoard = generateDashboardName();
+
+        initDashboardsPage()
+                .addNewDashboard(dashBoard)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_DEPARTMENT);
+
+        DashboardWidgetDirection.LEFT.moveElementToRightPlace(getFilter(ATTR_STAGE_NAME).getRoot());
+
+        if (!multipleChoice) {
+            getFilter(ATTR_STAGE_NAME).changeSelectionToOneValue();
+            getFilter(ATTR_DEPARTMENT).changeSelectionToOneValue();
+        }
+
+        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(DISCOVERY);
+        getFilter(ATTR_DEPARTMENT).changeAttributeFilterValues(DIRECT_SALES);
+        dashboardsPage.saveDashboard();
+
+        if (multipleChoice) {
+            takeScreenshot(browser, "Attribute-default-filter-combination-applied", getClass());
+            assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), ALL);
+            assertEquals(getFilter(ATTR_DEPARTMENT).getCurrentValue(), ALL);
+        } else {
+            takeScreenshot(browser, "Attribute-default-filter-combination-applied", getClass());
+            assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), INTEREST);
+            assertEquals(getFilter(ATTR_DEPARTMENT).getCurrentValue(), DIRECT_SALES);
+        }
+    }
+
+    @Test(dependsOnGroups = {"precondition"}, groups = {"df-single", "df-multiple"})
     public void turnOnDashboardSavedViewAfterSettingDefaultFilter() throws JSONException {
         final String dashBoard = generateDashboardName();
 
