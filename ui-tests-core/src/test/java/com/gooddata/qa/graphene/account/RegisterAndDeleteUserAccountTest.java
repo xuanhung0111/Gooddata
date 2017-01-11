@@ -10,6 +10,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.deleteUserByEmail;
 import static com.gooddata.qa.graphene.fragments.account.LostPasswordPage.PASSWORD_HINT;
+import static java.lang.String.format;
 
 import java.io.IOException;
 
@@ -41,7 +42,6 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
             cssSelector(".yui3-d-modaldialog:not(.gdc-hidden) .title");
     private static final By CLOSE_DIALOG_BUTTON_LOCATOR = By.cssSelector(".s-btn-close");
 
-    private static final String DEMO_PROJECT = "GoodSales";
     private static final String GOODDATA_PRODUCT_TOUR_PROJECT = "GoodData Product Tour";
 
     private static final String SHORT_PASSWORD_ERROR_MESSAGE = "Password too short. "
@@ -124,9 +124,6 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
         initProjectsAndUsersPage();
         assertTrue(isWalkmeDisplayed(), "Walkme-dialog-is-not-visible");
-
-        openProject(DEMO_PROJECT);
-        assertFalse(isWalkmeDisplayed(), "Walkme-dialog-is-visible-in-project-that-is-not-Product-Tour");
 
         openProject(GOODDATA_PRODUCT_TOUR_PROJECT);
         assertFalse(isWalkmeDisplayed(), "Walkme-dialog-displays-more-than-one-time-in-Product-Tour-project");
@@ -244,8 +241,8 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
     @Test(groups = {"sanity"})
     public void registerNewUser() throws MessagingException, IOException, ParseException, JSONException {
-        if (!testParams.isClusterEnvironment() || testParams.isProductionEnvironment() ||
-                testParams.isPerformanceEnvironment()) {
+        if (testParams.isPIEnvironment() || testParams.isProductionEnvironment() 
+                || testParams.isPerformanceEnvironment()) {
             log.warning("Register New User is not tested on PI or Production environment");
             return;
         }
@@ -266,8 +263,9 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
             LoginFragment.getInstance(browser).login(registrationUser, testParams.getPassword(), true);
             waitForDashboardPageLoaded(browser);
 
-            openProject(DEMO_PROJECT);
-            assertFalse(dashboardsPage.isEditButtonPresent(), "Dashboard can be edited in Goodsales Demo project");
+            openProject(GOODDATA_PRODUCT_TOUR_PROJECT);
+            assertTrue(dashboardsPage.isEditButtonPresent(), format("Dashboard cannot be edited in %s project", 
+                    GOODDATA_PRODUCT_TOUR_PROJECT));
         } finally {
             logout();
         }
@@ -326,7 +324,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
     @Test(dependsOnMethods = "registerUserWithEmailOfExistingAccount")
     public void deleteUserAccount() throws JSONException {
-        testParams.setProjectId(getProjectId(DEMO_PROJECT));
+        testParams.setProjectId(getProjectId(GOODDATA_PRODUCT_TOUR_PROJECT));
 
         initAccountPage()
             .tryDeleteAccountButDiscard();
@@ -343,8 +341,8 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
     @AfterClass(alwaysRun = true)
     public void tearDown() throws ParseException, JSONException, IOException {
-        if (!testParams.isClusterEnvironment() || testParams.isProductionEnvironment() ||
-                testParams.isPerformanceEnvironment()) return;
+        if (testParams.isPIEnvironment() || testParams.isProductionEnvironment() 
+                || testParams.isPerformanceEnvironment()) return;
         deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), registrationUser);
     }
 
