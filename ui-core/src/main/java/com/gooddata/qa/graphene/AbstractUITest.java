@@ -36,6 +36,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.List;
@@ -177,7 +178,16 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     public LoginFragment logout() {
         openUrl(PAGE_PROJECTS);
-        waitForElementVisible(BY_LOGGED_USER_BUTTON, browser).click();
+
+        //after logged user button displays, 
+        //there could be still a layer of spinner icon, for loading projects paging
+        //and the button is not clickable
+        //we must wait until the button is clickable
+        //see CL-11186 for more details
+        Graphene.waitGui()
+            .until(ExpectedConditions.elementToBeClickable(BY_LOGGED_USER_BUTTON))
+            .click();
+
         waitForElementVisible(BY_LOGOUT_LINK, browser).click();
         waitForElementNotPresent(BY_LOGGED_USER_BUTTON);
         return LoginFragment.getInstance(browser);
