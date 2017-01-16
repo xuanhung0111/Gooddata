@@ -59,6 +59,9 @@ public final class GoodSalesUtils {
     public static final String ATTR_DEPARTMENT = "Department";
     public static final String ATTR_STATUS = "Status";
     public static final String ATTR_REGION = "Region";
+    public static final String ATTR_IS_CLOSED = "Is Closed?";
+    public static final String ATTR_IS_ACTIVE = "Is Active?";
+    public static final String ATTR_IS_TASK = "Is Task?";
     public static final String ATTR_IS_WON = "Is Won?";
     public static final String ATTR_OPPORTUNITY = "Opportunity";
     public static final String ATTR_OPP_SNAPSHOT = "Opp. Snapshot";
@@ -78,6 +81,7 @@ public final class GoodSalesUtils {
     public static final String ATTR_DATE_CREATED = "Date (Created)";
     public static final String ATTR_YEAR_CREATED = "Year (Created)";
     public static final String ATTR_PRIORITY = "Priority";
+    public static final String ATTR_FORECAST_CATEGORY = "Forecast Category";
 
     // facts
     public static final String FACT_AMOUNT = "Amount";
