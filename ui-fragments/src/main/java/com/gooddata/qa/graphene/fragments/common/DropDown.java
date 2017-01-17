@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.common;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
@@ -26,8 +27,11 @@ public class DropDown extends AbstractFragment {
     @FindBy(css = ".gd-list-view-item span")
     private List<WebElement> items;
 
-    public static final DropDown getInstance(By root, SearchContext context) {
-        return Graphene.createPageFragment(DropDown.class, waitForElementVisible(root, context));
+    public static final DropDown getInstance(By locator, SearchContext searchContext) {
+        WebElement root = waitForElementVisible(locator, searchContext);
+        waitForElementNotPresent(By.cssSelector("[class*='loadingWheel'],.gd-spinner"), root);
+
+        return Graphene.createPageFragment(DropDown.class, root);
     }
 
     public void searchAndSelectItem(String name) {

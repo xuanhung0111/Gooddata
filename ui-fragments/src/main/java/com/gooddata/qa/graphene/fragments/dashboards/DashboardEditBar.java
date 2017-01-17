@@ -98,9 +98,6 @@ public class DashboardEditBar extends AbstractFragment {
     @FindBy(xpath = "//div[contains(@class,'s-active-tab')]")
     private DashboardEditFilter dashboardEditFilter;
 
-    @FindBy(xpath = "//div[contains(@class,'reportPicker')]")
-    private DropDown reportPicker;
-
     public DashboardEditFilter getDashboardEditFilter() {
         return dashboardEditFilter;
     }
@@ -108,8 +105,7 @@ public class DashboardEditBar extends AbstractFragment {
     public DashboardEditBar addReportToDashboard(String reportName) {
         int widgetCountBefore = listDashboardWidgets.size();
         clickReportMenuButton();
-        waitForElementVisible(reportPicker.getRoot());
-        reportPicker.searchAndSelectItem(reportName);
+        DropDown.getInstance(By.className("reportPicker"), browser).searchAndSelectItem(reportName);
         Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1,
                 "Widget wasn't added");
 

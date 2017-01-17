@@ -93,10 +93,7 @@ public class ApplicationHeaderBar extends AbstractFragment {
 
     public static void selectProject(String name, WebDriver browser) {
         waitForElementVisible(getInstance(browser).navigationPicker).click();
-
-        Graphene.createPageFragment(DropDown.class,
-                waitForElementVisible(By.className("project-selector"), browser))
-                .searchAndSelectItem(name);
+        DropDown.getInstance(By.className("project-selector"), browser).searchAndSelectItem(name);
     }
 
     public static String getCurrentProjectName(WebDriver browser) {
