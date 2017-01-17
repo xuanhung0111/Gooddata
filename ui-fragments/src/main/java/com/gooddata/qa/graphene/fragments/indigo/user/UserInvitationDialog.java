@@ -4,7 +4,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 
-import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -59,9 +58,7 @@ public class UserInvitationDialog extends AbstractFragment {
 
     private UserInvitationDialog selectRoles(UserRoles role) {
         waitForElementVisible(roles).click();
-        Graphene.createPageFragment(DropDown.class,
-                waitForElementVisible(By.className("ember-list-container"), browser))
-                    .selectItem(role.getName());
+        DropDown.getInstance(By.className("ember-list-container"), browser).selectItem(role.getName());
         return this;
     }
 

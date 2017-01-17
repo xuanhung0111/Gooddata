@@ -38,12 +38,6 @@ public class CreateAttributePage extends AbstractFragment {
     @FindBy(css = ".computed-attribute-metric")
     private WebElement metricButton;
 
-    @FindBy(css = ".dropdown-attribute")
-    private DropDown attributeDropDown;
-
-    @FindBy(css = ".dropdown-metric")
-    private DropDown metricDropDown;
-
     @FindBy(css = ".bucketing")
     private WebElement bucketing;
 
@@ -95,13 +89,13 @@ public class CreateAttributePage extends AbstractFragment {
 
     public CreateAttributePage selectAttribute(String name) {
         waitForElementVisible(attributeButton).click();
-        attributeDropDown.searchAndSelectItem(name);
+        DropDown.getInstance(By.className("dropdown-attribute"), getRoot()).searchAndSelectItem(name);
         return this;
     }
 
     public CreateAttributePage selectMetric(String name) {
         waitForElementVisible(metricButton).click();
-        metricDropDown.searchAndSelectItem(name);
+        DropDown.getInstance(By.className("dropdown-metric"), getRoot()).searchAndSelectItem(name);
         return this;
     }
 

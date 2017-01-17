@@ -168,8 +168,7 @@ public class UserManagementPage extends AbstractFragment {
         deselectAllUserEmails();
         selectUsers(emails);
         waitForElementVisible(BY_CHANGE_ROLE_BUTTON, browser).click();
-        Graphene.createPageFragment(DropDown.class,
-                waitForElementVisible(By.className("ember-list-container"), browser)).selectItem(role.getName());
+        DropDown.getInstance(By.className("ember-list-container"), browser).selectItem(role.getName());
         return this;
     }
 
