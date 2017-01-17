@@ -7,7 +7,6 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -78,10 +77,8 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
         uploadCsvFileWithErrors(BAD_STRUCTURE_FILE,
                 asList(format(ROW_CONTAINS_MORE_COLUMNS_THAN_THE_HEADER_ROW, 2)));
 
-        final String datasetName = BAD_STRUCTURE_FILE.getDatasetNameOfFirstUpload();
-        assertThat("Dataset with name '" + datasetName + "' should not be in datasets list.",
-                DatasetsListPage.getInstance(browser).getMyDatasetsTable().getDatasetNames(),
-                not(hasItem(datasetName)));
+        assertTrue(DatasetsListPage.getInstance(browser).isMyDatasetsEmpty(),
+                "Csv with bad format should not allow to upload");
     }
 
     @Test(dependsOnGroups = {"createProject"})

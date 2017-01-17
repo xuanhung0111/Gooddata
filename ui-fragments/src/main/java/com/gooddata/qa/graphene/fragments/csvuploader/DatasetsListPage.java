@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.csvuploader;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static org.openqa.selenium.By.className;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -16,7 +17,7 @@ import com.gooddata.qa.graphene.utils.ElementUtils;
 
 public class DatasetsListPage extends AbstractFragment {
 
-    private static final By BY_EMPTY_STATE = className("datasets-empty-state");
+    private static final By BY_EMPTY_STATE = className("empty-state");
     private static final By BY_MY_DATASETS_EMPTY_STATE = className("my-datasets-empty-state");
 
     @FindBy(className = "s-datasets-list-header")
@@ -25,10 +26,10 @@ public class DatasetsListPage extends AbstractFragment {
     @FindBy(className = "s-add-data-button")
     private WebElement addDataButton;
 
-    @FindBy(className = "s-my-datasets-list")
+    @FindBy(css = ".s-my-datasets-list table")
     private DatasetsTable myDatasetsTable;
 
-    @FindBy(className = "others-datasets")
+    @FindBy(css = ".others-datasets table")
     private DatasetsTable othersDatasetsTable;
 
     public static DatasetsListPage getInstance(SearchContext context) {
@@ -75,7 +76,7 @@ public class DatasetsListPage extends AbstractFragment {
     }
 
     public boolean isMyDatasetsEmpty() {
-        return getMyDatasetsTable().getRoot().getAttribute("class").contains("empty-state");
+        return isElementPresent(BY_EMPTY_STATE, getRoot());
     }
 
     public int getMyDatasetsCount() {
