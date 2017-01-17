@@ -54,6 +54,6 @@ public class WalkmeOnEmbeddedAdTest extends AbstractUITest {
     }
 
     private String getProductTourProjectId() {
-        return initProjectsPage().getProjectsIds(GOODDATA_PRODUCT_TOUR_PROJECT).get(0);
+        return initProjectsPage().getProjectItem(GOODDATA_PRODUCT_TOUR_PROJECT).getId();
     }
 }

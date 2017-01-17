@@ -20,32 +20,33 @@ public class DeleteTestProjects extends AbstractUITest {
         signIn(false, UserRoles.ADMIN);
     }
 
-    @Test(dependsOnGroups = {"deleteProjectsInit"})
-    public void deleteAllConnectorCheckProjects() {
-        deleteProjects("Connector-test");
-    }
-
-    @Test(dependsOnGroups = {"deleteProjectsInit"})
-    public void deleteAllGoodSalesCheckProjects() {
-        deleteProjects("GoodSales-test");
-    }
-
-    @Test(dependsOnGroups = {"deleteProjectsInit"})
-    public void deleteAllSimpleProjects() {
-        deleteProjects("SimpleProject-test");
-    }
-
-    @Test(dependsOnGroups = {"deleteProjectsInit"})
-    public void deleteAllDiscProjects() {
-        deleteProjects("Disc-test");
-    }
-
-    private void deleteProjects(String projectSubstring) {
-        List<String> projectsToDelete = initProjectsPage().getProjectsIds(projectSubstring);
-        System.out.println("Going to delete " + projectsToDelete.size() + " projects, " + projectsToDelete.toString());
-        for (String projectToDelete : projectsToDelete) {
-            deleteProject(projectToDelete);
-        }
-    }
+//    waiting Michal's confirmation at https://jira.intgdc.com/browse/CL-11228
+//    @Test(dependsOnGroups = {"deleteProjectsInit"})
+//    public void deleteAllConnectorCheckProjects() {
+//        deleteProjects("Connector-test");
+//    }
+//
+//    @Test(dependsOnGroups = {"deleteProjectsInit"})
+//    public void deleteAllGoodSalesCheckProjects() {
+//        deleteProjects("GoodSales-test");
+//    }
+//
+//    @Test(dependsOnGroups = {"deleteProjectsInit"})
+//    public void deleteAllSimpleProjects() {
+//        deleteProjects("SimpleProject-test");
+//    }
+//
+//    @Test(dependsOnGroups = {"deleteProjectsInit"})
+//    public void deleteAllDiscProjects() {
+//        deleteProjects("Disc-test");
+//    }
+//
+//    private void deleteProjects(String projectSubstring) {
+//        List<String> projectsToDelete = initProjectsPage().getProjectsIds(projectSubstring);
+//        System.out.println("Going to delete " + projectsToDelete.size() + " projects, " + projectsToDelete.toString());
+//        for (String projectToDelete : projectsToDelete) {
+//            deleteProject(projectToDelete);
+//        }
+//    }
 
 }
