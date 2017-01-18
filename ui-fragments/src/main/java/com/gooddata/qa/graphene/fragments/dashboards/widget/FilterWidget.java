@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.fragments.dashboards.widget;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.util.List;
@@ -15,6 +17,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.Select
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.AttributeFilterPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.DashboardEditWidgetToolbarPanel;
 
 public class FilterWidget extends AbstractFragment {
 
@@ -34,14 +37,22 @@ public class FilterWidget extends AbstractFragment {
         return this;
     }
 
+    public FilterWidget openEditPanel() {
+        if (!isOpen()) {
+            DashboardEditWidgetToolbarPanel.openEditPanelFor(this.getRoot(), browser);
+        }
+        return this;
+    }
+
     public void closePanel() {
         if (isOpen()) {
-            waitForElementVisible(button).click();
+            waitForElementVisible(titleContainer).click();
         }
+        waitForElementNotPresent(AttributeFilterPanel.LOCATOR);
     }
 
     public boolean isOpen() {
-        return button.getAttribute("class").contains("active");
+        return isElementPresent(AttributeFilterPanel.LOCATOR, browser);
     }
 
     /**
@@ -74,7 +85,21 @@ public class FilterWidget extends AbstractFragment {
     }
 
     /**
-     * Change values by open and select attribute values in Attribute filter panel.
+     * Change values permanently by click pencil icon to open and
+     * Select attribute values in default Attribute filter panel.
+     * Can use for both single and multiple mode.
+     * @param values
+     * @return
+     */
+    public FilterWidget editAttributeFilterValues(String... values) {
+        openEditPanel().getAttributeFilterPanel().changeValues(values);
+
+        closePanel();
+        return this;
+    }
+
+    /**
+     * change values temporarily by open and select attribute values in review Attribute filter panel.
      * Can use for both single and multiple mode.
      * @param values
      * @return

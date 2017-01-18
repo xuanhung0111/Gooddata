@@ -71,7 +71,7 @@ public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest 
                 .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME);
 
         DashboardWidgetDirection.LEFT.moveElementToRightPlace(getReport(REPORT_WITH_PROMPT_FILTER).getRoot());
-        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(INTEREST, DISCOVERY);
+        getFilter(ATTR_STAGE_NAME).editAttributeFilterValues(INTEREST, DISCOVERY);
         dashboardsPage.saveDashboard();
 
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), String.join(", ", INTEREST, DISCOVERY));
@@ -113,14 +113,15 @@ public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest 
 
         DashboardWidgetDirection.LEFT.moveElementToRightPlace(getReport(REPORT_WITH_PROMPT_FILTER).getRoot());
         DashboardWidgetDirection.RIGHT.moveElementToRightPlace(getFilter(ATTR_STAGE_NAME).getRoot());
+        DashboardWidgetDirection.UP.moveElementToRightPlace(getFilter(DF_VARIABLE).getRoot());
 
         if (combinationType == FilterCombination.USING_GROUP)
             dashboardsPage.groupFiltersOnDashboard(ATTR_STAGE_NAME, DF_VARIABLE);
 
-        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(INTEREST, DISCOVERY);
+        getFilter(ATTR_STAGE_NAME).editAttributeFilterValues(INTEREST, DISCOVERY);
         getFilter(DF_VARIABLE)
                 .changeSelectionToOneValue()
-                .changeAttributeFilterValues(DISCOVERY);
+                .editAttributeFilterValues(DISCOVERY);
 
         if (combinationType == FilterCombination.USING_GROUP)
             dashboardsPage.applyValuesForGroupFilter();
@@ -228,11 +229,12 @@ public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest 
                 .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_DEPARTMENT)
                 .groupFiltersOnDashboard(ATTR_STAGE_NAME, ATTR_DEPARTMENT);
         DashboardWidgetDirection.LEFT.moveElementToRightPlace(getFilter(ATTR_STAGE_NAME).getRoot());
+        DashboardWidgetDirection.RIGHT.moveElementToRightPlace(getFilter(ATTR_DEPARTMENT).getRoot());
 
-        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(INTEREST);
+        getFilter(ATTR_STAGE_NAME).editAttributeFilterValues(INTEREST);
         getFilter(ATTR_DEPARTMENT)
                 .changeSelectionToOneValue()
-                .changeAttributeFilterValues(DIRECT_SALES);
+                .editAttributeFilterValues(DIRECT_SALES);
         dashboardsPage.applyValuesForGroupFilter().copyDashboardTab(0, DASH_PIPELINE_ANALYSIS);
 
         takeScreenshot(browser, "Filter-group-value-kept-after-copy-tab", getClass());
@@ -258,10 +260,10 @@ public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest 
                 .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_DEPARTMENT);
 
         DashboardWidgetDirection.LEFT.moveElementToRightPlace(getFilter(ATTR_STAGE_NAME).getRoot());
-        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(INTEREST);
+        getFilter(ATTR_STAGE_NAME).editAttributeFilterValues(INTEREST);
         getFilter(ATTR_DEPARTMENT)
                 .changeSelectionToOneValue()
-                .changeAttributeFilterValues(DIRECT_SALES);
+                .editAttributeFilterValues(DIRECT_SALES);
 
         dashboardsPage.saveDashboard().openTab(0);
         takeScreenshot(browser, "Initial-value-for-connected-filters-applied", getClass());

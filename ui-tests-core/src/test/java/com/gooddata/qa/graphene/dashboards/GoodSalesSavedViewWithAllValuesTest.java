@@ -58,8 +58,8 @@ public class GoodSalesSavedViewWithAllValuesTest extends AbstractDashboardWidget
                 .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STATUS)
                 .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_PRIORITY);
 
-        getFilter(ATTR_PRIORITY).changeAttributeFilterValues(LOW);
-        getFilter(ATTR_STATUS).changeAttributeFilterValues(COMPLETED, DEFERRED);
+        getFilter(ATTR_PRIORITY).editAttributeFilterValues(LOW);
+        getFilter(ATTR_STATUS).editAttributeFilterValues(COMPLETED, DEFERRED);
 
         DashboardWidgetDirection.LEFT.moveElementToRightPlace(getReport(REPORT).getRoot());
         DashboardWidgetDirection.RIGHT.moveElementToRightPlace(getFilter(ATTR_STATUS).getRoot());
@@ -99,7 +99,7 @@ public class GoodSalesSavedViewWithAllValuesTest extends AbstractDashboardWidget
                 SaveAsDialog.PermissionType.USE_EXISTING_PERMISSIONS);
 
         dashboardsPage.editDashboard();
-        getFilter(ATTR_PRIORITY).openPanel().getAttributeFilterPanel().selectAllItems().submitPanel();
+        getFilter(ATTR_PRIORITY).openEditPanel().getAttributeFilterPanel().selectAllItems().submitPanel();
         dashboardsPage.saveDashboard();
 
         logoutAndLoginAs(true, UserRoles.VIEWER);

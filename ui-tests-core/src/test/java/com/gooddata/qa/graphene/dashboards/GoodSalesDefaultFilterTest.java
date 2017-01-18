@@ -104,7 +104,7 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
         DashboardWidgetDirection.LEFT.moveElementToRightPlace(getReport(report).getRoot());
         if (!multipleChoice) getFilter(name).changeSelectionToOneValue();
 
-        getFilter(name).changeAttributeFilterValues(DISCOVERY);
+        getFilter(name).editAttributeFilterValues(DISCOVERY);
         dashboardsPage.saveDashboard();
 
         takeScreenshot(browser, "Default-filter-is-applied-with-" + type + "-" + DISCOVERY, getClass());
@@ -117,7 +117,7 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
         assertEquals(getReport(report).getAttributeElements(), singletonList(DISCOVERY));
 
         dashboardsPage.editDashboard();
-        getFilter(name).changeAttributeFilterValues(SHORT_LIST);
+        getFilter(name).editAttributeFilterValues(SHORT_LIST);
         dashboardsPage.saveDashboard();
 
         takeScreenshot(browser, "Default-filter-is-applied-with-" + type + "-" + SHORT_LIST, getClass());
@@ -143,8 +143,8 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
             getFilter(DF_VARIABLE).changeSelectionToOneValue();
         }
 
-        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(DISCOVERY);
-        getFilter(DF_VARIABLE).changeAttributeFilterValues(DISCOVERY);
+        getFilter(ATTR_STAGE_NAME).editAttributeFilterValues(DISCOVERY);
+        getFilter(DF_VARIABLE).editAttributeFilterValues(DISCOVERY);
         dashboardsPage.saveDashboard().publishDashboard(true);
 
         takeScreenshot(browser, "Attribute-and-prompt-default-filter-combination-applied", getClass());
@@ -167,6 +167,62 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
     }
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"df-single", "df-multiple"})
+    public void setInitialDashViewForAttribute() throws JSONException {
+        final String dashBoard = generateDashboardName();
+
+        initDashboardsPage()
+                .addNewDashboard(dashBoard)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_DEPARTMENT);
+
+        DashboardWidgetDirection.LEFT.moveElementToRightPlace(getFilter(ATTR_STAGE_NAME).getRoot());
+
+        if (!multipleChoice) {
+            getFilter(ATTR_STAGE_NAME).changeSelectionToOneValue();
+            getFilter(ATTR_DEPARTMENT).changeSelectionToOneValue();
+        }
+
+        getFilter(ATTR_STAGE_NAME).editAttributeFilterValues(DISCOVERY);
+        getFilter(ATTR_DEPARTMENT).editAttributeFilterValues(DIRECT_SALES);
+        dashboardsPage.saveDashboard();
+
+        takeScreenshot(browser, "Attribute-default-filter-combination-applied", getClass());
+        assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), DISCOVERY);
+        assertEquals(getFilter(ATTR_DEPARTMENT).getCurrentValue(), DIRECT_SALES);
+    }
+
+    @Test(dependsOnGroups = {"precondition"}, groups = {"df-single", "df-multiple"})
+    public void notApplyValueDashViewForAttributeInPreviewMode() throws JSONException {
+        final String dashBoard = generateDashboardName();
+
+        initDashboardsPage()
+                .addNewDashboard(dashBoard)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME)
+                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_DEPARTMENT);
+
+        DashboardWidgetDirection.LEFT.moveElementToRightPlace(getFilter(ATTR_STAGE_NAME).getRoot());
+
+        if (!multipleChoice) {
+            getFilter(ATTR_STAGE_NAME).changeSelectionToOneValue();
+            getFilter(ATTR_DEPARTMENT).changeSelectionToOneValue();
+        }
+
+        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(DISCOVERY);
+        getFilter(ATTR_DEPARTMENT).changeAttributeFilterValues(DIRECT_SALES);
+        dashboardsPage.saveDashboard();
+
+        if (multipleChoice) {
+            takeScreenshot(browser, "Attribute-default-filter-combination-applied", getClass());
+            assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), ALL);
+            assertEquals(getFilter(ATTR_DEPARTMENT).getCurrentValue(), ALL);
+        } else {
+            takeScreenshot(browser, "Attribute-default-filter-combination-applied", getClass());
+            assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), INTEREST);
+            assertEquals(getFilter(ATTR_DEPARTMENT).getCurrentValue(), DIRECT_SALES);
+        }
+    }
+
+    @Test(dependsOnGroups = {"precondition"}, groups = {"df-single", "df-multiple"})
     public void turnOnDashboardSavedViewAfterSettingDefaultFilter() throws JSONException {
         final String dashBoard = generateDashboardName();
 
@@ -179,7 +235,7 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
         DashboardWidgetDirection.LEFT.moveElementToRightPlace(getReport(REPORT).getRoot());
         if (!multipleChoice) getFilter(ATTR_STAGE_NAME).changeSelectionToOneValue();
 
-        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(DISCOVERY);
+        getFilter(ATTR_STAGE_NAME).editAttributeFilterValues(DISCOVERY);
         dashboardsPage.saveDashboard().publishDashboard(true);
 
         takeScreenshot(browser, "Default-view-displayed-after-turn-on-dashboard-saved-view", getClass());
@@ -212,7 +268,7 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
         DashboardWidgetDirection.LEFT.moveElementToRightPlace(getReport(REPORT).getRoot());
         if (!multipleChoice) getFilter(ATTR_STAGE_NAME).changeSelectionToOneValue();
 
-        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(DISCOVERY);
+        getFilter(ATTR_STAGE_NAME).editAttributeFilterValues(DISCOVERY);
         dashboardsPage.saveDashboard();
 
         SavedViewWidget savedViewWidget = dashboardsPage.getSavedViewWidget();
@@ -248,8 +304,8 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
             getFilter(DF_VARIABLE).changeSelectionToOneValue();
         }
 
-        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(DISCOVERY);
-        getFilter(DF_VARIABLE).changeAttributeFilterValues(DISCOVERY);
+        getFilter(ATTR_STAGE_NAME).editAttributeFilterValues(DISCOVERY);
+        getFilter(DF_VARIABLE).editAttributeFilterValues(DISCOVERY);
         dashboardsPage.saveDashboard();
         getReport(REPORT_WITH_PROMPT_FILTER).waitForReportLoading();
 
@@ -267,8 +323,8 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
         }
 
         dashboardsPage.editDashboard();
-        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(SHORT_LIST);
-        getFilter(DF_VARIABLE).changeAttributeFilterValues(SHORT_LIST);
+        getFilter(ATTR_STAGE_NAME).editAttributeFilterValues(SHORT_LIST);
+        getFilter(DF_VARIABLE).editAttributeFilterValues(SHORT_LIST);
         dashboardsPage.applyValuesForGroupFilter().saveDashboard();
         getReport(REPORT_WITH_PROMPT_FILTER).waitForReportLoading();
 
@@ -313,7 +369,7 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
                 .addNewDashboard(dashboard)
                 .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME)
                 .getFilterWidgetByName(ATTR_STAGE_NAME)
-                .changeAttributeFilterValues(INTEREST);
+                .editAttributeFilterValues(INTEREST);
 
         if (!multipleChoice) {
             getFilter(ATTR_STAGE_NAME).changeSelectionToOneValue();
