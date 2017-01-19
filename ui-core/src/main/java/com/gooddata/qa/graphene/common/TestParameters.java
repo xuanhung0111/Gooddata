@@ -221,4 +221,12 @@ public class TestParameters {
         return Stream.of("perf\\.getgooddata\\.com")
                 .anyMatch(this.host::matches);
     }
+
+    public boolean isPIEnvironment() {
+        return !isClusterEnvironment() && !isHostProxy();
+    }
+
+    public boolean isClientDemoEnvironment() {
+        return !isClusterEnvironment() && isHostProxy();
+    }
 }
