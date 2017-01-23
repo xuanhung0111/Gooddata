@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAllInsightNames;
+import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+import com.gooddata.qa.browser.BrowserUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
@@ -259,9 +261,9 @@ public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnMethods = {"testInsightListWithCreatedByMeFilter", "createInsightByEditor"})
     public void testInsightListWithAllFilter() {
-        final AnalysisInsightSelectionPanel insightSelectionPanel = analysisPage
-                .getPageHeader()
+        final AnalysisInsightSelectionPanel insightSelectionPanel = analysisPage.getPageHeader()
                 .expandInsightSelection();
+
         insightSelectionPanel.switchFilter(FilterType.ALL).searchInsight("Insight-List-Test-With-Filter");
         assertEquals(insightSelectionPanel.getInsightItems().size(), 2, "The number of insights is not correct");
     }
@@ -309,9 +311,10 @@ public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
     @Test(dependsOnGroups = {"init"})
     public void testBlankInsightAfterSwitchingProject() {
         final String blankProject = "Blank-Project-For-Insight-Test";
-        final String blankProjectId = ProjectRestUtils.createBlankProject(getGoodDataClient(), blankProject,
-                testParams.getAuthorizationToken(), testParams.getProjectDriver(), testParams
-                        .getProjectEnvironment());
+        final String blankProjectId = ProjectRestUtils.createBlankProject(getGoodDataClient(),
+                blankProject, testParams.getAuthorizationToken(),
+                testParams.getProjectDriver(), testParams.getProjectEnvironment());
+
         assertFalse(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing().isBlankState(),
                 "Workspace is blank before switching project");
 
@@ -326,6 +329,26 @@ public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
             ProjectRestUtils.deleteProject(getGoodDataClient(), blankProjectId);
             assertTrue(browser.getCurrentUrl().contains(mainProjectId));
             assertTrue(analysisPage.isBlankState(), "AD does not show blank state after switching project");
+        }
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void openAsReportAfterSaveInsight() {
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addAttribute(ATTR_ACTIVITY_TYPE)
+                .changeReportType(ReportType.TABLE)
+                .waitForReportComputing()
+                .saveInsight("Open-As-Report-After-Save-Insight");
+
+        analysisPage.exportReport();
+        BrowserUtils.switchToLastTab(browser);
+        try {
+            List<String> attributes = reportPage.getTableReport().waitForReportLoading().getAttributeElements();
+            takeScreenshot(browser, "openAsReportAfterSaveInsight", getClass());
+            assertEquals(attributes, asList("Email", "In Person Meeting", "Phone Call", "Web Meeting"),
+                    "Report is not rendered correctly");
+        } finally {
+            BrowserUtils.switchToFirstTab(browser);
         }
     }
 

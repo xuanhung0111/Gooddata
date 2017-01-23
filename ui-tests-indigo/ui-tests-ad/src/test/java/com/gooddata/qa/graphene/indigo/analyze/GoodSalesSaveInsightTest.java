@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.dialog.SaveInsightDialog;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 import org.json.JSONException;
@@ -18,6 +20,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACT
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_STAGE_VELOCITY;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAllInsightNames;
+import static java.util.Arrays.asList;
 import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -155,7 +158,7 @@ public class GoodSalesSaveInsightTest extends GoodSalesAbstractAnalyseTest {
     @Test(dependsOnGroups = {"init"})
     public void testSaveAsButtonNotPresentInBlankState() {
         assertFalse(analysisPage.getPageHeader().isSaveAsPresent(),
-                "Save As button is dispayed at start state");
+                "Save As button is displayed at start state");
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -227,5 +230,27 @@ public class GoodSalesSaveInsightTest extends GoodSalesAbstractAnalyseTest {
                 .getPageHeader().getInsightTitle(), DATE_CREATED_DIMENSION_INSIGHT);
         assertEquals(analysisPage.getAttributesBucket().getSelectedDimensionSwitch(), CREATED,
                 "Selected date dimension of " + DATE_CREATED_DIMENSION_INSIGHT + "was not correct");
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void saveInsightAfterOpenAsReport() {
+        String insight = "Save-Insight-After-Open-As-Report";
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addAttribute(ATTR_ACTIVITY_TYPE).changeReportType(ReportType.TABLE).waitForReportComputing();
+
+        analysisPage.exportReport();
+        BrowserUtils.switchToLastTab(browser);
+        try {
+            reportPage.getTableReport().waitForReportLoading();
+        } finally {
+            BrowserUtils.switchToFirstTab(browser);
+        }
+
+        analysisPage.saveInsight(insight).resetToBlankState().openInsight(insight).waitForReportComputing();
+
+        takeScreenshot(browser, "saveInsightAfterOpenAsReport", getClass());
+        assertEquals(analysisPage.getTableReport().getContent(),
+                asList(asList("Email", "33,920"), asList("In Person Meeting", "35,975"),
+                        asList("Phone Call", "50,780"), asList("Web Meeting", "33,596")));
     }
 }
