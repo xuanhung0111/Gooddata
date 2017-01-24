@@ -17,7 +17,6 @@
         <module>ui-tests-dss</module>
         <module>ui-tests-connectors</module>
         <module>ui-tests-perf</module>
-        <module>ui-tests-tools</module>
         <module>ui-tests-msf</module>
         <module>ui-tests-indigo</module>
     </modules>

@@ -56,7 +56,6 @@ Currently there are following modules available (use them for tests of specific 
  * ui-tests-core - includes common classes for all tests and basic tests
  * ui-tests-dashboards - for running dashboard tests
  * ui-tests-dss - for running DSS tests
- * ui-tests-tools - for running extra tools tests (specific usage, no tests by default)
  * ui-tests-upload - for running csv upload tests (experimental)
 
 ## Git workflow

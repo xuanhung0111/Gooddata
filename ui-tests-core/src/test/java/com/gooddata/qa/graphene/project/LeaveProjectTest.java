@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.project;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.projects.PopupDialog;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import org.json.JSONException;
@@ -33,8 +34,9 @@ public class LeaveProjectTest extends AbstractProjectTest {
     public void testProjectHavingOneAdmin() {
         String blankProjectID = createBlankProject("Project-Having-One-Admin");
         try {
-            ProjectsPage page = initProjectsPage().leaveProject(blankProjectID);
-            assertEquals(page.getPopupDialog().getMessage(), ERROR_MESSAGE, "The error msg is not correct");
+            initProjectsPage().getProjectItem(blankProjectID).leave();
+            assertEquals(PopupDialog.getInstance(browser).getMessage(),
+                    ERROR_MESSAGE, "The error msg is not correct");
         } finally {
             ProjectRestUtils.deleteProject(getGoodDataClient(), blankProjectID);
         }
@@ -50,9 +52,9 @@ public class LeaveProjectTest extends AbstractProjectTest {
             logout();
             signInAtGreyPages(anotherUser, testParams.getPassword());
 
-            initProjectsPage().leaveProject(testParams.getProjectId());
-            assertFalse(initProjectsPage().isProjectDisplayed(testParams.getProjectId()), "The project is not removed" +
-                    " from list");
+            initProjectsPage().getProjectItem(testParams.getProjectId()).leave();
+            assertFalse(initProjectsPage().isProjectDisplayed(testParams.getProjectId()),
+                    "The project is not removed from list");
         } finally {
             // switch to domain user because the new user which is created in this test has just left created project
             logoutAndLoginAs(true, UserRoles.ADMIN);

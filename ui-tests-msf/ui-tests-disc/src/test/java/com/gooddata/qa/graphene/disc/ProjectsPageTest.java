@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.disc;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
@@ -39,7 +38,6 @@ import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 import com.gooddata.qa.graphene.enums.disc.ProjectStateFilters;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.google.common.base.Joiner;
 
@@ -212,10 +210,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkPagingProjectsPage() {
-        final ProjectsPage projectsPage = initProjectsPage();
-        waitForCollectionIsNotEmpty(projectsPage.getProjectsElements());
-        int projectsNumber =
-                projectsPage.getProjectsElements().size() + projectsPage.getDemoProjectsElements().size();
+        int projectsNumber = initProjectsPage().getProjectsInViewPortCount();
         String[] additionalProjectIds = null;
         if (projectsNumber <= MINIMUM_NUMBER_OF_PROJECTS) {
             additionalProjectIds = new String[MINIMUM_NUMBER_OF_PROJECTS - projectsNumber + 1];
