@@ -18,6 +18,7 @@ import com.google.common.base.Predicate;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import java.util.List;
 
@@ -126,6 +127,10 @@ public class ConfigurationPanel extends AbstractFragment {
                 .getDropdownButton()
                 .getAttribute("class")
                 .contains("disabled");
+    }
+
+    public boolean isDateDataSetDropdownVisible() {
+        return isElementPresent(By.className("s-viz-filter-date-dropdown"), browser);
     }
 
     public MetricSelect getMetricSelect() {

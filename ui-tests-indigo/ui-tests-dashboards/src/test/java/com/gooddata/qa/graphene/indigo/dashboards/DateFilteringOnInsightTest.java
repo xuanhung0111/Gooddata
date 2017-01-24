@@ -1,19 +1,13 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.md.Restriction.title;
-import static  com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
-import static  com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_LOST_OPPS;
-import static  com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_OPP_FIRST_SNAPSHOT ;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_OPP_FIRST_SNAPSHOT ;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createInsight;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteWidgetsUsingCascade;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getInsightUri;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getInsightWidgetTitles;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
@@ -26,18 +20,13 @@ import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.gooddata.md.Attribute;
 import com.gooddata.md.Metric;
-import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.ObjectTypes;
-import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.ConfigurationPanel;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.manage.DatasetDetailPage;
@@ -47,16 +36,10 @@ import com.gooddata.qa.graphene.utils.Sleeper;
 
 public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
 
-    private static String ALL_TIME = "All time";
     private static String SNAPSHOT = "Snapshot";
     private static String DATE_SNAPSHOT = "Date (Snapshot)";
     private static String DATE_SNAPSHOT_RENAMED = "Date (Snapshot)_Renamed";
     private static String TEST_INSIGHT = "Test-Insight";
-    private static String NON_RELATED_DATE_INSIGHT = "Non-Related-Date-Insight";
-    private static String LARGE_INSIGHT = "Large-Insight";
-    private static String EMPTY_INSIGHT = "Empty-Insight";
-    private static String WITHOUT_METRIC_INSIGHT = "Without-Metric-Insight";
-    private static String INCOMPUTED_INSIGHT = "Incomputed-Insight";
 
     @BeforeClass
     public void setProjectTitle() {
@@ -72,31 +55,6 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
         // creating insight which is set date filter via REST is not recommended in these tests
         initIndigoDashboardsPage().getSplashScreen().startEditingWidgets().addInsight(TEST_INSIGHT)
                 .waitForWidgetsLoading().saveEditModeWithWidgets();
-    }
-
-    @DataProvider
-    public Object[][] defaultFilterStateProvider() throws ParseException, JSONException, IOException {
-        return new Object[][] {
-                {INCOMPUTED_INSIGHT, ALL_TIME, false, createIncomputedReport()},
-                {NON_RELATED_DATE_INSIGHT, ALL_TIME, false, createUnrelatedDateInsight()},
-                {LARGE_INSIGHT, ALL_TIME, true, createLargeInsight()},
-                {WITHOUT_METRIC_INSIGHT, ALL_TIME, true, createTableInsight()},
-                {EMPTY_INSIGHT, "Last year", true, createEmptyInsight()}
-        };
-    }
-
-    @Test(dependsOnGroups = {"dashboardsInit"}, dataProvider = "defaultFilterStateProvider")
-    public void testDefaultDateFilterState(String insight, String dateValue, boolean expectedState,
-            String insightUri) throws JSONException, IOException {
-        try {
-            initIndigoDashboardsPageWithWidgets().switchToEditMode().selectDateFilterByName(dateValue)
-                    .waitForWidgetsLoading().addInsight(insight).waitForWidgetsLoading();
-            ConfigurationPanel panel = indigoDashboardsPage.getConfigurationPanel();
-            takeScreenshot(browser, "default-date-filter-state-test-" + insight.toUpperCase(), getClass());
-            assertEquals(panel.isDateFilterCheckboxEnabled(), expectedState, "Date filter state is not correct");
-        } finally {
-            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), insightUri);
-        }
     }
 
     @Test(dependsOnGroups = {"dashboardsInit"})
@@ -134,10 +92,10 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
                 TEST_INSIGHT);
 
         ConfigurationPanel panel = indigoDashboardsPage.getConfigurationPanel();
-        assertTrue(panel.isDataSetEnabled(), "Default state of date filter is not enabled");
+        assertTrue(panel.isDateDataSetDropdownVisible(), "Default state of date filter is not enabled");
 
         panel.disableDateFilter();
-        assertFalse(indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().isDataSetEnabled(),
+        assertFalse(indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().isDateDataSetDropdownVisible(),
                 "State of date filter is not disabled");
     }
 
@@ -147,11 +105,11 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
                 TEST_INSIGHT);
 
         ConfigurationPanel panel = indigoDashboardsPage.getConfigurationPanel().disableDateFilter();
-        assertFalse(indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().isDataSetEnabled(),
+        assertFalse(indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().isDateDataSetDropdownVisible(),
                 "Date filter is not disabled");
 
         panel.enableDateFilter();
-        assertTrue(indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().isDataSetEnabled(),
+        assertTrue(indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().isDateDataSetDropdownVisible(),
                 "Date filter is not enabled");
     }
 
@@ -178,13 +136,13 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
 
         initIndigoDashboardsPageWithWidgets().switchToEditMode().addInsight(insight).waitForWidgetsLoading()
                 .getConfigurationPanel().disableDateFilter();
-        assertFalse(indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().isDataSetEnabled(),
+        assertFalse(indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().isDateDataSetDropdownVisible(),
                 "Date filter is not disabled");
         indigoDashboardsPage.saveEditModeWithWidgets();
 
         try {
             indigoDashboardsPage.switchToEditMode().selectWidgetByHeadline(Insight.class, insight);
-            assertFalse(indigoDashboardsPage.getConfigurationPanel().isDataSetEnabled(),
+            assertFalse(indigoDashboardsPage.getConfigurationPanel().isDateDataSetDropdownVisible(),
                     "Date filter is not disabled");
         } finally {
             deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), insightUri);
@@ -201,12 +159,12 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
         initIndigoDashboardsPageWithWidgets().switchToEditMode().addInsight(insight).waitForWidgetsLoading();
         // this test should not depend on default state of date filter
         indigoDashboardsPage.getConfigurationPanel().disableDateFilter().enableDateFilter();
-        assertTrue(indigoDashboardsPage.getConfigurationPanel().isDataSetEnabled(), "Date filter is not enabled");
+        assertTrue(indigoDashboardsPage.getConfigurationPanel().isDateDataSetDropdownVisible(), "Date filter is not enabled");
         indigoDashboardsPage.saveEditModeWithWidgets();
 
         try {
             indigoDashboardsPage.switchToEditMode().selectWidgetByHeadline(Insight.class, insight);
-            assertTrue(indigoDashboardsPage.getConfigurationPanel().isDataSetEnabled(),
+            assertTrue(indigoDashboardsPage.getConfigurationPanel().isDateDataSetDropdownVisible(),
                     "Date filter is not enabled");
         } finally {
             deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), insightUri);
@@ -298,93 +256,7 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"},
-            description = "CL-10356: List date should not open when selecting Insights")
-    public void collapseDateDatasetWhenEditing() throws JSONException, IOException {
-        String insight = "Insight-Created-From-Fact";
-        initAnalysePage().addMetric(FACT_AMOUNT, FieldType.FACT).waitForReportComputing().saveInsight(insight);
-
-        try {
-            initIndigoDashboardsPageWithWidgets().switchToEditMode().addInsight(insight).waitForWidgetsLoading()
-                    .getConfigurationPanel().selectDateDataSetByName(DATE_CREATED);
-            indigoDashboardsPage.saveEditModeWithWidgets().switchToEditMode().selectLastWidget(Insight.class);
-
-            assertTrue(indigoDashboardsPage.getConfigurationPanel().isDateDataSetSelectCollapsed(),
-                    "Date dataset is not collapsed");
-        } finally {
-            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(),
-                    getInsightUri(insight, getRestApiClient(), testParams.getProjectId()));
-        }
-    }
-
-    @Test(dependsOnGroups = {"dashboardsInit"})
-    public void addInsightUsingDateFilter() throws JSONException, IOException {
-        String insight = "Insight-Using-Date-Filter";
-        AnalysisPage page =
-                initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDateFilter().waitForReportComputing();
-        page.getFilterBuckets().changeDateDimension(DATE_CREATED);
-        page.saveInsight(insight);
-
-        try {
-            assertTrue(page.getFilterBuckets().getDateFilterText().contains(DATE_CREATED),
-                    "Date filter is not added correctly");
-
-            ConfigurationPanel panel = initIndigoDashboardsPageWithWidgets().switchToEditMode().addInsight(insight)
-                    .waitForWidgetsLoading().getConfigurationPanel();
-            assertEquals(panel.getSelectedDataSet(), DATE_CREATED, "Selected date dataset is not correct");
-            assertTrue(panel.isDateDataSetSelectCollapsed(), "Date dataset is not selected automatically");
-        } finally {
-            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(),
-                    getInsightUri(insight, getRestApiClient(), testParams.getProjectId()));
-        }
-    }
-
     private Metric getMetric(String title) {
         return getMdService().getObj(getProject(), Metric.class, title(title));
-    }
-
-    private String createUnrelatedDateInsight() throws ParseException, JSONException, IOException {
-        String accountUri = getMdService().getObjUri(getProject(), Attribute.class, title(ATTR_ACCOUNT));
-        Metric nonRelatedMetric = getMdService().createObj(getProject(),
-                new Metric("Non-Related-Date-Metric", "SELECT COUNT([" + accountUri + "])", "#,##0"));
-
-        return createInsight(getRestApiClient(), testParams.getProjectId(),
-                new InsightMDConfiguration(NON_RELATED_DATE_INSIGHT, ReportType.COLUMN_CHART)
-                        .setMeasureBucket(singletonList(MeasureBucket.getSimpleInstance(nonRelatedMetric))));
-    }
-
-    private String createLargeInsight() throws ParseException, JSONException, IOException {
-        Metric numberOfActivies =
-                getMdService().getObj(getProject(), Metric.class, title(METRIC_NUMBER_OF_ACTIVITIES));
-        Attribute activity = getMdService().getObj(getProject(), Attribute.class, title(ATTR_ACTIVITY));
-
-        return createInsight(getRestApiClient(), testParams.getProjectId(),
-                new InsightMDConfiguration(LARGE_INSIGHT, ReportType.COLUMN_CHART)
-                        .setMeasureBucket(singletonList(MeasureBucket.getSimpleInstance(numberOfActivies)))
-                        .setCategoryBucket(singletonList(CategoryBucket.createViewByBucket(activity))));
-    }
-
-    private String createEmptyInsight() throws ParseException, JSONException, IOException {
-        return createInsight(getRestApiClient(), testParams.getProjectId(),
-                new InsightMDConfiguration(EMPTY_INSIGHT, ReportType.COLUMN_CHART).setMeasureBucket(
-                        singletonList(MeasureBucket.getSimpleInstance(getMetric(METRIC_NUMBER_OF_LOST_OPPS)))));
-    }
-
-    private String createIncomputedReport() throws ParseException, JSONException, IOException {
-        String productUri = getMdService().getObjUri(getProject(), Attribute.class, title(ATTR_PRODUCT));
-        Metric incomputedMetric = getMdService().createObj(getProject(),
-                new Metric("Incomputed-Metric", "SELECT [" + productUri + "]", "#,##0"));
-
-        return createInsight(getRestApiClient(), testParams.getProjectId(),
-                new InsightMDConfiguration(INCOMPUTED_INSIGHT, ReportType.COLUMN_CHART)
-                        .setMeasureBucket(singletonList(MeasureBucket.getSimpleInstance(incomputedMetric))));
-    }
-
-    private String createTableInsight() throws ParseException, JSONException, IOException {
-        Attribute department = getMdService().getObj(getProject(), Attribute.class, title(ATTR_DEPARTMENT));
-
-        return createInsight(getRestApiClient(), testParams.getProjectId(),
-                new InsightMDConfiguration(WITHOUT_METRIC_INSIGHT, ReportType.TABLE)
-                        .setCategoryBucket(singletonList(CategoryBucket.createViewByBucket(department))));
     }
 }

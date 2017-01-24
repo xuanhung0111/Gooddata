@@ -75,7 +75,7 @@ public class CommonDateFilteringTest extends GoodSalesAbstractDashboardTest {
     public void makeNoChangeOnDisabledDateDatasetFilterInsight() {
         initIndigoDashboardsPageWithWidgets().switchToEditMode().selectDateFilterByName(ALL_TIME)
                 .waitForWidgetsLoading().selectWidgetByHeadline(Insight.class, TEST_INSIGHT);
-        assertFalse(indigoDashboardsPage.getConfigurationPanel().disableDateFilter().isDataSetEnabled(),
+        assertFalse(indigoDashboardsPage.getConfigurationPanel().disableDateFilter().isDateDataSetDropdownVisible(),
                 "The insight date dataset is not disabled");
 
         List<String> expectedValues = initIndigoDashboardsPageWithWidgets().switchToEditMode()
