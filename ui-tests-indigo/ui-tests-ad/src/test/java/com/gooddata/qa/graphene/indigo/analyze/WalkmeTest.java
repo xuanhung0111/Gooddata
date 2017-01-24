@@ -106,6 +106,6 @@ public class WalkmeTest extends AbstractUITest {
     }
 
     private String getProjectId(String name) {
-        return initProjectsPage().getProjectsIds(name).get(0);
+        return initProjectsPage().getProjectItem(name).getId();
     }
 }

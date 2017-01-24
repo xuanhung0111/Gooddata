@@ -5,16 +5,16 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoade
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
 import static com.gooddata.qa.graphene.fragments.account.LostPasswordPage.PASSWORD_HINT;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.updateUserPassword;
 import static com.gooddata.qa.utils.http.project.ProjectRestUtils.createBlankProject;
+import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.mail.MessagingException;
 
+import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
@@ -26,7 +26,6 @@ import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.AbstractUITest;
 import com.gooddata.qa.graphene.fragments.account.LostPasswordPage;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
-import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 
 public class ResetPasswordTest extends AbstractUITest {
 
@@ -131,13 +130,13 @@ public class ResetPasswordTest extends AbstractUITest {
      */
     @Test(dependsOnMethods = {"resetWithValidAndInvalidPassword"}, enabled = false)
     public void openOneProject() {
-        List<String> projectIds = initProjectsPage().getProjectsIds(PROJECT_NAME);
-        assertFalse(projectIds.isEmpty(), "Project Ids are empty");
+        assertTrue(initProjectsPage().isProjectDisplayed(PROJECT_NAME));
 
-        ProjectsPage.getInstance(browser).goToProject(projectIds.get(0));
+        ProjectsPage.ProjectItem projectItem = initProjectsPage().getProjectItem(PROJECT_NAME);
+        projectItem.open();
         waitForDashboardPageLoaded(browser);
 
-        testParams.setProjectId(projectIds.get(0));
+        testParams.setProjectId(projectItem.getId());
     }
 
     @Test(dependsOnMethods = { "openOneProject" }, enabled = false)

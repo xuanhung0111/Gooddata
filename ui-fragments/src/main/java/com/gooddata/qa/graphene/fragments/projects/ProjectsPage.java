@@ -1,80 +1,41 @@
 package com.gooddata.qa.graphene.fragments.projects;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.id;
-import static org.openqa.selenium.By.tagName;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Optional;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 
 public class ProjectsPage extends AbstractFragment {
 
     @FindBy(xpath = "//ul[@id='myProjects']/li")
     private List<WebElement> projects;
 
-    @FindBy(xpath = "//ul[@id='demoProjects']/li")
-    private List<WebElement> demoProjects;
-
-    private static final By BY_PROJECT_TITLE = By.cssSelector(".projectTitle");
+    @FindBy(css = ".projectListSearch .gdc-input")
+    private WebElement searchTextbox;
 
     public static final ProjectsPage getInstance(SearchContext context) {
         return Graphene.createPageFragment(ProjectsPage.class, waitForElementVisible(id("projectsCentral"), context));
     }
 
-    public List<WebElement> getProjectsElements() {
-        return projects;
+    public void goToProject(String nameOrId) {
+        getProjectItem(nameOrId).open();
     }
 
-    public List<WebElement> getDemoProjectsElements() {
-        return demoProjects;
-    }
-
-    public List<String> getProjectsIds() {
-        return getProjectsIds("");
-    }
-
-    public List<String> getProjectsIds(String projectSubstringFilter) {
-        return Stream.concat(demoProjects.stream(), projects.stream())
-                .filter(e -> e.findElement(BY_PROJECT_TITLE).getText().contains(projectSubstringFilter))
-                .map(this::getProjectIdFrom)
-                .collect(Collectors.toList());
-    }
-
-    public void goToProject(final String projectId) {
-        Iterables.find(Iterables.concat(demoProjects, projects), new Predicate<WebElement>() {
-            @Override
-            public boolean apply(WebElement project) {
-                return projectId.equals(getProjectIdFrom(project));
-            }
-        }).click();
-    }
-
-    public String getProjectNameFrom(String projectId) {
-        return projects.stream()
-                .filter(e -> e.getAttribute("gdc:link").contains(projectId))
-                .map(e -> e.findElement(By.cssSelector(".projectTitle")))
-                .map(WebElement::getText)
-                .findFirst()
-                .get();
-    }
-
-    public boolean isProjectDisplayed(String projectId) {
-        return projects.stream()
-                .filter(e -> e.getAttribute("gdc:link").contains(projectId))
-                .findFirst()
-                .isPresent();
+    public boolean isProjectDisplayed(String nameOrId) {
+        return searchProject(nameOrId).getProjectElementInViewport(nameOrId).isPresent();
     }
 
     public String getAlertMessage() {
@@ -82,46 +43,57 @@ public class ProjectsPage extends AbstractFragment {
                 .getText();
     }
 
-    public ProjectsPage leaveProject(String projectId) {
-        waitForElementVisible(findProject(getProjectNameFrom(projectId))).findElement(className("leaveProject")).click();
-        getPopupDialog().leaveProject();
+    /**
+     * The method handles projects paging on project html page. Please note that
+     * search is available only when having more than 25 projects.
+     *
+     * please use search text wisely because it could be a potential risk when the result contains projects paging
+     * @param nameOrId
+     * @return
+     */
+    public ProjectsPage searchProject(String nameOrId) {
+        if (isElementVisible(searchTextbox)) {
+            searchTextbox.clear();
+            searchTextbox.sendKeys(nameOrId);
+
+            waitForElementNotVisible(id("spinnerSearch"));
+        }
 
         return this;
     }
 
-    public PopupDialog getPopupDialog() {
-        return Graphene.createPageFragment(PopupDialog.class, waitForElementVisible(className
-                ("t-infoMessageDialog"), browser));
+    public ProjectItem getProjectItem(String nameOrId) {
+        WebElement foundElement = searchProject(nameOrId).getProjectElementInViewport(nameOrId)
+                .orElseThrow(() -> new NoSuchElementException("There is no project named " + nameOrId));
+
+        return Graphene.createPageFragment(ProjectItem.class, waitForElementVisible(foundElement));
     }
 
-    private WebElement findProject(String name) {
-        return projects.stream().filter(e -> name.equals(e.findElement(className("projectTitle")).getText()))
-                .findFirst().get();
+    public int getProjectsInViewPortCount() {
+        return projects.size();
     }
 
-    private String getProjectIdFrom(WebElement project) {
-        String gdcLink = project.getAttribute("gdc:link");
-        return gdcLink.substring(gdcLink.lastIndexOf("/") + 1);
+    private Optional<WebElement> getProjectElementInViewport(String nameOrId) {
+        return projects.stream()
+                .filter(e -> nameOrId.equals(e.findElement(className("projectTitle")).getText())
+                        || e.getAttribute("gdc:link").contains(nameOrId))
+                .findFirst();
     }
 
-    public class PopupDialog extends AbstractFragment {
-        @FindBy(className = "s-btn-leave")
-        private WebElement leaveButton;
+    public class ProjectItem extends AbstractFragment {
 
-        public void leaveProject() {
-            waitForElementVisible(leaveButton).click();
+        public void leave() {
+            waitForElementVisible(className("leaveProject"), getRoot()).click();
+            PopupDialog.getInstance(browser).leaveProject();
         }
 
-        public String getMessage() {
-            // getText() returns value contains child text, so it should be removed from error msg
-            String returnString = waitForElementVisible(tagName("form"), getRoot()).getText();
-
-            return returnString.substring(0, returnString.indexOf(waitForElementVisible(className("bd_controls"),
-                    getRoot()).getText())).trim();
+        public void open() {
+            waitForElementVisible(className("projectTitle"), getRoot()).click();
         }
 
-        public void close() {
-            waitForElementVisible(className("container-close"), getRoot()).click();
+        public String getId() {
+            String gdcLink = getRoot().getAttribute("gdc:link");
+            return gdcLink.substring(gdcLink.lastIndexOf("/") + 1);
         }
     }
 }

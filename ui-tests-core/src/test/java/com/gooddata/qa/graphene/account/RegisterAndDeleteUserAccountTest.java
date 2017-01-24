@@ -13,7 +13,6 @@ import static com.gooddata.qa.graphene.fragments.account.LostPasswordPage.PASSWO
 import static java.lang.String.format;
 
 import java.io.IOException;
-
 import javax.mail.MessagingException;
 
 import org.apache.http.ParseException;
@@ -357,7 +356,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     }
 
     private String getProjectId(String name) {
-        return initProjectsPage().getProjectsIds(name).get(0);
+        return initProjectsPage().getProjectItem(name).getId();
     }
 
     private boolean isWalkmeDisplayed() {

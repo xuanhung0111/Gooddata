@@ -53,7 +53,8 @@ public class CreateAndDeleteProjectTest extends AbstractProjectTest {
                 FIRST_EDITED_PROJECT_NAME);
         assertEquals(getCurrentProjectName(browser), FIRST_EDITED_PROJECT_NAME);
 
-        assertEquals(initProjectsPage().getProjectNameFrom(fisrtProjectId), FIRST_EDITED_PROJECT_NAME);
+        assertTrue(initProjectsPage().isProjectDisplayed(FIRST_EDITED_PROJECT_NAME),
+                "The project has not been renamed to " + FIRST_EDITED_PROJECT_NAME);
     }
 
     @Test(dependsOnMethods = {"renameProjectByOwner"})
@@ -70,7 +71,8 @@ public class CreateAndDeleteProjectTest extends AbstractProjectTest {
                 SECOND_EDITED_PROJECT_NAME);
         assertEquals(getCurrentProjectName(browser), SECOND_EDITED_PROJECT_NAME);
 
-        assertEquals(initProjectsPage().getProjectNameFrom(fisrtProjectId), SECOND_EDITED_PROJECT_NAME);
+        assertTrue(initProjectsPage().isProjectDisplayed(SECOND_EDITED_PROJECT_NAME),
+                "The project has not been renamed to " + SECOND_EDITED_PROJECT_NAME);
     }
 
     @Test(dependsOnMethods = { "renameProjectByInvitedAdminUser" })
