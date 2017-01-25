@@ -25,6 +25,7 @@ import com.gooddata.qa.graphene.indigo.analyze.GoodSalesMetricVisibilityTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesNotRenderedInsightTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesProjectNavigationTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesRelatedAndUnrelatedDateDimensionsTest;
+import com.gooddata.qa.graphene.indigo.analyze.GoodSalesSaveInsightTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesShortcutRecommendationTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesTableReportTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesTrendingRecommendationTest;
@@ -108,6 +109,7 @@ public class UITestsRegistry {
             GoodSalesRelatedAndUnrelatedDateDimensionsTest.class,
             EmbeddedAdTest.class,
             GoodSalesInsightTest.class,
+            GoodSalesSaveInsightTest.class,
             GoodSalesMetricVisibilityTest.class,
             GoodSalesProjectNavigationTest.class,
             "testng-ad-ChartLabelFormat.xml",
