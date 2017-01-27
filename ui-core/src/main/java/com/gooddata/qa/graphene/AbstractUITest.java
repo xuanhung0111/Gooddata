@@ -184,6 +184,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
         //and the button is not clickable
         //we must wait until the button is clickable
         //see CL-11186 for more details
+        waitForProjectsPageLoaded(browser);
         Graphene.waitGui()
             .until(ExpectedConditions.elementToBeClickable(BY_LOGGED_USER_BUTTON))
             .click();
