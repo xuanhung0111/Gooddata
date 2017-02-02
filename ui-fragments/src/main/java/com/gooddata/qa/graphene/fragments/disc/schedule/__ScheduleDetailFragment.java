@@ -24,6 +24,7 @@ import org.openqa.selenium.support.ui.Select;
 
 import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
 import com.gooddata.qa.graphene.enums.disc.__Executable;
+import com.gooddata.qa.graphene.enums.disc.__ScheduleCronTime;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.disc.ConfirmationDialog;
 import com.google.common.base.Predicate;
@@ -36,11 +37,23 @@ public class __ScheduleDetailFragment extends AbstractFragment {
     @FindBy(className = "s-btn-run")
     private WebElement runButton;
 
+    @FindBy(className = "s-btn-stop")
+    private WebElement stopButton;
+
+    @FindBy(className = "ait-schedule-enable-btn")
+    private WebElement enableButton;
+
     @FindBy(className = "execution-history-item")
     private List<__ExecutionHistoryItem> executionHistoryItems;
 
     @FindBy(className = "ait-schedule-executable-select-btn")
     private Select executableSelect;
+
+    @FindBy(className = "cron-picker")
+    private Select cronSelect;
+
+    @FindBy(className = "ait-schedule-reschedule-add-btn")
+    private WebElement addRetryDelayLink;
 
     @FindBy(className = "button-positive")
     private WebElement saveButton;
@@ -59,6 +72,23 @@ public class __ScheduleDetailFragment extends AbstractFragment {
         return this;
     }
 
+    public String getDisabledMessage() {
+        return waitForElementVisible(By.className("disabled-info"), getRoot()).getText();
+    }
+
+    public String getDisableRecommendMessage() {
+        return waitForElementVisible(By.className("info-section"), getRoot()).getText();
+    }
+
+    public String getAutoDisabledMessage() {
+        return waitForElementVisible(By.cssSelector(".ait-schedule-disabled .message p"), getRoot()).getText();
+    }
+
+    public __ScheduleDetailFragment enableSchedule() {
+        waitForElementVisible(enableButton).click();
+        return this;
+    }
+
     public __ScheduleDetailFragment executeSchedule() {
         int executionItems = executionHistoryItems.size();
 
@@ -67,6 +97,12 @@ public class __ScheduleDetailFragment extends AbstractFragment {
 
         Predicate<WebDriver> scheduleExecuted = browser -> executionHistoryItems.size() == executionItems + 1;
         Graphene.waitGui().until(scheduleExecuted);
+        return this;
+    }
+
+    public __ScheduleDetailFragment stopExecution() {
+        waitForElementVisible(stopButton).click();
+        ConfirmationDialog.getInstance(browser).confirm();
         return this;
     }
 
@@ -79,15 +115,28 @@ public class __ScheduleDetailFragment extends AbstractFragment {
     }
 
     public __ScheduleDetailFragment waitForAutoExecute(DateTime startTime) {
+        if (!canAutoTriggered(startTime)) {
+            throw new RuntimeException("Schedule execution not triggered by auto!");
+        }
+
+        return this;
+    }
+
+    public boolean canAutoTriggered(DateTime startTime) {
         int executionItems = executionHistoryItems.size();
 
         while (DateTime.now().compareTo(startTime) < 0) {
             sleepTightInSeconds(3);
         }
 
-        Predicate<WebDriver> autoExecutionTriggered = browser -> executionHistoryItems.size() == executionItems + 1;
-        Graphene.waitGui().until(autoExecutionTriggered);
-        return this;
+        try {
+            Predicate<WebDriver> autoExecutionTriggered = browser -> executionHistoryItems.size() == executionItems + 1;
+            Graphene.waitGui().until(autoExecutionTriggered);
+            return true;
+
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 
     public __ScheduleDetailFragment waitForExecutionFinish() {
@@ -98,12 +147,34 @@ public class __ScheduleDetailFragment extends AbstractFragment {
                     !executionStatus.equals(ScheduleStatus.RUNNING.toString());
         };
 
-        Graphene.waitGui().until(executionFinished);
+        Graphene.waitGui().withTimeout(5, TimeUnit.MINUTES).until(executionFinished);
         return this;
     }
 
     public __ScheduleDetailFragment editExecutable(__Executable executable) {
         waitForElementVisible(executableSelect).selectByVisibleText(executable.getValue());
+        waitForElementVisible(saveButton).click();
+        return this;
+    }
+
+    public __ScheduleDetailFragment setRunTimeByCronExpression(String cronExpression) {
+        waitForElementVisible(cronSelect).selectByVisibleText(__ScheduleCronTime.CRON_EXPRESSION.toString());
+
+        WebElement valueInput = waitForElementVisible(By.cssSelector(".cron-field input"), getRoot());
+        valueInput.clear();
+        valueInput.sendKeys(cronExpression);
+
+        waitForElementVisible(saveButton).click();
+        return this;
+    }
+
+    public __ScheduleDetailFragment addRetryDelay(int retryInMinute) {
+        waitForElementVisible(addRetryDelayLink).click();
+
+        WebElement valueInput = waitForElementVisible(By.cssSelector(".reschedule-text input"), getRoot());
+        valueInput.clear();
+        valueInput.sendKeys(String.valueOf(retryInMinute));
+
         waitForElementVisible(saveButton).click();
         return this;
     }
