@@ -28,6 +28,7 @@ public final class ProcessRestUtils {
     private static final Logger log = Logger.getLogger(ProcessRestUtils.class.getName());
 
     public static final String DATALOAD_PROCESS_TYPE = "DATALOAD";
+    public static final String PROCESS_EXECUTIONS_URI = "/gdc/projects/%s/dataload/processes/%s/executions";
 
     private ProcessRestUtils() {
     }
@@ -113,6 +114,15 @@ public final class ProcessRestUtils {
         return responseObject.getJSONObject("executionTask")
                 .getJSONObject("links")
                 .getString("poll");
+    }
+
+    public static JSONObject getLastExecutionDetail(RestApiClient restApiClient, String projectId, String processId)
+            throws JSONException, IOException {
+        return getJsonObject(restApiClient, format(PROCESS_EXECUTIONS_URI, projectId, processId))
+                .getJSONObject("executions")
+                .getJSONArray("items")
+                .getJSONObject(0)
+                .getJSONObject("executionDetail");
     }
 
     public static void deteleProcess(GoodData goodDataClient, DataloadProcess process) {

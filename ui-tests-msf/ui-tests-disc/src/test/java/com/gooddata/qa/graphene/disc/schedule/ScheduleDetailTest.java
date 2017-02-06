@@ -332,10 +332,4 @@ public class ScheduleDetailTest extends __AbstractDISCTest {
             deteleProcess(getGoodDataClient(), process);
         }
     }
-
-    private void executeScheduleWithSpecificTimes(__ScheduleDetailFragment scheduleDetail, int times) {
-        for (int i = 1; i <= times; i++) {
-            scheduleDetail.executeSchedule().waitForExecutionFinish();
-        }
-    }
 }

@@ -17,6 +17,7 @@ import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
 import com.gooddata.qa.graphene.enums.disc.__Executable;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.disc.ConfirmationDialog;
+import com.gooddata.qa.graphene.fragments.disc.notification.__NotificationRulesDialog;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.gooddata.qa.graphene.fragments.disc.schedule.__ScheduleDetailFragment;
@@ -36,6 +37,9 @@ public class ProcessDetail extends AbstractFragment {
 
     @FindBy(className = "ait-process-metadata-list-item")
     private Collection<WebElement> metadataObjects;
+
+    @FindBy(className = "notification-rule-link")
+    private WebElement notificationRuleLink;
 
     @FindBy(className = "ait-process-delete-btn")
     private WebElement deleteButton;
@@ -135,6 +139,15 @@ public class ProcessDetail extends AbstractFragment {
 
     public String getBrokenScheduleMessage() {
         return waitForElementVisible(By.cssSelector(".broken-schedules-section .message"), getRoot()).getText();
+    }
+
+    public __NotificationRulesDialog openNotificationRuleDialog() {
+        waitForElementVisible(notificationRuleLink).click();
+        return __NotificationRulesDialog.getInstance(browser);
+    }
+
+    public String getNotificationRuleDescription() {
+        return waitForElementVisible(notificationRuleLink).getText();
     }
 
     private Optional<WebElement> findSchedule(String scheduleName) {
