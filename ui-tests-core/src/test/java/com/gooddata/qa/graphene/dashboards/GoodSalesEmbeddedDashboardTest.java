@@ -1,10 +1,12 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.GOODSALES_TEMPLATE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -19,8 +21,10 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -62,7 +66,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     private static final int HEADLINE_REPORT_TAB_INDEX = 2;
     private static final int CHART_REPORT_TAB_INDEX = 1;
     private static final int TABULAR_REPORT_TAB_INDEX = 0;
-    private static final int NUMBER_OF_TABS = 4;
+    private static final int NUMBER_OF_TABS = 5;
 
     private static final String ADDITIONAL_PROJECT_TITLE = "GoodSales-project-to-share-dashboard";
     private static final String EMBEDDED_DASHBOARD_NAME = "Embedded Dashboard";
@@ -75,6 +79,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     private List<Float> metricValues;
     private UiReportDefinition chartReportDef;
     private UiReportDefinition headlineReportDef;
+    private UiReportDefinition drillingReportDef;
     private String headlineReportDescription;
     private String headlineReportValue;
     private String sharedDashboardUrl;
@@ -86,15 +91,19 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     @BeforeClass(alwaysRun = true)
     public void setUpData() {
         projectTitle = "GoodSales-embedded-dashboard-test";
-        tabularReportDef =
-                new UiReportDefinition().withName("tabular_report").withWhats(new WhatItem(METRIC_AMOUNT, ATTR_STATUS))
-                        .withHows(ATTR_YEAR_CREATED);
-        chartReportDef =
-                new UiReportDefinition().withName("chart_report").withWhats(METRIC_AMOUNT).withHows(ATTR_YEAR_CREATED)
-                        .withType(ReportTypes.BAR);
-        headlineReportDef =
-                new UiReportDefinition().withName("headline_report").withWhats(METRIC_AMOUNT)
-                        .withType(ReportTypes.HEADLINE);
+        tabularReportDef = new UiReportDefinition().withName("tabular_report")
+                .withWhats(new WhatItem(METRIC_AMOUNT, ATTR_STATUS))
+                .withHows(ATTR_YEAR_CREATED);
+        chartReportDef = new UiReportDefinition().withName("chart_report")
+                .withWhats(METRIC_AMOUNT)
+                .withHows(ATTR_YEAR_CREATED)
+                .withType(ReportTypes.BAR);
+        headlineReportDef = new UiReportDefinition().withName("headline_report")
+                .withWhats(METRIC_AMOUNT)
+                .withType(ReportTypes.HEADLINE);
+        drillingReportDef = new UiReportDefinition().withName("drilling_report")
+                .withWhats(new WhatItem(METRIC_NUMBER_OF_ACTIVITIES))
+                .withHows(ATTR_ACTIVITY_TYPE);
     }
 
     @Test(dependsOnGroups = "createProject")
@@ -108,6 +117,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         OneNumberReport headlineReport = reportPage.getHeadlineReport();
         headlineReportDescription = headlineReport.getDescription();
         headlineReportValue = headlineReport.getValue();
+        createReport(drillingReportDef, drillingReportDef.getName());
     }
 
     @Test(dependsOnMethods = "prepareReportsForEmbeddedDashboard")
@@ -124,7 +134,15 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
                 .addWebContentToDashboard("https://developer.gooddata.com/docs/reporting")
                 .addWidgetToDashboard(WidgetTypes.KEY_METRIC, METRIC_AMOUNT)
                 .addWidgetToDashboard(WidgetTypes.GEO_CHART, METRIC_AMOUNT)
+                .addNewTab("drilling_report")
+                .addReportToDashboard("drilling_report")
                 .saveDashboard();
+
+        dashboardsPage.editDashboard();
+        TableReport report = dashboardsPage.openTab(4).getReport(drillingReportDef.getName(), TableReport.class);
+        report.addDrilling(Pair.of(Collections.singletonList(ATTR_ACTIVITY_TYPE), tabularReportDef.getName()), 
+                "Reports");
+        dashboardsPage.saveDashboard();
 
         sharedDashboardUrl = browser.getCurrentUrl();
 
@@ -244,6 +262,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = "createAdditionalProject")
     public void drillingOnEmbeddedDashboard() {
+        // check drill to attribute
         String attributeValueToDrill = "2009";
         List<String> drilledDownReportAttributeValues =
                 Lists.newArrayList("Q1/2009", "Q2/2009", "Q3/2009", "Q4/2009");
@@ -283,6 +302,21 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
         assertThat(drilledTableReport.getAttributeElements(), is(drilledInReportAttributeValues));
         assertThat(drilledTableReport.getMetricElements(), is(drilledInReportMetricValues));
+
+        drillDialog.closeDialog();
+
+        // check drill to report
+        embeddedDashboard.openTab(4)
+                .getReport(drillingReportDef.getName(), TableReport.class)
+                .drillOnAttributeValue("Email");
+        drillDialog = Graphene.createPageFragment(DashboardDrillDialog.class,
+                waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
+
+        drilledTableReport = drillDialog.getReport(TableReport.class);
+        assertThat(drilledTableReport.getAttributeElements(), is(Lists.newArrayList("2008", "2009", "2010", "2011",
+                "2012")));
+        assertThat(drilledTableReport.getMetricElements(), is(Lists.newArrayList(2773426.95F, 8656468.20F,
+                29140409.09F, 60270072.20F, 15785080.10F)));
     }
 
     @Test(dependsOnMethods = "createAdditionalProject")
