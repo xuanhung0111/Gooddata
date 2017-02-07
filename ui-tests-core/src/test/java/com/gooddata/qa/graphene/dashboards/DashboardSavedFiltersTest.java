@@ -375,7 +375,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
             dashboardsPage.selectDashboard(FIRST_DASHBOARD_NAME);
             DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
             DashboardEditFilter dashboardEditFilter = dashboardEditBar.getDashboardEditFilter();
-            dashboardEditFilter.deleteFilter("time");
+            dashboardEditFilter.deleteTimeFilter();
             dashboardEditBar.saveDashboard();
     
             sleepTightInSeconds(1);
