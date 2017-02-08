@@ -56,7 +56,7 @@ public class ProjectsPage extends AbstractFragment {
             searchTextbox.clear();
             searchTextbox.sendKeys(nameOrId);
 
-            waitForElementNotVisible(id("spinnerSearch"));
+            waitForElementNotVisible(id("spinner"));
         }
 
         return this;
