@@ -27,6 +27,8 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage
 import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
 
 public class EmbeddingDashboardPostMessageTest extends GoodSalesAbstractDashboardTest {
+    private static final By FANCYBOX_OVERLAY_LOADED = By.className("fancybox-overlay-fixed");
+    private static final By FANCYBOX_LOADED = By.className("fancybox-opened");
 
     private String dashboardOnlyUser;
 
@@ -87,6 +89,35 @@ public class EmbeddingDashboardPostMessageTest extends GoodSalesAbstractDashboar
                     .getJSONObject("data")
                     .getString("project"),
                     testParams.getProjectId());
+        }
+    }
+
+    @Test(dependsOnGroups = {"dashboardsInit"})
+    public void testPostMessageWithUserNotBelongToProject() throws JSONException, IOException {
+        String user = createDynamicUserFrom(testParams.getUser());
+        String password= testParams.getPassword();
+        logout();
+        signInAtUI(user,password);
+
+        String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
+                singletonList(createAmountKpi()));
+
+        try {
+            tryToInitEmbeddedIndigoDashboardPage();
+            waitForElementVisible(FANCYBOX_OVERLAY_LOADED, browser);
+            waitForElementVisible(FANCYBOX_LOADED, browser);
+
+            Optional<JSONObject> noPermissions = getPostMessageEvent(PostMessageEvent.NO_PERMISSIONS);
+
+            takeScreenshot(browser, "Post-message-with-user-not-belong-to-project", getClass());
+            assertTrue(noPermissions.isPresent(), "Post message event not found");
+            assertEquals(noPermissions.get()
+                    .getJSONObject("data")
+                    .getString("reason"),
+                    "viewDenied");
+        } finally {
+            getMdService().removeObjByUri(dashboardUri);
+            logoutAndLoginAs(UserRoles.ADMIN);
         }
     }
 
