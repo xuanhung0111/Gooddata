@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.fragments.csvuploader;
 
-import static java.lang.String.format;
 import static java.util.Objects.isNull;
 
 import org.openqa.selenium.WebElement;

@@ -242,7 +242,7 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
     }
 
     @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"}, dataProvider = "testWidgets")
-    public void testAddingIgnoredCheckboxesOnConfigurationPanel(String widgetHeadline, Class widgetClass) {
+    public void testAddingIgnoredCheckboxesOnConfigurationPanel(String widgetHeadline, Class<? extends Widget> widgetClass) {
         initIndigoDashboardsPage().switchToEditMode()
                 .addAttributeFilter(ATTR_STAGE_NAME)
                 .addAttributeFilter(ATTR_STAGE_HISTORY)
