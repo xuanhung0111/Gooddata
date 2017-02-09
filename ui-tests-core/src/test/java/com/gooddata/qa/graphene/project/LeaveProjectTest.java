@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.project;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.projects.PopupDialog;
-import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
