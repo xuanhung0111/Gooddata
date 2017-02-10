@@ -15,6 +15,8 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
 import com.google.common.base.Predicate;
 
+import javax.security.auth.login.Configuration;
+
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
@@ -31,10 +33,10 @@ public class ConfigurationPanel extends AbstractFragment {
     @FindBy(css = ".s-metric_select button")
     private WebElement metricSelectLoaded;
 
-    @FindBy(css = ".s-dataSet_select button")
+    @FindBy(css = ".s-date-dataset-button")
     private WebElement dataSetSelectLoaded;
 
-    @FindBy(css = ".s-dataSet_select,.s-viz-filter-date-dropdown")
+    @FindBy(css = ".s-filter-date-dropdown")
     private DateDimensionSelect dateDataSetSelect;
 
     @FindBy(className = "s-compare_with_select")
@@ -76,12 +78,16 @@ public class ConfigurationPanel extends AbstractFragment {
 
     private static final By DATE_DATASET_ERROR_LOCATOR = By.cssSelector(".gd-message.error");
 
-    public ConfigurationPanel waitForButtonsLoaded() {
-        waitForElementVisible(metricSelectLoaded);
+    private ConfigurationPanel waitForVisDateDataSetsLoaded() {
         final Predicate<WebDriver> dataSetLoaded =
                 browser -> !dataSetSelectLoaded.getAttribute("class").contains("is-loading");
         Graphene.waitGui().until(dataSetLoaded);
         return this;
+    }
+
+    public ConfigurationPanel waitForButtonsLoaded() {
+        waitForElementVisible(metricSelectLoaded);
+        return waitForVisDateDataSetsLoaded();
     }
 
     public ConfigurationPanel selectMetricByName(String name) {
@@ -114,6 +120,7 @@ public class ConfigurationPanel extends AbstractFragment {
     }
 
     public String getSelectedDataSet() {
+        waitForVisDateDataSetsLoaded();
         return waitForFragmentVisible(dateDataSetSelect).getSelection();
     }
 
@@ -121,15 +128,8 @@ public class ConfigurationPanel extends AbstractFragment {
         return waitForFragmentVisible(dateDataSetSelect).getValues();
     }
 
-    public boolean isDataSetEnabled() {
-        return !waitForFragmentVisible(dateDataSetSelect)
-                .getDropdownButton()
-                .getAttribute("class")
-                .contains("disabled");
-    }
-
     public boolean isDateDataSetDropdownVisible() {
-        return isElementPresent(By.className("s-viz-filter-date-dropdown"), browser);
+        return isElementPresent(By.className("s-filter-date-dropdown"), browser);
     }
 
     public MetricSelect getMetricSelect() {
@@ -196,6 +196,7 @@ public class ConfigurationPanel extends AbstractFragment {
     }
 
     public boolean isDateDataSetErrorPresent() {
+        waitForVisDateDataSetsLoaded();
         return isElementPresent(DATE_DATASET_ERROR_LOCATOR, getRoot());
     }
 

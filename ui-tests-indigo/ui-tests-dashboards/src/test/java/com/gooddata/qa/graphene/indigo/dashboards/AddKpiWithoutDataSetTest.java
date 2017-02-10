@@ -48,7 +48,7 @@ public class AddKpiWithoutDataSetTest extends AbstractDashboardTest {
             .dragAddKpiPlaceholder()
             .getConfigurationPanel()
             .selectMetricByName(METRIC_NOT_CONNECT_WITH_DATA_SET)
-            .isDataSetEnabled());
+            .isDateDataSetDropdownVisible());
 
         IndigoDashboardsPage.getInstance(browser).saveEditModeWithWidgets();
 
@@ -76,6 +76,7 @@ public class AddKpiWithoutDataSetTest extends AbstractDashboardTest {
 
         IndigoDashboardsPage.getInstance(browser).getConfigurationPanel()
             .selectMetricByName(METRIC_CONNECT_WITH_DATA_SET)
+            .enableDateFilter()
             .selectDateDataSetByName(DATA_SET);
 
         IndigoDashboardsPage.getInstance(browser).saveEditModeWithWidgets();

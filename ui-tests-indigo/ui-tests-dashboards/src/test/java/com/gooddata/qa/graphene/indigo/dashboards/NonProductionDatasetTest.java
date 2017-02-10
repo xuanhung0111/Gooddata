@@ -203,8 +203,8 @@ public class NonProductionDatasetTest extends AbstractDashboardTest {
             takeScreenshot(browser, "Add-Kpi-Using-Dataset-Without-Date", getClass());
 
             assertEquals(indigoDashboardsPage.getLastWidget(Kpi.class).getValue(), "7,070,658.41");
-            assertFalse(indigoDashboardsPage.getConfigurationPanel().isDataSetEnabled(),
-                    "Date Dataset panel is not disabled");
+            assertFalse(indigoDashboardsPage.getConfigurationPanel().isDateDataSetDropdownVisible(),
+                    "Date Dataset panel is visible.");
         } finally {
             initDataUploadPage().getMyDatasetsTable().getDataset(WITHOUT_DATE_DATASET).clickDeleteButton()
                     .clickDelete();
