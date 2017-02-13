@@ -597,13 +597,16 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public IndigoDashboardsPage initEmbeddedIndigoDashboardPageByIframe() {
+        tryToInitEmbeddedIndigoDashboardPage();
+        browser.switchTo().frame(waitForElementVisible(BY_IFRAME, browser));
+        return IndigoDashboardsPage.getInstance(browser);
+    }
+
+    public void tryToInitEmbeddedIndigoDashboardPage(){
         browser.get(EMBEDDED_IFRAME_WRAPPER_URL);
 
         waitForElementVisible(By.id("url"), browser).sendKeys(getRootUrl() + getEmbeddedIndigoDashboardPageUri());
         waitForElementVisible(By.cssSelector("input[value='Go']"), browser).click();
-
-        browser.switchTo().frame(waitForElementVisible(BY_IFRAME, browser));
-        return IndigoDashboardsPage.getInstance(browser);
     }
 
     protected void waitForOpeningIndigoDashboard() {
