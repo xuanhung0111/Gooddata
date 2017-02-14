@@ -45,7 +45,6 @@ public class InvalidDateDataSetTest extends GoodSalesAbstractDashboardTest {
 
         ConfigurationPanel panel = indigoDashboardsPage.getConfigurationPanel();
         takeScreenshot(browser, "Unrelated-Date-DataSet-Error-Message", getClass());
-        assertEquals(panel.getSelectedDataSetColor(), "rgba(229, 77, 66, 1)", "Selected data set color is not red");
         assertEquals(panel.getDateDataSetError(), "\"" + DATE_TIMELINE + "\"" + DATE_DIMENSION_ERROR_MESSAGE,
                 "Error msg is not correct");
 
