@@ -27,6 +27,7 @@ import org.testng.annotations.Test;
 import com.gooddata.GoodDataException;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
+import com.gooddata.qa.graphene.disc.common.__AbstractDISCTest;
 import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
 import com.gooddata.qa.graphene.enums.disc.__Executable;
 import com.gooddata.qa.graphene.enums.disc.__ScheduleCronTime;

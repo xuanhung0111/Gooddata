@@ -18,6 +18,7 @@ import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.getAsyncTaskStatus
 import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.waitingForAsyncTask;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
+import static com.gooddata.qa.utils.ads.AdsHelper.ADS_DB_CONNECTION_URL;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableMap;
@@ -175,7 +176,7 @@ public class AbstractMSFTest extends AbstractProjectTest {
         final Map<String, String> params = new HashMap<>();
         final String createTableSql = getResourceAsString("/" + SQL_FILES + "/" + createTableSqlFile);
         final String copyTableSql = getResourceAsString("/" + SQL_FILES + "/" + copyTableSqlFile);
-        final String adsUrl = AdsHelper.ADS_URL.replace("${host}", testParams.getHost()).replace("${adsId}", adsId);
+        final String adsUrl = format(ADS_DB_CONNECTION_URL, testParams.getHost(), adsId);
 
         params.put("CREATE_TABLE", createTableSql);
         params.put("COPY_TABLE", copyTableSql);
