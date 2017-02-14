@@ -334,6 +334,12 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void verifyDashboardExport(String dashboardName, String tabName, long minimalSize) {
+        // client-demo does not support dashboard export
+        if (testParams.isClientDemoEnvironment()) {
+            log.info("client-demo does not support dashboard export");
+            return; 
+        }
+
         File pdfExport = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
                 + dashboardName.replaceAll(" ", "_") + ".pdf");
         System.out.println("pdfExport = " + pdfExport);

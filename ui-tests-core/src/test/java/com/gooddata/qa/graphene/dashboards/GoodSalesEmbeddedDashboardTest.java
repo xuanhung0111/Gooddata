@@ -188,6 +188,11 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         assertEquals(oneNumberReport.getDescription(), headlineReportDescription);
         assertEquals(oneNumberReport.getValue(), headlineReportValue);
 
+        if (testParams.isClientDemoEnvironment()) {
+            log.info("Client-demo does not support dashboard export");
+            return; 
+        }
+
         String exportedDashboardName = embeddedDashboard.printDashboardTab(OTHER_WIDGETS_TAB_INDEX);
 
         try {

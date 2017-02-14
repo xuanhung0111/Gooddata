@@ -206,14 +206,19 @@ public class TestParameters {
      * * Kpi alert evaluation via Sendrid (3rd party) - dependency on 3rd party system
      */
     public boolean isClusterEnvironment() {
+        return isTestingEnvironment() || isProductionEnvironment() || isPerformanceEnvironment();
+    }
+
+    public boolean isTestingEnvironment() {
         return Stream.of("ponies\\.intgdc\\.com", "zebroids\\.intgdc\\.com", "donkeys\\.intgdc\\.com",
-                "whitelabeled\\.intgdc\\.com", ".*secure.*\\.gooddata\\.com", "staging.*\\.intgdc\\.com",
-                "perf\\.getgooddata\\.com", ".*\\.eu\\.gooddata\\.com")
+                "staging.*\\.intgdc\\.com")
                 .anyMatch(this.host::matches);
     }
 
     public boolean isProductionEnvironment() {
-        return Stream.of("whitelabeled\\.intgdc\\.com", ".*secure.*\\.gooddata\\.com", ".*\\.eu\\.gooddata\\.com")
+        return Stream.of("whitelabeled\\.intgdc\\.com", ".*secure.*\\.gooddata\\.com",
+                ".*\\.eu\\.gooddata\\.com", "gdcwltesteu\\.getgooddata\\.com",
+                ".*\\.ca\\.gooddata\\.com")
                 .anyMatch(this.host::matches);
     }
 
@@ -227,6 +232,7 @@ public class TestParameters {
     }
 
     public boolean isClientDemoEnvironment() {
-        return !isClusterEnvironment() && isHostProxy();
+        return Stream.of("client-demo\\.na\\.intgdc\\.com.*")
+                .anyMatch(this.host::matches);
     }
 }

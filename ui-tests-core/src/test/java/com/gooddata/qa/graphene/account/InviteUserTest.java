@@ -103,7 +103,7 @@ public class InviteUserTest extends AbstractProjectTest {
         LoginFragment.getInstance(browser).waitForNotificationMessageDisplayed();
 
         //workaround for bug WA-6127 Activation/Invitation link is redirected to the back-end link
-        if (isPIEnvironment()) {
+        if (!testParams.isClusterEnvironment()) {
             log.info("This test is run on PI/client-demo so it needs to be redirected to the PI/client-demo's login page");
             //reload the login page to switch to PI/client-demo server.
             openUrl(PAGE_LOGIN);
@@ -128,7 +128,7 @@ public class InviteUserTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"inviteRegistedUser"})
     public void inviteNonRegistedUser() throws Throwable {
-        if (isPIEnvironment()) {
+        if (!testParams.isClusterEnvironment()) {
             log.info("This test cannot be run on PI/client-demo");
             return;
         }
@@ -226,10 +226,5 @@ public class InviteUserTest extends AbstractProjectTest {
 
     private void dismissStatusBarMessage() {
         waitForElementVisible(className("s-statusbar-dismiss"), browser).click();
-    }
-
-    private boolean isPIEnvironment() {
-        return !testParams.isClusterEnvironment() && !testParams.isProductionEnvironment() &&
-                !testParams.isPerformanceEnvironment();
     }
 }
