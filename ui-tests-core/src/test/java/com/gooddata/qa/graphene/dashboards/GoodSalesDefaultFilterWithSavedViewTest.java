@@ -229,7 +229,7 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         dashboardsPage.editDashboard();
         getFilter(ATTR_STAGE_NAME).editAttributeFilterValues(SHORT_LIST);
         getFilter(DF_VARIABLE).editAttributeFilterValues(SHORT_LIST);
-        dashboardsPage.applyValuesForGroupFilter().saveDashboard();
+        dashboardsPage.saveDashboard();
         getReport(REPORT_WITH_PROMPT_FILTER).waitForReportLoading();
 
         takeScreenshot(browser, "DF-applied-for-filter-group-on-saved-view", getClass());
