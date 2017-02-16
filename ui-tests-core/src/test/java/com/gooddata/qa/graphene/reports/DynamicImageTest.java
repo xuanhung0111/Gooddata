@@ -31,11 +31,11 @@ public class DynamicImageTest extends AbstractProjectTest {
     private final static String ID_METRIC = "Id-Metric";
 
     private final static String IMAGE_SOURCE_1 =
-            "source=web&url=https://api.monosnap.com/image/download?id=987dH7kckbVcKcv8UFK5jdoKXCJ8wk"; 
+            "source=web&url=https://s3.amazonaws.com/gdc-testing/images/publicImage.png";
     private final static String IMAGE_SOURCE_2 =
-            "source=web&url=http://hdwallweb.com/wp-content/uploads/2014/10/01/nature-home-drawing.jpg";
+            "source=web&url=https://s3.amazonaws.com/gdc-testing/images/publicImage2.png";
     private final static String IMAGE_SOURCE_3 =
-            "source=http://samsuria.com/wp-content/uploads/2014/10/wallpaper-nature-3d.jpg";
+            "source=web&url=https://s3.amazonaws.com/gdc-testing/images/publicImage3.png";
 
     @Test(dependsOnGroups = {"createProject"})
     public void uploadCsvFile() {
@@ -161,12 +161,9 @@ public class DynamicImageTest extends AbstractProjectTest {
     private void checkAllImagesInReport() {
         final TableReport table = reportPage.waitForReportExecutionProgress().getTableReport();
 
-        assertTrue(
-                isImageDisplayed(table.getImageElement(IMAGE_SOURCE_1)) 
-                        && IMAGE_SOURCE_1.contains(table.getImageElement(IMAGE_SOURCE_1).getAttribute("src")),
-                "The expected image is not loaded");
-
-        assertFalse(isImageDisplayed(table.getImageElement(IMAGE_SOURCE_2)), "The expected or error image is loaded");
+        // scr value is simplified and put into class attribute, so checking src is not necessary
+        assertTrue(isImageDisplayed(table.getImageElement(IMAGE_SOURCE_1)), "The image1 is not loaded");
+        assertTrue(isImageDisplayed(table.getImageElement(IMAGE_SOURCE_2)), "The image2 is not loaded");
 
         assertTrue(
                 isImageDisplayed(table.getImageElement(IMAGE_SOURCE_3))
