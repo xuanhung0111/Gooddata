@@ -9,6 +9,7 @@ import com.gooddata.qa.graphene.indigo.dashboards.DataSetTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DateDatasetRecommendationTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DateFilterOnCategoryBucketTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DateFilteringOnInsightTest;
+import com.gooddata.qa.graphene.indigo.dashboards.DeleteAttributeFilterTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DragWidgetsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.FilteringWidgetsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.EmbeddingDashboardPostMessageTest;
@@ -62,6 +63,7 @@ public class UITestsRegistry {
             DateFilterOnCategoryBucketTest.class,
             AttributeFilterManipulationTest.class,
             AttributeFilterMiscTest.class,
+            DeleteAttributeFilterTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-EditMode.xml",
@@ -110,6 +112,7 @@ public class UITestsRegistry {
             DateFilterOnCategoryBucketTest.class,
             AttributeFilterManipulationTest.class,
             AttributeFilterMiscTest.class,
+            DeleteAttributeFilterTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-EditMode.xml",
