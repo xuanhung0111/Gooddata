@@ -304,8 +304,8 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
             getFilter(DF_VARIABLE).changeSelectionToOneValue();
         }
 
-        getFilter(ATTR_STAGE_NAME).editAttributeFilterValues(DISCOVERY);
-        getFilter(DF_VARIABLE).editAttributeFilterValues(DISCOVERY);
+        getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(DISCOVERY);
+        getFilter(DF_VARIABLE).changeAttributeFilterValues(DISCOVERY);
         dashboardsPage.saveDashboard();
         getReport(REPORT_WITH_PROMPT_FILTER).waitForReportLoading();
 
@@ -325,7 +325,7 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
         dashboardsPage.editDashboard();
         getFilter(ATTR_STAGE_NAME).editAttributeFilterValues(SHORT_LIST);
         getFilter(DF_VARIABLE).editAttributeFilterValues(SHORT_LIST);
-        dashboardsPage.applyValuesForGroupFilter().saveDashboard();
+        dashboardsPage.saveDashboard();
         getReport(REPORT_WITH_PROMPT_FILTER).waitForReportLoading();
 
         takeScreenshot(browser, "DF-applied-for-filter-group", getClass());

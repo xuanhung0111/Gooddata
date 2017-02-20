@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.dashboards.widget.filter;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 
 import java.util.List;
 
@@ -10,6 +11,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.DashboardEditWidgetToolbarPanel;
 
 public class AttributeFilterPanel extends SelectItemPopupPanel {
 
@@ -32,12 +34,16 @@ public class AttributeFilterPanel extends SelectItemPopupPanel {
     public void changeValues(String... values) {
         boolean singleMode = isOnSingleMode();
         boolean groupMode = isOnGroupMode();
+        boolean editMode = isEditMode();
 
         if (!singleMode) clearAllItems();
         searchAndSelectItems(values);
 
-        if (!singleMode && !groupMode)
-            submitPanel();
+        if (!singleMode) {
+            if (!groupMode || editMode) {
+                submitPanel();
+            }
+        }
     }
 
     public boolean isOnSingleMode() {
@@ -47,6 +53,11 @@ public class AttributeFilterPanel extends SelectItemPopupPanel {
     @Override
     public List<WebElement> getItemElements() {
         return listAttrValues;
+    }
+
+    private boolean isEditMode() {
+        return DashboardEditWidgetToolbarPanel.isVisible(browser) &&
+                !isElementVisible(By.cssSelector(".infoThisIsJustPreview"), this.getRoot());
     }
 
     private boolean isOnGroupMode() {

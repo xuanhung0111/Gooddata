@@ -123,9 +123,6 @@ public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest 
                 .changeSelectionToOneValue()
                 .editAttributeFilterValues(DISCOVERY);
 
-        if (combinationType == FilterCombination.USING_GROUP)
-            dashboardsPage.applyValuesForGroupFilter();
-
         dashboardsPage.saveDashboard();
         getReport(REPORT_WITH_PROMPT_FILTER).waitForReportLoading();
 
@@ -235,7 +232,7 @@ public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest 
         getFilter(ATTR_DEPARTMENT)
                 .changeSelectionToOneValue()
                 .editAttributeFilterValues(DIRECT_SALES);
-        dashboardsPage.applyValuesForGroupFilter().copyDashboardTab(0, DASH_PIPELINE_ANALYSIS);
+        dashboardsPage.copyDashboardTab(0, DASH_PIPELINE_ANALYSIS);
 
         takeScreenshot(browser, "Filter-group-value-kept-after-copy-tab", getClass());
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), INTEREST);
