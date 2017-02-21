@@ -92,7 +92,7 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
 
         filterFragment.searchAndSelectAttributeValues(filterItem.getValues())
                 .apply();
-        waitForReportLoaded();
+        reportPage.waitForReportExecutionProgress();
         assertTrue(reportPage.isReportContains(filterItem.getValues()),
                 "Attribute filter is not applied successfully");
 
@@ -110,6 +110,7 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
                 .searchAndSelectAttribute(ATTR_YEAR_SNAPSHOT)
                 .selectFloatingTime(Time.THIS_YEAR)
                 .apply();
+        reportPage.waitForReportExecutionProgress();
         waitForAnalysisPageLoaded(browser);
 
         reportPage.saveReport();
@@ -122,7 +123,7 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
                 .selectFloatingTime(new FloatingTime(Time.YEARS_AGO)
                         .withRangeNumber(rangeNumber), new FloatingTime(Time.THIS_YEAR))
                 .apply();
-        waitForReportLoaded();
+        reportPage.waitForReportExecutionProgress();
 
         filterName = String.format(ATTR_YEAR_SNAPSHOT + " is the last %s years", String.valueOf(rangeNumber + 1));
         assertThat(reportPage.getFilters(), hasItem(filterName));
@@ -165,7 +166,6 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
         initReport(REPORT_NAME + System.currentTimeMillis())
                 .addFilter(FilterItem.Factory
                         .createRankingFilter(Ranking.BOTTOM, 2, METRIC_AMOUNT, ATTR_STAGE_NAME));
-        waitForReportLoaded();
 
         String filterName = "Bottom 2 Stage Name by Amount";
         assertThat(reportPage.getFilters(), hasItem(filterName));
@@ -178,7 +178,6 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
     public void checkFilterAppliedInOrder() {
         initReport(REPORT_NAME + System.currentTimeMillis())
                 .addFilter(FilterItem.Factory.createAttributeFilter(ATTR_YEAR_SNAPSHOT, "2010"));
-        waitForReportLoaded();
 
         String filterName = "Year (Snapshot) is 2010";
         assertThat(reportPage.getFilters(), hasItem(filterName));
@@ -199,11 +198,6 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
         waitForAnalysisPageLoaded(browser);
 
         return waitForFragmentVisible(reportPage);
-    }
-
-    private void waitForReportLoaded() {
-        reportPage.getTableReport()
-                .waitForReportLoading();
     }
 
     private int getCurrentYear() {
