@@ -7,13 +7,17 @@ public enum __Executable {
     LONG_TIME_RUNNING_GRAPH("/graph/longTimeRunningGraph.grf"),
     SHORT_TIME_ERROR_GRAPH("/graph/shortTimeErrorGraph.grf");
 
-    private String value;
+    private String path;
 
-    private __Executable(String value) {
-        this.value = value;
+    private __Executable(String path) {
+        this.path = path;
     }
 
-    public String getValue() {
-        return value;
+    public String getPath() {
+        return path;
+    }
+
+    public String getName() {
+        return path.substring(path.lastIndexOf("/") + 1);
     }
 }

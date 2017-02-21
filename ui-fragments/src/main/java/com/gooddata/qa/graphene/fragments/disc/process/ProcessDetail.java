@@ -6,6 +6,7 @@ import static java.util.stream.Collectors.toList;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.openqa.selenium.By;
@@ -17,6 +18,7 @@ import com.gooddata.qa.graphene.enums.disc.__Executable;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.disc.ConfirmationDialog;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
+import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.gooddata.qa.graphene.fragments.disc.schedule.__ScheduleDetailFragment;
 
 public class ProcessDetail extends AbstractFragment {
@@ -61,12 +63,30 @@ public class ProcessDetail extends AbstractFragment {
         return isElementPresent(BY_CREATE_NEW_SCHEDULE_LINK, getRoot());
     }
 
+    public boolean hasSchedule(String scheduleName) {
+        return findSchedule(scheduleName).isPresent();
+    }
+
     public Collection<String> getExecutables() {
         return executables.stream().map(this::getExecutableTitle).collect(toList());
     }
 
     public String getScheduleInfoFrom(__Executable executable) {
         return getExecutableElement(executable).findElement(By.className("executable-schedules-cell")).getText();
+    }
+
+    public String getScheduleCronTime(String scheduleName) {
+        return findSchedule(scheduleName).get().findElement(By.className("schedule-cron-cell")).getText();
+    }
+
+    public CreateScheduleForm clickCreateScheduleLink() {
+        waitForElementVisible(BY_CREATE_NEW_SCHEDULE_LINK, getRoot()).click();
+        return CreateScheduleForm.getInstance(browser);
+    }
+
+    public CreateScheduleForm clickScheduleLinkFrom(__Executable executable) {
+        getExecutableElement(executable).findElement(By.cssSelector("a[class*='new-schedule-btn']")).click();
+        return CreateScheduleForm.getInstance(browser);
     }
 
     public String getMetadata(String key) {
@@ -86,9 +106,10 @@ public class ProcessDetail extends AbstractFragment {
         return waitForElementVisible(title).getText();
     }
 
-    public void redeployWithZipFile(String processName, ProcessType processType, File packageFile) {
+    public ProcessDetail redeployWithZipFile(String processName, ProcessType processType, File packageFile) {
         waitForElementVisible(redeployButton).click();
         DeployProcessForm.getInstance(browser).deployProcessWithZipFile(processName, processType, packageFile);
+        return this;
     }
 
     public ConfirmationDialog clickDeleteButton() {
@@ -100,28 +121,31 @@ public class ProcessDetail extends AbstractFragment {
         clickDeleteButton().confirm();
     }
 
-    public ScheduleStatus getScheduleStatus(String scheduleId) {
+    public ScheduleStatus getScheduleStatus(String scheduleName) {
         return Stream.of(ScheduleStatus.values())
-                .filter(status -> isElementPresent(status.getIconByCss(), getScheduleElement(scheduleId)))
+                .filter(status -> isElementPresent(status.getIconByCss(), findSchedule(scheduleName).get()))
                 .findFirst()
                 .get();
     }
 
-    public __ScheduleDetailFragment openSchedule(String scheduleId) {
-        getScheduleElement(scheduleId).findElement(By.cssSelector(".schedule-title-cell a")).click();
+    public __ScheduleDetailFragment openSchedule(String scheduleName) {
+        findSchedule(scheduleName).get().findElement(By.cssSelector(".schedule-title-cell a")).click();
         return __ScheduleDetailFragment.getInstance(browser);
     }
 
-    private WebElement getScheduleElement(String scheduleId) {
+    public String getBrokenScheduleMessage() {
+        return waitForElementVisible(By.cssSelector(".broken-schedules-section .message"), getRoot()).getText();
+    }
+
+    private Optional<WebElement> findSchedule(String scheduleName) {
         return schedules.stream()
-                .filter(s -> scheduleId.equals(s.getAttribute("scheduleid")))
-                .findFirst()
-                .get();
+                .filter(s -> scheduleName.equals(s.findElement(By.className("name")).getText()))
+                .findFirst();
     }
 
     private WebElement getExecutableElement(__Executable executable) {
         return executables.stream()
-                .filter(e -> executable.getValue().equals(getExecutableTitle(e)))
+                .filter(e -> executable.getPath().equals(getExecutableTitle(e)))
                 .findFirst()
                 .get();
     }

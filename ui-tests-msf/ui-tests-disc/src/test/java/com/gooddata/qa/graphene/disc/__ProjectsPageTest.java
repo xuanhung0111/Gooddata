@@ -13,11 +13,11 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.IntStream;
 
 import org.apache.http.ParseException;
-import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -65,7 +65,7 @@ public class __ProjectsPageTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule schedule = createSchedule(process, executable, __ScheduleCronTime.EVERY_30_MINUTE.getExpression());
+            Schedule schedule = createSchedule(process, executable, __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule);
 
@@ -101,7 +101,7 @@ public class __ProjectsPageTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            createSchedule(process, __Executable.SUCCESSFUL_GRAPH, __ScheduleCronTime.EVERY_30_MINUTE.getExpression());
+            createSchedule(process, __Executable.SUCCESSFUL_GRAPH, __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             __initDiscProjectsPage();
             takeScreenshot(browser, "Data-loading-processes-shows-correctly", getClass());
@@ -118,7 +118,7 @@ public class __ProjectsPageTest extends __AbstractDISCTest {
 
         try {
             Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTE.getExpression());
+                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             String executionDateTime = initScheduleDetail(schedule)
                     .executeSchedule()
@@ -139,10 +139,10 @@ public class __ProjectsPageTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            DateTime autoExecutionStartTime = DateTime.now().plusMinutes(2);
+            LocalTime autoExecutionStartTime = LocalTime.now().plusMinutes(2);
 
             Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    parseDateToCronExpression(autoExecutionStartTime));
+                    parseTimeToCronExpression(autoExecutionStartTime));
 
             String executionDateTime = initScheduleDetail(schedule)
                     .waitForAutoExecute(autoExecutionStartTime)

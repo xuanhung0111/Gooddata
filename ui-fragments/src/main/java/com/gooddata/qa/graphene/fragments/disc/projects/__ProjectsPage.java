@@ -182,7 +182,7 @@ public class __ProjectsPage extends AbstractFragment {
     }
 
     public boolean hasNextPage() {
-        return !waitForElementVisible(nextPageButton).getAttribute("class").contains("disabled");
+        return !pages.isEmpty() && !waitForElementVisible(nextPageButton).getAttribute("class").contains("disabled");
     }
 
     public __ProjectsPage goToPreviousPage() {
@@ -193,7 +193,7 @@ public class __ProjectsPage extends AbstractFragment {
     }
 
     public boolean hasPreviousPage() {
-        return !waitForElementVisible(previousPageButton).getAttribute("class").contains("disabled");
+        return !pages.isEmpty() && !waitForElementVisible(previousPageButton).getAttribute("class").contains("disabled");
     }
 
     public String getPagingDescription() {

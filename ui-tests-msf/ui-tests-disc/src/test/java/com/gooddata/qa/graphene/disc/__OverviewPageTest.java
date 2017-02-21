@@ -22,6 +22,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
+import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
 import com.gooddata.qa.graphene.enums.disc.__Executable;
 import com.gooddata.qa.graphene.enums.disc.__ScheduleCronTime;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
@@ -97,7 +98,7 @@ public class __OverviewPageTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule schedule = createSchedule(process, executable, __ScheduleCronTime.EVERY_30_MINUTE.getExpression());
+            Schedule schedule = createSchedule(process, executable, __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             __ScheduleDetailFragment scheduleDetailFragment = initScheduleDetail(schedule).executeSchedule();
             if (state != OverviewState.RUNNING) {
@@ -119,7 +120,7 @@ public class __OverviewPageTest extends __AbstractDISCTest {
 
         try {
             Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTE.getExpression());
+                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             initScheduleDetail(schedule).executeSchedule().waitForExecutionFinish();
 
@@ -143,7 +144,7 @@ public class __OverviewPageTest extends __AbstractDISCTest {
 
         try {
             Schedule schedule = createSchedule(process, __Executable.ERROR_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTE.getExpression());
+                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             assertEquals(initScheduleDetail(schedule)
                     .executeSchedule()
@@ -171,7 +172,7 @@ public class __OverviewPageTest extends __AbstractDISCTest {
 
         try {
             Schedule schedule = createSchedule(process, __Executable.ERROR_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTE.getExpression());
+                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             initScheduleDetail(schedule).executeSchedule().waitForExecutionFinish();
 
@@ -197,7 +198,7 @@ public class __OverviewPageTest extends __AbstractDISCTest {
 
         try {
             Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTE.getExpression());
+                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             assertEquals(initScheduleDetail(schedule)
                     .executeSchedule()
@@ -225,7 +226,7 @@ public class __OverviewPageTest extends __AbstractDISCTest {
 
         try {
             Schedule schedule = createSchedule(process, __Executable.LONG_TIME_RUNNING_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTE.getExpression());
+                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             initScheduleDetail(schedule).executeSchedule();
 
@@ -261,7 +262,7 @@ public class __OverviewPageTest extends __AbstractDISCTest {
 
         try {
             Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTE.getExpression());
+                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             initScheduleDetail(schedule).executeSchedule().waitForExecutionFinish();
 
@@ -293,6 +294,44 @@ public class __OverviewPageTest extends __AbstractDISCTest {
 
         getOverviewButton().click();
         waitForFragmentVisible(overviewPage).waitForPageLoaded();
+    }
+
+    @DataProvider(name = "scheduleProvider")
+    public Object[][] getScheduleProvider() {
+        return new Object[][] {
+            {__Executable.SUCCESSFUL_GRAPH, OverviewState.SUCCESSFUL},
+            {__Executable.ERROR_GRAPH, OverviewState.FAILED},
+            {__Executable.LONG_TIME_RUNNING_GRAPH, OverviewState.RUNNING}
+        };
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "scheduleProvider")
+    public void checkCustomScheduleNameInOverviewPage(__Executable executable, OverviewState state) {
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
+
+        try {
+            Schedule schedule = createSchedule(process, executable, __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+
+            String customScheduleName = "Schedule-" + generateHashString();
+            __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule)
+                    .editNameByClickOnTitle(customScheduleName)
+                    .saveChanges()
+                    .executeSchedule();
+
+            if (executable == __Executable.LONG_TIME_RUNNING_GRAPH) {
+                scheduleDetail.waitForStatus(ScheduleStatus.RUNNING);
+            } else {
+                scheduleDetail.waitForExecutionFinish();
+            }
+
+            __OverviewProjectItem project = __initDiscOverviewPage()
+                    .selectState(state).getOverviewProject(projectTitle);
+            assertTrue(project.expand().hasSchedule(customScheduleName), "Schedule " + customScheduleName + " not show");
+            assertEquals(project.getScheduleExecutable(customScheduleName), executable.getPath());
+
+        } finally {
+            deteleProcess(getGoodDataClient(), process);
+        }
     }
 
     private void logoutInDiscPage() {
