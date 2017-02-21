@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
@@ -35,7 +36,8 @@ public class DateDimensionSelect extends AbstractReactDropDown {
 
     public List<DateDimensionGroup> getDateDimensionGroups() {
         ensureDropdownOpen();
-
+        //Wait for the Dropdown open and loading successfully
+        sleepTightInSeconds(1);
         List<DateDimensionGroup> dateDimensionGroups = new ArrayList<>();
         List<WebElement> dateDimensions = getPanelRoot().findElements(By.cssSelector(".gd-list-item"));
 
