@@ -67,34 +67,41 @@ public class GoodSalesSortByTotalsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createReportContainingOneMetric"})
     public void sortByTotalsInReportContainingOneMetric() {
-        final TableReport table = initReportsPage().openReport(REPORT_CONTAINING_ONE_METRIC).getTableReport(); 
+        final TableReport table = initReportsPage().openReport(REPORT_CONTAINING_ONE_METRIC).getTableReport();
         table.openContextMenuFromCellValue(METRIC_AMOUNT).aggregateTableData(AggregationType.SUM, OF_ALL_ROWS);
         reportPage.waitForReportExecutionProgress();
         assertEquals(table.getTotalValues(), asList(886.15f, 886.15f, 886.15f, 3318.24f));
         
         table.sortByHeader(SUM, Sort.DESC);
+        reportPage.waitForReportExecutionProgress();
         assertEquals(table.getTotalValues(), asList(3318.24f, 886.15f, 886.15f, 886.15f));
 
         table.sortByHeader(SUM, Sort.ASC);
+        reportPage.waitForReportExecutionProgress();
         assertEquals(table.getTotalValues(), asList(886.15f, 886.15f, 886.15f, 3318.24f));
 
         table.openContextMenuFromCellValue(METRIC_AMOUNT).aggregateTableData(AggregationType.SUM, BY_STAGE_NAME);
+        reportPage.waitForReportExecutionProgress();
         assertEquals(table.getTotalValues(), asList(0.0f, 886.15f, 0.0f, 0.0f, 886.15f, 0.0f, 0.0f, 886.15f, 0.0f,
                 2432.09f, 886.15f, 0.0f, 886.15f, 886.15f, 886.15f, 3318.24f));
 
         table.sortByHeader(SUM, Sort.DESC);
+        reportPage.waitForReportExecutionProgress();
         assertEquals(table.getTotalValues(), asList(2432.09f, 886.15f, 0.0f, 0.0f, 886.15f, 0.0f, 0.0f, 886.15f, 0.0f,
                 0.0f, 886.15f, 0.0f, 3318.24f, 886.15f, 886.15f, 886.15f));
 
         table.sortByHeader(SUM, Sort.ASC);
+        reportPage.waitForReportExecutionProgress();
         assertEquals(table.getTotalValues(), asList(0.0f, 886.15f, 0.0f, 0.0f, 886.15f, 0.0f, 0.0f, 886.15f, 0.0f,
                 2432.09f, 886.15f, 0.0f, 886.15f, 886.15f, 886.15f, 3318.24f));
 
         table.sortByHeader(METRIC_AMOUNT, Sort.DESC);
+        reportPage.waitForReportExecutionProgress();
         assertEquals(table.getMetricElements(), asList(886.15f, 0.0f, 0.0f, 886.15f, 0.0f, 0.0f, 886.15f, 0.0f, 0.0f,
                 886.15f, 2432.09f, 0.0f, 886.15f, 886.15f, 886.15f, 3318.24f));
 
         reportPage.openFilterPanel().addFilter(FilterItem.Factory.createAttributeFilter(ATTR_QUARTER_YEAR_SNAPSHOT, Q1_2011));
+        reportPage.waitForReportExecutionProgress();
         assertEquals(table.getMetricElements(), asList(886.15f, 0.0f, 886.15f));
     }
 
