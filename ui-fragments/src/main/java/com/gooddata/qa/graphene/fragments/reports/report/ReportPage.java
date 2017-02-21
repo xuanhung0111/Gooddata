@@ -43,6 +43,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
@@ -882,8 +883,9 @@ public class ReportPage extends AbstractFragment {
         if (values.isEmpty()) {
             return this;
         }
-        waitForElementNotPresent(cssSelector(".busyMask[style='display: block;]"));
-        waitForElementVisible(cssSelector(".s-btn-filter_this_attribute"), browser).click();
+        waitForElementNotPresent(cssSelector(".busyMask[style='display: block;']"));
+        Graphene.waitGui()
+                .until(ExpectedConditions.elementToBeClickable(cssSelector(".s-btn-filter_this_attribute"))).click();
         SelectItemPopupPanel panel = Graphene.createPageFragment(SelectItemPopupPanel.class,
                 waitForElementVisible(cssSelector(".c-attributeElementsFilterEditor"), browser));
         values.stream().forEach(panel::searchAndSelectItem);
