@@ -8,6 +8,7 @@
     <extension qualifier="webdriver">
         <property name="browser">chrome</property>
         <property name="chromeDriverBinary">${chromeDriverBinaryPath}</property>
+        <property name="chromeArguments">${chromeDriverArguments}</property>
         <property name="chromePrintOptions">true</property>
         <property name="chromeExperimentalOption">
             {"prefs": {"download.default_directory": "${browserDownloadFolder}", "download.prompt_for_download": "false"}}
