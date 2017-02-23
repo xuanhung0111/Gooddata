@@ -83,6 +83,13 @@ public class MetricConfiguration extends AbstractFragment {
         return this;
     }
 
+    public MetricConfiguration hidePop() {
+        if (isPopSelected())
+            compareToSamePeriod.click();
+
+        return this;
+    }
+
     public String getAggregation() {
         return new Select(getRoot().findElement(BY_FACT_AGGREGATION)).getFirstSelectedOption()
                 .getText();
