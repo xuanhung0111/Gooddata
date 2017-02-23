@@ -45,7 +45,6 @@ public class ZendeskHelper {
     private static final String TICKETS_INC_URL = "/api/v2/incremental/tickets.json?start_time=0";
     private static final String USERS_INC_URL = "/api/v2/incremental/users.json?start_time=0";
     private static final String ORGANIZATIONS_INC_URL = "/api/v2/incremental/organizations.json?start_time=0";
-    private static final String TICKET_EVENTS_INC_URL = "/api/v2/incremental/ticket_events.json";
 
     private static final String TICKETS_URL = "/api/v2/tickets";
     private static final String USERS_URL = "/api/v2/users";
@@ -72,10 +71,6 @@ public class ZendeskHelper {
 
     public int createNewTicket(String jsonTicket) throws IOException, JSONException {
         return createNewZendeskObject(TICKETS_URL, jsonTicket, ZendeskObject.TICKET);
-    }
-
-    public void updateTicket(int tickedId, String jsonTicketUpdate) throws IOException, JSONException {
-        updateZendeskObject(TICKETS_URL + "/" + tickedId + ".json", jsonTicketUpdate, ZendeskObject.TICKET);
     }
 
     public int createNewUser(String jsonUser) throws IOException, JSONException {
@@ -110,36 +105,6 @@ public class ZendeskHelper {
     private int getZendeskEntityCount(String url, ZendeskObject objectType)
             throws JSONException, IOException {
         return getSetOfActiveZendeskEntities(url, objectType, 1).size();
-    }
-
-    public OptionalInt loadLastTicketEventId(int ticketId, DateTime startDateTime)
-            throws JSONException, IOException {
-        JSONObject ticketsEventsPageJson;
-        JSONArray ticketEventsJson;
-        long startTimestampInUTC = startDateTime.toDateTime(DateTimeZone.UTC).getMillis() / 1000L;
-        String jsonUrl = TICKET_EVENTS_INC_URL + "?start_time=" + startTimestampInUTC;
-        int lastTicketEventId = 0;
-        long lastEventTimestamp = 0;
-
-        do {
-            ticketsEventsPageJson = retrieveEntitiesJsonFromUrl(jsonUrl);
-            jsonUrl = ticketsEventsPageJson.getString("next_page");
-            ticketEventsJson = ticketsEventsPageJson.getJSONArray(ZendeskObject.TICKET_EVENT.getPluralName());
-
-            for (int i = 0; i < ticketEventsJson.length(); i++) {
-                JSONObject ticketEventJson = ticketEventsJson.getJSONObject(i);
-
-                if (ticketEventJson.getInt("ticket_id") == ticketId
-                        && ticketEventJson.getLong("timestamp") > lastEventTimestamp
-                        // Ignore ticketEvents from automatic updates
-                        && ticketEventJson.getLong("updater_id") != -1) {
-                    lastTicketEventId = ticketEventJson.getInt("id");
-                    lastEventTimestamp = ticketEventJson.getLong("timestamp");
-                }
-            }
-        } while (ticketsEventsPageJson.getInt("count") == 1000 && jsonUrl != null);
-
-        return lastTicketEventId == 0 ? OptionalInt.empty() : OptionalInt.of(lastTicketEventId);
     }
 
     private JSONObject retrieveEntitiesJsonFromUrl(String url)
@@ -220,13 +185,6 @@ public class ZendeskHelper {
                 executeRequest(apiClient, apiClient.newDeleteMethod(objectUrl)),
                 isOneOf(204, 200));
         System.out.println("Deleted object on url " + objectUrl);
-    }
-
-    private void updateZendeskObject(String url, String jsonContent, ZendeskObject objectName)
-            throws IOException, JSONException {
-        final int id = getJsonObject(apiClient, apiClient.newPutMethod(url, jsonContent))
-            .getJSONObject(objectName.getName()).getInt("id");
-        System.out.println("Zendesk " + objectName.getName() + " was updated, id: " + id);
     }
 
     public static String getCurrentTimeIdentifier() {
