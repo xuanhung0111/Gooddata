@@ -49,14 +49,10 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     private ZendeskHelper zendeskHelper;
     private boolean useApiProxy;
 
-    private static final String JSON_USER_CREATE = getResourceAsString("/zendesk-api/user-create.json");
-
     private static final String JSON_ORGANIZATION_CREATE = getResourceAsString("/zendesk-api/organization-create.json");
 
-    private static final String USERS_REPORT_NAME = "Users count";
     private static final String ORGANIZATIONS_REPORT_NAME = "Organizations count";
 
-    private int createdZendeskUserId;
     private int createdZendeskOrganizationId;
     private Map<String, Integer> reportMetricsResults;
 
@@ -90,11 +86,6 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     }
 
     @Test(dependsOnMethods = {"initializeGoodDataSDK"}, groups = {"zendeskApiTests", "connectorWalkthrough"})
-    public void createZendeskUsersReport() throws IOException {
-        createOneNumberReportDefinition(USERS_REPORT_NAME, "# Users");
-    }
-
-    @Test(dependsOnMethods = {"initializeGoodDataSDK"}, groups = {"zendeskApiTests", "connectorWalkthrough"})
     public void createZendeskOrganizationsReport() throws IOException {
         createOneNumberReportDefinition(ORGANIZATIONS_REPORT_NAME, "# Organizations");
     }
@@ -109,14 +100,6 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initZendeskApiClient", "createZendeskUsersReport"}, groups = {"zendeskApiTests",
-            "connectorWalkthrough"})
-    public void testUsersCount() throws IOException, JSONException {
-        int gdUsersCount = getNumberFromGDReport(USERS_REPORT_NAME);
-        reportMetricsResults.put(USERS_REPORT_NAME, gdUsersCount);
-        compareObjectsCount(gdUsersCount, zendeskHelper.getNumberOfUsers(), ZendeskHelper.ZendeskObject.USER);
-    }
-
     @Test(dependsOnMethods = {"initZendeskApiClient", "createZendeskOrganizationsReport"},
             groups = {"zendeskApiTests", "connectorWalkthrough"})
     public void testOrganizationsCount() throws IOException, JSONException {
@@ -127,14 +110,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
                 ZendeskHelper.ZendeskObject.ORGANIZATION);
     }
 
-    @Test(dependsOnMethods = {"testUsersCount"}, groups = {"zendeskApiTests", "newZendeskObjects",
-            "connectorWalkthrough"})
-    public void testAddNewUser() throws IOException, JSONException {
-        createdZendeskUserId = zendeskHelper.createNewUser(
-                format(JSON_USER_CREATE, ZendeskHelper.getCurrentTimeIdentifier()));
-    }
-
-    @Test(dependsOnMethods = {"testUsersCount"}, groups = {"zendeskApiTests", "newZendeskObjects",
+    @Test(dependsOnMethods = {"testOrganizationsCount"}, groups = {"zendeskApiTests", "newZendeskObjects",
             "connectorWalkthrough"})
     public void testAddNewOrganization() throws IOException, JSONException {
         createdZendeskOrganizationId = zendeskHelper.createNewOrganization(
@@ -144,16 +120,6 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     @Test(dependsOnGroups = {"newZendeskObjects"}, groups = {"zendeskApiTests", "connectorWalkthrough"})
     public void testIncrementalSynchronization() throws JSONException {
         scheduleIntegrationProcess(integrationProcessCheckLimit);
-    }
-
-    @Test(dependsOnMethods = {"testIncrementalSynchronization"}, groups = {"zendeskApiTests",
-            "zendeskAfterCreateTests", "connectorWalkthrough"})
-    public void testUsersCountAfterIncrementalSync() throws IOException, JSONException {
-        int gdUsersCount = getNumberFromGDReport(USERS_REPORT_NAME);
-        compareObjectsCount(gdUsersCount, zendeskHelper.getNumberOfUsers(),
-                ZendeskHelper.ZendeskObject.USER);
-        assertEquals(gdUsersCount, reportMetricsResults.get(USERS_REPORT_NAME) + 1,
-                "Users count doesn't match after incremental sync");
     }
 
     @Test(dependsOnMethods = {"testIncrementalSynchronization"}, groups = {"zendeskApiTests",
@@ -168,12 +134,6 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
                 "Organizations count doesn't match after incremental sync");
     }
 
-    @Test(dependsOnMethods = {"testUsersCountAfterIncrementalSync"}, groups = {"zendeskApiTests",
-            "connectorWalkthrough", "deleteZendeskObjects"})
-    public void deleteZendeskUser() throws IOException {
-        zendeskHelper.deleteUser(createdZendeskUserId);
-    }
-
     @Test(dependsOnMethods = {"testOrganizationsCountAfterIncrementalSync"}, groups = {"zendeskApiTests",
             "connectorWalkthrough", "deleteZendeskObjects"})
     public void deleteZendeskOrganization() throws IOException {
@@ -183,15 +143,6 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     @Test(dependsOnGroups = {"deleteZendeskObjects"}, groups = {"zendeskApiTests", "connectorWalkthrough"})
     public void testIncrementalSynchronizationAfterObjectsDeletion() throws JSONException {
         scheduleIntegrationProcess(integrationProcessCheckLimit);
-    }
-
-    @Test(dependsOnMethods = {"testIncrementalSynchronizationAfterObjectsDeletion"}, groups = {"zendeskApiTests",
-            "zendeskAfterDeletionTests", "connectorWalkthrough"})
-    public void testUsersCountAfterDeletion() throws IOException, JSONException {
-        int gdUsersCount = getNumberFromGDReport(USERS_REPORT_NAME);
-        compareObjectsCount(gdUsersCount, zendeskHelper.getNumberOfUsers(), ZendeskHelper.ZendeskObject.USER);
-        assertEquals(gdUsersCount, reportMetricsResults.get(USERS_REPORT_NAME).intValue(),
-                "Users count doesn't match after incremental sync");
     }
 
     @Test(dependsOnMethods = {"testIncrementalSynchronizationAfterObjectsDeletion"}, groups = {"zendeskApiTests",
