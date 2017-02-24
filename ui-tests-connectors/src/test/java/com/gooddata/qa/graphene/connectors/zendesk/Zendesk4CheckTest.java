@@ -168,11 +168,6 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
                 "Organizations count doesn't match after incremental sync");
     }
 
-    @Test(dependsOnGroups = {"updateZendeskObjects"}, groups = {"zendeskApiTests", "connectorWalkthrough"})
-    public void testIncrementalSynchronizationAfterObjectsUpdate() throws JSONException {
-        scheduleIntegrationProcess(integrationProcessCheckLimit);
-    }
-
     @Test(dependsOnMethods = {"testUsersCountAfterIncrementalSync"}, groups = {"zendeskApiTests",
             "connectorWalkthrough", "deleteZendeskObjects"})
     public void deleteZendeskUser() throws IOException {
@@ -280,23 +275,4 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         return reader;
     }
 
-    private static class FieldChange {
-        private final String fieldAlias;
-        private final String newValue;
-        private final String oldValue;
-        private final boolean toBeChecked;
-        private final boolean toBeSend;
-
-        FieldChange(String fieldAlias, String newValue, String oldValue) {
-            this(fieldAlias, newValue, oldValue, true, true);
-        }
-
-        FieldChange(String fieldAlias, String newValue, String oldValue, boolean toBeChecked, boolean toBeSend) {
-            this.fieldAlias = fieldAlias;
-            this.newValue = newValue;
-            this.oldValue = oldValue;
-            this.toBeChecked = toBeChecked;
-            this.toBeSend = toBeSend;
-        }
-    }
 }
