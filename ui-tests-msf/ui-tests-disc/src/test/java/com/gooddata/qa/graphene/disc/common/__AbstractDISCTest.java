@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.disc.common;
 
 import static java.lang.String.format;
+import static java.util.Objects.nonNull;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 
 import java.time.LocalTime;
@@ -23,7 +24,6 @@ import com.gooddata.qa.graphene.fragments.disc.schedule.__ScheduleDetailFragment
 public class __AbstractDISCTest extends AbstractProjectTest {
 
     public static final String PROJECT_DETAIL_PAGE_URL = "admin/disc/#/projects/%s";
-    private static final String SCHEDULT_DETAIL_URL = "admin/disc/#/projects/%s/processes/%s/schedules/%s";
 
     @FindBy(className = "l-page")
     protected __DiscOverviewPage overviewPage;
@@ -50,8 +50,7 @@ public class __AbstractDISCTest extends AbstractProjectTest {
     }
 
     protected __ScheduleDetailFragment initScheduleDetail(Schedule schedule) {
-        openUrl(format(SCHEDULT_DETAIL_URL, testParams.getProjectId(), schedule.getProcessId(), schedule.getId()));
-        return __ScheduleDetailFragment.getInstance(browser);
+        return __initDiscProjectDetailPage().getProcessById(schedule.getProcessId()).openSchedule(schedule.getName());
     }
 
     protected DataloadProcess createProcessWithBasicPackage(String processName) {
@@ -73,13 +72,18 @@ public class __AbstractDISCTest extends AbstractProjectTest {
         return createSchedule(getGoodDataClient(), process, executable, crontimeExpression);
     }
 
-    protected Schedule createSchedule(GoodData goodDataClient, DataloadProcess process,
-            __Executable executable, String crontimeExpression) {
-        return createScheduleWithTriggerType(goodDataClient, process, executable, crontimeExpression);
+    protected Schedule createSchedule(GoodData goodDataClient, DataloadProcess process, __Executable executable,
+            String crontimeExpression) {
+        return createScheduleWithTriggerType(goodDataClient, process, null, executable, crontimeExpression);
     }
 
     protected Schedule createSchedule(DataloadProcess process, __Executable executable, Schedule triggeringSchedule) {
-        return createScheduleWithTriggerType(getGoodDataClient(), process, executable, triggeringSchedule);
+        return createSchedule(process, null, executable, triggeringSchedule);
+    }
+
+    protected Schedule createSchedule(DataloadProcess process, String name, __Executable executable,
+            Schedule triggeringSchedule) {
+        return createScheduleWithTriggerType(getGoodDataClient(), process, name, executable, triggeringSchedule);
     }
 
     protected void deleteScheduleByName(DataloadProcess process, String scheduleName) {
@@ -108,7 +112,7 @@ public class __AbstractDISCTest extends AbstractProjectTest {
         return getGoodDataClient().getProcessService();
     }
 
-    private Schedule createScheduleWithTriggerType(GoodData goodDataClient, DataloadProcess process,
+    private Schedule createScheduleWithTriggerType(GoodData goodDataClient, DataloadProcess process, String name,
             __Executable executable, Object triggerType) {
         String expectedExecutable = process.getExecutables()
                 .stream().filter(e -> e.contains(executable.getPath())).findFirst().get();
@@ -120,6 +124,8 @@ public class __AbstractDISCTest extends AbstractProjectTest {
         } else {
             schedule = new Schedule(process, expectedExecutable, (Schedule) triggerType);
         }
+
+        if (nonNull(name)) schedule.setName(name);
 
         return goodDataClient.getProcessService().createSchedule(getProject(), schedule);
     }

@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.disc.schedule;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -27,7 +28,8 @@ public class CreateScheduleForm extends AbstractScheduleFragment {
     private WebElement cancelButton;
 
     public static final CreateScheduleForm getInstance(SearchContext searchContext) {
-        return Graphene.createPageFragment(CreateScheduleForm.class, waitForElementVisible(LOCATOR, searchContext));
+        return Graphene.createPageFragment(CreateScheduleForm.class, waitForElementVisible(LOCATOR, searchContext))
+                .waitForLoaded();
     }
 
     public CreateScheduleForm selectProcess(String processName) {
@@ -52,5 +54,10 @@ public class CreateScheduleForm extends AbstractScheduleFragment {
     public void cancelSchedule() {
         waitForElementVisible(cancelButton).click();
         waitForFragmentNotVisible(this);
+    }
+
+    private CreateScheduleForm waitForLoaded() {
+        waitForElementNotPresent(By.className("gd-spinner"), getRoot());
+        return this;
     }
 }

@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.disc.projects;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static java.util.stream.Collectors.toList;
 
 import java.io.File;
@@ -8,6 +9,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -66,11 +68,15 @@ public class __ProjectDetailPage extends AbstractFragment {
     }
 
     public ProcessDetail getProcess(String processName) {
-        return findProcess(processName).get();
+        return findProcess(Restriction.NAME, processName).get();
+    }
+
+    public ProcessDetail getProcessById(String processId) {
+        return findProcess(Restriction.ID, processId).get();
     }
 
     public boolean hasProcess(String processName) {
-        return findProcess(processName).isPresent();
+        return findProcess(Restriction.NAME, processName).isPresent();
     }
 
     public DeployProcessForm clickDeployButton() {
@@ -110,7 +116,14 @@ public class __ProjectDetailPage extends AbstractFragment {
         return CreateScheduleForm.getInstance(browser);
     }
 
-    private Optional<ProcessDetail> findProcess(String processName) {
-        return processes.stream().filter(p -> processName.equals(p.getTitle())).findFirst();
+    private Optional<ProcessDetail> findProcess(Restriction restriction, String value) {
+        if (restriction == Restriction.NAME) {
+            return processes.stream().filter(p -> value.equals(p.getTitle())).findFirst();
+        }
+        return processes.stream().filter(p -> isElementPresent(By.id(value), p.getRoot())).findFirst();
+    }
+
+    private enum Restriction {
+        ID, NAME
     }
 }

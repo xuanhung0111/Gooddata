@@ -5,7 +5,6 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getTooltipFromElement;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static java.lang.Integer.parseInt;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
@@ -292,28 +291,7 @@ public class __ScheduleDetailFragment extends AbstractScheduleFragment {
     }
 
     private __ScheduleDetailFragment waitForLoaded() {
-        final By byHistoryLoadingItem = By.cssSelector(".history-section .loading");
-        int waitingTimeInSecond = 30;
-
-        try {
-            waitForElementNotPresent(byHistoryLoadingItem, waitingTimeInSecond);
-
-        // Sometimes history icon loading never end, so should refresh page until it disappears
-        } catch (TimeoutException e) {
-            Predicate<WebDriver> pageLoaded = browser -> {
-                if (isElementPresent(byHistoryLoadingItem, browser)) {
-                    browser.navigate().refresh();
-                    waitForFragmentVisible(this);
-                    return false;
-                }
-                return true;
-            };
-            Graphene.waitGui()
-                    .withTimeout(5, TimeUnit.MINUTES)
-                    .pollingEvery(waitingTimeInSecond, TimeUnit.SECONDS)
-                    .until(pageLoaded);
-        }
-
+        waitForElementNotPresent(By.cssSelector(".history-section .loading"), getRoot());
         return this;
     }
 
