@@ -190,9 +190,8 @@ public abstract class AbstractProjectTest extends AbstractUITest {
             System.out.println("Going to validate project after tests...");
             // TODO remove when ATP-1520, ATP-1519, ATP-1822 are fixed
             String testName = this.getClass().getSimpleName();
-            if (!canAccessGreyPage(browser) || testName.contains("Coupa") || testName.contains("Pardot")
-                    ||testName.contains("Zendesk4")) {
-                System.out.println("Validations are skipped for Coupa, Pardot and Zendesk4 projects"
+            if (!canAccessGreyPage(browser) || testName.contains("Coupa") || testName.contains("Pardot")) {
+                System.out.println("Validations are skipped for Coupa and Pardot projects"
                         + " or running in IE, Android and Safari");
                 return;
             }
