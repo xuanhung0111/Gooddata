@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.flow;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.gooddata.qa.graphene.indigo.dashboards.AddKpiWithoutDataSetTest;
 import com.gooddata.qa.graphene.indigo.dashboards.CommonDateFilteringTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DataSetTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DateDatasetRecommendationTest;
@@ -45,7 +44,6 @@ public class UITestsRegistry {
             ManipulateWidgetsTest.class,
             DragWidgetsTest.class,
             PartialExportDashboardsTest.class,
-            AddKpiWithoutDataSetTest.class,
             MetricsDropdownTest.class,
             VisualizationsTest.class,
             ReorderInsightTest.class,
@@ -93,7 +91,6 @@ public class UITestsRegistry {
             ManipulateWidgetsTest.class,
             DragWidgetsTest.class,
             PartialExportDashboardsTest.class,
-            AddKpiWithoutDataSetTest.class,
             MetricsDropdownTest.class,
             VisualizationsTest.class,
             ReorderInsightTest.class,
