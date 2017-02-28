@@ -29,6 +29,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.md.report.Report;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.entity.attribute.ComputedAttributeDefinition;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.enums.ObjectTypes;
@@ -608,12 +609,9 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         String name = "CA " + System.currentTimeMillis();
         initAttributePage()
             .moveToCreateAttributePage()
-            .selectAttribute(attribute.name)
-            .selectMetric(WIN_RATE_METRIC)
-            .setComputedAttributeName(name)
-            .submit();
-        waitForElementVisible(By.className("s-attributeBucketName"), browser);
-
+            .createComputedAttribute(new ComputedAttributeDefinition().withAttribute(attribute.name)
+                    .withMetric(WIN_RATE_METRIC)
+                    .withName(name));
         return name;
     }
 

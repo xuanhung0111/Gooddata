@@ -15,7 +15,6 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.entity.attribute.ComputedAttributeDefinition;
 import com.gooddata.qa.graphene.enums.AttributeLabelTypes;
 
 public class AttributePage extends DataPage {
@@ -78,9 +77,5 @@ public class AttributePage extends DataPage {
 
     public boolean isAttributeVisible(String attribute) {
         return getAllAttributes().contains(attribute);
-    }
-
-    public String createComputedAttribute(ComputedAttributeDefinition definition) {
-        return moveToCreateAttributePage().createComputedAttribute(definition);
     }
 }
