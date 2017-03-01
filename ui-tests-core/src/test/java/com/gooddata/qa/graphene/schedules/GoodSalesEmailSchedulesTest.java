@@ -93,24 +93,21 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
         ImapUtils.saveMessageAttachments(reportMessages.get(0), attachmentsDirectory);
 
         // REPORT EXPORT
-        //TODO: disable this test on PI because this bug: CL-11420. Will be reverted when CL-11420 fixed.
-        if (!testParams.isPIEnvironment()) {
-            List<Part> reportAttachmentParts = ImapUtils.getAttachmentParts(reportMessages.get(0));
-            assertEquals(reportAttachmentParts.size(), 4, "Report message has correct number of attachments.");
+        List<Part> reportAttachmentParts = ImapUtils.getAttachmentParts(reportMessages.get(0));
+        assertEquals(reportAttachmentParts.size(), 4, "Report message has correct number of attachments.");
 
-            Part pdfPart = findPartByContentType(reportAttachmentParts, "application/pdf");
-            verifyAttachment(pdfPart, "PDF", 3200);
+        Part pdfPart = findPartByContentType(reportAttachmentParts, "application/pdf");
+        verifyAttachment(pdfPart, "PDF", 3200);
 
-            Part xlsPart = findPartByContentType(reportAttachmentParts, "application/vnd.ms-excel");
-            verifyAttachment(xlsPart, "XLS", 7700);
+        Part xlsPart = findPartByContentType(reportAttachmentParts, "application/vnd.ms-excel");
+        verifyAttachment(xlsPart, "XLS", 7700);
 
-            Part xlsxPart = findPartByContentType(reportAttachmentParts,
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            verifyAttachment(xlsxPart, "XLSX", 7500);
+        Part xlsxPart = findPartByContentType(reportAttachmentParts,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        verifyAttachment(xlsxPart, "XLSX", 7500);
 
-            Part csvPart = findPartByContentType(reportAttachmentParts, "text/csv");
-            verifyAttachment(csvPart, "CSV", 120);
-        }
+        Part csvPart = findPartByContentType(reportAttachmentParts, "text/csv");
+        verifyAttachment(csvPart, "CSV", 120);
 
         // DASHBOARD EXPORT
         List<Part> dashboardAttachmentParts = ImapUtils.getAttachmentParts(dashboardMessages.get(0));
