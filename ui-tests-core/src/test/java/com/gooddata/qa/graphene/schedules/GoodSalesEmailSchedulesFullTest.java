@@ -406,14 +406,16 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
 
     @Test(dependsOnMethods = {"waitForScheduleMessages"})
     public void verifyIncomputableReport() {
-        String error = format("ERROR: report '%s' did not export to '%s' format", INCOMPUTABLE_REPORT, "pdf");
+        String error = format("Report '%s' you wanted to export to '%s' format is not currently computable",
+                INCOMPUTABLE_REPORT, "pdf");
         assertTrue(attachments.get(incomputableReportTitle).body.contains(error),
                 "Cannot find message: [" + error + "] in email!");
     }
 
     @Test(dependsOnMethods = {"waitForScheduleMessages"})
     public void verifyTooLargeReport() {
-        String error = format("ERROR: report '%s' did not export to '%s' format", TOO_LARGE_REPORT, "pdf");
+        String error = format("Report '%s' cannot be exported to '%s' format as it is too large", TOO_LARGE_REPORT,
+                "pdf");
         assertTrue(attachments.get(tooLargeReportTitle).body.contains(error),
                 "Cannot find message: [" + error + "] in email!");
     }
