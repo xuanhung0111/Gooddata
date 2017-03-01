@@ -54,9 +54,7 @@ public class FailureLoggingListener extends TestListenerAdapter {
             LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
 
             for (LogEntry entry : logEntries) {
-                if (entry.getLevel() == Level.SEVERE) {
-                    consolelog += (new Date(entry.getTimestamp()) + " " + entry.getMessage() + "\n");
-               }
+                consolelog += entry.toString() + "\n";
             }
         }
 
