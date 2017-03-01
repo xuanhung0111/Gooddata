@@ -73,8 +73,6 @@ public class TimeFormattingTest extends AbstractProjectTest {
         assertEquals(timeFormattedMetrics, timeFormatExpected);
         assertEquals(timeMetrics, timeExpected);
 
-        verifyExcelFile(new File(testParams.getDownloadFolder(),
-                reportPage.exportReport(ExportFormat.EXCEL_XLS) + ".xls"), timeFormatExpected, timeExpected);
         verifyPdfFile(new File(testParams.getDownloadFolder(),
                 reportPage.exportReport(ExportFormat.PDF) + ".pdf"), timeFormatExpected, timeExpected);
     }

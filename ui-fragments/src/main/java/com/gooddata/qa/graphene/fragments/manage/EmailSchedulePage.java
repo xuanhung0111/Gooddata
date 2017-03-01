@@ -301,7 +301,7 @@ public class EmailSchedulePage extends AbstractFragment {
 
     public List<String> getControlsOfSchedule(WebElement schedule) {
         List<WebElement> controlElements = waitForElementVisible(schedule).findElements(BY_SCHEDULE_CONTROLS);
-        if (controlElements.size() == 0) 
+        if (controlElements.size() == 0)
             throw new IllegalArgumentException("No control buttons for this schedule: " + schedule);
 
         List<String> results = new ArrayList<String>();
@@ -333,9 +333,6 @@ public class EmailSchedulePage extends AbstractFragment {
                 break;
             case PDF:
                 selectCheckbox(formatsList.get(1).findElement(checkboxLocator));
-                break;
-            case EXCEL_XLS:
-                selectCheckbox(formatsList.get(2).findElement(checkboxLocator));
                 break;
             case EXCEL_XLSX:
                 selectCheckbox(formatsList.get(3).findElement(checkboxLocator));

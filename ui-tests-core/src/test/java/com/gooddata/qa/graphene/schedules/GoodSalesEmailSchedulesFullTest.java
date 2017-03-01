@@ -329,8 +329,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
 
             assertEquals(EmailSchedulePage.getInstance(browser).openSchedule(updatedTitle).getMessageFromInput(),
                     "Scheduled email test - report. (Updated)");
-            assertEquals(EmailSchedulePage.getInstance(browser).getSelectedFormats(), asList("Inline message", "PDF",
-                    "Excel (XLS)", "Excel (XLSX)", "CSV"));
+            assertEquals(EmailSchedulePage.getInstance(browser).getSelectedFormats(), asList("Inline message", "PDF", "Excel (XLSX)", "CSV"));
         } finally {
             if (initEmailSchedulesPage().isGlobalSchedulePresent(updatedTitle)) {
                 waitForFragmentVisible(EmailSchedulePage.getInstance(browser)).deleteSchedule(updatedTitle);

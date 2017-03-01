@@ -33,10 +33,8 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     private static final long expectedLineChartExportPDFSize = 110000L;
     private static final long expectedAreaChartReportExportPNGSize = 43000L;
-    private static final long expectedStackedAreaChartReportExportXLSSize = 5500L;
     private static final long expectedBarChartReportExportCSVSize = 300L;
     private static final long expectedTabularReportExportPDFSize = 28000L;
-    private static final long expectedTabularReportExportXLSSize = 11000L;
     private static final long expectedTabularReportExportXLSXSize = 6600L;
     private static final long expectedTabularReportExportCSVSize = 1650L;
 
@@ -154,16 +152,6 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
         prepareReport("Simple tabular report - 3", ReportTypes.TABLE, what, how);
     }
 
-    @Test(dependsOnMethods = {"createTabularReport3"}, groups = {"tabular-report-exports"})
-    public void exportTabularReportToXLS() {
-        exportReport("Simple tabular report - 3", ExportFormat.EXCEL_XLS);
-    }
-
-    @Test(dependsOnMethods = {"exportTabularReportToXLS"}, groups = {"tabular-report-exports"})
-    public void verifyExportedTabularReportXLS() {
-        verifyReportExport(ExportFormat.EXCEL_XLS, "Simple tabular report - 3", expectedTabularReportExportXLSSize);
-    }
-
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
     public void createTabularReport4() {
         List<String> what = new ArrayList<String>();
@@ -234,17 +222,6 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
         how.add("Region");
         how.add("Priority");
         prepareReport("Simple stacked area chart report", ReportTypes.STACKED_AREA, what, how);
-    }
-
-    @Test(dependsOnMethods = {"createStackedAreaChartReport"}, groups = {"chart-exports"})
-    public void exportStackedAreaChartToXLS() {
-        exportReport("Simple stacked area chart report", ExportFormat.EXCEL_XLS);
-    }
-
-    @Test(dependsOnMethods = {"exportStackedAreaChartToXLS"}, groups = {"chart-exports"})
-    public void verifyExportedStackedAreaChartXLS() {
-        verifyReportExport(ExportFormat.EXCEL_XLS, "Simple stacked area chart report",
-                expectedStackedAreaChartReportExportXLSSize);
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
