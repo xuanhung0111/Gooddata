@@ -9,13 +9,15 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
-import jxl.Sheet;
-import jxl.Workbook;
-import jxl.read.biff.BiffException;
-
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -54,7 +56,7 @@ public class TimeFormattingTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = {"createMetrics"})
-    public void testTimeFormatting() throws BiffException, IOException {
+    public void testTimeFormatting() throws InvalidFormatException, IOException {
         initReportsPage();
         UiReportDefinition reportDefinition = new UiReportDefinition()
             .withName("Time_format")
@@ -72,27 +74,31 @@ public class TimeFormattingTest extends AbstractProjectTest {
         List<String> timeExpected = asList("100,000.00", "10,000.00", "86,400.00", "1,000.00", "50.00");
         assertEquals(timeFormattedMetrics, timeFormatExpected);
         assertEquals(timeMetrics, timeExpected);
-
+        verifyExcelFile(new File(testParams.getDownloadFolder(),
+                reportPage.exportReport(ExportFormat.EXCEL_XLSX) + ".xlsx"), timeFormatExpected);
         verifyPdfFile(new File(testParams.getDownloadFolder(),
                 reportPage.exportReport(ExportFormat.PDF) + ".pdf"), timeFormatExpected, timeExpected);
     }
 
-    private void verifyExcelFile(File excelFile, List<String> formatExpected, List<String> expected)
-            throws BiffException, IOException {
-        Workbook workbook =  Workbook.getWorkbook(excelFile);
-        Sheet sheet = workbook.getSheet(0);
+    private void verifyExcelFile(File excelFile, List<String> formatExpected)
+            throws InvalidFormatException, IOException {
+        List<String> timeFormatActual = Lists.newArrayList();
+        XSSFWorkbook workbook = new XSSFWorkbook(excelFile);
+        try {
+            XSSFSheet sheet = workbook.getSheetAt(0);
 
-        List<String> actual = Lists.newArrayList();
-        for (int i = 1, n = formatExpected.size(); i <= n; i++) {
-            actual.add(sheet.getCell(1, i).getContents());
+            Iterator<Row> rows = sheet.iterator();
+            rows.next(); // skip the first row
+            while (rows.hasNext()) {
+                // For each row, iterate through each columns
+                Iterator<Cell> cellIterator = rows.next().cellIterator();
+                cellIterator.next(); // skip the first column
+                timeFormatActual.add(cellIterator.next().toString());
+            }
+            assertEquals(timeFormatActual, formatExpected);
+        } finally {
+            workbook.close();
         }
-        assertEquals(actual, formatExpected);
-
-        actual.clear();
-        for (int i = 1, n = expected.size(); i <= n; i++) {
-            actual.add(sheet.getCell(2, i).getContents());
-        }
-        assertEquals(actual, expected);
     }
 
     private void verifyPdfFile(File pdfFile, List<String> formatExpected, List<String> expected) {
