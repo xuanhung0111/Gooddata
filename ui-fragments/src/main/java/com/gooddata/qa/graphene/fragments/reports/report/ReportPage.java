@@ -131,7 +131,7 @@ public class ReportPage extends AbstractFragment {
 
     private static final By NO_MATCHING_METRIC = By.cssSelector(".sndPanel .s-snd-MetricsContainer + .noMatch");
 
-    private static final By NO_MATCHING_ATTRIBUTE = 
+    private static final By NO_MATCHING_ATTRIBUTE =
             By.cssSelector(".sndPanel .s-snd-AttributesContainer + .noMatch");
 
     private static final By METRIC_AXIS_CONFIGURATION_CONTENT_LOCATOR = By
@@ -194,7 +194,7 @@ public class ReportPage extends AbstractFragment {
         return this;
     }
 
-    
+
     public void tryOpenFilterPanel() {
         selectFilterButton();
     }
@@ -403,9 +403,6 @@ public class ReportPage extends AbstractFragment {
             case IMAGE_PNG:
                 exportXpath = format(exportXpath, "image__png_");
                 break;
-            case EXCEL_XLS:
-                exportXpath = format(exportXpath, "excel_xls");
-                break;
             case EXCEL_XLSX:
                 exportXpath = format(exportXpath, "excel_xlsx");
                 break;
@@ -451,7 +448,7 @@ public class ReportPage extends AbstractFragment {
     }
 
     public ReportPage clickSaveReport() {
-        Predicate<WebDriver> createReportButtonEnabled = 
+        Predicate<WebDriver> createReportButtonEnabled =
                 input -> waitForElementVisible(createReportButton).isEnabled();
         Graphene.waitGui().until(createReportButtonEnabled);
         createReportButton.click();
@@ -950,7 +947,7 @@ public class ReportPage extends AbstractFragment {
                 .contains("disabled");
         Graphene.waitGui().until(saveButtonEnabled);
     }
-    
+
     private void selectFilterButton() {
         Optional.of(waitForElementVisible(filterButton))
                 .filter(e -> !e.getAttribute("class").contains("editorBtnEditorSadHighlight"))

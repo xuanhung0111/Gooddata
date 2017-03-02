@@ -99,9 +99,6 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
         Part pdfPart = findPartByContentType(reportAttachmentParts, "application/pdf");
         verifyAttachment(pdfPart, "PDF", 3200);
 
-        Part xlsPart = findPartByContentType(reportAttachmentParts, "application/vnd.ms-excel");
-        verifyAttachment(xlsPart, "XLS", 7700);
-
         Part xlsxPart = findPartByContentType(reportAttachmentParts,
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         verifyAttachment(xlsxPart, "XLSX", 7500);
