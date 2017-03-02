@@ -20,20 +20,20 @@ import org.testng.annotations.Test;
 
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
-import com.gooddata.qa.graphene.disc.common.__AbstractDISCTest;
-import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
-import com.gooddata.qa.graphene.enums.disc.__Executable;
-import com.gooddata.qa.graphene.enums.disc.__ScheduleCronTime;
+import com.gooddata.qa.graphene.disc.common.AbstractDiscTest;
+import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
+import com.gooddata.qa.graphene.enums.disc.schedule.Executable;
+import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleCronTime;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail.Tab;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CronEditor;
-import com.gooddata.qa.graphene.fragments.disc.schedule.__ScheduleDetailFragment;
-import com.gooddata.qa.graphene.fragments.disc.schedule.__ScheduleDetailFragment.__ExecutionHistoryItem;
+import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
+import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail.__ExecutionHistoryItem;
 
-public class ScheduleDetailTest extends __AbstractDISCTest {
+public class ScheduleDetailTest extends AbstractDiscTest {
 
     private static final String BROKEN_SCHEDULE_MESSAGE = "The schedules cannot be executed. Its process has been"
             + " re-deployed with modified graphs or a different folder structure.";
@@ -58,12 +58,12 @@ public class ScheduleDetailTest extends __AbstractDISCTest {
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "rubyGitStoreProvider")
     public void executeScheduleWithRubyInGitStore(String gitStorePath) {
         String processName = generateProcessName();
-        __initDiscProjectDetailPage().deployProcessWithGitStorePath(processName, gitStorePath);
+        initDiscProjectDetailPage().deployProcessWithGitStorePath(processName, gitStorePath);
 
         try {
             projectDetailPage.openCreateScheduleForm().schedule();
 
-        __ScheduleDetailFragment scheduleDetail = __ScheduleDetailFragment.getInstance(browser)
+        ScheduleDetail scheduleDetail = ScheduleDetail.getInstance(browser)
                 .executeSchedule().waitForExecutionFinish();
 
         takeScreenshot(browser, "Execute-schedule-from-process-" + processName, getClass());
@@ -72,7 +72,7 @@ public class ScheduleDetailTest extends __AbstractDISCTest {
                 ScheduleStatus.OK.toString());
 
         } finally {
-            __initDiscProjectDetailPage().deleteProcess(processName);
+            initDiscProjectDetailPage().deleteProcess(processName);
         }
     }
 
@@ -81,10 +81,10 @@ public class ScheduleDetailTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule schedule = createSchedule(process, __Executable.LONG_TIME_RUNNING_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule = createSchedule(process, Executable.LONG_TIME_RUNNING_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule)
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
                     .executeSchedule()
                     .stopExecution();
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
@@ -100,20 +100,20 @@ public class ScheduleDetailTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule schedule = createSchedule(process, __Executable.ERROR_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule = createSchedule(process, Executable.ERROR_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            ProcessDetail processDetail = __initDiscProjectDetailPage().getProcess(process.getName());
+            ProcessDetail processDetail = initDiscProjectDetailPage().getProcess(process.getName());
             processDetail.redeployWithZipFile(process.getName(), ProcessType.CLOUD_CONNECT, PackageFile.ONE_GRAPH.loadFile());
 
             takeScreenshot(browser, "Broken-schedule-message-shows", getClass());
             assertEquals(processDetail.getBrokenScheduleMessage(), BROKEN_SCHEDULE_MESSAGE);
 
-            __ScheduleDetailFragment scheduleDetail = processDetail.openSchedule(schedule.getName());
+            ScheduleDetail scheduleDetail = processDetail.openSchedule(schedule.getName());
             takeScreenshot(browser, "Broken-schedule-message-shows-in-schedule-detail", getClass());
             assertEquals(scheduleDetail.getBrokenScheduleMessage(), BROKEN_MESSAGE_IN_SCHEDULE_DETAIL);
 
-            ((__ScheduleDetailFragment) scheduleDetail.replaceBrokenExecutableWith(__Executable.SUCCESSFUL_GRAPH))
+            ((ScheduleDetail) scheduleDetail.replaceBrokenExecutableWith(Executable.SUCCESSFUL_GRAPH))
                     .saveChanges().executeSchedule().waitForExecutionFinish();
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(), ScheduleStatus.OK.toString());
@@ -128,8 +128,8 @@ public class ScheduleDetailTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
             assertEquals(initScheduleDetail(schedule).getExecutionHistoryEmptyMessage(),
                     "No history available. This schedule has not been run yet.");
 
@@ -143,10 +143,10 @@ public class ScheduleDetailTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule);
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
             executeScheduleWithSpecificTimes(scheduleDetail, 3);
 
             __ExecutionHistoryItem item = scheduleDetail.getLastExecutionHistoryItem();
@@ -163,10 +163,10 @@ public class ScheduleDetailTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            CronEditor cronEditor = __initDiscProjectDetailPage()
+            CronEditor cronEditor = initDiscProjectDetailPage()
                     .openCreateScheduleForm()
                     .getCronEditor()
-                    .selectRunTime(__ScheduleCronTime.AFTER);
+                    .selectRunTime(ScheduleCronTime.AFTER);
             assertEquals(cronEditor.getEmptyTriggeringScheduleMessage(), SCHEDULE_IN_LOOP_MESSAGE);
 
         } finally {
@@ -179,12 +179,12 @@ public class ScheduleDetailTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule schedule = createSchedule(process, __Executable.ERROR_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
-            createSchedule(process, __Executable.SUCCESSFUL_GRAPH, schedule);
+            Schedule schedule = createSchedule(process, Executable.ERROR_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            createSchedule(process, Executable.SUCCESSFUL_GRAPH, schedule);
 
             CronEditor cronEditor = initScheduleDetail(schedule)
-                    .getCronEditor().selectRunTime(__ScheduleCronTime.AFTER);
+                    .getCronEditor().selectRunTime(ScheduleCronTime.AFTER);
             assertEquals(cronEditor.getEmptyTriggeringScheduleMessage(), SCHEDULE_IN_LOOP_MESSAGE);
 
         } finally {
@@ -197,16 +197,16 @@ public class ScheduleDetailTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule schedule1 = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
-            Schedule schedule2 = createSchedule(process, __Executable.ERROR_GRAPH, schedule1);
+            Schedule schedule1 = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule2 = createSchedule(process, Executable.ERROR_GRAPH, schedule1);
 
             initScheduleDetail(schedule1).deleteSchedule();
 
             ProcessDetail processDetail = projectDetailPage.getProcess(process.getName());
             assertEquals(processDetail.getScheduleCronTime(schedule2.getName()), "Trigger schedule missing!");
 
-            __ScheduleDetailFragment scheduleDetail = processDetail.openSchedule(schedule2.getName());
+            ScheduleDetail scheduleDetail = processDetail.openSchedule(schedule2.getName());
             assertEquals(scheduleDetail.getTriggeringScheduleErrorMessage(), TRIGGERING_SCHEDULE_ERROR_MESSAGE);
             assertEquals(scheduleDetail.getCronEditor().getCronExpression(), "0 * * * *");
 
@@ -220,10 +220,10 @@ public class ScheduleDetailTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule)
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
                     .executeSchedule()
                     .waitForExecutionFinish();
             assertNotNull(getResource(getRestApiClient(), scheduleDetail.getLastExecutionLogUri(), HttpStatus.OK));
@@ -239,8 +239,8 @@ public class ScheduleDetailTest extends __AbstractDISCTest {
         String otherUser = createAndAddUserToProject(UserRoles.ADMIN);
 
         try {
-            Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             assertEquals(initScheduleDetail(schedule).getEffectiveUser(), testParams.getUser());
 
@@ -249,8 +249,8 @@ public class ScheduleDetailTest extends __AbstractDISCTest {
 
             assertEquals(initScheduleDetail(schedule).getEffectiveUser(), testParams.getUser());
 
-            __ScheduleDetailFragment.getInstance(browser).close();
-            __ScheduleDetailFragment scheduleDetail = projectDetailPage.getProcess(process.getName())
+            ScheduleDetail.getInstance(browser).close();
+            ScheduleDetail scheduleDetail = projectDetailPage.getProcess(process.getName())
                     .redeployWithZipFile(process.getName(), ProcessType.CLOUD_CONNECT, PackageFile.BASIC.loadFile())
                     .openSchedule(schedule.getName());
             assertEquals(scheduleDetail.getEffectiveUser(), otherUser);
@@ -266,10 +266,10 @@ public class ScheduleDetailTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule successfulSchedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
-            Schedule failedSchedule = createSchedule(process, __Executable.ERROR_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule successfulSchedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule failedSchedule = createSchedule(process, Executable.ERROR_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             String executionTimelineTooltip = initScheduleDetail(successfulSchedule)
                     .executeSchedule()
@@ -295,16 +295,16 @@ public class ScheduleDetailTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            ProcessDetail processDetail = __initDiscProjectDetailPage().getProcess(process.getName());
+            ProcessDetail processDetail = initDiscProjectDetailPage().getProcess(process.getName());
             processDetail.openTab(Tab.SCHEDULE).openSchedule(schedule.getName());
             processDetail.openTab(Tab.EXECUTABLE);
-            assertFalse(__ScheduleDetailFragment.isVisible(browser), "Schedule detail is not close");
+            assertFalse(ScheduleDetail.isVisible(browser), "Schedule detail is not close");
 
             processDetail.openTab(Tab.SCHEDULE).openSchedule(schedule.getName()).close();
-            assertFalse(__ScheduleDetailFragment.isVisible(browser), "Schedule detail is not close");
+            assertFalse(ScheduleDetail.isVisible(browser), "Schedule detail is not close");
 
         } finally {
             deteleProcess(getGoodDataClient(), process);
@@ -316,10 +316,10 @@ public class ScheduleDetailTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule);
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
             scheduleDetail.clickDeleteScheduleButton().discard();
             assertTrue(projectDetailPage.getProcess(process.getName()).hasSchedule(schedule.getName()),
                     "Schedule is deleted");

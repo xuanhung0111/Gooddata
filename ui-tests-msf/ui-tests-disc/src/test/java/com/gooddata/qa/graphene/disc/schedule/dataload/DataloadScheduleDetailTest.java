@@ -18,13 +18,13 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.disc.common.AbstractDataloadScheduleTest;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
-import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
-import com.gooddata.qa.graphene.fragments.disc.overview.__DiscOverviewPage.OverviewState;
-import com.gooddata.qa.graphene.fragments.disc.overview.__OverviewProjects.__OverviewProjectItem;
+import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
+import com.gooddata.qa.graphene.fragments.disc.overview.OverviewPage.OverviewState;
+import com.gooddata.qa.graphene.fragments.disc.overview.OverviewProjects.__OverviewProjectItem;
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
-import com.gooddata.qa.graphene.fragments.disc.schedule.__ScheduleDetailFragment;
-import com.gooddata.qa.graphene.fragments.disc.schedule.__ScheduleDetailFragment.__ExecutionHistoryItem;
+import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
+import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail.__ExecutionHistoryItem;
 
 public class DataloadScheduleDetailTest extends AbstractDataloadScheduleTest {
 
@@ -42,14 +42,14 @@ public class DataloadScheduleDetailTest extends AbstractDataloadScheduleTest {
     @Test(dependsOnGroups = {"precondition"})
     public void executeDataloadSchedule() {
         String schedule = "Schedule-" + generateHashString();
-        __initDiscProjectDetailPage()
+        initDiscProjectDetailPage()
                 .openCreateScheduleForm()
                 .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
                 .enterScheduleName(schedule)
                 .schedule();
 
         try {
-            __ScheduleDetailFragment scheduleDetail = __ScheduleDetailFragment.getInstance(browser)
+            ScheduleDetail scheduleDetail = ScheduleDetail.getInstance(browser)
                     .executeSchedule().waitForExecutionFinish();
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
@@ -65,7 +65,7 @@ public class DataloadScheduleDetailTest extends AbstractDataloadScheduleTest {
         String schedule = "Schedule-" + generateHashString();
         LocalTime autoStartTime = LocalTime.now().plusMinutes(2);
 
-        ((CreateScheduleForm) __initDiscProjectDetailPage()
+        ((CreateScheduleForm) initDiscProjectDetailPage()
                 .openCreateScheduleForm()
                 .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
                 .selectRunTimeByCronExpression(parseTimeToCronExpression(autoStartTime)))
@@ -73,7 +73,7 @@ public class DataloadScheduleDetailTest extends AbstractDataloadScheduleTest {
                 .schedule();
 
         try {
-            __ScheduleDetailFragment scheduleDetail = __ScheduleDetailFragment.getInstance(browser)
+            ScheduleDetail scheduleDetail = ScheduleDetail.getInstance(browser)
                     .waitForAutoExecute(autoStartTime).waitForExecutionFinish();
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
@@ -95,26 +95,26 @@ public class DataloadScheduleDetailTest extends AbstractDataloadScheduleTest {
         String schedule1 = "Schedule-" + generateHashString();
         String schedule2 = "Schedule-" + generateHashString();
 
-        __initDiscProjectDetailPage()
+        initDiscProjectDetailPage()
                 .openCreateScheduleForm()
                 .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
                 .enterScheduleName(schedule1)
                 .schedule();
-        __ScheduleDetailFragment.getInstance(browser).close();
+        ScheduleDetail.getInstance(browser).close();
 
         projectDetailPage
                 .openCreateScheduleForm()
                 .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
                 .enterScheduleName(schedule2)
                 .schedule();
-        __ScheduleDetailFragment.getInstance(browser).close();
+        ScheduleDetail.getInstance(browser).close();
 
         try {
             ProcessDetail processDetail = projectDetailPage.getProcess(DEFAULT_DATAlOAD_PROCESS_NAME);
             processDetail.openSchedule(schedule1).executeSchedule().close();
             processDetail.openSchedule(schedule2).executeSchedule().waitForExecutionFinish();
 
-            __ExecutionHistoryItem executionItem = __ScheduleDetailFragment.getInstance(browser)
+            __ExecutionHistoryItem executionItem = ScheduleDetail.getInstance(browser)
                     .getLastExecutionHistoryItem();
             assertEquals(executionItem.getStatusDescription(), "SCHEDULER_ERROR");
             assertEquals(executionItem.getErrorMessage(), "The schedule did not run because one or more of the "
@@ -135,7 +135,7 @@ public class DataloadScheduleDetailTest extends AbstractDataloadScheduleTest {
         String schedule = "Schedule-" + generateHashString();
         LocalTime autoStartTime = LocalTime.now().plusMinutes(2);
 
-        ((CreateScheduleForm) __initDiscProjectDetailPage()
+        ((CreateScheduleForm) initDiscProjectDetailPage()
                 .openCreateScheduleForm()
                 .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
                 .selectRunTimeByCronExpression(parseTimeToCronExpression(autoStartTime)))
@@ -143,7 +143,7 @@ public class DataloadScheduleDetailTest extends AbstractDataloadScheduleTest {
                 .schedule();
 
         try {
-            __ScheduleDetailFragment scheduleDetail = __ScheduleDetailFragment.getInstance(browser).disableSchedule();
+            ScheduleDetail scheduleDetail = ScheduleDetail.getInstance(browser).disableSchedule();
             assertFalse(scheduleDetail.canAutoTriggered(autoStartTime),
                     "Schedule executed automatically although disabled");
 
@@ -157,25 +157,25 @@ public class DataloadScheduleDetailTest extends AbstractDataloadScheduleTest {
         String schedule1 = "Schedule-" + generateHashString();
         String schedule2 = "Schedule-" + generateHashString();
 
-        __initDiscProjectDetailPage()
+        initDiscProjectDetailPage()
                 .openCreateScheduleForm()
                 .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
                 .enterScheduleName(schedule1)
                 .schedule();
-        __ScheduleDetailFragment.getInstance(browser).close();
+        ScheduleDetail.getInstance(browser).close();
 
         ((CreateScheduleForm) projectDetailPage.openCreateScheduleForm()
                 .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
                 .selectRunTimeByTriggeringSchedule(getScheduleId(getDataloadProcess(), schedule1)))
                 .enterScheduleName(schedule2)
                 .schedule();
-        __ScheduleDetailFragment.getInstance(browser).close();
+        ScheduleDetail.getInstance(browser).close();
 
         try {
             ProcessDetail processDetail = projectDetailPage.getProcess(DEFAULT_DATAlOAD_PROCESS_NAME);
             processDetail.openSchedule(schedule1).executeSchedule().close();
 
-            __ScheduleDetailFragment scheduleDetail = processDetail.openSchedule(schedule2)
+            ScheduleDetail scheduleDetail = processDetail.openSchedule(schedule2)
                     .waitForAutoExecute(LocalTime.now()).waitForExecutionFinish();
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
@@ -190,16 +190,16 @@ public class DataloadScheduleDetailTest extends AbstractDataloadScheduleTest {
     @Test(dependsOnGroups = {"precondition"})
     public void checkDataloadScheduleAtOverviewPage() {
         String schedule = "Schedule-" + generateHashString();
-        __initDiscProjectDetailPage()
+        initDiscProjectDetailPage()
                 .openCreateScheduleForm()
                 .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
                 .enterScheduleName(schedule)
                 .schedule();
 
         try {
-            __ScheduleDetailFragment.getInstance(browser).executeSchedule().waitForExecutionFinish();
+            ScheduleDetail.getInstance(browser).executeSchedule().waitForExecutionFinish();
 
-            __OverviewProjectItem project = __initDiscOverviewPage()
+            __OverviewProjectItem project = initDiscOverviewPage()
                     .selectState(OverviewState.SUCCESSFUL).getOverviewProject(projectTitle);
             assertTrue(project.expand().hasSchedule(schedule), "Schedule " + schedule + " not show");
             assertEquals(project.getScheduleExecutable(schedule), "");

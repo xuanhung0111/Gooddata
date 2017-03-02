@@ -34,22 +34,22 @@ import org.testng.annotations.Test;
 import com.gooddata.GoodData;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
-import com.gooddata.qa.graphene.disc.common.__AbstractDISCTest;
+import com.gooddata.qa.graphene.disc.common.AbstractDiscTest;
 import com.gooddata.qa.graphene.entity.disc.NotificationRule;
 import com.gooddata.qa.graphene.enums.GDEmails;
-import com.gooddata.qa.graphene.enums.disc.__Executable;
-import com.gooddata.qa.graphene.enums.disc.__ScheduleCronTime;
 import com.gooddata.qa.graphene.enums.disc.notification.Variable;
 import com.gooddata.qa.graphene.enums.disc.notification.VariableList;
+import com.gooddata.qa.graphene.enums.disc.schedule.Executable;
+import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleCronTime;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.disc.notification.NotificationRuleItem.NotificationEvent;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
-import com.gooddata.qa.graphene.fragments.disc.schedule.__ScheduleDetailFragment;
+import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
 
-public class NotificationEmailTest extends __AbstractDISCTest {
+public class NotificationEmailTest extends AbstractDiscTest {
 
     private static final String DATE_FORMAT_PATTERN_1 = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     private static final String DATE_FORMAT_PATTERN_2 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
@@ -82,8 +82,8 @@ public class NotificationEmailTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             NotificationRule notificationRule = new NotificationRule()
                     .withEmail(imapUser)
@@ -91,7 +91,7 @@ public class NotificationEmailTest extends __AbstractDISCTest {
                     .withSubject("Notification for process scheduled event " + generateHashString())
                     .withMessage(VariableList.PROCESS_SCHEDULED.buildMessage());
 
-            ProcessDetail processDetail = __initDiscProjectDetailPage().getProcess(process.getName());
+            ProcessDetail processDetail = initDiscProjectDetailPage().getProcess(process.getName());
 
             processDetail.openNotificationRuleDialog()
                     .createNotificationRule(notificationRule)
@@ -109,7 +109,7 @@ public class NotificationEmailTest extends __AbstractDISCTest {
             assertEquals(variables.get(Variable.USER_EMAIL.getName()), testParams.getUser());
             assertEquals(variables.get(Variable.PROCESS_URI.getName()), process.getUri());
             assertEquals(variables.get(Variable.PROCESS_ID.getName()), process.getId());
-            assertThat(variables.get(Variable.EXECUTABLE.getName()), containsString(__Executable.SUCCESSFUL_GRAPH.getPath()));
+            assertThat(variables.get(Variable.EXECUTABLE.getName()), containsString(Executable.SUCCESSFUL_GRAPH.getPath()));
             assertEquals(variables.get(Variable.SCHEDULE_ID.getName()), schedule.getId());
             assertEquals(variables.get(Variable.SCHEDULE_NAME.getName()), schedule.getName());
             assertTrue(isDateEqualWithinAcceptedThreshold(
@@ -126,8 +126,8 @@ public class NotificationEmailTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             NotificationRule notificationRule = new NotificationRule()
                     .withEmail(imapUser)
@@ -136,7 +136,7 @@ public class NotificationEmailTest extends __AbstractDISCTest {
                     .withMessage(VariableList.PROCESS_STARTED
                             .buildMessage(Variable.PROCESS_ID, Variable.SCHEDULE_ID, Variable.LOG, Variable.START_TIME));
 
-            ProcessDetail processDetail = __initDiscProjectDetailPage().getProcess(process.getName());
+            ProcessDetail processDetail = initDiscProjectDetailPage().getProcess(process.getName());
 
             processDetail.openNotificationRuleDialog()
                     .createNotificationRule(notificationRule)
@@ -166,8 +166,8 @@ public class NotificationEmailTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             NotificationRule notificationRule = new NotificationRule()
                     .withEmail(imapUser)
@@ -176,7 +176,7 @@ public class NotificationEmailTest extends __AbstractDISCTest {
                     .withMessage(VariableList.SUCCESS
                             .buildMessage(Variable.PROCESS_ID, Variable.SCHEDULE_ID, Variable.FINISH_TIME));
 
-            ProcessDetail processDetail = __initDiscProjectDetailPage().getProcess(process.getName());
+            ProcessDetail processDetail = initDiscProjectDetailPage().getProcess(process.getName());
 
             processDetail.openNotificationRuleDialog()
                     .createNotificationRule(notificationRule)
@@ -205,8 +205,8 @@ public class NotificationEmailTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule schedule = createSchedule(process, __Executable.SHORT_TIME_ERROR_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule = createSchedule(process, Executable.SHORT_TIME_ERROR_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             NotificationRule notificationRule = new NotificationRule()
                     .withEmail(imapUser)
@@ -215,7 +215,7 @@ public class NotificationEmailTest extends __AbstractDISCTest {
                     .withMessage(VariableList.FAILURE
                             .buildMessage(Variable.PROCESS_ID, Variable.SCHEDULE_ID, Variable.ERROR_MESSAGE));
 
-            ProcessDetail processDetail = __initDiscProjectDetailPage().getProcess(process.getName());
+            ProcessDetail processDetail = initDiscProjectDetailPage().getProcess(process.getName());
 
             processDetail.openNotificationRuleDialog()
                     .createNotificationRule(notificationRule)
@@ -243,8 +243,8 @@ public class NotificationEmailTest extends __AbstractDISCTest {
         DataloadProcess process = createProcess(generateProcessName(), PackageFile.CTL_EVENT, ProcessType.CLOUD_CONNECT);
 
         try {
-            Schedule schedule = createSchedule(process, __Executable.CTL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule = createSchedule(process, Executable.CTL_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             NotificationRule notificationRule = new NotificationRule()
                     .withEmail(imapUser)
@@ -253,7 +253,7 @@ public class NotificationEmailTest extends __AbstractDISCTest {
                     .withSubject("Notification for custom event " + generateHashString())
                     .withMessage("params.CUSTOM==${params.hello}");
 
-            ProcessDetail processDetail = __initDiscProjectDetailPage().getProcess(process.getName());
+            ProcessDetail processDetail = initDiscProjectDetailPage().getProcess(process.getName());
 
             processDetail.openNotificationRuleDialog()
                     .createNotificationRule(notificationRule)
@@ -284,16 +284,16 @@ public class NotificationEmailTest extends __AbstractDISCTest {
 
         try {
             String cronExpression = parseTimeToCronExpression(LocalTime.now().minusMinutes(1));
-            Schedule schedule = createSchedule(goodData, process, __Executable.SHORT_TIME_ERROR_GRAPH, cronExpression);
+            Schedule schedule = createSchedule(goodData, process, Executable.SHORT_TIME_ERROR_GRAPH, cronExpression);
 
-            __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule);
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
             executeScheduleWithSpecificTimes(scheduleDetail, 5);
 
             Document repeatedFailureEmailContent = getNotificationEmailContent(
                     format(REPEATED_DATA_LOADING_FAILURE_SUBJECT, process.getName()));
 
             assertEquals(repeatedFailureEmailContent.text(),
-                    format(REPEATED_DATA_LOADING_FAILURE_MESSAGE, __Executable.SHORT_TIME_ERROR_GRAPH.getName(),
+                    format(REPEATED_DATA_LOADING_FAILURE_MESSAGE, Executable.SHORT_TIME_ERROR_GRAPH.getName(),
                             process.getName(), projectTitle, testParams.getProjectId()));
 
             executeScheduleWithSpecificTimes(scheduleDetail, 25);
@@ -301,7 +301,7 @@ public class NotificationEmailTest extends __AbstractDISCTest {
                     format(SCHEDULE_DISABLED_SUBJECT, process.getName()));
 
             assertEquals(scheduleDisabledEmailContent.text(),
-                    format(SCHEDULE_DISABLED_MESSAGE, __Executable.SHORT_TIME_ERROR_GRAPH.getName(),
+                    format(SCHEDULE_DISABLED_MESSAGE, Executable.SHORT_TIME_ERROR_GRAPH.getName(),
                             process.getName(), projectTitle, testParams.getProjectId()));
 
         } finally {

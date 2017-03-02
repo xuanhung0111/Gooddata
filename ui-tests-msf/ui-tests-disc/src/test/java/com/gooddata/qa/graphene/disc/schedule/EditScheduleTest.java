@@ -18,28 +18,28 @@ import org.testng.annotations.Test;
 
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
-import com.gooddata.qa.graphene.disc.common.__AbstractDISCTest;
-import com.gooddata.qa.graphene.enums.disc.__Executable;
-import com.gooddata.qa.graphene.enums.disc.__ScheduleCronTime;
+import com.gooddata.qa.graphene.disc.common.AbstractDiscTest;
+import com.gooddata.qa.graphene.enums.disc.schedule.Executable;
+import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleCronTime;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
-import com.gooddata.qa.graphene.fragments.disc.schedule.__ScheduleDetailFragment;
+import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 
-public class EditScheduleTest extends __AbstractDISCTest {
+public class EditScheduleTest extends AbstractDiscTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void editScheduleWithCustomName() {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule schedule = createSchedule(process, __Executable.ERROR_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule = createSchedule(process, Executable.ERROR_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             String customName = "Schedule-" + generateHashString();
-            __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule)
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
                     .editNameByClickOnTitle(customName).cancelChanges();
 
-            assertEquals(scheduleDetail.getName(), __Executable.ERROR_GRAPH.getName());
-            assertTrue(projectDetailPage.getProcess(process.getName()).hasSchedule(__Executable.ERROR_GRAPH.getName()),
+            assertEquals(scheduleDetail.getName(), Executable.ERROR_GRAPH.getName());
+            assertTrue(projectDetailPage.getProcess(process.getName()).hasSchedule(Executable.ERROR_GRAPH.getName()),
                     "Schedule name is edited!");
 
             scheduleDetail.editNameByClickOnTitle(customName).saveChanges();
@@ -57,11 +57,11 @@ public class EditScheduleTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             String customName = "Schedule-" + generateHashString();
-            __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule)
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
                     .editNameByClickOnEditIcon(customName)
                     .saveChanges();
             assertEquals(scheduleDetail.getName(), customName);
@@ -76,10 +76,10 @@ public class EditScheduleTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule).editNameByClickOnTitle("");
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule).editNameByClickOnTitle("");
             assertTrue(scheduleDetail.isNameInputError(), "Schedule name input not show error");
             assertEquals(getBubbleMessage(browser), "can't be blank");
 
@@ -93,17 +93,17 @@ public class EditScheduleTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            createSchedule(process, __Executable.SUCCESSFUL_GRAPH, __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
-            Schedule schedule = createSchedule(process, __Executable.ERROR_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            createSchedule(process, Executable.SUCCESSFUL_GRAPH, ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule = createSchedule(process, Executable.ERROR_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule)
-                    .editNameByClickOnTitle(__Executable.SUCCESSFUL_GRAPH.getName());
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
+                    .editNameByClickOnTitle(Executable.SUCCESSFUL_GRAPH.getName());
 
             assertTrue(scheduleDetail.isNameInputError(), "Schedule name input not show error");
             assertEquals(getBubbleMessage(browser),
                     format("'%s' name already in use within the process. Change the name.",
-                            __Executable.SUCCESSFUL_GRAPH.getName()));
+                            Executable.SUCCESSFUL_GRAPH.getName()));
 
         } finally {
             deteleProcess(getGoodDataClient(), process);
@@ -115,17 +115,17 @@ public class EditScheduleTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule);
-            scheduleDetail.selectExecutable(__Executable.ERROR_GRAPH);
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+            scheduleDetail.selectExecutable(Executable.ERROR_GRAPH);
             scheduleDetail.cancelChanges();
-            assertEquals(scheduleDetail.getSelectedExecutable(), __Executable.SUCCESSFUL_GRAPH);
+            assertEquals(scheduleDetail.getSelectedExecutable(), Executable.SUCCESSFUL_GRAPH);
 
-            scheduleDetail.selectExecutable(__Executable.ERROR_GRAPH);
+            scheduleDetail.selectExecutable(Executable.ERROR_GRAPH);
             scheduleDetail.saveChanges();
-            assertEquals(scheduleDetail.getSelectedExecutable(), __Executable.ERROR_GRAPH);
+            assertEquals(scheduleDetail.getSelectedExecutable(), Executable.ERROR_GRAPH);
 
         } finally {
             deteleProcess(getGoodDataClient(), process);
@@ -137,17 +137,17 @@ public class EditScheduleTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule);
-            scheduleDetail.selectRunTime(__ScheduleCronTime.EVERY_15_MINUTES);
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+            scheduleDetail.selectRunTime(ScheduleCronTime.EVERY_15_MINUTES);
             scheduleDetail.cancelChanges();
-            assertEquals(scheduleDetail.getCronEditor().getSelectedCronType(), __ScheduleCronTime.EVERY_30_MINUTES);
+            assertEquals(scheduleDetail.getCronEditor().getSelectedCronType(), ScheduleCronTime.EVERY_30_MINUTES);
 
-            scheduleDetail.selectRunTime(__ScheduleCronTime.EVERY_15_MINUTES);
+            scheduleDetail.selectRunTime(ScheduleCronTime.EVERY_15_MINUTES);
             scheduleDetail.saveChanges();
-            assertEquals(scheduleDetail.getCronEditor().getSelectedCronType(), __ScheduleCronTime.EVERY_15_MINUTES);
+            assertEquals(scheduleDetail.getCronEditor().getSelectedCronType(), ScheduleCronTime.EVERY_15_MINUTES);
 
         } finally {
             deteleProcess(getGoodDataClient(), process);
@@ -159,10 +159,10 @@ public class EditScheduleTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule);
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
             scheduleDetail.selectRunTimeByCronExpression("* * *");
             scheduleDetail.clickSaveButton();
 
@@ -183,7 +183,7 @@ public class EditScheduleTest extends __AbstractDISCTest {
             Pair<String, String> param = createRandomParam();
             Pair<String, String> secureParam = createRandomParam();
 
-            ((CreateScheduleForm) __initDiscProjectDetailPage()
+            ((CreateScheduleForm) initDiscProjectDetailPage()
                     .openCreateScheduleForm()
                     .addParameter(param.getKey(), param.getValue())
                     .addSecureParameter(secureParam.getKey(), secureParam.getValue()))
@@ -192,7 +192,7 @@ public class EditScheduleTest extends __AbstractDISCTest {
             Pair<String, String> editedParam = createRandomParam();
             Pair<String, String> editedSecureParam = createRandomParam();
 
-            __ScheduleDetailFragment scheduleDetail = __ScheduleDetailFragment.getInstance(browser);
+            ScheduleDetail scheduleDetail = ScheduleDetail.getInstance(browser);
             scheduleDetail.getParameter(param.getKey()).editNameValuePair(editedParam.getKey(), editedParam.getValue());
             scheduleDetail.getParameter(secureParam.getKey()).editNameValuePair(editedSecureParam.getKey(), editedSecureParam.getValue());
             scheduleDetail.saveChanges();
@@ -218,7 +218,7 @@ public class EditScheduleTest extends __AbstractDISCTest {
             Pair<String, String> param = createRandomParam();
             Pair<String, String> secureParam = createRandomParam();
 
-            ((CreateScheduleForm) __initDiscProjectDetailPage()
+            ((CreateScheduleForm) initDiscProjectDetailPage()
                     .openCreateScheduleForm()
                     .addParameter(param.getKey(), param.getValue())
                     .addSecureParameter(secureParam.getKey(), secureParam.getValue()))
@@ -227,7 +227,7 @@ public class EditScheduleTest extends __AbstractDISCTest {
             Pair<String, String> editedParam = createRandomParam();
             Pair<String, String> editedSecureParam = createRandomParam();
 
-            __ScheduleDetailFragment scheduleDetail = __ScheduleDetailFragment.getInstance(browser);
+            ScheduleDetail scheduleDetail = ScheduleDetail.getInstance(browser);
             scheduleDetail.getParameter(param.getKey()).editNameValuePair(editedParam.getKey(), editedParam.getValue());
             scheduleDetail.getParameter(secureParam.getKey()).editNameValuePair(editedSecureParam.getKey(), editedSecureParam.getValue());
             scheduleDetail.cancelChanges();
@@ -249,7 +249,7 @@ public class EditScheduleTest extends __AbstractDISCTest {
             Pair<String, String> param = createRandomParam();
             Pair<String, String> secureParam = createRandomParam();
 
-            ((CreateScheduleForm) __initDiscProjectDetailPage()
+            ((CreateScheduleForm) initDiscProjectDetailPage()
                     .openCreateScheduleForm()
                     .addParameter(param.getKey(), param.getValue())
                     .addSecureParameter(secureParam.getKey(), secureParam.getValue()))
@@ -258,7 +258,7 @@ public class EditScheduleTest extends __AbstractDISCTest {
             Pair<String, String> additionalParam = createRandomParam();
             Pair<String, String> additionalSecureParam = createRandomParam();
 
-            __ScheduleDetailFragment scheduleDetail = __ScheduleDetailFragment.getInstance(browser);
+            ScheduleDetail scheduleDetail = ScheduleDetail.getInstance(browser);
             scheduleDetail.addParameter(additionalParam.getKey(), additionalParam.getValue())
                     .addSecureParameter(additionalSecureParam.getKey(), additionalSecureParam.getValue());
             scheduleDetail.saveChanges();
@@ -287,12 +287,12 @@ public class EditScheduleTest extends __AbstractDISCTest {
         try {
             Pair<String, String> param = createRandomParam();
 
-            ((CreateScheduleForm) __initDiscProjectDetailPage()
+            ((CreateScheduleForm) initDiscProjectDetailPage()
                     .openCreateScheduleForm()
                     .addParameter(param.getKey(), param.getValue()))
                     .schedule();
 
-            __ScheduleDetailFragment scheduleDetail = __ScheduleDetailFragment.getInstance(browser);
+            ScheduleDetail scheduleDetail = ScheduleDetail.getInstance(browser);
             scheduleDetail.deleteParameter(param.getKey());
             scheduleDetail.cancelChanges();
             assertTrue(scheduleDetail.hasParameter(param.getKey()), "Parameter is deleted after cancel");
@@ -311,11 +311,11 @@ public class EditScheduleTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             int retryDelayInMinute = 60;
-            __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule)
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
                     .addRetryDelay(retryDelayInMinute).cancelChanges();
             assertFalse(scheduleDetail.hasRetryDelay(), "Retry delay is added");
 
@@ -332,10 +332,10 @@ public class EditScheduleTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule)
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
                     .addRetryDelay(5)
                     .clickSaveButton();
             assertTrue(scheduleDetail.isRetryDelayInputError(), "Retry delay input not show error");
@@ -351,10 +351,10 @@ public class EditScheduleTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule schedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule)
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
                     .addRetryDelay(15).saveChanges();
 
             scheduleDetail.clickDeleteRetryDelay().discard();

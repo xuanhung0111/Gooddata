@@ -12,13 +12,13 @@ import java.io.RandomAccessFile;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.disc.common.__AbstractDISCTest;
+import com.gooddata.qa.graphene.disc.common.AbstractDiscTest;
 import com.gooddata.qa.graphene.fragments.disc.ConfirmationDialog;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 
-public class DeployProcessByGraphTest extends __AbstractDISCTest {
+public class DeployProcessByGraphTest extends AbstractDiscTest {
 
     private static final String ZIP_FILE_INPUT_ERROR_MESSAGE = "Select a ZIP file that is smaller than 5 MB.";
     private static final String FAILED_DEPLOY_MESSAGE = "Failed to (re-)?deploy .*\\. Reasons?: Process contains no executables.";
@@ -26,7 +26,7 @@ public class DeployProcessByGraphTest extends __AbstractDISCTest {
     @Test(dependsOnGroups = {"createProject"})
     public void redeployProcessWithSamePackage() {
         String processName = generateProcessName();
-        __initDiscProjectDetailPage()
+        initDiscProjectDetailPage()
                 .deployProcessWithZipFile(processName, ProcessType.CLOUD_CONNECT, PackageFile.BASIC.loadFile());
 
         takeScreenshot(browser, "Process-deployed-successfully", getClass());
@@ -42,7 +42,7 @@ public class DeployProcessByGraphTest extends __AbstractDISCTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void emptyInputErrorDeployment() {
-        DeployProcessForm deployForm = __initDiscProjectDetailPage().clickDeployButton();
+        DeployProcessForm deployForm = initDiscProjectDetailPage().clickDeployButton();
 
         deployForm.submit();
         takeScreenshot(browser, "Package-input-shows-error", getClass());
@@ -65,7 +65,7 @@ public class DeployProcessByGraphTest extends __AbstractDISCTest {
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "invalidFileProvider")
     public void deployInvalidPackageFile(File packageFile) throws IOException {
-        DeployProcessForm deployForm = __initDiscProjectDetailPage()
+        DeployProcessForm deployForm = initDiscProjectDetailPage()
                 .clickDeployButton()
                 .inputPackageFile(packageFile);
 
@@ -84,7 +84,7 @@ public class DeployProcessByGraphTest extends __AbstractDISCTest {
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "fileWithoutExecutableProvider")
     public void deployFileWithoutExecutableInProjectDetail(File fileWithoutExecutable) {
-        __initDiscProjectDetailPage()
+        initDiscProjectDetailPage()
                 .deployProcessWithZipFile(generateProcessName(), ProcessType.CLOUD_CONNECT, fileWithoutExecutable);
 
         takeScreenshot(browser, "No-executable-error-dialog-shows-for-" + fileWithoutExecutable.getName(), getClass());
@@ -94,7 +94,7 @@ public class DeployProcessByGraphTest extends __AbstractDISCTest {
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "fileWithoutExecutableProvider")
     public void deployFileWithoutExecutableInProjectsPage(File fileWithoutExecutable) {
-        __initDiscProjectsPage().markProjectCheckbox(projectTitle)
+        initDiscProjectsPage().markProjectCheckbox(projectTitle)
                 .deployProcessWithZipFile(generateProcessName(), ProcessType.CLOUD_CONNECT, fileWithoutExecutable);
 
         takeScreenshot(browser, "No-executable-error-bar-shows-for-" + fileWithoutExecutable.getName(), getClass());
@@ -106,7 +106,7 @@ public class DeployProcessByGraphTest extends __AbstractDISCTest {
     public void redeployFileWithoutExecutable(File fileWithoutExecutable) {
         String processName = generateProcessName();
 
-        __initDiscProjectDetailPage()
+        initDiscProjectDetailPage()
                 .deployProcessWithZipFile(processName, ProcessType.CLOUD_CONNECT, PackageFile.BASIC.loadFile());
 
         projectDetailPage.getProcess(processName)

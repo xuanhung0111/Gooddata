@@ -5,8 +5,6 @@ import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.SQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.ZIP_FILES;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.http.RestUtils.ACCEPT_TEXT_PLAIN_WITH_VERSION;
 import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
@@ -63,10 +61,10 @@ import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
-import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.entity.dlui.DataSource;
 import com.gooddata.qa.graphene.enums.DatasetElements;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.fragments.disc.projects.ProjectDetailPage;
 import com.gooddata.qa.utils.ads.AdsHelper;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
@@ -239,14 +237,6 @@ public class AbstractMSFTest extends AbstractProjectTest {
                 .get();
     }
 
-    protected void createSchedule(ScheduleBuilder scheduleBuilder) {
-        projectDetailPage.clickOnNewScheduleButton();
-        waitForFragmentVisible(scheduleForm);
-        scheduleForm.createNewSchedule(scheduleBuilder);
-        if (scheduleBuilder.isConfirmed())
-        waitForFragmentVisible(scheduleDetail);
-    }
-
     protected DataloadProcess deleteDataloadProcessAndCreateNewOne() {
         final Optional<DataloadProcess> dataloadProcess = getDataloadProcess();
         if (dataloadProcess.isPresent()) {
@@ -356,11 +346,9 @@ public class AbstractMSFTest extends AbstractProjectTest {
         assertTrue(isEqualCollection(metrics, metricValues), "Incorrect metric values!");
     }
 
-    protected void openProjectDetailPage(String projectId) {
-        openUrl(DISC_PROJECTS_PAGE_URL);
-        waitForElementVisible(discProjectsList.getRoot());
-        openUrl(DISC_PROJECTS_PAGE_URL + "/" + projectId);
-        waitForElementVisible(projectDetailPage.getRoot());
+    protected ProjectDetailPage openProjectDetailPage() {
+        openUrl(format(ProjectDetailPage.URI, testParams.getProjectId()));
+        return ProjectDetailPage.getInstance(browser);
     }
 
     protected void checkReportAfterAddReferenceToDataset() {

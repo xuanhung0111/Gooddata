@@ -34,9 +34,9 @@ import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
 import com.gooddata.qa.graphene.disc.common.AbstractDataloadScheduleTest;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
-import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
+import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
-import com.gooddata.qa.graphene.fragments.disc.schedule.__ScheduleDetailFragment;
+import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 
 public class DataloadDatasetDetailTest extends AbstractDataloadScheduleTest {
@@ -70,7 +70,7 @@ public class DataloadDatasetDetailTest extends AbstractDataloadScheduleTest {
     @Test(dependsOnGroups = {"precondition"})
     public void executeDataloadScheduleWithOneDataset() {
         String schedule = "Schedule-" + generateHashString();
-        ((CreateScheduleForm) __initDiscProjectDetailPage()
+        ((CreateScheduleForm) initDiscProjectDetailPage()
                 .openCreateScheduleForm()
                 .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
                 .selectDatasets(ARTIST_DATASET))
@@ -78,7 +78,7 @@ public class DataloadDatasetDetailTest extends AbstractDataloadScheduleTest {
                 .schedule();
 
         try {
-            __ScheduleDetailFragment scheduleDetail = __ScheduleDetailFragment.getInstance(browser)
+            ScheduleDetail scheduleDetail = ScheduleDetail.getInstance(browser)
                     .executeSchedule().waitForExecutionFinish();
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
@@ -98,7 +98,7 @@ public class DataloadDatasetDetailTest extends AbstractDataloadScheduleTest {
     @Test(dependsOnMethods = {"executeDataloadScheduleWithOneDataset"})
     public void executeDataloadScheduleWithAllDatasets() {
         String schedule = "Schedule-" + generateHashString();
-        ((CreateScheduleForm) __initDiscProjectDetailPage()
+        ((CreateScheduleForm) initDiscProjectDetailPage()
                 .openCreateScheduleForm()
                 .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
                 .selectAllDatasetsOption())
@@ -106,7 +106,7 @@ public class DataloadDatasetDetailTest extends AbstractDataloadScheduleTest {
                 .schedule();
 
         try {
-            __ScheduleDetailFragment scheduleDetail = __ScheduleDetailFragment.getInstance(browser)
+            ScheduleDetail scheduleDetail = ScheduleDetail.getInstance(browser)
                     .executeSchedule().waitForExecutionFinish();
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(), ScheduleStatus.OK.toString());

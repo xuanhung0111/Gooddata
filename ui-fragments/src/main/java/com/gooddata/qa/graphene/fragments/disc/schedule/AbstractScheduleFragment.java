@@ -17,8 +17,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
-import com.gooddata.qa.graphene.enums.disc.__Executable;
-import com.gooddata.qa.graphene.enums.disc.__ScheduleCronTime;
+import com.gooddata.qa.graphene.enums.disc.schedule.Executable;
+import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleCronTime;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class AbstractScheduleFragment extends AbstractFragment {
@@ -47,20 +47,20 @@ public class AbstractScheduleFragment extends AbstractFragment {
     @FindBy(className = "ait-dataset-selection-dropdown-button")
     private DatasetDropdown datasetDropdown;
 
-    public AbstractScheduleFragment selectExecutable(__Executable executable) {
+    public AbstractScheduleFragment selectExecutable(Executable executable) {
         waitForElementVisible(executableSelect).selectByVisibleText(executable.getPath());
         return this;
     }
 
-    public __Executable getSelectedExecutable() {
-        return Stream.of(__Executable.values())
+    public Executable getSelectedExecutable() {
+        return Stream.of(Executable.values())
                 .filter(e -> e.getPath().equals(
                         waitForElementVisible(executableSelect).getFirstSelectedOption().getText()))
                 .findFirst()
                 .get();
     }
 
-    public AbstractScheduleFragment selectRunTime(__ScheduleCronTime cronTime) {
+    public AbstractScheduleFragment selectRunTime(ScheduleCronTime cronTime) {
         getCronEditor().selectRunTime(cronTime);
         return this;
     }

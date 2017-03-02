@@ -13,14 +13,14 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
-import com.gooddata.qa.graphene.enums.disc.__Executable;
+import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
+import com.gooddata.qa.graphene.enums.disc.schedule.Executable;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.disc.ConfirmationDialog;
-import com.gooddata.qa.graphene.fragments.disc.notification.__NotificationRulesDialog;
+import com.gooddata.qa.graphene.fragments.disc.notification.NotificationRulesDialog;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
-import com.gooddata.qa.graphene.fragments.disc.schedule.__ScheduleDetailFragment;
+import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 
 public class ProcessDetail extends AbstractFragment {
 
@@ -75,7 +75,7 @@ public class ProcessDetail extends AbstractFragment {
         return executables.stream().map(this::getExecutableTitle).collect(toList());
     }
 
-    public String getScheduleInfoFrom(__Executable executable) {
+    public String getScheduleInfoFrom(Executable executable) {
         return getExecutableElement(executable).findElement(By.className("executable-schedules-cell")).getText();
     }
 
@@ -88,7 +88,7 @@ public class ProcessDetail extends AbstractFragment {
         return CreateScheduleForm.getInstance(browser);
     }
 
-    public CreateScheduleForm clickScheduleLinkFrom(__Executable executable) {
+    public CreateScheduleForm clickScheduleLinkFrom(Executable executable) {
         getExecutableElement(executable).findElement(By.cssSelector("a[class*='new-schedule-btn']")).click();
         return CreateScheduleForm.getInstance(browser);
     }
@@ -132,18 +132,18 @@ public class ProcessDetail extends AbstractFragment {
                 .get();
     }
 
-    public __ScheduleDetailFragment openSchedule(String scheduleName) {
+    public ScheduleDetail openSchedule(String scheduleName) {
         findSchedule(scheduleName).get().findElement(By.cssSelector(".schedule-title-cell a")).click();
-        return __ScheduleDetailFragment.getInstance(browser);
+        return ScheduleDetail.getInstance(browser);
     }
 
     public String getBrokenScheduleMessage() {
         return waitForElementVisible(By.cssSelector(".broken-schedules-section .message"), getRoot()).getText();
     }
 
-    public __NotificationRulesDialog openNotificationRuleDialog() {
+    public NotificationRulesDialog openNotificationRuleDialog() {
         waitForElementVisible(notificationRuleLink).click();
-        return __NotificationRulesDialog.getInstance(browser);
+        return NotificationRulesDialog.getInstance(browser);
     }
 
     public String getNotificationRuleDescription() {
@@ -156,7 +156,7 @@ public class ProcessDetail extends AbstractFragment {
                 .findFirst();
     }
 
-    private WebElement getExecutableElement(__Executable executable) {
+    private WebElement getExecutableElement(Executable executable) {
         return executables.stream()
                 .filter(e -> executable.getPath().equals(getExecutableTitle(e)))
                 .findFirst()

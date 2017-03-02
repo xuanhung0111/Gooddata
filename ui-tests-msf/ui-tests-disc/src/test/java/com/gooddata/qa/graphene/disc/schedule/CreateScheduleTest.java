@@ -15,28 +15,28 @@ import org.testng.annotations.Test;
 
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
-import com.gooddata.qa.graphene.disc.common.__AbstractDISCTest;
+import com.gooddata.qa.graphene.disc.common.AbstractDiscTest;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
-import com.gooddata.qa.graphene.enums.disc.__Executable;
-import com.gooddata.qa.graphene.enums.disc.__ScheduleCronTime;
+import com.gooddata.qa.graphene.enums.disc.schedule.Executable;
+import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleCronTime;
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail.Tab;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CronEditor;
-import com.gooddata.qa.graphene.fragments.disc.schedule.__ScheduleDetailFragment;
+import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 
-public class CreateScheduleTest extends __AbstractDISCTest {
+public class CreateScheduleTest extends AbstractDiscTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void createSchedule() {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            ((CreateScheduleForm) __initDiscProjectDetailPage()
+            ((CreateScheduleForm) initDiscProjectDetailPage()
                     .openCreateScheduleForm()
-                    .selectExecutable(__Executable.SUCCESSFUL_GRAPH))
+                    .selectExecutable(Executable.SUCCESSFUL_GRAPH))
                     .schedule();
             assertTrue(projectDetailPage.getProcess(process.getName())
-                    .hasSchedule(__Executable.SUCCESSFUL_GRAPH.getName()),
+                    .hasSchedule(Executable.SUCCESSFUL_GRAPH.getName()),
                     "Schedule is not created");
 
         } finally {
@@ -50,7 +50,7 @@ public class CreateScheduleTest extends __AbstractDISCTest {
 
         try {
             String scheduleName = "Schedule-" + generateHashString();
-            __initDiscProjectDetailPage()
+            initDiscProjectDetailPage()
                     .openCreateScheduleForm()
                     .enterScheduleName(scheduleName)
                     .cancelSchedule();
@@ -73,13 +73,13 @@ public class CreateScheduleTest extends __AbstractDISCTest {
                     .addSecureParameter("secureParam1", "secureValue1")
                     .addSecureParameter("secureParam2", "secureValue2");
 
-            ((CreateScheduleForm) __initDiscProjectDetailPage()
+            ((CreateScheduleForm) initDiscProjectDetailPage()
                     .openCreateScheduleForm()
                     .addParameters(parameters.getParameters())
                     .addSecureParameters(parameters.getSecureParameters()))
                     .schedule();
 
-            __ScheduleDetailFragment scheduleDetail = __ScheduleDetailFragment.getInstance(browser);
+            ScheduleDetail scheduleDetail = ScheduleDetail.getInstance(browser);
             assertEquals(scheduleDetail.getAllParametersInfo(), parameters.getParameters());
 
             Map<String, String> actualSecureParams = scheduleDetail.getAllSecureParametersInfo();
@@ -99,15 +99,15 @@ public class CreateScheduleTest extends __AbstractDISCTest {
         try {
             String scheduleName = "Schedule-" + generateHashString();
 
-            __initDiscProjectDetailPage()
+            initDiscProjectDetailPage()
                     .getProcess(process.getName())
                     .openTab(Tab.EXECUTABLE)
-                    .clickScheduleLinkFrom(__Executable.SUCCESSFUL_GRAPH)
+                    .clickScheduleLinkFrom(Executable.SUCCESSFUL_GRAPH)
                     .enterScheduleName(scheduleName)
                     .schedule();
 
-            assertEquals(__ScheduleDetailFragment.getInstance(browser).getSelectedExecutable(),
-                    __Executable.SUCCESSFUL_GRAPH);
+            assertEquals(ScheduleDetail.getInstance(browser).getSelectedExecutable(),
+                    Executable.SUCCESSFUL_GRAPH);
             assertTrue(projectDetailPage.getProcess(process.getName()).hasSchedule(scheduleName),
                     "Schedule " + scheduleName + " is not created");
 
@@ -123,7 +123,7 @@ public class CreateScheduleTest extends __AbstractDISCTest {
         try {
             String scheduleName = "Schedule-" + generateHashString();
 
-            __initDiscProjectDetailPage()
+            initDiscProjectDetailPage()
                     .getProcess(process.getName())
                     .openTab(Tab.SCHEDULE)
                     .clickCreateScheduleLink()
@@ -144,13 +144,13 @@ public class CreateScheduleTest extends __AbstractDISCTest {
         try {
             LocalDateTime date = LocalDateTime.now();
 
-            ((CreateScheduleForm) __initDiscProjectDetailPage()
+            ((CreateScheduleForm) initDiscProjectDetailPage()
                     .openCreateScheduleForm()
                     .selectRunTimeByEveryWeek(date.getDayOfWeek(), date.getHour(), date.getMinute()))
                     .schedule();
 
-            CronEditor cronEditor = __ScheduleDetailFragment.getInstance(browser).getCronEditor();
-            assertEquals(cronEditor.getSelectedCronType(), __ScheduleCronTime.EVERY_WEEK);
+            CronEditor cronEditor = ScheduleDetail.getInstance(browser).getCronEditor();
+            assertEquals(cronEditor.getSelectedCronType(), ScheduleCronTime.EVERY_WEEK);
             assertEquals(cronEditor.getSelectedDayOfWeek(), date.getDayOfWeek());
             assertEquals(cronEditor.getSelectedHourOfDay(), date.getHour());
             assertEquals(cronEditor.getSelectedMinuteOfHour(), date.getMinute());
@@ -167,13 +167,13 @@ public class CreateScheduleTest extends __AbstractDISCTest {
         try {
             LocalTime time = LocalTime.now();
 
-            ((CreateScheduleForm) __initDiscProjectDetailPage()
+            ((CreateScheduleForm) initDiscProjectDetailPage()
                     .openCreateScheduleForm()
                     .selectRunTimeByEveryDay(time.getHour(), time.getMinute()))
                     .schedule();
 
-            CronEditor cronEditor = __ScheduleDetailFragment.getInstance(browser).getCronEditor();
-            assertEquals(cronEditor.getSelectedCronType(), __ScheduleCronTime.EVERY_DAY);
+            CronEditor cronEditor = ScheduleDetail.getInstance(browser).getCronEditor();
+            assertEquals(cronEditor.getSelectedCronType(), ScheduleCronTime.EVERY_DAY);
             assertEquals(cronEditor.getSelectedHourOfDay(), time.getHour());
             assertEquals(cronEditor.getSelectedMinuteOfHour(), time.getMinute());
 
@@ -189,13 +189,13 @@ public class CreateScheduleTest extends __AbstractDISCTest {
         try {
             LocalTime time = LocalTime.now();
 
-            ((CreateScheduleForm) __initDiscProjectDetailPage()
+            ((CreateScheduleForm) initDiscProjectDetailPage()
                     .openCreateScheduleForm()
                     .selectRunTimeByEveryHour(time.getMinute()))
                     .schedule();
 
-            CronEditor cronEditor = __ScheduleDetailFragment.getInstance(browser).getCronEditor();
-            assertEquals(cronEditor.getSelectedCronType(), __ScheduleCronTime.EVERY_HOUR);
+            CronEditor cronEditor = ScheduleDetail.getInstance(browser).getCronEditor();
+            assertEquals(cronEditor.getSelectedCronType(), ScheduleCronTime.EVERY_HOUR);
             assertEquals(cronEditor.getSelectedMinuteOfHour(), time.getMinute());
 
         } finally {
@@ -210,13 +210,13 @@ public class CreateScheduleTest extends __AbstractDISCTest {
         try {
             String cronExpression = "*/20 * * * *";
 
-            ((CreateScheduleForm) __initDiscProjectDetailPage()
+            ((CreateScheduleForm) initDiscProjectDetailPage()
                     .openCreateScheduleForm()
                     .selectRunTimeByCronExpression(cronExpression))
                     .schedule();
 
-            CronEditor cronEditor = __ScheduleDetailFragment.getInstance(browser).getCronEditor();
-            assertEquals(cronEditor.getSelectedCronType(), __ScheduleCronTime.CRON_EXPRESSION);
+            CronEditor cronEditor = ScheduleDetail.getInstance(browser).getCronEditor();
+            assertEquals(cronEditor.getSelectedCronType(), ScheduleCronTime.CRON_EXPRESSION);
             assertEquals(cronEditor.getCronExpression(), cronExpression);
 
         } finally {
@@ -229,7 +229,7 @@ public class CreateScheduleTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            CreateScheduleForm scheduleForm = __initDiscProjectDetailPage().openCreateScheduleForm();
+            CreateScheduleForm scheduleForm = initDiscProjectDetailPage().openCreateScheduleForm();
             scheduleForm.selectRunTimeByCronExpression("* * *");
             scheduleForm.schedule();
 
@@ -247,16 +247,16 @@ public class CreateScheduleTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Schedule triggeringSchedule = createSchedule(process, __Executable.SUCCESSFUL_GRAPH,
-                    __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule triggeringSchedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            ((CreateScheduleForm) __initDiscProjectDetailPage()
+            ((CreateScheduleForm) initDiscProjectDetailPage()
                     .openCreateScheduleForm()
                     .selectRunTimeByTriggeringSchedule(triggeringSchedule.getId()))
                     .schedule();
 
-            CronEditor cronEditor = __ScheduleDetailFragment.getInstance(browser).getCronEditor();
-            assertEquals(cronEditor.getSelectedCronType(), __ScheduleCronTime.AFTER);
+            CronEditor cronEditor = ScheduleDetail.getInstance(browser).getCronEditor();
+            assertEquals(cronEditor.getSelectedCronType(), ScheduleCronTime.AFTER);
             assertEquals(cronEditor.getTriggeringSchedule(), triggeringSchedule.getName());
 
         } finally {
@@ -270,7 +270,7 @@ public class CreateScheduleTest extends __AbstractDISCTest {
 
         try {
             String scheduleName = "Schedule-" + generateHashString();
-            __initDiscProjectDetailPage()
+            initDiscProjectDetailPage()
                     .openCreateScheduleForm()
                     .enterScheduleName(scheduleName)
                     .schedule();
@@ -287,7 +287,7 @@ public class CreateScheduleTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            CreateScheduleForm scheduleForm = __initDiscProjectDetailPage()
+            CreateScheduleForm scheduleForm = initDiscProjectDetailPage()
                     .openCreateScheduleForm()
                     .enterScheduleName("");
             assertTrue(scheduleForm.isScheduleNameInputError(), "Schedule name input not show error");
@@ -303,14 +303,14 @@ public class CreateScheduleTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            createSchedule(process, __Executable.SUCCESSFUL_GRAPH, __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            createSchedule(process, Executable.SUCCESSFUL_GRAPH, ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            CreateScheduleForm scheduleForm = __initDiscProjectDetailPage().openCreateScheduleForm()
-                    .enterScheduleName(__Executable.SUCCESSFUL_GRAPH.getName());
+            CreateScheduleForm scheduleForm = initDiscProjectDetailPage().openCreateScheduleForm()
+                    .enterScheduleName(Executable.SUCCESSFUL_GRAPH.getName());
             assertTrue(scheduleForm.isScheduleNameInputError(), "Schedule name input not show error");
             assertEquals(getBubbleMessage(browser),
                     format("'%s' name already in use within the process. Change the name.",
-                            __Executable.SUCCESSFUL_GRAPH.getName()));
+                            Executable.SUCCESSFUL_GRAPH.getName()));
 
         } finally {
             deteleProcess(getGoodDataClient(), process);

@@ -8,11 +8,11 @@ import static org.testng.Assert.assertTrue;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.disc.common.__AbstractDISCTest;
+import com.gooddata.qa.graphene.disc.common.AbstractDiscTest;
 import com.gooddata.qa.graphene.fragments.disc.ConfirmationDialog;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm;
 
-public class DeployProcessByGitStoreTest extends __AbstractDISCTest {
+public class DeployProcessByGitStoreTest extends AbstractDiscTest {
 
     @DataProvider(name = "invalidGitPathFormatProvider")
     public Object[][] getInvalidGitPathFormatProvider() {
@@ -27,7 +27,7 @@ public class DeployProcessByGitStoreTest extends __AbstractDISCTest {
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "invalidGitPathFormatProvider")
     public void deployProcessWithInvalidFormatGitPath(String gitPath) {
-        DeployProcessForm deployForm = __initDiscProjectDetailPage().clickDeployButton();
+        DeployProcessForm deployForm = initDiscProjectDetailPage().clickDeployButton();
 
         deployForm.selectGitOption()
                 .enterGitPath(gitPath)
@@ -63,7 +63,7 @@ public class DeployProcessByGitStoreTest extends __AbstractDISCTest {
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "invalidGitPathProvider")
     public void deployProcessWithInvalidGitPathOnProjectDetailPage(String gitPath, String errorMessage) {
-        __initDiscProjectDetailPage().deployProcessWithGitStorePath(generateProcessName(), gitPath);
+        initDiscProjectDetailPage().deployProcessWithGitStorePath(generateProcessName(), gitPath);
 
         ConfirmationDialog confirmDialog = ConfirmationDialog.getInstance(browser);
         assertEquals(confirmDialog.getTitle(), "Process failed to deploy");
@@ -74,7 +74,7 @@ public class DeployProcessByGitStoreTest extends __AbstractDISCTest {
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "invalidGitPathProvider")
     public void deployProcessWithInvalidGitPathOnProjectsPage(String gitPath, String errorMessage) {
-        __initDiscProjectsPage().markProjectCheckbox(projectTitle)
+        initDiscProjectsPage().markProjectCheckbox(projectTitle)
                 .deployProcessWithGitStorePath(generateProcessName(), gitPath);
 
         String completeErrorMessage = format(errorMessage, gitPath.replace("$", "\\$").replace("{", "\\{").replace("}", "\\}"));

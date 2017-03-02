@@ -6,14 +6,14 @@ import static org.testng.Assert.assertEquals;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.disc.common.__AbstractDISCTest;
+import com.gooddata.qa.graphene.disc.common.AbstractDiscTest;
 import com.gooddata.qa.graphene.fragments.disc.ConfirmationDialog;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail.Tab;
 
-public class DeployProcessByRubyScriptTest extends __AbstractDISCTest {
+public class DeployProcessByRubyScriptTest extends AbstractDiscTest {
 
     private static final String FAILED_DEPLOY_MESSAGE = "Failed to (re-)?deploy .*\\. Reasons?: Process contains no executables.";
 
@@ -27,17 +27,17 @@ public class DeployProcessByRubyScriptTest extends __AbstractDISCTest {
     public void deployProcessInProjectsPage() {
         String processName = generateProcessName();
 
-        __initDiscProjectsPage()
+        initDiscProjectsPage()
                 .markProjectCheckbox(projectTitle)
                 .deployProcessWithZipFile(processName, ProcessType.RUBY_SCRIPTS, PackageFile.RUBY.loadFile());
-        assertTrue(__initDiscProjectDetailPage().hasProcess(processName), "Process is not deployed");
+        assertTrue(initDiscProjectDetailPage().hasProcess(processName), "Process is not deployed");
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void deployProcessInProjectDetailPage() {
         String processName = generateProcessName();
 
-        __initDiscProjectDetailPage()
+        initDiscProjectDetailPage()
                 .deployProcessWithZipFile(processName, ProcessType.RUBY_SCRIPTS, PackageFile.RUBY.loadFile());
         assertTrue(projectDetailPage.hasProcess(processName), "Process is not deployed");
     }
@@ -46,7 +46,7 @@ public class DeployProcessByRubyScriptTest extends __AbstractDISCTest {
     public void redeployProcessWithDifferentProcessType() {
         String processName = generateProcessName();
 
-        __initDiscProjectDetailPage()
+        initDiscProjectDetailPage()
                 .deployProcessWithZipFile(processName, ProcessType.CLOUD_CONNECT, PackageFile.BASIC.loadFile());
         assertTrue(projectDetailPage.hasProcess(processName), "Process is not deployed");
 
@@ -59,14 +59,14 @@ public class DeployProcessByRubyScriptTest extends __AbstractDISCTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void deployGraphFileWithRubyScriptTypeInProjectsPage() {
-        __initDiscProjectsPage().markProjectCheckbox(projectTitle)
+        initDiscProjectsPage().markProjectCheckbox(projectTitle)
                 .deployProcessWithZipFile(generateProcessName(), ProcessType.RUBY_SCRIPTS, PackageFile.BASIC.loadFile());
         assertTrue(projectsPage.getErrorBarMessage().matches(FAILED_DEPLOY_MESSAGE), "Error message not show correctly");
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void deployGraphFileWithRubyScriptTypeInProjectDetailPage() {
-        __initDiscProjectDetailPage()
+        initDiscProjectDetailPage()
                 .deployProcessWithZipFile(generateProcessName(), ProcessType.RUBY_SCRIPTS, PackageFile.BASIC.loadFile());
         assertTrue(ConfirmationDialog.getInstance(browser).getMessage().matches(FAILED_DEPLOY_MESSAGE),
                 "Error message not show correctly");
@@ -75,7 +75,7 @@ public class DeployProcessByRubyScriptTest extends __AbstractDISCTest {
     @Test(dependsOnGroups = {"createProject"})
     public void redeployGraphFileWithRubyScriptType() {
         String processName = generateProcessName();
-        __initDiscProjectDetailPage()
+        initDiscProjectDetailPage()
                 .deployProcessWithZipFile(processName, ProcessType.CLOUD_CONNECT, PackageFile.BASIC.loadFile());
 
         projectDetailPage.getProcess(processName)

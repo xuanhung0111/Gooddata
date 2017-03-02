@@ -14,7 +14,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
-import com.gooddata.qa.graphene.enums.disc.__ScheduleCronTime;
+import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleCronTime;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class CronEditor extends AbstractFragment {
@@ -37,24 +37,24 @@ public class CronEditor extends AbstractFragment {
     @FindBy(css = ".whenSchedule select")
     private Select triggeringScheduleSelect;
 
-    public CronEditor selectRunTime(__ScheduleCronTime cronTime) {
+    public CronEditor selectRunTime(ScheduleCronTime cronTime) {
         waitForElementVisible(cronTypeSelect).selectByVisibleText(cronTime.toString());
         return this;
     }
 
     public CronEditor selectRunTimeByEveryHour(int minuteOfHour) {
-        selectRunTime(__ScheduleCronTime.EVERY_HOUR).selectMinuteOfHour(minuteOfHour);
+        selectRunTime(ScheduleCronTime.EVERY_HOUR).selectMinuteOfHour(minuteOfHour);
         return this;
     }
 
     public CronEditor selectRunTimeByEveryDay(int hourOfDay, int minuteOfHour) {
-        selectRunTime(__ScheduleCronTime.EVERY_DAY).selectHourOfDay(hourOfDay)
+        selectRunTime(ScheduleCronTime.EVERY_DAY).selectHourOfDay(hourOfDay)
                 .selectMinuteOfHour(minuteOfHour);
         return this;
     }
 
     public CronEditor selectRunTimeByEveryWeek(DayOfWeek dayOfWeek, int hourOfDay, int minuteOfHour) {
-        selectRunTime(__ScheduleCronTime.EVERY_WEEK);
+        selectRunTime(ScheduleCronTime.EVERY_WEEK);
 
         waitForElementVisible(cronDayOfWeekSelect)
                 .selectByVisibleText(dayOfWeek.getDisplayName(TextStyle.FULL, Locale.ENGLISH));
@@ -64,7 +64,7 @@ public class CronEditor extends AbstractFragment {
     }
 
     public CronEditor selectRunTimeByCronExpression(String cronExpression) {
-        selectRunTime(__ScheduleCronTime.CRON_EXPRESSION);
+        selectRunTime(ScheduleCronTime.CRON_EXPRESSION);
 
         waitForElementVisible(cronExpressionInput).clear();
         cronExpressionInput.sendKeys(cronExpression);
@@ -72,13 +72,13 @@ public class CronEditor extends AbstractFragment {
     }
 
     public CronEditor selectRunTimeByTriggeringSchedule(String anotherScheduleId) {
-        selectRunTime(__ScheduleCronTime.AFTER);
+        selectRunTime(ScheduleCronTime.AFTER);
         waitForElementVisible(triggeringScheduleSelect).selectByValue(anotherScheduleId);
         return this;
     }
 
-    public __ScheduleCronTime getSelectedCronType() {
-        return Stream.of(__ScheduleCronTime.values())
+    public ScheduleCronTime getSelectedCronType() {
+        return Stream.of(ScheduleCronTime.values())
                 .filter(cron -> waitForElementVisible(cronTypeSelect).getFirstSelectedOption().getText()
                         .equals(cron.toString()))
                 .findFirst().get();
