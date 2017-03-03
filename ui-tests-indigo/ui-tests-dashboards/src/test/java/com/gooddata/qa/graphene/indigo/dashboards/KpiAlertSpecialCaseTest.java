@@ -128,10 +128,10 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
         final String ratioExpression = format("SELECT [%s] / [%s]", sumOfNumberMetricUri, sumOfNumberMetricUri);
 
         return new Object[][] {
-            {createMetric("timeMacroMetric-" + uniqueString, timeMacroExpression, "#,##0"), true},
-            {createMetric("shareMetric-" + uniqueString, shareExpression, "#,##0"), false},
-            {createMetric("differenceMetric-" + uniqueString, differenceExpression, "#,##0"), false},
-            {createMetric("ratioMetric-" + uniqueString, ratioExpression, "#,##0"), false}
+            {createMetric("time-" + uniqueString, timeMacroExpression, "#,##0"), true},
+            {createMetric("share-" + uniqueString, shareExpression, "#,##0"), false},
+            {createMetric("diff-" + uniqueString, differenceExpression, "#,##0"), false},
+            {createMetric("ratio-" + uniqueString, ratioExpression, "#,##0"), false}
         };
     }
 
