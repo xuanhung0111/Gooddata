@@ -7,6 +7,7 @@ import java.time.LocalTime;
 
 import org.openqa.selenium.support.FindBy;
 
+import com.gooddata.GoodData;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.qa.graphene.AbstractProjectTest;
@@ -53,17 +54,31 @@ public class __AbstractDISCTest extends AbstractProjectTest {
     }
 
     protected DataloadProcess createProcessWithBasicPackage(String processName) {
+        return createProcess(processName, PackageFile.BASIC, ProcessType.CLOUD_CONNECT);
+    }
+
+    protected DataloadProcess createProcess(String processName, PackageFile packageFile, ProcessType type) {
+        return createProcess(getGoodDataClient(), processName, packageFile, type);
+    }
+
+    protected DataloadProcess createProcess (GoodData goodDataClient, String processName,
+            PackageFile packageFile, ProcessType type) {
         log.info("Create process: " + processName);
-        return getGoodDataClient().getProcessService().createProcess(getProject(),
-                new DataloadProcess(processName, ProcessType.CLOUD_CONNECT.getValue()), PackageFile.BASIC.loadFile());
+        return goodDataClient.getProcessService().createProcess(getProject(),
+                new DataloadProcess(processName, type.getValue()), packageFile.loadFile());
     }
 
     protected Schedule createSchedule(DataloadProcess process, __Executable executable, String crontimeExpression) {
-        return createScheduleWithTriggerType(process, executable, crontimeExpression);
+        return createSchedule(getGoodDataClient(), process, executable, crontimeExpression);
+    }
+
+    protected Schedule createSchedule(GoodData goodDataClient, DataloadProcess process,
+            __Executable executable, String crontimeExpression) {
+        return createScheduleWithTriggerType(goodDataClient, process, executable, crontimeExpression);
     }
 
     protected Schedule createSchedule(DataloadProcess process, __Executable executable, Schedule triggeringSchedule) {
-        return createScheduleWithTriggerType(process, executable, triggeringSchedule);
+        return createScheduleWithTriggerType(getGoodDataClient(), process, executable, triggeringSchedule);
     }
 
     protected String parseTimeToCronExpression(LocalTime time) {
@@ -74,8 +89,14 @@ public class __AbstractDISCTest extends AbstractProjectTest {
         return "Process-" + generateHashString();
     }
 
-    private Schedule createScheduleWithTriggerType(DataloadProcess process, __Executable executable,
-            Object triggerType) {
+    protected void executeScheduleWithSpecificTimes(__ScheduleDetailFragment scheduleDetail, int times) {
+        for (int i = 1; i <= times; i++) {
+            scheduleDetail.executeSchedule().waitForExecutionFinish();
+        }
+    }
+
+    private Schedule createScheduleWithTriggerType(GoodData goodDataClient, DataloadProcess process,
+            __Executable executable, Object triggerType) {
         String expectedExecutable = process.getExecutables()
                 .stream().filter(e -> e.contains(executable.getPath())).findFirst().get();
 
@@ -87,6 +108,6 @@ public class __AbstractDISCTest extends AbstractProjectTest {
             schedule = new Schedule(process, expectedExecutable, (Schedule) triggerType);
         }
 
-        return getGoodDataClient().getProcessService().createSchedule(getProject(), schedule);
+        return goodDataClient.getProcessService().createSchedule(getProject(), schedule);
     }
 }

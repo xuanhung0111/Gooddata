@@ -5,7 +5,8 @@ public enum __Executable {
     SUCCESSFUL_GRAPH("/graph/successfulGraph.grf"),
     ERROR_GRAPH("/graph/errorGraph.grf"),
     LONG_TIME_RUNNING_GRAPH("/graph/longTimeRunningGraph.grf"),
-    SHORT_TIME_ERROR_GRAPH("/graph/shortTimeErrorGraph.grf");
+    SHORT_TIME_ERROR_GRAPH("/graph/shortTimeErrorGraph.grf"),
+    CTL_GRAPH("/graph/CTL_Function.grf");
 
     private String path;
 
