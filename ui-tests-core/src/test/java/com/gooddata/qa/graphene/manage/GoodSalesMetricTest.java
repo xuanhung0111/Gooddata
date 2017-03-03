@@ -1123,7 +1123,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                 return asList(1.8447266E7f, 4249028.0f, 5612062.5f, 2606293.5f, 3067466.0f, 1862015.8f,
                         3.8310752E7f, 4.2470572E7f);
             case THIS:
-                return asList(2.7219256E7f, 2.2946896E7f, 3.8596196E7f, 8042032.0f, 9525858.0f, 1.0291577E7f);
+                return asList(2.72229E7f, 2.2946896E7f, 3.8596196E7f, 8042032.0f, 9525858.0f, 1.0291577E7f);
             case PREVIOUS:
                 return asList(2.72229E7f, 2.2946896E7f, 3.8596196E7f, 8042032.0f, 9525858.0f, 1.0291577E7f);
             case NEXT:
