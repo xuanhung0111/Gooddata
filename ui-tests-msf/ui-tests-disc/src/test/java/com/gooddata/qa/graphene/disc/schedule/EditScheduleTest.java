@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.disc.schedule;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getBubbleMessage;
+import static com.gooddata.qa.graphene.entity.disc.Parameters.createRandomParam;
 import static com.gooddata.qa.utils.http.process.ProcessRestUtils.deteleProcess;
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -17,7 +18,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
-import com.gooddata.qa.graphene.disc.__AbstractDISCTest;
+import com.gooddata.qa.graphene.disc.common.__AbstractDISCTest;
 import com.gooddata.qa.graphene.enums.disc.__Executable;
 import com.gooddata.qa.graphene.enums.disc.__ScheduleCronTime;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
@@ -365,9 +366,5 @@ public class EditScheduleTest extends __AbstractDISCTest {
         } finally {
             deteleProcess(getGoodDataClient(), process);
         }
-    }
-
-    private Pair<String, String> createRandomParam() {
-        return Pair.of("param" + generateHashString(), "value" + generateHashString());
     }
 }

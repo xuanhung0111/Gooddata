@@ -121,7 +121,8 @@ public class DeployProcessForm extends AbstractFragment {
         BASIC("Basic.zip"),
         ONE_GRAPH("One_Graph.zip"),
         RUBY("ruby.zip"),
-        CTL_EVENT("CTL_event.zip");
+        CTL_EVENT("CTL_event.zip"),
+        ADS_TABLE("adsTable.zip");
 
         private String name;
 

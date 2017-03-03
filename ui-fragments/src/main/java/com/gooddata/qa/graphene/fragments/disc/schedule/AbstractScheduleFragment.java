@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -36,6 +37,15 @@ public class AbstractScheduleFragment extends AbstractFragment {
 
     @FindBy(className = "schedule-param")
     private Collection<ScheduleParameter> scheduleParams;
+
+    @FindBy(className = "ait-dataset-selection-radio-all")
+    private WebElement allDatasetsOption;
+
+    @FindBy(className = "ait-dataset-selection-radio-custom")
+    private WebElement customDatasetsOption;
+
+    @FindBy(className = "ait-dataset-selection-dropdown-button")
+    private DatasetDropdown datasetDropdown;
 
     public AbstractScheduleFragment selectExecutable(__Executable executable) {
         waitForElementVisible(executableSelect).selectByVisibleText(executable.getPath());
@@ -129,6 +139,47 @@ public class AbstractScheduleFragment extends AbstractFragment {
 
     public boolean hasParameter(String parameter) {
         return findParameter(parameter).isPresent();
+    }
+
+    public DatasetDropdown getDatasetDropdown() {
+        return waitForFragmentVisible(datasetDropdown);
+    }
+
+    public AbstractScheduleFragment selectAllDatasetsOption() {
+        waitForElementVisible(allDatasetsOption).click();
+        return this;
+    }
+
+    public AbstractScheduleFragment selectCustomDatasetsOption() {
+        waitForElementVisible(customDatasetsOption).click();
+        return this;
+    }
+
+    public AbstractScheduleFragment selectDatasets(String... datasets) {
+        selectCustomDatasetsOption();
+        getDatasetDropdown().expand().selectDatasets(datasets).submit();
+        return this;
+    }
+
+    public boolean isAllDatasetsOptionSelected() {
+        return waitForElementVisible(allDatasetsOption).isSelected();
+    }
+
+    public boolean isCustomDatasetsOptionSelected() {
+        return waitForElementVisible(customDatasetsOption).isSelected();
+    }
+
+    public Collection<String> getSelectedDatasets() {
+        DatasetDropdown dropdown = getDatasetDropdown();
+        try {
+            return dropdown.expand().getSelectedDatasets();
+        } finally {
+            dropdown.collapse();
+        }
+    }
+
+    public String getOverlappedDatasetMessage() {
+        return waitForElementVisible(By.className("datasets-messages"), getRoot()).getText();
     }
 
     private Optional<ScheduleParameter> findParameter(String parameter) {

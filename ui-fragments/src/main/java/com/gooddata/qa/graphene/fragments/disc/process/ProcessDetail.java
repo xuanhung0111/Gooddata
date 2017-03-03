@@ -152,7 +152,7 @@ public class ProcessDetail extends AbstractFragment {
 
     private Optional<WebElement> findSchedule(String scheduleName) {
         return schedules.stream()
-                .filter(s -> scheduleName.equals(s.findElement(By.className("name")).getText()))
+                .filter(s -> scheduleName.equals(s.findElement(By.tagName("a")).getText()))
                 .findFirst();
     }
 

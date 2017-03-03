@@ -354,6 +354,10 @@ public class __ScheduleDetailFragment extends AbstractScheduleFragment {
             return waitForElementVisible(description).getText();
         }
 
+        public String getErrorMessage() {
+            return waitForElementVisible(By.className("execution-history-error"), getRoot()).getText();
+        }
+
         public boolean isItemGroup() {
             return getRoot().getAttribute("class").contains("group-header");
         }

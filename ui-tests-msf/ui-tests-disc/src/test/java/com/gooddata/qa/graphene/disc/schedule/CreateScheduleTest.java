@@ -9,14 +9,14 @@ import static org.testng.Assert.assertTrue;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.testng.annotations.Test;
 
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
-import com.gooddata.qa.graphene.disc.__AbstractDISCTest;
+import com.gooddata.qa.graphene.disc.common.__AbstractDISCTest;
+import com.gooddata.qa.graphene.entity.disc.Parameters;
 import com.gooddata.qa.graphene.enums.disc.__Executable;
 import com.gooddata.qa.graphene.enums.disc.__ScheduleCronTime;
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail.Tab;
@@ -67,20 +67,23 @@ public class CreateScheduleTest extends __AbstractDISCTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            Map<String, String> params = createRandomParams();
-            Map<String, String> secureParams = createRandomParams();
+            Parameters parameters = new Parameters()
+                    .addParameter("param1", "value1")
+                    .addParameter("param2", "value2")
+                    .addSecureParameter("secureParam1", "secureValue1")
+                    .addSecureParameter("secureParam2", "secureValue2");
 
             ((CreateScheduleForm) __initDiscProjectDetailPage()
                     .openCreateScheduleForm()
-                    .addParameters(params)
-                    .addSecureParameters(secureParams))
+                    .addParameters(parameters.getParameters())
+                    .addSecureParameters(parameters.getSecureParameters()))
                     .schedule();
 
             __ScheduleDetailFragment scheduleDetail = __ScheduleDetailFragment.getInstance(browser);
-            assertEquals(scheduleDetail.getAllParametersInfo(), params);
+            assertEquals(scheduleDetail.getAllParametersInfo(), parameters.getParameters());
 
             Map<String, String> actualSecureParams = scheduleDetail.getAllSecureParametersInfo();
-            assertEquals(actualSecureParams.keySet(), secureParams.keySet());
+            assertEquals(actualSecureParams.keySet(), parameters.getSecureParameters().keySet());
             assertTrue(actualSecureParams.values().stream().allMatch(value -> value.equals("")),
                     "Secure value is not hidden!");
 
@@ -312,13 +315,5 @@ public class CreateScheduleTest extends __AbstractDISCTest {
         } finally {
             deteleProcess(getGoodDataClient(), process);
         }
-    }
-
-    @SuppressWarnings("serial")
-    private Map<String, String> createRandomParams() {
-        return new HashMap<String, String>() {{
-            put("param" + generateHashString(), "value" + generateHashString());
-            put("param" + generateHashString(), "value" + generateHashString());
-        }};
     }
 }

@@ -17,6 +17,10 @@ public enum ResourceDirectory {
         this.name = name;
     }
 
+    public String getPath() {
+        return "/" + name + "/";
+    }
+
     @Override
     public String toString() {
         return name;

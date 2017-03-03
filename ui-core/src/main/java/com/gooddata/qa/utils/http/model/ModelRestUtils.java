@@ -85,12 +85,7 @@ public final class ModelRestUtils {
         throw new NoSuchElementException("Dataset element not found!");
     }
 
-    private static JSONObject getProjectModelView(final RestApiClient restApiClient, final String projectId) 
-            throws ParseException, JSONException, IOException {
-        return getProjectModelViewByModelLink(restApiClient, format(PROJECT_MODEL_VIEW_LINK, projectId));
-    }
-
-    private static JSONObject getDatasetModelView(final RestApiClient restApiClient, final String projectId,
+    public static JSONObject getDatasetModelView(final RestApiClient restApiClient, final String projectId,
             final String dataset) throws ParseException, JSONException, IOException {
         final JSONArray datasets = getProjectModelView(restApiClient, projectId)
                 .getJSONObject("projectModelView")
@@ -105,6 +100,11 @@ public final class ModelRestUtils {
             return object;
         }
         throw new NoSuchElementException("Dataset json object not found!");
+    }
+
+    private static JSONObject getProjectModelView(final RestApiClient restApiClient, final String projectId) 
+            throws ParseException, JSONException, IOException {
+        return getProjectModelViewByModelLink(restApiClient, format(PROJECT_MODEL_VIEW_LINK, projectId));
     }
 
     private static JSONObject getProjectModelViewByModelLink(final RestApiClient restApiClient,

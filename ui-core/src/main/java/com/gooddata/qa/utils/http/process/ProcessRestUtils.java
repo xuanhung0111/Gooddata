@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 
 import com.gooddata.GoodData;
 import com.gooddata.dataload.processes.DataloadProcess;
+import com.gooddata.dataload.processes.ProcessExecution;
 import com.gooddata.dataload.processes.ProcessExecutionDetail;
 import com.gooddata.qa.utils.http.RestApiClient;
 
@@ -83,6 +84,13 @@ public final class ProcessRestUtils {
         final String pollingUri = createProcessExecution(HttpStatus.CREATED, restApiClient, executionUri, executable, params);
         log.info("Execution polling uri: " + pollingUri);
         return pollingUri;
+    }
+
+    public static ProcessExecutionDetail executeProcess(GoodData goodData, DataloadProcess process, String executable,
+            Map<String, String> params, Map<String, String> secureParams) {
+        return goodData.getProcessService()
+                .executeProcess(new ProcessExecution(process, executable, params, secureParams))
+                .get();
     }
 
     /**
