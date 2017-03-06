@@ -37,7 +37,7 @@ public class __LongRunTimeTest extends __AbstractDISCTest {
     }
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "executableProvider")
-    public void autoExecuteWithSuccessfulGraph(__Executable executable, String status) {
+    public void autoExecuteSchedule(__Executable executable, String status) {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
@@ -218,13 +218,15 @@ public class __LongRunTimeTest extends __AbstractDISCTest {
         try {
             Schedule schedule1 = createSchedule(process1, __Executable.SUCCESSFUL_GRAPH,
                     __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
-            Schedule schedule2 = createSchedule(process1, __Executable.SUCCESSFUL_GRAPH, schedule1);
-            Schedule schedule3 = createSchedule(process2, __Executable.ERROR_GRAPH, schedule2);
+            Schedule schedule2 = createSchedule(process1, "Schedule2", __Executable.SUCCESSFUL_GRAPH, schedule1);
+            Schedule schedule3 = createSchedule(process2, "Schedule3", __Executable.ERROR_GRAPH, schedule2);
 
-            initScheduleDetail(schedule1).executeSchedule().waitForExecutionFinish();
-            initScheduleDetail(schedule2).waitForAutoExecute(LocalTime.now()).waitForExecutionFinish();
+            initScheduleDetail(schedule1).executeSchedule().close();
+            projectDetailPage.getProcess(process1.getName()).openSchedule(schedule2.getName())
+                    .waitForAutoExecute(LocalTime.now()).close();
 
-            __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule3)
+            __ScheduleDetailFragment scheduleDetail = projectDetailPage.getProcess(process2.getName())
+                    .openSchedule(schedule3.getName())
                     .waitForAutoExecute(LocalTime.now())
                     .waitForExecutionFinish();
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);

@@ -102,7 +102,9 @@ public class __OverviewPageTest extends __AbstractDISCTest {
             Schedule schedule = createSchedule(process, executable, __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             __ScheduleDetailFragment scheduleDetailFragment = initScheduleDetail(schedule).executeSchedule();
-            if (state != OverviewState.RUNNING) {
+            if (state == OverviewState.RUNNING) {
+                scheduleDetailFragment.waitForStatus(ScheduleStatus.RUNNING);
+            } else {
                 scheduleDetailFragment.waitForExecutionFinish();
             }
 
@@ -229,7 +231,7 @@ public class __OverviewPageTest extends __AbstractDISCTest {
             Schedule schedule = createSchedule(process, __Executable.LONG_TIME_RUNNING_GRAPH,
                     __ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            initScheduleDetail(schedule).executeSchedule();
+            initScheduleDetail(schedule).executeSchedule().waitForStatus(ScheduleStatus.RUNNING);
 
             __initDiscOverviewPage()
                     .selectState(OverviewState.RUNNING)

@@ -25,6 +25,7 @@ import org.testng.annotations.Test;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.qa.graphene.disc.common.__AbstractDISCTest;
+import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
 import com.gooddata.qa.graphene.enums.disc.__Executable;
 import com.gooddata.qa.graphene.enums.disc.__ScheduleCronTime;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
@@ -70,14 +71,12 @@ public class __ProjectsPageTest extends __AbstractDISCTest {
 
             __ScheduleDetailFragment scheduleDetail = initScheduleDetail(schedule);
 
-            if(filterOption == FilterOption.DISABLED) {
+            if (filterOption == FilterOption.DISABLED) {
                 scheduleDetail.disableSchedule();
-
+            } else if (filterOption == FilterOption.RUNNING) {
+                scheduleDetail.executeSchedule().waitForStatus(ScheduleStatus.RUNNING);
             } else {
-                scheduleDetail.executeSchedule();
-                if (filterOption != FilterOption.RUNNING) {
-                    scheduleDetail.waitForExecutionFinish();
-                }
+                scheduleDetail.executeSchedule().waitForExecutionFinish();
             }
 
             __initDiscProjectsPage().selectFilterOption(filterOption);
