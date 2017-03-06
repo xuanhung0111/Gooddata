@@ -30,6 +30,7 @@ import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
+import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static org.testng.Assert.assertFalse;
 
 import com.gooddata.qa.utils.http.rolap.RolapRestUtils;
@@ -39,7 +40,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.UUID;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.ParseException;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -255,7 +255,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     public void setupMaql(String maqlPath) throws JSONException, IOException {
         getGoodDataClient()
                 .getModelService()
-                .updateProjectModel(getProject(), IOUtils.toString(getClass().getResource(maqlPath)))
+                .updateProjectModel(getProject(), getResourceAsString(maqlPath))
                 .get();
     }
 

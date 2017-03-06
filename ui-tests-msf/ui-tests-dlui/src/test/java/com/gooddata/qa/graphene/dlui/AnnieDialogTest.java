@@ -33,16 +33,15 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.ADSTables;
 import com.gooddata.qa.graphene.AdditionalDatasets;
-import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.entity.dlui.DataSource;
 import com.gooddata.qa.graphene.entity.dlui.Dataset;
 import com.gooddata.qa.graphene.entity.dlui.Field;
 import com.gooddata.qa.graphene.entity.dlui.Field.FieldStatus;
 import com.gooddata.qa.graphene.entity.dlui.Field.FieldTypes;
 import com.gooddata.qa.graphene.enums.ObjectTypes;
-import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.AnnieUIDialogFragment;
+import com.gooddata.qa.graphene.fragments.disc.schedule.DatasetDropdown;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.utils.ads.AdsHelper;
 import com.gooddata.qa.utils.graphene.Screenshots;
@@ -455,27 +454,19 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, priority = 1)
     public void addNewDataWithCSVUploader() throws JSONException, IOException {
-        try {
-            uploadCSV(getFilePathFromResource("/" + PAYROLL_CSV + "/payroll.csv"));
-            addMultiFieldsAndAssertAnnieDialog(UserRoles.ADMIN);
-            initManagePage();
-            assertThat(ObjectsTable.getInstance(id(ObjectTypes.DATA_SETS.getObjectsTableID()), browser).getAllItems(),
-                    containsInAnyOrder("person", "opportunity", "Payroll", "Date (Paydate)")); 
-            openProjectDetailPage(testParams.getProjectId());
-            ScheduleBuilder scheduleBuilder = new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
-                                    .setCronTime(ScheduleCronTimes.CRON_EVERYDAY)
-                                    .setHasDataloadProcess(true)
-                                    .setSynchronizeAllDatasets(false)
-                                    .setScheduleName("2 datasets")
-                                    .setConfirmed(true);
-            createSchedule(scheduleBuilder);
-            scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
-            scheduleDetail.openDatasetDialog();
-            assertThat(scheduleDetail.getSearchedDatasets(), containsInAnyOrder("person", "opportunity")); 
-        } finally {
-            scheduleDetail.disableSchedule();
-        }
-        
+        uploadCSV(getFilePathFromResource("/" + PAYROLL_CSV + "/payroll.csv"));
+        addMultiFieldsAndAssertAnnieDialog(UserRoles.ADMIN);
+        initManagePage();
+        assertThat(ObjectsTable.getInstance(id(ObjectTypes.DATA_SETS.getObjectsTableID()), browser).getAllItems(),
+                containsInAnyOrder("person", "opportunity", "Payroll", "Date (Paydate)"));
+
+        DatasetDropdown dropdown = openProjectDetailPage()
+                .openCreateScheduleForm()
+                .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
+                .selectCustomDatasetsOption()
+                .getDatasetDropdown()
+                .expand();
+        assertThat(dropdown.getAvailableDatasets(), containsInAnyOrder("person", "opportunity")); 
     }
 
     @AfterClass(alwaysRun = true)

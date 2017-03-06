@@ -1,255 +1,272 @@
 package com.gooddata.qa.graphene.disc;
 
-import static com.gooddata.qa.utils.http.RestUtils.getResource;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.utils.http.process.ProcessRestUtils.deteleProcess;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
-import java.io.IOException;
-import java.util.Calendar;
+import java.time.LocalTime;
 
-import org.apache.http.ParseException;
-import org.json.JSONException;
-import org.springframework.http.HttpStatus;
-
-import javax.mail.MessagingException;
-
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.entity.disc.NotificationBuilder;
-import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
-import com.gooddata.qa.graphene.enums.disc.DeployPackages;
-import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.graphene.enums.disc.NotificationEvents;
-import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
-import com.gooddata.qa.graphene.enums.disc.ProjectStateFilters;
-import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
-import com.gooddata.qa.utils.mail.ImapClient;
+import com.gooddata.GoodData;
+import com.gooddata.dataload.processes.DataloadProcess;
+import com.gooddata.dataload.processes.Schedule;
+import com.gooddata.qa.graphene.disc.common.AbstractDiscTest;
+import com.gooddata.qa.graphene.entity.disc.NotificationRule;
+import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
+import com.gooddata.qa.graphene.enums.disc.schedule.Executable;
+import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleCronTime;
+import com.gooddata.qa.graphene.fragments.disc.notification.NotificationRuleItem;
+import com.gooddata.qa.graphene.fragments.disc.notification.NotificationRuleItem.NotificationEvent;
+import com.gooddata.qa.graphene.fragments.disc.overview.OverviewPage.OverviewState;
+import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
+import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
+import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
+import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail.Tab;
+import com.gooddata.qa.graphene.fragments.disc.projects.ProjectsPage.FilterOption;
+import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
+import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 
-public class SanityTest extends AbstractOverviewProjectsTest {
+public class SanityTest extends AbstractDiscTest {
 
-    @BeforeClass
-    public void initProperties() {
-        projectTitle = "Disc-test-sanity";
-        imapHost = testParams.loadProperty("imap.host");
-        imapUser = testParams.loadProperty("imap.user");
-        imapPassword = testParams.loadProperty("imap.password");
+    @Test(dependsOnGroups = {"createProject"})
+    public void deployProcessInProjectsPage() {
+        String processName = generateProcessName();
+
+        initDiscProjectsPage()
+                .markProjectCheckbox(projectTitle)
+                .deployProcessWithZipFile(processName, ProcessType.CLOUD_CONNECT, PackageFile.BASIC.loadFile());
+        assertTrue(initDiscProjectDetailPage().hasProcess(processName), "Process is not deployed");
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"deploy"})
-    public void deployCloudConnectInProjectsPage() {
-        try {
-            deployInProjectsPage(DeployPackages.CLOUDCONNECT, "CloudConnect - Projects List Page",
-                    testParams.getProjectId());
-        } finally {
-            cleanProcessesInWorkingProject();
-        }
+    @Test(dependsOnGroups = {"createProject"})
+    public void deployProcessInProjectDetailPage() {
+        String processName = generateProcessName();
+
+        initDiscProjectDetailPage()
+                .deployProcessWithZipFile(processName, ProcessType.CLOUD_CONNECT, PackageFile.BASIC.loadFile());
+        assertTrue(projectDetailPage.hasProcess(processName), "Process is not deployed");
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"deploy"})
-    public void deployCloudConnectInProjectDetailPage() {
-        try {
-            openProjectDetailPage(testParams.getProjectId());
-            deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, "CloudConnect - Project Detail Page");
-        } finally {
-            cleanProcessesInWorkingProject();
-        }
-    }
-
-    @Test(dependsOnGroups = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnGroups = {"createProject"})
     public void redeployProcessWithDifferentPackage() {
+        String processName = generateProcessName();
+
+        initDiscProjectDetailPage()
+                .deployProcessWithZipFile(processName, ProcessType.CLOUD_CONNECT, PackageFile.BASIC.loadFile());
+        assertTrue(projectDetailPage.hasProcess(processName), "Process is not deployed");
+
+        ProcessDetail process = projectDetailPage.getProcess(processName);
+        assertEquals(process.getTabTitle(Tab.EXECUTABLE), "4 graphs total");
+
+        process.redeployWithZipFile(processName, ProcessType.CLOUD_CONNECT, PackageFile.ONE_GRAPH.loadFile());
+        assertTrue(process.getTabTitle(Tab.EXECUTABLE).matches("1 graphs? total"));
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void createSchedule() {
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
+
         try {
-            openProjectDetailPage(testParams.getProjectId());
-            String processName = "Redeploy process with different package";
-            deployInProjectDetailPage(DeployPackages.EXECUTABLES_GRAPH, processName);
-            redeployProcess(processName, DeployPackages.CLOUDCONNECT, processName);
+            ((CreateScheduleForm) initDiscProjectDetailPage()
+                    .openCreateScheduleForm()
+                    .selectExecutable(Executable.SUCCESSFUL_GRAPH))
+                    .schedule();
+            assertTrue(projectDetailPage.getProcess(process.getName())
+                    .hasSchedule(Executable.SUCCESSFUL_GRAPH.getName()),
+                    "Schedule is not created");
+
         } finally {
-            cleanProcessesInWorkingProject();
+            deteleProcess(getGoodDataClient(), process);
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"schedule"})
-    public void createAndAssertSchedule() {
-        try {
-            openProjectDetailPage(testParams.getProjectId());
+    @Test(dependsOnGroups = {"createProject"})
+    public void executeSchedule() {
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
-            String processName = "Create Schedule with Custom Input";
-            deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
-            ScheduleBuilder scheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.DWHS2)
-                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
-            createAndAssertSchedule(scheduleBuilder);
+        try {
+            Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
+                    .executeSchedule().waitForExecutionFinish();
+
+            assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
+            assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
+                    ScheduleStatus.OK.toString());
+
         } finally {
-            cleanProcessesInWorkingProject();
+            deteleProcess(getGoodDataClient(), process);
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"schedule"})
-    public void checkManualExecution() {
-        try {
-            openProjectDetailPage(testParams.getProjectId());
-
-            String processName = "Check Manual Execution";
-            ScheduleBuilder scheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.SUCCESSFUL_GRAPH)
-                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
-            prepareScheduleWithBasicPackage(scheduleBuilder);
-
-            scheduleDetail.manualRun();
-            assertSuccessfulExecution();
-            assertLastExecutionDetail();
-            assertTrue(scheduleDetail.isLastExecutionManualIconDisplay());
-        } finally {
-            cleanProcessesInWorkingProject();
-        }
-    }
-
-    /**
-     * this testcase is used to check that a ruby process could be executed well in DISC.
-     * @throws IOException 
-     * @throws ParseException 
-     */
-    @Test(dependsOnGroups = {"createProject"}, groups = {"schedule"})
-    public void checkRubyExecution() throws ParseException, IOException, JSONException {
-        logout();
-        if (useDynamicUser) {
-            signInAtGreyPages(testParams.getDomainUser(), testParams.getPassword());
+    @Test(dependsOnGroups = {"createProject"})
+    public void checkRubyExecution() {
+        GoodData goodData = null;
+        if (testParams.getDomainUser() != null) {
+            goodData = getGoodDataClient(testParams.getDomainUser(), testParams.getPassword());
         } else {
-            signInAtGreyPages(testParams.getUser(), testParams.getPassword());
+            goodData = getGoodDataClient();
         }
+
+        DataloadProcess process = createProcess(goodData, generateProcessName(), PackageFile.RUBY,
+                ProcessType.RUBY_SCRIPTS);
+
         try {
-            openProjectDetailPage(testParams.getProjectId());
+            Schedule schedule = createSchedule(goodData, process, Executable.RUBY_SCRIPT_3,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            String processName = "Check Ruby Execution";
-            ScheduleBuilder scheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.RUBY3)
-                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
-            prepareScheduleWithBasicPackage(scheduleBuilder);
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
+                    .executeSchedule().waitForExecutionFinish();
 
-            scheduleDetail.manualRun();
-            assertSuccessfulExecution();
-            assertTrue(scheduleDetail.isLastExecutionManualIconDisplay());
-            assertThat(getResource(getRestApiClient(), scheduleDetail.getLastExecutionLogLink(), HttpStatus.OK),
-                    containsString("Hello World"));
+            assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
+            assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
+                    ScheduleStatus.OK.toString());
+
         } finally {
-            cleanProcessesInWorkingProject();
-            logoutAndLoginAs(true, UserRoles.ADMIN);
+            deteleProcess(goodData, process);
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"schedule"})
-    public void checkScheduleAutoRun() {
+    @Test(dependsOnGroups = {"createProject"})
+    public void autoExecuteSchedule() {
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
+
         try {
-            openProjectDetailPage(testParams.getProjectId());
+            LocalTime autoExecutionStartTime = LocalTime.now().plusMinutes(2);
+            Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
+                    parseTimeToCronExpression(autoExecutionStartTime));
 
-            String processName = "Check Auto Run Schedule";
-            ScheduleBuilder scheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.SUCCESSFUL_GRAPH)
-                            .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR).setMinuteInHour("${minute}");
-            prepareScheduleWithBasicPackage(scheduleBuilder);
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
+                    .waitForAutoExecute(autoExecutionStartTime)
+                    .waitForExecutionFinish();
 
-            assertTrue(scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder()),
-                    "Schedule is not run automatically well!");
-            assertSuccessfulExecution();
+            assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
+            assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
+                    ScheduleStatus.OK.toString());
+
         } finally {
-            cleanProcessesInWorkingProject();
+            deteleProcess(getGoodDataClient(), process);
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"notification"})
-    public void createAndAssertNotification() throws MessagingException {
-        openProjectDetailPage(testParams.getProjectId());
-        String processName = "Check Notification";
+    @Test(dependsOnGroups = {"createProject"})
+    public void createNotificationRule() {
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
+
         try {
-            deployInProjectDetailPage(DeployPackages.BASIC, processName);
+            ProcessDetail processDetail = initDiscProjectDetailPage().getProcess(process.getName());
 
-            final String subject = "Notification Subject_" + Calendar.getInstance().getTime();
-            String message = "Notification message.";
+            final NotificationRule notificationRule = new NotificationRule()
+                    .withEmail(testParams.getUser())
+                    .withEvent(NotificationEvent.SUCCESS)
+                    .withSubject("Subject " + generateHashString())
+                    .withMessage("Message " + generateHashString());
 
-            NotificationBuilder notificationInfo =
-                    new NotificationBuilder().setProcessName(processName).setEmail(imapUser).setSubject(subject)
-                            .setMessage(message).setEvent(NotificationEvents.SUCCESS);
-            createAndAssertNotification(notificationInfo);
+            processDetail.openNotificationRuleDialog()
+                    .createNotificationRule(notificationRule)
+                    .closeDialog();
 
-            openProjectDetailPage(testParams.getProjectId());
-            browser.navigate().refresh();
-            ScheduleBuilder scheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.SUCCESSFUL_GRAPH)
-                            .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR);
-            createSchedule(scheduleBuilder);
-            scheduleDetail.manualRun();
-            assertSuccessfulExecution();
+            NotificationRuleItem notifyItem = processDetail.openNotificationRuleDialog()
+                    .getLastNotificationRuleItem()
+                    .expand();
 
-            final ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword);
-            getNotification(imapClient, subject);
+            assertEquals(notifyItem.getEmail(), notificationRule.getEmail());
+            assertEquals(notifyItem.getEvent(), notificationRule.getEvent());
+            assertEquals(notifyItem.getSubject(), notificationRule.getSubject());
+            assertEquals(notifyItem.getMessage(), notificationRule.getMessage());
+
         } finally {
-            cleanProcessesInWorkingProject();
+            deteleProcess(getGoodDataClient(), process);
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"project-overview"})
-    public void checkFailedOverviewNumber() {
+    @DataProvider(name = "specificStatesProvider")
+    public Object[][] getSpecificStatesProvider() {
+        return new Object[][] {
+            {OverviewState.FAILED, Executable.ERROR_GRAPH},
+            {OverviewState.SUCCESSFUL, Executable.SUCCESSFUL_GRAPH},
+            {OverviewState.RUNNING, Executable.LONG_TIME_RUNNING_GRAPH},
+        };
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "specificStatesProvider")
+    public void checkOverviewSpecificState(OverviewState state, Executable executable) {
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
+
         try {
-            checkOverviewStateNumber(OverviewProjectStates.FAILED);
+            Schedule schedule = createSchedule(process, executable, ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+
+            ScheduleDetail scheduleDetailFragment = initScheduleDetail(schedule).executeSchedule();
+            if (state == OverviewState.RUNNING) {
+                scheduleDetailFragment.waitForStatus(ScheduleStatus.RUNNING);
+            } else {
+                scheduleDetailFragment.waitForExecutionFinish();
+            }
+
+            initDiscOverviewPage().selectState(state);
+            takeScreenshot(browser, "State-" + state + "-shows-correctly", getClass());
+            assertEquals(overviewPage.getStateNumber(state), 1);
+
         } finally {
-            cleanProcessesInWorkingProject();
+            deteleProcess(getGoodDataClient(), process);
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"project-overview"})
-    public void checkRunningOverviewNumber() {
+    @DataProvider(name = "filterProvider")
+    public Object[][] getFilterProvider() {
+        return new Object[][] {
+            {FilterOption.SUCCESSFUL, Executable.SUCCESSFUL_GRAPH},
+            {FilterOption.FAILED, Executable.ERROR_GRAPH},
+            {FilterOption.RUNNING, Executable.LONG_TIME_RUNNING_GRAPH},
+            {FilterOption.DISABLED, Executable.SUCCESSFUL_GRAPH}
+        };
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "filterProvider")
+    public void checkProjectFilterWorkCorrectly(FilterOption filterOption, Executable executable) {
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
+
         try {
-            checkOverviewStateNumber(OverviewProjectStates.RUNNING);
+            Schedule schedule = createSchedule(process, executable, ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+
+            if (filterOption == FilterOption.DISABLED) {
+                scheduleDetail.disableSchedule();
+            } else if (filterOption == FilterOption.RUNNING) {
+                scheduleDetail.executeSchedule().waitForStatus(ScheduleStatus.RUNNING);
+            } else {
+                scheduleDetail.executeSchedule().waitForExecutionFinish();
+            }
+
+            initDiscProjectsPage().selectFilterOption(filterOption);
+            takeScreenshot(browser, "Filter-" + filterOption + "-work-correctly", getClass());
+            assertTrue(projectsPage.hasProject(projectTitle), "Filter " + filterOption + " not work properly");
+
+            projectsPage.selectFilterOption(FilterOption.UNSCHEDULED);
+
+            if (filterOption == FilterOption.DISABLED) {
+                assertTrue(projectsPage.hasProject(projectTitle), "Filter " + filterOption + " not work properly");
+            } else {
+                assertFalse(projectsPage.hasProject(projectTitle), "Filter " + filterOption + " not work properly");
+            }
+
         } finally {
-            cleanProcessesInWorkingProject();
+            deteleProcess(getGoodDataClient(), process);
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"project-overview"})
-    public void checkSuccessfulOverviewNumber() {
-        try {
-            checkOverviewStateNumber(OverviewProjectStates.SUCCESSFUL);
-        } finally {
-            cleanProcessesInWorkingProject();
-        }
-    }
+    @Test(dependsOnGroups = {"createProject"})
+    public void searchProject() {
+        initDiscProjectsPage().searchProject(projectTitle);
+        assertTrue(projectsPage.hasProject(projectTitle), "Project not found");
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"projects-page"})
-    public void checkFailedProjectsFilterOption() {
-        try {
-            checkProjectsFilter(ProjectStateFilters.FAILED);
-        } finally {
-            cleanProcessesInWorkingProject();
-        }
-    }
-
-    @Test(dependsOnGroups = {"createProject"}, groups = {"projects-page"})
-    public void checkSuccessfulProjectsFilterOptions() {
-        try {
-            checkProjectsFilter(ProjectStateFilters.SUCCESSFUL);
-        } finally {
-            cleanProcessesInWorkingProject();
-        }
-    }
-
-    @Test(dependsOnGroups = {"createProject"}, groups = {"projects-page"})
-    public void checkRunningProjectsFilterOptions() {
-        try {
-            checkProjectsFilter(ProjectStateFilters.RUNNING);
-        } finally {
-            cleanProcessesInWorkingProject();
-        }
-    }
-
-    @Test(dependsOnGroups = {"createProject"}, groups = {"projects-page"})
-    public void checkSearchProjectByName() {
-        checkSearchWorkingProjectByName();
-    }
-
-    @Test(dependsOnGroups = {"createProject"}, groups = {"projects-page"})
-    public void checkSearchProjectById() {
-        checkSearchWorkingProjectById();
+        initDiscProjectsPage().searchProject(testParams.getProjectId());
+        assertTrue(projectsPage.hasProject(projectTitle), "Project not found");
     }
 }
