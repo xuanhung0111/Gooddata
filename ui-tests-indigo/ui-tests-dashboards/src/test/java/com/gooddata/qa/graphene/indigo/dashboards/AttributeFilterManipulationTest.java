@@ -1,23 +1,34 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.*;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFiltersPanel;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
 import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.interactions.Actions;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.*;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRIORITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
 import static java.lang.String.join;
 import static java.util.Collections.singletonList;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 public class AttributeFilterManipulationTest extends GoodSalesAbstractDashboardTest {
 
@@ -215,5 +226,20 @@ public class AttributeFilterManipulationTest extends GoodSalesAbstractDashboardT
             IndigoRestUtils.deleteAttributeFilterIfExist(getRestApiClient(), testParams.getProjectId(),
                     getAttributeDisplayFormUri(ATTR_PRIORITY));
         }
+    }
+
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    public void cancelAttributeFilterDrag() {
+        initIndigoDashboardsPageWithWidgets().switchToEditMode();
+        Dimension bodySize = indigoDashboardsPage.getDashboardBodySize();
+        new Actions(browser).dragAndDropBy(indigoDashboardsPage.getAttributeFiltersPanel()
+                .getAttributeFilter(ATTR_ACCOUNT).getRoot(), bodySize.getWidth() / 2, bodySize.getHeight() / 2)
+                .perform();
+
+        indigoDashboardsPage.selectFirstWidget(Kpi.class);
+        assertTrue(indigoDashboardsPage.getAttributeFiltersPanel().isFilterVisible(ATTR_ACCOUNT));
+        assertTrue(indigoDashboardsPage.getConfigurationPanel().getFilterByAttributeFilters().stream()
+                .anyMatch(e -> e.getTitle().equals(ATTR_ACCOUNT)), "Selected kpi is not applied attribute filter");
+
     }
 }

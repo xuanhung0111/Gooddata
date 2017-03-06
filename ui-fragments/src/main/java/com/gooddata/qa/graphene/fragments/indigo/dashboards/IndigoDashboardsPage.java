@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -425,6 +426,14 @@ public class IndigoDashboardsPage extends AbstractFragment {
         waitForElementVisible(className("add-item-panel"), browser);
 
         return isElementVisible(cssSelector(ADD_ATTRIBUTE_FILTER_PLACEHOLDER), browser);
+    }
+
+    public boolean hasAttributeFilterTrash() {
+        return isElementVisible(cssSelector(DELETE_DROPZONE), browser);
+    }
+
+    public Dimension getDashboardBodySize() {
+        return waitForElementVisible(cssSelector(DASHBOARD_BODY), browser).getSize();
     }
 
     private IndigoDashboardsPage waitForWidgetsEditable() {
