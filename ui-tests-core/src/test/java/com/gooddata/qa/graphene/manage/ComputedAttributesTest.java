@@ -35,8 +35,6 @@ import java.util.stream.Collectors;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -65,12 +63,6 @@ import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 
 public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
-    @FindBy(css = ".s-attributeBucketName")
-    private WebElement attributeBucketName;
-
-    @FindBy(css = ".modelThumbContentImage")
-    private WebElement modelImage;
-
     private static final String COMPUTED_ATTRIBUTE_NAME = "A Sales Rep Ranking";
     private static final String REPORT_NAME = "Computed Attribute Report";
     private static final String CA_VARIABLE_REPORT_NAME = "Computed Attribute Report with Variable";
@@ -97,7 +89,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             description = "AQE-1684 starjoin_failed when create compute attribute based on complex metric")
     public void testComputedAttributeInComplexMetric() {
         final String computedAttr = "AQE-1684";
-        initAttributePage().createComputedAttribute(
+        initAttributePage().moveToCreateAttributePage().createComputedAttribute(
                 new ComputedAttributeDefinition()
                     .withAttribute(ATTR_STAGE_NAME)
                     .withMetric(METRIC_EXPECTED_PERCENT_OF_GOAL)
@@ -125,8 +117,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
                 By.cssSelector(String.format(".s-title-%s a", CssUtils.simplifyText(COMPUTED_ATTRIBUTE_NAME)));
         assertTrue(browser.findElements(computedAttributeItem).isEmpty());
 
-        AttributePage.getInstance(browser).createComputedAttribute(DEFINITION);
-        waitForElementVisible(attributeBucketName);
+        AttributePage.getInstance(browser).moveToCreateAttributePage().createComputedAttribute(DEFINITION);
         Screenshots.takeScreenshot(browser, "computed-attribute-details-page", this.getClass());
 
         List<String> expectedBucketNames = Arrays.asList("Poor", "Good", "Great", "Best");
@@ -171,13 +162,8 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         Screenshots.takeScreenshot(browser, "attribute-list", this.getClass());
 
         initModelPage();
-        String src = modelImage.getAttribute("src");
-        for (int i = 0; i < 10 && src.equals(""); i++) {
-            sleepTight(1000);
-            src = modelImage.getAttribute("src");
-        }
-        // time for the ldm image loaded from src.
-        sleepTight(4000);
+        waitForDataModelImageDisplayed();
+
         Screenshots.takeScreenshot(browser, "project-model", this.getClass());
 
         verifyLDMModelProject(33320);
@@ -427,10 +413,13 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         String metric = createMetric("New-metric", expression, "#,##0").getTitle();
 
         final String computedAttribute = "Computed-Attribute";
-        final String attributeUri = initAttributePage().createComputedAttribute(new ComputedAttributeDefinition()
-                .withName(computedAttribute)
-                .withAttribute(ATTR_STAGE_NAME)
-                .withMetric(metric));
+        final String attributeUri = initAttributePage()
+                .moveToCreateAttributePage()
+                .createComputedAttribute(new ComputedAttributeDefinition()
+                        .withName(computedAttribute)
+                        .withAttribute(ATTR_STAGE_NAME)
+                        .withMetric(metric))
+                .getAttributeUri();
 
         try {
             createReport(new UiReportDefinition()
@@ -448,6 +437,10 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     @Override
     protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
         createAndAddUserToProject(UserRoles.EDITOR);
+    }
+
+    private void waitForDataModelImageDisplayed() {
+        waitForElementVisible(By.className("modelThumbContentImage"), browser);
     }
 
     // check that delete button is disabled and that there's expected explanation message

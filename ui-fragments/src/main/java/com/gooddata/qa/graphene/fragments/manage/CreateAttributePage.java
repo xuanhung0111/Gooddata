@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertEquals;
 
@@ -54,9 +53,9 @@ public class CreateAttributePage extends AbstractFragment {
 
     private static final By bucketToLocator = By.cssSelector(".row-item .bucket-range input");
 
-    private static final By attributeBucketNameLocator = By.cssSelector(".s-attributeBucketName");
+    private static final By attributeBucketNameLocator = By.className("s-attributeBucketName");
 
-    private static final By attributeBucketRangeLocator = By.cssSelector(".s-attributeBucketRange");
+    private static final By attributeBucketRangeLocator = By.className("s-attributeBucketRange");
 
     public static final CreateAttributePage getInstance(SearchContext context) {
         return Graphene.createPageFragment(CreateAttributePage.class, waitForElementVisible(id("p-objectPage"), context));
@@ -80,11 +79,9 @@ public class CreateAttributePage extends AbstractFragment {
         return this;
     }
 
-    public String createComputedAttribute(ComputedAttributeDefinition definition) {
+    public AttributeDetailPage createComputedAttribute(ComputedAttributeDefinition definition) {
         fillInComputedAttributeForm(definition).submit();
-        waitForElementNotPresent(submitButton);
-
-        return AttributeDetailPage.getInstance(browser).waitForCreatingComputedAttribute().getAttributeUri();
+        return AttributeDetailPage.getInstance(browser).waitForCreatingComputedAttribute();
     }
 
     public CreateAttributePage selectAttribute(String name) {
@@ -118,8 +115,9 @@ public class CreateAttributePage extends AbstractFragment {
         waitForElementVisible(submitButton).click();
     }
 
-    public void cancel() {
+    public AttributePage cancel() {
         waitForElementVisible(backDataPageLink).click();
+        return AttributePage.getInstance(browser);
     }
 
     public void checkCreatedComputedAttribute(String attributeName, List<String> expectedBucketNames, List<String> expectedBucketRanges) {

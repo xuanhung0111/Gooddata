@@ -276,7 +276,8 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
 
         // below code is the only way to create an attribute which has long name for now
         // renaming existing one is not a recommended option.
-        initAttributePage().createComputedAttribute(new ComputedAttributeDefinition().withName(longNameAttribute)
+        initAttributePage().moveToCreateAttributePage()
+                .createComputedAttribute(new ComputedAttributeDefinition().withName(longNameAttribute)
                 .withAttribute(ATTR_SALES_REP).withMetric(METRIC_NUMBER_OF_WON_OPPS)
                 .withBucket(new ComputedAttributeDefinition.AttributeBucket(0, "Poor", "120"))
                 .withBucket(new ComputedAttributeDefinition.AttributeBucket(1, "Good", "200"))
