@@ -7,15 +7,12 @@ import static org.openqa.selenium.By.cssSelector;
 
 import java.util.stream.Stream;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.common.AbstractReactDropDown;
 
 public class AttributeFilter extends AbstractReactDropDown {
-
-    private static By APPLY_BUTTON_SELECTOR =  cssSelector("button.s-apply_button");
 
     @FindBy(className = "button-title")
     private WebElement buttonTitle;
@@ -41,7 +38,7 @@ public class AttributeFilter extends AbstractReactDropDown {
     public AttributeFilter selectByNames(String... names) {
         Stream.of(names).forEach(name -> {
             selectByName(name);
-            waitForElementVisible(APPLY_BUTTON_SELECTOR, browser).click();
+            apply();
         });
         return this;
     }
@@ -49,7 +46,7 @@ public class AttributeFilter extends AbstractReactDropDown {
     public void selectAllValues() {
         ensureDropdownOpen();
         waitForElementVisible(className("s-select_all"), browser).click();
-        waitForElementVisible(APPLY_BUTTON_SELECTOR, browser).click();
+        apply();
     }
 
     public AttributeFilter clearAllCheckedValues() {
@@ -79,6 +76,10 @@ public class AttributeFilter extends AbstractReactDropDown {
     public boolean isActive() {
         return waitForElementPresent(cssSelector(getDropdownButtonCssSelector()), getRoot()).getAttribute("class")
                 .contains("is-active");
+    }
+
+    public void apply() {
+        waitForElementVisible(cssSelector("button.s-apply_button"), browser).click();
     }
 
     @Override
