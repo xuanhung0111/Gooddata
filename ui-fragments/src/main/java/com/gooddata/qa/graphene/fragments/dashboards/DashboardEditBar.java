@@ -137,7 +137,7 @@ public class DashboardEditBar extends AbstractFragment {
         waitForElementVisible(webContentButton).click();
         waitForElementVisible(By.className("addUrl"), browser).sendKeys(urlOrEmbedCode);
 
-        WebElement saveButton = waitForElementVisible(By.cssSelector(".c-addUrlDialog .s-btn-save"), browser);
+        WebElement saveButton = waitForElementVisible(By.cssSelector(".c-addLinkDialog .s-btn-save"), browser);
         saveButton.click();
         waitForElementNotPresent(saveButton);
 
