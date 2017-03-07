@@ -94,7 +94,7 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
 
         // REPORT EXPORT
         List<Part> reportAttachmentParts = ImapUtils.getAttachmentParts(reportMessages.get(0));
-        assertEquals(reportAttachmentParts.size(), 4, "Report message has correct number of attachments.");
+        assertEquals(reportAttachmentParts.size(), 3, "Report message has correct number of attachments.");
 
         Part pdfPart = findPartByContentType(reportAttachmentParts, "application/pdf");
         verifyAttachment(pdfPart, "PDF", 3200);
