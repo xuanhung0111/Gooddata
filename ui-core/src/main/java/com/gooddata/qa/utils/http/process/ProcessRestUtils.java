@@ -16,6 +16,8 @@ import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
 import com.gooddata.GoodData;
+import com.gooddata.dataload.processes.DataloadProcess;
+import com.gooddata.dataload.processes.ProcessExecution;
 import com.gooddata.dataload.processes.ProcessExecutionDetail;
 import com.gooddata.qa.utils.http.RestApiClient;
 
@@ -27,6 +29,7 @@ public final class ProcessRestUtils {
     private static final Logger log = Logger.getLogger(ProcessRestUtils.class.getName());
 
     public static final String DATALOAD_PROCESS_TYPE = "DATALOAD";
+    public static final String PROCESS_EXECUTIONS_URI = "/gdc/projects/%s/dataload/processes/%s/executions";
 
     private ProcessRestUtils() {
     }
@@ -83,6 +86,13 @@ public final class ProcessRestUtils {
         return pollingUri;
     }
 
+    public static ProcessExecutionDetail executeProcess(GoodData goodData, DataloadProcess process, String executable,
+            Map<String, String> params, Map<String, String> secureParams) {
+        return goodData.getProcessService()
+                .executeProcess(new ProcessExecution(process, executable, params, secureParams))
+                .get();
+    }
+
     /**
      * Create process execution
      * 
@@ -112,5 +122,18 @@ public final class ProcessRestUtils {
         return responseObject.getJSONObject("executionTask")
                 .getJSONObject("links")
                 .getString("poll");
+    }
+
+    public static JSONObject getLastExecutionDetail(RestApiClient restApiClient, String projectId, String processId)
+            throws JSONException, IOException {
+        return getJsonObject(restApiClient, format(PROCESS_EXECUTIONS_URI, projectId, processId))
+                .getJSONObject("executions")
+                .getJSONArray("items")
+                .getJSONObject(0)
+                .getJSONObject("executionDetail");
+    }
+
+    public static void deteleProcess(GoodData goodDataClient, DataloadProcess process) {
+        goodDataClient.getProcessService().removeProcess(process);
     }
 }

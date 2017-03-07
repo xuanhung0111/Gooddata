@@ -1,271 +1,250 @@
 package com.gooddata.qa.graphene.disc;
 
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.utils.http.process.ProcessRestUtils.deteleProcess;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertFalse;
 
-import org.testng.annotations.BeforeClass;
+import java.time.LocalTime;
+
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
-import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
-import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
-import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail.Confirmation;
-import com.gooddata.qa.graphene.utils.Sleeper;
+import com.gooddata.dataload.processes.DataloadProcess;
+import com.gooddata.dataload.processes.Schedule;
+import com.gooddata.qa.graphene.disc.common.AbstractDiscTest;
+import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
+import com.gooddata.qa.graphene.enums.disc.schedule.Executable;
+import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleCronTime;
+import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 
-public class LongRunTimeTest extends AbstractSchedulesTest {
+public class LongRunTimeTest extends AbstractDiscTest {
 
-    private static final String FAILED_SCHEDULE_FOR_5TH_TIME_MESSAGE =
-            "This schedule has failed for the %dth time. We highly recommend disable this schedule until the issue is addressed. If you want to disable the schedule, click here or read troubleshooting article for more information.";
-    private static final String AUTO_DISABLED_SCHEDULE_MESSAGE =
-            "This schedule has been automatically disabled following its %dth consecutive failure. If you addressed the issue, you can enable it.";
-    private static final String AUTO_DISABLED_SCHEDULE_MORE_INFO =
-            "For more information read Automatic Disabling of Failed Schedules article at our support portal.";
+    private static final String DISABLE_RECOMMEND_MESSAGE = "This schedule has failed for the 5th time. "
+            + "We highly recommend disable this schedule until the issue is addressed. "
+            + "If you want to disable the schedule, click here or read troubleshooting article for more information.";
 
-    @BeforeClass(alwaysRun = true)
-    public void initProperties() {
-        projectTitle = "Disc-test-long-time-running-schedule";
+    private static final String AUTO_DISABLED_MESSAGE = "This schedule has been automatically disabled following "
+            + "its 30th consecutive failure. If you addressed the issue, you can enable it.";
+
+    @DataProvider(name = "executableProvider")
+    public Object[][] getExecutableProvider() {
+        return new Object[][] {
+            {Executable.SUCCESSFUL_GRAPH, ScheduleStatus.OK.toString()},
+            {Executable.ERROR_GRAPH, ScheduleStatus.ERROR.toString()}
+        };
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"autoRun"})
-    public void checkScheduleAutoRun() {
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "executableProvider")
+    public void autoExecuteSchedule(Executable executable, String status) {
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
+
         try {
-            openProjectDetailPage(testParams.getProjectId());
+            LocalTime autoExecutionStartTime = LocalTime.now().plusMinutes(2);
+            Schedule schedule = createSchedule(process, executable, parseTimeToCronExpression(autoExecutionStartTime));
 
-            String processName = "Check Auto Run Schedule";
-            ScheduleBuilder scheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.SUCCESSFUL_GRAPH)
-                            .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR).setMinuteInHour("${minute}");
-            prepareScheduleWithBasicPackage(scheduleBuilder);
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
+                    .waitForAutoExecute(autoExecutionStartTime)
+                    .waitForExecutionFinish();
 
-            assertTrue(scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder()),
-                    "Schedule is not run automatically well!");
-            assertSuccessfulExecution();
+            takeScreenshot(browser, "Auto-execution-triggered-successfully-with-" + executable, getClass());
+            assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
+            assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(), status);
+
         } finally {
-            cleanProcessesInWorkingProject();
+            deteleProcess(getGoodDataClient(), process);
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"autoRun"})
-    public void checkErrorExecution() {
-        try {
-            openProjectDetailPage(testParams.getProjectId());
-
-            String processName = "Check Error Execution of Schedule";
-            ScheduleBuilder scheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.FAILED_GRAPH)
-                            .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR).setMinuteInHour("${minute}");
-            prepareScheduleWithBasicPackage(scheduleBuilder);
-
-            assertTrue(scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder()),
-                    "Schedule is not run automatically well!");
-            assertFailedExecution(scheduleBuilder.getExecutable());
-        } finally {
-            cleanProcessesInWorkingProject();
-        }
-    }
-
-    @Test(dependsOnGroups = {"createProject"}, groups = {"autoRun"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkRetryExecution() {
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
+
         try {
-            openProjectDetailPage(testParams.getProjectId());
+            LocalTime autoExecutionStartTime = LocalTime.now().plusMinutes(2);
+            Schedule schedule = createSchedule(process, Executable.ERROR_GRAPH,
+                    parseTimeToCronExpression(autoExecutionStartTime));
 
-            String processName = "Check Retry Schedule";
-            ScheduleBuilder scheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.FAILED_GRAPH)
-                            .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR).setMinuteInHour("${minute}");
-            prepareScheduleWithBasicPackage(scheduleBuilder);
+            int retryInMinute = 15;
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
+                    .addRetryDelay(retryInMinute)
+                    .saveChanges()
+                    .waitForAutoExecute(autoExecutionStartTime)
+                    .waitForExecutionFinish();
 
-            scheduleBuilder.setRetryDelayInMinute(15);
-            scheduleDetail.addValidRetry(String.valueOf(scheduleBuilder.getRetryDelay()),
-                    Confirmation.SAVE_CHANGES);
-            assertEquals(scheduleDetail.getRescheduleTime(), String.valueOf(scheduleBuilder.getRetryDelay()));
-            assertTrue(scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder()),
-                    "Schedule is not run automatically well!");
-            assertFailedExecution(scheduleBuilder.getExecutable());
-            assertTrue(scheduleDetail.waitForRetrySchedule(scheduleBuilder),
-                    "Schedule is not re-run automatically well!");
-            assertFailedExecution(scheduleBuilder.getExecutable());
+            assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
+            assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
+                    ScheduleStatus.ERROR.toString());
+
+            scheduleDetail.waitForAutoExecute(LocalTime.now().plusMinutes(retryInMinute)).waitForExecutionFinish();
+            takeScreenshot(browser, "Schedule-auto-retry-after-" + retryInMinute + "-minutes", getClass());
+            assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 2);
+            assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
+                    ScheduleStatus.ERROR.toString());
+
         } finally {
-            cleanProcessesInWorkingProject();
+            deteleProcess(getGoodDataClient(), process);
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"autoRun"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkStopAutoExecution() {
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
+
         try {
-            openProjectDetailPage(testParams.getProjectId());
+            LocalTime autoExecutionStartTime = LocalTime.now().plusMinutes(2);
+            Schedule schedule = createSchedule(process, Executable.LONG_TIME_RUNNING_GRAPH,
+                    parseTimeToCronExpression(autoExecutionStartTime));
 
-            String processName = "Check Stop Auto Execution";
-            ScheduleBuilder scheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName)
-                            .setExecutable(Executables.LONG_TIME_RUNNING_GRAPH)
-                            .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR).setMinuteInHour("${minute}");
-            prepareScheduleWithBasicPackage(scheduleBuilder);
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
+                    .waitForAutoExecute(autoExecutionStartTime)
+                    .stopExecution();
 
-            assertTrue(scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder()),
-                    "Schedule is not run automatically well!");
-            /*
-             * Wait for schedule execution is in running state for a few seconds to make sure that
-             * the runtime field will be shown well
-             */
-            Sleeper.sleepTightInSeconds(5);
-            scheduleDetail.manualStop();
-            assertManualStoppedExecution();
+            takeScreenshot(browser, "Auto-execution-stopped-successfully", getClass());
+            assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
+            assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(), "MANUALLY STOPPED");
+
         } finally {
-            cleanProcessesInWorkingProject();
+            deteleProcess(getGoodDataClient(), process);
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"autoRun"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkLongTimeExecution() {
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
+
         try {
-            openProjectDetailPage(testParams.getProjectId());
+            Schedule schedule = createSchedule(process, Executable.LONG_TIME_RUNNING_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            String processName = "Check Long Time Execution";
-            ScheduleBuilder scheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName)
-                            .setExecutable(Executables.LONG_TIME_RUNNING_GRAPH)
-                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
-            prepareScheduleWithBasicPackage(scheduleBuilder);
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
+                    .executeSchedule()
+                    .waitForExecutionFinish();
+            assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
+            assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
+                    ScheduleStatus.OK.toString());
 
-            scheduleDetail.manualRun();
-            assertSuccessfulExecution();
         } finally {
-            cleanProcessesInWorkingProject();
+            deteleProcess(getGoodDataClient(), process);
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"disabledSchedule"})
+    @Test(dependsOnGroups = {"createProject"})
     public void disableSchedule() {
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
+
         try {
-            openProjectDetailPage(testParams.getProjectId());
+            LocalTime autoExecutionStartTime = LocalTime.now().plusMinutes(2);
+            Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
+                    parseTimeToCronExpression(autoExecutionStartTime));
 
-            String processName = "Disable Schedule";
-            ScheduleBuilder scheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.SUCCESSFUL_GRAPH)
-                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
-            prepareScheduleWithBasicPackage(scheduleBuilder);
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule).disableSchedule();
+            takeScreenshot(browser, "Schedule-is-disabled", getClass());
+            assertTrue(scheduleDetail.isDisabled(), "Schedule is not disabled");
+            assertEquals(scheduleDetail.getDisabledMessage(),
+                    "This schedule is disabled and it will not run according to schedule until re-enabled.");
+            assertFalse(scheduleDetail.canAutoTriggered(autoExecutionStartTime),
+                    "Schedule execution can auto trigger although disabled");
 
-            scheduleDetail.disableSchedule();
-            assertTrue(scheduleDetail.isDisabledSchedule(scheduleBuilder.getCronTimeBuilder()));
-            scheduleDetail.manualRun();
-            assertSuccessfulExecution();
-            scheduleDetail.enableSchedule();
-            assertTrue(scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder()),
-                    "Schedule is not run automatically well!");
-            assertSuccessfulExecution();
+            scheduleDetail.executeSchedule().waitForExecutionFinish();
+            assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
+            assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
+                    ScheduleStatus.OK.toString());
+
         } finally {
-            cleanProcessesInWorkingProject();
+            deteleProcess(getGoodDataClient(), process);
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"repeatedFailures"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkScheduleFailForManyTimes() {
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
+
         try {
-            openProjectDetailPage(testParams.getProjectId());
+            LocalTime executionStartTime = LocalTime.now().plusHours(1);
+            Schedule schedule = createSchedule(process, Executable.SHORT_TIME_ERROR_GRAPH,
+                    parseTimeToCronExpression(executionStartTime));
 
-            String processName = "Check Failed Schedule";
-            ScheduleBuilder scheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName)
-                            .setExecutable(Executables.SHORT_TIME_FAILED_GRAPH)
-                            .setCronTime(ScheduleCronTimes.CRON_EXPRESSION)
-                            //cron time expression which rarely happen - Feb 29
-                            //so that it don't happen the case 
-                            //where scheduled run and manual run happen at the same time
-                            .setCronTimeExpression("*/30 * 29 2 *");
-            prepareScheduleWithBasicPackage(scheduleBuilder);
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+            executeScheduleWithSpecificTimes(scheduleDetail, 5);
+            assertEquals(scheduleDetail.getDisableRecommendMessage(), DISABLE_RECOMMEND_MESSAGE);
 
-            // scheduleDetail.checkRepeatedFailureSchedule(scheduleBuilder.getCronTimeBuilder(),
-            // scheduleBuilder.getExecutable());
+            executeScheduleWithSpecificTimes(scheduleDetail, 25);
+            assertEquals(scheduleDetail.getAutoDisabledMessage(), AUTO_DISABLED_MESSAGE);
+            assertTrue(scheduleDetail.isDisabled(), "Schedule is not disabled");
 
-            repeatManualRunFailedSchedule(5, scheduleBuilder.getExecutable());
-            System.out.println("Schedule failed for the 5th time...");
-            assertEquals(
-                    String.format(FAILED_SCHEDULE_FOR_5TH_TIME_MESSAGE, scheduleDetail.getExecutionItemsNumber()),
-                    scheduleDetail.getRepeatedFailureInfo());
-            repeatManualRunFailedSchedule(25, scheduleBuilder.getExecutable());
-            System.out.println("Schedule failed for the 30th time...");
-            assertEquals(String.format(AUTO_DISABLED_SCHEDULE_MESSAGE, scheduleDetail.getExecutionItemsNumber()),
-                    scheduleDetail.getAutoDisabledScheduleMessage());
-            assertEquals(AUTO_DISABLED_SCHEDULE_MORE_INFO, scheduleDetail.getAutoDisabledScheduleMoreInfo());
-            assertTrue(scheduleDetail.isScheduleDisabledInUI());
         } finally {
-            cleanProcessesInWorkingProject();
+            deteleProcess(getGoodDataClient(), process);
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"autoRun"})
-    public void checkScheduleTriggerByFailedSchedule() {
+    @Test(dependsOnGroups = {"createProject"})
+    public void checkScheduleTriggeredByFailedSchedule() {
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
+
         try {
-            String processName = "Check Schedule With Trigger Schedule";
+            Schedule schedule1 = createSchedule(process, Executable.ERROR_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule2 = createSchedule(process, Executable.SUCCESSFUL_GRAPH, schedule1);
 
-            ScheduleBuilder triggerScheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.FAILED_GRAPH);
-            ScheduleBuilder dependentScheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.SUCCESSFUL_GRAPH);
-            prepareDataForTriggerScheduleTest(triggerScheduleBuilder, dependentScheduleBuilder);
+            initScheduleDetail(schedule1).executeSchedule().waitForExecutionFinish();
 
-            manualRunTriggerSchedule(triggerScheduleBuilder.getScheduleUrl());
-            assertFailedExecution(triggerScheduleBuilder.getExecutable());
-            int dependentScheduleExecutionNumber = waitForAutoRunDependentSchedule(dependentScheduleBuilder);
-            assertEquals(dependentScheduleExecutionNumber, 0);
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule2);
+            assertFalse(scheduleDetail.canAutoTriggered(LocalTime.now()), "Schedule is still triggered");
+            assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 0);
+
         } finally {
-            cleanProcessesInWorkingProject();
+            deteleProcess(getGoodDataClient(), process);
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"autoRun"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkMultipleScheduleTriggers() {
+        DataloadProcess process1 = createProcessWithBasicPackage(generateProcessName());
+        DataloadProcess process2 = createProcessWithBasicPackage(generateProcessName());
+
         try {
-            String processName1 = "Check Schedule With Trigger Schedule 1";
+            Schedule schedule1 = createSchedule(process1, Executable.SUCCESSFUL_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule2 = createSchedule(process1, "Schedule2", Executable.SUCCESSFUL_GRAPH, schedule1);
+            Schedule schedule3 = createSchedule(process2, "Schedule3", Executable.ERROR_GRAPH, schedule2);
 
-            ScheduleBuilder triggerScheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName1).setScheduleName("Trigger schedule")
-                            .setExecutable(Executables.SUCCESSFUL_GRAPH);
-            ScheduleBuilder dependentScheduleBuilder1 =
-                    new ScheduleBuilder().setProcessName(processName1).setScheduleName("Dependent schedule 1")
-                            .setExecutable(Executables.SUCCESSFUL_GRAPH);
-            prepareDataForTriggerScheduleTest(triggerScheduleBuilder, dependentScheduleBuilder1);
+            initScheduleDetail(schedule1).executeSchedule().close();
+            projectDetailPage.getProcess(process1.getName()).openSchedule(schedule2.getName())
+                    .waitForAutoExecute(LocalTime.now()).close();
 
-            String processName2 = "Check Schedule With Trigger Schedule 2";
-            ScheduleBuilder dependentScheduleBuilder2 =
-                    new ScheduleBuilder().setProcessName(processName2).setExecutable(Executables.FAILED_GRAPH)
-                            .setCronTime(ScheduleCronTimes.AFTER)
-                            .setTriggerScheduleGroup(dependentScheduleBuilder1.getProcessName())
-                            .setTriggerScheduleOption(dependentScheduleBuilder1.getScheduleName());
-            prepareScheduleWithBasicPackage(dependentScheduleBuilder2);
+            ScheduleDetail scheduleDetail = projectDetailPage.getProcess(process2.getName())
+                    .openSchedule(schedule3.getName())
+                    .waitForAutoExecute(LocalTime.now())
+                    .waitForExecutionFinish();
+            assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
+            assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(), ScheduleStatus.ERROR.toString());
 
-            runSuccessfulTriggerSchedule(triggerScheduleBuilder.getScheduleUrl());
-            waitForAutoRunDependentSchedule(dependentScheduleBuilder1);
-            assertSuccessfulExecution();
-            waitForAutoRunDependentSchedule(dependentScheduleBuilder2);
-            assertFailedExecution(dependentScheduleBuilder2.getExecutable());
         } finally {
-            cleanProcessesInWorkingProject();
+            deteleProcess(getGoodDataClient(), process1);
+            deteleProcess(getGoodDataClient(), process2);
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"disabledSchedule"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkDisableDependentSchedule() {
+        DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
+
         try {
-            String processName = "Check Schedule With Trigger Schedule";
+            Schedule schedule1 = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
+                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+            Schedule schedule2 = createSchedule(process, Executable.ERROR_GRAPH, schedule1);
 
-            ScheduleBuilder triggerScheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.SUCCESSFUL_GRAPH);
-            ScheduleBuilder dependentScheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.FAILED_GRAPH);
-            prepareDataForTriggerScheduleTest(triggerScheduleBuilder, dependentScheduleBuilder);
+            initScheduleDetail(schedule2).disableSchedule();
+            initScheduleDetail(schedule1).executeSchedule().waitForExecutionFinish();
 
-            runSuccessfulTriggerSchedule(triggerScheduleBuilder.getScheduleUrl());
-            waitForAutoRunDependentSchedule(dependentScheduleBuilder);
-            assertFailedExecution(dependentScheduleBuilder.getExecutable());
-            scheduleDetail.disableSchedule();
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule2);
+            assertFalse(scheduleDetail.canAutoTriggered(LocalTime.now()), "Schedule is still triggered");
+            assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 0);
 
-            runSuccessfulTriggerSchedule(triggerScheduleBuilder.getScheduleUrl());
-            int dependentScheduleExecutionNumber = waitForAutoRunDependentSchedule(dependentScheduleBuilder);
-            assertEquals(dependentScheduleExecutionNumber, 1);
         } finally {
-            cleanProcessesInWorkingProject();
+            deteleProcess(getGoodDataClient(), process);
         }
     }
 }

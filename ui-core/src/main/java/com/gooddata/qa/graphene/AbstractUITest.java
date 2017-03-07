@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene;
 
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.account.AccountPage;
@@ -15,7 +14,6 @@ import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
-import com.gooddata.qa.graphene.fragments.disc.*;
 import com.gooddata.qa.graphene.fragments.i18n.LocalizationPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
@@ -72,9 +70,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     protected static final String PAGE_REGISTRATION =
             "account.html#/registration/projectTemplate/urn%3Agooddata%3AOnboardingProductTour";
 
-    protected static final String DISC_PROJECTS_PAGE_URL = "admin/disc/#/projects";
-    protected static final String DISC_OVERVIEW_PAGE = "admin/disc/#/overview";
-
     protected static final String CSV_UPLOADER_PROJECT_ROOT_TEMPLATE = "data/#/projects/%s";
     protected static final String DATA_UPLOAD_PAGE_URI_TEMPLATE = CSV_UPLOADER_PROJECT_ROOT_TEMPLATE + "/datasets";
 
@@ -93,45 +88,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     @FindBy(id = "p-analysisPage")
     protected ReportPage reportPage;
-
-    /**
-     * ----- DISC fragments -----
-     */
-    @FindBy(css = ".ait-header-fragment")
-    protected NavigationBar discNavigation;
-
-    @FindBy(css = ".project-list")
-    protected ProjectsList discProjectsList;
-
-    @FindBy(css = ".ait-project-detail-fragment")
-    protected ProjectDetailPage projectDetailPage;
-
-    @FindBy(css = ".l-page .overlay")
-    protected DeployForm deployForm;
-
-    @FindBy(css = ".ait-new-schedule-fragment")
-    protected ScheduleForm scheduleForm;
-
-    @FindBy(css = ".ait-schedule-detail-fragment")
-    protected ScheduleDetail scheduleDetail;
-
-    @FindBy(css = ".active .ait-process-schedule-list")
-    protected SchedulesTable schedulesTable;
-
-    @FindBy(css = ".active .broken-schedules-section .selectable-domain-table")
-    protected SchedulesTable brokenSchedulesTable;
-
-    @FindBy(css = ".ait-projects-fragment")
-    protected DISCProjectsPage discProjectsPage;
-
-    @FindBy(css = ".ait-notification-rules-fragment")
-    protected NotificationRulesDialog discNotificationRules;
-
-    @FindBy(css = ".ait-overview-fragment")
-    protected OverviewStates discOverview;
-
-    @FindBy(css = ".ait-overview-projects-fragment")
-    protected OverviewProjects discOverviewProjects;
 
     /**
      * Help method which provides verification if login page is present a sign in a demo user if needed
@@ -558,24 +514,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForSchedulesPageLoaded(browser);
         waitForElementNotVisible(BY_SCHEDULES_LOADING);
         return EmailSchedulePage.getInstance(browser);
-    }
-
-    public void initDISCOverviewPage() {
-        openUrl(DISC_OVERVIEW_PAGE);
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-
-            @Override
-            public boolean apply(WebDriver browser) {
-                return !discOverview.getStateNumber(OverviewProjectStates.FAILED).isEmpty();
-            }
-        });
-        waitForFragmentVisible(discOverviewProjects);
-    }
-
-    public void initDISCProjectsPage() {
-        openUrl(DISC_PROJECTS_PAGE_URL);
-        waitForFragmentVisible(discProjectsPage);
-        waitForFragmentVisible(discProjectsList);
     }
 
     public LostPasswordPage initLostPasswordPage() {

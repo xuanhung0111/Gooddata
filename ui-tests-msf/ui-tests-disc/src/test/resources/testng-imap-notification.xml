@@ -3,7 +3,7 @@
 
     <test name="notification" enabled="true">
         <classes>
-            <class name="com.gooddata.qa.graphene.disc.NotificationsTest" />
+            <class name="com.gooddata.qa.graphene.disc.notification.NotificationEmailTest" />
         </classes>
     </test>
 
