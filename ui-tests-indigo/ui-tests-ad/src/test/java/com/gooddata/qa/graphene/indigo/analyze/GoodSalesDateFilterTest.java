@@ -56,7 +56,7 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
 
         panel.changeToDateRangeSection();
 
-        Calendar date = Calendar.getInstance(TimeZone.getTimeZone("GMT-7:00"));
+        Calendar date = Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles"));
         assertEquals(panel.getToDate(), getTimeString(date));
 
         date.add(Calendar.DAY_OF_MONTH, -29);
