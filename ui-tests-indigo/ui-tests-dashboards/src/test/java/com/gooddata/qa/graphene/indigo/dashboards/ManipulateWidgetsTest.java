@@ -285,6 +285,6 @@ public class ManipulateWidgetsTest extends GoodSalesAbstractDashboardTest {
 
     private String generateUniqueHeadlineTitle() {
         // create unique headline title which fits into headline title (has limited size)
-        return UUID.randomUUID().toString().substring(0, 18);
+        return UUID.randomUUID().toString().substring(0, 13);
     }
 }
