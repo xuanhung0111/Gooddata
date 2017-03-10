@@ -10,6 +10,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmp
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
@@ -954,7 +955,7 @@ public class ReportPage extends AbstractFragment {
     private void selectFilterButton() {
         Optional.of(waitForElementVisible(filterButton))
                 .filter(e -> !e.getAttribute("class").contains("editorBtnEditorSadHighlight"))
-                .ifPresent(WebElement::click);
+                .ifPresent(e -> waitForElementEnabled(e).click());
     }
 
     private List<WebElement> getMetricAxisConfigurationRows() {
