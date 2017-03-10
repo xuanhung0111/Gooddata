@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.reports.report;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
@@ -113,7 +114,7 @@ public class TableReport extends AbstractDashboardReport {
     }
 
     public List<String> getAttributeElements() {
-        waitForReportLoading();
+        waitForTableReportExecutionProgress();
         return getElementTexts(attributeElementInGrid);
     }
 
@@ -289,6 +290,16 @@ public class TableReport extends AbstractDashboardReport {
                 }
             }
         });
+        return this;
+    }
+    public TableReport waitForTableReportExecutionProgress() {
+        sleepTightInSeconds(1);
+        if(isElementPresent(cssSelector(".c-report"), browser)){
+            //in dashboard page
+            final WebElement progress = waitForElementPresent(cssSelector(".c-report-overlay"), browser);
+            Predicate<WebDriver> waitForProgress = browser -> progress.getCssValue("display").equals("none");
+            Graphene.waitGui().until(waitForProgress);
+        }
         return this;
     }
 
