@@ -335,10 +335,10 @@ public class EmailSchedulePage extends AbstractFragment {
                 selectCheckbox(formatsList.get(1).findElement(checkboxLocator));
                 break;
             case EXCEL_XLSX:
-                selectCheckbox(formatsList.get(3).findElement(checkboxLocator));
+                selectCheckbox(formatsList.get(2).findElement(checkboxLocator));
                 break;
             case CSV:
-                selectCheckbox(formatsList.get(4).findElement(checkboxLocator));
+                selectCheckbox(formatsList.get(3).findElement(checkboxLocator));
                 break;
             default:
                 System.out.println("Invalid format!!!");
