@@ -198,8 +198,8 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     public String exportDashboardTab(int tabIndex) {
-        //wait for exporting dashboard tab in maximum 5 minutes
-        int exportingTextDisplayedTimeoutInSeconds = 300;
+        //wait for exporting dashboard tab in maximum 10 minutes
+        int exportingTextDisplayedTimeoutInSeconds = 600;
 
         tabs.openTab(tabIndex);
         waitForDashboardPageLoaded(browser);
