@@ -104,6 +104,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
         final TableReport table = initReportsPage().openReport(SIMPLE_REPORT).getTableReport();
 
         table.openContextMenuFromCellValue(YEAR_2011).aggregateTableData(type, OF_ALL_ROWS);
+        reportPage.waitForReportExecutionProgress();
         checkNumberOfTotalHeaders(type, 1);
 
         //use List.equal() due to checking value order
@@ -122,6 +123,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
                 type.getType() + " values are not correct");
 
         table.openContextMenuFromCellValue(YEAR_2011).nonAggregateTableData(type, OF_ALL_ROWS);
+        reportPage.waitForReportExecutionProgress();
         checkNumberOfTotalHeaders(type, 3);
 
         //use List.equals() to check total value order
@@ -166,6 +168,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
         final List<Float> totalValuesOfEachYear = totalValuesOfAllColumns;
 
         table.openContextMenuFromCellValue(SHORT_LIST).aggregateTableData(type, OF_ALL_COLUMNS);
+        reportPage.waitForReportExecutionProgress();
         checkNumberOfTotalHeaders(type, 1);
 
         //use List.equal() due to checking value order
@@ -184,6 +187,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
                 type.getType() + " values are not correct");
 
         table.openContextMenuFromCellValue(SHORT_LIST).nonAggregateTableData(type, OF_ALL_COLUMNS);
+        reportPage.waitForReportExecutionProgress();
         checkNumberOfTotalHeaders(type, 1);
 
         //use List.equals() to check total value order
@@ -252,6 +256,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
         reportPage.waitForReportExecutionProgress();
 
         table.openContextMenuFromCellValue(YEAR_2011).aggregateTableData(AggregationType.SUM, BY_STAGE_NAME);
+        reportPage.waitForReportExecutionProgress();
         checkNumberOfTotalHeaders(AggregationType.SUM, 4);
         
         table.openContextMenuFromCellValue("90.0%").selectItem("Remove from Probability");
@@ -334,12 +339,15 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
     public void addMultipleRollupTotals() {
         final TableReport table = initReportsPage().openReport(MULTIPLE_TOTALS_REPORT).getTableReport();
         table.openContextMenuFromCellValue(MAY_2011).aggregateTableData(AggregationType.ROLLUP, BY_OPPORTUNITY);
+        reportPage.waitForReportExecutionProgress();
         checkNumberOfTotalHeaders(AggregationType.ROLLUP, 3);
 
         table.openContextMenuFromCellValue(YEAR_2011).aggregateTableData(AggregationType.ROLLUP, BY_STAGE_NAME);
+        reportPage.waitForReportExecutionProgress();
         checkNumberOfTotalHeaders(AggregationType.ROLLUP, 4);
 
         table.openContextMenuFromCellValue(Q1_2011).aggregateTableData(AggregationType.ROLLUP, OF_ALL_ROWS);
+        reportPage.waitForReportExecutionProgress();
         checkNumberOfTotalHeaders(AggregationType.ROLLUP, 5);
         assertTrue(
                 table.getTotalValues()
@@ -387,6 +395,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
         reportPage.waitForReportExecutionProgress();
 
         table.openContextMenuFromCellValue(Q1_2011).aggregateTableData(AggregationType.MEDIAN, OF_ALL_ROWS);
+        reportPage.waitForReportExecutionProgress();
 
         checkNumberOfTotalHeaders(AggregationType.MEDIAN, 5);
 
