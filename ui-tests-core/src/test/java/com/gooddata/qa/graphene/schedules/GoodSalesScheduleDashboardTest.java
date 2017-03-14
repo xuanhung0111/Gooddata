@@ -435,22 +435,22 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     }
 
     private void enableHideDashboardScheduleFlag() throws JSONException {
-        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+        ProjectRestUtils.setFeatureFlagInProjectAndCheckResult(getGoodDataClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.HIDE_DASHBOARD_SCHEDULE, true);
     }
 
     private void disableHideDashboardScheduleFlag() throws JSONException, IOException {
-        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+        ProjectRestUtils.setFeatureFlagInProjectAndCheckResult(getGoodDataClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.HIDE_DASHBOARD_SCHEDULE, false);
     }
 
     private void enableDashboardScheduleRecipientsFlag() throws JSONException {
-        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+        ProjectRestUtils.setFeatureFlagInProjectAndCheckResult(getGoodDataClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS, true);
     }
 
     private void disableDashboardScheduleRecipientsFlag() throws JSONException, IOException {
-        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+        ProjectRestUtils.setFeatureFlagInProjectAndCheckResult(getGoodDataClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS, false);
     }
 
