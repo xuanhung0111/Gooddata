@@ -44,8 +44,8 @@ public class NonProductionDatasetTest extends AbstractDashboardTest {
     private static final String WITHOUT_DATE_CSV_PATH = "/" + UPLOAD_CSV + "/without.date.csv";
     private static final String WITHOUT_DATE_DATASET = "Without Date";
 
-    private static final String DATASET_CONTAINING_24_DATES_CSV_PATH = "/" + UPLOAD_CSV + "/24dates.yyyy.csv";
-    private static final String DATASET_CONTAINING_24_DATES = "24dates Yyyy";
+    private static final String DATASET_CONTAINING_11_DATES_CSV_PATH = "/" + UPLOAD_CSV + "/11dates.yyyy.csv";
+    private static final String DATASET_CONTAINING_11_DATES = "11dates Yyyy";
 
     private static final String FACT_AMOUNT = "Amount";
 
@@ -160,12 +160,12 @@ public class NonProductionDatasetTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"dashboardsInit"})
     public void testScrollBarAppearenceOnDateDataset() throws JSONException, IOException {
-        String insight = "Insight-Relating-24-dates";
-        uploadCSV(getFilePathFromResource(DATASET_CONTAINING_24_DATES_CSV_PATH));
-        takeScreenshot(browser, "uploaded-" + DATASET_CONTAINING_24_DATES + "-dataset", getClass());
+        String insight = "Insight-Relating-11-dates";
+        uploadCSV(getFilePathFromResource(DATASET_CONTAINING_11_DATES_CSV_PATH));
+        takeScreenshot(browser, "uploaded-" + DATASET_CONTAINING_11_DATES + "-dataset", getClass());
 
         AnalysisPage page = initAnalysePage();
-        page.getCataloguePanel().changeDataset(DATASET_CONTAINING_24_DATES);
+        page.getCataloguePanel().changeDataset(DATASET_CONTAINING_11_DATES);
         page.addMetric("Number", FieldType.FACT).waitForReportComputing().saveInsight(insight);
 
         try {
@@ -177,7 +177,7 @@ public class NonProductionDatasetTest extends AbstractDashboardTest {
         } finally {
             deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(),
                     getInsightUri(insight, getRestApiClient(), testParams.getProjectId()));
-            initDataUploadPage().getMyDatasetsTable().getDataset(DATASET_CONTAINING_24_DATES).clickDeleteButton()
+            initDataUploadPage().getMyDatasetsTable().getDataset(DATASET_CONTAINING_11_DATES).clickDeleteButton()
                     .clickDelete();
             Dataset.waitForDatasetLoaded(browser);
         }
