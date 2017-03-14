@@ -195,9 +195,11 @@ public class ReportPage extends AbstractFragment {
         return this;
     }
 
+    public void tryOpenFilterPanelInDisabledState() {
+        if(!waitForElementVisible(filterButton).getAttribute("class").contains("editorBtnEditorSadDisabled"))
+            throw new RuntimeException("Filter button is not disabled");
 
-    public void tryOpenFilterPanel() {
-        selectFilterButton();
+        filterButton.click();
     }
 
     public ReportPage selectFolderLocation(String folder) {
