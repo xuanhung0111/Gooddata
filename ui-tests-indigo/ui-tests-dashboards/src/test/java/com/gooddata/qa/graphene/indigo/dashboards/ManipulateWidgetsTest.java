@@ -5,7 +5,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -18,7 +17,6 @@ import java.util.UUID;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.MetricSelect;
 import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
@@ -29,13 +27,6 @@ public class ManipulateWidgetsTest extends GoodSalesAbstractDashboardTest {
     private static final String HINT_FOR_EDIT_NAME_BORDER_COLOR = "rgba(177, 193, 209, 0.5)";
     private static final String LONG_NAME_METRIC = "# test metric with longer name is shortened";
     private static final String PATTERN_OF_METRIC_NAME = "is shortened";
-
-    @Override
-    protected void setDashboardFeatureFlags() {
-        // turn off insight flag is a requirement
-        setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
-    }
 
     @Override
     protected void prepareSetupProject() throws Throwable {
