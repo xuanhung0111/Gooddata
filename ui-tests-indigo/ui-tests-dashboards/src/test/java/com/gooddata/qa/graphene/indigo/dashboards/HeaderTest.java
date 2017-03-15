@@ -38,7 +38,7 @@ public class HeaderTest extends GoodSalesAbstractDashboardTest {
     @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkKpiLinkMissingIfFeatureFlagOff() throws JSONException {
         try {
-            ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+            ProjectRestUtils.setFeatureFlagInProjectAndCheckResult(getGoodDataClient(), testParams.getProjectId(),
                     ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, false);
 
             // ensure that feature flag is applied
@@ -50,7 +50,7 @@ public class HeaderTest extends GoodSalesAbstractDashboardTest {
             assertFalse(ApplicationHeaderBar.isKpisLinkVisible(browser));
 
         } finally {
-            ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+            ProjectRestUtils.setFeatureFlagInProjectAndCheckResult(getGoodDataClient(), testParams.getProjectId(),
                     ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
         }
     }
@@ -58,7 +58,7 @@ public class HeaderTest extends GoodSalesAbstractDashboardTest {
     @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkKpiLinkExistingAlthoughFeatureFlagOff() throws JSONException, IOException {
         try {
-            ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+            ProjectRestUtils.setFeatureFlagInProjectAndCheckResult(getGoodDataClient(), testParams.getProjectId(),
                     ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
 
             // load old dashboards first to avoid redirect to projects.html
@@ -76,8 +76,8 @@ public class HeaderTest extends GoodSalesAbstractDashboardTest {
 
             // need another try finally block because not deleting kpi affects to other tests.
             try {
-                ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                        ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, false);
+                ProjectRestUtils.setFeatureFlagInProjectAndCheckResult(getGoodDataClient(), 
+                        testParams.getProjectId(), ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, false);
 
                 // ensure that feature flag is applied
                 initDashboardsPage();
@@ -97,7 +97,7 @@ public class HeaderTest extends GoodSalesAbstractDashboardTest {
             assertFalse(ApplicationHeaderBar.isKpisLinkVisible(browser));
 
         } finally {
-            ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+            ProjectRestUtils.setFeatureFlagInProjectAndCheckResult(getGoodDataClient(), testParams.getProjectId(),
                     ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
         }
     }

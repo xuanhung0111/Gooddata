@@ -6,7 +6,7 @@ import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalytical
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createInsight;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidgetWrap;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAnalyticalDashboards;
-import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
+import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProjectAndCheckResult;
 import static com.gooddata.qa.utils.mail.ImapUtils.getEmailBody;
 import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 import static com.google.common.collect.Iterables.getLast;
@@ -110,7 +110,7 @@ public abstract class AbstractDashboardTest extends AbstractProjectTest {
     }
 
     protected void setDashboardFeatureFlags() {
-        setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+        setFeatureFlagInProjectAndCheckResult(getGoodDataClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
     }
 
