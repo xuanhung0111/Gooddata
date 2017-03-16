@@ -15,6 +15,7 @@ import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -195,7 +196,7 @@ public class ProjectsDetailTest extends AbstractDiscTest {
 
         try {
             Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
-                    ScheduleCronTime.EVERY_30_MINUTES.getExpression());
+                    parseTimeToCronExpression(LocalTime.now().minusMinutes(2)));
 
             ProcessDetail processDetail = initDiscProjectDetailPage()
                     .getProcess(process.getName())
