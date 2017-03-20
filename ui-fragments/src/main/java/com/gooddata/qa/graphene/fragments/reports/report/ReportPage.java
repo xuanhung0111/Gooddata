@@ -883,6 +883,8 @@ public class ReportPage extends AbstractFragment {
         if (values.isEmpty()) {
             return this;
         }
+        //sleep here to wait for busyMask loading
+        sleepTightInSeconds(1);
         waitForElementNotPresent(cssSelector(".busyMask[style='display: block;']"));
         Graphene.waitGui()
                 .until(ExpectedConditions.elementToBeClickable(cssSelector(".s-btn-filter_this_attribute"))).click();
