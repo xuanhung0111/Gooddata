@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.account;
 import static com.gooddata.qa.graphene.fragments.account.InviteUserDialog.INVITE_USER_DIALOG_LOCATOR;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 import static com.gooddata.qa.utils.mail.ImapUtils.getLastEmail;
@@ -225,6 +226,8 @@ public class InviteUserTest extends AbstractProjectTest {
     }
 
     private void dismissStatusBarMessage() {
-        waitForElementVisible(className("s-statusbar-dismiss"), browser).click();
+        By statusBarDismiss = By.className("s-statusbar-dismiss");
+        waitForElementVisible(statusBarDismiss, browser).click();
+        waitForElementNotPresent(statusBarDismiss);
     }
 }
