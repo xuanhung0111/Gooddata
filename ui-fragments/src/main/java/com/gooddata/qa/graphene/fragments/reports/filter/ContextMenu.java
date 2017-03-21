@@ -15,6 +15,7 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.entity.filter.RangeFilterItem.RangeType;
 import com.gooddata.qa.graphene.entity.filter.RankingFilterItem.Ranking;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 
 public class ContextMenu extends AbstractFragment {
 
@@ -31,14 +32,17 @@ public class ContextMenu extends AbstractFragment {
 
     public void selectItem(String item) {
         getItemElement(item).click();
+        waitForReportReloaded();
     }
 
     public void addRankingFilter(Ranking ranking, int size) {
         addFilter(ranking, size);
+        waitForReportReloaded();
     }
 
     public void addRangeFilter(RangeType rangeType, int rangeNumber) {
         addFilter(rangeType, rangeNumber);
+        waitForReportReloaded();
     }
 
     public List<String> getGroupNames() {
@@ -47,10 +51,12 @@ public class ContextMenu extends AbstractFragment {
 
     public void aggregateTableData(final AggregationType type, final String subItem) {
         aggregateTableData(type, subItem, true);
+        waitForReportReloaded();
     }
 
     public void nonAggregateTableData(final AggregationType type, final String subItem) {
         aggregateTableData(type, subItem, false);
+        waitForReportReloaded();
     }
 
     public List<String> getItemNames() {
@@ -115,7 +121,9 @@ public class ContextMenu extends AbstractFragment {
         if(subItemState ^ isChecked)
             subItemElement.click();
     }
-
+    private void waitForReportReloaded() {
+        ReportPage.getInstance(browser).waitForReportExecutionProgress();
+    }
     public static enum AggregationType {
         SUM("Sum"),
         AVERAGE("Average"),
