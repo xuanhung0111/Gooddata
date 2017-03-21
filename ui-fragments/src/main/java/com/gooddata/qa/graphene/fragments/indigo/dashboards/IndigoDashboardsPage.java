@@ -332,12 +332,17 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return initWidgetObject(clazz, scrollWidgetIntoView(getWidgets().get(index)));
     }
 
-    public <T extends Widget> T getWidgetByHeadline(final Class<T> clazz, final String headline) {
+    public <T extends Widget> T getWidgetByHeadline(final Class<T> clazz, final String searchString) {
         return initWidgetObject(clazz, scrollWidgetIntoView(
                 getWidgets().stream()
-                    .filter(widget -> headline.equals(widget.getHeadline()))
+                    .filter(widget -> {
+                        // handle shortened name on preview mode
+                        String widgetHeadline = widget.getHeadline();
+                        return isShortenedTitle(widgetHeadline) ? compareShortenedTitle(widgetHeadline,
+                                searchString) : searchString.equals(widgetHeadline);
+                    })
                     .findFirst()
-                    .orElseThrow(() -> new NoSuchElementException("Cannot find widget with headline: " + headline))));
+                    .orElseThrow(() -> new NoSuchElementException("Cannot find widget with headline: " + searchString))));
     }
 
     public <T extends Widget> T getLastWidget(final Class<T> clazz) {
@@ -475,5 +480,18 @@ public class IndigoDashboardsPage extends AbstractFragment {
             return (T) widget;
 
         throw new RuntimeException("Widget type is not correct !!!");
+    }
+
+    private boolean compareShortenedTitle(String widgetHeadline, String searchString) {
+        return searchString.startsWith(widgetHeadline.substring(0, widgetHeadline.indexOf("...")));
+    }
+
+    private boolean isShortenedTitle(String title) {
+        if (!isOnEditMode() && title.contains("...")) {
+            log.info("shortened widget name: " + title);
+            return true;
+        }
+
+        return false;
     }
 }
