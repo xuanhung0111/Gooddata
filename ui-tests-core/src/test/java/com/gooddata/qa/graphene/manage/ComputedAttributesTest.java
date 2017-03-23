@@ -3,9 +3,11 @@ package com.gooddata.qa.graphene.manage;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
+import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.changeMetricExpression;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForObjectPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getBubbleMessage;
 import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertEquals;
@@ -13,6 +15,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_MONTH_YEAR_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_SALES_REP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
@@ -36,11 +39,13 @@ import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Attribute;
 import com.gooddata.md.AttributeElement;
 import com.gooddata.md.Fact;
+import com.gooddata.md.Metric;
 import com.gooddata.md.Restriction;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.attribute.ComputedAttributeDefinition;
@@ -57,14 +62,26 @@ import com.gooddata.qa.graphene.fragments.manage.CreateAttributePage;
 import com.gooddata.qa.graphene.fragments.manage.MetricDetailsPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 
+
 public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
     private static final String COMPUTED_ATTRIBUTE_NAME = "A Sales Rep Ranking";
+    private static final String COMPUTED_ANOTHER_ATTRIBUTE_1 = "Another Computed Attribute 1";
+    private static final String COMPUTED_ANOTHER_ATTRIBUTE_2 = "Another Computed Attribute 2";
+    private static final String COMPUTED_ANOTHER_ATTRIBUTE_3 = "Another Computed Attribute 3";
+    private static final String COMPUTED_ANOTHER_ATTRIBUTE_4 = "Another Computed Attribute 4";
     private static final String REPORT_NAME = "Computed Attribute Report";
+    private static final String DRILL_REPORT_NAME_1 = "Drill Computed Attribute Report 1";
+    private static final String DRILL_REPORT_NAME_2 = "Drill Computed Attribute Report 2";
+    private static final String DRILL_REPORT_NAME_3 = "Drill Computed Attribute Report 3";
+    private static final String CHANGEMAQL_REPORT_NAME = "Change MAQL Report";
+    private static final String CHANGEMAQL_REPORT_NAME_2 = "Change MAQL Report 2";
+    private static final String ATTRIBUTE_VALUE_TO_DRILL = "Poor";
     private static final String CA_VARIABLE_REPORT_NAME = "Computed Attribute Report with Variable";
     private static final String TEST_DASHBOAD_NAME = "Test computed attribute";
     private static final String VARIABLE_NAME = "F Stage Name";
@@ -169,6 +186,18 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         verifyLDMModelProject(33320);
     }
 
+    @Test(dependsOnMethods = {"createComputedAttributeTest"}, priority = 1)
+    public void checkRenameComputedAttribute() {
+        String newAttributeName = "New Attribute Name";
+        initAttributePage().renameAttribute(COMPUTED_ATTRIBUTE_NAME, newAttributeName);
+        By newNameAttributeItem =
+                By.cssSelector(String.format(".s-title-%s a", CssUtils.simplifyText(newAttributeName)));
+        initAttributePage();
+        assertTrue(!browser.findElements(newNameAttributeItem).isEmpty());
+        initAttributePage().renameAttribute(newAttributeName, COMPUTED_ATTRIBUTE_NAME);
+        Screenshots.takeScreenshot(browser, "attribute-list", this.getClass());
+    }
+
     @Test(dependsOnMethods = {"createComputedAttributeTest"}, priority = 2)
     public void checkAttributePageAfterComputedAttributeCreated() {
         initAttributePage();
@@ -196,6 +225,55 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         checkDeleteButtonAndInfo();
     }
 
+    @Test(dependsOnMethods = {"createComputedAttributeTest"}, priority = 3)
+    public void checkComputedAttributeWhenChangeMetricExpression() throws JSONException, IOException {
+        String SUM_OF_AMOUNT = "SumOfAmount";
+        String amountFactUri = getMdService().getObjUri(getProject(), Fact.class, title(FACT_AMOUNT));
+        Attribute saleRepAttribute = getMdService().getObj(getProject(), Attribute.class, Restriction.
+                title(ATTR_SALES_REP));
+        String saleRepAttributeUri = saleRepAttribute.getUri();
+        String saleRepValueUri = getMdService().getAttributeElements(saleRepAttribute)
+                .stream()
+                .filter(e -> "Cory Owens".equals(e.getTitle()))
+                .findFirst()
+                .get()
+                .getUri();
+        String maqlExpression = format("SELECT SUM([%s])", amountFactUri);
+        String sumOfAmountMetricUri = getMdService()
+             .createObj(getProject(), new Metric(SUM_OF_AMOUNT, maqlExpression, "#,##0"))
+             .getUri();
+        createAndOpenComputedAttribute(ATTR_SALES_REP, SUM_OF_AMOUNT, COMPUTED_ANOTHER_ATTRIBUTE_4);
+        createReport(new UiReportDefinition().withName(CHANGEMAQL_REPORT_NAME).withWhats(SUM_OF_AMOUNT)
+             , "SaleRepReport");
+        createReport(new UiReportDefinition().withName(CHANGEMAQL_REPORT_NAME_2).withWhats(SUM_OF_AMOUNT)
+             .withHows(ATTR_SALES_REP, COMPUTED_ANOTHER_ATTRIBUTE_4), "SaleRepReport2");
+
+         String newMaqlExpression = format("SELECT SUM([%s]) WHERE [%s] = [%s]",
+                 amountFactUri, saleRepAttributeUri, saleRepValueUri);
+        changeMetricExpression(getRestApiClient(), sumOfAmountMetricUri, newMaqlExpression);
+
+        initReportsPage().openReport(CHANGEMAQL_REPORT_NAME).initPage();
+        checkRedBar(browser);
+
+        initReportsPage().openReport(CHANGEMAQL_REPORT_NAME_2).initPage();
+        checkRedBar(browser);
+    }
+
+    @Test(dependsOnMethods = {"createComputedAttributeTest"}, priority = 4)
+    public void checkDrillOnComputedAttribute() {
+        createAndOpenComputedAttribute(ATTR_SALES_REP, METRIC_NUMBER_OF_WON_OPPS, COMPUTED_ANOTHER_ATTRIBUTE_1);
+        drillToAttribute(ATTR_DEPARTMENT);
+        checkRedBar(browser);
+
+        createAndOpenComputedAttribute(ATTR_SALES_REP, METRIC_NUMBER_OF_WON_OPPS, COMPUTED_ANOTHER_ATTRIBUTE_2);
+        drillToAttribute(ATTR_MONTH_YEAR_CREATED);
+        checkRedBar(browser);
+
+        createAndOpenComputedAttribute(ATTR_SALES_REP, METRIC_NUMBER_OF_WON_OPPS, COMPUTED_ANOTHER_ATTRIBUTE_3);
+        drillToAttribute(COMPUTED_ATTRIBUTE_NAME);
+        checkRedBar(browser);
+    }
+
     @Test(dependsOnMethods = {"createComputedAttributeTest"}, priority = 4)
     public void createReportWithComputedAttribute() {
         createReport(new UiReportDefinition().withName(REPORT_NAME).withWhats("Amount")
@@ -209,6 +287,35 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
                 "Attribute values are incorrrect " + attributeValues);
         assertEquals(metricValues, Arrays.asList(3.4506136E7f, 8632501.0f, 3.8943492E7f, 3.4543328E7f),
                 "Metric values are incorrrect");
+    }
+
+    @DataProvider
+    public Object[][] drillComputedAttributeTest() {
+        return new Object[][] {
+            {DRILL_REPORT_NAME_1, COMPUTED_ANOTHER_ATTRIBUTE_1, ATTRIBUTE_VALUE_TO_DRILL, ATTR_DEPARTMENT},
+            {DRILL_REPORT_NAME_2, COMPUTED_ANOTHER_ATTRIBUTE_2, ATTRIBUTE_VALUE_TO_DRILL, ATTR_MONTH_YEAR_CREATED},
+            {DRILL_REPORT_NAME_3, COMPUTED_ANOTHER_ATTRIBUTE_3, ATTRIBUTE_VALUE_TO_DRILL, COMPUTED_ATTRIBUTE_NAME}
+        };
+    }
+
+    @Test(dependsOnMethods = {"checkDrillOnComputedAttribute"}, priority = 5, dataProvider = "drillComputedAttributeTest")
+    public void createReportWithDrillComputedAttribute(String name, String attribute, String value, String target){
+        UiReportDefinition rd = new UiReportDefinition().withName(name)
+                  .withWhats("Amount").withHows(attribute);
+        createReport(rd, rd.getName());
+        checkRedBar(browser);
+
+        TableReport report = openTableReport(name);
+        assertEquals(report.getAttributesHeader(), asList(attribute));
+        assertTrue(reportPage.getFilters().isEmpty());
+
+        report = drillOnAttributeFromReport(report,value);
+        assertEquals(report.getAttributesHeader(), asList(target));
+        assertEquals(reportPage.getFilters(), asList(attribute + " is " + value));
+
+        report = backToPreviousReport();
+        assertEquals(report.getAttributesHeader(), asList(attribute));
+        assertTrue(reportPage.getFilters().isEmpty());
     }
 
     @Test(dependsOnMethods = {"createReportWithComputedAttribute"})
@@ -450,6 +557,42 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         assertEquals(attributeDetailPage.getDeleteButtonDescription(), EXPECTED_DELETE_DESCRIPTION);
     }
 
+    private void createAndOpenComputedAttribute(String attribute, String metric, String name){
+        initAttributePage().moveToCreateAttributePage().createComputedAttribute(
+                new ComputedAttributeDefinition()
+                .withAttribute(attribute)
+                .withMetric(metric)
+                .withName(name)
+                .withBucket(new AttributeBucket(0, "Poor", "120"))
+                .withBucket(new AttributeBucket(1, "Good", "200"))
+                .withBucket(new AttributeBucket(2, "Great", "250"))
+                .withBucket(new AttributeBucket(3, "Best")));
+
+        initAttributePage();
+        String titleSelector = ".s-title-" + CssUtils.simplifyText(name);
+        By computedAttributeItem = By.cssSelector(titleSelector + " a");
+        waitForElementVisible(computedAttributeItem, browser).click();
+    }
+
+    private void drillToAttribute(String attribute) {
+        AttributeDetailPage attributeDetailPage = AttributeDetailPage.getInstance(browser);
+        attributeDetailPage.setDrillToAttribute(attribute);
+    }
+
+    private TableReport openTableReport(String reportName) {
+        return initReportsPage().openReport(reportName).getTableReport();
+    }
+
+    private TableReport drillOnAttributeFromReport(TableReport report, String value) {
+        report.drillOnAttributeValue(value);
+        return ReportPage.getInstance(browser).waitForReportExecutionProgress().getTableReport();
+    }
+
+    private TableReport backToPreviousReport() {
+        browser.navigate().back();
+        return ReportPage.getInstance(browser).waitForReportExecutionProgress().getTableReport();
+    }
+
     private String createStageMuf(final List<String> expectedStageElements, final String mufTitle)
                     throws ParseException, JSONException, IOException {
         final Attribute stage = getMdService().getObj(getProject(), Attribute.class, Restriction.identifier("attr.stage.status"));
@@ -464,5 +607,4 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         return DashboardsRestUtils
                 .createSimpleMufObjByUri(getRestApiClient(), testParams.getProjectId(), mufTitle, conditions);
     }
-
 }

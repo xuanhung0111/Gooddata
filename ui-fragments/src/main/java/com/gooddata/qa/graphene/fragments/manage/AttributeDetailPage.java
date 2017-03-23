@@ -17,6 +17,7 @@ import java.util.Collection;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -25,6 +26,7 @@ import com.gooddata.qa.graphene.enums.AttributeLabelTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 import com.gooddata.qa.utils.CssUtils;
+import com.google.common.base.Predicate;
 
 public class AttributeDetailPage extends ObjectPropertiesPage {
 
@@ -105,6 +107,11 @@ public class AttributeDetailPage extends ObjectPropertiesPage {
         if (!clearExternalPageButton.getAttribute("class").contains("gdc-hidden")) {
             clearDrillingSetting();
         }
+        //add here to wait Attribute button loading successfully
+        Predicate<WebDriver> drillAttributeButtonEnabled = browser -> !waitForElementVisible(selectDrillAttributeButton)
+                .getAttribute("class")
+                .contains("disabled");
+        Graphene.waitGui().until(drillAttributeButtonEnabled);
         waitForElementVisible(selectDrillAttributeButton).click();
         SelectItemPopupPanel popup = SelectItemPopupPanel.getInstance(browser);
         popup.searchAndSelectItem(attribute).submitPanel();
