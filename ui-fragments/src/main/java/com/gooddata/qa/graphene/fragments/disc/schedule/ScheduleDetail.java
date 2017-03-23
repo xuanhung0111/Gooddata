@@ -291,7 +291,7 @@ public class ScheduleDetail extends AbstractScheduleFragment {
     }
 
     private ScheduleDetail waitForLoaded() {
-        waitForElementNotPresent(By.cssSelector(".history-section .loading"), getRoot());
+        waitForElementNotPresent(By.className("loading"), getRoot());
         return this;
     }
 

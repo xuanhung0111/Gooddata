@@ -133,8 +133,8 @@ public class NotificationEmailTest extends AbstractDiscTest {
                     .withEmail(imapUser)
                     .withEvent(NotificationEvent.PROCESS_STARTED)
                     .withSubject("Notification for process started event " + generateHashString())
-                    .withMessage(VariableList.PROCESS_STARTED
-                            .buildMessage(Variable.PROCESS_ID, Variable.SCHEDULE_ID, Variable.LOG, Variable.START_TIME));
+                    .withMessage(NotificationRule.buildMessage(Variable.PROCESS_ID, Variable.SCHEDULE_ID,
+                            Variable.LOG, Variable.START_TIME));
 
             ProcessDetail processDetail = initDiscProjectDetailPage().getProcess(process.getName());
 
@@ -173,8 +173,8 @@ public class NotificationEmailTest extends AbstractDiscTest {
                     .withEmail(imapUser)
                     .withEvent(NotificationEvent.SUCCESS)
                     .withSubject("Notification for success event " + generateHashString())
-                    .withMessage(VariableList.SUCCESS
-                            .buildMessage(Variable.PROCESS_ID, Variable.SCHEDULE_ID, Variable.FINISH_TIME));
+                    .withMessage(NotificationRule.buildMessage(Variable.PROCESS_ID, Variable.SCHEDULE_ID,
+                            Variable.FINISH_TIME));
 
             ProcessDetail processDetail = initDiscProjectDetailPage().getProcess(process.getName());
 
@@ -212,8 +212,8 @@ public class NotificationEmailTest extends AbstractDiscTest {
                     .withEmail(imapUser)
                     .withEvent(NotificationEvent.FAILURE)
                     .withSubject("Notification for failure event " + generateHashString())
-                    .withMessage(VariableList.FAILURE
-                            .buildMessage(Variable.PROCESS_ID, Variable.SCHEDULE_ID, Variable.ERROR_MESSAGE));
+                    .withMessage(NotificationRule.buildMessage(Variable.PROCESS_ID, Variable.SCHEDULE_ID,
+                            Variable.ERROR_MESSAGE));
 
             ProcessDetail processDetail = initDiscProjectDetailPage().getProcess(process.getName());
 

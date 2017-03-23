@@ -14,12 +14,13 @@ import java.util.NoSuchElementException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.disc.common.AbstractDataloadScheduleTest;
+import com.gooddata.qa.graphene.disc.common.AbstractDataloadProcessTest;
+import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.gooddata.qa.graphene.fragments.disc.schedule.DatasetDropdown;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 
-public class CreateDataloadScheduleTest extends AbstractDataloadScheduleTest {
+public class CreateDataloadScheduleTest extends AbstractDataloadProcessTest {
 
     private static final String OPPORTUNITY_DATASET = "opportunity";
     private static final String PERSON_DATASET = "person";
@@ -30,7 +31,7 @@ public class CreateDataloadScheduleTest extends AbstractDataloadScheduleTest {
 
     @Test(dependsOnGroups = {"initDataload"}, groups = {"precondition"})
     public void initData() throws JSONException, IOException {
-        setupMaql(MAQL_FILES.getPath() + TxtFile.CREATE_LDM.getName());
+        setupMaql(LdmModel.loadFromFile(MAQL_FILES.getPath() + TxtFile.CREATE_LDM.getName()));
     }
 
     @Test(dependsOnGroups = {"precondition"})

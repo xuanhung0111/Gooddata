@@ -1,5 +1,12 @@
 package com.gooddata.qa.graphene.entity.disc;
 
+import static java.util.stream.Collectors.joining;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
+
+import com.gooddata.qa.graphene.enums.disc.notification.Variable;
 import com.gooddata.qa.graphene.fragments.disc.notification.NotificationRuleItem.NotificationEvent;
 
 public class NotificationRule {
@@ -9,6 +16,25 @@ public class NotificationRule {
     private String customEventName;
     private String subject;
     private String message;
+
+    public static String buildMessage(Variable... variables) {
+        return Stream.of(variables)
+                .map(v -> v.getName() + "==" + v.getValue())
+                .collect(joining(" | "));
+    }
+
+    public static Map<String, String> getVariablesFromMessage(String message) {
+        if (!Stream.of(Variable.values()).anyMatch(v -> message.contains(v.getName()))) {
+            throw new RuntimeException("This message: " + message + " contains no variable!");
+        }
+
+        Map<String, String> variables = new HashMap<>();
+        Stream.of(message.split(" \\| "))
+                .map(v -> v.split("=="))
+                .forEach(v -> variables.put(v[0], v.length == 2 ? v[1] : ""));
+
+        return variables;
+    }
 
     public NotificationRule withEmail(String email) {
         this.email = email;

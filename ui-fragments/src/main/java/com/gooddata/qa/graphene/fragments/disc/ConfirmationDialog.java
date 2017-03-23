@@ -21,10 +21,10 @@ public class ConfirmationDialog extends AbstractFragment {
     @FindBy(className = "dialog-body")
     private WebElement body;
 
-    @FindBy(css = "button:first-child")
+    @FindBy(css = ".button-bar-area button:first-child")
     private WebElement confirmButton;
 
-    @FindBy(css = "button:last-child")
+    @FindBy(css = ".button-bar-area button:last-child")
     private WebElement discardButton;
 
     public static final ConfirmationDialog getInstance(SearchContext searchContext) {

@@ -101,6 +101,11 @@ public class CsvFile {
         if (!parent.exists() && !parent.mkdirs()) {
             throw new IOException("Cannot create new folder in: " + path);
         }
+
+        if (file.exists()) {
+            file.delete();
+        }
+
         if (!file.createNewFile()) {
             throw new IOException("Cannot create new file in: " + path);
         }

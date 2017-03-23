@@ -28,6 +28,7 @@ import org.testng.annotations.Test;
 import com.gooddata.md.Fact;
 import com.gooddata.md.Restriction;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
+import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
@@ -66,7 +67,7 @@ public class KpiAlertEvaluateTest extends AbstractDashboardTest {
     @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void setupProject() throws JSONException, IOException {
         switchToAdmin();
-        setupMaql(MAQL_PATH);
+        setupMaql(LdmModel.loadFromFile(MAQL_PATH));
     }
 
     @DataProvider(name = "alertsProvider")

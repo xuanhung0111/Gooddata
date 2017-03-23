@@ -14,6 +14,7 @@ import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
@@ -41,7 +42,7 @@ public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
             return;
         }
 
-        setupMaql(MAQL_PATH);
+        setupMaql(LdmModel.loadFromFile(MAQL_PATH));
         setupData(CSV_PATH, UPLOADINFO_PATH);
     }
 

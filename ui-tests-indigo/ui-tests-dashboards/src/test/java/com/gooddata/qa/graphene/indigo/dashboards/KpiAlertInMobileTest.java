@@ -24,6 +24,7 @@ import com.gooddata.md.Dataset;
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
+import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
@@ -42,7 +43,7 @@ public class KpiAlertInMobileTest extends AbstractDashboardTest {
 
     @Override
     protected void prepareSetupProject() throws Throwable {
-        setupMaql(KPI_ALERT_RESOURCE + "user.maql");
+        setupMaql(LdmModel.loadFromFile(KPI_ALERT_RESOURCE + "user.maql"));
 
         // Grey page cannot be accessed on mobile, should use Rest to setup dataset for project here
         setupDataViaRest(DATASET_ID, new FileInputStream(getResourceAsFile(KPI_ALERT_RESOURCE + "user.csv")));
