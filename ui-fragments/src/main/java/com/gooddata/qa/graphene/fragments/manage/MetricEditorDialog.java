@@ -201,8 +201,6 @@ public class MetricEditorDialog extends AbstractFragment {
             case GREATER_OR_EQUAL:
             case LESS:
             case LESS_OR_EQUAL:
-            case BETWEEN:
-            case NOT_BETWEEN:
             case IN:
             case NOT_IN:
                 selectAttrElements(metricUI);
