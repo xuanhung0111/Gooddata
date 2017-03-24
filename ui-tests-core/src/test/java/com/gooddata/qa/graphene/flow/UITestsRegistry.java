@@ -132,9 +132,6 @@ public class UITestsRegistry {
         });
 
         suites.put("reports", new Object[] {
-            GoodSalesDrillReportTest.class,
-            GoodSalesDrillReportToExportTest.class,
-            GoodSalesDrillDownToExportSpecialTest.class,
             GoodSalesDrillReportInReportPageTest.class,
             GoodSalesTotalsInReportTest.class,
             GoodSalesSortByTotalsTest.class,
@@ -160,6 +157,9 @@ public class UITestsRegistry {
 
         suites.put("dashboards", new HashMap<String, Object[]>() {{
             put("phaseDashboardMainFunctions", new Object[] {
+                    GoodSalesDrillReportTest.class,
+                    GoodSalesDrillReportToExportTest.class,
+                    GoodSalesDrillDownToExportSpecialTest.class,
                     GoodSalesDashboardAllKindsFiltersTest.class,
                     GoodSalesFilterDropdownAttributeValueTest.class,
                     GoodSalesCascadingFilterTest.class,
