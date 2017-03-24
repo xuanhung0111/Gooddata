@@ -15,6 +15,7 @@ import static java.lang.String.format;
 import java.io.IOException;
 import javax.mail.MessagingException;
 
+import com.gooddata.qa.graphene.utils.CheckUtils;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -336,6 +337,28 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
         LoginFragment.getInstance(browser).login(registrationUser, testParams.getPassword(), false);
         LoginFragment.getInstance(browser).checkInvalidLogin();
+    }
+
+    @Test(dependsOnMethods = "deleteUserAccount", description = "WA-6433: 500 Internal Error when deleting user twice")
+    public void deleteUserWithoutActivationTwice() {
+        initRegistrationPage().registerNewUserSuccessfully(registrationForm);
+
+        testParams.setProjectId(getProjectId(GOODDATA_PRODUCT_TOUR_PROJECT));
+        initAccountPage().deleteAccount();
+
+        LoginFragment loginPage = LoginFragment.getInstance(browser);
+        loginPage.login(registrationUser, testParams.getPassword(), false);
+        loginPage.checkInvalidLogin();
+
+        initRegistrationPage().registerNewUserSuccessfully(registrationForm);
+
+        testParams.setProjectId(getProjectId(GOODDATA_PRODUCT_TOUR_PROJECT));
+        initAccountPage().deleteAccount();
+
+        CheckUtils.checkRedBar(browser);
+        takeScreenshot(browser, "deleteUserWithoutActivationTwice", getClass());
+        loginPage.login(registrationUser, testParams.getPassword(), false);
+        loginPage.checkInvalidLogin();
     }
 
     @AfterClass(alwaysRun = true)
