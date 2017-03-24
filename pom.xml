@@ -28,6 +28,8 @@
 
         <browser>firefox</browser>
         <chromeDriverBinaryPath>/usr/bin/chromium-browser</chromeDriverBinaryPath>
+        <!-- Add option 'no-sandbox' in case running chromium inside docker -->
+        <chromeDriverArguments></chromeDriverArguments>
         <!-- (seconds) -->
         <timeout>90</timeout>
         <!-- can be used to multiply the timeout on a specific test places (currently the only place is the validation on vertica DM) -->
@@ -312,6 +314,10 @@
                                             <property>
                                                 <name>chromeDriverBinaryPath</name>
                                                 <value>${chromeDriverBinaryPath}</value>
+                                            </property>
+                                            <property>
+                                                <name>chromeDriverArguments</name>
+                                                <value>${chromeDriverArguments}</value>
                                             </property>
                                             <property>
                                                 <name>timeout</name>

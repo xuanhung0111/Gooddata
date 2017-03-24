@@ -71,3 +71,9 @@ Summary:
  * merge of `release` branch to `master` happens automatically before the production release
 
 More details about the [GitFlow](https://confluence.intgdc.com/display/plat/Gitflow).
+
+## Docker
+You can easily run graphene-tests inside docker
+
+	./docker-run.sh xvfb-run echo test
+	./docker-run.sh mvn clean test -Duser.home=/home/$USER -s /home/$USER/.m2/settings.xml
