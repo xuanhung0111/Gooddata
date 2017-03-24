@@ -37,7 +37,7 @@ public class NotificationTest extends AbstractCsvUploaderTest {
 
     @BeforeClass(alwaysRun = true)
     public void initProperties() {
-        projectTitle = "Csv-uploader-notification-test-" + System.currentTimeMillis();
+        projectTitle = "Csv-uploader-notification-test";
 
         imapHost = testParams.loadProperty("imap.host");
         imapUser = testParams.loadProperty("imap.user");
@@ -61,7 +61,8 @@ public class NotificationTest extends AbstractCsvUploaderTest {
         checkSuccessfulNotification(getSuccessfulNotification(1), datasetName);
     }
 
-    @Test(dependsOnGroups = "precondition", groups = "csv")
+    //disable test due to MSF-12009
+    @Test(dependsOnGroups = "precondition", groups = "csv", enabled = false)
     public void checkNotificationForFailedUpload() {
         final String projectId = testParams.getProjectId();
 
