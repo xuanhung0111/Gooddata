@@ -35,6 +35,8 @@ public class CreateScheduleTest extends AbstractDiscTest {
                     .openCreateScheduleForm()
                     .selectExecutable(Executable.SUCCESSFUL_GRAPH))
                     .schedule();
+
+            ScheduleDetail.getInstance(browser).close();
             assertTrue(projectDetailPage.getProcess(process.getName())
                     .hasSchedule(Executable.SUCCESSFUL_GRAPH.getName()),
                     "Schedule is not created");
