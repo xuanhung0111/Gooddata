@@ -44,10 +44,10 @@ public class CreateDataloadScheduleTest extends AbstractDataloadScheduleTest {
                 .schedule();
 
         try {
-            assertTrue(projectDetailPage.getProcess(DEFAULT_DATAlOAD_PROCESS_NAME).hasSchedule(schedule),
-                    "Dataload schedule is not created");
             assertTrue(ScheduleDetail.getInstance(browser).isAllDatasetsOptionSelected(),
                     "All dataset radio option is not selected");
+            assertTrue(projectDetailPage.getProcess(DEFAULT_DATAlOAD_PROCESS_NAME).hasSchedule(schedule),
+                    "Dataload schedule is not created");
 
         } finally {
             deleteScheduleByName(getDataloadProcess(), schedule);
@@ -66,10 +66,10 @@ public class CreateDataloadScheduleTest extends AbstractDataloadScheduleTest {
 
         try {
             ScheduleDetail scheduleDetail = ScheduleDetail.getInstance(browser);
-            assertTrue(projectDetailPage.getProcess(DEFAULT_DATAlOAD_PROCESS_NAME).hasSchedule(schedule),
-                    "Dataload schedule is not created");
             assertTrue(scheduleDetail.isCustomDatasetsOptionSelected(), "Custom dataset radio option is not selected");
             assertEquals(scheduleDetail.getSelectedDatasets(), singletonList(OPPORTUNITY_DATASET));
+            assertTrue(projectDetailPage.getProcess(DEFAULT_DATAlOAD_PROCESS_NAME).hasSchedule(schedule),
+                    "Dataload schedule is not created");
 
         } finally {
             deleteScheduleByName(getDataloadProcess(), schedule);

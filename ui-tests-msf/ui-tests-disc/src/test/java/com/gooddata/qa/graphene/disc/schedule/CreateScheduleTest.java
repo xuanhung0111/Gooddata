@@ -131,6 +131,8 @@ public class CreateScheduleTest extends AbstractDiscTest {
                     .clickCreateScheduleLink()
                     .enterScheduleName(scheduleName)
                     .schedule();
+
+            ScheduleDetail.getInstance(browser).close();
             assertTrue(projectDetailPage.getProcess(process.getName()).hasSchedule(scheduleName),
                     "Schedule " + scheduleName + " is not created");
 
@@ -276,6 +278,8 @@ public class CreateScheduleTest extends AbstractDiscTest {
                     .openCreateScheduleForm()
                     .enterScheduleName(scheduleName)
                     .schedule();
+
+            ScheduleDetail.getInstance(browser).close();
             assertTrue(projectDetailPage.getProcess(process.getName()).hasSchedule(scheduleName),
                     "Schedule is not created");
 
