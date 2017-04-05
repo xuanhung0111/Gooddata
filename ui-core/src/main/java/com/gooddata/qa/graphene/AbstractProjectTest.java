@@ -30,7 +30,6 @@ import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
-import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static org.testng.Assert.assertFalse;
 
 import com.gooddata.qa.utils.http.rolap.RolapRestUtils;
@@ -252,10 +251,10 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         return getMdService().createObj(getProject(), new Report(defination.getTitle(), defination));
     }
 
-    public void setupMaql(String maqlPath) throws JSONException, IOException {
+    public void setupMaql(String maql) throws JSONException, IOException {
         getGoodDataClient()
                 .getModelService()
-                .updateProjectModel(getProject(), getResourceAsString(maqlPath))
+                .updateProjectModel(getProject(), maql)
                 .get();
     }
 

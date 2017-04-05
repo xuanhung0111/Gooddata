@@ -8,7 +8,6 @@ import static com.gooddata.qa.utils.ads.AdsHelper.ADS_DB_CONNECTION_URL;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.model.ModelRestUtils.getDatasetModelView;
 import static com.gooddata.qa.utils.http.process.ProcessRestUtils.executeProcess;
-import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -23,6 +22,7 @@ import java.util.Collection;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Attribute;
@@ -32,14 +32,16 @@ import com.gooddata.md.report.AttributeInGrid;
 import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
-import com.gooddata.qa.graphene.disc.common.AbstractDataloadScheduleTest;
+import com.gooddata.qa.graphene.disc.common.AbstractDataloadProcessTest;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
+import com.gooddata.qa.graphene.entity.model.LdmModel;
+import com.gooddata.qa.graphene.entity.model.SqlBuilder;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 
-public class DataloadDatasetDetailTest extends AbstractDataloadScheduleTest {
+public class DataloadDatasetDetailTest extends AbstractDataloadProcessTest {
 
     private static final String ARTIST_DATASET = "artist";
     private static final String TRACK_DATASET = "track";
@@ -52,13 +54,18 @@ public class DataloadDatasetDetailTest extends AbstractDataloadScheduleTest {
     private static final Collection<String> TRACK_ID_ATTR_VALUES = asList("1tractID", "2tractID", "3tractID",
             "4tractID", "5tractID", "6tractID");
 
+    @BeforeClass(alwaysRun = true)
+    public void turnOnDE() {
+        enableDataExplorer = true;
+    }
+
     @Test(dependsOnGroups = {"initDataload"}, groups = {"precondition"})
     public void initData() throws JSONException, IOException {
-        setupMaql(MAQL_FILES.getPath() + TxtFile.CREATE_REFERENCE_LDM.getName());
+        setupMaql(LdmModel.loadFromFile(MAQL_FILES.getPath() + TxtFile.CREATE_REFERENCE_LDM.getName()));
 
         Parameters parameters = new Parameters()
-                .addParameter("CREATE_TABLE",
-                        getResourceAsString(SQL_FILES.getPath() + TxtFile.REFERENCE_ADS_TABLE.getName()))
+                .addParameter("SQL_QUERY",
+                        SqlBuilder.loadFromFile(SQL_FILES.getPath() + TxtFile.REFERENCE_ADS_TABLE.getName()))
                 .addParameter("ADS_URL", format(ADS_DB_CONNECTION_URL, testParams.getHost(), ads.getId()))
                 .addParameter("ADS_USER", testParams.getUser())
                 .addSecureParameter("ADS_PASSWORD", testParams.getPassword());

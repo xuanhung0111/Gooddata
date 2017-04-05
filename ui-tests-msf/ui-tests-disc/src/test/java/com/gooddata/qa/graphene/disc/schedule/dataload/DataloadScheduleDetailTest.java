@@ -4,7 +4,6 @@ import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.SQL_FILES;
 import static com.gooddata.qa.utils.ads.AdsHelper.ADS_DB_CONNECTION_URL;
 import static com.gooddata.qa.utils.http.process.ProcessRestUtils.executeProcess;
-import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -14,10 +13,13 @@ import java.io.IOException;
 import java.time.LocalTime;
 
 import org.json.JSONException;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.disc.common.AbstractDataloadScheduleTest;
+import com.gooddata.qa.graphene.disc.common.AbstractDataloadProcessTest;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
+import com.gooddata.qa.graphene.entity.model.LdmModel;
+import com.gooddata.qa.graphene.entity.model.SqlBuilder;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
 import com.gooddata.qa.graphene.fragments.disc.overview.OverviewPage.OverviewState;
 import com.gooddata.qa.graphene.fragments.disc.overview.OverviewProjects.__OverviewProjectItem;
@@ -26,14 +28,19 @@ import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail.__ExecutionHistoryItem;
 
-public class DataloadScheduleDetailTest extends AbstractDataloadScheduleTest {
+public class DataloadScheduleDetailTest extends AbstractDataloadProcessTest {
+
+    @BeforeClass(alwaysRun = true)
+    public void turnOnDE() {
+        enableDataExplorer = true;
+    }
 
     @Test(dependsOnGroups = {"initDataload"}, groups = {"precondition"})
     public void initData() throws JSONException, IOException {
-        setupMaql(MAQL_FILES.getPath() + TxtFile.CREATE_LDM.getName());
+        setupMaql(LdmModel.loadFromFile(MAQL_FILES.getPath() + TxtFile.CREATE_LDM.getName()));
 
         Parameters parameters = getDefaultParameters()
-                .addParameter("CREATE_TABLE", getResourceAsString(SQL_FILES.getPath() + TxtFile.ADS_TABLE.getName()));
+                .addParameter("SQL_QUERY", SqlBuilder.loadFromFile(SQL_FILES.getPath() + TxtFile.ADS_TABLE.getName()));
 
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
@@ -86,8 +93,8 @@ public class DataloadScheduleDetailTest extends AbstractDataloadScheduleTest {
 
     @Test(dependsOnGroups = {"precondition"})
     public void checkConcurrentDataLoadSchedule() {
-        Parameters parameters = getDefaultParameters()
-                .addParameter("CREATE_TABLE", getResourceAsString(SQL_FILES.getPath() + TxtFile.LARGE_ADS_TABLE.getName()));
+        Parameters parameters = getDefaultParameters().addParameter("SQL_QUERY",
+                SqlBuilder.loadFromFile(SQL_FILES.getPath() + TxtFile.LARGE_ADS_TABLE.getName()));
 
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
@@ -124,7 +131,8 @@ public class DataloadScheduleDetailTest extends AbstractDataloadScheduleTest {
             deleteScheduleByName(getDataloadProcess(), schedule1);
             deleteScheduleByName(getDataloadProcess(), schedule2);
 
-            parameters.addParameter("CREATE_TABLE", getResourceAsString(SQL_FILES.getPath() + TxtFile.ADS_TABLE.getName()));
+            parameters.addParameter("SQL_QUERY",
+                    SqlBuilder.loadFromFile(SQL_FILES.getPath() + TxtFile.ADS_TABLE.getName()));
             executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                     parameters.getParameters(), parameters.getSecureParameters());
         }

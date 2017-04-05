@@ -178,7 +178,7 @@ public class SanityTest extends AbstractDiscTest {
                     .expand();
 
             assertEquals(notifyItem.getEmail(), notificationRule.getEmail());
-            assertEquals(notifyItem.getEvent(), notificationRule.getEvent());
+            assertEquals(notifyItem.getSelectedEvent(), notificationRule.getEvent());
             assertEquals(notifyItem.getSubject(), notificationRule.getSubject());
             assertEquals(notifyItem.getMessage(), notificationRule.getMessage());
 

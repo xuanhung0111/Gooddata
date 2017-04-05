@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.google.common.collect.Iterables.getLast;
 
 import java.time.DayOfWeek;
+import java.time.LocalTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,6 +68,11 @@ public class AbstractScheduleFragment extends AbstractFragment {
 
     public AbstractScheduleFragment selectRunTimeByEveryHour(int minuteOfHour) {
         getCronEditor().selectRunTimeByEveryHour(minuteOfHour);
+        return this;
+    }
+
+    public AbstractScheduleFragment selectLongRunTimeUntilAutoTrigger() {
+        getCronEditor().selectRunTimeByEveryHour(LocalTime.now().minusMinutes(2).getMinute());
         return this;
     }
 

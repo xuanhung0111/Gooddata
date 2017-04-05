@@ -15,7 +15,8 @@ public enum Variable {
     LOG("params.LOG", "${params.LOG}"),
     START_TIME("params.START_TIME", "${params.START_TIME}"),
     FINISH_TIME("params.FINISH_TIME", "${params.FINISH_TIME}"),
-    ERROR_MESSAGE("params.ERROR_MESSAGE", "${params.ERROR_MESSAGE}");
+    ERROR_MESSAGE("params.ERROR_MESSAGE", "${params.ERROR_MESSAGE}"),
+    DATASETS("params.DATASETS", "${params.DATASETS}");
 
     private String name;
     private String value;

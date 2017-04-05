@@ -40,7 +40,8 @@ public class UITestsRegistry {
             DataloadDatasetDetailTest.class,
             DataloadScheduleDetailTest.class,
             NotificationsTest.class,
-            "testng-imap-notification.xml"
+            "testng-imap-notification.xml",
+            "testng-imap-dataload-process-notification.xml"
         });
 
         suites.put("orchestrator", new Object[] {

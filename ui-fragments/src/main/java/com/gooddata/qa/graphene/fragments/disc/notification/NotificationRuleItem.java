@@ -110,11 +110,13 @@ public class NotificationRuleItem extends AbstractFragment {
         return waitForElementVisible(emailInput).getAttribute("value");
     }
 
-    public NotificationEvent getEvent() {
-        return Stream.of(NotificationEvent.values())
-                .filter(e -> waitForElementVisible(eventSelect).getFirstSelectedOption().getText().equals(e.toString()))
-                .findFirst()
-                .get();
+    public NotificationEvent getSelectedEvent() {
+        return getNotificationEventByValue(waitForElementVisible(eventSelect).getFirstSelectedOption().getText());
+    }
+
+    public Collection<NotificationEvent> getAvailableEvents() {
+        return waitForElementVisible(eventSelect).getOptions()
+                .stream().map(e -> getNotificationEventByValue(e.getText())).collect(toList());
     }
 
     public String getSubject() {
@@ -164,6 +166,10 @@ public class NotificationRuleItem extends AbstractFragment {
 
     private Variable getVariableByValue(String value) {
         return Stream.of(Variable.values()).filter(v -> v.getValue().equals(value)).findFirst().get();
+    }
+
+    private NotificationEvent getNotificationEventByValue(String value) {
+        return Stream.of(NotificationEvent.values()).filter(e -> e.toString().equals(value)).findFirst().get();
     }
 
     public enum NotificationEvent {
