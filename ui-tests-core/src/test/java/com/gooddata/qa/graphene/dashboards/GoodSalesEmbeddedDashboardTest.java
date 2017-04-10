@@ -71,7 +71,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     private static final String ADDITIONAL_PROJECT_TITLE = "GoodSales-project-to-share-dashboard";
     private static final String EMBEDDED_DASHBOARD_NAME = "Embedded Dashboard";
 
-    private static final long EXPECTED_EXPORT_DASHBOARD_SIZE = 140000L;;
+    private static final long EXPECTED_EXPORT_DASHBOARD_SIZE = 130000L;
     private static final long EXPECTED_EXPORT_CHART_SIZE = 28000L;
 
     private UiReportDefinition tabularReportDef;
