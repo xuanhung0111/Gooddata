@@ -1,4 +1,4 @@
-FROM docker-registry-el7.na.intgdc.com/gdc_base_co7:latest
+FROM docker-registry.na.intgdc.com/gdc_base_co7:latest
 
 LABEL name="Checklist xvfb image based on CentOS-7" \
       maintainer="Silent Assassins Scrum <scrumsa@gooddata.com>" \
