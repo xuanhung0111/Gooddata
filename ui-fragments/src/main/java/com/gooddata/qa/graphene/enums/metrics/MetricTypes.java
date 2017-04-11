@@ -49,11 +49,11 @@ public enum MetricTypes {
     LESS("< (less)", "SELECT __metric__ WHERE __attr__ < __attrValue__", "Filters"),
     GREATER_OR_EQUAL(">= (greater or equal)", "SELECT __metric__ WHERE __attr__ >= __attrValue__", "Filters"),
     LESS_OR_EQUAL("<= (less or equal)", "SELECT __metric__ WHERE __attr__ <= __attrValue__", "Filters"),
-    BETWEEN("SELECT __metric__ WHERE __attr__ BETWEEN __attrValue__ AND __attrValue__", "Filters"),
+    BETWEEN("SELECT __metric__ WHERE __attr__ BETWEEN __attrValue__ AND __attrValue__", "Filters-SDK"),
     NOT_BETWEEN(
             "NOT BETWEEN",
             "SELECT __metric__ WHERE __attr__ NOT BETWEEN __attrValue__ AND __attrValue__",
-            "Filters"),
+            "Filters-SDK"),
     IN("SELECT __metric__ WHERE __attr__ IN (__attrValue__, __attrValue__)", "Filters"),
     NOT_IN("NOT IN", "SELECT __metric__ WHERE __attr__ NOT IN (__attrValue__, __attrValue__)", "Filters"),
     WITHOUT_PF(
