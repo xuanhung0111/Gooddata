@@ -69,7 +69,7 @@ public final class GoodSalesUtils {
     public static final String ATTR_SNAPSHOT_EOP2 = "_Snapshot [EOP-2]";
     public static final String ATTR_SALES_REP = "Sales Rep";
     public static final String ATTR_QUARTER_YEAR_CLOSED = "Quarter/Year (Closed)";
-    public static final String ATTR_DATE_DIMENSION_CLOSE = "Date dimension (Closed)";
+    public static final String ATTR_DATE_CLOSE = "Date (Closed)";
     public static final String ATTR_YEAR_CLOSE = "Year (Closed)";
     public static final String ATTR_DATE_SNAPSHOT = "Date (Snapshot)";
     public static final String ATTR_YEAR_SNAPSHOT = "Year (Snapshot)";
