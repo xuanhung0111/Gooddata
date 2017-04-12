@@ -38,7 +38,6 @@ import com.gooddata.qa.graphene.indigo.analyze.NonProductionDatasetInsightTest;
 import com.gooddata.qa.graphene.indigo.analyze.SpecialCasesTest;
 import com.gooddata.qa.graphene.indigo.analyze.WalkmeOnEmbeddedAdTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.AttributeBasedMetricsTest;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.AttributeFiltersTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.BucketsTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.EmptyCatalogueTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.FactBasedMetricsTest;
@@ -57,7 +56,6 @@ public class UITestsRegistry {
         suites.put("e2e", new Object[] {
             EmptyCatalogueTest.class,
             RecommendationsWithoutDateDimensionTest.class,
-            AttributeFiltersTest.class,
             BucketsTest.class,
             TableTest.class,
             UndoTest.class,
