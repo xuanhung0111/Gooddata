@@ -4,7 +4,7 @@ import static com.gooddata.md.Restriction.title;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -191,10 +191,9 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
         assertTrue(embeddedReportPage.isSndDeleteMetricButtonVisible(), "Delete button in Snd Metric detail is not visible");
 
         String editedMetricName = "Edited-" + metric;
-        MetricEditorDialog metricEditorDialog = embeddedReportPage.clickEditInSndMetricDetail();
-
-        metricEditorDialog.enterMetricName(editedMetricName).save();
-        waitForFragmentNotVisible(metricEditorDialog);
+        embeddedReportPage.clickEditInSndMetricDetail().enterMetricName(editedMetricName).save();
+        switchToParentFrame();
+        waitForElementNotPresent(MetricEditorDialog.IFRAME);
 
         switchToMainWindow(browser);
         assertTrue(initMetricPage().isMetricVisible(editedMetricName), "There is an error when editing metric name");
@@ -299,5 +298,9 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
     private String getRedBarMessage() {
         return waitForElementVisible(BY_RED_BAR, browser).getText();
+    }
+
+    private void switchToParentFrame() {
+        browser.switchTo().parentFrame();
     }
 }
