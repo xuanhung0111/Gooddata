@@ -28,8 +28,8 @@ public class DrillingConfigPanel extends AbstractFragment {
     @FindBy(className = "s-btn-select_metric___attribute___")
     private WebElement selectMetricAttributeButton;
 
-    @FindBy(className = "s-btn-select_attribute___report")
-    private WebElement selectAttributeReportButton;
+    @FindBy(className = "s-btn-select_attribute___report___dashboard")
+    private WebElement selectAttributeReportDashboardButton;
 
     public void addDrilling(Pair<List<String>, String> pairs, String group) {
         waitForElementVisible(isAddDrillingButtonVisible() ? drillingButton : addMoreButton).click();
@@ -48,7 +48,7 @@ public class DrillingConfigPanel extends AbstractFragment {
         for (String item : pairs.getLeft()) {
             popupPanel.searchAndSelectItem(item).submitPanel();
         }
-        waitForElementVisible(selectAttributeReportButton).click();
+        waitForElementVisible(selectAttributeReportDashboardButton).click();
         waitForElementVisible(popupPanel.getRoot());
         popupPanel.changeGroup(group);
         popupPanel.searchAndSelectItem(pairs.getRight()).submitPanel();
