@@ -57,6 +57,7 @@ public class MetricEditorDialog extends AbstractFragment {
     @FindBy(css = QUESTION_ACTIVE_LOCATOR + " .newFolder")
     private WebElement newFolderField;
 
+    public static final By IFRAME = By.className("metricEditorFrame");
     public static final By LOCATOR = By.className("s-metricEditor");
 
     private static final String METRIC_LINK_LOCATOR = "${metricType}";
@@ -80,7 +81,7 @@ public class MetricEditorDialog extends AbstractFragment {
     private static final By SEARCH_FIELD_LOCATOR = By.className("s-afp-input");
 
     public static MetricEditorDialog getInstance(WebDriver driver) {
-        driver.switchTo().frame(waitForElementVisible(By.className("metricEditorFrame"), driver));
+        driver.switchTo().frame(waitForElementVisible(IFRAME, driver));
 
         return Graphene.createPageFragment(MetricEditorDialog.class, waitForElementVisible(LOCATOR, driver));
     }
