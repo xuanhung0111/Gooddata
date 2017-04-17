@@ -96,7 +96,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     public static final String MAIN_ID = "app-dashboards";
 
     public static final IndigoDashboardsPage getInstance(SearchContext context) {
-        return Graphene.createPageFragment(IndigoDashboardsPage.class, waitForElementPresent(id(MAIN_ID), context));
+        return Graphene.createPageFragment(IndigoDashboardsPage.class, waitForElementVisible(id(MAIN_ID), context));
     }
 
     public SplashScreen getSplashScreen() {

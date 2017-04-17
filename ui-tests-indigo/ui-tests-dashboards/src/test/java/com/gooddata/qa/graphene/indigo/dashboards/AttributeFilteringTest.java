@@ -43,7 +43,6 @@ import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFiltersPanel;
 import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
 
 import java.util.Collection;
@@ -71,8 +70,6 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
                 asList(createAmountKpi(), insightWidget));
     }
-
-
 
     @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "mobile"})
     public void checkDashboardWithNoAttributeFilters() {
@@ -411,6 +408,8 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
     @Test(dependsOnGroups = "dashboardsInit", groups = {"desktop"},
             description = "ONE-1987: MUF user get JS error when Attribute Filter select element that he isn't applied")
     public void testFilterValuesWithMUF() throws IOException, JSONException {
+        String anotherUser = createAndAddUserToProject(UserRoles.EDITOR);
+
         Attribute department = getMdService()
                 .getObj(getProject(), Attribute.class, Restriction.title(ATTR_DEPARTMENT));
 
@@ -421,21 +420,31 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
                 .findFirst()
                 .get();
 
-        String anotherUser = createAndAddUserToProject(UserRoles.EDITOR);
-        addMufToUser(getRestApiClient(), testParams.getProjectId(), anotherUser, createMufObjectByUri
+        String mufUri = createMufObjectByUri
                 (getRestApiClient(), testParams.getProjectId(), "department-MUF", format("[%s] = [%s]",
-                        department.getUri(), directSales.getUri())));
+                        department.getUri(), directSales.getUri()));
+        addMufToUser(getRestApiClient(), testParams.getProjectId(), anotherUser, mufUri);
 
-        initIndigoDashboardsPageWithWidgets().switchToEditMode()
-                .addAttributeFilter(ATTR_DEPARTMENT).getAttributeFiltersPanel()
-                .getAttributeFilter(ATTR_DEPARTMENT).selectByName("Inside Sales");
+        AttributeFilter atttributefilter = initIndigoDashboardsPageWithWidgets()
+                .switchToEditMode()
+                .addAttributeFilter(ATTR_DEPARTMENT)
+                .getAttributeFiltersPanel()
+                .getAttributeFilter(ATTR_DEPARTMENT);
+        atttributefilter.clearAllCheckedValues().selectByName("Inside Sales");
+        atttributefilter.apply();
         indigoDashboardsPage.saveEditModeWithWidgets();
 
         try {
-            logoutAndLoginAs(true, UserRoles.EDITOR);
+            logoutAndLoginAs(false, UserRoles.EDITOR);
 
-            AttributeFilter departmentFilter = initIndigoDashboardsPageWithWidgets().getAttributeFiltersPanel()
+            initIndigoDashboardsPageWithWidgets();
+            //reload the Indigo dashboard page to avoid a red bar. See details in bug CL-11196
+            AttributeFilter departmentFilter =  initIndigoDashboardsPageWithWidgets()
+                    .getAttributeFiltersPanel()
                     .getAttributeFilter(ATTR_DEPARTMENT);
+
+            assertEquals(departmentFilter.getSelection(), "None", "Attribute filter selection is wrong");
+
             departmentFilter.ensureDropdownOpen();
             takeScreenshot(browser, "testFilterValuesWithMUF", getClass());
             departmentFilter.searchForText("Inside Sales");
