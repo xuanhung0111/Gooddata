@@ -15,6 +15,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 
 import java.util.List;
 
@@ -26,6 +27,7 @@ import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.fragments.manage.MetricDetailsPage;
 import com.gooddata.qa.graphene.fragments.manage.MetricEditorDialog;
 import com.gooddata.qa.graphene.fragments.manage.MetricEditorDialog.ElementType;
+import com.gooddata.qa.utils.browser.BrowserUtils;
 
 public class GoodSalesMetricEditorTest extends GoodSalesAbstractTest {
 
@@ -81,6 +83,10 @@ public class GoodSalesMetricEditorTest extends GoodSalesAbstractTest {
                 .addToGlobalMetrics().addNewFolder(MY_METRICS).submit();
 
         switchToMainWindow(browser);
+        //after switch from Metric editor, report page is scrolled up and can't click Advanced button on SndPanel
+        //solution is use Javascript to scroll page
+        waitForElementNotPresent(MetricEditorDialog.IFRAME, browser);
+        BrowserUtils.runScript(browser, "window.scrollTo(0, 0)");
 
         assertEquals(
                 reportPage.clickAddAdvanceMetric().clickCustomMetricLink().selectElementType(ElementType.METRICS)
@@ -118,7 +124,7 @@ public class GoodSalesMetricEditorTest extends GoodSalesAbstractTest {
                 METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACCOUNT);
 
         switchToMainWindow(browser);
-
+        waitForElementNotPresent(MetricEditorDialog.IFRAME, browser);
         assertTrue(reportPage.editMetric(metricName).waitForElementsLoading().search(metricName)
                 .isEmptyMessagePresent(), "The empty message is not displayed");
     }
