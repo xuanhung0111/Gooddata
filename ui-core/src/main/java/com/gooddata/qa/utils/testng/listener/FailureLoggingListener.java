@@ -2,12 +2,9 @@ package com.gooddata.qa.utils.testng.listener;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
-import java.util.logging.Level;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.arquillian.drone.browserstack.extension.webdriver.BrowserStackDriver;
 import org.jboss.arquillian.drone.api.annotation.Default;
 import org.jboss.arquillian.graphene.context.GrapheneContext;
 import org.openqa.selenium.OutputType;
@@ -50,12 +47,10 @@ public class FailureLoggingListener extends TestListenerAdapter {
 
         String htmlSource = driver.getPageSource();
 
-        if (!(driver instanceof BrowserStackDriver)) {
-            LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
+        LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
 
-            for (LogEntry entry : logEntries) {
-                consolelog += entry.toString() + "\n";
-            }
+        for (LogEntry entry : logEntries) {
+            consolelog += entry.toString() + "\n";
         }
 
         File consoleLogOutputFile = new File(failuresOutputDir, filenameIdentification + "/console.log");

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.arquillian.drone.browserstack.extension.webdriver.BrowserStackDriver;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
@@ -30,13 +29,6 @@ public class BrowserUtils {
 
     public static String getCurrentBrowserAgent(WebDriver browser) {
         Capabilities capabilities = ((RemoteWebDriver) browser).getCapabilities();
-
-        if (browser instanceof BrowserStackDriver) {
-            capabilities = ((BrowserStackDriver) browser).getCapabilities();
-            if (capabilities.getCapability("platformName") != null) {
-                return capabilities.getCapability("browser") + " - " + capabilities.getCapability("platformName");
-            }
-        }
 
         return capabilities.getBrowserName() + " - " + capabilities.getCapability("platform");
     }
