@@ -67,14 +67,9 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     public void init() throws JSONException {
         System.out.println("Current browser agent is: " + getCurrentBrowserAgent(browser).toUpperCase());
 
-        String executionEnv = System.getProperty("test.execution.env");
-        if (executionEnv != null && executionEnv.contains("browserstack-mobile")) {
-            System.out.println("Maximizing window is ignored for execution on mobile devices at Browserstack.");
-        } else {
-            // Use this utility to maximize browser in chrome - MAC
-            // browser.manage().window().maximize(); do not work
-            maximize(browser);
-        }
+        // Use this utility to maximize browser in chrome - MAC
+        // browser.manage().window().maximize(); do not work
+        maximize(browser);
 
         // sign in with admin user
         signIn(canAccessGreyPage(browser), UserRoles.ADMIN);

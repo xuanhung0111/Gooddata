@@ -25,17 +25,9 @@ import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashbo
 
 public class ResponsiveNavigationTest extends GoodSalesAbstractDashboardTest {
 
-    private boolean isTestedOnBrowserStack = false;
-
     @Override
     protected void prepareSetupProject() throws Throwable {
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
-    }
-
-    @BeforeClass(alwaysRun = true)
-    public void detectExecutionEnvironment() {
-        String executionEnv = System.getProperty("test.execution.env");
-        isTestedOnBrowserStack = executionEnv != null && executionEnv.contains("browserstack-mobile");
     }
 
     @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"mobile"})
@@ -87,14 +79,6 @@ public class ResponsiveNavigationTest extends GoodSalesAbstractDashboardTest {
 
     @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"mobile"})
     public void checkLandingPage() throws JSONException {
-        String executionEnv = System.getProperty("test.execution.env");
-        if (executionEnv == null || !executionEnv.contains("browserstack-mobile")) {
-            String message = "This test should be executed in browserstack mobile."
-                    + " Skip this test in local testing.";
-            log.info(message);
-            throw new SkipException(message);
-        }
-
         if (!isDeviceSupportHamburgerMenu()) return;
 
         HamburgerMenu menu = waitForFragmentVisible(indigoDashboardsPage).openHamburgerMenu();
@@ -156,32 +140,8 @@ public class ResponsiveNavigationTest extends GoodSalesAbstractDashboardTest {
     }
 
     private void navigateToEachHamburgerMenuItem(String page) {
-        try {
-            initIndigoDashboardsPage()
-                .openHamburgerMenu()
-                .goToPage(page);
-        } catch (TimeoutException e) {
-            if (isTestedOnBrowserStack) {
-                switch(page) {
-                    case "Dashboards":
-                        if (browser.getCurrentUrl().contains("|projectDashboardPage")) {
-                            return;
-                        } 
-                    case "Analyze":
-                        if (browser.getCurrentUrl().contains("/reportId/edit")) {
-                            return;
-                        } 
-                    case "Reports":
-                        if (browser.getCurrentUrl().contains("|domainPage")) {
-                            return;
-                        } 
-                    case "Manage":
-                        if (browser.getCurrentUrl().contains("|dataPage|")) {
-                            return;
-                        } 
-                }
-            }
-            throw e;
-        }
+        initIndigoDashboardsPage()
+            .openHamburgerMenu()
+            .goToPage(page);
     }
 }

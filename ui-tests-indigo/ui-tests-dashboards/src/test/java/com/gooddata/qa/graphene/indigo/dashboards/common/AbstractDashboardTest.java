@@ -160,12 +160,8 @@ public abstract class AbstractDashboardTest extends AbstractProjectTest {
     }
 
     private void adjustWindowSize(final String windowSize) {
-        String executionEnv = System.getProperty("test.execution.env");
         if ("maximize".equals(windowSize)) {
             maximizeWindow();
-        } else if (executionEnv != null && executionEnv.contains("browserstack-mobile")) {
-            System.out.println(
-                    "Window size is ignored for execution on mobile devices at Browserstack.");
         } else {
             String[] dimensions = windowSize.split(",");
             if (dimensions.length == 2) {
