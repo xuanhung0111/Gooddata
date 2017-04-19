@@ -94,22 +94,6 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void addAttributeToFilterBucket() {
-        final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
-
-        assertEquals(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                .addAttribute(ATTR_ACTIVITY_TYPE)
-                .waitForReportComputing()
-                .getChartReport()
-                .getTrackersCount(), 4);
-        assertEquals(filtersBucketReact.getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ":\nAll");
-
-        analysisPage.addFilter(ATTR_DEPARTMENT);
-        assertEquals(filtersBucketReact.getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ":\nAll");
-        checkingOpenAsReport("addAttributeToFilterBucket");
-    }
-
-    @Test(dependsOnGroups = {"init"})
     public void testAttributeReplaceDate() {
         final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
 
