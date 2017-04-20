@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.disc.schedule.dataload;
+package com.gooddata.qa.graphene.add.schedule;
 
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static java.util.Arrays.asList;
@@ -20,7 +20,7 @@ import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.gooddata.qa.graphene.fragments.disc.schedule.DatasetDropdown;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 
-public class CreateDataloadScheduleTest extends AbstractDataloadProcessTest {
+public class CreateScheduleTest extends AbstractDataloadProcessTest {
 
     private static final String OPPORTUNITY_DATASET = "opportunity";
     private static final String PERSON_DATASET = "person";

@@ -1,8 +1,7 @@
-package com.gooddata.qa.graphene.disc.notification;
+package com.gooddata.qa.graphene.add.notification;
 
 import static com.gooddata.qa.graphene.entity.disc.NotificationRule.buildMessage;
 import static com.gooddata.qa.graphene.entity.disc.NotificationRule.getVariablesFromMessage;
-import static com.gooddata.qa.utils.ads.AdsHelper.ADS_DB_CONNECTION_URL;
 import static com.gooddata.qa.utils.http.process.ProcessRestUtils.executeProcess;
 import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
 import static com.gooddata.qa.utils.mail.ImapUtils.getEmailBody;
@@ -46,7 +45,7 @@ import com.gooddata.qa.graphene.fragments.disc.notification.NotificationRuleItem
 import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 
-public class DataloadProcessNotificationTest extends AbstractDataloadProcessTest {
+public class NotificationTest extends AbstractDataloadProcessTest {
 
     private static final String DATASET_OPPORTUNITY = "opportunity";
     private static final String DATASET_PERSON = "person";
@@ -136,7 +135,7 @@ public class DataloadProcessNotificationTest extends AbstractDataloadProcessTest
                         .hasTimeStamp(true)
                         .withDataFile(person));
 
-        Parameters parameters = getDefaultParameter().addParameter("SQL_QUERY", sqlBuilder.build());
+        Parameters parameters = getDefaultParameters().addParameter("SQL_QUERY", sqlBuilder.build());
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
     }
@@ -218,7 +217,7 @@ public class DataloadProcessNotificationTest extends AbstractDataloadProcessTest
         Date timeReceiveEmail = getTimeReceiveEmail();
 
         person.rows("P2", "20", getCurrentDate()).saveToDisc(testParams.getCsvFolder());
-        Parameters parameters = getDefaultParameter().addParameter("SQL_QUERY", sqlBuilder.build());
+        Parameters parameters = getDefaultParameters().addParameter("SQL_QUERY", sqlBuilder.build());
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
 
@@ -258,7 +257,7 @@ public class DataloadProcessNotificationTest extends AbstractDataloadProcessTest
         Date timeReceiveEmail = getTimeReceiveEmail();
 
         person.rows("P3", "20").saveToDisc(testParams.getCsvFolder());
-        Parameters parameters = getDefaultParameter().addParameter("SQL_QUERY", sqlBuilder.build());
+        Parameters parameters = getDefaultParameters().addParameter("SQL_QUERY", sqlBuilder.build());
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
 
@@ -291,12 +290,5 @@ public class DataloadProcessNotificationTest extends AbstractDataloadProcessTest
 
     private Date getTimeReceiveEmail() {
         return new Date();
-    }
-
-    private Parameters getDefaultParameter() {
-        return new Parameters()
-                .addParameter("ADS_URL", format(ADS_DB_CONNECTION_URL, testParams.getHost(), ads.getId()))
-                .addParameter("ADS_USER", testParams.getUser())
-                .addSecureParameter("ADS_PASSWORD", testParams.getPassword());
     }
 }

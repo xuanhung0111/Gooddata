@@ -3,7 +3,7 @@
 
     <test name="dataload-process-notification" enabled="true">
         <classes>
-            <class name="com.gooddata.qa.graphene.disc.notification.DataloadProcessNotificationTest" />
+            <class name="com.gooddata.qa.graphene.add.notification.NotificationTest" />
         </classes>
     </test>
 

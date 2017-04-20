@@ -15,9 +15,6 @@ import com.gooddata.qa.graphene.disc.project.ProjectsPageTest;
 import com.gooddata.qa.graphene.disc.schedule.CreateScheduleTest;
 import com.gooddata.qa.graphene.disc.schedule.EditScheduleTest;
 import com.gooddata.qa.graphene.disc.schedule.ScheduleDetailTest;
-import com.gooddata.qa.graphene.disc.schedule.dataload.CreateDataloadScheduleTest;
-import com.gooddata.qa.graphene.disc.schedule.dataload.DataloadDatasetDetailTest;
-import com.gooddata.qa.graphene.disc.schedule.dataload.DataloadScheduleDetailTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 public class UITestsRegistry {
@@ -36,12 +33,8 @@ public class UITestsRegistry {
             CreateScheduleTest.class,
             EditScheduleTest.class,
             ScheduleDetailTest.class,
-            CreateDataloadScheduleTest.class,
-            DataloadDatasetDetailTest.class,
-            DataloadScheduleDetailTest.class,
             NotificationsTest.class,
-            "testng-imap-notification.xml",
-            "testng-imap-dataload-process-notification.xml"
+            "testng-imap-notification.xml"
         });
 
         suites.put("orchestrator", new Object[] {
@@ -54,9 +47,6 @@ public class UITestsRegistry {
             CreateScheduleTest.class,
             EditScheduleTest.class,
             ScheduleDetailTest.class,
-            CreateDataloadScheduleTest.class,
-            DataloadDatasetDetailTest.class,
-            DataloadScheduleDetailTest.class,
             NotificationsTest.class
         });
 
