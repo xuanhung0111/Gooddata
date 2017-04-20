@@ -345,6 +345,10 @@
                                                 <name>test.execution.env</name>
                                                 <value>${test.execution.env}</value>
                                             </property>
+                                            <property>
+                                                <name>user.domain</name>
+                                                <value>${user.domain}</value>
+                                            </property>
                                         </systemProperties>
                                     </configuration>
                                 </execution>
