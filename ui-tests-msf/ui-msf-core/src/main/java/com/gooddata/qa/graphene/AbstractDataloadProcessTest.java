@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.disc.common;
+package com.gooddata.qa.graphene;
 
 import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
 
@@ -15,7 +15,7 @@ import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.Package
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 import com.gooddata.warehouse.Warehouse;
 
-public class AbstractDataloadProcessTest extends AbstractDiscTest {
+public class AbstractDataloadProcessTest extends __AbstractMsfTest {
 
     protected static final String DEFAULT_DATAlOAD_PROCESS_NAME = "Automated Data Distribution";
     protected static final String UPDATE_ADS_TABLE_EXECUTABLE = "DLUI/graph/CreateAndCopyDataToADS.grf";

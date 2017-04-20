@@ -34,7 +34,7 @@ import org.testng.annotations.Test;
 import com.gooddata.GoodData;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
-import com.gooddata.qa.graphene.disc.common.AbstractDiscTest;
+import com.gooddata.qa.graphene.AbstractDiscTest;
 import com.gooddata.qa.graphene.entity.disc.NotificationRule;
 import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.disc.notification.Variable;

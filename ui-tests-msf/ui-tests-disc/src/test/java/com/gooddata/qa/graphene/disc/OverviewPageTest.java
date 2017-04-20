@@ -22,13 +22,13 @@ import org.testng.annotations.Test;
 
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
-import com.gooddata.qa.graphene.disc.common.AbstractDiscTest;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
+import com.gooddata.qa.graphene.AbstractDiscTest;
 import com.gooddata.qa.graphene.enums.disc.schedule.Executable;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleCronTime;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.disc.overview.OverviewPage.OverviewState;
-import com.gooddata.qa.graphene.fragments.disc.overview.OverviewProjects.__OverviewProjectItem;
+import com.gooddata.qa.graphene.fragments.disc.overview.OverviewProjects.OverviewProjectItem;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 
@@ -271,7 +271,7 @@ public class OverviewPageTest extends AbstractDiscTest {
 
             logoutAndLoginAs(canAccessGreyPage(browser), role);
 
-            __OverviewProjectItem project = initDiscOverviewPage()
+            OverviewProjectItem project = initDiscOverviewPage()
                     .selectState(OverviewState.SUCCESSFUL)
                     .getOverviewProject(projectTitle);
 
@@ -327,7 +327,7 @@ public class OverviewPageTest extends AbstractDiscTest {
                 scheduleDetail.waitForExecutionFinish();
             }
 
-            __OverviewProjectItem project = initDiscOverviewPage()
+            OverviewProjectItem project = initDiscOverviewPage()
                     .selectState(state).getOverviewProject(projectTitle);
             assertTrue(project.expand().hasSchedule(customScheduleName), "Schedule " + customScheduleName + " not show");
             assertEquals(project.getScheduleExecutable(customScheduleName), executable.getPath());
