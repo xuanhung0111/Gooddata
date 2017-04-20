@@ -77,27 +77,6 @@ public class ResponsiveNavigationTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"mobile"})
-    public void checkLandingPage() throws JSONException {
-        if (!isDeviceSupportHamburgerMenu()) return;
-
-        HamburgerMenu menu = waitForFragmentVisible(indigoDashboardsPage).openHamburgerMenu();
-        List<String> pages = menu.getAllMenuItems();
-        indigoDashboardsPage.closeHamburgerMenu();
-
-        for (String page : pages) {
-            log.info("Navigate to page: " + page);
-
-            navigateToEachHamburgerMenuItem(page);
-
-            logout();
-            signIn(false, UserRoles.ADMIN);
-            waitForFragmentVisible(indigoDashboardsPage)
-                .waitForDashboardLoad()
-                .waitForWidgetsLoading();
-        }
-    }
-
     @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
     public void checkHamburgerMenuNotPresentInDesktop() {
         assertFalse(initIndigoDashboardsPage().isHamburgerMenuLinkPresent());
