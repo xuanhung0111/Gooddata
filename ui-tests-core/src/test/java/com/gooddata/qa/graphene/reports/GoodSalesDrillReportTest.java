@@ -1,9 +1,11 @@
 package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -12,11 +14,13 @@ import static org.testng.Assert.fail;
 
 import java.util.Arrays;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -31,11 +35,13 @@ import com.gooddata.qa.graphene.fragments.dashboards.ReportInfoViewPanel;
 import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.google.common.collect.Sets;
+import com.google.common.base.Predicate;
 
 public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
 
     private static final String TEST_DASHBOAD_NAME = "test-drill-report";
     private static final String REPORT_NAME = "Drill report";
+    private static final String SECOND_DASHBOARD_TAB_NAME = "Second Tab";
 
     @BeforeClass
     public void setProjectTitle() {
@@ -389,6 +395,31 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
 
             initAttributePage().initAttribute("Activity")
                 .clearDrillingSetting();
+        }
+    }
+
+    @Test(dependsOnMethods = { "createDrillReport" })
+    public void drillReportToDashboard() {
+        try {
+            initDashboardsPage()
+                    .addNewDashboard(TEST_DASHBOAD_NAME)
+                    .addNewTab(SECOND_DASHBOARD_TAB_NAME)
+                    .addReportToDashboard(REPORT_NAME)
+                    .saveDashboard();
+            checkRedBar(browser);
+
+            dashboardsPage.editDashboard();
+
+            TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
+            tableReport.addDrilling(Pair.of(Arrays.asList(ATTR_STAGE_NAME), "First Tab"), "Dashboards");
+            dashboardsPage.saveDashboard();
+
+            tableReport.drillOnAttributeValue();
+
+            Predicate<WebDriver> waitDrilledTabLoaded = browser -> dashboardsPage.getTabs().isTabSelected(0);
+            Graphene.waitGui().withTimeout(1, TimeUnit.MINUTES).until(waitDrilledTabLoaded);
+        } finally {
+            dashboardsPage.deleteDashboard();
         }
     }
 
