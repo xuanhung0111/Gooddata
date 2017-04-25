@@ -10,7 +10,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.getBubbleMessage;
 import org.testng.annotations.Test;
 
 import com.gooddata.dataload.processes.DataloadProcess;
-import com.gooddata.qa.graphene.disc.common.AbstractDiscTest;
+import com.gooddata.qa.graphene.AbstractDiscTest;
 import com.gooddata.qa.graphene.entity.disc.NotificationRule;
 import com.gooddata.qa.graphene.enums.disc.notification.VariableList;
 import com.gooddata.qa.graphene.fragments.disc.notification.NotificationRuleItem;

@@ -62,7 +62,7 @@ public class ScheduleDetail extends AbstractScheduleFragment {
     private WebElement retryDelayInput;
 
     @FindBy(className = "execution-history-item")
-    private List<__ExecutionHistoryItem> executionHistoryItems;
+    private List<ExecutionHistoryItem> executionHistoryItems;
 
     public static final ScheduleDetail getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(ScheduleDetail.class, waitForElementVisible(LOCATOR, searchContext))
@@ -278,7 +278,7 @@ public class ScheduleDetail extends AbstractScheduleFragment {
                 .sum();
     }
 
-    public __ExecutionHistoryItem getLastExecutionHistoryItem() {
+    public ExecutionHistoryItem getLastExecutionHistoryItem() {
         return executionHistoryItems.get(0);
     }
 
@@ -314,7 +314,7 @@ public class ScheduleDetail extends AbstractScheduleFragment {
                 .findFirst();
     }
 
-    public class __ExecutionHistoryItem extends AbstractFragment {
+    public class ExecutionHistoryItem extends AbstractFragment {
 
         @FindBy(className = "execution-history-item-description")
         private WebElement description;

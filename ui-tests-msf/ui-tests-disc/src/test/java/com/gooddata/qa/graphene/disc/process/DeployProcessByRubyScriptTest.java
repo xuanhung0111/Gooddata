@@ -6,7 +6,7 @@ import static org.testng.Assert.assertEquals;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.disc.common.AbstractDiscTest;
+import com.gooddata.qa.graphene.AbstractDiscTest;
 import com.gooddata.qa.graphene.fragments.disc.ConfirmationDialog;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;

@@ -30,13 +30,13 @@ public class OverviewProjects extends AbstractFragment {
     private WebElement disableButton;
 
     @FindBy(className = "overview-project-item")
-    private Collection<__OverviewProjectItem> projectItems;
+    private Collection<OverviewProjectItem> projectItems;
 
     public String getEmptyStateMessage() {
         return waitForElementVisible(emptyState).getText();
     }
 
-    public __OverviewProjectItem getProject(String title) {
+    public OverviewProjectItem getProject(String title) {
         return projectItems.stream()
                 .filter(project -> title.equals(project.getTitle()))
                 .findFirst()
@@ -72,7 +72,7 @@ public class OverviewProjects extends AbstractFragment {
         return this;
     }
 
-    public class __OverviewProjectItem extends AbstractFragment {
+    public class OverviewProjectItem extends AbstractFragment {
 
         @FindBy(className = "ait-overview-project-list-item-title")
         private WebElement title;
@@ -94,7 +94,7 @@ public class OverviewProjects extends AbstractFragment {
             return getRoot().getAttribute("class").contains("non-admin");
         }
 
-        public __OverviewProjectItem expand() {
+        public OverviewProjectItem expand() {
             if (isCollapsed()) {
                 expandArrow.click();
             }
@@ -113,7 +113,7 @@ public class OverviewProjects extends AbstractFragment {
             return waitForElementVisible(title).getText();
         }
 
-        private __OverviewProjectItem markOn() {
+        private OverviewProjectItem markOn() {
             waitForElementVisible(checkbox);
 
             if (!checkbox.isSelected()) {

@@ -12,7 +12,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.disc.overview.OverviewProjects.__OverviewProjectItem;
+import com.gooddata.qa.graphene.fragments.disc.overview.OverviewProjects.OverviewProjectItem;
 import com.google.common.base.Predicate;
 
 public class OverviewPage extends AbstractFragment {
@@ -42,7 +42,7 @@ public class OverviewPage extends AbstractFragment {
         return waitForFragmentVisible(overviewProjects).getEmptyStateMessage();
     }
 
-    public __OverviewProjectItem getOverviewProject(String title) {
+    public OverviewProjectItem getOverviewProject(String title) {
         return waitForFragmentVisible(overviewProjects).getProject(title);
     }
 

@@ -20,8 +20,8 @@ import org.testng.annotations.Test;
 
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
-import com.gooddata.qa.graphene.disc.common.AbstractDiscTest;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
+import com.gooddata.qa.graphene.AbstractDiscTest;
 import com.gooddata.qa.graphene.enums.disc.schedule.Executable;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleCronTime;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
@@ -31,7 +31,7 @@ import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail.Tab;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CronEditor;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
-import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail.__ExecutionHistoryItem;
+import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail.ExecutionHistoryItem;
 
 public class ScheduleDetailTest extends AbstractDiscTest {
 
@@ -149,7 +149,7 @@ public class ScheduleDetailTest extends AbstractDiscTest {
             ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
             executeScheduleWithSpecificTimes(scheduleDetail, 3);
 
-            __ExecutionHistoryItem item = scheduleDetail.getLastExecutionHistoryItem();
+            ExecutionHistoryItem item = scheduleDetail.getLastExecutionHistoryItem();
             assertTrue(item.isItemGroup(), "All sucessful executions are not grouped");
             assertEquals(item.getStatusDescription(), "OK 3×");
 

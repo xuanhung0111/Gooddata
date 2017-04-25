@@ -30,7 +30,7 @@ import org.jsoup.nodes.Document;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.disc.common.AbstractDataloadProcessTest;
+import com.gooddata.qa.graphene.AbstractDataloadProcessTest;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.entity.disc.NotificationRule;
 import com.gooddata.qa.graphene.entity.disc.Parameters;

@@ -16,17 +16,17 @@ import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.disc.common.AbstractDataloadProcessTest;
+import com.gooddata.qa.graphene.AbstractDataloadProcessTest;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
 import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.entity.model.SqlBuilder;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
 import com.gooddata.qa.graphene.fragments.disc.overview.OverviewPage.OverviewState;
-import com.gooddata.qa.graphene.fragments.disc.overview.OverviewProjects.__OverviewProjectItem;
+import com.gooddata.qa.graphene.fragments.disc.overview.OverviewProjects.OverviewProjectItem;
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
-import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail.__ExecutionHistoryItem;
+import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail.ExecutionHistoryItem;
 
 public class DataloadScheduleDetailTest extends AbstractDataloadProcessTest {
 
@@ -121,7 +121,7 @@ public class DataloadScheduleDetailTest extends AbstractDataloadProcessTest {
             processDetail.openSchedule(schedule1).executeSchedule().close();
             processDetail.openSchedule(schedule2).executeSchedule().waitForExecutionFinish();
 
-            __ExecutionHistoryItem executionItem = ScheduleDetail.getInstance(browser)
+            ExecutionHistoryItem executionItem = ScheduleDetail.getInstance(browser)
                     .getLastExecutionHistoryItem();
             assertEquals(executionItem.getStatusDescription(), "SCHEDULER_ERROR");
             assertEquals(executionItem.getErrorMessage(), "The schedule did not run because one or more of the "
@@ -207,7 +207,7 @@ public class DataloadScheduleDetailTest extends AbstractDataloadProcessTest {
         try {
             ScheduleDetail.getInstance(browser).executeSchedule().waitForExecutionFinish();
 
-            __OverviewProjectItem project = initDiscOverviewPage()
+            OverviewProjectItem project = initDiscOverviewPage()
                     .selectState(OverviewState.SUCCESSFUL).getOverviewProject(projectTitle);
             assertTrue(project.expand().hasSchedule(schedule), "Schedule " + schedule + " not show");
             assertEquals(project.getScheduleExecutable(schedule), "");

@@ -32,7 +32,7 @@ import com.gooddata.md.report.AttributeInGrid;
 import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
-import com.gooddata.qa.graphene.disc.common.AbstractDataloadProcessTest;
+import com.gooddata.qa.graphene.AbstractDataloadProcessTest;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
 import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.entity.model.SqlBuilder;
