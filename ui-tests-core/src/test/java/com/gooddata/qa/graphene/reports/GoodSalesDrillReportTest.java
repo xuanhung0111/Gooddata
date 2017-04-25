@@ -1,11 +1,12 @@
 package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -16,6 +17,7 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
@@ -40,8 +42,9 @@ import com.google.common.base.Predicate;
 public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
 
     private static final String TEST_DASHBOAD_NAME = "test-drill-report";
+    private static final String TARGET_DASHBOAD_NAME = "drill-target-dashboard";
     private static final String REPORT_NAME = "Drill report";
-    private static final String SECOND_DASHBOARD_TAB_NAME = "Second Tab";
+    private static final String TARGET_DASHBOARD_TAB_NAME = "Target Tab";
 
     @BeforeClass
     public void setProjectTitle() {
@@ -65,15 +68,15 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     public void drillOnDashboard() {
         try {
             addReportToNewDashboard(REPORT_NAME, TEST_DASHBOAD_NAME);
-    
+
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             assertFalse(tableReport.isRollupTotalVisible());
             assertEquals(tableReport.getAttributesHeader(), Arrays.asList("Year (Snapshot)", "Stage Name"));
             assertSetEquals(tableReport.getMetricsHeader(), Sets.newHashSet("Amount", "Avg. Amount"),
                     "Metric headers are not correct!");
-    
+
             tableReport.clickOnAttributeToOpenDrillReport("2010");
-            DashboardDrillDialog drillDialog = 
+            DashboardDrillDialog drillDialog =
                     Graphene.createPageFragment(DashboardDrillDialog.class,
                             waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
 
@@ -275,7 +278,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.addDrilling(Pair.of(Arrays.asList("Stage Name"), "Account"));
             dashboardsPage.saveDashboard();
-            
+
             tableReport.drillOnAttributeValue();
             DashboardDrillDialog drillDialog = Graphene.createPageFragment(DashboardDrillDialog.class,
                     waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
@@ -401,25 +404,76 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = { "createDrillReport" })
     public void drillReportToDashboard() {
         try {
+            prepareDrillReportToDashboard();
             initDashboardsPage()
-                    .addNewDashboard(TEST_DASHBOAD_NAME)
-                    .addNewTab(SECOND_DASHBOARD_TAB_NAME)
-                    .addReportToDashboard(REPORT_NAME)
-                    .saveDashboard();
-            checkRedBar(browser);
-
-            dashboardsPage.editDashboard();
+                    .selectDashboard(TEST_DASHBOAD_NAME)
+                    .editDashboard();
 
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            tableReport.addDrilling(Pair.of(Arrays.asList(ATTR_STAGE_NAME), "First Tab"), "Dashboards");
+            tableReport.addDrilling(Pair.of(Arrays.asList(ATTR_STAGE_NAME), TARGET_DASHBOARD_TAB_NAME), "Dashboards");
             dashboardsPage.saveDashboard();
 
             tableReport.drillOnAttributeValue();
 
-            Predicate<WebDriver> waitDrilledTabLoaded = browser -> dashboardsPage.getTabs().isTabSelected(0);
-            Graphene.waitGui().withTimeout(1, TimeUnit.MINUTES).until(waitDrilledTabLoaded);
+            Predicate<WebDriver> waitDrilledDashboardLoaded = browser -> dashboardsPage.getDashboardName()
+                    .equals(TARGET_DASHBOAD_NAME);
+            Graphene.waitGui().withTimeout(1, TimeUnit.MINUTES).until(waitDrilledDashboardLoaded);
+
+            assertTrue(dashboardsPage.getTabs().isTabSelected(1));
         } finally {
-            dashboardsPage.deleteDashboard();
+            initDashboardsPage().selectDashboard(TARGET_DASHBOAD_NAME).deleteDashboard();
+            initDashboardsPage().selectDashboard(TEST_DASHBOAD_NAME).deleteDashboard();
+        }
+    }
+
+    @Test(dependsOnMethods = { "createDrillReport" })
+    public void drillToDashboardPassValueListFilter() {
+        try {
+            prepareDrillReportToDashboard();
+
+            // setup for origin tab
+            initDashboardsPage().selectDashboard(TEST_DASHBOAD_NAME).editDashboard();
+
+            dashboardsPage.openTab(0)
+                    .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_ACCOUNT,
+                            DashboardWidgetDirection.RIGHT)
+                    .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME,
+                            DashboardWidgetDirection.LEFT)
+                    .getFilterWidgetByName(ATTR_STAGE_NAME).changeSelectionToOneValue();
+
+            TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
+            tableReport.addDrilling(Pair.of(Arrays.asList(ATTR_STAGE_NAME), TARGET_DASHBOARD_TAB_NAME), "Dashboards");
+            dashboardsPage.saveDashboard();
+
+            //setup for target tab
+            dashboardsPage.selectDashboard(TARGET_DASHBOAD_NAME).openTab(1)
+                    .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_ACCOUNT,
+                            DashboardWidgetDirection.RIGHT)
+                    .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME,
+                            DashboardWidgetDirection.LEFT)
+                    .getFilterWidgetByName(ATTR_STAGE_NAME).changeSelectionToOneValue();
+
+            dashboardsPage.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_PRODUCT,
+                    DashboardWidgetDirection.MIDDLE)
+                    .saveDashboard();
+
+            dashboardsPage.selectDashboard(TEST_DASHBOAD_NAME)
+                    .getFilterWidgetByName(ATTR_ACCOUNT).changeAttributeFilterValues("101 Financial", "14 West");
+            dashboardsPage.getFilterWidgetByName(ATTR_STAGE_NAME).changeAttributeFilterValues("Risk Assessment");
+
+            tableReport.drillOnAttributeValue();
+
+            Predicate<WebDriver> waitDrilledDashboardLoaded = browser -> dashboardsPage.getDashboardName()
+                    .equals(TARGET_DASHBOAD_NAME);
+            Graphene.waitGui().withTimeout(1, TimeUnit.MINUTES).until(waitDrilledDashboardLoaded);
+
+            assertTrue(dashboardsPage.getTabs().isTabSelected(1));
+            assertEquals(dashboardsPage.getFilterWidgetByName(ATTR_ACCOUNT).getCurrentValue(), "101 Financial, 14 West");
+            assertEquals(dashboardsPage.getFilterWidgetByName(ATTR_STAGE_NAME).getCurrentValue(), "Risk Assessment");
+            assertEquals(dashboardsPage.getFilterWidgetByName(ATTR_PRODUCT).getCurrentValue(), "All");
+        } finally {
+            initDashboardsPage().selectDashboard(TARGET_DASHBOAD_NAME).deleteDashboard();
+            initDashboardsPage().selectDashboard(TEST_DASHBOAD_NAME).deleteDashboard();
         }
     }
 
@@ -429,6 +483,19 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
 
         if (!actual.containsAll(expected) || !expected.containsAll(actual))
             fail(message);
+    }
+
+    private void prepareDrillReportToDashboard() {
+        initDashboardsPage();
+        dashboardsPage.addNewDashboard(TEST_DASHBOAD_NAME)
+                .addReportToDashboard(REPORT_NAME)
+                .saveDashboard();
+
+        dashboardsPage.addNewDashboard(TARGET_DASHBOAD_NAME)
+                .addNewTab(TARGET_DASHBOARD_TAB_NAME)
+                .saveDashboard();
+
+        checkRedBar(browser);
     }
 
     private DashboardDrillDialog drillReportYear2010() {
