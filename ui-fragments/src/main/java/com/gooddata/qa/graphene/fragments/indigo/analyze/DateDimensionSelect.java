@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
@@ -99,7 +100,7 @@ public class DateDimensionSelect extends AbstractReactDropDown {
         waitForPickerLoaded();
         return getElements()
                 .stream()
-                .filter(e -> e.getText().equals(name))
+                .filter(e -> e.getAttribute("class").contains("s-" + simplifyText(name)))
                 .findFirst()
                 .get();
     }
