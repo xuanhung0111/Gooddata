@@ -235,7 +235,6 @@ public class CreateScheduleTest extends AbstractDiscTest {
         try {
             CreateScheduleForm scheduleForm = initDiscProjectDetailPage().openCreateScheduleForm();
             scheduleForm.selectRunTimeByCronExpression("* * *");
-            scheduleForm.schedule();
 
             assertTrue(scheduleForm.getCronEditor().isCronExpressionInputError(),
                     "Cron expression input not show error");
