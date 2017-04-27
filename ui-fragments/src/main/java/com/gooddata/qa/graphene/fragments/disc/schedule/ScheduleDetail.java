@@ -211,7 +211,7 @@ public class ScheduleDetail extends AbstractScheduleFragment {
 
         try {
             Predicate<WebDriver> autoExecutionTriggered = browser -> executionHistoryItems.size() == executionItems + 1;
-            Graphene.waitGui().until(autoExecutionTriggered);
+            Graphene.waitGui().withTimeout(2, TimeUnit.MINUTES).until(autoExecutionTriggered);
             return true;
 
         } catch (TimeoutException e) {

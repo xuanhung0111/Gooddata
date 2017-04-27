@@ -1,10 +1,8 @@
-package com.gooddata.qa.graphene.disc.schedule.dataload;
+package com.gooddata.qa.graphene.add.schedule;
 
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.SQL_FILES;
-import static com.gooddata.qa.utils.ads.AdsHelper.ADS_DB_CONNECTION_URL;
 import static com.gooddata.qa.utils.http.process.ProcessRestUtils.executeProcess;
-import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -13,7 +11,6 @@ import java.io.IOException;
 import java.time.LocalTime;
 
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractDataloadProcessTest;
@@ -28,19 +25,14 @@ import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail.ExecutionHistoryItem;
 
-public class DataloadScheduleDetailTest extends AbstractDataloadProcessTest {
-
-    @BeforeClass(alwaysRun = true)
-    public void turnOnDE() {
-        enableDataExplorer = true;
-    }
+public class ScheduleDetailTest extends AbstractDataloadProcessTest {
 
     @Test(dependsOnGroups = {"initDataload"}, groups = {"precondition"})
     public void initData() throws JSONException, IOException {
         setupMaql(LdmModel.loadFromFile(MAQL_FILES.getPath() + TxtFile.CREATE_LDM.getName()));
 
-        Parameters parameters = getDefaultParameters()
-                .addParameter("SQL_QUERY", SqlBuilder.loadFromFile(SQL_FILES.getPath() + TxtFile.ADS_TABLE.getName()));
+        Parameters parameters = getDefaultParameters().addParameter("SQL_QUERY",
+                SqlBuilder.loadFromFile(SQL_FILES.getPath() + TxtFile.ADS_TABLE.getName()));
 
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
@@ -215,12 +207,5 @@ public class DataloadScheduleDetailTest extends AbstractDataloadProcessTest {
         } finally {
             deleteScheduleByName(getDataloadProcess(), schedule);
         }
-    }
-
-    private Parameters getDefaultParameters() {
-        return new Parameters()
-                .addParameter("ADS_URL", format(ADS_DB_CONNECTION_URL, testParams.getHost(), ads.getId()))
-                .addParameter("ADS_USER", testParams.getUser())
-                .addSecureParameter("ADS_PASSWORD", testParams.getPassword());
     }
 }

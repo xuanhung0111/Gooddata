@@ -15,6 +15,7 @@
         <module>ui-tests-disc</module>
         <module>ui-tests-dlui</module>
         <module>ui-tests-csv-uploader</module>
+        <module>ui-tests-add</module>
     </modules>
 
     <properties>
