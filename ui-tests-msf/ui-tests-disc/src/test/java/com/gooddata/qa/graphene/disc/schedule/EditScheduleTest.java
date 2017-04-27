@@ -164,7 +164,6 @@ public class EditScheduleTest extends AbstractDiscTest {
 
             ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
             scheduleDetail.selectRunTimeByCronExpression("* * *");
-            scheduleDetail.clickSaveButton();
 
             assertTrue(scheduleDetail.getCronEditor().isCronExpressionInputError(),
                     "Cron expression input not show error");
