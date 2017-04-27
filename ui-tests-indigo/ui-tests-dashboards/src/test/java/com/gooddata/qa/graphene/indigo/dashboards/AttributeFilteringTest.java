@@ -4,10 +4,7 @@ import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.UPLOAD_CSV;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.*;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.addMufToUser;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createMufObjectByUri;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteAttributeFilterIfExist;
 import static com.gooddata.qa.utils.http.project.ProjectRestUtils.createBlankProject;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.lang.String.format;
@@ -20,18 +17,13 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.md.AttributeElement;
-import com.gooddata.md.Fact;
-import com.gooddata.md.Metric;
-import com.gooddata.md.Restriction;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
+import com.gooddata.md.*;
 import com.gooddata.qa.graphene.entity.attribute.ComputedAttributeDefinition;
 import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
@@ -43,11 +35,10 @@ import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFiltersPanel;
 import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
@@ -70,6 +61,8 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
                 asList(createAmountKpi(), insightWidget));
     }
+
+
 
     @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "mobile"})
     public void checkDashboardWithNoAttributeFilters() {
@@ -254,9 +247,9 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
                 .addAttributeFilter(ATTR_STAGE_NAME)
                 .addAttributeFilter(ATTR_STAGE_HISTORY)
                 .waitForWidgetsLoading()
-                .selectWidgetByHeadline(widgetClass, widgetHeadline);
+                .selectWidgetByHeadline(Widget.class, widgetHeadline);
 
-        takeScreenshot(browser, "testAddingIgnoreCheckboxesOnKpi - " + widgetHeadline, getClass());
+        takeScreenshot(browser, "testAddingIgnoreCheckboxesOnKpi - " + widgetClass.toString(), getClass());
         assertEquals(
                 indigoDashboardsPage.getConfigurationPanel().getFilterByAttributeFilters()
                         .stream()
@@ -403,59 +396,6 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
         assertEquals(indigoDashboardsPage.getAttributeFiltersPanel().getAttributeFilter(ATTR_DEPARTMENT)
                         .getValues(), asList("Direct Sales", "Inside Sales"),
                 "List of values is not correct");
-    }
-
-    @Test(dependsOnGroups = "dashboardsInit", groups = {"desktop"},
-            description = "ONE-1987: MUF user get JS error when Attribute Filter select element that he isn't applied")
-    public void testFilterValuesWithMUF() throws IOException, JSONException {
-        String anotherUser = createAndAddUserToProject(UserRoles.EDITOR);
-
-        Attribute department = getMdService()
-                .getObj(getProject(), Attribute.class, Restriction.title(ATTR_DEPARTMENT));
-
-        AttributeElement directSales = getMdService()
-                .getAttributeElements(department)
-                .stream()
-                .filter(element -> element.getTitle().equals("Direct Sales"))
-                .findFirst()
-                .get();
-
-        String mufUri = createMufObjectByUri
-                (getRestApiClient(), testParams.getProjectId(), "department-MUF", format("[%s] = [%s]",
-                        department.getUri(), directSales.getUri()));
-        addMufToUser(getRestApiClient(), testParams.getProjectId(), anotherUser, mufUri);
-
-        AttributeFilter atttributefilter = initIndigoDashboardsPageWithWidgets()
-                .switchToEditMode()
-                .addAttributeFilter(ATTR_DEPARTMENT)
-                .getAttributeFiltersPanel()
-                .getAttributeFilter(ATTR_DEPARTMENT);
-        atttributefilter.clearAllCheckedValues().selectByName("Inside Sales");
-        atttributefilter.apply();
-        indigoDashboardsPage.saveEditModeWithWidgets();
-
-        try {
-            logoutAndLoginAs(false, UserRoles.EDITOR);
-
-            initIndigoDashboardsPageWithWidgets();
-            //reload the Indigo dashboard page to avoid a red bar. See details in bug CL-11196
-            AttributeFilter departmentFilter =  initIndigoDashboardsPageWithWidgets()
-                    .getAttributeFiltersPanel()
-                    .getAttributeFilter(ATTR_DEPARTMENT);
-
-            assertEquals(departmentFilter.getSelection(), "None", "Attribute filter selection is wrong");
-
-            departmentFilter.ensureDropdownOpen();
-            takeScreenshot(browser, "testFilterValuesWithMUF", getClass());
-            departmentFilter.searchForText("Inside Sales");
-
-            assertTrue(departmentFilter.isShowingNoMatchingDataMessage(),
-                    "MUF is not applied on attribute filter");
-        } finally {
-            logoutAndLoginAs(true, UserRoles.ADMIN);
-            deleteAttributeFilterIfExist(getRestApiClient(), testParams.getProjectId(),
-                    getAttributeDisplayFormUri(ATTR_DEPARTMENT));
-        }
     }
 
     private IndigoDashboardsPage addAttributeFilterToDashboard(String attribute) {
