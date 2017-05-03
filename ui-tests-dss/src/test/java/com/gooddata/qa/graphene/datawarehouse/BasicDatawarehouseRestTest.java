@@ -519,6 +519,7 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
                 "Instance jdbc link doesn't match");
         assertTrue(storage.getJSONObject("links").getString("schemas").equals(getStorageSchemasUrl()),
                 "Instance schemas link doesn't match");
+        assertTrue(storage.has("license"), "License element is missing");
         final String currentState = storage.getString("status");
         assertTrue(currentState.equals(state), format("Instance is in invalid state - %s.", currentState));
         userCreatedByUrl = storage.getString("createdBy");
