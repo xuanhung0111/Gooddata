@@ -464,7 +464,16 @@ public class DashboardsPage extends AbstractFragment {
 
     public DashboardsPage addTimeFilterToDashboard(String dateDimension, DateGranularity dateGranularity,
             String timeLine) {
+        return addTimeFilterToDashboard(dateDimension, dateGranularity, timeLine, null);
+    }
+
+    public DashboardsPage addTimeFilterToDashboard(String dateDimension, DateGranularity dateGranularity,
+                                                   String timeLine, DashboardWidgetDirection position) {
         editDashboard().addTimeFilterToDashboard(dateDimension, dateGranularity, timeLine);
+
+        if (position != null) {
+            position.moveElementToRightPlace(getFilterWidgetByName(dateDimension).getRoot());
+        }
         return this;
     }
 

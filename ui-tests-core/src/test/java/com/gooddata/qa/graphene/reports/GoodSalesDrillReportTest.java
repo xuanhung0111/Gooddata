@@ -4,20 +4,25 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CREATED;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
+import static java.lang.String.format;
+import static java.util.Calendar.YEAR;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
@@ -45,6 +50,9 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     private static final String TARGET_DASHBOAD_NAME = "drill-target-dashboard";
     private static final String REPORT_NAME = "Drill report";
     private static final String TARGET_DASHBOARD_TAB_NAME = "Target Tab";
+    private static final int YEAR_2010 = 2010;
+    private static final int YEAR_2011 = 2011;
+    private static final String YEAR_2012 = "2012";
 
     @BeforeClass
     public void setProjectTitle() {
@@ -471,6 +479,47 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             assertEquals(dashboardsPage.getFilterWidgetByName(ATTR_ACCOUNT).getCurrentValue(), "101 Financial, 14 West");
             assertEquals(dashboardsPage.getFilterWidgetByName(ATTR_STAGE_NAME).getCurrentValue(), "Risk Assessment");
             assertEquals(dashboardsPage.getFilterWidgetByName(ATTR_PRODUCT).getCurrentValue(), "All");
+        } finally {
+            initDashboardsPage().selectDashboard(TARGET_DASHBOAD_NAME).deleteDashboard();
+            initDashboardsPage().selectDashboard(TEST_DASHBOAD_NAME).deleteDashboard();
+        }
+    }
+
+    @Test(dependsOnMethods = { "createDrillReport" })
+    public void drillToDashboardAndPassDateFilterValue() {
+        try {
+            prepareDrillReportToDashboard();
+
+            // setup for origin tab
+            initDashboardsPage().selectDashboard(TEST_DASHBOAD_NAME).editDashboard();
+
+            dashboardsPage.openTab(0)
+                    .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, TimeFilterPanel.DateGranularity.YEAR,
+                            format("%s ago", Calendar.getInstance().get(YEAR) - YEAR_2010),
+                            DashboardWidgetDirection.RIGHT);
+
+            TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
+            tableReport.addDrilling(Pair.of(Arrays.asList(ATTR_STAGE_NAME), TARGET_DASHBOARD_TAB_NAME), "Dashboards");
+            dashboardsPage.saveDashboard();
+
+            //setup for target tab
+            dashboardsPage.selectDashboard(TARGET_DASHBOAD_NAME).openTab(1)
+                    .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, TimeFilterPanel.DateGranularity.YEAR,
+                            format("%s ago", Calendar.getInstance().get(YEAR) - YEAR_2011))
+                    .saveDashboard();
+
+            dashboardsPage.selectDashboard(TEST_DASHBOAD_NAME)
+                    .getFilterWidgetByName(DATE_DIMENSION_CREATED)
+                    .changeTimeFilterValueByClickInTimeLine(YEAR_2012);
+
+            tableReport.drillOnAttributeValue();
+
+            Predicate<WebDriver> waitDrilledDashboardLoaded = browser -> dashboardsPage.getDashboardName()
+                    .equals(TARGET_DASHBOAD_NAME);
+            Graphene.waitGui().withTimeout(1, TimeUnit.MINUTES).until(waitDrilledDashboardLoaded);
+
+            assertTrue(dashboardsPage.getTabs().isTabSelected(1));
+            assertEquals(dashboardsPage.getFilterWidgetByName(DATE_DIMENSION_CREATED).getCurrentValue(), YEAR_2012);
         } finally {
             initDashboardsPage().selectDashboard(TARGET_DASHBOAD_NAME).deleteDashboard();
             initDashboardsPage().selectDashboard(TEST_DASHBOAD_NAME).deleteDashboard();
