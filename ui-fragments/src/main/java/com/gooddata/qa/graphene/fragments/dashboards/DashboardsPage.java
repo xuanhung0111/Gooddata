@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -448,7 +449,16 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     public DashboardsPage addAttributeFilterToDashboard(DashAttributeFilterTypes type, String name, String... label) {
+        return addAttributeFilterToDashboard(type, name, null, label);
+    }
+
+    public DashboardsPage addAttributeFilterToDashboard(DashAttributeFilterTypes type, String name,
+            DashboardWidgetDirection position, String... label) {
         editDashboard().addAttributeFilterToDashboard(type, name, label);
+
+        if (position != null) {
+            position.moveElementToRightPlace(getFilterWidgetByName(name).getRoot());
+        }
         return this;
     }
 
