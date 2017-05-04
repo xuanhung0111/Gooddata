@@ -141,6 +141,10 @@ public class CsvFile {
         return dataRowCount;
     }
 
+    public List<List<String>> getDataRows() {
+        return data;
+    }
+
     public String getDatasetNameOfFirstUpload() {
         return WordUtils.capitalize(fileName.replace(".", " "));
     }

@@ -12,6 +12,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
+import com.gooddata.qa.graphene.enums.process.Parameter;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 import com.gooddata.warehouse.Warehouse;
@@ -21,13 +22,24 @@ public class AbstractDataloadProcessTest extends __AbstractMsfTest {
     protected static final String DEFAULT_DATAlOAD_PROCESS_NAME = "Automated Data Distribution";
     protected static final String UPDATE_ADS_TABLE_EXECUTABLE = "DLUI/graph/CreateAndCopyDataToADS.grf";
 
+    protected static final String DATASET_OPPORTUNITY = "opportunity";
+    protected static final String DATASET_PERSON = "person";
+
+    protected static final String X_TIMESTAMP_COLUMN = "timestamp";
+    protected static final String X_CLIENT_ID_COLUMN = "clientId";
+
+    protected static final String ATTR_OPPORTUNITY = "opportunity";
+    protected static final String ATTR_PERSON = "person";
+
+    protected static final String FACT_AGE = "age";
+    protected static final String FACT_PRICE = "price";
+
     protected Warehouse ads;
     protected DataloadProcess updateAdsTableProcess;
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"initDataload"})
     public void setup() throws ParseException, JSONException, IOException {
-        ads = getAdsHelper().createAds("ads-" + generateHashString(),
-                testParams.loadProperty("dss.authorizationToken"));
+        ads = getAdsHelper().createAds("ads-" + generateHashString(), getAdsToken());
 
         getAdsHelper().associateAdsWithProject(ads, testParams.getProjectId());
 
@@ -46,9 +58,13 @@ public class AbstractDataloadProcessTest extends __AbstractMsfTest {
 
     protected Parameters getDefaultParameters() {
         return new Parameters()
-                .addParameter("ADS_URL", format(ADS_DB_CONNECTION_URL, testParams.getHost(), ads.getId()))
-                .addParameter("ADS_USER", testParams.getUser())
-                .addSecureParameter("ADS_PASSWORD", testParams.getPassword());
+                .addParameter(Parameter.ADS_URL, format(ADS_DB_CONNECTION_URL, testParams.getHost(), ads.getId()))
+                .addParameter(Parameter.ADS_USER, testParams.getUser())
+                .addSecureParameter(Parameter.ADS_PASSWORD, testParams.getPassword());
+    }
+
+    protected String getAdsToken() {
+        return testParams.loadProperty("dss.authorizationToken");
     }
 
     protected enum TxtFile {

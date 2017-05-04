@@ -5,14 +5,8 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.math.NumberUtils.isNumber;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.supercsv.io.CsvListReader;
-import org.supercsv.prefs.CsvPreference;
 
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 
@@ -20,6 +14,7 @@ public class AdsTable {
     private String name;
     private List<String> attributes;
     private List<String> facts;
+    private boolean hasClientId;
     private boolean hasTimeStamp;
     private CsvFile dataFile;
 
@@ -27,6 +22,7 @@ public class AdsTable {
         this.name = name;
         this.attributes = new ArrayList<>();
         this.facts = new ArrayList<>();
+        this.hasClientId = false;
         this.hasTimeStamp = false;
         this.dataFile = null;
     }
@@ -38,6 +34,11 @@ public class AdsTable {
 
     public AdsTable withFacts(String... facts) {
         this.facts.addAll(asList(facts));
+        return this;
+    }
+
+    public AdsTable hasClientId(boolean hasClientId) {
+        this.hasClientId = hasClientId;
         return this;
     }
 
@@ -70,6 +71,7 @@ public class AdsTable {
                         .collect(joining(", ")))
                 .append(", " + facts.stream().map(fact -> fact.replace(fact, "f__" + fact + " NUMERIC(12,2)"))
                         .collect(joining(", ")))
+                .append(hasClientId == true ? ", x__client_id VARCHAR(128) ENCODING RLE" : "")
                 .append(hasTimeStamp == true ? ", x__timestamp TIMESTAMP ENCODING RLE" : "")
                 .append(");")
                 .toString()
@@ -77,23 +79,7 @@ public class AdsTable {
     }
 
     private String insertData() {
-        List<List<String>> data = new ArrayList<>();
-
-        try (final CsvListReader reader = new CsvListReader(new FileReader(dataFile.getFilePath()),
-                CsvPreference.STANDARD_PREFERENCE)) {
-            reader.getHeader(true);
-            List<String> row;
-            while ((row = reader.read()) != null) {
-                data.add(row);
-            }
-
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException("Csv file: " + dataFile.getFilePath() + " not found!");
-        } catch (IOException e) {
-            throw new RuntimeException("There has an error when reading file");
-        }
-
-        return data.stream()
+        return dataFile.getDataRows().stream()
                 .map(this::parseDataInRowAsCorrectType)
                 .map(row -> "INSERT into ${table} values (" + row.stream().collect(joining(", ")) + ");")
                 .collect(joining())

@@ -89,9 +89,21 @@ public final class AdsHelper {
 
     public void associateAdsWithProject(final Warehouse adsInstance, final String projectId)
             throws JSONException, ParseException, IOException {
+        associateAdsWithProject(adsInstance, projectId, "", "");
+    }
+
+    public void associateAdsWithProject(final Warehouse adsInstance, final String projectId, final String clientId)
+            throws JSONException, ParseException, IOException {
+        associateAdsWithProject(adsInstance, projectId, clientId, "");
+    }
+
+    public void associateAdsWithProject(final Warehouse adsInstance, final String projectId, final String clientId,
+            final String prefix) throws JSONException, ParseException, IOException {
         final JSONObject outputStageObj = new JSONObject() {{
             put("outputStage", new JSONObject() {{
                 put("schema", format(ADS_INSTANCE_SCHEMA_URI, adsInstance.getId()));
+                put("clientId", clientId);
+                put("outputStagePrefix", prefix);
             }});
         }};
         final String outputStageUri = format(OUTPUT_STAGE_URI, projectId);
