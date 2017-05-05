@@ -40,7 +40,6 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
 
     private static final String FISCAL_CSV_PATH = "/" + UPLOAD_CSV + "/fiscal_dimension_sample_test.csv";
     private static final String FISCAL_DATASET = "Fiscal Dimension Sample Test";
-    private static final String FISCAL_DATASET_ID = "dataset.csv_fiscal_dimension_sample_test";
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -53,14 +52,13 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
 
             @Override
             public void waitForStartPageLoaded() {
-                waitForFragmentVisible(analysisPage);
+                // load the Fiscal dataset
+                waitForFragmentVisible(analysisPage).getCataloguePanel().changeDataset(FISCAL_DATASET);
             }
 
             @Override
             public String getStartPage() {
-                //load fiscal data set as default 
-                //because FF is only refreshed when url is different from previous one
-                return PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/reportId/edit?dataset=" + FISCAL_DATASET_ID;
+                return PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/reportId/edit";
             }
         };
     }
