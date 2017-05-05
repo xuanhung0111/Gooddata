@@ -14,6 +14,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.util.Arrays.asList;
@@ -58,6 +59,7 @@ import com.gooddata.qa.graphene.utils.Sleeper;
 
 public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
 
+    private static final By LOADING_FILTER_BUTTON_LOCATOR = By.cssSelector("button.s-btn-___") ;
     private static final String REPORT_1 = "Report1";
     private static final String REPORT_2 = "Report2";
     private static final String REPORT_3 = "Report3";
@@ -237,6 +239,8 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
             assertTrue(groupAButton.getAttribute("class").contains("disabled"));
             assertFalse(groupBButton.getAttribute("class").contains("disabled"));
             groupBButton.click();
+            waitForElementNotPresent(LOADING_FILTER_BUTTON_LOCATOR);
+
             assertEquals(regionFilter.getCurrentValue(), "East Coast");
             assertEquals(departmentFilter.getCurrentValue(), "Direct Sales");
             assertEquals(productFilter.getCurrentValue(), "All");
