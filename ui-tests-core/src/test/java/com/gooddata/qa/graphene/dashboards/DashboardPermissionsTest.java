@@ -61,9 +61,8 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
             waitForDashboardPageLoaded(browser);
             waitForElementVisible(dashboardsPage.getRoot());
             String dashboardName = dashboardsPage.getDashboardName();
-            // the dashboard name in this case will contains a redundant character in the end
-            // check the code of getDashboardName for more details.
-            assertEquals(dashboardName.substring(0, dashboardName.length() - 1), DASH_PIPELINE_ANALYSIS);
+
+            assertEquals(dashboardName, DASH_PIPELINE_ANALYSIS);
 
             selectDashboard("Only one dashboard of Editor");
         } finally {
