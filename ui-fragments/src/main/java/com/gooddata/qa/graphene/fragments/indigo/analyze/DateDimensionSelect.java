@@ -16,6 +16,7 @@ import org.openqa.selenium.WebElement;
 import com.gooddata.qa.graphene.fragments.common.AbstractReactDropDown;
 
 public class DateDimensionSelect extends AbstractReactDropDown {
+    private static final String WEEK_GRANULARITY = "Week (Sun-Sat)";
 
     public boolean isEnabled() {
         return !getDropdownButton().getAttribute("class").contains("disabled");
@@ -97,10 +98,13 @@ public class DateDimensionSelect extends AbstractReactDropDown {
 
     @Override
     protected WebElement getElementByName(final String name) {
+        //CL-11807 inconsistency in css name for week granularity
+        String cssName = name.equals(WEEK_GRANULARITY)? "s-week" : "s-" + simplifyText(name);
+
         waitForPickerLoaded();
         return getElements()
                 .stream()
-                .filter(e -> e.getAttribute("class").contains("s-" + simplifyText(name)))
+                .filter(e -> e.getAttribute("class").contains(cssName))
                 .findFirst()
                 .get();
     }
