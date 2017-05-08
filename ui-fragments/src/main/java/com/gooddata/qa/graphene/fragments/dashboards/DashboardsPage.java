@@ -137,7 +137,7 @@ public class DashboardsPage extends AbstractFragment {
 
     public String getDashboardName() {
         String name = waitForElementVisible(dashboardSwitcherButton).getText();
-        if (getDashboardsCount() > 1) {
+        if (isElementVisible(dashboardSwitcherArrowMenu)) {
             return name.substring(0, name.length() - 1);
         }
         return name;
