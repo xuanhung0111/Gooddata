@@ -4,12 +4,14 @@ import static com.gooddata.qa.utils.ads.AdsHelper.ADS_DB_CONNECTION_URL;
 import static java.lang.String.format;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.GoodDataException;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
 import com.gooddata.qa.graphene.enums.process.Parameter;
@@ -34,6 +36,8 @@ public class AbstractDataloadProcessTest extends __AbstractMsfTest {
     protected static final String FACT_AGE = "age";
     protected static final String FACT_PRICE = "price";
 
+    private static final String DATALOAD_PROCESS_TYPE = "DATALOAD";
+
     protected Warehouse ads;
     protected DataloadProcess updateAdsTableProcess;
 
@@ -51,9 +55,29 @@ public class AbstractDataloadProcessTest extends __AbstractMsfTest {
         getAdsHelper().removeAds(ads);
     }
 
+    protected DataloadProcess createDataloadProcess() {
+        return getProcessService().createProcess(getProject(),
+                new DataloadProcess(DEFAULT_DATAlOAD_PROCESS_NAME, DATALOAD_PROCESS_TYPE));
+    }
+
+    protected boolean canCreateDataloadProcess() {
+        if (!hasDataloadProcess()) return true;
+
+        try {
+            createDataloadProcess();
+            throw new RuntimeException("Dataload process can be created more than one!");
+
+        } catch (GoodDataException e) {
+            return false;
+        }
+    }
+
     protected DataloadProcess getDataloadProcess() {
-        return getProcessService().listProcesses(getProject()).
-                stream().filter(p -> p.getType().equals("DATALOAD")).findFirst().get();
+        return findDataloadProcess().get();
+    }
+
+    protected boolean hasDataloadProcess() {
+        return findDataloadProcess().isPresent();
     }
 
     protected Parameters getDefaultParameters() {
@@ -65,6 +89,11 @@ public class AbstractDataloadProcessTest extends __AbstractMsfTest {
 
     protected String getAdsToken() {
         return testParams.loadProperty("dss.authorizationToken");
+    }
+
+    private Optional<DataloadProcess> findDataloadProcess() {
+        return getProcessService().listProcesses(getProject())
+                .stream().filter(p -> p.getType().equals(DATALOAD_PROCESS_TYPE)).findFirst();
     }
 
     protected enum TxtFile {
