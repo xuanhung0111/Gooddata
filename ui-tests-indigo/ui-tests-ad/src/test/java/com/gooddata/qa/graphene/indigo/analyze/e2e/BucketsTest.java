@@ -33,7 +33,7 @@ public class BucketsTest extends AbstractAdE2ETest {
         projectTitle = "Buckets-E2E-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
     public void allow_metric_properties_to_be_set_in_chart_configuration_buckets() {
         MetricConfiguration metricConfiguration = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
@@ -52,7 +52,7 @@ public class BucketsTest extends AbstractAdE2ETest {
         assertTrue(metricConfiguration.showPop().isPopSelected());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
     public void test_stack_bucket_is_visible_for_line_colunm_and_bar_charts() {
         analysisPage.changeReportType(ReportType.COLUMN_CHART);
         assertTrue(isElementPresent(className(StacksBucket.CSS_CLASS), browser));
@@ -64,13 +64,13 @@ public class BucketsTest extends AbstractAdE2ETest {
         assertTrue(isElementPresent(className(StacksBucket.CSS_CLASS), browser));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
     public void test_stack_bucket_is_hidden_for_table_visualization() {
         analysisPage.changeReportType(ReportType.TABLE);
         assertFalse(isElementPresent(className(StacksBucket.CSS_CLASS), browser));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
     public void test_stack_bucket_should_accept_only_attributes() {
         WebElement metric = analysisPage.getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC);
         analysisPage.drag(metric, analysisPage.getStacksBucket().getInvitation());
@@ -83,19 +83,19 @@ public class BucketsTest extends AbstractAdE2ETest {
         assertFalse(analysisPage.addStack(ATTR_ACTIVITY_TYPE).getStacksBucket().isEmpty());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
     public void test_stack_bucket_automatically_adds_new_attribute_filter() {
         assertFalse(analysisPage.addStack(ATTR_ACTIVITY_TYPE).getFilterBuckets().isEmpty());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
     public void test_stack_bucket_should_accept_only_one_attribute_at_the_time() {
         WebElement invitation = analysisPage.getStacksBucket().getInvitation();
         analysisPage.addStack(ATTR_ACTIVITY_TYPE);
         assertFalse(invitation.isDisplayed());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
     public void test_stack_bucket_should_prevent_dropping_if_two_metrics_are_active() {
         StacksBucket stacksBucket = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addMetric(METRIC_NUMBER_OF_LOST_OPPS)
@@ -104,7 +104,7 @@ public class BucketsTest extends AbstractAdE2ETest {
         assertFalse(stacksBucket.getWarningMessage().isEmpty());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
     public void should_be_possible_to_drag_item_from_stack_by_to_category() {
         analysisPage.addStack(ATTR_ACTIVITY_TYPE)
             .drag(analysisPage.getStacksBucket().get(), analysisPage.getAttributesBucket().getInvitation());
@@ -114,7 +114,7 @@ public class BucketsTest extends AbstractAdE2ETest {
         assertFalse(analysisPage.getAttributesBucket().isEmpty());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
     public void should_be_possible_to_drag_item_from_category_to_stack_by() {
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
             .drag(analysisPage.getAttributesBucket().getFirst(), analysisPage.getStacksBucket().getInvitation());
@@ -123,7 +123,7 @@ public class BucketsTest extends AbstractAdE2ETest {
         assertTrue(analysisPage.getAttributesBucket().isEmpty());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
     public void should_swap_items_between_category_and_stack_by() {
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
             .addStack(ATTR_ACCOUNT)
@@ -136,7 +136,7 @@ public class BucketsTest extends AbstractAdE2ETest {
         assertTrue(analysisPage.getFilterBuckets().isFilterVisible(ATTR_ACTIVITY_TYPE));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
     public void should_not_swap_if_date_dimension_is_present() {
         analysisPage.addDate()
             .addStack(ATTR_ACTIVITY_TYPE)
@@ -153,7 +153,7 @@ public class BucketsTest extends AbstractAdE2ETest {
         assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
     public void should_disable_metric_properties_when_there_are_two_metrics() {
         MetricConfiguration configuration = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addMetric(METRIC_NUMBER_OF_LOST_OPPS)
@@ -172,7 +172,7 @@ public class BucketsTest extends AbstractAdE2ETest {
         assertFalse(configuration.isShowPercentEnabled());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
     public void should_disable_metric_properties_when_there_are_two_attributes() {
         MetricConfiguration configuration = analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
             .addStack(ATTR_ACCOUNT)
@@ -186,7 +186,7 @@ public class BucketsTest extends AbstractAdE2ETest {
         assertFalse(configuration.isShowPercentEnabled());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
     public void should_disable_metric_properties_when_trending_recommendation_and_stacking_are_applied() {
         MetricConfiguration configuration = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .getMetricsBucket()
@@ -210,81 +210,7 @@ public class BucketsTest extends AbstractAdE2ETest {
         assertFalse(configuration.isShowPercentEnabled());
     }
 
-    @Test(dependsOnGroups = {"init"})
-    public void should_create_two_autogenerated_filters() {
-        assertEquals(analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
-                .addStack(ATTR_ACCOUNT)
-                .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                .getFilterBuckets()
-                .getFiltersCount(), 2);
-    }
-
-    @Test(dependsOnGroups = {"init"})
-    public void should_generate_filter_for_date_item() {
-        analysisPage.addDate()
-            .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-            .getAttributesBucket()
-            .changeGranularity("Month");
-
-        assertTrue(analysisPage.removeMetric(METRIC_NUMBER_OF_ACTIVITIES)
-            .getFilterBuckets()
-            .isDateFilterVisible());
-    }
-
-
-    @Test(dependsOnGroups = {"init"})
-    public void should_add_date_filter_when_adding_date_to_configuration_bucket() {
-        assertTrue(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-            .addDate()
-            .waitForReportComputing()
-            .getFilterBuckets()
-            .isDateFilterVisible());
-
-    }
-
-    @Test(dependsOnGroups = {"init"})
-    public void should_have_date_filter_when_replacing_date_in_configuration_bucket_with_date() {
-        assertTrue(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-            .addDate()
-            .waitForReportComputing()
-            .getFilterBuckets()
-            .isDateFilterVisible());
-
-        assertTrue(analysisPage.replaceAttributeWithDate(DATE)
-            .getFilterBuckets()
-            .isDateFilterVisible());
-    }
-
-    @Test(dependsOnGroups = {"init"})
-    public void should_keep_the_selected_date_dimension_second_time_dropped() {
-        assertEquals(analysisPage.addDate()
-            .getFilterBuckets()
-            .getDateFilterText(), "Activity: All time");
-
-        assertTrue(analysisPage.removeAttribute(DATE)
-            .getAttributesBucket()
-            .isEmpty());
-
-        assertEquals(analysisPage.addDate()
-            .getFilterBuckets()
-            .getDateFilterText(), "Activity: All time");
-    }
-
-    @Test(dependsOnGroups = {"init"})
-    public void should_have_metric_series_in_correct_order() {
-        analysisPage.addDate()
-            .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-            .getMetricsBucket()
-            .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
-            .expandConfiguration()
-            .showPop();
-
-        assertEquals(analysisPage.waitForReportComputing()
-            .getChartReport()
-            .getLegends(), asList(METRIC_NUMBER_OF_ACTIVITIES + " - previous year", METRIC_NUMBER_OF_ACTIVITIES));
-    }
-
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
     public void should_be_possible_to_add_metric_after_another_one() {
         assertEquals(analysisPage
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
@@ -297,7 +223,7 @@ public class BucketsTest extends AbstractAdE2ETest {
             .getItemNames(), asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPEN_OPPS, METRIC_NUMBER_OF_LOST_OPPS));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
     public void should_be_possible_to_replace_categories() {
         assertEquals(analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
             .replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_ACCOUNT)
@@ -305,7 +231,7 @@ public class BucketsTest extends AbstractAdE2ETest {
             .getItemNames(), asList(ATTR_ACCOUNT));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
     public void should_be_possible_to_replace_category_with_date() {
         assertEquals(analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
             .replaceAttributeWithDate(ATTR_ACTIVITY_TYPE)
@@ -313,7 +239,7 @@ public class BucketsTest extends AbstractAdE2ETest {
             .getItemNames(), asList(DATE));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
     public void should_be_possible_to_replace_stacks() {
         assertEquals(analysisPage.addStack(ATTR_ACTIVITY_TYPE)
             .replaceStack(ATTR_ACCOUNT)
