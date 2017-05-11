@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoade
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
@@ -29,6 +30,7 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.enums.dashboard.PublishType;
 import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
@@ -190,6 +192,9 @@ public class DashboardsPage extends AbstractFragment {
         if (!isElementPresent(BY_DASHBOARD_EDIT_BAR, browser)) {
             openEditExportEmbedMenu().select("Edit");
         }
+
+        //wait for animation for displaying dashboard edit bar finished.
+        waitForElementNotVisible(By.className(ApplicationHeaderBar.ROOT_LOCATOR));
 
         return getDashboardEditBar();
     }
