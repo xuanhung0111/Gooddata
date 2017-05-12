@@ -93,7 +93,7 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("filterOnDateAndAttribute");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
     public void addAttributeToFilterBucket() {
         final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
 
