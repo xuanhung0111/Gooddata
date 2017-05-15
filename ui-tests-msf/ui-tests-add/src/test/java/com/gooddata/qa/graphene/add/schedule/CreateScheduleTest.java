@@ -78,6 +78,18 @@ public class CreateScheduleTest extends AbstractDataloadProcessTest {
     }
 
     @Test(dependsOnGroups = {"precondition"})
+    public void createScheduleWithNoDataset() {
+        DatasetDropdown dropdown = initDiscProjectDetailPage()
+                .openCreateScheduleForm()
+                .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
+                .selectCustomDatasetsOption()
+                .getDatasetDropdown()
+                .expand()
+                .clearAllSelected();
+        assertFalse(dropdown.isSaveButtonEnabled(), "Save button is not disabled");
+    }
+
+    @Test(dependsOnGroups = {"precondition"})
     public void editDataloadScheduleWithCustomDatasets() {
         String schedule = "Schedule-" + generateHashString();
         ((CreateScheduleForm) initDiscProjectDetailPage()

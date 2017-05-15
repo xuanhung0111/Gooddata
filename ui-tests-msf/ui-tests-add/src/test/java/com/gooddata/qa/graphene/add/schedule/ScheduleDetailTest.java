@@ -18,6 +18,7 @@ import com.gooddata.qa.graphene.entity.disc.Parameters;
 import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.entity.model.SqlBuilder;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
+import com.gooddata.qa.graphene.enums.process.Parameter;
 import com.gooddata.qa.graphene.fragments.disc.overview.OverviewPage.OverviewState;
 import com.gooddata.qa.graphene.fragments.disc.overview.OverviewProjects.OverviewProjectItem;
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
@@ -31,7 +32,7 @@ public class ScheduleDetailTest extends AbstractDataloadProcessTest {
     public void initData() throws JSONException, IOException {
         setupMaql(LdmModel.loadFromFile(MAQL_FILES.getPath() + TxtFile.CREATE_LDM.getName()));
 
-        Parameters parameters = getDefaultParameters().addParameter("SQL_QUERY",
+        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY,
                 SqlBuilder.loadFromFile(SQL_FILES.getPath() + TxtFile.ADS_TABLE.getName()));
 
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
@@ -85,7 +86,7 @@ public class ScheduleDetailTest extends AbstractDataloadProcessTest {
 
     @Test(dependsOnGroups = {"precondition"})
     public void checkConcurrentDataLoadSchedule() {
-        Parameters parameters = getDefaultParameters().addParameter("SQL_QUERY",
+        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY,
                 SqlBuilder.loadFromFile(SQL_FILES.getPath() + TxtFile.LARGE_ADS_TABLE.getName()));
 
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,

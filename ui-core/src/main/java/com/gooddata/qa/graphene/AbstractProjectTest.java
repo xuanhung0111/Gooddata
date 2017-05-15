@@ -17,6 +17,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.md.Attribute;
 import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
 import com.gooddata.md.report.Report;
@@ -30,6 +31,7 @@ import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
+import static java.util.stream.Collectors.toList;
 import static org.testng.Assert.assertFalse;
 
 import com.gooddata.qa.utils.http.rolap.RolapRestUtils;
@@ -37,6 +39,7 @@ import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.UUID;
 
 import org.apache.http.ParseException;
@@ -239,6 +242,11 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     protected Metric createMetric(String name, String expression, String format) {
         return getMdService().createObj(getProject(), new Metric(name, expression, format));
+    }
+
+    protected Collection<String> getAttributeValues(Attribute attribute) {
+        return getMdService().getAttributeElements(attribute)
+                .stream().map(attr -> attr.getTitle()).map(String::trim).collect(toList());
     }
 
     protected Report createReportViaRest(ReportDefinition defination) {

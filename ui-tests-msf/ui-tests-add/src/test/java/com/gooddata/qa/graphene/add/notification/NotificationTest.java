@@ -39,6 +39,7 @@ import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.entity.model.SqlBuilder;
 import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.disc.notification.Variable;
+import com.gooddata.qa.graphene.enums.process.Parameter;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.disc.notification.NotificationRuleItem;
 import com.gooddata.qa.graphene.fragments.disc.notification.NotificationRuleItem.NotificationEvent;
@@ -47,12 +48,7 @@ import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 
 public class NotificationTest extends AbstractDataloadProcessTest {
 
-    private static final String DATASET_OPPORTUNITY = "opportunity";
-    private static final String DATASET_PERSON = "person";
     private static final String ATTR_NAME = "name";
-    private static final String FACT_AGE = "age";
-    private static final String FACT_PRICE = "price";
-    private static final String X_TIMESTAMP = "timestamp";
     private static final String ERROR_MESSAGE = "While trying to load project %s, the following datasets had one "
             + "or more rows with a null timestamp, which is not allowed: %s: 1 rows.";
 
@@ -114,14 +110,14 @@ public class NotificationTest extends AbstractDataloadProcessTest {
                 .buildMaql());
 
         opportunity = new CsvFile(DATASET_OPPORTUNITY)
-                .columns(new CsvFile.Column(ATTR_NAME), new CsvFile.Column(FACT_PRICE), new CsvFile.Column(X_TIMESTAMP))
+                .columns(new CsvFile.Column(ATTR_NAME), new CsvFile.Column(FACT_PRICE),
+                        new CsvFile.Column(X_TIMESTAMP_COLUMN))
                 .rows("Op1", "100", getCurrentDate());
-        opportunity.saveToDisc(testParams.getCsvFolder());
 
         person = new CsvFile(DATASET_PERSON)
-                .columns(new CsvFile.Column(ATTR_NAME), new CsvFile.Column(FACT_AGE), new CsvFile.Column(X_TIMESTAMP))
+                .columns(new CsvFile.Column(ATTR_NAME), new CsvFile.Column(FACT_AGE),
+                        new CsvFile.Column(X_TIMESTAMP_COLUMN))
                 .rows("P1", "18", getCurrentDate());
-        person.saveToDisc(testParams.getCsvFolder());
 
         sqlBuilder = new SqlBuilder()
                 .withAdsTable(new AdsTable(DATASET_OPPORTUNITY)
@@ -135,7 +131,7 @@ public class NotificationTest extends AbstractDataloadProcessTest {
                         .hasTimeStamp(true)
                         .withDataFile(person));
 
-        Parameters parameters = getDefaultParameters().addParameter("SQL_QUERY", sqlBuilder.build());
+        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, sqlBuilder.build());
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
     }
@@ -216,8 +212,8 @@ public class NotificationTest extends AbstractDataloadProcessTest {
     public void checkNotificationForIncrementalLoadDataset() throws MessagingException, IOException {
         Date timeReceiveEmail = getTimeReceiveEmail();
 
-        person.rows("P2", "20", getCurrentDate()).saveToDisc(testParams.getCsvFolder());
-        Parameters parameters = getDefaultParameters().addParameter("SQL_QUERY", sqlBuilder.build());
+        person.rows("P2", "20", getCurrentDate());
+        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, sqlBuilder.build());
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
 
@@ -256,8 +252,8 @@ public class NotificationTest extends AbstractDataloadProcessTest {
     public void checkNotificationForErrorDatasetLoaded() throws IOException, MessagingException {
         Date timeReceiveEmail = getTimeReceiveEmail();
 
-        person.rows("P3", "20").saveToDisc(testParams.getCsvFolder());
-        Parameters parameters = getDefaultParameters().addParameter("SQL_QUERY", sqlBuilder.build());
+        person.rows("P3", "20");
+        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, sqlBuilder.build());
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
 

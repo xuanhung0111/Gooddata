@@ -6,6 +6,7 @@ import static java.lang.String.format;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -84,6 +85,11 @@ public final class ProcessRestUtils {
         final String pollingUri = createProcessExecution(HttpStatus.CREATED, restApiClient, executionUri, executable, params);
         log.info("Execution polling uri: " + pollingUri);
         return pollingUri;
+    }
+
+    public static ProcessExecutionDetail executeProcess(GoodData goodData, DataloadProcess process,
+            Map<String, String> params) {
+        return executeProcess(goodData, process, "", params, new HashMap<>());
     }
 
     public static ProcessExecutionDetail executeProcess(GoodData goodData, DataloadProcess process, String executable,
