@@ -33,7 +33,7 @@ import com.gooddata.warehouse.Warehouse;
 
 public class DataloadProcessTest extends AbstractDataloadProcessTest {
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
+    @Test(dependsOnGroups = {"initDataload"}, groups = {"precondition"})
     public void setupLdm() throws JSONException, IOException {
         setupMaql(new LdmModel()
                 .withDataset(new Dataset(DATASET_OPPORTUNITY)
