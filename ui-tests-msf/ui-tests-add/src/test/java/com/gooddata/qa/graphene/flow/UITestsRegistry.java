@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.gooddata.qa.graphene.add.DataloadProcessTest;
+import com.gooddata.qa.graphene.add.DataloadResourcesPermissionTest;
 import com.gooddata.qa.graphene.add.SqlDiffTest;
 import com.gooddata.qa.graphene.add.schedule.CreateScheduleTest;
 import com.gooddata.qa.graphene.add.schedule.DatasetDetailTest;
@@ -23,6 +24,7 @@ public class UITestsRegistry {
             LoadDatasetTest.class,
             SqlDiffTest.class,
             DataloadProcessTest.class,
+            DataloadResourcesPermissionTest.class,
             "testng-imap-notification.xml"
         });
 
