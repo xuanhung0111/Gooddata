@@ -4,7 +4,17 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRIORITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_ACTIVITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_QUARTER_YEAR_ACTIVITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CREATED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -49,6 +59,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     private static final String TEST_DASHBOAD_NAME = "test-drill-report";
     private static final String TARGET_DASHBOAD_NAME = "drill-target-dashboard";
     private static final String REPORT_NAME = "Drill report";
+    private static final String DRILL_ACTIVITY_REPORT = "Drill-Activity report";
     private static final String TARGET_DASHBOARD_TAB_NAME = "Target Tab";
     private static final int YEAR_2010 = 2010;
     private static final int YEAR_2011 = 2011;
@@ -309,22 +320,22 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
 
         initReportsPage();
         UiReportDefinition reportDefinition = new UiReportDefinition()
-            .withName("Drill-Activity")
-            .withWhats(new WhatItem("# of Activities", "Account"))
-            .withHows(new HowItem("Activity", "Email with AirSplat on Apr-21-11"))
-            .withHows(new HowItem("Year (Activity)", HowItem.Position.TOP));
+                .withName(DRILL_ACTIVITY_REPORT)
+                .withWhats(new WhatItem(METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACCOUNT))
+                .withHows(new HowItem(ATTR_ACTIVITY, "Email with AirSplat on Apr-21-11"))
+                .withHows(new HowItem(ATTR_YEAR_ACTIVITY, HowItem.Position.TOP));
 
-        createReport(reportDefinition, "Drill-Activity");
+        createReport(reportDefinition, DRILL_ACTIVITY_REPORT + "_screenshot");
         checkRedBar(browser);
 
         try {
-            addReportToNewDashboard("Drill-Activity", TEST_DASHBOAD_NAME);
+            addReportToNewDashboard(DRILL_ACTIVITY_REPORT, TEST_DASHBOAD_NAME);
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
 
             dashboardsPage.editDashboard();
-            tableReport.addDrilling(Pair.of(Arrays.asList("Activity"), "Priority"));
-            tableReport.addDrilling(Pair.of(Arrays.asList("Year (Activity)"), REPORT_NAME), "Reports");
-            tableReport.addDrilling(Pair.of(Arrays.asList("# of Activities"), "Status"));
+            tableReport.addDrilling(Pair.of(Arrays.asList(ATTR_ACTIVITY), ATTR_PRIORITY));
+            tableReport.addDrilling(Pair.of(Arrays.asList(ATTR_YEAR_ACTIVITY), REPORT_NAME), "Reports");
+            tableReport.addDrilling(Pair.of(Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES), ATTR_STATUS));
             dashboardsPage.saveDashboard();
             checkRedBar(browser);
 
@@ -333,26 +344,29 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
                     waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
             TableReport tableReportInDialog = drillDialog.getReport(TableReport.class);
             assertTrue(tableReportInDialog.isRollupTotalVisible());
-            assertEquals(tableReportInDialog.getAttributesHeader(), Arrays.asList("Year (Activity)", "Priority"));
-            assertSetEquals(tableReportInDialog.getMetricsHeader(), Sets.newHashSet("# of Activities"),
+            assertEquals(tableReportInDialog.getAttributesHeader(), Arrays.asList(ATTR_YEAR_ACTIVITY, ATTR_PRIORITY));
+            assertSetEquals(tableReportInDialog.getMetricsHeader(), Sets.newHashSet(METRIC_NUMBER_OF_ACTIVITIES),
                     "Metric headers are not correct!");
-            assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(Arrays.asList("Drill-Activity", "Email with AirSplat on Apr-21-11"), ">>"));
+            assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(Arrays.asList(DRILL_ACTIVITY_REPORT, 
+                    "Email with AirSplat on Apr-21-11"), ">>"));
             drillDialog.closeDialog();
 
             tableReport.drillOnMetricValue("1");
             assertTrue(tableReportInDialog.isRollupTotalVisible());
-            assertEquals(tableReportInDialog.getAttributesHeader(), Arrays.asList("Status"));
-            assertSetEquals(tableReportInDialog.getMetricsHeader(), Sets.newHashSet("# of Activities"),
+            assertEquals(tableReportInDialog.getAttributesHeader(), Arrays.asList(ATTR_STATUS));
+            assertSetEquals(tableReportInDialog.getMetricsHeader(), Sets.newHashSet(METRIC_NUMBER_OF_ACTIVITIES),
                     "Metric headers are not correct!");
-            assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(Arrays.asList("Drill-Activity", "Email with AirSplat on Apr-21..."), ">>"));
+            assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(Arrays.asList(DRILL_ACTIVITY_REPORT,
+                    "Email with AirSplat on Apr-21..."), ">>"));
             drillDialog.closeDialog();
 
             tableReport.clickOnAttributeToOpenDrillReport("2011");
             assertFalse(tableReportInDialog.isRollupTotalVisible());
-            assertEquals(tableReportInDialog.getAttributesHeader(), Arrays.asList("Year (Snapshot)", "Stage Name"));
-            assertSetEquals(tableReportInDialog.getMetricsHeader(), Sets.newHashSet("Amount", "Avg. Amount"),
+            assertEquals(tableReportInDialog.getAttributesHeader(), Arrays.asList(ATTR_YEAR_SNAPSHOT, ATTR_STAGE_NAME));
+            assertSetEquals(tableReportInDialog.getMetricsHeader(), Sets.newHashSet(METRIC_AMOUNT, METRIC_AVG_AMOUNT),
                     "Metric headers are not correct!");
-            assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(Arrays.asList("Drill-Activity", "2011"), ">>"));
+            assertEquals(drillDialog.getBreadcrumbsString(), 
+                    StringUtils.join(Arrays.asList(DRILL_ACTIVITY_REPORT, "2011"), ">>"));
             drillDialog.closeDialog();
         } finally {
             dashboardsPage.deleteDashboard();
@@ -362,9 +376,9 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"overrideDrilldownAndDrillIn"})
     public void drillReportContainsFilter() {
         try {
-            addReportToNewDashboard("Drill-Activity", TEST_DASHBOAD_NAME);
+            addReportToNewDashboard(DRILL_ACTIVITY_REPORT, TEST_DASHBOAD_NAME);
 
-            dashboardsPage.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, "Activity")
+            dashboardsPage.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_ACTIVITY)
                     .saveDashboard();
 
             browser.navigate().refresh();
@@ -380,31 +394,34 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
                     waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
             TableReport tableReportInDialog = drillDialog.getReport(TableReport.class);
             assertTrue(tableReportInDialog.isRollupTotalVisible());
-            assertEquals(tableReportInDialog.getAttributesHeader(), Arrays.asList("Year (Activity)", "Activity Type"));
-            assertSetEquals(tableReportInDialog.getMetricsHeader(), Sets.newHashSet("# of Activities"),
+            assertEquals(tableReportInDialog.getAttributesHeader(), Arrays.asList(ATTR_YEAR_ACTIVITY, ATTR_ACTIVITY_TYPE));
+            assertSetEquals(tableReportInDialog.getMetricsHeader(), Sets.newHashSet(METRIC_NUMBER_OF_ACTIVITIES),
                     "Metric headers are not correct!");
-            assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(Arrays.asList("Drill-Activity", "Email with Bulbs.com on Aug-0..."), ">>"));
+            assertEquals(drillDialog.getBreadcrumbsString(),
+                    StringUtils.join(Arrays.asList(DRILL_ACTIVITY_REPORT, "Email with Bulbs.com on Aug-0..."), ">>"));
             drillDialog.closeDialog();
 
             tableReport.drillOnMetricValue("1");
             assertTrue(tableReportInDialog.isRollupTotalVisible());
-            assertEquals(tableReportInDialog.getAttributesHeader(), Arrays.asList("Account"));
-            assertSetEquals(tableReportInDialog.getMetricsHeader(), Sets.newHashSet("# of Activities"),
+            assertEquals(tableReportInDialog.getAttributesHeader(), Arrays.asList(ATTR_ACCOUNT));
+            assertSetEquals(tableReportInDialog.getMetricsHeader(), Sets.newHashSet(METRIC_NUMBER_OF_ACTIVITIES),
                     "Metric headers are not correct!");
-            assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(Arrays.asList("Drill-Activity", "Email with Bulbs.com on Aug-0..."), ">>"));
+            assertEquals(drillDialog.getBreadcrumbsString(),
+                    StringUtils.join(Arrays.asList(DRILL_ACTIVITY_REPORT, "Email with Bulbs.com on Aug-0..."), ">>"));
             drillDialog.closeDialog();
 
             tableReport.clickOnAttributeToOpenDrillReport("2010");
             assertTrue(tableReportInDialog.isRollupTotalVisible());
-            assertEquals(tableReportInDialog.getAttributesHeader(), Arrays.asList("Quarter/Year (Activity)", "Activity"));
-            assertSetEquals(tableReportInDialog.getMetricsHeader(), Sets.newHashSet("# of Activities"),
+            assertEquals(tableReportInDialog.getAttributesHeader(), Arrays.asList(ATTR_QUARTER_YEAR_ACTIVITY, ATTR_ACTIVITY));
+            assertSetEquals(tableReportInDialog.getMetricsHeader(), Sets.newHashSet(METRIC_NUMBER_OF_ACTIVITIES),
                     "Metric headers are not correct!");
-            assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(Arrays.asList("Drill-Activity", "2010"), ">>"));
+            assertEquals(drillDialog.getBreadcrumbsString(),
+                    StringUtils.join(Arrays.asList(DRILL_ACTIVITY_REPORT, "2010"), ">>"));
             drillDialog.closeDialog();
         } finally {
             dashboardsPage.deleteDashboard();
 
-            initAttributePage().initAttribute("Activity")
+            initAttributePage().initAttribute(ATTR_ACTIVITY)
                 .clearDrillingSetting();
         }
     }

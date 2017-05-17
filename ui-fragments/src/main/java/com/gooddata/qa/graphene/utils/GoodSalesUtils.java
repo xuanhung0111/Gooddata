@@ -80,6 +80,8 @@ public final class GoodSalesUtils {
     public static final String ATTR_MONTH_YEAR_CREATED = "Month/Year (Created)";
     public static final String ATTR_DATE_CREATED = "Date (Created)";
     public static final String ATTR_YEAR_CREATED = "Year (Created)";
+    public static final String ATTR_YEAR_ACTIVITY = "Year (Activity)";
+    public static final String ATTR_QUARTER_YEAR_ACTIVITY = "Quarter/Year (Activity)";
     public static final String ATTR_PRIORITY = "Priority";
     public static final String ATTR_FORECAST_CATEGORY = "Forecast Category";
 
