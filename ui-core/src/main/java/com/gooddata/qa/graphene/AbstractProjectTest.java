@@ -23,6 +23,8 @@ import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.project.Project;
 import com.gooddata.project.ProjectDriver;
+import com.gooddata.qa.fixture.Fixture;
+import com.gooddata.qa.fixture.GdcFixture;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.utils.graphene.Screenshots;
@@ -37,6 +39,7 @@ import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.apache.http.ParseException;
@@ -49,7 +52,10 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     protected static final int DEFAULT_PROJECT_CHECK_LIMIT = 60; // 5 minutes
 
     protected String projectTitle = "simple-project";
+    // keep this param for tests depending on other templates (e.g.: connectors test)
     protected String projectTemplate = "";
+
+    protected Fixture appliedFixture;
     protected int projectCreateCheckIterations = DEFAULT_PROJECT_CHECK_LIMIT;
 
     // validations are enabled by default on any child class
@@ -92,7 +98,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     }
 
     @Test(dependsOnMethods = {"configureStartPage"}, groups = {"createProject"})
-    public void createProject() throws JSONException {
+    public void createProject() throws JSONException, IOException {
         if (testParams.isReuseProject()) {
             if (testParams.getProjectId() != null && !testParams.getProjectId().isEmpty()) {
                 System.out.println("Project will be re-used, id: " + testParams.getProjectId());
@@ -102,39 +108,51 @@ public abstract class AbstractProjectTest extends AbstractUITest {
             }
         }
 
-        if (!canAccessGreyPage(browser)) {
-            System.out.println("Use REST api to create project.");
-            testParams.setProjectId(ProjectRestUtils.createProject(getGoodDataClient(), projectTitle,
-                    projectTemplate, testParams.getAuthorizationToken(), ProjectDriver.POSTGRES,
-                    testParams.getProjectEnvironment()));
+        if (!Objects.isNull(appliedFixture)) {
+            log.info(appliedFixture.getName() + " fixture is being used");
 
+            GdcFixture fixture = new GdcFixture(appliedFixture);
+            fixture.setGoodDataClient(getGoodDataClient());
+            fixture.setRestApiClient(getRestApiClient());
+
+            testParams.setProjectId(fixture.deploy(projectTitle, testParams.getAuthorizationToken(),
+                    testParams.getProjectDriver(), testParams.getProjectEnvironment()));
         } else {
-            openUrl(PAGE_GDC_PROJECTS);
-            waitForElementVisible(gpProject.getRoot());
+            // keep old approach for tests depending on other templates (e.g.: connectors test)
+            if (!canAccessGreyPage(browser)) {
+                System.out.println("Use REST api to create project.");
+                testParams.setProjectId(ProjectRestUtils.createProject(getGoodDataClient(), projectTitle,
+                        projectTemplate, testParams.getAuthorizationToken(), ProjectDriver.POSTGRES,
+                        testParams.getProjectEnvironment()));
 
-            projectTitle += "-" + testParams.getProjectDriver().name();
-            if (projectTemplate.isEmpty()) {
-                testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, null,
-                        testParams.getAuthorizationToken(), testParams.getProjectDriver(),
-                        testParams.getProjectEnvironment(), projectCreateCheckIterations));
             } else {
-                testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, projectTemplate,
-                        testParams.getAuthorizationToken(), ProjectDriver.POSTGRES, testParams.getProjectEnvironment(),
-                        projectCreateCheckIterations));
+                openUrl(PAGE_GDC_PROJECTS);
+                waitForElementVisible(gpProject.getRoot());
 
-                if (testParams.getProjectDriver().equals(ProjectDriver.VERTICA)) {
-                    String exportToken = exportProject(true, true, false, projectCreateCheckIterations * 5);
-                    deleteProject(testParams.getProjectId());
-
-                    openUrl(PAGE_GDC_PROJECTS);
-                    waitForElementVisible(gpProject.getRoot());
+                projectTitle += "-" + testParams.getProjectDriver().name();
+                if (projectTemplate.isEmpty()) {
                     testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, null,
-                            testParams.getAuthorizationToken2(), testParams.getProjectDriver(),
+                            testParams.getAuthorizationToken(), testParams.getProjectDriver(),
                             testParams.getProjectEnvironment(), projectCreateCheckIterations));
-                    importProject(exportToken, projectCreateCheckIterations * 5);
+                } else {
+                    testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, projectTemplate,
+                            testParams.getAuthorizationToken(), ProjectDriver.POSTGRES, testParams.getProjectEnvironment(),
+                            projectCreateCheckIterations));
+
+                    if (testParams.getProjectDriver().equals(ProjectDriver.VERTICA)) {
+                        String exportToken = exportProject(true, true, false, projectCreateCheckIterations * 5);
+                        deleteProject(testParams.getProjectId());
+
+                        openUrl(PAGE_GDC_PROJECTS);
+                        waitForElementVisible(gpProject.getRoot());
+                        testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, null,
+                                testParams.getAuthorizationToken2(), testParams.getProjectDriver(),
+                                testParams.getProjectEnvironment(), projectCreateCheckIterations));
+                        importProject(exportToken, projectCreateCheckIterations * 5);
+                    }
                 }
+                Screenshots.takeScreenshot(browser, projectTitle + "-created", this.getClass());
             }
-            Screenshots.takeScreenshot(browser, projectTitle + "-created", this.getClass());
         }
 
         projectTitle = testParams.getProjectId().substring(0, 6) + "-" + projectTitle;
