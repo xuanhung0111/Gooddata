@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.AbstractDataloadProcessTest;
+import com.gooddata.qa.graphene.common.AbstractDataloadProcessTest;
 import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.gooddata.qa.graphene.fragments.disc.schedule.DatasetDropdown;

@@ -5,7 +5,6 @@ import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.model.ModelRestUtils.getProductionProjectModelView;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
-import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -30,6 +29,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.md.Fact;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
+import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.enums.ResourceDirectory;
@@ -266,7 +266,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
 
     @Test(dependsOnGroups = "createProject")
     public void checkCSVUploaderWithLDMModeler() throws ParseException, JSONException, IOException {
-        updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES + "/" + initialLdmMaqlFile));
+        setupMaql(LdmModel.loadFromFile(MAQL_FILES.getPath() + "createLdm.txt"));
 
         final Dataset dataset = uploadCsv(PAYROLL);
         final String datasetName = dataset.getName();

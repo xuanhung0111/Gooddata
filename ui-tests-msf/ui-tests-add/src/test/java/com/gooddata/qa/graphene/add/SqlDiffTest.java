@@ -13,7 +13,7 @@ import org.json.JSONException;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.AbstractDataloadProcessTest;
+import com.gooddata.qa.graphene.common.AbstractDataloadProcessTest;
 import com.gooddata.qa.graphene.entity.model.Dataset;
 import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.enums.user.UserRoles;

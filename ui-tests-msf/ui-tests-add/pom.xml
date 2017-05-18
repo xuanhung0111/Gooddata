@@ -11,14 +11,6 @@
     </parent>
     <artifactId>ui-tests-add</artifactId>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.gooddata.qa</groupId>
-            <artifactId>ui-msf-core</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-    </dependencies>
-
     <profiles>
         <profile>
             <id>selenium</id>
