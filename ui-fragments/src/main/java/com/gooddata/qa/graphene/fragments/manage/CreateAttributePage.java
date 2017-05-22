@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertEquals;
 
@@ -81,6 +82,7 @@ public class CreateAttributePage extends AbstractFragment {
 
     public AttributeDetailPage createComputedAttribute(ComputedAttributeDefinition definition) {
         fillInComputedAttributeForm(definition).submit();
+        waitForElementNotPresent(submitButton);
         return AttributeDetailPage.getInstance(browser).waitForCreatingComputedAttribute();
     }
 
