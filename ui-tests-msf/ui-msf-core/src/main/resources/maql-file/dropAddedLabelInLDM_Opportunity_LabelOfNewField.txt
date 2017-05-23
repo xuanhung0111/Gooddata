@@ -1,1 +1,0 @@
-ALTER ATTRIBUTE {attr.opportunity.title2} DROP KEYS {d_opportunity_title2.id}, {f_opportunity.title2_id};ALTER DATASET {dataset.opportunity} DROP {attr.opportunity.title2};DROP {attr.opportunity.title2} CASCADE;SYNCHRONIZE {dataset.opportunity} PRESERVE DATA;

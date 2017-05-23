@@ -1,1 +1,0 @@
-COPY opportunity(cp__nameErrorMapping, a__title, f__price, f__totalprice) FROM LOCAL '${DATA_SOURCE_DIR}/opportunity_with_error_mapping.csv' DELIMITER ',';COPY person(a__personErrorMapping, l__person__personid, l__person__firstname, l__person__lastname, f__age) FROM LOCAL '${DATA_SOURCE_DIR}/person_with_error_mapping.csv' DELIMITER ',';

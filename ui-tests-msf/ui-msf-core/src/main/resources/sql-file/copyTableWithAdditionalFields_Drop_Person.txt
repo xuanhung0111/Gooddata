@@ -1,1 +1,0 @@
-COPY opportunity(cp__name, a__title, a__title2, l__title__label, f__price, f__totalprice, f__totalprice2) FROM LOCAL '${DATA_SOURCE_DIR}/opportunity_with_additional_fields.csv' DELIMITER ',';

@@ -12,7 +12,7 @@ import java.io.RandomAccessFile;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.AbstractDiscTest;
+import com.gooddata.qa.graphene.common.AbstractDiscTest;
 import com.gooddata.qa.graphene.fragments.disc.ConfirmationDialog;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
