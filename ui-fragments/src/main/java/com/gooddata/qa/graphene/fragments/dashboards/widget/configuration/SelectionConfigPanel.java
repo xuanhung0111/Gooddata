@@ -16,7 +16,7 @@ public class SelectionConfigPanel extends AbstractFragment {
     @FindBy(xpath = "//div[./label[.='Multiple values']]/input")
     private WebElement multipleValue;
 
-    private final static String HIDE_DATE_RANGE_CHECKBOX_CSS = ".c-checkBox input";
+    private final static String HIDE_DATE_RANGE_CHECKBOX_CSS = ".selectionModeRow input";
 
     public void changeSelectionToOneValue() {
         waitForElementVisible(oneValue).click();
@@ -31,8 +31,7 @@ public class SelectionConfigPanel extends AbstractFragment {
     }
 
     public boolean isHideDateRangeSelectionVisible() {
-        return isElementVisible(By.cssSelector("[title='Hide explicit date range selection']"), getRoot())
-                && isElementVisible(By.cssSelector(HIDE_DATE_RANGE_CHECKBOX_CSS), getRoot());
+        return isElementVisible(By.cssSelector(HIDE_DATE_RANGE_CHECKBOX_CSS), getRoot());
     }
 
     public SelectionConfigPanel setHideDateRange(boolean enabled) {
