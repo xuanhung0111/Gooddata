@@ -66,15 +66,6 @@ public class AbstractDashboardReport extends AbstractReport {
         configPanel.saveConfiguration();
     }
 
-    public boolean areAllFiltersDisabled() {
-        WidgetConfigPanel configPanel = WidgetConfigPanel.openConfigurationPanelFor(this.getRoot(), browser);
-        boolean ret =
-                configPanel.getTab(WidgetConfigPanel.Tab.FILTERS, FiltersConfigPanel.class)
-                        .areAllFiltersDisabled();
-        configPanel.discardConfiguration();
-        return ret;
-    }
-
     public boolean isCellLimit() {
         String text = waitForElementVisible(reportTooBig).getText();
         return (CELL_LIMIT.equals(text) && SHOW_ANYWAY.equals(showAnywayBtn.getText()));

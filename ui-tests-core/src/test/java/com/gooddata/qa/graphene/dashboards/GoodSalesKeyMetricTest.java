@@ -114,7 +114,6 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
         FiltersConfigPanel filtersConfigPanel = widgetConfigPanel.getTab(Tab.FILTERS, FiltersConfigPanel.class);
         assertTrue(isEqualCollection(filtersConfigPanel.getAllFilters(),
                 asList("Date dimension (Created)", VARIABLE_NAME, ATTR_PRODUCT)));
-        assertTrue(isEqualCollection(filtersConfigPanel.getAllDisabledFilters(), singleton(VARIABLE_NAME)));
         filtersConfigPanel.removeFiltersFromSelectedList(ATTR_PRODUCT);
         widgetConfigPanel.getTab(Tab.METRIC, MetricConfigPanel.class)
             .selectMetric(METRIC_VARIABLE, "Created");
