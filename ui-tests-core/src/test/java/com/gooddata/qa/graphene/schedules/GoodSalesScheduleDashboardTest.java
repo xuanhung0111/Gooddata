@@ -257,7 +257,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
                 "Maximum of ten recipients allowed. Remove some recipients.");
 
         String schedule = "Public schedule test";
-        initEmailSchedulesPage().scheduleNewDahboardEmail(testParams.getUser(), schedule,
+        initEmailSchedulesPage().scheduleNewDashboardEmail(testParams.getUser(), schedule,
                 "Scheduled email test - dashboard.", "Outlook");
     }
 
