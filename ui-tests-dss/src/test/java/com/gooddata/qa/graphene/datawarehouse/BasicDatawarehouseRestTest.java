@@ -189,7 +189,7 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
     @Test(dependsOnMethods = {"gpInstanceFormsAvailable"})
     public void createStorageWithNonexistentAuthToken() throws JSONException {
         createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, "nonexistentAuthToken",
-                "Project group 'nonexistentAuthToken' does not exists.");
+                "Project group 'nonexistentAuthToken' is disabled or does not exists.");
     }
 
     @Test(dependsOnMethods = {"gpInstanceFormsAvailable"})
