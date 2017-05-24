@@ -50,7 +50,7 @@ public class NotificationTest extends AbstractDataloadProcessTest {
 
     private static final String ATTR_NAME = "name";
     private static final String ERROR_MESSAGE = "While trying to load project %s, the following datasets had one "
-            + "or more rows with a null timestamp, which is not allowed: %s: 1 rows.";
+            + "or more rows with a null timestamp, which is not allowed: %s: 1 row(s).";
 
     private final String SCHEDULE = "Schedule-" + generateHashString();
     private final String SUCCESS_EMAIL_SUBJECT = "Notification for success event " + generateHashString();
