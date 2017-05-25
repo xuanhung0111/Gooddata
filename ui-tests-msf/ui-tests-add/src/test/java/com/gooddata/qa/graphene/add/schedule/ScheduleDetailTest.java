@@ -13,7 +13,9 @@ import java.time.LocalTime;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
+import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.qa.graphene.common.AbstractDataloadProcessTest;
+import com.gooddata.qa.graphene.entity.add.SyncDatasets;
 import com.gooddata.qa.graphene.entity.ads.SqlBuilder;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
 import com.gooddata.qa.graphene.entity.model.LdmModel;
@@ -22,7 +24,6 @@ import com.gooddata.qa.graphene.enums.process.Parameter;
 import com.gooddata.qa.graphene.fragments.disc.overview.OverviewPage.OverviewState;
 import com.gooddata.qa.graphene.fragments.disc.overview.OverviewProjects.OverviewProjectItem;
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
-import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail.ExecutionHistoryItem;
 
@@ -41,46 +42,35 @@ public class ScheduleDetailTest extends AbstractDataloadProcessTest {
 
     @Test(dependsOnGroups = {"precondition"})
     public void executeDataloadSchedule() {
-        String schedule = "Schedule-" + generateHashString();
-        initDiscProjectDetailPage()
-                .openCreateScheduleForm()
-                .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .enterScheduleName(schedule)
-                .schedule();
+        Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.ALL);
 
         try {
-            ScheduleDetail scheduleDetail = ScheduleDetail.getInstance(browser)
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
                     .executeSchedule().waitForExecutionFinish();
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
                     ScheduleStatus.OK.toString());
 
         } finally {
-            deleteScheduleByName(getDataloadProcess(), schedule);
+            getProcessService().removeSchedule(schedule);
         }
     }
 
     @Test(dependsOnGroups = {"precondition"})
     public void autoExecuteDataloadSchedule() {
-        String schedule = "Schedule-" + generateHashString();
         LocalTime autoStartTime = LocalTime.now().plusMinutes(2);
-
-        ((CreateScheduleForm) initDiscProjectDetailPage()
-                .openCreateScheduleForm()
-                .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .selectRunTimeByCronExpression(parseTimeToCronExpression(autoStartTime)))
-                .enterScheduleName(schedule)
-                .schedule();
+        Schedule schedule = createSchedule(generateScheduleName(), SyncDatasets.ALL,
+                parseTimeToCronExpression(autoStartTime));
 
         try {
-            ScheduleDetail scheduleDetail = ScheduleDetail.getInstance(browser)
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
                     .waitForAutoExecute(autoStartTime).waitForExecutionFinish();
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
                     ScheduleStatus.OK.toString());
 
         } finally {
-            deleteScheduleByName(getDataloadProcess(), schedule);
+            getProcessService().removeSchedule(schedule);
         }
     }
 
@@ -92,27 +82,14 @@ public class ScheduleDetailTest extends AbstractDataloadProcessTest {
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
 
-        String schedule1 = "Schedule-" + generateHashString();
-        String schedule2 = "Schedule-" + generateHashString();
-
-        initDiscProjectDetailPage()
-                .openCreateScheduleForm()
-                .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .enterScheduleName(schedule1)
-                .schedule();
-        ScheduleDetail.getInstance(browser).close();
-
-        projectDetailPage
-                .openCreateScheduleForm()
-                .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .enterScheduleName(schedule2)
-                .schedule();
-        ScheduleDetail.getInstance(browser).close();
+        Schedule schedule1 = createScheduleForManualTrigger(generateScheduleName(),
+                SyncDatasets.custom(DATASET_OPPORTUNITY));
+        Schedule schedule2 = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.ALL);
 
         try {
-            ProcessDetail processDetail = projectDetailPage.getProcess(DEFAULT_DATAlOAD_PROCESS_NAME);
-            processDetail.openSchedule(schedule1).executeSchedule().close();
-            processDetail.openSchedule(schedule2).executeSchedule().waitForExecutionFinish();
+            ProcessDetail processDetail = initDiscProjectDetailPage().getProcess(DEFAULT_DATAlOAD_PROCESS_NAME);
+            processDetail.openSchedule(schedule1.getName()).executeSchedule().close();
+            processDetail.openSchedule(schedule2.getName()).executeSchedule().waitForExecutionFinish();
 
             ExecutionHistoryItem executionItem = ScheduleDetail.getInstance(browser)
                     .getLastExecutionHistoryItem();
@@ -121,8 +98,8 @@ public class ScheduleDetailTest extends AbstractDataloadProcessTest {
                     + "datasets in this schedule is already synchronizing.");
 
         } finally {
-            deleteScheduleByName(getDataloadProcess(), schedule1);
-            deleteScheduleByName(getDataloadProcess(), schedule2);
+            getProcessService().removeSchedule(schedule1);
+            getProcessService().removeSchedule(schedule2);
 
             parameters.addParameter("SQL_QUERY",
                     SqlBuilder.loadFromFile(SQL_FILES.getPath() + TxtFile.ADS_TABLE.getName()));
@@ -133,80 +110,55 @@ public class ScheduleDetailTest extends AbstractDataloadProcessTest {
 
     @Test(dependsOnGroups = {"precondition"})
     public void disableDataloadSchedule() {
-        String schedule = "Schedule-" + generateHashString();
         LocalTime autoStartTime = LocalTime.now().plusMinutes(2);
-
-        ((CreateScheduleForm) initDiscProjectDetailPage()
-                .openCreateScheduleForm()
-                .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .selectRunTimeByCronExpression(parseTimeToCronExpression(autoStartTime)))
-                .enterScheduleName(schedule)
-                .schedule();
+        Schedule schedule = createSchedule(generateScheduleName(), SyncDatasets.ALL,
+                parseTimeToCronExpression(autoStartTime));
 
         try {
-            ScheduleDetail scheduleDetail = ScheduleDetail.getInstance(browser).disableSchedule();
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule).disableSchedule();
             assertFalse(scheduleDetail.canAutoTriggered(autoStartTime),
                     "Schedule executed automatically although disabled");
 
         } finally {
-            deleteScheduleByName(getDataloadProcess(), schedule);
+            getProcessService().removeSchedule(schedule);
         }
     }
 
     @Test(dependsOnGroups = {"precondition"})
     public void dependentDataloadSchedule() {
-        String schedule1 = "Schedule-" + generateHashString();
-        String schedule2 = "Schedule-" + generateHashString();
-
-        initDiscProjectDetailPage()
-                .openCreateScheduleForm()
-                .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .enterScheduleName(schedule1)
-                .schedule();
-        ScheduleDetail.getInstance(browser).close();
-
-        ((CreateScheduleForm) projectDetailPage.openCreateScheduleForm()
-                .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .selectRunTimeByTriggeringSchedule(getScheduleId(getDataloadProcess(), schedule1)))
-                .enterScheduleName(schedule2)
-                .schedule();
-        ScheduleDetail.getInstance(browser).close();
+        Schedule schedule1 = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.custom(DATASET_PERSON));
+        Schedule schedule2 = createSchedule(generateScheduleName(), SyncDatasets.ALL, schedule1);
 
         try {
-            ProcessDetail processDetail = projectDetailPage.getProcess(DEFAULT_DATAlOAD_PROCESS_NAME);
-            processDetail.openSchedule(schedule1).executeSchedule().close();
+            ProcessDetail processDetail = initDiscProjectDetailPage().getProcess(DEFAULT_DATAlOAD_PROCESS_NAME);
+            processDetail.openSchedule(schedule1.getName()).executeSchedule().close();
 
-            ScheduleDetail scheduleDetail = processDetail.openSchedule(schedule2)
+            ScheduleDetail scheduleDetail = processDetail.openSchedule(schedule2.getName())
                     .waitForAutoExecute(LocalTime.now()).waitForExecutionFinish();
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
                     ScheduleStatus.OK.toString());
 
         } finally {
-            deleteScheduleByName(getDataloadProcess(), schedule1);
-            deleteScheduleByName(getDataloadProcess(), schedule2);
+            getProcessService().removeSchedule(schedule1);
+            getProcessService().removeSchedule(schedule2);
         }
     }
 
     @Test(dependsOnGroups = {"precondition"})
     public void checkDataloadScheduleAtOverviewPage() {
-        String schedule = "Schedule-" + generateHashString();
-        initDiscProjectDetailPage()
-                .openCreateScheduleForm()
-                .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .enterScheduleName(schedule)
-                .schedule();
+        Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.ALL);
 
         try {
-            ScheduleDetail.getInstance(browser).executeSchedule().waitForExecutionFinish();
+            initScheduleDetail(schedule).executeSchedule().waitForExecutionFinish();
 
             OverviewProjectItem project = initDiscOverviewPage()
                     .selectState(OverviewState.SUCCESSFUL).getOverviewProject(projectTitle);
-            assertTrue(project.expand().hasSchedule(schedule), "Schedule " + schedule + " not show");
-            assertEquals(project.getScheduleExecutable(schedule), "");
+            assertTrue(project.expand().hasSchedule(schedule.getName()), "Schedule " + schedule + " not show");
+            assertEquals(project.getScheduleExecutable(schedule.getName()), "");
 
         } finally {
-            deleteScheduleByName(getDataloadProcess(), schedule);
+            getProcessService().removeSchedule(schedule);
         }
     }
 }

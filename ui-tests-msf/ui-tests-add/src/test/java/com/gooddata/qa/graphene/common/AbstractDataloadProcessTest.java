@@ -4,8 +4,10 @@ import static com.gooddata.qa.utils.ads.AdsHelper.ADS_DB_CONNECTION_URL;
 import static java.lang.String.format;
 
 import java.io.IOException;
+import java.time.LocalTime;
 import java.util.Optional;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.AfterClass;
@@ -14,7 +16,9 @@ import org.testng.annotations.Test;
 import com.gooddata.GoodDataException;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.ProcessType;
+import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.qa.graphene.AbstractDataIntegrationTest;
+import com.gooddata.qa.graphene.entity.add.SyncDatasets;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
 import com.gooddata.qa.graphene.enums.process.Parameter;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
@@ -82,6 +86,20 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
         return findDataloadProcess().isPresent();
     }
 
+    protected Schedule createSchedule(String name, SyncDatasets datasetToSynchronize, String crontimeExpression) {
+        return createScheduleWithTriggerType(name, datasetToSynchronize, crontimeExpression);
+    }
+
+    //This method is used to create a schedule which never been automatically triggered.
+    protected Schedule createScheduleForManualTrigger(String name, SyncDatasets datasetToSynchronize) {
+        String cronExpression = parseTimeToCronExpression(LocalTime.now().minusMinutes(2));
+        return createSchedule(name, datasetToSynchronize, cronExpression);
+    }
+
+    protected Schedule createSchedule(String name, SyncDatasets datasetToSynchronize, Schedule triggeringSchedule) {
+        return createScheduleWithTriggerType(name, datasetToSynchronize, triggeringSchedule);
+    }
+
     protected Parameters getDefaultParameters() {
         return new Parameters()
                 .addParameter(Parameter.ADS_URL, format(ADS_DB_CONNECTION_URL, testParams.getHost(), ads.getId()))
@@ -96,6 +114,23 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
     private Optional<DataloadProcess> findDataloadProcess() {
         return getProcessService().listProcesses(getProject())
                 .stream().filter(p -> p.getType().equals(DATALOAD_PROCESS_TYPE)).findFirst();
+    }
+
+    private Schedule createScheduleWithTriggerType(String name, SyncDatasets datasetToSynchronize,
+            Object triggerType) {
+        Schedule schedule = null;
+
+        if (triggerType instanceof String) {
+            schedule = new Schedule(getDataloadProcess(), null, (String) triggerType);
+        } else {
+            schedule = new Schedule(getDataloadProcess(), null, (Schedule) triggerType);
+        }
+
+        Pair<String, String> datasetParameter = datasetToSynchronize.getParameter();
+        schedule.addParam(datasetParameter.getKey(), datasetParameter.getValue());
+        schedule.setName(name);
+
+        return getProcessService().createSchedule(getProject(), schedule);
     }
 
     protected enum TxtFile {

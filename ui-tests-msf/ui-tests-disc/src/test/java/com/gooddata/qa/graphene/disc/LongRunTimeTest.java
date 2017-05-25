@@ -14,12 +14,12 @@ import org.testng.annotations.Test;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
-import com.gooddata.qa.graphene.common.AbstractDiscTest;
+import com.gooddata.qa.graphene.common.AbstractProcessTest;
 import com.gooddata.qa.graphene.enums.disc.schedule.Executable;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleCronTime;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 
-public class LongRunTimeTest extends AbstractDiscTest {
+public class LongRunTimeTest extends AbstractProcessTest {
 
     private static final String DISABLE_RECOMMEND_MESSAGE = "This schedule has failed for the 5th time. "
             + "We highly recommend disable this schedule until the issue is addressed. "
