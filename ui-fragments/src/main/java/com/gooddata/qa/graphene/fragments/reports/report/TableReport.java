@@ -244,20 +244,24 @@ public class TableReport extends AbstractDashboardReport {
         throw new IllegalArgumentException("Cannot find metric value " + value);
     }
 
-    public void drillOnAttributeValue() {
+    public TableReport drillOnAttributeValue() {
         waitForReportLoading();
-        for (WebElement e : attributeElementInGrid) {
-            if (!e.findElement(BY_PARENT).getAttribute("class").contains("rows"))
-                continue;
 
-            e.click();
-            return;
-        }
-        throw new IllegalArgumentException("No attribute value to drill on");
+        attributeElementInGrid.stream()
+                //drill on div element to avoid the case attribute value's width is twice as long as the table cell's
+                //the click action could happen on the table line and fail
+                .map(e -> e.findElement(BY_PARENT))
+                .filter(e -> e.getAttribute("class").contains("rows"))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No attribute value to drill on"))
+                .click();
+        return this;
     }
 
     public TableReport drillOnAttributeValue(String value) {
-        getAttributeValueElement(value).click();
+        //drill on div element to avoid the case attribute value's width is twice as long as the table cell's
+        //the click action could happen on the table line and fail
+        getAttributeValueElement(value).findElement(BY_PARENT).click();
         return this;
     }
 

@@ -1,8 +1,10 @@
 package com.gooddata.qa.graphene.fragments.dashboards.widget.configuration;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
@@ -30,11 +32,24 @@ public class DrillingConfigPanel extends AbstractFragment {
 
     @FindBy(className = "s-btn-select_attribute___report___dashboard")
     private WebElement selectAttributeReportDashboardButton;
+    
+    @FindBy(className = "yui3-drillitempanel")
+    private List<WebElement> drillItemPanelList;
 
     public void addDrilling(Pair<List<String>, String> pairs, String group) {
+        int currentDrillItemPanelSize = drillItemPanelList.size();
         waitForElementVisible(isAddDrillingButtonVisible() ? drillingButton : addMoreButton).click();
 
+        Predicate<WebDriver> newDrillItemPanelAdded =
+                browser -> drillItemPanelList.size() == currentDrillItemPanelSize + 1;
+        Graphene.waitGui().withTimeout(3, TimeUnit.SECONDS).until(newDrillItemPanelAdded);
+
+        //if there are more than 2 drill items, the scroll bar displays.
+        if (drillItemPanelList.size() > 2) {
+            scrollElementIntoView(waitForElementVisible(selectMetricAttributeButton), browser);
+        }
         waitForElementVisible(selectMetricAttributeButton).click();
+
         Graphene.waitGui().until(new Predicate<WebDriver>() {
             @Override
             public boolean apply(WebDriver input) {
