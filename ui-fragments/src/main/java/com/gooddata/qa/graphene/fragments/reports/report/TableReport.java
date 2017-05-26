@@ -248,20 +248,21 @@ public class TableReport extends AbstractDashboardReport {
         waitForReportLoading();
 
         attributeElementInGrid.stream()
-                //drill on div element to avoid the case attribute value's width is twice as long as the table cell's
-                //the click action could happen on the table line and fail
-                .map(e -> e.findElement(BY_PARENT))
-                .filter(e -> e.getAttribute("class").contains("rows"))
+                .filter(e -> e.findElement(BY_PARENT).getAttribute("class").contains("rows"))
                 .findFirst()
+                //if attribute value is longer than the table cell, click on the table cell element (div)
+                //otherwise, click on the attribute value (span)
+                .map(e -> (e.getSize().width > e.findElement(BY_PARENT).getSize().width)? e.findElement(BY_PARENT) : e)
                 .orElseThrow(() -> new IllegalArgumentException("No attribute value to drill on"))
                 .click();
         return this;
     }
 
     public TableReport drillOnAttributeValue(String value) {
-        //drill on div element to avoid the case attribute value's width is twice as long as the table cell's
-        //the click action could happen on the table line and fail
-        getAttributeValueElement(value).findElement(BY_PARENT).click();
+        //if attribute value is longer than the table cell, click on the table cell element (div)
+        //otherwise, click on the attribute value (span)
+        WebElement e = getAttributeValueElement(value);
+        ((e.getSize().width > e.findElement(BY_PARENT).getSize().width)? e.findElement(BY_PARENT) : e).click();;
         return this;
     }
 
