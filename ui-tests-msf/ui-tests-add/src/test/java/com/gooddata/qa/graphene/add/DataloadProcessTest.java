@@ -21,7 +21,6 @@ import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.ProcessExecution;
 import com.gooddata.dataload.processes.ProcessExecutionDetail;
 import com.gooddata.qa.graphene.common.AbstractDataloadProcessTest;
-import com.gooddata.qa.graphene.entity.ads.AdsTable;
 import com.gooddata.qa.graphene.entity.ads.SqlBuilder;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
@@ -46,13 +45,7 @@ public class DataloadProcessTest extends AbstractDataloadProcessTest {
                 .rows("OOP1", "100")
                 .rows("OOP2", "200");
 
-        AdsTable opportunityTable = new AdsTable(DATASET_OPPORTUNITY)
-                .withAttributes(ATTR_OPPORTUNITY)
-                .withFacts(FACT_PRICE)
-                .withDataFile(opportunity);
-
-        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY,
-                new SqlBuilder().withAdsTable(opportunityTable).build());
+        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity));
 
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());

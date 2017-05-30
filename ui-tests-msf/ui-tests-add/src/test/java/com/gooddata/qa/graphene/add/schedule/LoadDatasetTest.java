@@ -17,7 +17,6 @@ import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.md.Attribute;
 import com.gooddata.qa.graphene.common.AbstractDataloadProcessTest;
 import com.gooddata.qa.graphene.entity.add.SyncDatasets;
-import com.gooddata.qa.graphene.entity.ads.AdsTable;
 import com.gooddata.qa.graphene.entity.ads.SqlBuilder;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
@@ -50,14 +49,7 @@ public class LoadDatasetTest extends AbstractDataloadProcessTest {
                 .rows("OOP2", "200", CLIENT_ID)
                 .rows("OPP3", "300", "");
 
-        AdsTable opportunityTable = new AdsTable(DATASET_OPPORTUNITY)
-                .withAttributes(ATTR_OPPORTUNITY)
-                .withFacts(FACT_PRICE)
-                .hasClientId(true)
-                .withDataFile(opportunity);
-
-        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY,
-                new SqlBuilder().withAdsTable(opportunityTable).build());
+        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity));
 
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
@@ -84,14 +76,7 @@ public class LoadDatasetTest extends AbstractDataloadProcessTest {
                 .rows("OOP1", "100", CLIENT_ID)
                 .rows("OOP2", "200", CLIENT_ID);
 
-        AdsTable opportunityTable = new AdsTable(DATASET_OPPORTUNITY)
-                .withAttributes(ATTR_OPPORTUNITY)
-                .withFacts(FACT_PRICE)
-                .hasClientId(true)
-                .withDataFile(opportunity);
-
-        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY,
-                new SqlBuilder().withAdsTable(opportunityTable).build());
+        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity));
 
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
@@ -128,13 +113,7 @@ public class LoadDatasetTest extends AbstractDataloadProcessTest {
                 .rows("OOP11", "100")
                 .rows("OOP22", "200");
 
-        AdsTable opportunityTable = new AdsTable(DATASET_OPPORTUNITY)
-                .withAttributes(ATTR_OPPORTUNITY)
-                .withFacts(FACT_PRICE)
-                .withDataFile(opportunity);
-
-        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY,
-                new SqlBuilder().withAdsTable(opportunityTable).build());
+        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity));
 
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
@@ -160,18 +139,12 @@ public class LoadDatasetTest extends AbstractDataloadProcessTest {
         final String prefix = "gDC_";
         getAdsHelper().associateAdsWithProject(ads, testParams.getProjectId(), "", prefix);
 
-        CsvFile opportunity = new CsvFile(DATASET_OPPORTUNITY)
+        CsvFile opportunity = new CsvFile(prefix + DATASET_OPPORTUNITY)
                 .columns(new CsvFile.Column(ATTR_OPPORTUNITY), new CsvFile.Column(FACT_PRICE))
                 .rows("OOP111", "100")
                 .rows("OOP222", "200");
 
-        AdsTable opportunityTable = new AdsTable(prefix + DATASET_OPPORTUNITY)
-                .withAttributes(ATTR_OPPORTUNITY)
-                .withFacts(FACT_PRICE)
-                .withDataFile(opportunity);
-
-        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY,
-                new SqlBuilder().withAdsTable(opportunityTable).build());
+        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity));
 
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());

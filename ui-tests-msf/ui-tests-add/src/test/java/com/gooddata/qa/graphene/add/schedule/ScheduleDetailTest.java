@@ -82,8 +82,7 @@ public class ScheduleDetailTest extends AbstractDataloadProcessTest {
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
 
-        Schedule schedule1 = createScheduleForManualTrigger(generateScheduleName(),
-                SyncDatasets.custom(DATASET_OPPORTUNITY));
+        Schedule schedule1 = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.ALL);
         Schedule schedule2 = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.ALL);
 
         try {

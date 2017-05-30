@@ -8,15 +8,14 @@ import static org.apache.commons.lang.math.NumberUtils.isNumber;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
-
 public class AdsTable {
+
     private String name;
     private List<String> attributes;
     private List<String> facts;
     private boolean hasClientId;
     private boolean hasTimeStamp;
-    private CsvFile dataFile;
+    private List<List<String>> dataToInsert;
 
     public AdsTable(String name) {
         this.name = name;
@@ -24,7 +23,7 @@ public class AdsTable {
         this.facts = new ArrayList<>();
         this.hasClientId = false;
         this.hasTimeStamp = false;
-        this.dataFile = null;
+        this.dataToInsert = null;
     }
 
     public AdsTable withAttributes(String... attributes) {
@@ -47,8 +46,8 @@ public class AdsTable {
         return this;
     }
 
-    public AdsTable withDataFile(CsvFile dataFile) {
-        this.dataFile = dataFile;
+    public AdsTable withData(List<List<String>> dataToInsert) {
+        this.dataToInsert = dataToInsert;
         return this;
     }
 
@@ -79,7 +78,10 @@ public class AdsTable {
     }
 
     private String insertData() {
-        return dataFile.getDataRows().stream()
+        System.out.println("Data of Ads table: " + getName());
+        dataToInsert.stream().forEach(System.out::println);
+
+        return dataToInsert.stream()
                 .map(this::parseDataInRowAsCorrectType)
                 .map(row -> "INSERT into ${table} values (" + row.stream().collect(joining(", ")) + ");")
                 .collect(joining())

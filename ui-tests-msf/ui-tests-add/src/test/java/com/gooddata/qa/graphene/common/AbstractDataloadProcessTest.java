@@ -4,7 +4,9 @@ import static com.gooddata.qa.utils.ads.AdsHelper.ADS_DB_CONNECTION_URL;
 import static java.lang.String.format;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -17,6 +19,7 @@ import com.gooddata.GoodDataException;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.ProcessType;
 import com.gooddata.dataload.processes.Schedule;
+import com.gooddata.dataload.processes.ScheduleExecution;
 import com.gooddata.qa.graphene.AbstractDataIntegrationTest;
 import com.gooddata.qa.graphene.entity.add.SyncDatasets;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
@@ -100,6 +103,16 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
         return createScheduleWithTriggerType(name, datasetToSynchronize, triggeringSchedule);
     }
 
+    protected ScheduleExecution executeSchedule(Schedule schedule) {
+        return executeSchedule(schedule, LoadMode.DEFAULT);
+    }
+
+    protected ScheduleExecution executeSchedule(Schedule schedule, LoadMode loadMode) {
+        schedule.addParam("GDC_DATALOAD_SINGLE_RUN_LOAD_MODE", loadMode.toString());
+        getProcessService().updateSchedule(schedule);
+        return getProcessService().executeSchedule(schedule).get();
+    }
+
     protected Parameters getDefaultParameters() {
         return new Parameters()
                 .addParameter(Parameter.ADS_URL, format(ADS_DB_CONNECTION_URL, testParams.getHost(), ads.getId()))
@@ -109,6 +122,10 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
 
     protected String getAdsToken() {
         return testParams.loadProperty("dss.authorizationToken");
+    }
+
+    protected String parseDateTime(LocalDateTime dateTime, String pattern) {
+        return dateTime.format(DateTimeFormatter.ofPattern(pattern));
     }
 
     private Optional<DataloadProcess> findDataloadProcess() {
@@ -147,5 +164,11 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
         public String getName() {
             return name;
         }
+    }
+
+    protected enum LoadMode {
+        DEFAULT,
+        FULL,
+        INCREMENTAL
     }
 }
