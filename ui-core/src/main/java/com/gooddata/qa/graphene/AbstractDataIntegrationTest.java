@@ -13,6 +13,7 @@ import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.qa.graphene.fragments.disc.overview.OverviewPage;
 import com.gooddata.qa.graphene.fragments.disc.projects.ProjectDetailPage;
 import com.gooddata.qa.graphene.fragments.disc.projects.ProjectsPage;
+import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 
 public class AbstractDataIntegrationTest extends AbstractProjectTest {
 
@@ -40,6 +41,10 @@ public class AbstractDataIntegrationTest extends AbstractProjectTest {
         return waitForFragmentVisible(projectDetailPage);
     }
 
+    protected ScheduleDetail initScheduleDetail(Schedule schedule) {
+        return initDiscProjectDetailPage().getProcessById(schedule.getProcessId()).openSchedule(schedule.getName());
+    }
+
     protected void deleteScheduleByName(DataloadProcess process, String scheduleName) {
         getProcessService().removeSchedule(getScheduleByName(process, scheduleName));
     }
@@ -54,6 +59,10 @@ public class AbstractDataIntegrationTest extends AbstractProjectTest {
 
     protected String generateProcessName() {
         return "Process-" + generateHashString();
+    }
+
+    protected String generateScheduleName() {
+        return "Schedule-" + generateHashString();
     }
 
     protected ProcessService getProcessService() {

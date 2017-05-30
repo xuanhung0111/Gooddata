@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.add.notification;
 import static com.gooddata.qa.graphene.entity.disc.NotificationRule.buildMessage;
 import static com.gooddata.qa.graphene.entity.disc.NotificationRule.getVariablesFromMessage;
 import static com.gooddata.qa.utils.http.process.ProcessRestUtils.executeProcess;
-import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
 import static com.gooddata.qa.utils.mail.ImapUtils.getEmailBody;
 import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 import static java.lang.String.format;
@@ -29,7 +28,9 @@ import org.jsoup.nodes.Document;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.qa.graphene.common.AbstractDataloadProcessTest;
+import com.gooddata.qa.graphene.entity.add.SyncDatasets;
 import com.gooddata.qa.graphene.entity.ads.AdsTable;
 import com.gooddata.qa.graphene.entity.ads.SqlBuilder;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
@@ -40,11 +41,8 @@ import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.disc.notification.Variable;
 import com.gooddata.qa.graphene.enums.process.Parameter;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.disc.notification.NotificationRuleItem;
 import com.gooddata.qa.graphene.fragments.disc.notification.NotificationRuleItem.NotificationEvent;
-import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
-import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 
 public class NotificationTest extends AbstractDataloadProcessTest {
 
@@ -52,7 +50,6 @@ public class NotificationTest extends AbstractDataloadProcessTest {
     private static final String ERROR_MESSAGE = "While trying to load project %s, the following datasets had one "
             + "or more rows with a null timestamp, which is not allowed: %s: 1 row(s).";
 
-    private final String SCHEDULE = "Schedule-" + generateHashString();
     private final String SUCCESS_EMAIL_SUBJECT = "Notification for success event " + generateHashString();
     private final String PROCESS_STARTED_EMAIL_SUBJECT = "Notification for process started event " + generateHashString();
     private final String FAILURE_EMAIL_SUBJECT = "Notification for failure event " + generateHashString();
@@ -60,6 +57,7 @@ public class NotificationTest extends AbstractDataloadProcessTest {
     private CsvFile opportunity;
     private CsvFile person;
     private SqlBuilder sqlBuilder;
+    private Schedule schedule;
 
     @BeforeClass(alwaysRun = true)
     public void initImapUser() {
@@ -169,43 +167,14 @@ public class NotificationTest extends AbstractDataloadProcessTest {
     public void checkNotificationForFullLoadDataset() throws MessagingException, IOException {
         Date timeReceiveEmail = getTimeReceiveEmail();
 
-        ((CreateScheduleForm) initDiscProjectDetailPage()
-                .openCreateScheduleForm()
-                .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .selectAllDatasetsOption()
-                .selectLongRunTimeUntilAutoTrigger())
-                .enterScheduleName(SCHEDULE)
-                .schedule();
+        schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.ALL);
 
-        ScheduleDetail.getInstance(browser).executeSchedule().waitForExecutionFinish();
+        initScheduleDetail(schedule).executeSchedule().waitForExecutionFinish();
         Document processStartedNotification = getNotificationEmailContent(PROCESS_STARTED_EMAIL_SUBJECT, timeReceiveEmail);
         assertEquals(processStartedNotification.text(), "PERSON (full load), OPPORTUNITY (full load)");
 
         Document successNotification = getNotificationEmailContent(SUCCESS_EMAIL_SUBJECT, timeReceiveEmail);
         assertEquals(successNotification.text(), "PERSON (full load), OPPORTUNITY (full load)");
-    }
-
-    @Test(dependsOnMethods = {"checkNotificationForFullLoadDataset"}, groups = {"successfulLoad"})
-    public void checkNotificationForDatasetLoadedInDE() throws MessagingException, IOException {
-        Date timeReceiveEmail = getTimeReceiveEmail();
-
-        setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.ENABLE_DATA_EXPLORER, true);
-
-        try {
-            initDiscProjectDetailPage()
-                    .getProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                    .openSchedule(SCHEDULE)
-                    .executeSchedule()
-                    .waitForExecutionFinish();
-
-            Document notification = getNotificationEmailContent(SUCCESS_EMAIL_SUBJECT, timeReceiveEmail);
-            assertEquals(notification.text(), "PERSON, OPPORTUNITY");
-
-        } finally {
-            setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                    ProjectFeatureFlags.ENABLE_DATA_EXPLORER, false);
-        }
     }
 
     @Test(dependsOnMethods = {"checkNotificationForFullLoadDataset"}, groups = {"successfulLoad"})
@@ -217,11 +186,7 @@ public class NotificationTest extends AbstractDataloadProcessTest {
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
 
-        initDiscProjectDetailPage()
-                .getProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .openSchedule(SCHEDULE)
-                .executeSchedule()
-                .waitForExecutionFinish();
+        initScheduleDetail(schedule).executeSchedule().waitForExecutionFinish();
 
         Document processStartedNotification = getNotificationEmailContent(PROCESS_STARTED_EMAIL_SUBJECT, timeReceiveEmail);
         assertTrue(processStartedNotification.text().matches("PERSON \\(incremental load from .*\\)"),
@@ -235,11 +200,7 @@ public class NotificationTest extends AbstractDataloadProcessTest {
     @Test(dependsOnMethods = {"checkNotificationForFullLoadDataset"}, groups = {"successfulLoad"})
     public void checkNotificationWithoutDatasetLoaded() throws MessagingException, IOException {
         Date timeReceiveEmail = getTimeReceiveEmail();
-        initDiscProjectDetailPage()
-                .getProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .openSchedule(SCHEDULE)
-                .executeSchedule()
-                .waitForExecutionFinish();
+        initScheduleDetail(schedule).executeSchedule().waitForExecutionFinish();
 
         Document processStartedNotification = getNotificationEmailContent(PROCESS_STARTED_EMAIL_SUBJECT, timeReceiveEmail);
         assertEquals(processStartedNotification.text(), "No datasets were loaded");
@@ -257,9 +218,7 @@ public class NotificationTest extends AbstractDataloadProcessTest {
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
 
-        String errorMessage = initDiscProjectDetailPage()
-                .getProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .openSchedule(SCHEDULE)
+        String errorMessage = initScheduleDetail(schedule)
                 .executeSchedule()
                 .waitForExecutionFinish()
                 .getLastExecutionHistoryItem()

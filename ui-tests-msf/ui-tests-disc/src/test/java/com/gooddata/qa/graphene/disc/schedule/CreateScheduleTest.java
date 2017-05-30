@@ -15,7 +15,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
-import com.gooddata.qa.graphene.common.AbstractDiscTest;
+import com.gooddata.qa.graphene.common.AbstractProcessTest;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
 import com.gooddata.qa.graphene.enums.disc.schedule.Executable;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleCronTime;
@@ -24,7 +24,7 @@ import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CronEditor;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 
-public class CreateScheduleTest extends AbstractDiscTest {
+public class CreateScheduleTest extends AbstractProcessTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void createSchedule() {

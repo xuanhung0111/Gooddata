@@ -12,8 +12,10 @@ import java.util.Collection;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
+import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.md.Attribute;
 import com.gooddata.qa.graphene.common.AbstractDataloadProcessTest;
+import com.gooddata.qa.graphene.entity.add.SyncDatasets;
 import com.gooddata.qa.graphene.entity.ads.AdsTable;
 import com.gooddata.qa.graphene.entity.ads.SqlBuilder;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
@@ -22,7 +24,6 @@ import com.gooddata.qa.graphene.entity.model.Dataset;
 import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
 import com.gooddata.qa.graphene.enums.process.Parameter;
-import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 
 public class DatasetDetailTest extends AbstractDataloadProcessTest {
@@ -75,16 +76,10 @@ public class DatasetDetailTest extends AbstractDataloadProcessTest {
 
     @Test(dependsOnGroups = {"precondition"})
     public void executeDataloadScheduleWithOneDataset() {
-        String schedule = "Schedule-" + generateHashString();
-        ((CreateScheduleForm) initDiscProjectDetailPage()
-                .openCreateScheduleForm()
-                .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .selectDatasets(DATASET_OPPORTUNITY))
-                .enterScheduleName(schedule)
-                .schedule();
+        Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.custom(DATASET_OPPORTUNITY));
 
         try {
-            ScheduleDetail scheduleDetail = ScheduleDetail.getInstance(browser)
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
                     .executeSchedule().waitForExecutionFinish();
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
@@ -97,22 +92,16 @@ public class DatasetDetailTest extends AbstractDataloadProcessTest {
             assertEquals(getAttributeValues(person), emptyList());
 
         } finally {
-            deleteScheduleByName(getDataloadProcess(), schedule);
+            getProcessService().removeSchedule(schedule);
         }
     }
 
     @Test(dependsOnMethods = {"executeDataloadScheduleWithOneDataset"})
     public void executeDataloadScheduleWithAllDatasets() {
-        String schedule = "Schedule-" + generateHashString();
-        ((CreateScheduleForm) initDiscProjectDetailPage()
-                .openCreateScheduleForm()
-                .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .selectAllDatasetsOption())
-                .enterScheduleName(schedule)
-                .schedule();
+        Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.ALL);
 
         try {
-            ScheduleDetail scheduleDetail = ScheduleDetail.getInstance(browser)
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
                     .executeSchedule().waitForExecutionFinish();
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(), ScheduleStatus.OK.toString());
@@ -124,7 +113,7 @@ public class DatasetDetailTest extends AbstractDataloadProcessTest {
             assertEquals(getAttributeValues(person), PERSON_ATTR_VALUES);
 
         } finally {
-            deleteScheduleByName(getDataloadProcess(), schedule);
+            getProcessService().removeSchedule(schedule);
         }
     }
 }

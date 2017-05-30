@@ -9,6 +9,7 @@ import com.gooddata.qa.graphene.AbstractDataIntegrationTest;
 import com.gooddata.qa.graphene.enums.disc.schedule.Executable;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
+import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 
 public class AbstractProcessTest extends AbstractDataIntegrationTest {
 
@@ -43,6 +44,12 @@ public class AbstractProcessTest extends AbstractDataIntegrationTest {
     protected Schedule createSchedule(DataloadProcess process, String name, Executable executable,
             Schedule triggeringSchedule) {
         return createScheduleWithTriggerType(getGoodDataClient(), process, name, executable, triggeringSchedule);
+    }
+
+    protected void executeScheduleWithSpecificTimes(ScheduleDetail scheduleDetail, int times) {
+        for (int i = 1; i <= times; i++) {
+            scheduleDetail.executeSchedule().waitForExecutionFinish();
+        }
     }
 
     private Schedule createScheduleWithTriggerType(GoodData goodDataClient, DataloadProcess process, String name,

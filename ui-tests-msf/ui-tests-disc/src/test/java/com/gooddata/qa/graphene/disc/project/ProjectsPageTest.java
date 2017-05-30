@@ -25,7 +25,7 @@ import org.testng.annotations.Test;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
-import com.gooddata.qa.graphene.common.AbstractDiscTest;
+import com.gooddata.qa.graphene.common.AbstractProcessTest;
 import com.gooddata.qa.graphene.enums.disc.schedule.Executable;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleCronTime;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
@@ -33,7 +33,7 @@ import com.gooddata.qa.graphene.fragments.disc.projects.ProjectsPage.FilterOptio
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
-public class ProjectsPageTest extends AbstractDiscTest {
+public class ProjectsPageTest extends AbstractProcessTest {
 
     private static final String EMPTY_STATE_MESSAGE = "No %sprojects matching \"%s\"";
 

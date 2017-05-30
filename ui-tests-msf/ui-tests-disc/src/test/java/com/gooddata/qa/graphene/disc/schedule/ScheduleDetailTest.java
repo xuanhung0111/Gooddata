@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
-import com.gooddata.qa.graphene.common.AbstractDiscTest;
+import com.gooddata.qa.graphene.common.AbstractProcessTest;
 import com.gooddata.qa.graphene.enums.disc.schedule.Executable;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleCronTime;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
@@ -33,7 +33,7 @@ import com.gooddata.qa.graphene.fragments.disc.schedule.CronEditor;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail.ExecutionHistoryItem;
 
-public class ScheduleDetailTest extends AbstractDiscTest {
+public class ScheduleDetailTest extends AbstractProcessTest {
 
     private static final String BROKEN_SCHEDULE_MESSAGE = "The schedules cannot be executed. Its process has been"
             + " re-deployed with modified graphs or a different folder structure.";

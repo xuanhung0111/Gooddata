@@ -13,8 +13,10 @@ import org.json.JSONException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.md.Attribute;
 import com.gooddata.qa.graphene.common.AbstractDataloadProcessTest;
+import com.gooddata.qa.graphene.entity.add.SyncDatasets;
 import com.gooddata.qa.graphene.entity.ads.AdsTable;
 import com.gooddata.qa.graphene.entity.ads.SqlBuilder;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
@@ -60,18 +62,17 @@ public class LoadDatasetTest extends AbstractDataloadProcessTest {
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
 
-        String schedule = "Schedule-" + generateHashString();
-        initDiscProjectDetailPage().openCreateScheduleForm().enterScheduleName(schedule).schedule();
+        Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.custom(DATASET_OPPORTUNITY));
 
         try {
-            ScheduleDetail.getInstance(browser).executeSchedule().waitForExecutionFinish();
+            initScheduleDetail(schedule).executeSchedule().waitForExecutionFinish();
 
             Attribute opportunityAttr = getMdService().getObj(getProject(), Attribute.class, title(ATTR_OPPORTUNITY));
             assertEquals(getAttributeValues(opportunityAttr), asList("OOP1", "OOP2"));
 
         } finally {
             getAdsHelper().associateAdsWithProject(ads, testParams.getProjectId());
-            deleteScheduleByName(getDataloadProcess(), schedule);
+            getProcessService().removeSchedule(schedule);
         }
     }
 
@@ -95,11 +96,10 @@ public class LoadDatasetTest extends AbstractDataloadProcessTest {
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
 
-        String schedule = "Schedule-" + generateHashString();
-        initDiscProjectDetailPage().openCreateScheduleForm().enterScheduleName(schedule).schedule();
+        Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.custom(DATASET_OPPORTUNITY));
 
         try {
-            ScheduleDetail scheduleDetail = ScheduleDetail.getInstance(browser)
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
                     .executeSchedule().waitForExecutionFinish();
 
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getErrorMessage(),
@@ -108,7 +108,7 @@ public class LoadDatasetTest extends AbstractDataloadProcessTest {
                     testParams.getProjectId(), DATASET_OPPORTUNITY));
 
         } finally {
-            deleteScheduleByName(getDataloadProcess(), schedule);
+            getProcessService().removeSchedule(schedule);
         }
     }
 
@@ -139,11 +139,10 @@ public class LoadDatasetTest extends AbstractDataloadProcessTest {
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
 
-        String schedule = "Schedule-" + generateHashString();
-        initDiscProjectDetailPage().openCreateScheduleForm().enterScheduleName(schedule).schedule();
+        Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.custom(DATASET_OPPORTUNITY));
 
         try {
-            ScheduleDetail.getInstance(browser).executeSchedule().waitForExecutionFinish();
+            initScheduleDetail(schedule).executeSchedule().waitForExecutionFinish();
 
             Attribute opportunityAttr = getMdService().getObj(getProject(), Attribute.class, title(ATTR_OPPORTUNITY));
             assertEquals(getAttributeValues(opportunityAttr), asList("OOP11", "OOP22"));
@@ -152,7 +151,7 @@ public class LoadDatasetTest extends AbstractDataloadProcessTest {
             if (shouldSetClientId) {
                 getAdsHelper().associateAdsWithProject(ads, testParams.getProjectId());
             }
-            deleteScheduleByName(getDataloadProcess(), schedule);
+            getProcessService().removeSchedule(schedule);
         }
     }
 
@@ -177,18 +176,17 @@ public class LoadDatasetTest extends AbstractDataloadProcessTest {
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
 
-        String schedule = "Schedule-" + generateHashString();
-        initDiscProjectDetailPage().openCreateScheduleForm().enterScheduleName(schedule).schedule();
+        Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.custom(DATASET_OPPORTUNITY));
 
         try {
-            ScheduleDetail.getInstance(browser).executeSchedule().waitForExecutionFinish();
+            initScheduleDetail(schedule).executeSchedule().waitForExecutionFinish();
 
             Attribute opportunityAttr = getMdService().getObj(getProject(), Attribute.class, title(ATTR_OPPORTUNITY));
             assertEquals(getAttributeValues(opportunityAttr), asList("OOP111", "OOP222"));
 
         } finally {
             getAdsHelper().associateAdsWithProject(ads, testParams.getProjectId());
-            deleteScheduleByName(getDataloadProcess(), schedule);
+            getProcessService().removeSchedule(schedule);
         }
     }
 }
