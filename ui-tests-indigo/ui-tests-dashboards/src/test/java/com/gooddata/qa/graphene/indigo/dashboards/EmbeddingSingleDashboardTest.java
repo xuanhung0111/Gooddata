@@ -218,16 +218,19 @@ public class EmbeddingSingleDashboardTest extends GoodSalesAbstractDashboardTest
                     .waitForDashboardLoad()
                     .waitForWidgetsLoading();
 
-            takeScreenshot(browser, "Cannot-drill-kpi-in-embedded-dashboard-with-" + type, getClass());
-            assertFalse(indigoDashboardsPage.getLastWidget(Kpi.class).isDrillable(),
-                    "Kpi is drillable in embedded dashboard");
+            takeScreenshot(browser, "Can-drill-kpi-in-embedded-dashboard-with-" + type, getClass());
+            assertTrue(indigoDashboardsPage.getLastWidget(Kpi.class).isDrillable(),
+                    "Kpi is not drillable in embedded dashboard");
 
             indigoDashboardsPage.switchToEditMode().selectLastWidget(Kpi.class);
-            takeScreenshot(browser, "Drill-To-select-not-visile-in-embedded-dashboard-with-" + type, getClass());
-            assertFalse(indigoDashboardsPage
+            takeScreenshot(browser, "Drill-To-select-visible-in-embedded-dashboard-with-" + type, getClass());
+            assertTrue(indigoDashboardsPage
                     .getConfigurationPanel()
                     .isDrillToSelectVisible(),
-                    "Drill To Select is visible in embedded dashboard");
+                    "Drill To Select is not visible in embedded dashboard");
+            takeScreenshot(browser, "Can-just-see-drill-kpi-in-embedded-dashboard-with-" + type, getClass());
+            assertTrue(indigoDashboardsPage.getLastWidget(Kpi.class).isDrillableButNotClickable(),
+                    "Kpi drill is not not visible or is clickable in embedded dashboard, edit mode");
 
         } finally {
             getMdService().removeObjByUri(dashboardUri);
