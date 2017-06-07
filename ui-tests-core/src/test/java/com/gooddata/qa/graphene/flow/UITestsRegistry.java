@@ -96,7 +96,7 @@ public class UITestsRegistry {
                         .param("GRAPHENE_PASSWORD", "$CHECKLIST_SCHEDULED_EMAIL_USER_PASSWORD")
                         .param("QA_TEST_USER", "gd.scheduledemail@gmail.com")
                         .param("QA_TEST_PASSWORD", "$CHECKLIST_SCHEDULED_EMAIL_USER_PASSWORD")
-                        .param("VAULT_QA_TEST_SECRET_PATH", "secret/v1/gooddata/all/imap_user"),
+                        .param("VAULT_QA_TEST_SECRET_PATH", "secret/v1/google/all/imap_user"),
                    "testng-imap-project-n-users-sanity-test.xml"
             });
             //separate localization test into one phase so it does not affect to other tests
@@ -218,13 +218,13 @@ public class UITestsRegistry {
                 .param("GRAPHENE_PASSWORD", "$CHECKLIST_SCHEDULED_EMAIL_USER_PASSWORD")
                 .param("QA_TEST_USER", "gd.scheduledemail@gmail.com")
                 .param("QA_TEST_PASSWORD", "$CHECKLIST_SCHEDULED_EMAIL_USER_PASSWORD")
-                .param("VAULT_QA_TEST_SECRET_PATH", "secret/v1/gooddata/all/imap_user"),
+                .param("VAULT_QA_TEST_SECRET_PATH", "secret/v1/google/all/imap_user"),
             new PredefineParameterTest("testng-imap-GoodSales-email-unsubscribe.xml")
                 .param("GRAPHENE_USER", "gd.scheduledemail@gmail.com")
                 .param("GRAPHENE_PASSWORD", "$CHECKLIST_SCHEDULED_EMAIL_USER_PASSWORD")
                 .param("QA_TEST_USER", "gd.scheduledemail@gmail.com")
                 .param("QA_TEST_PASSWORD", "$CHECKLIST_SCHEDULED_EMAIL_USER_PASSWORD")
-                .param("VAULT_QA_TEST_SECRET_PATH", "secret/v1/gooddata/all/imap_user"),
+                .param("VAULT_QA_TEST_SECRET_PATH", "secret/v1/google/all/imap_user"),
             GoodSalesScheduleDialogRecurrenceTest.class,
             GoodSalesScheduleDialogFiltersTest.class,
             "testng-imap-GoodSales-email-schedule-dashboard.xml"
