@@ -44,7 +44,7 @@ public class KpiAlertNullValueTest extends AbstractDashboardTest {
 
     private static final String DATASET_NAME = "User";
 
-    private static final String DROP_BELOW_LIMIT = "dropped below the set limit";
+    private static final String DROP_BELOW_LIMIT = "has dropped below the set limit";
     private static final String GONE_ABOVE_LIMIT = "has gone above the set limit";
 
     private List<String> kpiNames = new ArrayList<>();
