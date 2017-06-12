@@ -16,11 +16,13 @@ import static java.lang.Integer.parseInt;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -101,7 +103,16 @@ public class UserProfilePage extends AbstractFragment {
     }
 
     public String getUserRole() {
-        return waitForElementPresent(role).getText();
+        //wait for role element present
+        WebElement roleElement = waitForElementPresent(role);
+        try {
+            //wait for the role text is updated
+            Predicate<WebDriver> waitUntil = browser -> !roleElement.getText().trim().isEmpty();
+            Graphene.waitGui(browser).withTimeout(10, TimeUnit.SECONDS).until(waitUntil);
+        } catch (TimeoutException e) {
+            //ignore TimeoutException because in case Unverified Admin, no text displayed
+        }
+        return roleElement.getText();
     }
 
     public UserProfilePage selectAttributeValuesFor(String variable, Collection<String> values) {
