@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene;
 
+import static com.gooddata.md.Restriction.identifier;
+import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.browser.BrowserUtils.getCurrentBrowserAgent;
 import static com.gooddata.qa.browser.BrowserUtils.maximize;
@@ -9,8 +11,14 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.gooddata.md.Attribute;
 import com.gooddata.project.ProjectValidationResults;
 
+import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
+import com.gooddata.qa.mdObjects.dashboard.filter.FilterType;
+import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
+import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
+import com.gooddata.qa.utils.java.Builder;
 import org.json.JSONException;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
@@ -39,6 +47,7 @@ import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -293,6 +302,52 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         String integrationEntry = webdavUrl.substring(webdavUrl.lastIndexOf("/") + 1, webdavUrl.length());
         RolapRestUtils.postEtlPullIntegration(getRestApiClient(), testParams.getProjectId(),
                 integrationEntry);
+    }
+
+    protected Attribute getAttributeByTitle(String title) {
+        return getMdService().getObj(getProject(), Attribute.class, title(title));
+    }
+
+    protected Attribute getAttributeByIdentifier(String id) {
+        return getMdService().getObj(getProject(), Attribute.class, identifier(id));
+    }
+
+    protected Metric getMetricByTitle(String title) {
+        return getMdService().getObj(getProject(), Metric.class, title(title));
+    }
+
+    //------------------------- DASHBOARD MD OBJECTS - BEGIN -------------------------
+    protected FilterItemContent createSingleValueFilter(Attribute attribute) {
+        return Builder.of(FilterItemContent::new).with(item -> {
+            item.setObjUri(attribute.getDefaultDisplayForm().getUri());
+            item.setType(FilterType.LIST);
+        }).build();
+    }
+
+    protected FilterItemContent createMultipleValuesFilter(Attribute attribute) {
+        return Builder.of(FilterItemContent::new).with(item -> {
+            item.setObjUri(attribute.getDefaultDisplayForm().getUri());
+            item.setMultiple(true);
+            item.setType(FilterType.LIST);
+        }).build();
+    }
+
+    protected ReportItem createTableReportItem(String reportUri, List<String> appliedFilters) {
+        return Builder.of(ReportItem::new).with(item -> {
+            item.setObjUri(reportUri);
+            item.setAppliedFilterIds(appliedFilters);
+        }).build();
+    }
+
+    protected FilterItem createFilterItem(FilterItemContent item) {
+        return Builder.of(FilterItem::new).with(filterItem -> filterItem.setContentId(item.getId())).build();
+    }
+
+    //------------------------- DASHBOARD MD OBJECTS - END ------------------------
+
+    protected String createTableReport(ReportDefinition reportDefinition) {
+        ReportDefinition definition = getMdService().createObj(getProject(), reportDefinition);
+        return getMdService().createObj(getProject(), new Report(definition.getTitle(), definition)).getUri();
     }
 
     private String getWebDavServerUrl(final RestApiClient restApiClient, final String serverRootUrl)
