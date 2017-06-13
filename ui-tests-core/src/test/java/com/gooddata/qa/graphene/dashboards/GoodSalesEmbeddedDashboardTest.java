@@ -71,7 +71,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     private static final String ADDITIONAL_PROJECT_TITLE = "GoodSales-project-to-share-dashboard";
     private static final String EMBEDDED_DASHBOARD_NAME = "Embedded Dashboard";
 
-    private static final long EXPECTED_EXPORT_DASHBOARD_SIZE = 71000L;
+    private static final long EXPECTED_EXPORT_DASHBOARD_SIZE = 62000L;
     private static final long EXPECTED_EXPORT_CHART_SIZE = 28000L;
 
     private UiReportDefinition tabularReportDef;
@@ -131,7 +131,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
                 .addReportToDashboard(headlineReportDef.getName())
                 .addNewTab("other_widgets")
                 .addLineToDashboard()
-                .addWebContentToDashboard("https://developer.gooddata.com/docs/reporting")
+                .addWebContentToDashboard("https://s3.amazonaws.com/gdc-testing/images/publicImage.png")
                 .addWidgetToDashboard(WidgetTypes.KEY_METRIC, METRIC_AMOUNT)
                 .addWidgetToDashboard(WidgetTypes.GEO_CHART, METRIC_AMOUNT)
                 .addNewTab("drilling_report")
