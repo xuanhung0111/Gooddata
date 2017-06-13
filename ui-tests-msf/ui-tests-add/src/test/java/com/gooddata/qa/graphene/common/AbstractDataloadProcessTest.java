@@ -25,6 +25,8 @@ import com.gooddata.qa.graphene.entity.add.SyncDatasets;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
 import com.gooddata.qa.graphene.enums.process.Parameter;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
+import com.gooddata.qa.graphene.fragments.disc.schedule.add.DataloadScheduleDetail;
+import com.gooddata.qa.graphene.fragments.disc.schedule.add.ExecuteADDConfirmDialog.LoadMode;
 import com.gooddata.warehouse.Warehouse;
 
 public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
@@ -113,6 +115,10 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
         return getProcessService().executeSchedule(schedule).get();
     }
 
+    protected DataloadScheduleDetail initScheduleDetail(Schedule schedule) {
+        return initDiscProjectDetailPage().getDataloadProcess().openSchedule(schedule.getName());
+    }
+
     protected Parameters getDefaultParameters() {
         return new Parameters()
                 .addParameter(Parameter.ADS_URL, format(ADS_DB_CONNECTION_URL, testParams.getHost(), ads.getId()))
@@ -164,11 +170,5 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
         public String getName() {
             return name;
         }
-    }
-
-    protected enum LoadMode {
-        DEFAULT,
-        FULL,
-        INCREMENTAL
     }
 }

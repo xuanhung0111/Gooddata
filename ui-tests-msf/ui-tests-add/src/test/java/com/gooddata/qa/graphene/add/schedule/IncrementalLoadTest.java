@@ -28,8 +28,9 @@ import com.gooddata.qa.graphene.entity.disc.Parameters;
 import com.gooddata.qa.graphene.entity.model.Dataset;
 import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.enums.process.Parameter;
-import com.gooddata.qa.graphene.fragments.disc.schedule.DatasetDropdown;
-import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
+import com.gooddata.qa.graphene.fragments.disc.schedule.add.DataloadScheduleDetail;
+import com.gooddata.qa.graphene.fragments.disc.schedule.add.DatasetDropdown;
+import com.gooddata.qa.graphene.fragments.disc.schedule.add.ExecuteADDConfirmDialog.LoadMode;
 
 public class IncrementalLoadTest extends AbstractDataloadProcessTest {
 
@@ -143,7 +144,9 @@ public class IncrementalLoadTest extends AbstractDataloadProcessTest {
         Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.ALL);
 
         try {
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule).executeSchedule().waitForExecutionFinish();
+            DataloadScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+
+            scheduleDetail.executeSchedule().waitForExecutionFinish();
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getErrorMessage(),
                     format("While trying to load project %s, the following datasets had one or more rows with a "
                     + "null timestamp, which is not allowed: %s: 1 row(s), %s: 1 row(s).",
@@ -243,7 +246,7 @@ public class IncrementalLoadTest extends AbstractDataloadProcessTest {
         try {
             executeSchedule(loadPersonSchedule);
 
-            ScheduleDetail scheduleDetail = initScheduleDetail(loadPersonSchedule);
+            DataloadScheduleDetail scheduleDetail = initScheduleDetail(loadPersonSchedule);
             assertFalse(scheduleDetail.getDatasetDropdown().expand().hasLSLTSValueFor(DATASET_PERSON),
                     "LSLTS still show up for dataset" + DATASET_PERSON);
             assertTrue(getResource(getRestApiClient(), scheduleDetail.getLastExecutionLogUri(), HttpStatus.OK)

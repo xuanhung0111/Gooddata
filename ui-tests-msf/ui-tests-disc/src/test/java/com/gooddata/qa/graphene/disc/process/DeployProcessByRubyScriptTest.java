@@ -8,10 +8,10 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.common.AbstractProcessTest;
 import com.gooddata.qa.graphene.fragments.disc.ConfirmationDialog;
+import com.gooddata.qa.graphene.fragments.disc.process.AbstractProcessDetail.Tab;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
-import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail.Tab;
 
 public class DeployProcessByRubyScriptTest extends AbstractProcessTest {
 

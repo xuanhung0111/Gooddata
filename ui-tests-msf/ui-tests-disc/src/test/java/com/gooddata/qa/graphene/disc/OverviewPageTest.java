@@ -316,10 +316,10 @@ public class OverviewPageTest extends AbstractProcessTest {
             Schedule schedule = createSchedule(process, executable, ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             String customScheduleName = "Schedule-" + generateHashString();
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
-                    .editNameByClickOnTitle(customScheduleName)
-                    .saveChanges()
-                    .executeSchedule();
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+
+            scheduleDetail.editNameByClickOnTitle(customScheduleName).saveChanges();
+            scheduleDetail.executeSchedule();
 
             if (executable == Executable.LONG_TIME_RUNNING_GRAPH) {
                 scheduleDetail.waitForStatus(ScheduleStatus.RUNNING);
