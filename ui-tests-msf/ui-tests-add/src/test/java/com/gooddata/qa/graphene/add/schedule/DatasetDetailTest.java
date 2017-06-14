@@ -16,7 +16,6 @@ import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.md.Attribute;
 import com.gooddata.qa.graphene.common.AbstractDataloadProcessTest;
 import com.gooddata.qa.graphene.entity.add.SyncDatasets;
-import com.gooddata.qa.graphene.entity.ads.AdsTable;
 import com.gooddata.qa.graphene.entity.ads.SqlBuilder;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
@@ -59,17 +58,8 @@ public class DatasetDetailTest extends AbstractDataloadProcessTest {
                 .rows("P1", "18")
                 .rows("P2", "20");
 
-        SqlBuilder sqlBuilder = new SqlBuilder()
-                .withAdsTable(new AdsTable(DATASET_OPPORTUNITY)
-                        .withAttributes(ATTR_OPPORTUNITY)
-                        .withFacts(FACT_PRICE)
-                        .withDataFile(opportunity))
-                .withAdsTable(new AdsTable(DATASET_PERSON)
-                        .withAttributes(ATTR_PERSON)
-                        .withFacts(FACT_AGE)
-                        .withDataFile(person));
-
-        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, sqlBuilder.build());
+        Parameters parameters = getDefaultParameters()
+                .addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity, person));
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
     }

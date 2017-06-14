@@ -31,7 +31,6 @@ import org.testng.annotations.Test;
 import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.qa.graphene.common.AbstractDataloadProcessTest;
 import com.gooddata.qa.graphene.entity.add.SyncDatasets;
-import com.gooddata.qa.graphene.entity.ads.AdsTable;
 import com.gooddata.qa.graphene.entity.ads.SqlBuilder;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.entity.disc.NotificationRule;
@@ -56,7 +55,6 @@ public class NotificationTest extends AbstractDataloadProcessTest {
 
     private CsvFile opportunity;
     private CsvFile person;
-    private SqlBuilder sqlBuilder;
     private Schedule schedule;
 
     @BeforeClass(alwaysRun = true)
@@ -116,22 +114,6 @@ public class NotificationTest extends AbstractDataloadProcessTest {
                 .columns(new CsvFile.Column(ATTR_NAME), new CsvFile.Column(FACT_AGE),
                         new CsvFile.Column(X_TIMESTAMP_COLUMN))
                 .rows("P1", "18", getCurrentDate());
-
-        sqlBuilder = new SqlBuilder()
-                .withAdsTable(new AdsTable(DATASET_OPPORTUNITY)
-                        .withAttributes(ATTR_NAME)
-                        .withFacts(FACT_PRICE)
-                        .hasTimeStamp(true)
-                        .withDataFile(opportunity))
-                .withAdsTable(new AdsTable(DATASET_PERSON)
-                        .withAttributes(ATTR_NAME)
-                        .withFacts(FACT_AGE)
-                        .hasTimeStamp(true)
-                        .withDataFile(person));
-
-        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, sqlBuilder.build());
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
     }
 
     @Test(dependsOnMethods = {"initData"}, groups = {"precondition"})
@@ -167,6 +149,11 @@ public class NotificationTest extends AbstractDataloadProcessTest {
     public void checkNotificationForFullLoadDataset() throws MessagingException, IOException {
         Date timeReceiveEmail = getTimeReceiveEmail();
 
+        Parameters parameters = getDefaultParameters()
+                .addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity, person));
+        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
+                parameters.getParameters(), parameters.getSecureParameters());
+
         schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.ALL);
 
         initScheduleDetail(schedule).executeSchedule().waitForExecutionFinish();
@@ -182,7 +169,7 @@ public class NotificationTest extends AbstractDataloadProcessTest {
         Date timeReceiveEmail = getTimeReceiveEmail();
 
         person.rows("P2", "20", getCurrentDate());
-        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, sqlBuilder.build());
+        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person));
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
 
@@ -214,7 +201,7 @@ public class NotificationTest extends AbstractDataloadProcessTest {
         Date timeReceiveEmail = getTimeReceiveEmail();
 
         person.rows("P3", "20");
-        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, sqlBuilder.build());
+        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person));
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
 

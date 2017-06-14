@@ -42,7 +42,9 @@ public class DatasetDropdown extends AbstractDropDown {
 
     @Override
     protected WebElement getElementByName(String name) {
-        return getElements().stream().filter(e -> name.equals(e.getText())).findFirst().get();
+        return getElements().stream()
+                .filter(e -> name.equals(e.findElement(By.className("dataset-title")).getText()))
+                .findFirst().get();
     }
 
     public DatasetDropdown expand() {
@@ -104,6 +106,14 @@ public class DatasetDropdown extends AbstractDropDown {
                 .filter(e -> e.getAttribute("class").contains("is-selected"))
                 .map(WebElement::getText)
                 .collect(toList());
+    }
+
+    public String getLSLTSOf(String dataset) {
+        return getElementByName(dataset).findElement(By.className("dataset-status-icon-container")).getText();
+    }
+
+    public boolean hasLSLTSValueFor(String dataset) {
+        return !getLSLTSOf(dataset).isEmpty();
     }
 
     private boolean isCollapsed() {
