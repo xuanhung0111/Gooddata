@@ -1,6 +1,8 @@
 package com.gooddata.qa.mdObjects.dashboard;
 
 import com.gooddata.qa.mdObjects.MdObject;
+import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
+import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,12 +20,16 @@ public class Dashboard implements MdObject {
         this.name = name;
     }
 
-    public void addTab(JSONObject tab) {
-        tabs.add(tab);
+    public void addTab(Tab tab) {
+        tabs.add(tab.getMdObject());
     }
 
-    public void addFilter(JSONObject filter) {
-        filters.add(filter);
+    public void addFilter(FilterItemContent filter) {
+        filters.add(filter.getMdObject());
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override

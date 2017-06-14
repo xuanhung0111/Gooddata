@@ -27,6 +27,10 @@ public abstract class TabItem implements MdObject {
         this.sizeY = sizeY;
     }
 
+    public void setPosition(ItemPosition position) {
+        mapItemPosition(position);
+    }
+
     @Override
     public JSONObject getMdObject() {
         JSONObject obj = null;
@@ -60,24 +64,32 @@ public abstract class TabItem implements MdObject {
         sizeY = itemSize.getSizeY();
     }
 
-    protected enum ItemSize {
-        FILTER_ITEM(190, 40),
-        REPORT_ITEM(220, 310);
+    private void mapItemPosition(ItemPosition itemPosition) {
+        positionX = itemPosition.getPosX();
+        positionY = itemPosition.getPosY();
+    }
 
-        private int sizeX;
-        private int sizeY;
+    public enum ItemPosition {
+        TOP(370, 0),
+        TOP_LEFT(0, 0),
+        TOP_RIGHT(750, 0),
+        LEFT(0, 150),
+        RIGHT(750, 151);
 
-        ItemSize(int sizeX, int sizeY) {
-            this.sizeX = sizeX;
-            this.sizeY = sizeY;
+        private int posX;
+        private int posY;
+
+        ItemPosition(int posX, int posY) {
+            this.posX = posX;
+            this.posY = posY;
         }
 
-        public int getSizeX() {
-            return sizeX;
+        public int getPosX() {
+            return posX;
         }
 
-        public int getSizeY() {
-            return sizeY;
+        public int getPosY() {
+            return posY;
         }
     }
 }

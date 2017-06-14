@@ -24,9 +24,11 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
     @BeforeClass(alwaysRun = true)
     public void initProperties() {
         projectTitle = "GoodSales-test";
-        appliedFixture = ResourceTemplate.GOODSALES;
+        // uncomment when fixture migration is completed
+        // appliedFixture = ResourceTemplate.GOODSALES;
 
         // going to be removed when https://jira.intgdc.com/browse/QA-6503 is done
+        projectTemplate = GOODSALES_TEMPLATE;
         expectedGoodSalesDashboardsAndTabs = new HashMap<>();
         expectedGoodSalesDashboardsAndTabs.put(DASH_PIPELINE_ANALYSIS, new String[]{
                 DASH_TAB_OUTLOOK, DASH_TAB_WHATS_CHANGED, DASH_TAB_WATERFALL_ANALYSIS, DASH_TAB_LEADERBOARDS, DASH_TAB_ACTIVITIES, DASH_TAB_SALES_VELOCITY,
@@ -36,7 +38,7 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
 
     // md objects for dashboard
     protected String createTopSalesRepsByWonAndLostReport() {
-        return createTableReport(
+        return createReport(
                 GridReportDefinitionContent.create(
                         REPORT_TOP_SALES_REPS_BY_WON_AND_LOST,
                         singletonList(METRIC_GROUP),
@@ -47,9 +49,8 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
     }
 
     protected String createAmountByProductReport() {
-        return createTableReport(GridReportDefinitionContent.create(REPORT_AMOUNT_BY_PRODUCT, singletonList(METRIC_GROUP),
+        return createReport(GridReportDefinitionContent.create(REPORT_AMOUNT_BY_PRODUCT, singletonList(METRIC_GROUP),
                 singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_PRODUCT))),
                 singletonList(new MetricElement(getMetricByTitle(METRIC_AMOUNT)))));
     }
-
 }

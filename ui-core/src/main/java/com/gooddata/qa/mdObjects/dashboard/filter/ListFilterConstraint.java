@@ -11,7 +11,7 @@ public class ListFilterConstraint implements FilterConstraint {
     private String type;
     private List<String> elementUrisToFiltered = new ArrayList<>();
 
-    public ListFilterConstraint(String type, List<String> elementUrisToFiltered) {
+    private ListFilterConstraint(String type, List<String> elementUrisToFiltered) {
         this.type = type;
         this.elementUrisToFiltered = elementUrisToFiltered;
     }

@@ -94,7 +94,12 @@ public class SelectItemPopupPanel extends AbstractFragment {
         waitForPanelNotVisible();
     }
 
-    public void changeGroup(String group) {
+    public void cancelPanel() {
+        waitForElementVisible(cancelButton).click();
+        waitForPanelNotVisible();
+    }
+
+    public SelectItemPopupPanel changeGroup(String group) {
         waitForElementVisible(this.getRoot());
         final WebElement button = waitForElementVisible(By.xpath(
                 String.format(BUTTON_GROUP_XPATH_LOCATOR, group)), browser);
@@ -107,6 +112,8 @@ public class SelectItemPopupPanel extends AbstractFragment {
                         .contains("yui3-c-label-selected");
             }
         });
+
+        return this;
     }
 
     public List<String> getItems() {

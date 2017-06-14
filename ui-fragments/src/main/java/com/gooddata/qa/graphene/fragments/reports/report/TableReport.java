@@ -63,6 +63,7 @@ public class TableReport extends AbstractDashboardReport {
 
     private static final By BY_SORT_LOCATOR = className("sort");
     private static final By REPORT_MESSAGE_LOCATOR = className("c-report-message");
+    private static final By REPORT_TITLE = cssSelector(".yui3-c-reportdashboardwidget-reportTitle > a");
 
     public TableReport sortByHeader(final String header, final Sort howToSort) {
         getActions().moveToElement(getHeaderElement(header)).perform();
@@ -322,14 +323,16 @@ public class TableReport extends AbstractDashboardReport {
         waitForElementVisible(cssSelector("#ctxMenu .s-" + simplifyText(label) +" > a"), browser).click();
     }
 
-    public boolean isReportTitleVisible() {
-        final By reportLabelLocator = cssSelector(".yui3-c-reportdashboardwidget-reportTitle > a");
+    public String getReportTiTle() {
+        return waitForElementVisible(getRoot().findElement(REPORT_TITLE)).getText();
+    }
 
-        if (!isElementPresent(reportLabelLocator, getRoot())) {
+    public boolean isReportTitleVisible() {
+        if (!isElementPresent(REPORT_TITLE, getRoot())) {
             return false;
         }
 
-        return !getRoot().findElement(reportLabelLocator).getCssValue("display").startsWith("none");
+        return !getRoot().findElement(REPORT_TITLE).getCssValue("display").startsWith("none");
     }
 
     public ContextMenu openContextMenuFromCellValue(final String cellValue) {
