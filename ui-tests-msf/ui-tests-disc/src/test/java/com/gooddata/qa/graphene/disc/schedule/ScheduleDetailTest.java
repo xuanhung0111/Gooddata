@@ -25,13 +25,13 @@ import com.gooddata.qa.graphene.common.AbstractProcessTest;
 import com.gooddata.qa.graphene.enums.disc.schedule.Executable;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleCronTime;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.disc.process.AbstractProcessDetail.Tab;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
-import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail.Tab;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CronEditor;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
-import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail.ExecutionHistoryItem;
+import com.gooddata.qa.graphene.fragments.disc.schedule.common.AbstractScheduleDetail.ExecutionHistoryItem;
 
 public class ScheduleDetailTest extends AbstractProcessTest {
 
@@ -63,8 +63,8 @@ public class ScheduleDetailTest extends AbstractProcessTest {
         try {
             projectDetailPage.openCreateScheduleForm().schedule();
 
-        ScheduleDetail scheduleDetail = ScheduleDetail.getInstance(browser)
-                .executeSchedule().waitForExecutionFinish();
+        ScheduleDetail scheduleDetail = ScheduleDetail.getInstance(browser);
+        scheduleDetail.executeSchedule().waitForExecutionFinish();
 
         takeScreenshot(browser, "Execute-schedule-from-process-" + processName, getClass());
         assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
@@ -84,9 +84,9 @@ public class ScheduleDetailTest extends AbstractProcessTest {
             Schedule schedule = createSchedule(process, Executable.LONG_TIME_RUNNING_GRAPH,
                     ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
-                    .executeSchedule()
-                    .stopExecution();
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+
+            scheduleDetail.executeSchedule().stopExecution();
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(), "MANUALLY STOPPED");
 
@@ -113,8 +113,9 @@ public class ScheduleDetailTest extends AbstractProcessTest {
             takeScreenshot(browser, "Broken-schedule-message-shows-in-schedule-detail", getClass());
             assertEquals(scheduleDetail.getBrokenScheduleMessage(), BROKEN_MESSAGE_IN_SCHEDULE_DETAIL);
 
-            ((ScheduleDetail) scheduleDetail.replaceBrokenExecutableWith(Executable.SUCCESSFUL_GRAPH))
-                    .saveChanges().executeSchedule().waitForExecutionFinish();
+            scheduleDetail.selectExecutable(Executable.SUCCESSFUL_GRAPH).saveChanges();
+            scheduleDetail.executeSchedule().waitForExecutionFinish();
+
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(), ScheduleStatus.OK.toString());
 
@@ -223,9 +224,9 @@ public class ScheduleDetailTest extends AbstractProcessTest {
             Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
                     ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
-                    .executeSchedule()
-                    .waitForExecutionFinish();
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+
+            scheduleDetail.executeSchedule().waitForExecutionFinish();
             assertNotNull(getResource(getRestApiClient(), scheduleDetail.getLastExecutionLogUri(), HttpStatus.OK));
 
         } finally {
@@ -299,11 +300,13 @@ public class ScheduleDetailTest extends AbstractProcessTest {
                     ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             ProcessDetail processDetail = initDiscProjectDetailPage().getProcess(process.getName());
-            processDetail.openTab(Tab.SCHEDULE).openSchedule(schedule.getName());
+            processDetail.openTab(Tab.SCHEDULE);
+            processDetail.openSchedule(schedule.getName());
             processDetail.openTab(Tab.EXECUTABLE);
             assertFalse(ScheduleDetail.isVisible(browser), "Schedule detail is not close");
 
-            processDetail.openTab(Tab.SCHEDULE).openSchedule(schedule.getName()).close();
+            processDetail.openTab(Tab.SCHEDULE);
+            processDetail.openSchedule(schedule.getName()).close();
             assertFalse(ScheduleDetail.isVisible(browser), "Schedule detail is not close");
 
         } finally {

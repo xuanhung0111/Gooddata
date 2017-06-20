@@ -44,9 +44,8 @@ public class LongRunTimeTest extends AbstractProcessTest {
             LocalTime autoExecutionStartTime = LocalTime.now().plusMinutes(2);
             Schedule schedule = createSchedule(process, executable, parseTimeToCronExpression(autoExecutionStartTime));
 
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
-                    .waitForAutoExecute(autoExecutionStartTime)
-                    .waitForExecutionFinish();
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+            scheduleDetail.waitForAutoExecute(autoExecutionStartTime).waitForExecutionFinish();
 
             takeScreenshot(browser, "Auto-execution-triggered-successfully-with-" + executable, getClass());
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
@@ -67,8 +66,8 @@ public class LongRunTimeTest extends AbstractProcessTest {
                     parseTimeToCronExpression(autoExecutionStartTime));
 
             int retryInMinute = 15;
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
-                    .addRetryDelay(retryInMinute)
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+            scheduleDetail.addRetryDelay(retryInMinute)
                     .saveChanges()
                     .waitForAutoExecute(autoExecutionStartTime)
                     .waitForExecutionFinish();
@@ -97,9 +96,8 @@ public class LongRunTimeTest extends AbstractProcessTest {
             Schedule schedule = createSchedule(process, Executable.LONG_TIME_RUNNING_GRAPH,
                     parseTimeToCronExpression(autoExecutionStartTime));
 
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
-                    .waitForAutoExecute(autoExecutionStartTime)
-                    .stopExecution();
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+            scheduleDetail.waitForAutoExecute(autoExecutionStartTime).stopExecution();
 
             takeScreenshot(browser, "Auto-execution-stopped-successfully", getClass());
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
@@ -118,9 +116,9 @@ public class LongRunTimeTest extends AbstractProcessTest {
             Schedule schedule = createSchedule(process, Executable.LONG_TIME_RUNNING_GRAPH,
                     ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
-                    .executeSchedule()
-                    .waitForExecutionFinish();
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+
+            scheduleDetail.executeSchedule().waitForExecutionFinish();
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
                     ScheduleStatus.OK.toString());
@@ -139,7 +137,9 @@ public class LongRunTimeTest extends AbstractProcessTest {
             Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
                     parseTimeToCronExpression(autoExecutionStartTime));
 
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule).disableSchedule();
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+            scheduleDetail.disableSchedule();
+
             takeScreenshot(browser, "Schedule-is-disabled", getClass());
             assertTrue(scheduleDetail.isDisabled(), "Schedule is not disabled");
             assertEquals(scheduleDetail.getDisabledMessage(),
@@ -211,15 +211,17 @@ public class LongRunTimeTest extends AbstractProcessTest {
             Schedule schedule3 = createSchedule(process2, "Schedule3", Executable.ERROR_GRAPH, schedule2);
 
             initScheduleDetail(schedule1).executeSchedule().close();
+
             projectDetailPage.getProcess(process1.getName()).openSchedule(schedule2.getName())
                     .waitForAutoExecute(LocalTime.now()).close();
 
             ScheduleDetail scheduleDetail = projectDetailPage.getProcess(process2.getName())
-                    .openSchedule(schedule3.getName())
-                    .waitForAutoExecute(LocalTime.now())
-                    .waitForExecutionFinish();
+                    .openSchedule(schedule3.getName());
+
+            scheduleDetail.waitForAutoExecute(LocalTime.now()).waitForExecutionFinish();
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
-            assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(), ScheduleStatus.ERROR.toString());
+            assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
+                    ScheduleStatus.ERROR.toString());
 
         } finally {
             deteleProcess(getGoodDataClient(), process1);

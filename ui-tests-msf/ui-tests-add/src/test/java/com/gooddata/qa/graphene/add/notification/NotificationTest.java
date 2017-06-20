@@ -67,7 +67,7 @@ public class NotificationTest extends AbstractDataloadProcessTest {
     @Test(dependsOnGroups = {"initDataload"})
     public void checkParamExecutableReplacedByDataset() {
         NotificationRuleItem item = initDiscProjectDetailPage()
-                .getProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
+                .getDataloadProcess()
                 .openNotificationRuleDialog()
                 .clickAddNotificationRule();
 
@@ -87,7 +87,7 @@ public class NotificationTest extends AbstractDataloadProcessTest {
     @Test(dependsOnGroups = {"initDataload"})
     public void notShowCustomEventForDataloadProcess() {
         Collection<NotificationEvent> events = initDiscProjectDetailPage()
-                .getProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
+                .getDataloadProcess()
                 .openNotificationRuleDialog()
                 .clickAddNotificationRule()
                 .getAvailableEvents();
@@ -137,7 +137,7 @@ public class NotificationTest extends AbstractDataloadProcessTest {
                 .withMessage(buildMessage(Variable.DATASETS, Variable.ERROR_MESSAGE));
 
         initDiscProjectDetailPage()
-                .getProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
+                .getDataloadProcess()
                 .openNotificationRuleDialog()
                 .createNotificationRule(successRule)
                 .createNotificationRule(processStartedRule)

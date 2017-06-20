@@ -23,7 +23,7 @@ import com.gooddata.qa.graphene.entity.model.Dataset;
 import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
 import com.gooddata.qa.graphene.enums.process.Parameter;
-import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
+import com.gooddata.qa.graphene.fragments.disc.schedule.add.DataloadScheduleDetail;
 
 public class DatasetDetailTest extends AbstractDataloadProcessTest {
 
@@ -69,8 +69,9 @@ public class DatasetDetailTest extends AbstractDataloadProcessTest {
         Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.custom(DATASET_OPPORTUNITY));
 
         try {
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
-                    .executeSchedule().waitForExecutionFinish();
+            DataloadScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+
+            scheduleDetail.executeSchedule().waitForExecutionFinish();
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
                     ScheduleStatus.OK.toString());
@@ -91,8 +92,9 @@ public class DatasetDetailTest extends AbstractDataloadProcessTest {
         Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.ALL);
 
         try {
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
-                    .executeSchedule().waitForExecutionFinish();
+            DataloadScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+
+            scheduleDetail.executeSchedule().waitForExecutionFinish();
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(), ScheduleStatus.OK.toString());
 

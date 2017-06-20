@@ -35,8 +35,8 @@ public class EditScheduleTest extends AbstractProcessTest {
                     ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             String customName = "Schedule-" + generateHashString();
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
-                    .editNameByClickOnTitle(customName).cancelChanges();
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+            scheduleDetail.editNameByClickOnTitle(customName).cancelChanges();
 
             assertEquals(scheduleDetail.getName(), Executable.ERROR_GRAPH.getName());
             assertTrue(projectDetailPage.getProcess(process.getName()).hasSchedule(Executable.ERROR_GRAPH.getName()),
@@ -61,9 +61,9 @@ public class EditScheduleTest extends AbstractProcessTest {
                     ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             String customName = "Schedule-" + generateHashString();
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
-                    .editNameByClickOnEditIcon(customName)
-                    .saveChanges();
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+
+            scheduleDetail.editNameByClickOnEditIcon(customName).saveChanges();
             assertEquals(scheduleDetail.getName(), customName);
 
         } finally {
@@ -79,7 +79,8 @@ public class EditScheduleTest extends AbstractProcessTest {
             Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
                     ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule).editNameByClickOnTitle("");
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+            scheduleDetail.editNameByClickOnTitle("");
             assertTrue(scheduleDetail.isNameInputError(), "Schedule name input not show error");
             assertEquals(getBubbleMessage(browser), "can't be blank");
 
@@ -97,8 +98,8 @@ public class EditScheduleTest extends AbstractProcessTest {
             Schedule schedule = createSchedule(process, Executable.ERROR_GRAPH,
                     ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
-                    .editNameByClickOnTitle(Executable.SUCCESSFUL_GRAPH.getName());
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+            scheduleDetail.editNameByClickOnTitle(Executable.SUCCESSFUL_GRAPH.getName());
 
             assertTrue(scheduleDetail.isNameInputError(), "Schedule name input not show error");
             assertEquals(getBubbleMessage(browser),
@@ -119,12 +120,10 @@ public class EditScheduleTest extends AbstractProcessTest {
                     ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
-            scheduleDetail.selectExecutable(Executable.ERROR_GRAPH);
-            scheduleDetail.cancelChanges();
+            scheduleDetail.selectExecutable(Executable.ERROR_GRAPH).cancelChanges();
             assertEquals(scheduleDetail.getSelectedExecutable(), Executable.SUCCESSFUL_GRAPH);
 
-            scheduleDetail.selectExecutable(Executable.ERROR_GRAPH);
-            scheduleDetail.saveChanges();
+            scheduleDetail.selectExecutable(Executable.ERROR_GRAPH).saveChanges();
             assertEquals(scheduleDetail.getSelectedExecutable(), Executable.ERROR_GRAPH);
 
         } finally {
@@ -314,8 +313,9 @@ public class EditScheduleTest extends AbstractProcessTest {
                     ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             int retryDelayInMinute = 60;
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
-                    .addRetryDelay(retryDelayInMinute).cancelChanges();
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+
+            scheduleDetail.addRetryDelay(retryDelayInMinute).cancelChanges();
             assertFalse(scheduleDetail.hasRetryDelay(), "Retry delay is added");
 
             scheduleDetail.addRetryDelay(retryDelayInMinute).saveChanges();
@@ -334,9 +334,9 @@ public class EditScheduleTest extends AbstractProcessTest {
             Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
                     ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
-                    .addRetryDelay(5)
-                    .clickSaveButton();
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+
+            scheduleDetail.addRetryDelay(5).clickSaveButton();
             assertTrue(scheduleDetail.isRetryDelayInputError(), "Retry delay input not show error");
             assertEquals(getBubbleMessage(browser), "The minimal delay is every 15 minutes.\nUse numbers only.");
 
@@ -353,8 +353,8 @@ public class EditScheduleTest extends AbstractProcessTest {
             Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
                     ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
-                    .addRetryDelay(15).saveChanges();
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+            scheduleDetail.addRetryDelay(15).saveChanges();
 
             scheduleDetail.clickDeleteRetryDelay().discard();
             assertTrue(scheduleDetail.hasRetryDelay(), "Retry delay is deleted");

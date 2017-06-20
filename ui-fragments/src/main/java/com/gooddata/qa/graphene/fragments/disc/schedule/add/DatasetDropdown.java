@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.fragments.disc.schedule;
+package com.gooddata.qa.graphene.fragments.disc.schedule.add;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;

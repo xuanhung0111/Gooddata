@@ -23,7 +23,7 @@ import com.gooddata.qa.graphene.entity.disc.Parameters;
 import com.gooddata.qa.graphene.entity.model.Dataset;
 import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.enums.process.Parameter;
-import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
+import com.gooddata.qa.graphene.fragments.disc.schedule.add.DataloadScheduleDetail;
 
 public class LoadDatasetTest extends AbstractDataloadProcessTest {
 
@@ -84,8 +84,8 @@ public class LoadDatasetTest extends AbstractDataloadProcessTest {
         Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.custom(DATASET_OPPORTUNITY));
 
         try {
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
-                    .executeSchedule().waitForExecutionFinish();
+            DataloadScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+            scheduleDetail.executeSchedule().waitForExecutionFinish();
 
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getErrorMessage(),
                     format("client_id for project %s is not set although output stage table associated"

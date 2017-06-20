@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.fragments.disc.schedule;
+package com.gooddata.qa.graphene.fragments.disc.schedule.common;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
@@ -11,21 +11,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.Select;
 
-import com.gooddata.qa.graphene.enums.disc.schedule.Executable;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleCronTime;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.disc.schedule.CronEditor;
+import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleParameter;
 
-public class AbstractScheduleFragment extends AbstractFragment {
-
-    @FindBy(css = "[class*='schedule-executable-select-btn']")
-    private Select executableSelect;
+public abstract class AbstractScheduleFragment extends AbstractFragment {
 
     @FindBy(className = "cron-editor-main")
     private CronEditor cronEditor;
@@ -38,28 +33,6 @@ public class AbstractScheduleFragment extends AbstractFragment {
 
     @FindBy(className = "schedule-param")
     private Collection<ScheduleParameter> scheduleParams;
-
-    @FindBy(className = "ait-dataset-selection-radio-all")
-    private WebElement allDatasetsOption;
-
-    @FindBy(className = "ait-dataset-selection-radio-custom")
-    private WebElement customDatasetsOption;
-
-    @FindBy(className = "ait-dataset-selection-dropdown-button")
-    private DatasetDropdown datasetDropdown;
-
-    public AbstractScheduleFragment selectExecutable(Executable executable) {
-        waitForElementVisible(executableSelect).selectByVisibleText(executable.getPath());
-        return this;
-    }
-
-    public Executable getSelectedExecutable() {
-        return Stream.of(Executable.values())
-                .filter(e -> e.getPath().equals(
-                        waitForElementVisible(executableSelect).getFirstSelectedOption().getText()))
-                .findFirst()
-                .get();
-    }
 
     public AbstractScheduleFragment selectRunTime(ScheduleCronTime cronTime) {
         getCronEditor().selectRunTime(cronTime);
@@ -145,47 +118,6 @@ public class AbstractScheduleFragment extends AbstractFragment {
 
     public boolean hasParameter(String parameter) {
         return findParameter(parameter).isPresent();
-    }
-
-    public DatasetDropdown getDatasetDropdown() {
-        return waitForFragmentVisible(datasetDropdown);
-    }
-
-    public AbstractScheduleFragment selectAllDatasetsOption() {
-        waitForElementVisible(allDatasetsOption).click();
-        return this;
-    }
-
-    public AbstractScheduleFragment selectCustomDatasetsOption() {
-        waitForElementVisible(customDatasetsOption).click();
-        return this;
-    }
-
-    public AbstractScheduleFragment selectDatasets(String... datasets) {
-        selectCustomDatasetsOption();
-        getDatasetDropdown().expand().selectDatasets(datasets).submit();
-        return this;
-    }
-
-    public boolean isAllDatasetsOptionSelected() {
-        return waitForElementVisible(allDatasetsOption).isSelected();
-    }
-
-    public boolean isCustomDatasetsOptionSelected() {
-        return waitForElementVisible(customDatasetsOption).isSelected();
-    }
-
-    public Collection<String> getSelectedDatasets() {
-        DatasetDropdown dropdown = getDatasetDropdown();
-        try {
-            return dropdown.expand().getSelectedDatasets();
-        } finally {
-            dropdown.collapse();
-        }
-    }
-
-    public String getOverlappedDatasetMessage() {
-        return waitForElementVisible(By.className("datasets-messages"), getRoot()).getText();
     }
 
     private Optional<ScheduleParameter> findParameter(String parameter) {

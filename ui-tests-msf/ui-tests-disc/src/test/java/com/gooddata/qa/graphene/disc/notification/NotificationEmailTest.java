@@ -97,8 +97,7 @@ public class NotificationEmailTest extends AbstractProcessTest {
                     .createNotificationRule(notificationRule)
                     .closeDialog();
 
-            processDetail.openSchedule(schedule.getName())
-                    .executeSchedule().waitForExecutionFinish();
+            processDetail.openSchedule(schedule.getName()).executeSchedule().waitForExecutionFinish();
 
             JSONObject lastExecutionDetail = getLastExecutionDetail(getRestApiClient(), testParams.getProjectId(),
                     process.getId());
@@ -142,8 +141,7 @@ public class NotificationEmailTest extends AbstractProcessTest {
                     .createNotificationRule(notificationRule)
                     .closeDialog();
 
-            processDetail.openSchedule(schedule.getName())
-                    .executeSchedule().waitForExecutionFinish();
+            processDetail.openSchedule(schedule.getName()).executeSchedule().waitForExecutionFinish();
 
             JSONObject lastExecutionDetail = getLastExecutionDetail(getRestApiClient(), testParams.getProjectId(),
                     process.getId());
@@ -182,8 +180,7 @@ public class NotificationEmailTest extends AbstractProcessTest {
                     .createNotificationRule(notificationRule)
                     .closeDialog();
 
-            processDetail.openSchedule(schedule.getName())
-                    .executeSchedule().waitForExecutionFinish();
+            processDetail.openSchedule(schedule.getName()).executeSchedule().waitForExecutionFinish();
 
             JSONObject lastExecutionDetail = getLastExecutionDetail(getRestApiClient(), testParams.getProjectId(),
                     process.getId());
@@ -221,8 +218,7 @@ public class NotificationEmailTest extends AbstractProcessTest {
                     .createNotificationRule(notificationRule)
                     .closeDialog();
 
-            processDetail.openSchedule(schedule.getName())
-                    .executeSchedule().waitForExecutionFinish();
+            processDetail.openSchedule(schedule.getName()).executeSchedule().waitForExecutionFinish();
 
             JSONObject lastExecutionDetail = getLastExecutionDetail(getRestApiClient(), testParams.getProjectId(),
                     process.getId());
@@ -259,8 +255,7 @@ public class NotificationEmailTest extends AbstractProcessTest {
                     .createNotificationRule(notificationRule)
                     .closeDialog();
 
-            processDetail.openSchedule(schedule.getName())
-                    .executeSchedule().waitForExecutionFinish();
+            processDetail.openSchedule(schedule.getName()).executeSchedule().waitForExecutionFinish();
 
             Map<String, String> variables = getVariablesFromNotificationEmail(notificationRule.getSubject());
             assertEquals(variables.get("params.CUSTOM"), "World");

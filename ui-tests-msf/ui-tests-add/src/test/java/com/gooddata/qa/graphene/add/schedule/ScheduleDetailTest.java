@@ -23,9 +23,9 @@ import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
 import com.gooddata.qa.graphene.enums.process.Parameter;
 import com.gooddata.qa.graphene.fragments.disc.overview.OverviewPage.OverviewState;
 import com.gooddata.qa.graphene.fragments.disc.overview.OverviewProjects.OverviewProjectItem;
-import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
-import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
-import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail.ExecutionHistoryItem;
+import com.gooddata.qa.graphene.fragments.disc.process.DataloadProcessDetail;
+import com.gooddata.qa.graphene.fragments.disc.schedule.add.DataloadScheduleDetail;
+import com.gooddata.qa.graphene.fragments.disc.schedule.common.AbstractScheduleDetail.ExecutionHistoryItem;
 
 public class ScheduleDetailTest extends AbstractDataloadProcessTest {
 
@@ -45,8 +45,9 @@ public class ScheduleDetailTest extends AbstractDataloadProcessTest {
         Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.ALL);
 
         try {
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
-                    .executeSchedule().waitForExecutionFinish();
+            DataloadScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+
+            scheduleDetail.executeSchedule().waitForExecutionFinish();
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
                     ScheduleStatus.OK.toString());
@@ -63,8 +64,9 @@ public class ScheduleDetailTest extends AbstractDataloadProcessTest {
                 parseTimeToCronExpression(autoStartTime));
 
         try {
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
-                    .waitForAutoExecute(autoStartTime).waitForExecutionFinish();
+            DataloadScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+
+            scheduleDetail.waitForAutoExecute(autoStartTime).waitForExecutionFinish();
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
                     ScheduleStatus.OK.toString());
@@ -86,11 +88,12 @@ public class ScheduleDetailTest extends AbstractDataloadProcessTest {
         Schedule schedule2 = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.ALL);
 
         try {
-            ProcessDetail processDetail = initDiscProjectDetailPage().getProcess(DEFAULT_DATAlOAD_PROCESS_NAME);
-            processDetail.openSchedule(schedule1.getName()).executeSchedule().close();
+            DataloadProcessDetail processDetail = initDiscProjectDetailPage().getDataloadProcess();
+            processDetail.openSchedule(schedule1.getName()).executeSchedule()
+                    .waitForStatus(ScheduleStatus.RUNNING).close();
             processDetail.openSchedule(schedule2.getName()).executeSchedule().waitForExecutionFinish();
 
-            ExecutionHistoryItem executionItem = ScheduleDetail.getInstance(browser)
+            ExecutionHistoryItem executionItem = DataloadScheduleDetail.getInstance(browser)
                     .getLastExecutionHistoryItem();
             assertEquals(executionItem.getStatusDescription(), "SCHEDULER_ERROR");
             assertEquals(executionItem.getErrorMessage(), "The schedule did not run because one or more of the "
@@ -114,7 +117,8 @@ public class ScheduleDetailTest extends AbstractDataloadProcessTest {
                 parseTimeToCronExpression(autoStartTime));
 
         try {
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule).disableSchedule();
+            DataloadScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+            scheduleDetail.disableSchedule();
             assertFalse(scheduleDetail.canAutoTriggered(autoStartTime),
                     "Schedule executed automatically although disabled");
 
@@ -129,11 +133,12 @@ public class ScheduleDetailTest extends AbstractDataloadProcessTest {
         Schedule schedule2 = createSchedule(generateScheduleName(), SyncDatasets.ALL, schedule1);
 
         try {
-            ProcessDetail processDetail = initDiscProjectDetailPage().getProcess(DEFAULT_DATAlOAD_PROCESS_NAME);
+            DataloadProcessDetail processDetail = initDiscProjectDetailPage().getDataloadProcess();
             processDetail.openSchedule(schedule1.getName()).executeSchedule().close();
 
-            ScheduleDetail scheduleDetail = processDetail.openSchedule(schedule2.getName())
-                    .waitForAutoExecute(LocalTime.now()).waitForExecutionFinish();
+            DataloadScheduleDetail scheduleDetail = processDetail.openSchedule(schedule2.getName());
+
+            scheduleDetail.waitForAutoExecute(LocalTime.now()).waitForExecutionFinish();
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
                     ScheduleStatus.OK.toString());

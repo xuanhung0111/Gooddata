@@ -27,8 +27,12 @@ public class ConfirmationDialog extends AbstractFragment {
     @FindBy(css = ".button-bar-area button:last-child")
     private WebElement discardButton;
 
-    public static final ConfirmationDialog getInstance(SearchContext searchContext) {
-        return Graphene.createPageFragment(ConfirmationDialog.class, waitForElementVisible(LOCATOR, searchContext));
+    protected static final <T extends ConfirmationDialog> T getInstance(SearchContext searchContext, Class<T> clazz) {
+        return Graphene.createPageFragment(clazz, waitForElementVisible(LOCATOR, searchContext));
+    }
+
+    public static ConfirmationDialog getInstance(SearchContext searchContext) {
+        return getInstance(searchContext, ConfirmationDialog.class);
     }
 
     public String getTitle() {
