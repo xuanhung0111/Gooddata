@@ -46,7 +46,7 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
         projectTitle += "Date-Filter-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
     public void checkDefaultValueInDateRange() {
         analysisPage.addDateFilter()
             .getFilterBuckets()
@@ -63,7 +63,7 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
         assertEquals(panel.getFromDate(), getTimeString(date));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
     public void switchingDateRangeNotComputeReport() {
         final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
 
@@ -123,7 +123,7 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
         BrowserUtils.switchToFirstTab(browser);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
     public void testDateInCategoryAndDateInFilter() {
         assertTrue(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addDate()
@@ -136,7 +136,7 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("testDateInCategoryAndDateInFilter");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
     public void switchBetweenPresetsAndDataRange() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().getFilterBuckets().configDateFilter("Last 90 days");
         analysisPage.waitForReportComputing();
@@ -233,7 +233,8 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"init"},
-            description = "CL-9980: Date filter isn't remained when adding trending from recommendation panel")
+            description = "CL-9980: Date filter isn't remained when adding trending from recommendation panel, " +
+                    "covered by TestCafe")
     public void keepDateDimensionAfterApplyingSeeTrendRecommendation() {
         final String newDateDimension = "Created";
         analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT).addDateFilter().getFilterBuckets()

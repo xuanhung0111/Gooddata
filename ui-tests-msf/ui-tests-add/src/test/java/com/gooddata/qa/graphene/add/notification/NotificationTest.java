@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.add.notification;
 import static com.gooddata.qa.graphene.entity.disc.NotificationRule.buildMessage;
 import static com.gooddata.qa.graphene.entity.disc.NotificationRule.getVariablesFromMessage;
 import static com.gooddata.qa.utils.http.process.ProcessRestUtils.executeProcess;
-import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
 import static com.gooddata.qa.utils.mail.ImapUtils.getEmailBody;
 import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 import static java.lang.String.format;
@@ -29,41 +28,34 @@ import org.jsoup.nodes.Document;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.AbstractDataloadProcessTest;
+import com.gooddata.dataload.processes.Schedule;
+import com.gooddata.qa.graphene.common.AbstractDataloadProcessTest;
+import com.gooddata.qa.graphene.entity.add.SyncDatasets;
+import com.gooddata.qa.graphene.entity.ads.SqlBuilder;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.entity.disc.NotificationRule;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
-import com.gooddata.qa.graphene.entity.model.AdsTable;
 import com.gooddata.qa.graphene.entity.model.Dataset;
 import com.gooddata.qa.graphene.entity.model.LdmModel;
-import com.gooddata.qa.graphene.entity.model.SqlBuilder;
 import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.disc.notification.Variable;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.enums.process.Parameter;
 import com.gooddata.qa.graphene.fragments.disc.notification.NotificationRuleItem;
 import com.gooddata.qa.graphene.fragments.disc.notification.NotificationRuleItem.NotificationEvent;
-import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
-import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 
 public class NotificationTest extends AbstractDataloadProcessTest {
 
-    private static final String DATASET_OPPORTUNITY = "opportunity";
-    private static final String DATASET_PERSON = "person";
     private static final String ATTR_NAME = "name";
-    private static final String FACT_AGE = "age";
-    private static final String FACT_PRICE = "price";
-    private static final String X_TIMESTAMP = "timestamp";
     private static final String ERROR_MESSAGE = "While trying to load project %s, the following datasets had one "
-            + "or more rows with a null timestamp, which is not allowed: %s: 1 rows.";
+            + "or more rows with a null timestamp, which is not allowed: %s: 1 row(s).";
 
-    private final String SCHEDULE = "Schedule-" + generateHashString();
     private final String SUCCESS_EMAIL_SUBJECT = "Notification for success event " + generateHashString();
     private final String PROCESS_STARTED_EMAIL_SUBJECT = "Notification for process started event " + generateHashString();
     private final String FAILURE_EMAIL_SUBJECT = "Notification for failure event " + generateHashString();
 
     private CsvFile opportunity;
     private CsvFile person;
-    private SqlBuilder sqlBuilder;
+    private Schedule schedule;
 
     @BeforeClass(alwaysRun = true)
     public void initImapUser() {
@@ -75,7 +67,7 @@ public class NotificationTest extends AbstractDataloadProcessTest {
     @Test(dependsOnGroups = {"initDataload"})
     public void checkParamExecutableReplacedByDataset() {
         NotificationRuleItem item = initDiscProjectDetailPage()
-                .getProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
+                .getDataloadProcess()
                 .openNotificationRuleDialog()
                 .clickAddNotificationRule();
 
@@ -95,7 +87,7 @@ public class NotificationTest extends AbstractDataloadProcessTest {
     @Test(dependsOnGroups = {"initDataload"})
     public void notShowCustomEventForDataloadProcess() {
         Collection<NotificationEvent> events = initDiscProjectDetailPage()
-                .getProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
+                .getDataloadProcess()
                 .openNotificationRuleDialog()
                 .clickAddNotificationRule()
                 .getAvailableEvents();
@@ -114,30 +106,14 @@ public class NotificationTest extends AbstractDataloadProcessTest {
                 .buildMaql());
 
         opportunity = new CsvFile(DATASET_OPPORTUNITY)
-                .columns(new CsvFile.Column(ATTR_NAME), new CsvFile.Column(FACT_PRICE), new CsvFile.Column(X_TIMESTAMP))
+                .columns(new CsvFile.Column(ATTR_NAME), new CsvFile.Column(FACT_PRICE),
+                        new CsvFile.Column(X_TIMESTAMP_COLUMN))
                 .rows("Op1", "100", getCurrentDate());
-        opportunity.saveToDisc(testParams.getCsvFolder());
 
         person = new CsvFile(DATASET_PERSON)
-                .columns(new CsvFile.Column(ATTR_NAME), new CsvFile.Column(FACT_AGE), new CsvFile.Column(X_TIMESTAMP))
+                .columns(new CsvFile.Column(ATTR_NAME), new CsvFile.Column(FACT_AGE),
+                        new CsvFile.Column(X_TIMESTAMP_COLUMN))
                 .rows("P1", "18", getCurrentDate());
-        person.saveToDisc(testParams.getCsvFolder());
-
-        sqlBuilder = new SqlBuilder()
-                .withAdsTable(new AdsTable(DATASET_OPPORTUNITY)
-                        .withAttributes(ATTR_NAME)
-                        .withFacts(FACT_PRICE)
-                        .hasTimeStamp(true)
-                        .withDataFile(opportunity))
-                .withAdsTable(new AdsTable(DATASET_PERSON)
-                        .withAttributes(ATTR_NAME)
-                        .withFacts(FACT_AGE)
-                        .hasTimeStamp(true)
-                        .withDataFile(person));
-
-        Parameters parameters = getDefaultParameters().addParameter("SQL_QUERY", sqlBuilder.build());
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
     }
 
     @Test(dependsOnMethods = {"initData"}, groups = {"precondition"})
@@ -161,7 +137,7 @@ public class NotificationTest extends AbstractDataloadProcessTest {
                 .withMessage(buildMessage(Variable.DATASETS, Variable.ERROR_MESSAGE));
 
         initDiscProjectDetailPage()
-                .getProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
+                .getDataloadProcess()
                 .openNotificationRuleDialog()
                 .createNotificationRule(successRule)
                 .createNotificationRule(processStartedRule)
@@ -173,15 +149,14 @@ public class NotificationTest extends AbstractDataloadProcessTest {
     public void checkNotificationForFullLoadDataset() throws MessagingException, IOException {
         Date timeReceiveEmail = getTimeReceiveEmail();
 
-        ((CreateScheduleForm) initDiscProjectDetailPage()
-                .openCreateScheduleForm()
-                .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .selectAllDatasetsOption()
-                .selectLongRunTimeUntilAutoTrigger())
-                .enterScheduleName(SCHEDULE)
-                .schedule();
+        Parameters parameters = getDefaultParameters()
+                .addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity, person));
+        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
+                parameters.getParameters(), parameters.getSecureParameters());
 
-        ScheduleDetail.getInstance(browser).executeSchedule().waitForExecutionFinish();
+        schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.ALL);
+
+        initScheduleDetail(schedule).executeSchedule().waitForExecutionFinish();
         Document processStartedNotification = getNotificationEmailContent(PROCESS_STARTED_EMAIL_SUBJECT, timeReceiveEmail);
         assertEquals(processStartedNotification.text(), "PERSON (full load), OPPORTUNITY (full load)");
 
@@ -190,42 +165,15 @@ public class NotificationTest extends AbstractDataloadProcessTest {
     }
 
     @Test(dependsOnMethods = {"checkNotificationForFullLoadDataset"}, groups = {"successfulLoad"})
-    public void checkNotificationForDatasetLoadedInDE() throws MessagingException, IOException {
-        Date timeReceiveEmail = getTimeReceiveEmail();
-
-        setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.ENABLE_DATA_EXPLORER, true);
-
-        try {
-            initDiscProjectDetailPage()
-                    .getProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                    .openSchedule(SCHEDULE)
-                    .executeSchedule()
-                    .waitForExecutionFinish();
-
-            Document notification = getNotificationEmailContent(SUCCESS_EMAIL_SUBJECT, timeReceiveEmail);
-            assertEquals(notification.text(), "PERSON, OPPORTUNITY");
-
-        } finally {
-            setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                    ProjectFeatureFlags.ENABLE_DATA_EXPLORER, false);
-        }
-    }
-
-    @Test(dependsOnMethods = {"checkNotificationForFullLoadDataset"}, groups = {"successfulLoad"})
     public void checkNotificationForIncrementalLoadDataset() throws MessagingException, IOException {
         Date timeReceiveEmail = getTimeReceiveEmail();
 
-        person.rows("P2", "20", getCurrentDate()).saveToDisc(testParams.getCsvFolder());
-        Parameters parameters = getDefaultParameters().addParameter("SQL_QUERY", sqlBuilder.build());
+        person.rows("P2", "20", getCurrentDate());
+        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person));
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
 
-        initDiscProjectDetailPage()
-                .getProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .openSchedule(SCHEDULE)
-                .executeSchedule()
-                .waitForExecutionFinish();
+        initScheduleDetail(schedule).executeSchedule().waitForExecutionFinish();
 
         Document processStartedNotification = getNotificationEmailContent(PROCESS_STARTED_EMAIL_SUBJECT, timeReceiveEmail);
         assertTrue(processStartedNotification.text().matches("PERSON \\(incremental load from .*\\)"),
@@ -239,11 +187,7 @@ public class NotificationTest extends AbstractDataloadProcessTest {
     @Test(dependsOnMethods = {"checkNotificationForFullLoadDataset"}, groups = {"successfulLoad"})
     public void checkNotificationWithoutDatasetLoaded() throws MessagingException, IOException {
         Date timeReceiveEmail = getTimeReceiveEmail();
-        initDiscProjectDetailPage()
-                .getProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .openSchedule(SCHEDULE)
-                .executeSchedule()
-                .waitForExecutionFinish();
+        initScheduleDetail(schedule).executeSchedule().waitForExecutionFinish();
 
         Document processStartedNotification = getNotificationEmailContent(PROCESS_STARTED_EMAIL_SUBJECT, timeReceiveEmail);
         assertEquals(processStartedNotification.text(), "No datasets were loaded");
@@ -256,14 +200,12 @@ public class NotificationTest extends AbstractDataloadProcessTest {
     public void checkNotificationForErrorDatasetLoaded() throws IOException, MessagingException {
         Date timeReceiveEmail = getTimeReceiveEmail();
 
-        person.rows("P3", "20").saveToDisc(testParams.getCsvFolder());
-        Parameters parameters = getDefaultParameters().addParameter("SQL_QUERY", sqlBuilder.build());
+        person.rows("P3", "20");
+        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person));
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
 
-        String errorMessage = initDiscProjectDetailPage()
-                .getProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .openSchedule(SCHEDULE)
+        String errorMessage = initScheduleDetail(schedule)
                 .executeSchedule()
                 .waitForExecutionFinish()
                 .getLastExecutionHistoryItem()

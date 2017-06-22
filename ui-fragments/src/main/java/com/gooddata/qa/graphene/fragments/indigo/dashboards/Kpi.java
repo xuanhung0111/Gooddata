@@ -146,7 +146,11 @@ public class Kpi extends Widget {
     }
 
     public boolean isDrillable() {
-        return isElementPresent(By.className("kpi-link"), getRoot());
+        return isElementPresent(By.cssSelector(".s-kpi-link-clickable"), getRoot());
+    }
+
+    public boolean isDrillableButNotClickable() {
+        return isElementPresent(By.cssSelector(".s-kpi-link-nonclickable"), getRoot());
     }
 
     public static boolean isKpi(final Widget widget) {

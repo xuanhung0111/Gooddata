@@ -4,7 +4,6 @@ import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.utils.http.process.ProcessRestUtils.executeProcess;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
 import static org.testng.Assert.assertEquals;
 
 import java.io.IOException;
@@ -13,17 +12,18 @@ import java.util.Collection;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
+import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.md.Attribute;
-import com.gooddata.qa.graphene.AbstractDataloadProcessTest;
+import com.gooddata.qa.graphene.common.AbstractDataloadProcessTest;
+import com.gooddata.qa.graphene.entity.add.SyncDatasets;
+import com.gooddata.qa.graphene.entity.ads.SqlBuilder;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
-import com.gooddata.qa.graphene.entity.model.AdsTable;
 import com.gooddata.qa.graphene.entity.model.Dataset;
 import com.gooddata.qa.graphene.entity.model.LdmModel;
-import com.gooddata.qa.graphene.entity.model.SqlBuilder;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
-import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
-import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
+import com.gooddata.qa.graphene.enums.process.Parameter;
+import com.gooddata.qa.graphene.fragments.disc.schedule.add.DataloadScheduleDetail;
 
 public class DatasetDetailTest extends AbstractDataloadProcessTest {
 
@@ -52,42 +52,26 @@ public class DatasetDetailTest extends AbstractDataloadProcessTest {
                 .columns(new CsvFile.Column(ATTR_OPPORTUNITY), new CsvFile.Column(FACT_PRICE))
                 .rows("OOP1", "100")
                 .rows("OOP2", "200");
-        opportunity.saveToDisc(testParams.getCsvFolder());
 
         CsvFile person = new CsvFile(DATASET_PERSON)
                 .columns(new CsvFile.Column(ATTR_PERSON), new CsvFile.Column(FACT_AGE))
                 .rows("P1", "18")
                 .rows("P2", "20");
-        person.saveToDisc(testParams.getCsvFolder());
 
-        SqlBuilder sqlBuilder = new SqlBuilder()
-                .withAdsTable(new AdsTable(DATASET_OPPORTUNITY)
-                        .withAttributes(ATTR_OPPORTUNITY)
-                        .withFacts(FACT_PRICE)
-                        .withDataFile(opportunity))
-                .withAdsTable(new AdsTable(DATASET_PERSON)
-                        .withAttributes(ATTR_PERSON)
-                        .withFacts(FACT_AGE)
-                        .withDataFile(person));
-
-        Parameters parameters = getDefaultParameters().addParameter("SQL_QUERY", sqlBuilder.build());
+        Parameters parameters = getDefaultParameters()
+                .addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity, person));
         executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 parameters.getParameters(), parameters.getSecureParameters());
     }
 
     @Test(dependsOnGroups = {"precondition"})
     public void executeDataloadScheduleWithOneDataset() {
-        String schedule = "Schedule-" + generateHashString();
-        ((CreateScheduleForm) initDiscProjectDetailPage()
-                .openCreateScheduleForm()
-                .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .selectDatasets(DATASET_OPPORTUNITY))
-                .enterScheduleName(schedule)
-                .schedule();
+        Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.custom(DATASET_OPPORTUNITY));
 
         try {
-            ScheduleDetail scheduleDetail = ScheduleDetail.getInstance(browser)
-                    .executeSchedule().waitForExecutionFinish();
+            DataloadScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+
+            scheduleDetail.executeSchedule().waitForExecutionFinish();
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
                     ScheduleStatus.OK.toString());
@@ -99,23 +83,18 @@ public class DatasetDetailTest extends AbstractDataloadProcessTest {
             assertEquals(getAttributeValues(person), emptyList());
 
         } finally {
-            deleteScheduleByName(getDataloadProcess(), schedule);
+            getProcessService().removeSchedule(schedule);
         }
     }
 
     @Test(dependsOnMethods = {"executeDataloadScheduleWithOneDataset"})
     public void executeDataloadScheduleWithAllDatasets() {
-        String schedule = "Schedule-" + generateHashString();
-        ((CreateScheduleForm) initDiscProjectDetailPage()
-                .openCreateScheduleForm()
-                .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .selectAllDatasetsOption())
-                .enterScheduleName(schedule)
-                .schedule();
+        Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.ALL);
 
         try {
-            ScheduleDetail scheduleDetail = ScheduleDetail.getInstance(browser)
-                    .executeSchedule().waitForExecutionFinish();
+            DataloadScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+
+            scheduleDetail.executeSchedule().waitForExecutionFinish();
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(), ScheduleStatus.OK.toString());
 
@@ -126,12 +105,7 @@ public class DatasetDetailTest extends AbstractDataloadProcessTest {
             assertEquals(getAttributeValues(person), PERSON_ATTR_VALUES);
 
         } finally {
-            deleteScheduleByName(getDataloadProcess(), schedule);
+            getProcessService().removeSchedule(schedule);
         }
-    }
-
-    private Collection<String> getAttributeValues(Attribute attribute) {
-        return getMdService().getAttributeElements(attribute)
-                .stream().map(attr -> attr.getTitle()).map(String::trim).collect(toList());
     }
 }

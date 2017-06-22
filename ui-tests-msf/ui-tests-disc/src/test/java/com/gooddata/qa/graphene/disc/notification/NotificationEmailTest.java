@@ -34,7 +34,7 @@ import org.testng.annotations.Test;
 import com.gooddata.GoodData;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
-import com.gooddata.qa.graphene.AbstractDiscTest;
+import com.gooddata.qa.graphene.common.AbstractProcessTest;
 import com.gooddata.qa.graphene.entity.disc.NotificationRule;
 import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.disc.notification.Variable;
@@ -49,7 +49,7 @@ import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
 
-public class NotificationEmailTest extends AbstractDiscTest {
+public class NotificationEmailTest extends AbstractProcessTest {
 
     private static final String DATE_FORMAT_PATTERN_1 = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     private static final String DATE_FORMAT_PATTERN_2 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
@@ -97,8 +97,7 @@ public class NotificationEmailTest extends AbstractDiscTest {
                     .createNotificationRule(notificationRule)
                     .closeDialog();
 
-            processDetail.openSchedule(schedule.getName())
-                    .executeSchedule().waitForExecutionFinish();
+            processDetail.openSchedule(schedule.getName()).executeSchedule().waitForExecutionFinish();
 
             JSONObject lastExecutionDetail = getLastExecutionDetail(getRestApiClient(), testParams.getProjectId(),
                     process.getId());
@@ -142,8 +141,7 @@ public class NotificationEmailTest extends AbstractDiscTest {
                     .createNotificationRule(notificationRule)
                     .closeDialog();
 
-            processDetail.openSchedule(schedule.getName())
-                    .executeSchedule().waitForExecutionFinish();
+            processDetail.openSchedule(schedule.getName()).executeSchedule().waitForExecutionFinish();
 
             JSONObject lastExecutionDetail = getLastExecutionDetail(getRestApiClient(), testParams.getProjectId(),
                     process.getId());
@@ -182,8 +180,7 @@ public class NotificationEmailTest extends AbstractDiscTest {
                     .createNotificationRule(notificationRule)
                     .closeDialog();
 
-            processDetail.openSchedule(schedule.getName())
-                    .executeSchedule().waitForExecutionFinish();
+            processDetail.openSchedule(schedule.getName()).executeSchedule().waitForExecutionFinish();
 
             JSONObject lastExecutionDetail = getLastExecutionDetail(getRestApiClient(), testParams.getProjectId(),
                     process.getId());
@@ -221,8 +218,7 @@ public class NotificationEmailTest extends AbstractDiscTest {
                     .createNotificationRule(notificationRule)
                     .closeDialog();
 
-            processDetail.openSchedule(schedule.getName())
-                    .executeSchedule().waitForExecutionFinish();
+            processDetail.openSchedule(schedule.getName()).executeSchedule().waitForExecutionFinish();
 
             JSONObject lastExecutionDetail = getLastExecutionDetail(getRestApiClient(), testParams.getProjectId(),
                     process.getId());
@@ -259,8 +255,7 @@ public class NotificationEmailTest extends AbstractDiscTest {
                     .createNotificationRule(notificationRule)
                     .closeDialog();
 
-            processDetail.openSchedule(schedule.getName())
-                    .executeSchedule().waitForExecutionFinish();
+            processDetail.openSchedule(schedule.getName()).executeSchedule().waitForExecutionFinish();
 
             Map<String, String> variables = getVariablesFromNotificationEmail(notificationRule.getSubject());
             assertEquals(variables.get("params.CUSTOM"), "World");

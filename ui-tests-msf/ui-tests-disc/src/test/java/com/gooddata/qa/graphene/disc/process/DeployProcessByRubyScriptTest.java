@@ -6,14 +6,14 @@ import static org.testng.Assert.assertEquals;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.AbstractDiscTest;
+import com.gooddata.qa.graphene.common.AbstractProcessTest;
 import com.gooddata.qa.graphene.fragments.disc.ConfirmationDialog;
+import com.gooddata.qa.graphene.fragments.disc.process.AbstractProcessDetail.Tab;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
-import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail.Tab;
 
-public class DeployProcessByRubyScriptTest extends AbstractDiscTest {
+public class DeployProcessByRubyScriptTest extends AbstractProcessTest {
 
     private static final String FAILED_DEPLOY_MESSAGE = "Failed to (re-)?deploy .*\\. Reasons?: Process contains no executables.";
 

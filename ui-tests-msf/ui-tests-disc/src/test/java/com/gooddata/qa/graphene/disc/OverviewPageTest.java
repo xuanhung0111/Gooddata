@@ -23,7 +23,7 @@ import org.testng.annotations.Test;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
-import com.gooddata.qa.graphene.AbstractDiscTest;
+import com.gooddata.qa.graphene.common.AbstractProcessTest;
 import com.gooddata.qa.graphene.enums.disc.schedule.Executable;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleCronTime;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
@@ -32,7 +32,7 @@ import com.gooddata.qa.graphene.fragments.disc.overview.OverviewProjects.Overvie
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 
-public class OverviewPageTest extends AbstractDiscTest {
+public class OverviewPageTest extends AbstractProcessTest {
 
     private static final String FAILED_EMPTY_STATE_MESSAGE = "No failed data loading processes. Good job!";
     private static final String RUNNING_EMPTY_STATE_MESSAGE = "No data loading processes are running right now.";
@@ -316,10 +316,10 @@ public class OverviewPageTest extends AbstractDiscTest {
             Schedule schedule = createSchedule(process, executable, ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             String customScheduleName = "Schedule-" + generateHashString();
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
-                    .editNameByClickOnTitle(customScheduleName)
-                    .saveChanges()
-                    .executeSchedule();
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+
+            scheduleDetail.editNameByClickOnTitle(customScheduleName).saveChanges();
+            scheduleDetail.executeSchedule();
 
             if (executable == Executable.LONG_TIME_RUNNING_GRAPH) {
                 scheduleDetail.waitForStatus(ScheduleStatus.RUNNING);

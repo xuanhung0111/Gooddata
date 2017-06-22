@@ -3,15 +3,20 @@ package com.gooddata.qa.graphene.entity.csvuploader;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang.math.NumberUtils.isNumber;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.IntPredicate;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.text.WordUtils;
@@ -24,14 +29,14 @@ import com.google.common.collect.Lists;
 
 public class CsvFile {
 
-    private String fileName;
+    private String name;
     private List<Column> columns;
     private List<List<String>> data;
     private String filePath;
     private long dataRowCount;
 
-    public CsvFile(final String fileName) {
-        this.fileName = fileName;
+    public CsvFile(final String name) {
+        this.name = name;
         columns = Collections.emptyList();
         data = new ArrayList<>();
         filePath = "";
@@ -125,8 +130,13 @@ public class CsvFile {
         return filePath;
     }
 
+    public CsvFile setName(String name) {
+        this.name = name;
+        return this;
+    }
+
     public String getFileName() {
-        return fileName + ".csv";
+        return name + ".csv";
     }
 
     public List<String> getColumnNames() {
@@ -141,8 +151,17 @@ public class CsvFile {
         return dataRowCount;
     }
 
+    public List<List<String>> getDataRows() {
+        return data;
+    }
+
+    public CsvFile removeLastRowData() {
+        data.remove(data.size() - 1);
+        return this;
+    }
+
     public String getDatasetNameOfFirstUpload() {
-        return WordUtils.capitalize(fileName.replace(".", " "));
+        return WordUtils.capitalize(name.replace(".", " "));
     }
 
     public String getDatasetName(final long datasetIndex) {
@@ -158,6 +177,61 @@ public class CsvFile {
         final List<String> changedColumnTypes = Lists.newArrayList(getColumnTypes());
         changedColumnTypes.set(columnIndex, type.getVisibleText());
         return changedColumnTypes;
+    }
+
+    public String[] getFactColumns() {
+        return getColumnsByGivenIndex(getFactColumnIndex());
+    }
+
+    public String[] getAttributeColumns() {
+        return getColumnsByGivenIndex(getAttributeColumnIndex());
+    }
+
+    public boolean hasTimeStampColumn() {
+        return getColumnIndex(".*timestamp") != -1;
+    }
+
+    public boolean hasClientIdColumn() {
+        return getColumnIndex(".*client.*id") != -1;
+    }
+
+    public Collection<String> getColumnValues(String columnName) {
+        int columnIndex = getColumnIndex(columnName);
+        return data.stream().map(row -> row.get(columnIndex)).collect(toList());
+    }
+
+    private Integer[] getFactColumnIndex() {
+        List<String> row = getDataRows().get(0);
+        return identifyAttributeOrFactColumnIndex(row, i -> isNumber(row.get(i)));
+    }
+
+    private Integer[] getAttributeColumnIndex() {
+        List<String> row = getDataRows().get(0);
+        return identifyAttributeOrFactColumnIndex(row, i -> !isNumber(row.get(i)) && !isDateValue(row.get(i)));
+    }
+
+    private boolean isDateValue(String value) {
+        return value.matches("(\\d+(/|-)){2}\\d+(\\s(\\d+:?){2,3}.*)?");
+    }
+
+    private int getColumnIndex(String regex) {
+        return IntStream.range(0, columns.size())
+                .filter(i -> columns.get(i).getTitle().toLowerCase().matches(regex))
+                .findFirst().orElse(-1);
+    }
+
+    private Integer[] identifyAttributeOrFactColumnIndex(List<String> dataRow, IntPredicate filter) {
+        return IntStream.range(0, dataRow.size())
+                .filter(filter)
+                .filter(i -> i != getColumnIndex(".*client.*id"))
+                .mapToObj(Integer::new).toArray(Integer[]::new);
+    }
+
+    private String[] getColumnsByGivenIndex(Integer... index) {
+        return Stream.of(index)
+                .map(i -> columns.get(i))
+                .map(Column::getTitle)
+                .toArray(String[]::new);
     }
 
     public static class Column {

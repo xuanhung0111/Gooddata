@@ -104,7 +104,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     public void createEmptyDashboardSchedule() {
         initDashboardsPage();
         dashboardsPage.addNewDashboard("Empty dashboard");
-        initEmailSchedulesPage().scheduleNewDahboardEmail(testParams.getUser(), emptyDashboardTitle,
+        initEmailSchedulesPage().scheduleNewDashboardEmail(testParams.getUser(), emptyDashboardTitle,
                 "Scheduled email test - empty dashboard.", "First Tab");
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-empty-dashboard", this.getClass());
@@ -113,7 +113,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void deleteDashboardUsedInSchedule() {
         String dashboardTitle = "Schedule dashboard";
-        initEmailSchedulesPage().scheduleNewDahboardEmail(testParams.getUser(), dashboardTitle,
+        initEmailSchedulesPage().scheduleNewDashboardEmail(testParams.getUser(), dashboardTitle,
                 "Scheduled email test - dashboard.", "Outlook");
 
         try {

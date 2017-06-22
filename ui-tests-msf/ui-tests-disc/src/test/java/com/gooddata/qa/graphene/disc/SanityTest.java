@@ -14,7 +14,7 @@ import org.testng.annotations.Test;
 import com.gooddata.GoodData;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
-import com.gooddata.qa.graphene.AbstractDiscTest;
+import com.gooddata.qa.graphene.common.AbstractProcessTest;
 import com.gooddata.qa.graphene.entity.disc.NotificationRule;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
 import com.gooddata.qa.graphene.enums.disc.schedule.Executable;
@@ -23,14 +23,13 @@ import com.gooddata.qa.graphene.fragments.disc.notification.NotificationRuleItem
 import com.gooddata.qa.graphene.fragments.disc.notification.NotificationRuleItem.NotificationEvent;
 import com.gooddata.qa.graphene.fragments.disc.overview.OverviewPage.OverviewState;
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
+import com.gooddata.qa.graphene.fragments.disc.process.AbstractProcessDetail.Tab;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
-import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail.Tab;
 import com.gooddata.qa.graphene.fragments.disc.projects.ProjectsPage.FilterOption;
-import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 
-public class SanityTest extends AbstractDiscTest {
+public class SanityTest extends AbstractProcessTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void deployProcessInProjectsPage() {
@@ -71,9 +70,9 @@ public class SanityTest extends AbstractDiscTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            ((CreateScheduleForm) initDiscProjectDetailPage()
+            initDiscProjectDetailPage()
                     .openCreateScheduleForm()
-                    .selectExecutable(Executable.SUCCESSFUL_GRAPH))
+                    .selectExecutable(Executable.SUCCESSFUL_GRAPH)
                     .schedule();
 
             ScheduleDetail.getInstance(browser).close();
@@ -94,8 +93,8 @@ public class SanityTest extends AbstractDiscTest {
             Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
                     ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
-                    .executeSchedule().waitForExecutionFinish();
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+            scheduleDetail.executeSchedule().waitForExecutionFinish();
 
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
@@ -122,8 +121,8 @@ public class SanityTest extends AbstractDiscTest {
             Schedule schedule = createSchedule(goodData, process, Executable.RUBY_SCRIPT_3,
                     ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
-                    .executeSchedule().waitForExecutionFinish();
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+            scheduleDetail.executeSchedule().waitForExecutionFinish();
 
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),
@@ -143,9 +142,8 @@ public class SanityTest extends AbstractDiscTest {
             Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
                     parseTimeToCronExpression(autoExecutionStartTime));
 
-            ScheduleDetail scheduleDetail = initScheduleDetail(schedule)
-                    .waitForAutoExecute(autoExecutionStartTime)
-                    .waitForExecutionFinish();
+            ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
+            scheduleDetail.waitForAutoExecute(autoExecutionStartTime).waitForExecutionFinish();
 
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 1);
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(),

@@ -25,7 +25,7 @@ public class ReportFilter extends AbstractFragment {
     public static final By REPORT_FILTER_LOCATOR = id("filtersContainer");
     private static final By DELETE_FILTER_BUTTON_LOCATOR = By.className("s-btn-delete");
 
-    @FindBy(css = ".s-attributeFilter")
+    @FindBy(css = ".s-attributeFilter:not(.disabled)")
     private WebElement attributeFilterLink;
 
     @FindBy(css = ".s-rankFilter")
@@ -34,7 +34,7 @@ public class ReportFilter extends AbstractFragment {
     @FindBy(css = ".s-rangeFilter")
     private WebElement rangeFilterLink;
 
-    @FindBy(css = ".s-promptFilter")
+    @FindBy(css = ".s-promptFilter:not(.disabled)")
     private WebElement promptFilterLink;
 
     @FindBy(css = ".s-btn-add_filter")

@@ -175,6 +175,10 @@ public abstract class AbstractTest extends Arquillian {
         return adsHelper;
     }
 
+    public AdsHelper getAdsHelper(final String userLogin, final String userPassword) {
+        return new AdsHelper(getGoodDataClient(userLogin, userPassword), getRestApiClient(userLogin, userPassword));
+    }
+
     public String generateEmail(String email) {
         return email.replace("@", "+" + generateHashString() + "@");
     }

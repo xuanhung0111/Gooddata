@@ -1,4 +1,0 @@
-ALTER TABLE "opportunity" ADD COLUMN "a__title" VARCHAR(128) DEFAULT NULL;
-ALTER TABLE "opportunity" DROP COLUMN "a__titleErrorMapping";
-ALTER TABLE "person" ADD COLUMN "f__age" NUMERIC(12,2) DEFAULT NULL;
-ALTER TABLE "person" DROP COLUMN "f__ageErrorMapping";

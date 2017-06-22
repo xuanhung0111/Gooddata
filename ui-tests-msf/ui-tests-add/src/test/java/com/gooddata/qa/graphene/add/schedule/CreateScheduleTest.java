@@ -14,11 +14,11 @@ import java.util.NoSuchElementException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.AbstractDataloadProcessTest;
+import com.gooddata.qa.graphene.common.AbstractDataloadProcessTest;
 import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
-import com.gooddata.qa.graphene.fragments.disc.schedule.DatasetDropdown;
-import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
+import com.gooddata.qa.graphene.fragments.disc.schedule.add.DataloadScheduleDetail;
+import com.gooddata.qa.graphene.fragments.disc.schedule.add.DatasetDropdown;
 
 public class CreateScheduleTest extends AbstractDataloadProcessTest {
 
@@ -37,17 +37,17 @@ public class CreateScheduleTest extends AbstractDataloadProcessTest {
     @Test(dependsOnGroups = {"precondition"})
     public void createDataloadScheduleWithAllDatasets() {
         String schedule = "Schedule-" + generateHashString();
-        ((CreateScheduleForm) initDiscProjectDetailPage()
+        initDiscProjectDetailPage()
                 .openCreateScheduleForm()
                 .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .selectAllDatasetsOption())
+                .selectAllDatasetsOption()
                 .enterScheduleName(schedule)
                 .schedule();
 
         try {
-            assertTrue(ScheduleDetail.getInstance(browser).isAllDatasetsOptionSelected(),
+            assertTrue(DataloadScheduleDetail.getInstance(browser).isAllDatasetsOptionSelected(),
                     "All dataset radio option is not selected");
-            assertTrue(projectDetailPage.getProcess(DEFAULT_DATAlOAD_PROCESS_NAME).hasSchedule(schedule),
+            assertTrue(projectDetailPage.getDataloadProcess().hasSchedule(schedule),
                     "Dataload schedule is not created");
 
         } finally {
@@ -58,18 +58,18 @@ public class CreateScheduleTest extends AbstractDataloadProcessTest {
     @Test(dependsOnGroups = {"precondition"})
     public void createDataloadScheduleWithCustomDatasets() {
         String schedule = "Schedule-" + generateHashString();
-        ((CreateScheduleForm) initDiscProjectDetailPage()
+        initDiscProjectDetailPage()
                 .openCreateScheduleForm()
                 .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .selectDatasets(OPPORTUNITY_DATASET))
+                .selectDatasets(OPPORTUNITY_DATASET)
                 .enterScheduleName(schedule)
                 .schedule();
 
         try {
-            ScheduleDetail scheduleDetail = ScheduleDetail.getInstance(browser);
+            DataloadScheduleDetail scheduleDetail = DataloadScheduleDetail.getInstance(browser);
             assertTrue(scheduleDetail.isCustomDatasetsOptionSelected(), "Custom dataset radio option is not selected");
             assertEquals(scheduleDetail.getSelectedDatasets(), singletonList(OPPORTUNITY_DATASET));
-            assertTrue(projectDetailPage.getProcess(DEFAULT_DATAlOAD_PROCESS_NAME).hasSchedule(schedule),
+            assertTrue(projectDetailPage.getDataloadProcess().hasSchedule(schedule),
                     "Dataload schedule is not created");
 
         } finally {
@@ -78,17 +78,29 @@ public class CreateScheduleTest extends AbstractDataloadProcessTest {
     }
 
     @Test(dependsOnGroups = {"precondition"})
-    public void editDataloadScheduleWithCustomDatasets() {
-        String schedule = "Schedule-" + generateHashString();
-        ((CreateScheduleForm) initDiscProjectDetailPage()
+    public void createScheduleWithNoDataset() {
+        DatasetDropdown dropdown = initDiscProjectDetailPage()
                 .openCreateScheduleForm()
                 .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .selectDatasets(OPPORTUNITY_DATASET))
+                .selectCustomDatasetsOption()
+                .getDatasetDropdown()
+                .expand()
+                .clearAllSelected();
+        assertFalse(dropdown.isSaveButtonEnabled(), "Save button is not disabled");
+    }
+
+    @Test(dependsOnGroups = {"precondition"})
+    public void editDataloadScheduleWithCustomDatasets() {
+        String schedule = "Schedule-" + generateHashString();
+        initDiscProjectDetailPage()
+                .openCreateScheduleForm()
+                .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
+                .selectDatasets(OPPORTUNITY_DATASET)
                 .enterScheduleName(schedule)
                 .schedule();
 
         try {
-            DatasetDropdown dropdown = ScheduleDetail.getInstance(browser).getDatasetDropdown().expand();
+            DatasetDropdown dropdown = DataloadScheduleDetail.getInstance(browser).getDatasetDropdown().expand();
             dropdown.clearAllSelected();
             assertEquals(dropdown.getSelectedDatasets(), EMPTY_LIST);
             assertFalse(dropdown.isSaveButtonEnabled(), "Save button is not disabled");
@@ -129,15 +141,15 @@ public class CreateScheduleTest extends AbstractDataloadProcessTest {
     @Test(dependsOnGroups = {"precondition"})
     public void checkDataloadDatasetsOverlap() {
         String schedule = "Schedule-" + generateHashString();
-        ((CreateScheduleForm) initDiscProjectDetailPage()
+        initDiscProjectDetailPage()
                 .openCreateScheduleForm()
                 .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .selectDatasets(OPPORTUNITY_DATASET))
+                .selectDatasets(OPPORTUNITY_DATASET)
                 .enterScheduleName(schedule)
                 .schedule();
 
         try {
-            ScheduleDetail.getInstance(browser).close();
+            DataloadScheduleDetail.getInstance(browser).close();
 
             CreateScheduleForm scheduleForm = projectDetailPage.openCreateScheduleForm()
                     .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME);
@@ -151,18 +163,18 @@ public class CreateScheduleTest extends AbstractDataloadProcessTest {
     @Test(dependsOnGroups = {"precondition"})
     public void addRetryToDataloadSchedule() {
         String schedule = "Schedule-" + generateHashString();
-        ((CreateScheduleForm) initDiscProjectDetailPage()
+        initDiscProjectDetailPage()
                 .openCreateScheduleForm()
                 .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .selectDatasets(OPPORTUNITY_DATASET))
+                .selectDatasets(OPPORTUNITY_DATASET)
                 .enterScheduleName(schedule)
                 .schedule();
 
         try {
             final int retryInMinute = 15;
 
-            ScheduleDetail scheduleDetail = ScheduleDetail.getInstance(browser)
-                    .addRetryDelay(retryInMinute).saveChanges();
+            DataloadScheduleDetail scheduleDetail = DataloadScheduleDetail.getInstance(browser);
+            scheduleDetail.addRetryDelay(retryInMinute).saveChanges();
             assertEquals(scheduleDetail.getRetryDelayValue(), retryInMinute);
 
         } finally {
@@ -173,16 +185,16 @@ public class CreateScheduleTest extends AbstractDataloadProcessTest {
     @Test(dependsOnGroups = {"precondition"})
     public void deleteDataloadSchedule() {
         String schedule = "Schedule-" + generateHashString();
-        ((CreateScheduleForm) initDiscProjectDetailPage()
+        initDiscProjectDetailPage()
                 .openCreateScheduleForm()
                 .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .selectDatasets(OPPORTUNITY_DATASET))
+                .selectDatasets(OPPORTUNITY_DATASET)
                 .enterScheduleName(schedule)
                 .schedule();
 
         try {
-            ScheduleDetail.getInstance(browser).deleteSchedule();
-            assertFalse(projectDetailPage.getProcess(DEFAULT_DATAlOAD_PROCESS_NAME).hasSchedule(schedule),
+            DataloadScheduleDetail.getInstance(browser).deleteSchedule();
+            assertFalse(projectDetailPage.getDataloadProcess().hasSchedule(schedule),
                     "Dataload schedule is not deleted");
 
         } finally {

@@ -10,12 +10,12 @@ import java.util.Optional;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.disc.process.DataloadProcessDetail;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
@@ -25,7 +25,7 @@ import com.google.common.base.Predicate;
 public class ProjectDetailPage extends AbstractFragment {
 
     public static final String URI = "admin/disc/#/projects/%s";
-    public static final String CLASS_NAME = "ait-project-detail-fragment";
+    private static final String DATALOAD_PROCESS_NAME = "Automated Data Distribution";
 
     @FindBy(className = "ait-project-title")
     private WebElement title;
@@ -49,12 +49,7 @@ public class ProjectDetailPage extends AbstractFragment {
     private WebElement emptyStateMessage;
 
     @FindBy(className = "process-detail")
-    private Collection<ProcessDetail> processes;
-
-    public static final ProjectDetailPage getInstance(SearchContext searchContext) {
-        return Graphene.createPageFragment(ProjectDetailPage.class,
-                waitForElementVisible(By.className(CLASS_NAME), searchContext));
-    }
+    private Collection<WebElement> processes;
 
     public String getTitle() {
         return waitForElementVisible(title).getText();
@@ -77,11 +72,27 @@ public class ProjectDetailPage extends AbstractFragment {
     }
 
     public ProcessDetail getProcess(String processName) {
-        return findProcess(Restriction.NAME, processName).get();
+        if (processName.equals(DATALOAD_PROCESS_NAME)) {
+            throw new RuntimeException("The type of DATALOAD process should be called in getDataloadProcess method");
+        }
+
+        return findProcess(Restriction.NAME, processName)
+                .map(p -> Graphene.createPageFragment(ProcessDetail.class, p)).get();
+    }
+
+    public DataloadProcessDetail getDataloadProcess() {
+        return findProcess(Restriction.NAME, DATALOAD_PROCESS_NAME)
+                .map(p -> Graphene.createPageFragment(DataloadProcessDetail.class, p)).get();
     }
 
     public ProcessDetail getProcessById(String processId) {
-        return findProcess(Restriction.ID, processId).get();
+        WebElement process = findProcess(Restriction.ID, processId).get();
+
+        if (getProcessTitle(process).equals(DATALOAD_PROCESS_NAME)) {
+            throw new RuntimeException("The type of DATALOAD process should be called in getDataloadProcess method");
+        }
+
+        return Graphene.createPageFragment(ProcessDetail.class, process);
     }
 
     public boolean hasProcess(String processName) {
@@ -117,7 +128,7 @@ public class ProjectDetailPage extends AbstractFragment {
     }
 
     public Collection<String> getProcessNames() {
-        return processes.stream().map(p -> p.getTitle()).collect(toList());
+        return processes.stream().map(this::getProcessTitle).collect(toList());
     }
 
     public CreateScheduleForm openCreateScheduleForm() {
@@ -125,11 +136,15 @@ public class ProjectDetailPage extends AbstractFragment {
         return CreateScheduleForm.getInstance(browser);
     }
 
-    private Optional<ProcessDetail> findProcess(Restriction restriction, String value) {
+    private Optional<WebElement> findProcess(Restriction restriction, String value) {
         if (restriction == Restriction.NAME) {
-            return processes.stream().filter(p -> value.equals(p.getTitle())).findFirst();
+            return processes.stream().filter(p -> value.equals(getProcessTitle(p))).findFirst();
         }
-        return processes.stream().filter(p -> isElementPresent(By.id(value), p.getRoot())).findFirst();
+        return processes.stream().filter(p -> isElementPresent(By.id(value), p)).findFirst();
+    }
+
+    private String getProcessTitle(WebElement process) {
+        return process.findElement(By.className("ait-process-title")).getText();
     }
 
     private enum Restriction {

@@ -17,7 +17,7 @@ import java.util.Optional;
 import org.apache.commons.lang.WordUtils;
 import org.testng.annotations.BeforeClass;
 
-import com.gooddata.qa.graphene.AbstractMSFTest;
+import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
@@ -26,7 +26,7 @@ import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 import com.google.common.collect.Lists;
 
-public class AbstractCsvUploaderTest extends AbstractMSFTest {
+public class AbstractCsvUploaderTest extends AbstractProjectTest {
 
     protected static final String DATASET_DETAIL_PAGE_NAME = "dataset-detail";
     protected static final String AD_REPORT_LINK = "https://%s/analyze/#/%s/reportId/edit?dataset=%s";

@@ -15,25 +15,26 @@ import org.testng.annotations.Test;
 
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
-import com.gooddata.qa.graphene.AbstractDiscTest;
+import com.gooddata.qa.graphene.common.AbstractProcessTest;
 import com.gooddata.qa.graphene.entity.disc.Parameters;
 import com.gooddata.qa.graphene.enums.disc.schedule.Executable;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleCronTime;
-import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail.Tab;
-import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CronEditor;
+import com.gooddata.qa.graphene.fragments.disc.process.AbstractProcessDetail.Tab;
+import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
+import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 
-public class CreateScheduleTest extends AbstractDiscTest {
+public class CreateScheduleTest extends AbstractProcessTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void createSchedule() {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            ((CreateScheduleForm) initDiscProjectDetailPage()
+            initDiscProjectDetailPage()
                     .openCreateScheduleForm()
-                    .selectExecutable(Executable.SUCCESSFUL_GRAPH))
+                    .selectExecutable(Executable.SUCCESSFUL_GRAPH)
                     .schedule();
 
             ScheduleDetail.getInstance(browser).close();
@@ -101,9 +102,9 @@ public class CreateScheduleTest extends AbstractDiscTest {
         try {
             String scheduleName = "Schedule-" + generateHashString();
 
-            initDiscProjectDetailPage()
+            ((ProcessDetail) initDiscProjectDetailPage()
                     .getProcess(process.getName())
-                    .openTab(Tab.EXECUTABLE)
+                    .openTab(Tab.EXECUTABLE))
                     .clickScheduleLinkFrom(Executable.SUCCESSFUL_GRAPH)
                     .enterScheduleName(scheduleName)
                     .schedule();
