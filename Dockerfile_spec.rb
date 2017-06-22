@@ -12,7 +12,7 @@ describe "Dockerfile" do
     expect(file('/etc/redhat-release')).to contain("CentOS")
   end
 
-  packages = ['xorg-x11-server-Xvfb', 'xorg-x11-xinit', 'tigervnc-server',
+  packages = ['xorg-x11-server-Xvfb', 'xorg-x11-xinit',
               'chromedriver-2.22-1*', 'chromium-52.0.2743.0-1*',
               'firefox-45.0.2-1', 'dejavu-sans-fonts', 'dejavu-sans-mono-fonts',
               'dejavu-serif-fonts', 'phantomjs', 'maven-bin']

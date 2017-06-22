@@ -27,17 +27,16 @@ public class SimpleMenu extends AbstractFragment {
     protected List<WebElement> items;
 
     public static SimpleMenu getInstance(SearchContext searchContext) {
-        return Graphene.createPageFragment(SimpleMenu.class, waitForElementVisible(LOCATOR, searchContext));
+        return Graphene.createPageFragment(SimpleMenu.class, waitForElementVisible(LOCATOR, searchContext))
+                .waitItemsLoaded();
     }
 
     public int getItemsCount() {
-        waitForAllItemsVisible();
         return items.size();
     }
 
     public boolean contains(String label) {
         assertTrue(StringUtils.isNotBlank(label));
-        waitForAllItemsVisible();
 
         for (WebElement e : items) {
             if (label.equals(e.findElement(BY_LINK).getText().trim()))
@@ -53,7 +52,6 @@ public class SimpleMenu extends AbstractFragment {
     }
 
     public void select(Predicate<WebElement> filter) {
-        waitForAllItemsVisible();
         items.stream()
             .filter(filter)
             .map(e -> e.findElement(BY_LINK))
@@ -64,7 +62,6 @@ public class SimpleMenu extends AbstractFragment {
 
     public void openSubMenu(String label) {
         assertTrue(StringUtils.isNotBlank(label));
-        waitForAllItemsVisible();
         WebElement menu = items.stream()
             .filter(e -> label.equals(e.findElement(BY_LINK).getText().trim()))
             .findFirst()
@@ -73,8 +70,8 @@ public class SimpleMenu extends AbstractFragment {
         new Actions(browser).moveToElement(menu).perform();
     }
 
-    protected void waitForAllItemsVisible() {
-        waitForElementVisible(this.getRoot());
+    private SimpleMenu waitItemsLoaded() {
         waitForCollectionIsNotEmpty(items);
+        return this;
     }
 }

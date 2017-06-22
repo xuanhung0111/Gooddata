@@ -34,34 +34,38 @@ public class EmailSchedulePage extends AbstractFragment {
 
     private static final By BY_SCHEDULE_AUTHOR = By.cssSelector(".author a");
     private static final By BY_SCHEDULE_BCC_EMAILS = By.cssSelector(".bcc span");
-    private static final By BY_SCHEDULE_CONTROLS = By.cssSelector(".controls span");
+    private static final By BY_SCHEDULE_CONTROLS = By.cssSelector(".scheduleControls button");
     private static final By BY_PARENT_TR_TAG = By.xpath("ancestor::tr[1]");
-    private static final By BY_PRIVATE_SCHEDULES_TABLE_HIDDEN = By.cssSelector(".dashCreated.hidden");
+    private static final By BY_PRIVATE_SCHEDULES_TABLE_HIDDEN = By.cssSelector(".privateSchedules.hidden");
     private static final By BY_SCHEDULE_EMAIL_TITLES = By.cssSelector(".s-dataPage-listRow .title span");
 
     private static final String SCHEDULE_SELECTOR = "tbody td.title.s-title-%s";
     private static final String SCHEDULE_ANCHOR_SELECTOR = SCHEDULE_SELECTOR + " a";
-    private static final String CONTROL_SELECTOR = SCHEDULE_SELECTOR + " ~ .controls";
+    private static final String CONTROL_SELECTOR = SCHEDULE_SELECTOR + " ~ .scheduleControls";
     private static final String DELETE_SELECTOR = CONTROL_SELECTOR + " .s-btn-delete";
     private static final String DUPLICATE_SELECTOR = CONTROL_SELECTOR + " .s-btn-duplicate";
+    private static final String AUTOCOMPLETE_SELECTOR = ".emailScheduleForm-ac-item.s-%s";
 
     @FindBy(css = ".s-btn-schedule_new_email")
     private WebElement addScheduleButton;
 
-    @FindBy(css = ".noSchedulesMsg")
+    @FindBy(css = ".globalNoSchedulesMsg")
     private WebElement noSchedulesMessage;
 
-    @FindBy(css = ".listView>.listTable")
+    @FindBy(css = ".globalSchedulesTable")
     private WebElement globalSchedulesTable;
 
-    @FindBy(css = ".listView .dashCreated .listTable")
+    @FindBy(css = ".privateSchedulesTable")
     private WebElement privateSchedulesTable;
 
-    @FindBy(css = ".detailView")
+    @FindBy(css = ".emailScheduleForm")
     private WebElement scheduleDetail;
 
-    @FindBy(name = "emailAddresses")
+    @FindBy(css = ".selectize-input input")
     private WebElement emailToInput;
+
+    @FindBy(css = "select.emailScheduleForm-emails")
+    private WebElement emailToSelect;
 
     @FindBy(name = "emailSubject")
     private WebElement emailSubjectInput;
@@ -129,10 +133,6 @@ public class EmailSchedulePage extends AbstractFragment {
         return this;
     }
 
-    public String getToFromInput() {
-        return waitForElementVisible(emailToInput).getAttribute("value");
-    }
-
     public String getTimeDescription() {
         return timeDescription.getText();
     }
@@ -188,7 +188,7 @@ public class EmailSchedulePage extends AbstractFragment {
 
     public String getSubscribed(String scheduleName) {
         openSchedule(scheduleName);
-        return waitForElementVisible(emailToInput).getAttribute("value");
+        return waitForElementVisible(emailToSelect).getAttribute("value");
     }
 
     public String getUnsubscribed(String scheduleName) {
@@ -210,11 +210,28 @@ public class EmailSchedulePage extends AbstractFragment {
         return this;
     }
 
-    public EmailSchedulePage scheduleNewDahboardEmail(String emailTo, String emailSubject, String emailBody,
+    public void fillToField(String emailTo) {
+        searchEmail(emailTo);
+        selectEmail(emailTo);
+    }
+
+    private void searchEmail(String emailTo) {
+        waitForElementVisible(emailToInput).clear();
+        emailToInput.sendKeys(emailTo);
+        // there can be async call on the background after you search which fills the autocompletion.
+        sleepTightInSeconds(2);
+    }
+
+    private void selectEmail(String emailTo) {
+        WebElement acItem = waitForElementVisible(By.cssSelector(format(AUTOCOMPLETE_SELECTOR, simplifyText(emailTo))), browser);
+        acItem.click();
+    }
+
+    public EmailSchedulePage scheduleNewDashboardEmail(String emailTo, String emailSubject, String emailBody,
             String dashboardName) {
         Graphene.guardAjax(waitForElementVisible(addScheduleButton)).click();
         waitForElementVisible(scheduleDetail);
-        waitForElementVisible(emailToInput).sendKeys(emailTo);
+        fillToField(emailTo);
         emailSubjectInput.sendKeys(emailSubject);
         emailMessageInput.sendKeys(emailBody);
         waitForElementVisible(dashboardsSelector);
@@ -236,7 +253,7 @@ public class EmailSchedulePage extends AbstractFragment {
             ExportFormat format, RepeatTime repeatTime) {
         Graphene.guardAjax(waitForElementVisible(addScheduleButton)).click();
         waitForElementVisible(scheduleDetail);
-        waitForElementVisible(emailToInput).sendKeys(emailTo);
+        fillToField(emailTo);
         emailSubjectInput.sendKeys(emailSubject);
         emailMessageInput.sendKeys(emailBody);
         waitForElementVisible(reportsSelector).click();

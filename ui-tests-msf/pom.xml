@@ -11,9 +11,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>ui-msf-core</module>
         <module>ui-tests-disc</module>
-        <module>ui-tests-dlui</module>
         <module>ui-tests-csv-uploader</module>
         <module>ui-tests-add</module>
     </modules>

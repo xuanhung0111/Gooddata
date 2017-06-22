@@ -10,7 +10,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.getBubbleMessage;
 import org.testng.annotations.Test;
 
 import com.gooddata.dataload.processes.DataloadProcess;
-import com.gooddata.qa.graphene.AbstractDiscTest;
+import com.gooddata.qa.graphene.common.AbstractProcessTest;
 import com.gooddata.qa.graphene.entity.disc.NotificationRule;
 import com.gooddata.qa.graphene.enums.disc.notification.VariableList;
 import com.gooddata.qa.graphene.fragments.disc.notification.NotificationRuleItem;
@@ -18,7 +18,7 @@ import com.gooddata.qa.graphene.fragments.disc.notification.NotificationRuleItem
 import com.gooddata.qa.graphene.fragments.disc.notification.NotificationRulesDialog;
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
 
-public class NotificationsTest extends AbstractDiscTest {
+public class NotificationsTest extends AbstractProcessTest {
 
     private static final String INVALID_EMAIL_MESSAGE = "Email address is invalid. Please insert an email address "
             + "in this format: email@domain.com. You may insert only one recipient per notification rule.";

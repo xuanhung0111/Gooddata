@@ -1,1 +1,0 @@
-ALTER ATTRIBUTE {attr.artist.artistid} DROP KEYS {f_track.artist_id};SYNCHRONIZE {dataset.track} PRESERVE DATA;

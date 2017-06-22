@@ -4,14 +4,12 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
@@ -25,7 +23,6 @@ import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.Das
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.GroupConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
-import com.google.common.base.Predicate;
 
 public class DashboardEditBar extends AbstractFragment {
 
@@ -286,12 +283,7 @@ public class DashboardEditBar extends AbstractFragment {
     }
 
     private SimpleMenu openFilterMenu() {
-        Predicate<WebDriver> menuOpened = browser -> {
-            waitForElementVisible(addFilterMenu).click();
-            return isElementVisible(SimpleMenu.LOCATOR, browser);
-        };
-
-        Graphene.waitGui().until(menuOpened);
+        waitForElementVisible(addFilterMenu).click();
         return SimpleMenu.getInstance(browser);
     }
 }

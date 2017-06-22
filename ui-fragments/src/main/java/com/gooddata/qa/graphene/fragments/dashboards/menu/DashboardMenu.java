@@ -30,8 +30,6 @@ public class DashboardMenu extends SimpleMenu {
     }
 
     public Collection<String> getAllItemNames() {
-        waitForAllItemsVisible();
-
         return items.stream()
             .skip(1)
             .map(e -> e.findElement(BY_DASHBOARD_SELECTOR_TITLE))
@@ -52,8 +50,6 @@ public class DashboardMenu extends SimpleMenu {
     }
 
     private void selectDashboardByPredicate(final Predicate<WebElement> predicate) {
-        waitForAllItemsVisible();
-
         items.stream()
             .filter(predicate)
             .findFirst()

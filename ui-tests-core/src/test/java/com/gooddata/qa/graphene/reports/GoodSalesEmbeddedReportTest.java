@@ -15,6 +15,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.io.IOException;
 import java.util.List;
@@ -447,6 +448,11 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
     private EmbeddedReportContainer initEmbeddedReportWithUri(String embedUri) {
         browser.get(embedUri);
+
+        //the previous page is using the same widget so should sleep in two seconds before getting widget
+        //otherwise, it could get the old widget
+        sleepTightInSeconds(2);
+
         return Graphene.createPageFragment(EmbeddedReportContainer.class,
                 waitForElementVisible(EmbeddedReportContainer.LOCATOR, browser));
     }

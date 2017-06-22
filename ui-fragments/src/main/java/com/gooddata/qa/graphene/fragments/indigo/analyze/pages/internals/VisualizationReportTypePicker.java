@@ -18,7 +18,7 @@ public class VisualizationReportTypePicker extends AbstractFragment {
         if (isSelected(type))
             return;
 
-        waitForElementVisible(type.getLocator(), browser).findElement(By.tagName("button")).click();
+        waitForElementVisible(type.getLocator(), browser).click();
 
         Predicate<WebDriver> visualizationIsSelected = browser -> isSelected(type);
         Graphene.waitGui().until(visualizationIsSelected);

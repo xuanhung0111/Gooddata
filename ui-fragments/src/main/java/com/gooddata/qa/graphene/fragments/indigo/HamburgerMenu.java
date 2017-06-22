@@ -69,6 +69,9 @@ public class HamburgerMenu extends AbstractFragment {
             case "Manage":
                 waitForDataPageLoaded(browser);
                 return;
+            case "Load":
+                waitForElementVisible(By.className("s-datasets-list"), browser);
+                return;
         }
     }
 }

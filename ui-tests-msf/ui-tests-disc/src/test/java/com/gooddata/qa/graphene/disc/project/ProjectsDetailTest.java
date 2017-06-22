@@ -29,19 +29,19 @@ import com.gooddata.GoodDataException;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
-import com.gooddata.qa.graphene.AbstractDiscTest;
+import com.gooddata.qa.graphene.common.AbstractProcessTest;
 import com.gooddata.qa.graphene.enums.disc.schedule.Executable;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleCronTime;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
+import com.gooddata.qa.graphene.fragments.disc.process.AbstractProcessDetail.Tab;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
 import com.gooddata.qa.graphene.fragments.disc.ConfirmationDialog;
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
-import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail.Tab;
 import com.gooddata.qa.graphene.fragments.disc.projects.ProjectDetailPage;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 
-public class ProjectsDetailTest extends AbstractDiscTest {
+public class ProjectsDetailTest extends AbstractProcessTest {
 
     private static final String EMPTY_STATE_TITLE = "You don’t have any deployed data loading processes.";
     private static final String EMPTY_STATE_MESSAGE = "How to deploy a process? Read Preparing a Data Loading Process article";
@@ -73,9 +73,8 @@ public class ProjectsDetailTest extends AbstractDiscTest {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
-            ProcessDetail processDetail = initDiscProjectDetailPage()
-                    .getProcess(process.getName())
-                    .openTab(Tab.SCHEDULE);
+            ProcessDetail processDetail = initDiscProjectDetailPage().getProcess(process.getName());
+            processDetail.openTab(Tab.SCHEDULE);
             assertTrue(processDetail.isTabActive(Tab.SCHEDULE), "Tab is not active");
             assertTrue(processDetail.hasNoSchedule(), "Clean process should have no schedule");
 
@@ -176,9 +175,8 @@ public class ProjectsDetailTest extends AbstractDiscTest {
         try {
             createSchedule(process, Executable.SUCCESSFUL_GRAPH, ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
-            ProcessDetail processDetail = initDiscProjectDetailPage()
-                    .getProcess(process.getName())
-                    .openTab(Tab.EXECUTABLE);
+            ProcessDetail processDetail = initDiscProjectDetailPage().getProcess(process.getName());
+            processDetail.openTab(Tab.EXECUTABLE);
 
             assertEquals(processDetail.getScheduleInfoFrom(Executable.SUCCESSFUL_GRAPH), "Scheduled 1 time");
             assertEquals(processDetail.getScheduleInfoFrom(Executable.ERROR_GRAPH), NO_SCHEDULE);
@@ -198,21 +196,19 @@ public class ProjectsDetailTest extends AbstractDiscTest {
             Schedule schedule = createSchedule(process, Executable.SUCCESSFUL_GRAPH,
                     parseTimeToCronExpression(LocalTime.now().minusMinutes(2)));
 
-            ProcessDetail processDetail = initDiscProjectDetailPage()
-                    .getProcess(process.getName())
-                    .openTab(Tab.SCHEDULE);
+            ProcessDetail processDetail = initDiscProjectDetailPage().getProcess(process.getName());
+            processDetail.openTab(Tab.SCHEDULE);
             assertEquals(processDetail.getScheduleStatus(schedule.getName()), ScheduleStatus.UNSCHEDULED);
 
-            ScheduleDetail scheduleDetail = processDetail.openSchedule(schedule.getName())
-                    .executeSchedule()
-                    .waitForStatus(ScheduleStatus.RUNNING);
+            ScheduleDetail scheduleDetail = processDetail.openSchedule(schedule.getName()).executeSchedule();
+            scheduleDetail.waitForStatus(ScheduleStatus.RUNNING);
             assertEquals(processDetail.getScheduleStatus(schedule.getName()), ScheduleStatus.RUNNING);
 
             scheduleDetail.waitForExecutionFinish();
             assertEquals(processDetail.getScheduleStatus(schedule.getName()), ScheduleStatus.OK);
 
-            ((ScheduleDetail) scheduleDetail.selectExecutable(Executable.ERROR_GRAPH))
-                    .saveChanges().executeSchedule().waitForExecutionFinish();
+            scheduleDetail.selectExecutable(Executable.ERROR_GRAPH).saveChanges();
+            scheduleDetail.executeSchedule().waitForExecutionFinish();
             assertEquals(processDetail.getScheduleStatus(Executable.ERROR_GRAPH.getName()),
                     ScheduleStatus.ERROR);
 

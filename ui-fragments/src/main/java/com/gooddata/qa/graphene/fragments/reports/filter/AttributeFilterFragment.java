@@ -1,15 +1,16 @@
 package com.gooddata.qa.graphene.fragments.reports.filter;
 
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -18,6 +19,7 @@ import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.filter.FloatingTime;
 import com.gooddata.qa.graphene.entity.filter.FloatingTime.Time;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
+import com.gooddata.qa.graphene.utils.WaitUtils;
 
 public class AttributeFilterFragment extends AbstractFilterFragment {
 
@@ -70,10 +72,15 @@ public class AttributeFilterFragment extends AbstractFilterFragment {
     }
 
     public AttributeFilterFragment searchAndSelectAttribute(String attribute) {
-        if(!isElementPresent(SelectItemPopupPanel.LOCATOR, browser)){
+        try {
+            // check if the SelectItemPopupPanel displayed automatically when opening Filter Dialog
+            // if yes, do nothing
+            // if no, open it
+            int timeoutInSeconds = 2;
+            waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser, timeoutInSeconds);
+        } catch (TimeoutException e) {
             waitForElementVisible(selectButton).click();
         }
-
         searchAndSelectItem(attribute);
         return this;
     }

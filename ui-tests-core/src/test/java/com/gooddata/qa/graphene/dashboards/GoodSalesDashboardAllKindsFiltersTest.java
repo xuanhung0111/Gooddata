@@ -257,7 +257,6 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             dashboardsPage.editDashboard();
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
             assertTrue(isEqualCollection(report.getAllFilterNames(), asList("FQuarter/Year", "FStageName")));
-            assertTrue(report.areAllFiltersDisabled());
             dashboardsPage.saveDashboard();
             assertTrue(isEqualCollection(report.openReportInfoViewPanel().getAllFilterNames(),
                     asList("FQuarter/Year", "FStageName")));

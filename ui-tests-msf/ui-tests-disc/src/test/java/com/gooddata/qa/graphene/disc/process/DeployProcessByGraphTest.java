@@ -12,13 +12,13 @@ import java.io.RandomAccessFile;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.AbstractDiscTest;
+import com.gooddata.qa.graphene.common.AbstractProcessTest;
 import com.gooddata.qa.graphene.fragments.disc.ConfirmationDialog;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 
-public class DeployProcessByGraphTest extends AbstractDiscTest {
+public class DeployProcessByGraphTest extends AbstractProcessTest {
 
     private static final String ZIP_FILE_INPUT_ERROR_MESSAGE = "Select a ZIP file that is smaller than 5 MB.";
     private static final String FAILED_DEPLOY_MESSAGE = "Failed to (re-)?deploy .*\\. Reasons?: Process contains no executables.";

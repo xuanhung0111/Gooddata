@@ -29,7 +29,7 @@ public enum ReportType {
     }
 
     public By getLocator() {
-        return By.cssSelector(".vis-type-" + label);
+        return By.cssSelector(".gd-vis-type-" + label);
     }
 
     public String getMetricMessage() {
