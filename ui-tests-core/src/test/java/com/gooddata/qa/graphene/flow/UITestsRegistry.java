@@ -4,30 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.gooddata.qa.graphene.aqe.ValidElementsResourceTest;
-import com.gooddata.qa.graphene.dashboards.DashboardPermissionsTest;
+import com.gooddata.qa.graphene.dashboards.*;
 import com.gooddata.qa.graphene.account.GoodSalesMufOnUserProfileTest;
 import com.gooddata.qa.graphene.account.InviteUserInOtherDomainsTest;
 import com.gooddata.qa.graphene.account.ManageUserTest;
 import com.gooddata.qa.graphene.account.UserAccountSettingTest;
 import com.gooddata.qa.graphene.account.UserProfileInformationTest;
-import com.gooddata.qa.graphene.dashboards.DashboardSavedFiltersTest;
-import com.gooddata.qa.graphene.dashboards.GoodSalesCascadingFilterTest;
-import com.gooddata.qa.graphene.dashboards.GoodSalesCellLimitTest;
-import com.gooddata.qa.graphene.dashboards.GoodSalesConnectingFilterTest;
-import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardAllKindsFiltersTest;
-import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardTest;
-import com.gooddata.qa.graphene.dashboards.GoodSalesEditEmbeddedDashboardTest;
-import com.gooddata.qa.graphene.dashboards.GoodSalesEmbeddedDashboardTest;
-import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardWidgetManipulationTest;
-import com.gooddata.qa.graphene.dashboards.GoodSalesDefaultFilterMiscTest;
-import com.gooddata.qa.graphene.dashboards.GoodSalesFilterDropdownAttributeValueTest;
-import com.gooddata.qa.graphene.dashboards.GoodSalesFilterGroupTest;
-import com.gooddata.qa.graphene.dashboards.GoodSalesAdvancedConnectingFilterTest;
-import com.gooddata.qa.graphene.dashboards.GoodSalesHideDateRangeSelectionTest;
-import com.gooddata.qa.graphene.dashboards.GoodSalesKeyMetricTest;
-import com.gooddata.qa.graphene.dashboards.GoodSalesPersonalObjectsInDashboardWidgetTest;
-import com.gooddata.qa.graphene.dashboards.GoodSalesReportWidgetOnDashboardTest;
-import com.gooddata.qa.graphene.dashboards.GoodSalesSavedViewWithAllValuesTest;
 import com.gooddata.qa.graphene.filters.DashboardFilterVisualTest;
 import com.gooddata.qa.graphene.i18n.LocalizationTest;
 import com.gooddata.qa.graphene.manage.AttributeLabelsTest;
@@ -180,6 +162,7 @@ public class UITestsRegistry {
                     GoodSalesEditEmbeddedDashboardTest.class,
                     GoodSalesDefaultFilterMiscTest.class,
                     GoodSalesSavedViewWithAllValuesTest.class,
+                    GoodSalesDashboardRestrictedFacts.class,
                     GoodSalesHideDateRangeSelectionTest.class,
                     "testng-dashboard-default-filter-multiple-choice.xml",
                     "testng-dashboard-default-filter-single-choice.xml",
