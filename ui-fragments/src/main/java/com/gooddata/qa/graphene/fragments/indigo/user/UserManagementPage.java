@@ -187,12 +187,14 @@ public class UserManagementPage extends AbstractFragment {
     public UserManagementPage deactivateUsers(String... emails) {
         selectUsers(emails);
         waitForElementVisible(deactivateUserButton).click();
+        waitForProgressMessageDisappear();
         return this;
     }
 
     public UserManagementPage activateUsers(String... emails) {
         selectUsers(emails);
         waitForElementVisible(activateUserButton).click();
+        waitForProgressMessageDisappear();
         return this;
     }
 
@@ -326,6 +328,7 @@ public class UserManagementPage extends AbstractFragment {
         selectUserGroup(group, isSelect);
         waitForElementVisible(changeGroupApplyButton).click();
         waitForElementVisible(BY_MESSAGE_TEXT, browser);
+        waitForProgressMessageDisappear();
         return this;
     }
 
@@ -344,5 +347,11 @@ public class UserManagementPage extends AbstractFragment {
         if (groupNameCheckBox.isSelected() ^ isSelect) {
             groupNameCheckBox.click();
         }
+    }
+
+    private void waitForProgressMessageDisappear() {
+        Predicate<WebDriver> inProgressFinished = browser -> !(this.getMessageText().contains("changing")
+                || this.getMessageText().contains("are being"));
+        Graphene.waitGui(browser).until(inProgressFinished);
     }
 }
