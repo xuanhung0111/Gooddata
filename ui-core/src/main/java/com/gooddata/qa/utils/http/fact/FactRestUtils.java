@@ -4,6 +4,10 @@ import com.gooddata.project.Project;
 import com.gooddata.qa.utils.http.RestApiClient;
 import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
 import static java.lang.String.format;
+
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.springframework.http.HttpStatus;
 
 /**
@@ -48,16 +52,8 @@ public class FactRestUtils {
     }
 
     private static String quoteUris (String... uris) {
-        String result = "";
-        for (int i = 0; i < uris.length; i++) {
-            String uri = format(QUOTE_TEMPLATE, uris[i]);
-            if( result.isEmpty() ) {
-                result = uri;
-            }
-            else {
-                result += "," + uri;
-            }
-        }
-        return result;
+        return Stream.of(uris)
+            .map(uri -> String.format(QUOTE_TEMPLATE, uri))
+            .collect(Collectors.joining(","));
     }
 }
