@@ -51,7 +51,6 @@ public class GoodSalesDashboardRestrictedFacts extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"setupPrecondition"}, groups = {"restricted-fact"})
     public void exportRestrictedReport() {
         ReportPage my_report = initReportsPage()
-                .openFolder("My Reports")
                 .openReport(REPORT_NAME);
 
         // export to pdf
@@ -72,7 +71,6 @@ public class GoodSalesDashboardRestrictedFacts extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"unsetRestrictedFact"}, groups = {"unrestricted-fact"})
     public void exportReport() {
         ReportPage my_report = initReportsPage()
-                .openFolder("My Reports")
                 .openReport(REPORT_NAME);
 
         // export to csv
