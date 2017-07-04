@@ -7,7 +7,6 @@ import static org.apache.commons.lang.Validate.notEmpty;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
-import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -47,11 +46,6 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
         coupaInstanceApiKey = testParams.loadProperty("connectors.coupa.instance.apiKey");
 
         connectorType = Connectors.COUPA;
-        expectedDashboardsAndTabs = new HashMap<>();
-        expectedDashboardsAndTabs.put("Coupa Spend Optimizer", new String[]{
-                "KPIs", "Requisitions", "Approvals", "Purchase Orders", "Suppliers", "Invoices", "Commodities",
-                "Contracts", "Expenses", "Budgets", "All Spend"
-        });
 
         projectCreateCheckIterations = 120;
         integrationProcessCheckLimit = 720;
