@@ -56,9 +56,6 @@ public class KpiAlertEvaluateTest extends AbstractDashboardTest {
     @Override
     protected void addUsersWithOtherRolesToProject() throws ParseException, IOException, JSONException {
         addUserToProject(imapUser, UserRoles.ADMIN);
-
-        logout();
-        signInAtGreyPages(imapUser, imapPassword);
     }
 
     @Override
@@ -67,6 +64,9 @@ public class KpiAlertEvaluateTest extends AbstractDashboardTest {
 
         factUri = getMdService().getObjUri(getProject(), Fact.class, title("Fact"));
         dateDatasetUri = getMdService().getObjUri(getProject(), Dataset.class, identifier(KPI_DATE_DIMENSION));
+
+        logout();
+        signInAtGreyPages(imapUser, imapPassword);
     }
 
     @BeforeClass(alwaysRun = true)
