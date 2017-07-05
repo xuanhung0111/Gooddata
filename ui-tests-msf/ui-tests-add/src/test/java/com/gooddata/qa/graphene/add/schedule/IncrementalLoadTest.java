@@ -30,7 +30,7 @@ import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.enums.process.Parameter;
 import com.gooddata.qa.graphene.fragments.disc.schedule.add.DataloadScheduleDetail;
 import com.gooddata.qa.graphene.fragments.disc.schedule.add.DatasetDropdown;
-import com.gooddata.qa.graphene.fragments.disc.schedule.add.ExecuteADDConfirmDialog.LoadMode;
+import com.gooddata.qa.graphene.fragments.disc.schedule.add.RunOneOffDialog.LoadMode;
 
 public class IncrementalLoadTest extends AbstractDataloadProcessTest {
 

@@ -43,8 +43,12 @@ public class DatasetDropdown extends AbstractDropDown {
     @Override
     protected WebElement getElementByName(String name) {
         return getElements().stream()
-                .filter(e -> name.equals(e.findElement(By.className("dataset-title")).getText()))
+                .filter(e -> name.equals(getDatasetTitle(e)))
                 .findFirst().get();
+    }
+
+    public String getButtonText() {
+        return getRoot().getText();
     }
 
     public DatasetDropdown expand() {
@@ -104,7 +108,7 @@ public class DatasetDropdown extends AbstractDropDown {
     public Collection<String> getSelectedDatasets() {
         return getElements().stream()
                 .filter(e -> e.getAttribute("class").contains("is-selected"))
-                .map(WebElement::getText)
+                .map(this::getDatasetTitle)
                 .collect(toList());
     }
 
@@ -126,5 +130,9 @@ public class DatasetDropdown extends AbstractDropDown {
 
     private By getCancelButtonLocator() {
         return By.className("s-btn-cancel");
+    }
+
+    private String getDatasetTitle(WebElement dataset) {
+        return dataset.findElement(By.className("dataset-title")).getText();
     }
 }

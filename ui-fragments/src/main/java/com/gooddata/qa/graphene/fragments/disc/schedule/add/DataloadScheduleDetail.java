@@ -11,7 +11,8 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.fragments.disc.schedule.add.ExecuteADDConfirmDialog.LoadMode;
+import com.gooddata.qa.graphene.entity.add.SyncDatasets;
+import com.gooddata.qa.graphene.fragments.disc.schedule.add.RunOneOffDialog.LoadMode;
 import com.gooddata.qa.graphene.fragments.disc.schedule.common.AbstractScheduleDetail;
 import com.google.common.base.Predicate;
 
@@ -24,8 +25,41 @@ public class DataloadScheduleDetail extends AbstractScheduleDetail {
         return getInstance(searchContext, DataloadScheduleDetail.class);
     }
 
+    public RunOneOffDialog triggerRunOneOffDialog() {
+        waitForElementVisible(runButton).click();
+        return RunOneOffDialog.getInstance(browser);
+    }
+
+    public DataloadScheduleDetail executeSchedule(LoadMode mode, SyncDatasets syncDatasets) {
+        int executionItems = executionHistoryItems.size();
+
+        RunOneOffDialog dialog = triggerRunOneOffDialog();
+        if (nonNull(mode)) {
+            dialog.setMode(mode);
+        }
+        if (nonNull(syncDatasets)) {
+            DatasetDropdown dropdown = dialog.getDatasetDropdown().expand();
+            if (nonNull(syncDatasets.getDatasets())) {
+                dropdown.selectDatasets(syncDatasets.getDatasets());
+            } else {
+                dropdown.selectAllDatasets();
+            }
+            dropdown.submit();
+
+        }
+        dialog.confirm();
+
+        Predicate<WebDriver> scheduleExecuted = browser -> executionHistoryItems.size() == executionItems + 1;
+        Graphene.waitGui().until(scheduleExecuted);
+        return this;
+    }
+
+    public DataloadScheduleDetail executeSchedule(LoadMode mode) {
+        return executeSchedule(mode, null);
+    }
+
     public DataloadScheduleDetail executeSchedule() {
-        return executeSchedule(null);
+        return executeSchedule(null, null);
     }
 
     public DataloadScheduleDetail selectCustomDatasetsOption() {
@@ -47,21 +81,5 @@ public class DataloadScheduleDetail extends AbstractScheduleDetail {
 
     public Collection<String> getSelectedDatasets() {
         return waitForFragmentVisible(datasetUploadSection).getSelectedDatasets();
-    }
-
-    private DataloadScheduleDetail executeSchedule(LoadMode mode) {
-        int executionItems = executionHistoryItems.size();
-
-        waitForElementVisible(runButton).click();
-
-        ExecuteADDConfirmDialog dialog = ExecuteADDConfirmDialog.getInstance(browser);
-        if (nonNull(mode)) {
-            dialog.setMode(mode);
-        }
-        dialog.confirm();
-
-        Predicate<WebDriver> scheduleExecuted = browser -> executionHistoryItems.size() == executionItems + 1;
-        Graphene.waitGui().until(scheduleExecuted);
-        return this;
     }
 }
