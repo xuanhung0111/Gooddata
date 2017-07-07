@@ -15,6 +15,7 @@ import static org.testng.Assert.fail;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -106,6 +107,9 @@ public class EmailSchedulePage extends AbstractFragment {
     @FindBy(css = ".dashboards .picker .selected label")
     private List<WebElement> attachedDashboards;
 
+    @FindBy(css = ".emailScheduleForm-atom")
+    private List<WebElement> emailScheduleItems;
+
     @FindBy(css = ".pickers > :not([style*='display: none']) input.gdc-input")
     private WebElement searchInput;
 
@@ -125,6 +129,17 @@ public class EmailSchedulePage extends AbstractFragment {
 
     public String getMessageFromInput() {
         return waitForElementVisible(emailMessageInput).getAttribute("value");
+    }
+
+    public EmailSchedulePage openNewSchedule() {
+        waitForElementVisible(addScheduleButton).click();
+        waitForElementVisible(scheduleDetail);
+        return this;
+    }
+
+    public List<String> getEmailToListItem() {
+        waitForElementVisible(emailToInput);
+        return emailScheduleItems.stream().map(emailItem -> emailItem.getText()).collect(Collectors.toList());
     }
 
     public EmailSchedulePage setMessage(String message) {
@@ -229,8 +244,7 @@ public class EmailSchedulePage extends AbstractFragment {
 
     public EmailSchedulePage scheduleNewDashboardEmail(String emailTo, String emailSubject, String emailBody,
             String dashboardName) {
-        Graphene.guardAjax(waitForElementVisible(addScheduleButton)).click();
-        waitForElementVisible(scheduleDetail);
+        openNewSchedule();
         fillToField(emailTo);
         emailSubjectInput.sendKeys(emailSubject);
         emailMessageInput.sendKeys(emailBody);
@@ -251,8 +265,7 @@ public class EmailSchedulePage extends AbstractFragment {
 
     public void scheduleNewReportEmail(String emailTo, String emailSubject, String emailBody, String reportName,
             ExportFormat format, RepeatTime repeatTime) {
-        Graphene.guardAjax(waitForElementVisible(addScheduleButton)).click();
-        waitForElementVisible(scheduleDetail);
+        openNewSchedule();
         fillToField(emailTo);
         emailSubjectInput.sendKeys(emailSubject);
         emailMessageInput.sendKeys(emailBody);
