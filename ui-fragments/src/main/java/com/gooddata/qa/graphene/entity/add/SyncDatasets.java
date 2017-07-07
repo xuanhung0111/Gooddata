@@ -26,6 +26,10 @@ public class SyncDatasets {
         return new SyncDatasets(datasets);
     }
 
+    public String[] getDatasets() {
+        return datasets;
+    }
+
     public Pair<String, String> getParameter() {
         if (isNull(datasets)) return Pair.of("GDC_DE_SYNCHRONIZE_ALL", "true");
 

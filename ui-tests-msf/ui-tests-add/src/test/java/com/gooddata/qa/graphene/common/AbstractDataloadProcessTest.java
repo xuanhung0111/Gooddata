@@ -26,7 +26,7 @@ import com.gooddata.qa.graphene.entity.disc.Parameters;
 import com.gooddata.qa.graphene.enums.process.Parameter;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
 import com.gooddata.qa.graphene.fragments.disc.schedule.add.DataloadScheduleDetail;
-import com.gooddata.qa.graphene.fragments.disc.schedule.add.ExecuteADDConfirmDialog.LoadMode;
+import com.gooddata.qa.graphene.fragments.disc.schedule.add.RunOneOffDialog.LoadMode;
 import com.gooddata.warehouse.Warehouse;
 
 public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
