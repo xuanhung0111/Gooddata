@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.disc.schedule;
 
-import static com.gooddata.qa.utils.http.process.ProcessRestUtils.deteleProcess;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
@@ -91,7 +90,7 @@ public class ScheduleDetailTest extends AbstractProcessTest {
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(), "MANUALLY STOPPED");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -120,7 +119,7 @@ public class ScheduleDetailTest extends AbstractProcessTest {
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(), ScheduleStatus.OK.toString());
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -135,7 +134,7 @@ public class ScheduleDetailTest extends AbstractProcessTest {
                     "No history available. This schedule has not been run yet.");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -155,7 +154,7 @@ public class ScheduleDetailTest extends AbstractProcessTest {
             assertEquals(item.getStatusDescription(), "OK 3×");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -171,7 +170,7 @@ public class ScheduleDetailTest extends AbstractProcessTest {
             assertEquals(cronEditor.getEmptyTriggeringScheduleMessage(), SCHEDULE_IN_LOOP_MESSAGE);
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -189,7 +188,7 @@ public class ScheduleDetailTest extends AbstractProcessTest {
             assertEquals(cronEditor.getEmptyTriggeringScheduleMessage(), SCHEDULE_IN_LOOP_MESSAGE);
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -212,7 +211,7 @@ public class ScheduleDetailTest extends AbstractProcessTest {
             assertEquals(scheduleDetail.getCronEditor().getCronExpression(), "0 * * * *");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -230,7 +229,7 @@ public class ScheduleDetailTest extends AbstractProcessTest {
             assertNotNull(getResource(getRestApiClient(), scheduleDetail.getLastExecutionLogUri(), HttpStatus.OK));
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -257,7 +256,7 @@ public class ScheduleDetailTest extends AbstractProcessTest {
             assertEquals(scheduleDetail.getEffectiveUser(), otherUser);
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
             logoutAndLoginAs(true, UserRoles.ADMIN);
         }
     }
@@ -287,7 +286,7 @@ public class ScheduleDetailTest extends AbstractProcessTest {
             assertThat(executionTimelineTooltip, containsString("Failed execution"));
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -310,7 +309,7 @@ public class ScheduleDetailTest extends AbstractProcessTest {
             assertFalse(ScheduleDetail.isVisible(browser), "Schedule detail is not close");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -332,7 +331,7 @@ public class ScheduleDetailTest extends AbstractProcessTest {
                     "Schedule is not deleted");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 }

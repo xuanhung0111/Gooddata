@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.add.schedule;
 
 import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.utils.http.process.ProcessRestUtils.executeProcess;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.testng.Assert.assertEquals;
@@ -18,7 +17,6 @@ import com.gooddata.qa.graphene.common.AbstractDataloadProcessTest;
 import com.gooddata.qa.graphene.entity.add.SyncDatasets;
 import com.gooddata.qa.graphene.entity.ads.SqlBuilder;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
-import com.gooddata.qa.graphene.entity.disc.Parameters;
 import com.gooddata.qa.graphene.entity.model.Dataset;
 import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
@@ -58,10 +56,8 @@ public class DatasetDetailTest extends AbstractDataloadProcessTest {
                 .rows("P1", "18")
                 .rows("P2", "20");
 
-        Parameters parameters = getDefaultParameters()
-                .addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity, person));
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
+        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
+                defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity, person)));
     }
 
     @Test(dependsOnGroups = {"precondition"})

@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.disc.schedule;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getBubbleMessage;
-import static com.gooddata.qa.utils.http.process.ProcessRestUtils.deteleProcess;
 import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -43,7 +42,7 @@ public class CreateScheduleTest extends AbstractProcessTest {
                     "Schedule is not created");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -61,7 +60,7 @@ public class CreateScheduleTest extends AbstractProcessTest {
                     "Schedule " + scheduleName + " is created");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -91,7 +90,7 @@ public class CreateScheduleTest extends AbstractProcessTest {
                     "Secure value is not hidden!");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -115,7 +114,7 @@ public class CreateScheduleTest extends AbstractProcessTest {
                     "Schedule " + scheduleName + " is not created");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -138,7 +137,7 @@ public class CreateScheduleTest extends AbstractProcessTest {
                     "Schedule " + scheduleName + " is not created");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -161,7 +160,7 @@ public class CreateScheduleTest extends AbstractProcessTest {
             assertEquals(cronEditor.getSelectedMinuteOfHour(), date.getMinute());
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -183,7 +182,7 @@ public class CreateScheduleTest extends AbstractProcessTest {
             assertEquals(cronEditor.getSelectedMinuteOfHour(), time.getMinute());
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -204,7 +203,7 @@ public class CreateScheduleTest extends AbstractProcessTest {
             assertEquals(cronEditor.getSelectedMinuteOfHour(), time.getMinute());
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -225,7 +224,7 @@ public class CreateScheduleTest extends AbstractProcessTest {
             assertEquals(cronEditor.getCronExpression(), cronExpression);
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -242,7 +241,7 @@ public class CreateScheduleTest extends AbstractProcessTest {
             assertEquals(getBubbleMessage(browser), "Inserted cron format is invalid. Please verify and try again.");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -264,7 +263,7 @@ public class CreateScheduleTest extends AbstractProcessTest {
             assertEquals(cronEditor.getTriggeringSchedule(), triggeringSchedule.getName());
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -284,7 +283,7 @@ public class CreateScheduleTest extends AbstractProcessTest {
                     "Schedule is not created");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -300,7 +299,7 @@ public class CreateScheduleTest extends AbstractProcessTest {
             assertEquals(getBubbleMessage(browser), "can't be blank");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -319,7 +318,7 @@ public class CreateScheduleTest extends AbstractProcessTest {
                             Executable.SUCCESSFUL_GRAPH.getName()));
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 }

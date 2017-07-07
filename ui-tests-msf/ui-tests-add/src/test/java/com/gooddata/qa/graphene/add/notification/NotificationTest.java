@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.add.notification;
 
 import static com.gooddata.qa.graphene.entity.disc.NotificationRule.buildMessage;
 import static com.gooddata.qa.graphene.entity.disc.NotificationRule.getVariablesFromMessage;
-import static com.gooddata.qa.utils.http.process.ProcessRestUtils.executeProcess;
 import static com.gooddata.qa.utils.mail.ImapUtils.getEmailBody;
 import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 import static java.lang.String.format;
@@ -34,7 +33,6 @@ import com.gooddata.qa.graphene.entity.add.SyncDatasets;
 import com.gooddata.qa.graphene.entity.ads.SqlBuilder;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.entity.disc.NotificationRule;
-import com.gooddata.qa.graphene.entity.disc.Parameters;
 import com.gooddata.qa.graphene.entity.model.Dataset;
 import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.enums.GDEmails;
@@ -149,10 +147,8 @@ public class NotificationTest extends AbstractDataloadProcessTest {
     public void checkNotificationForFullLoadDataset() throws MessagingException, IOException {
         Date timeReceiveEmail = getTimeReceiveEmail();
 
-        Parameters parameters = getDefaultParameters()
-                .addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity, person));
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
+        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
+                defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity, person)));
 
         schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.ALL);
 
@@ -169,9 +165,8 @@ public class NotificationTest extends AbstractDataloadProcessTest {
         Date timeReceiveEmail = getTimeReceiveEmail();
 
         person.rows("P2", "20", getCurrentDate());
-        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person));
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
+        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
+                defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person)));
 
         initScheduleDetail(schedule).executeSchedule().waitForExecutionFinish();
 
@@ -201,9 +196,8 @@ public class NotificationTest extends AbstractDataloadProcessTest {
         Date timeReceiveEmail = getTimeReceiveEmail();
 
         person.rows("P3", "20");
-        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person));
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
+        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
+                defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person)));
 
         String errorMessage = initScheduleDetail(schedule)
                 .executeSchedule()
