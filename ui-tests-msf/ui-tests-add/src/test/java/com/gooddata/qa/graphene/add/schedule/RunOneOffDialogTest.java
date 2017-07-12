@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.add.schedule;
 
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.utils.http.RestUtils.getResource;
-import static com.gooddata.qa.utils.http.process.ProcessRestUtils.executeProcess;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -28,7 +27,6 @@ import com.gooddata.qa.graphene.common.AbstractDataloadProcessTest;
 import com.gooddata.qa.graphene.entity.add.SyncDatasets;
 import com.gooddata.qa.graphene.entity.ads.SqlBuilder;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
-import com.gooddata.qa.graphene.entity.disc.Parameters;
 import com.gooddata.qa.graphene.entity.model.Dataset;
 import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.enums.process.Parameter;
@@ -76,10 +74,8 @@ public class RunOneOffDialogTest extends AbstractDataloadProcessTest {
                         new CsvFile.Column(X_TIMESTAMP_COLUMN))
                 .rows("P1", "18", personLSLTS);
 
-        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY,
-                SqlBuilder.build(opportunity, person));
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
+        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
+                defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity, person)));
     }
 
     @Test(dependsOnGroups = {"precondition"})
@@ -151,10 +147,8 @@ public class RunOneOffDialogTest extends AbstractDataloadProcessTest {
         personLSLTS = parseDateTime(LocalDateTime.now(), DATE_PATTERN);
         person.rows("P2", "20", personLSLTS);
 
-        Parameters parameters = getDefaultParameters()
-                .addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person));
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
+        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
+                defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person)));
 
         Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.custom(DATASET_PERSON));
 
@@ -176,10 +170,8 @@ public class RunOneOffDialogTest extends AbstractDataloadProcessTest {
     public void checkDefaultLoadDoNothing() throws ParseException, IOException {
         person.rows("P3", "20", personLSLTS);
 
-        Parameters parameters = getDefaultParameters()
-                .addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person));
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
+        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
+                defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person)));
 
         Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.custom(DATASET_PERSON));
 
@@ -207,10 +199,8 @@ public class RunOneOffDialogTest extends AbstractDataloadProcessTest {
         personLSLTS = parseDateTime(LocalDateTime.now(), DATE_PATTERN);
         person.rows("P4", "20", personLSLTS);
 
-        Parameters parameters = getDefaultParameters()
-                .addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity, person));
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
+        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
+                defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity, person)));
 
         Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.ALL);
 
@@ -236,10 +226,8 @@ public class RunOneOffDialogTest extends AbstractDataloadProcessTest {
     public void checkForceFullLoad() throws ParseException, IOException {
         person.rows("P5", "20", personLSLTS);
 
-        Parameters parameters = getDefaultParameters()
-                .addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity, person));
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
+        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
+                defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity, person)));
 
         Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.custom(DATASET_PERSON));
 
@@ -267,10 +255,8 @@ public class RunOneOffDialogTest extends AbstractDataloadProcessTest {
         personLSLTS = parseDateTime(LocalDateTime.now(), DATE_PATTERN);
         person.rows("P6", "20", personLSLTS);
 
-        Parameters parameters = getDefaultParameters()
-                .addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person));
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
+        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
+                defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person)));
 
         LocalTime autoStartTime = LocalTime.now().plusMinutes(2);
         Schedule schedule = createSchedule(generateScheduleName(), SyncDatasets.custom(DATASET_PERSON),

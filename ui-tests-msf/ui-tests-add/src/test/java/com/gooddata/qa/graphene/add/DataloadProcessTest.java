@@ -1,14 +1,13 @@
 package com.gooddata.qa.graphene.add;
 
-import static com.gooddata.qa.utils.http.process.ProcessRestUtils.executeProcess;
-import static com.gooddata.qa.utils.http.process.ProcessRestUtils.getExecutionLog;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -45,10 +44,8 @@ public class DataloadProcessTest extends AbstractDataloadProcessTest {
                 .rows("OOP1", "100")
                 .rows("OOP2", "200");
 
-        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity));
-
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
+        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
+                defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity)));
     }
 
     @Test(dependsOnGroups = {"precondition"})
@@ -88,18 +85,16 @@ public class DataloadProcessTest extends AbstractDataloadProcessTest {
 
     @Test(dependsOnGroups = {"precondition"})
     public void checkProcessOwner() throws ParseException, IOException, JSONException {
-        ProcessExecutionDetail executionDetail = executeProcess(getGoodDataClient(), getDataloadProcess(),
+        ProcessExecutionDetail executionDetail = executeProcess(getDataloadProcess(),
                 Parameters.SYNCHRONIZE_ALL_DATASETS);
-        assertThat(getExecutionLog(getGoodDataClient(), executionDetail),
-                containsString("user=" + testParams.getUser()));
+        assertThat(getExecutionLog(executionDetail), containsString("user=" + testParams.getUser()));
 
         final String otherUser = createAndAddUserToProject(UserRoles.ADMIN);
         final GoodData otherGoodDataClient = getGoodDataClient(otherUser, testParams.getPassword());
 
-        ProcessExecutionDetail otherExecutionDetail = executeProcess(otherGoodDataClient, getDataloadProcess(),
+        ProcessExecutionDetail otherExecutionDetail = executeProcess(otherGoodDataClient, getDataloadProcess(), "",
                 Parameters.SYNCHRONIZE_ALL_DATASETS);
-        assertThat(getExecutionLog(getGoodDataClient(), otherExecutionDetail),
-                containsString("user=" + testParams.getUser()));
+        assertThat(getExecutionLog(otherExecutionDetail), containsString("user=" + testParams.getUser()));
     }
 
     @Test(dependsOnGroups = {"precondition"})
@@ -108,7 +103,7 @@ public class DataloadProcessTest extends AbstractDataloadProcessTest {
                 Parameters.SYNCHRONIZE_ALL_DATASETS);
 
         try {
-            executeProcess(getGoodDataClient(), getDataloadProcess(), Parameters.SYNCHRONIZE_ALL_DATASETS);
+            executeProcess(getDataloadProcess(), Parameters.SYNCHRONIZE_ALL_DATASETS);
         } catch (GoodDataException e) {
             assertThat(e.getCause().getMessage(), containsString("The schedule did not run because one or "
                     + "more of the datasets in this schedule is already synchronizing."));
@@ -117,8 +112,13 @@ public class DataloadProcessTest extends AbstractDataloadProcessTest {
         assertTrue(executionDetail.get().isSuccess(), "The first execution is failed!");
     }
 
-    private FutureResult<ProcessExecutionDetail> tryToExecuteProcess(DataloadProcess process,
-            Map<String, String> params) {
-        return getProcessService().executeProcess(new ProcessExecution(process, "", params));
+    private FutureResult<ProcessExecutionDetail> tryToExecuteProcess(DataloadProcess process, Parameters parameters) {
+        return getProcessService().executeProcess(new ProcessExecution(process, "", parameters.getParameters()));
+    }
+
+    private String getExecutionLog(ProcessExecutionDetail executionDetail) {
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        getProcessService().getExecutionLog(executionDetail, outputStream);
+        return new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
     }
 }

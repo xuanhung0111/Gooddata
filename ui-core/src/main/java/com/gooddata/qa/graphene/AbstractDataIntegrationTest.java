@@ -7,9 +7,13 @@ import java.time.LocalTime;
 
 import org.openqa.selenium.support.FindBy;
 
+import com.gooddata.GoodData;
 import com.gooddata.dataload.processes.DataloadProcess;
+import com.gooddata.dataload.processes.ProcessExecution;
+import com.gooddata.dataload.processes.ProcessExecutionDetail;
 import com.gooddata.dataload.processes.ProcessService;
 import com.gooddata.dataload.processes.Schedule;
+import com.gooddata.qa.graphene.entity.disc.Parameters;
 import com.gooddata.qa.graphene.fragments.disc.overview.OverviewPage;
 import com.gooddata.qa.graphene.fragments.disc.projects.ProjectDetailPage;
 import com.gooddata.qa.graphene.fragments.disc.projects.ProjectsPage;
@@ -38,6 +42,23 @@ public class AbstractDataIntegrationTest extends AbstractProjectTest {
     protected ProjectDetailPage initDiscProjectDetailPage() {
         openUrl(format(ProjectDetailPage.URI, testParams.getProjectId()));
         return waitForFragmentVisible(projectDetailPage);
+    }
+
+    protected ProcessExecutionDetail executeProcess(DataloadProcess process, Parameters parameters) {
+        return executeProcess(process, "", parameters);
+    }
+
+    protected ProcessExecutionDetail executeProcess(DataloadProcess process, String executable,
+            Parameters parameters) {
+        return executeProcess(getGoodDataClient(), process, executable, parameters);
+    }
+
+    protected ProcessExecutionDetail executeProcess(GoodData goodData, DataloadProcess process, String executable,
+            Parameters parameters) {
+        return goodData.getProcessService()
+                .executeProcess(new ProcessExecution(process, executable,
+                        parameters.getParameters(), parameters.getSecureParameters()))
+                .get();
     }
 
     protected void deleteScheduleByName(DataloadProcess process, String scheduleName) {

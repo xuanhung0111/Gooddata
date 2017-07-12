@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.add.schedule;
 
 import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.utils.http.process.ProcessRestUtils.executeProcess;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
@@ -19,7 +18,6 @@ import com.gooddata.qa.graphene.common.AbstractDataloadProcessTest;
 import com.gooddata.qa.graphene.entity.add.SyncDatasets;
 import com.gooddata.qa.graphene.entity.ads.SqlBuilder;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
-import com.gooddata.qa.graphene.entity.disc.Parameters;
 import com.gooddata.qa.graphene.entity.model.Dataset;
 import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.enums.process.Parameter;
@@ -49,10 +47,8 @@ public class LoadDatasetTest extends AbstractDataloadProcessTest {
                 .rows("OOP2", "200", CLIENT_ID)
                 .rows("OPP3", "300", "");
 
-        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity));
-
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
+        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
+                defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity)));
 
         Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.custom(DATASET_OPPORTUNITY));
 
@@ -76,10 +72,8 @@ public class LoadDatasetTest extends AbstractDataloadProcessTest {
                 .rows("OOP1", "100", CLIENT_ID)
                 .rows("OOP2", "200", CLIENT_ID);
 
-        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity));
-
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
+        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
+                defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity)));
 
         Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.custom(DATASET_OPPORTUNITY));
 
@@ -113,10 +107,8 @@ public class LoadDatasetTest extends AbstractDataloadProcessTest {
                 .rows("OOP11", "100")
                 .rows("OOP22", "200");
 
-        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity));
-
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
+        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
+                defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity)));
 
         Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.custom(DATASET_OPPORTUNITY));
 
@@ -144,10 +136,8 @@ public class LoadDatasetTest extends AbstractDataloadProcessTest {
                 .rows("OOP111", "100")
                 .rows("OOP222", "200");
 
-        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity));
-
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
+        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
+                defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity)));
 
         Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.custom(DATASET_OPPORTUNITY));
 

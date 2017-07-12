@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.disc;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.process.ProcessRestUtils.deteleProcess;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
@@ -52,7 +51,7 @@ public class LongRunTimeTest extends AbstractProcessTest {
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(), status);
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -83,7 +82,7 @@ public class LongRunTimeTest extends AbstractProcessTest {
                     ScheduleStatus.ERROR.toString());
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -104,7 +103,7 @@ public class LongRunTimeTest extends AbstractProcessTest {
             assertEquals(scheduleDetail.getLastExecutionHistoryItem().getStatusDescription(), "MANUALLY STOPPED");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -124,7 +123,7 @@ public class LongRunTimeTest extends AbstractProcessTest {
                     ScheduleStatus.OK.toString());
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -153,7 +152,7 @@ public class LongRunTimeTest extends AbstractProcessTest {
                     ScheduleStatus.OK.toString());
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -175,7 +174,7 @@ public class LongRunTimeTest extends AbstractProcessTest {
             assertTrue(scheduleDetail.isDisabled(), "Schedule is not disabled");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -195,7 +194,7 @@ public class LongRunTimeTest extends AbstractProcessTest {
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 0);
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -224,8 +223,8 @@ public class LongRunTimeTest extends AbstractProcessTest {
                     ScheduleStatus.ERROR.toString());
 
         } finally {
-            deteleProcess(getGoodDataClient(), process1);
-            deteleProcess(getGoodDataClient(), process2);
+            getProcessService().removeProcess(process1);
+            getProcessService().removeProcess(process2);
         }
     }
 
@@ -246,7 +245,7 @@ public class LongRunTimeTest extends AbstractProcessTest {
             assertEquals(scheduleDetail.getExecutionHistoryItemNumber(), 0);
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 }
