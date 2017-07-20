@@ -84,6 +84,10 @@ public class ReportsPage extends AbstractFragment {
         return this;
     }
 
+    public void clickReportOwner(String reportName) {
+        getReport(reportName).getOwner().click();
+    }
+
     public ReportsPage addNewFolder(String folderName) {
         waitForElementVisible(addFolderButton).click();
         IpeEditor.getInstance(browser).setText(folderName);
@@ -205,24 +209,14 @@ public class ReportsPage extends AbstractFragment {
 
     public PersonalInfo getReportOwnerInfoFrom(String reportName) {
         getActions()
-            .moveToElement(reports.stream()
-                .filter(entry -> reportName.equals(entry.getLabel()))
-                .findFirst()
-                .get()
-                .getOwner())
+            .moveToElement(getReport(reportName).getOwner())
             .perform();
 
         return AccountCard.getInstance(browser).getUserInfo();
     }
 
     public UserProfilePage openReportOwnerProfilePageFrom(String reportName) {
-        reports.stream()
-            .filter(entry -> reportName.equals(entry.getLabel()))
-            .findFirst()
-            .get()
-            .getOwner()
-            .click();
-
+        clickReportOwner(reportName);
         waitForUserProfilePageLoaded(browser);
         return UserProfilePage.getInstance(browser);
     }
@@ -251,12 +245,7 @@ public class ReportsPage extends AbstractFragment {
     }
 
     public ReportPage openReport(String report) {
-        reports.stream()
-            .filter(entry -> report.equals(entry.getLabel()))
-            .findFirst()
-            .get()
-            .openReport();
-
+        getReport(report).openReport();
         waitForAnalysisPageLoaded(browser);
         return ReportPage.getInstance(browser).waitForReportExecutionProgress();
     }
@@ -280,6 +269,13 @@ public class ReportsPage extends AbstractFragment {
             .filter(element -> folderName.equals(element.findElement(BY_LINK).getText()))
             .findFirst()
             .orElseThrow(() -> new NoSuchElementException("Cannot find folder: " + folderName));
+    }
+
+    private ReportEntry getReport(String reportName) {
+        return reports.stream()
+                .filter(entry -> reportName.equals(entry.getLabel()))
+                .findFirst()
+                .get();
     }
 
     public static class ReportEntry extends AbstractFragment {
