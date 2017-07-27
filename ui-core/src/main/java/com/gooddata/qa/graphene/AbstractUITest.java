@@ -127,11 +127,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
             openUrl(PAGE_LOGIN);
         }
         LoginFragment.getInstance(browser).login(username, password, true);
-
-        //QA-6552: checklist-staging3-locked is failed by LoginPageTest
-        log.info(username + " has " + getGoodDataClient().getProjectService().getProjects().size() + " projects");
-
-        waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
+        waitForElementVisible(BY_LOGGED_USER_BUTTON, browser, 300);
         takeScreenshot(browser, "login-ui", this.getClass());
         System.out.println("Successful login with user: " + username);
     }
