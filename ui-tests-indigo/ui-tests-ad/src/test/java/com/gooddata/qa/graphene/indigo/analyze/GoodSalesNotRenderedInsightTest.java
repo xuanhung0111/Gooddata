@@ -40,7 +40,7 @@ public class GoodSalesNotRenderedInsightTest extends GoodSalesAbstractAnalyseTes
         //because user still can add attribute to generate aggregation metric, it's a valid case to save insight
         assertEquals(analysisPage.getExplorerMessage(), "NO MEASURE IN YOUR INSIGHT",
                 "Missing metric message was not displayed");
-        assertFalse(analysisPage.getPageHeader().isSaveButtonEnabled(), "The save button is enabled");
+        assertFalse(analysisPage.isSaveInsightEnabled(), "The save button is enabled");
     }
 
     @Test(dependsOnGroups = { "init" })

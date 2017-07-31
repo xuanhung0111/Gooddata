@@ -4,9 +4,12 @@ import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.dialog.SaveInsightDialog;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
 import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -29,6 +32,14 @@ import static org.testng.Assert.assertTrue;
 public class GoodSalesSaveInsightTest extends GoodSalesAbstractAnalyseTest {
 
     private static final String INSIGHT_TEST = "Insight-Test";
+    private static final String INSIGHT_TEST_LONG = "British scientists were crucial to the success of the Manhattan Project, "
+            + "British scientists were crucial to the success of the Manhattan Project "
+            + "British scientists were crucial to the success of the Manhattan Project "
+            + "British scientists were crucial to the success of the Manhattan Project "
+            + "British scientists were crucial to the success of the Manhattan Project ";
+    private static final String INSIGHT_TEST_SPECIAL = "@#$%^&*()";
+    private static final String INSIGHT_TEST_DUPLICATE = "Insight-Test";
+    private static final String INSIGHT_TEST_NULL = "";
     private static final String CLOSED = "Closed";
     private static final String CREATED = "Created";
     private static final String DATE_CLOSED_DIMENSION_INSIGHT = "Save-Insight-Containing-Date-Closed-Dimension";
@@ -39,8 +50,17 @@ public class GoodSalesSaveInsightTest extends GoodSalesAbstractAnalyseTest {
         projectTitle += "Save-Insight-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
-    public void testSaveInsight() throws JSONException, IOException {
+    @DataProvider(name = "chartTypeDataProvider")
+    public Object[][] inSightNameDataProvider() {
+        return new Object[][]{
+                {INSIGHT_TEST},
+                {INSIGHT_TEST_LONG},
+                {INSIGHT_TEST_SPECIAL},
+                {INSIGHT_TEST_DUPLICATE}
+        };
+    }
+    @Test(dependsOnGroups = {"init"}, dataProvider = "chartTypeDataProvider")
+    public void testSaveInsight(String insightName) throws JSONException, IOException {
         final int expectedTrackerCount = analysisPage
                 .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -48,13 +68,19 @@ public class GoodSalesSaveInsightTest extends GoodSalesAbstractAnalyseTest {
                 .getChartReport()
                 .getTrackersCount();
 
-        analysisPage.setInsightTitle(INSIGHT_TEST).saveInsight();
+        analysisPage.setInsightTitle(insightName).saveInsight();
         assertFalse(isElementVisible(className(SaveInsightDialog.ROOT_CLASS), browser),
                 "Save dialog exists");
         //make sure data is cleared before open insight
         assertTrue(analysisPage.resetToBlankState().isBlankState());
-        assertEquals(analysisPage.openInsight(INSIGHT_TEST).getChartReport().getTrackersCount(),
+        assertEquals(analysisPage.openInsight(insightName).getChartReport().getTrackersCount(),
                 expectedTrackerCount);
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void testSaveInsightWithBlankName () throws JSONException, IOException {
+        analysisPage.setInsightTitle(INSIGHT_TEST_NULL);
+        assertFalse(analysisPage.isSaveInsightEnabled());
     }
 
     @Test(dependsOnMethods = {"testSaveInsight"})
@@ -115,6 +141,19 @@ public class GoodSalesSaveInsightTest extends GoodSalesAbstractAnalyseTest {
                         .getChartReport()
                         .getDataLabels(),
                 expectedLabels);
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void testInsightNameInSaveDialog() throws JSONException, IOException {
+        final String insight = "Untitled-Insight-Test-2";
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
+
+        AnalysisPageHeader pageheader =  analysisPage.getPageHeader();
+        pageheader.saveWithoutSubmitting(insight).cancel();
+        pageheader.saveInsight();
+        //After cancel and save again, the Save Dialog is not cached the old information.
+        assertTrue(SaveInsightDialog.getInstance(browser).isSubmitButtonDisabled());
+        assertEquals(SaveInsightDialog.getInstance(browser).getName(), "");
     }
 
     @Test(dependsOnGroups = {"init"})
