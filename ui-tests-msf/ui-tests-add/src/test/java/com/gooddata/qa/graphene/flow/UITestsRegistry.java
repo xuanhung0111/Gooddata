@@ -10,8 +10,9 @@ import com.gooddata.qa.graphene.add.schedule.CreateScheduleTest;
 import com.gooddata.qa.graphene.add.schedule.DatasetDetailTest;
 import com.gooddata.qa.graphene.add.schedule.IncrementalLoadTest;
 import com.gooddata.qa.graphene.add.schedule.LoadDatasetTest;
-import com.gooddata.qa.graphene.add.schedule.RunOneOffDialogTest;
 import com.gooddata.qa.graphene.add.schedule.ScheduleDetailTest;
+import com.gooddata.qa.graphene.add.schedule.execution.dialog.ForceIncrementalLoadTest;
+import com.gooddata.qa.graphene.add.schedule.execution.dialog.DefaultLoadTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 public class UITestsRegistry {
@@ -28,7 +29,8 @@ public class UITestsRegistry {
             DataloadProcessTest.class,
             DataloadResourcesPermissionTest.class,
             IncrementalLoadTest.class,
-            RunOneOffDialogTest.class,
+            DefaultLoadTest.class,
+            ForceIncrementalLoadTest.class,
             "testng-imap-notification.xml"
         });
 

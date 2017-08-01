@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.fragments.disc.schedule.add;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
-import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
@@ -102,7 +101,9 @@ public class DatasetDropdown extends AbstractDropDown {
     }
 
     public Collection<String> getAvailableDatasets() {
-        return getElementTexts(getElements());
+        return getElements().stream()
+                .map(this::getDatasetTitle)
+                .collect(toList());
     }
 
     public Collection<String> getSelectedDatasets() {

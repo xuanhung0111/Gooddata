@@ -5,16 +5,25 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static java.util.stream.Collectors.toList;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.stream.Stream;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.disc.ConfirmationDialog;
 
 public class RunOneOffDialog extends ConfirmationDialog {
+
+    @FindBy(css = "input[placeholder*=From]")
+    private WebElement incrementalStartTimeInput;
+
+    @FindBy(css = "input[placeholder*=To]")
+    private WebElement incrementalEndTimeInput;
 
     @FindBy(className = "ait-dataset-selection-dropdown-button")
     private DatasetDropdown datasetDropdown;
@@ -39,8 +48,37 @@ public class RunOneOffDialog extends ConfirmationDialog {
         return this;
     }
 
+    public String getIncrementalLoadHelperText() {
+        return waitForElementVisible(By.className("helper-text"), getRoot()).getText();
+    }
+
+    public RunOneOffDialog setIncrementalStartTime(String dateTimeValue) {
+        waitForElementVisible(incrementalStartTimeInput).clear();
+        incrementalStartTimeInput.sendKeys(dateTimeValue);
+        return this;
+    }
+
+    public RunOneOffDialog setIncrementalStartTime(LocalDateTime dateTime) {
+        return setIncrementalStartTime(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(dateTime));
+    }
+
+    public RunOneOffDialog setIncrementalEndTime(String dateTimeValue) {
+        waitForElementVisible(incrementalEndTimeInput).clear();
+        incrementalEndTimeInput.sendKeys(dateTimeValue);
+        return this;
+    }
+
+    public RunOneOffDialog setIncrementalEndTime(LocalDateTime dateTime) {
+        return setIncrementalEndTime(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(dateTime));
+    }
+
     public DatasetDropdown getDatasetDropdown() {
         return waitForFragmentVisible(datasetDropdown);
+    }
+
+    public RunOneOffDialog clickConfirmButton() {
+        waitForElementVisible(confirmButton).click();
+        return this;
     }
 
     public enum LoadMode {
@@ -50,7 +88,7 @@ public class RunOneOffDialog extends ConfirmationDialog {
 
         private String locator;
 
-        private LoadMode(String locator) {
+        LoadMode(String locator) {
             this.locator = locator;
         }
 
