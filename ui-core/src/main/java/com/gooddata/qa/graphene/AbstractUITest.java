@@ -554,7 +554,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     protected void waitForOpeningIndigoDashboard() {
-        final By loadingLabel = className(".gd-loading-equalizer");
+        final By loadingLabel = className("gd-loading-equalizer");
         try {
             Predicate<WebDriver> isLoadingLabelPresent = browser -> isElementPresent(loadingLabel, browser);
             Graphene.waitGui().withTimeout(2, TimeUnit.SECONDS).until(isLoadingLabelPresent);

@@ -127,6 +127,7 @@ public class KpiAlertEvaluateTest extends AbstractDashboardTest {
 
     private IndigoDashboardsPage openDashboardFromLink(String link) {
         browser.get(link);
+        waitForOpeningIndigoDashboard();
         return IndigoDashboardsPage.getInstance(browser).waitForDashboardLoad();
     }
 
