@@ -17,6 +17,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.GoodData;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
@@ -63,7 +64,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     @BeforeClass(alwaysRun = true)
     public void enableDynamicUser() {
-        useDynamicUser = Boolean.parseBoolean(System.getProperty("useDynamicUser"));
+        useDynamicUser = Boolean.parseBoolean(testParams.loadProperty("useDynamicUser"));
     }
 
     @Test(groups = {"createProject"})
@@ -241,7 +242,11 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     }
 
     protected Metric createMetric(String name, String expression, String format) {
-        return getMdService().createObj(getProject(), new Metric(name, expression, format));
+        return createMetric(getGoodDataClient(), name, expression, format);
+    }
+    
+    protected Metric createMetric(GoodData gooddata, String name, String expression, String format) {
+        return gooddata.getMetadataService().createObj(getProject(), new Metric(name, expression, format));
     }
 
     protected Collection<String> getAttributeValues(Attribute attribute) {
@@ -250,8 +255,13 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     }
 
     protected Report createReportViaRest(ReportDefinition defination) {
-        defination = getMdService().createObj(getProject(), defination);
-        return getMdService().createObj(getProject(), new Report(defination.getTitle(), defination));
+        return createReportViaRest(getGoodDataClient(), defination);
+    }
+
+    protected Report createReportViaRest(GoodData gooddata, ReportDefinition definition) {
+        MetadataService metadataService = gooddata.getMetadataService();
+        definition = metadataService.createObj(getProject(), definition);
+        return metadataService.createObj(getProject(), new Report(definition.getTitle(), definition));
     }
 
     public void setupMaql(String maql) throws JSONException, IOException {

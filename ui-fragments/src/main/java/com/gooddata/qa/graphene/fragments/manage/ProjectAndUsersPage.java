@@ -138,13 +138,17 @@ public class ProjectAndUsersPage extends AbstractFragment {
     }
 
     public UserProfilePage openUserProfile(final String userEmail) {
-        users.stream()
-                .filter(e -> e.findElement(USER_EMAIL_LOCATOR).getAttribute("title").equals(userEmail))
-                .map(e -> e.findElement(By.cssSelector(".name")))
-                .findFirst()
-                .get()
-                .click();
+        clickUserProfileLinkFrom(userEmail);
         return UserProfilePage.getInstance(browser);
+    }
+
+    public void clickUserProfileLinkFrom(final String userEmail) {
+        users.stream()
+            .filter(e -> e.findElement(USER_EMAIL_LOCATOR).getAttribute("title").equals(userEmail))
+            .map(e -> e.findElement(By.className("name")))
+            .findFirst()
+            .get()
+            .click();
     }
 
     public void clickInviteUserButton() {

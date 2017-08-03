@@ -9,6 +9,8 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForObjectPageLoaded;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static org.openqa.selenium.By.className;
 
+import java.util.List;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -28,6 +30,9 @@ public class MetricPage extends DataPage {
 
     @FindBy(xpath = "//a[@class='interpolateProject']")
     private WebElement dataLink;
+
+    @FindBy(className = "dataPage-listRow")
+    private List<WebElement> metrics;
 
     private static final By METRIC_EDITOR_LOCATOR = className("metricEditorFrame");
 
@@ -106,6 +111,15 @@ public class MetricPage extends DataPage {
         waitForElementVisible(createMetricButton).click();
 
         return MetricEditorDialog.getInstance(browser);
+    }
+
+    public void clickMetricOwner(String metricName) {
+        metrics.stream()
+                .filter(metric -> metric.findElement(By.cssSelector(".title span")).getText().equals(metricName))
+                .map(metric -> metric.findElement(By.cssSelector(".author a")))
+                .findFirst()
+                .get()
+                .click();
     }
 
     private MetricPage backToMetricsTable() {
