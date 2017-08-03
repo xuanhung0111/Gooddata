@@ -3,18 +3,22 @@ package com.gooddata.qa.fixture;
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
+import com.gooddata.AbstractPollHandler;
 import com.gooddata.GoodData;
+import com.gooddata.GoodDataRestException;
+import com.gooddata.PollResult;
+import com.gooddata.gdc.GdcError;
+import com.gooddata.gdc.TaskStatus;
 import com.gooddata.project.Environment;
 import com.gooddata.project.ProjectDriver;
 import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
-import com.gooddata.qa.utils.http.rolap.RolapRestUtils;
 import com.gooddata.qa.utils.io.ResourceUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -24,11 +28,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static java.lang.String.format;
 
@@ -51,6 +52,7 @@ public class GdcFixture {
     private RestApiClient restApiClient;
     private GoodData goodDataClient;
 
+    private static final String PULL_DATA_LINK = "/gdc/md/%s/etl/pull2";
     private final Logger log = Logger.getLogger(this.getClass().getName());
 
     public GdcFixture(Fixture fixture) throws IOException {
@@ -94,7 +96,7 @@ public class GdcFixture {
         }
         log.info("Data has been uploaded to directory named " + uploadDir);
 
-        RolapRestUtils.postEtlPullIntegration(restApiClient, projectId, uploadDir);
+        pullDataToProject(uploadDir);
         log.info("uploaded data has been added to working project");
 
         List<String> identifiers = getUsedIdentifiers();
@@ -118,8 +120,49 @@ public class GdcFixture {
         return projectId;
     }
 
+    private void pullDataToProject(String dirPath) throws JSONException, IOException {
+        String pollingUri = getPollingUri(getJsonObject(restApiClient,
+                restApiClient.newPostMethod(
+                        format(PULL_DATA_LINK, projectId),
+                        new JSONObject().put("pullIntegration", dirPath).toString()),
+                HttpStatus.CREATED));
+
+        doPolling(pollingUri, dirPath);
+    }
+
+    private String getPollingUri(JSONObject obj) throws JSONException {
+        return obj.getJSONObject("pull2Task").getJSONObject("links").getString("poll");
+    }
+
+    private void doPolling(String pollingUri, String dirPath) {
+        new PollResult<>(goodDataClient.getDatasetService(), new AbstractPollHandler<TaskStatus, Void>(pollingUri,
+                TaskStatus.class, Void.class) {
+            @Override
+            public void handlePollResult(TaskStatus pollResult) {
+                if (!pollResult.isSuccess()) {
+                    GdcError error = pollResult.getMessages().iterator().next();
+                    throw new FixtureException("Unable to pull data to the project"
+                            + " [requestId=" + error.getRequestId() + "]"
+                            + " [errorMessage=" + error.getFormattedMessage() + "]");
+                }
+
+                setResult(null);
+            }
+
+            @Override
+            public void handlePollException(GoodDataRestException e) {
+                throw new FixtureException("Unable to pull data to project", e);
+            }
+
+            @Override
+            protected void onFinish() {
+                goodDataClient.getDataStoreService().delete(dirPath);
+            }
+        }).get();
+    }
+
     private String createMdObject(String content) throws IOException, JSONException {
-        return getUriFromJSONObjectWithoutSearchKey(RestUtils.getJsonObject(restApiClient,
+        return getUriFromJSONObjectWithoutSearchKey(getJsonObject(restApiClient,
                 restApiClient.newPostMethod(format("/gdc/md/%s/obj?createAndGet=true", projectId), content)));
     }
 
@@ -158,7 +201,7 @@ public class GdcFixture {
     }
 
     private String getMappedUri(String identifier) throws JSONException, IOException {
-        return RestUtils.getJsonObject(restApiClient,
+        return getJsonObject(restApiClient,
                 restApiClient.newPostMethod(
                         format("/gdc/md/%s/identifiers", projectId),
                         new JSONObject().put("identifierToUri", Collections.singleton(identifier)).toString()))
