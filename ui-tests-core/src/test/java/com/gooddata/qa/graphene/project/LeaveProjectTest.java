@@ -1,21 +1,25 @@
 package com.gooddata.qa.graphene.project;
 
-import com.gooddata.qa.graphene.AbstractProjectTest;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.graphene.fragments.projects.PopupDialog;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+
+import java.io.IOException;
+
+import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
+import com.gooddata.qa.graphene.AbstractProjectTest;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
+import com.gooddata.qa.graphene.fragments.projects.PopupDialog;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class LeaveProjectTest extends AbstractProjectTest {
 
     private final static String ERROR_MESSAGE = "You cannot leave the project because you are the only administrator in it.";
+    private String anotherAdminUser;
 
     @BeforeClass
     public void setProjectTitle() {
@@ -27,6 +31,12 @@ public class LeaveProjectTest extends AbstractProjectTest {
         // these tests are working on another project & user
         // turn off using dynamic user to simplify workflow and increase readability
         useDynamicUser = false;
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        anotherAdminUser = createAndAddUserToProject(UserRoles.ADMIN);
+        createAndAddUserToProject(UserRoles.VIEWER);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -59,6 +69,47 @@ public class LeaveProjectTest extends AbstractProjectTest {
             logoutAndLoginAs(true, UserRoles.ADMIN);
             ProjectRestUtils.deleteProject(getGoodDataClient(), testParams.getProjectId());
             testParams.setProjectId(workingProjectID);
+        }
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void leaveProjectInProjectAndUsersPage() throws ParseException, JSONException, IOException {
+        try {
+            logout();
+            signInAtGreyPages(anotherAdminUser, testParams.getPassword());
+            initProjectsAndUsersPage().leaveProject();
+            assertFalse(initProjectsPage().isProjectDisplayed(testParams.getProjectId()),
+                "The project is not removed from list");
+    
+            logoutAndLoginAs(true, UserRoles.ADMIN);
+            ProjectAndUsersPage projectAndUsersPage = initProjectsAndUsersPage();
+            assertFalse(projectAndUsersPage.isLeaveButtonEnable(), "The only administrator still can leave project");
+            assertEquals(projectAndUsersPage.getMessageNextToLeaveButton(), ERROR_MESSAGE);
+        } finally {
+            addUserToProject(anotherAdminUser, UserRoles.ADMIN);
+        }
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void leaveProjectInProjectsPage() throws JSONException, IOException {
+        try {
+            logout();
+            signInAtGreyPages(anotherAdminUser, testParams.getPassword());
+            initProjectsPage().getProjectItem(testParams.getProjectId()).leave();
+            assertFalse(initProjectsPage().isProjectDisplayed(testParams.getProjectId()),
+                "The project is not removed from list");
+
+            logoutAndLoginAs(true, UserRoles.VIEWER);
+            initProjectsPage().getProjectItem(testParams.getProjectId()).leave();
+            assertFalse(initProjectsPage().isProjectDisplayed(testParams.getProjectId()),
+                "The project is not removed from list");
+
+            logoutAndLoginAs(true, UserRoles.ADMIN);
+            initProjectsPage().getProjectItem(testParams.getProjectId()).leave();
+            assertEquals(PopupDialog.getInstance(browser).getMessage(), ERROR_MESSAGE, "The error msg is not correct");
+        } finally {
+            addUserToProject(testParams.getViewerUser(), UserRoles.VIEWER);
+            addUserToProject(anotherAdminUser, UserRoles.ADMIN);
         }
     }
 
