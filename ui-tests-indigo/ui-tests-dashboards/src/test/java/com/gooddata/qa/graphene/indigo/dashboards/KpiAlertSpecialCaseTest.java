@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
+import com.gooddata.qa.utils.http.fact.FactRestUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.jsoup.nodes.Document;
@@ -202,6 +203,39 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
         } finally {
             getMdService().removeObjByUri(indigoDashboardUri);
             updateCsvDataset(DATASET_NAME, csvFilePath);
+        }
+    }
+
+    @Test(dependsOnGroups = {"precondition"}, groups = "desktop")
+    public void checkAlertOnRestrictedData() throws JSONException, IOException {
+
+        final String metricExpression = format("SELECT SUM([%s])", numberFactUri);
+        final Metric metric = createMetric("Metric-" + generateHashString(), metricExpression, "#,##0.00");
+        final String kpiName = generateUniqueName();
+        final String kpiUri = createKpi(kpiName, metric.getUri());
+
+
+        String indigoDashboardUri = createAnalyticalDashboard(
+                getRestApiClient(), testParams.getProjectId(), singletonList(kpiUri));
+
+        try {
+            FactRestUtils.setFactRestricted(getRestApiClient(), getProject(), numberFactUri );
+
+            setAlertForKpi(kpiName, TRIGGERED_WHEN_DROPS_BELOW, NUMBER_VALUE);
+
+            updateCsvDataset(DATASET_NAME, otherCsvFilePath);
+
+            Kpi kpi = initIndigoDashboardsPageWithWidgets().getWidgetByHeadline(Kpi.class, kpiName);
+
+            takeScreenshot(browser, "Kpi-" + kpiName + "-alert-triggered", getClass());
+            assertTrue(kpi.isAlertTriggered(), "Kpi alert is triggered");
+
+            assertTrue(doActionWithImapClient(imapClient -> areMessagesArrived(imapClient, GDEmails.NOREPLY, kpiName, 1)),
+                    "Alert email is sent to mailbox");
+        } finally {
+            getMdService().removeObjByUri(indigoDashboardUri);
+            updateCsvDataset(DATASET_NAME, csvFilePath);
+            FactRestUtils.unsetFactRestricted(getRestApiClient(), getProject(), numberFactUri );
         }
     }
 
