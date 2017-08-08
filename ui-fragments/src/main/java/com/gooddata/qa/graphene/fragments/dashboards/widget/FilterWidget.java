@@ -84,6 +84,14 @@ public class FilterWidget extends AbstractFragment {
         return this;
     }
 
+    public FilterWidget editTimeFilterValue(String timeLine) {
+        openEditPanel()
+            .getTimeFilterPanel()
+            .selectTimeLine(timeLine)
+            .submit();
+        return this;
+    }
+
     /**
      * Change values permanently by click pencil icon to open and
      * Select attribute values in default Attribute filter panel.

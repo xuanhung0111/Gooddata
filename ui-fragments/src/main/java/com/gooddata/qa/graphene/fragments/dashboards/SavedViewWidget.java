@@ -249,7 +249,7 @@ public class SavedViewWidget extends AbstractFragment{
         private SavedFiltersContextMenu savedFiltersContextMenu;
 
         public WebElement getSavedCurrentViewButton() {
-            return savedCurrentViewButton;
+            return waitForElementVisible(savedCurrentViewButton);
         }
 
         public boolean isNoSavedViewPresent() {
