@@ -31,7 +31,6 @@ import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.account.PersonalInfo;
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
@@ -41,6 +40,7 @@ import com.gooddata.qa.graphene.fragments.common.StatusBar.Status;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.UserStatus;
 
@@ -48,11 +48,13 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
 
     private static final String DEFAULT_METRIC_FORMAT = "#,##0";
     private static final String ERROR_MESSAGE = "You are not allowed to see this user profile.";
-    private static final String REPORT_NAME = "Report";
 
     private PersonalInfo userInfo;
     private List<String> allVariables;
     private GoodData editorGoodData;
+    private Report adminReport;
+    private Report editorReport;
+    private Metric avgAmountMetric;
     
     @Override
     protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
@@ -62,6 +64,26 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
     @BeforeClass
     public void setProjectTitle() {
         projectTitle = "User-profile-information-test";
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"initialize"})
+    public void initialize() {
+        Attribute stageNameAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_STAGE_NAME));
+        avgAmountMetric = createMetric(getEditorGoodData(), "Average of Amount", 
+                format("SELECT AVG([%s])", getMdService().getObjUri(getProject(), Fact.class, title(FACT_AMOUNT))),
+                DEFAULT_METRIC_FORMAT);
+        adminReport = createReportViaRest(getGoodDataClient(), GridReportDefinitionContent.create(
+                "Report" + generateHashString(),
+                singletonList(METRIC_GROUP),
+                singletonList(new AttributeInGrid(stageNameAttribute.getDefaultDisplayForm()
+                        .getUri(), stageNameAttribute.getTitle())),
+                singletonList(new MetricElement(avgAmountMetric))));
+        editorReport = createReportViaRest(getEditorGoodData(), GridReportDefinitionContent.create(
+                "Report" + generateHashString(),
+                singletonList(METRIC_GROUP),
+                singletonList(new AttributeInGrid(stageNameAttribute.getDefaultDisplayForm()
+                        .getUri(), stageNameAttribute.getTitle())),
+                singletonList(new MetricElement(avgAmountMetric))));
     }
 
     @Test(dependsOnGroups = { "createProject" })
@@ -81,15 +103,6 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = { "createProject" })
-    public void createReportTest() {
-        createReport(new UiReportDefinition()
-                .withName(REPORT_NAME)
-                .withWhats("Amount")
-                .withHows("Stage Name"),
-                "Simple report");
-    }
-
-    @Test(dependsOnGroups = { "createProject" })
     public void initGetUserInformation() {
         PersonalInfoDialog personalInfoDialog = initAccountPage().openPersonalInfoDialog();
         takeScreenshot(browser, "User info", getClass());
@@ -99,18 +112,19 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
         allVariables = ObjectsTable.getInstance(id(ObjectTypes.VARIABLE.getObjectsTableID()), browser).getAllItems();
     }
 
-    @Test(dependsOnMethods = { "initGetUserInformation" })
+    @Test(dependsOnMethods = { "initGetUserInformation", "initialize" })
     public void checkUserProfileInformation() {
-        PersonalInfo personalInfo = initReportsPage().getReportOwnerInfoFrom(REPORT_NAME);
+        PersonalInfo personalInfo = initReportsPage().getReportOwnerInfoFrom(adminReport.getTitle());
         assertEquals(userInfo.getFullName(), personalInfo.getFullName());
         assertEquals(userInfo.getEmail(), personalInfo.getEmail());
         assertEquals(userInfo.getPhoneNumber(), personalInfo.getPhoneNumber());
 
-        UserProfilePage userProfilePage = ReportsPage.getInstance(browser).openReportOwnerProfilePageFrom(REPORT_NAME);
+        UserProfilePage userProfilePage = ReportsPage.getInstance(browser)
+                .openReportOwnerProfilePageFrom(adminReport.getTitle());
         assertEquals(userProfilePage.getUserInfo(), userInfo);
 
-        assertTrue(userProfilePage.isItemDisplayedInRecentActivity(REPORT_NAME),
-                "Report: " + REPORT_NAME + " is not displayed in Recent Activity");
+        assertTrue(userProfilePage.isItemDisplayedInRecentActivity(adminReport.getTitle()),
+                "Report: " + adminReport.getTitle() + " is not displayed in Recent Activity");
 
         assertTrue(userProfilePage.getRecentActivityItems() <= 10,
                 "Number of items in Recent Activity has exceeded over 10");
@@ -121,8 +135,8 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"})
     public void cannotAccessProfilePageOfDisabledUser() throws JSONException, ParseException, IOException {
         UserManagementRestUtils.updateUserStatusInProject(
-                testParams.getDomainUser() == null ? getRestApiClient() : getDomainUserRestApiClient(),
-                testParams.getProjectId(), testParams.getEditorUser(), UserStatus.DISABLED);
+                getDomainUserRestApiClient(), testParams.getProjectId(),
+                testParams.getEditorUser(), UserStatus.DISABLED);
         try {
             initProjectsAndUsersPage().openDeactivatedUserTab().clickUserProfileLinkFrom(testParams.getEditorUser());
             StatusBar statusBar = StatusBar.getInstance(browser);
@@ -130,55 +144,71 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
             assertEquals(statusBar.getMessage(), ERROR_MESSAGE);
         } finally {
             UserManagementRestUtils.updateUserStatusInProject(
-                    testParams.getDomainUser() == null ? getRestApiClient() : getDomainUserRestApiClient(),
-                    testParams.getProjectId(), testParams.getEditorUser(), UserStatus.ENABLED);
+                    getDomainUserRestApiClient(), testParams.getProjectId(),
+                    testParams.getEditorUser(), UserStatus.ENABLED);
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}) 
+    @Test(dependsOnMethods = {"initialize"}) 
     public void accessProfilePageOfDisabledUserFromMetric() throws ParseException, JSONException, IOException {
-        Metric amountMetric = createMetric(getEditorGoodData(), "Sum of Amount", 
-                format("SELECT SUM([%s])", getMdService().getObjUri(getProject(), Fact.class, title(FACT_AMOUNT))),
-                DEFAULT_METRIC_FORMAT);
         UserManagementRestUtils.updateUserStatusInProject(
-                testParams.getDomainUser() == null ? getRestApiClient() : getDomainUserRestApiClient(),
-                testParams.getProjectId(), testParams.getEditorUser(), UserStatus.DISABLED);
+                getDomainUserRestApiClient(), testParams.getProjectId(),
+                testParams.getEditorUser(), UserStatus.DISABLED);
         try {
-            initMetricPage().clickMetricOwner(amountMetric.getTitle());
+            initMetricPage().clickMetricOwner(avgAmountMetric.getTitle());
             StatusBar statusBar = StatusBar.getInstance(browser);
             assertEquals(statusBar.getStatus(), Status.ERROR);
             assertEquals(statusBar.getMessage(), ERROR_MESSAGE);
         } finally {
             UserManagementRestUtils.updateUserStatusInProject(
-                    testParams.getDomainUser() == null ? getRestApiClient() : getDomainUserRestApiClient(),
-                    testParams.getProjectId(), testParams.getEditorUser(), UserStatus.ENABLED);
+                    getDomainUserRestApiClient(), testParams.getProjectId(),
+                    testParams.getEditorUser(), UserStatus.ENABLED);
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}) 
+    @Test(dependsOnMethods = {"initialize"}) 
     public void accessProfilePageOfDisabledUserFromReport() throws ParseException, JSONException, IOException {
-        Attribute stageNameAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_STAGE_NAME));
-        Metric avgAmountMetric = createMetric(getEditorGoodData(), "Average of Amount", 
-                format("SELECT AVG([%s])", getMdService().getObjUri(getProject(), Fact.class, title(FACT_AMOUNT))),
-                DEFAULT_METRIC_FORMAT);
-        Report report = createReportViaRest(getEditorGoodData(), GridReportDefinitionContent.create(
-                "Report" + generateHashString(),
-                singletonList(METRIC_GROUP),
-                singletonList(new AttributeInGrid(stageNameAttribute.getDefaultDisplayForm()
-                        .getUri(), stageNameAttribute.getTitle())),
-                singletonList(new MetricElement(avgAmountMetric))));
         UserManagementRestUtils.updateUserStatusInProject(
-                testParams.getDomainUser() == null ? getRestApiClient() : getDomainUserRestApiClient(),
-                testParams.getProjectId(), testParams.getEditorUser(), UserStatus.DISABLED);
+                getDomainUserRestApiClient(), testParams.getProjectId(),
+                testParams.getEditorUser(), UserStatus.DISABLED);
         try {
-            initReportsPage().clickReportOwner(report.getTitle());
+            initReportsPage().clickReportOwner(editorReport.getTitle());
             StatusBar statusBar = StatusBar.getInstance(browser);
             assertEquals(statusBar.getStatus(), Status.ERROR);
             assertEquals(statusBar.getMessage(), ERROR_MESSAGE);
         } finally {
             UserManagementRestUtils.updateUserStatusInProject(
-                    testParams.getDomainUser() == null ? getRestApiClient() : getDomainUserRestApiClient(),
-                    testParams.getProjectId(), testParams.getEditorUser(), UserStatus.ENABLED);
+                    getDomainUserRestApiClient(), testParams.getProjectId(),
+                    testParams.getEditorUser(), UserStatus.ENABLED);
+        }
+    }
+
+    @Test(dependsOnMethods = {"initialize"}) 
+    public void accessProfileOfDisabledUserButEnabledInOtherProject() throws ParseException, JSONException, IOException {
+        GoodData domainGoodData = getGoodDataClient(
+                testParams.getDomainUser() == null ? testParams.getUser() : testParams.getDomainUser(),
+                        testParams.getPassword());
+        String sameProject = ProjectRestUtils.createProject(domainGoodData, "Copy of " + projectTitle,
+                projectTemplate,testParams.getAuthorizationToken(), testParams.getProjectDriver(), 
+                testParams.getProjectEnvironment());
+        UserManagementRestUtils.addUserToProject(
+                getDomainUserRestApiClient(), sameProject, testParams.getEditorUser(), UserRoles.EDITOR);
+        UserManagementRestUtils.addUserToProject(
+                getDomainUserRestApiClient(), sameProject, testParams.getUser(), UserRoles.ADMIN);
+
+        UserManagementRestUtils.updateUserStatusInProject(
+                getDomainUserRestApiClient(), testParams.getProjectId(),
+                testParams.getEditorUser(), UserStatus.DISABLED);
+        try {
+            assertEquals(initReportsPage().openReportOwnerProfilePageFrom(editorReport.getTitle())
+                    .getUserInfo().getEmail(), testParams.getEditorUser());
+            assertEquals(initMetricPage().openMetricOwnerProfilePage(avgAmountMetric.getTitle())
+                    .getUserInfo().getEmail(), testParams.getEditorUser());
+        } finally {
+            UserManagementRestUtils.updateUserStatusInProject(
+                    getDomainUserRestApiClient(), testParams.getProjectId(),
+                    testParams.getEditorUser(), UserStatus.ENABLED);
+            ProjectRestUtils.deleteProject(domainGoodData, sameProject);
         }
     }
 
