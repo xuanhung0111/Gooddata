@@ -2,14 +2,22 @@ package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_PIPELINE_ANALYSIS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_WHATS_CHANGED;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
 
+import java.io.IOException;
+
+import org.json.JSONException;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 
 public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 
@@ -96,6 +104,26 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
         verifyProjectDashboardsAndTabs(true, expectedGoodSalesDashboardsAndTabs, true);
     }
 
+    @Test(dependsOnGroups = {"createProject"})
+    public void openDefaultDashboardWithoutPID() throws JSONException, IOException {
+        String domainUser = testParams.getDomainUser() == null ? testParams.getUser() : testParams.getDomainUser();
+        DashboardsRestUtils.setDefaultDashboardForDomainUser(getDomainUserRestApiClient(), testParams.getProjectId(),
+                DASH_PIPELINE_ANALYSIS, DASH_TAB_WHATS_CHANGED);
+        logout();
+        signInAtGreyPages(domainUser, testParams.getPassword());
+        try {
+            openDefaultDashboardOfDomainUser();
+            String dashboardUri = DashboardsRestUtils.getDashboardUri(getRestApiClient(), testParams.getProjectId(), 
+                    DASH_PIPELINE_ANALYSIS);
+            String tabID = DashboardsRestUtils.getTabId(getRestApiClient(), testParams.getProjectId(), 
+                    DASH_PIPELINE_ANALYSIS, DASH_TAB_WHATS_CHANGED);
+            assertThat(browser.getCurrentUrl(), containsString(dashboardUri));
+            assertThat(browser.getCurrentUrl(), containsString(tabID));
+        } finally {
+            logoutAndLoginAs(true, UserRoles.ADMIN);
+        }
+    }
+
     private void deleteTab(int offset) {
         initDashboardsPage();
         dashboardsPage.selectDashboard(DASH_PIPELINE_ANALYSIS);
@@ -105,5 +133,10 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
         dashboardsPage.deleteDashboardTab(tabsCount - offset);
         sleepTightInSeconds(5);
         assertEquals(dashboardsPage.getTabs().getNumberOfTabs(), tabsCount - 1, "Tab is still present");
+    }
+
+    private void openDefaultDashboardOfDomainUser() {
+        openUrl("/dashboard.html");
+        waitForDashboardPageLoaded(browser);
     }
 }
