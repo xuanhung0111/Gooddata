@@ -98,10 +98,18 @@ public class ProjectAndUsersPage extends AbstractFragment {
         waitForElementVisible(userManagementLink).click();
         return UserManagementPage.getInstance(browser);
     }
-    
+
     public void leaveProject() {
         waitForElementVisible(leaveProjectButton).click();
         waitForElementVisible(BY_LEAVE_PROJECT_DIALOG_BUTTON, browser).click();
+    }
+
+    public boolean isLeaveButtonEnable() {
+        return isButtonEnable(leaveProjectButton);
+    }
+
+    public String getMessageNextToLeaveButton() {
+        return waitForElementVisible(By.cssSelector(".projectLeaving .caption"), getRoot()).getText();
     }
 
     public ProjectAndUsersPage renameProject(String name) {
@@ -118,9 +126,7 @@ public class ProjectAndUsersPage extends AbstractFragment {
     }
 
     public boolean isDeleteButtonEnabled() {
-        return !waitForElementVisible(deleteProjectButton)
-                .getAttribute("class")
-                .contains("button-disabled");
+        return isButtonEnable(deleteProjectButton);
     }
 
     public void tryDeleteProjectButDiscard() {
@@ -318,5 +324,11 @@ public class ProjectAndUsersPage extends AbstractFragment {
         if(action.equals("cancel")) return isElementPresent(CANCEL_INVITATION_BUTTON_LOCATOR, user.get());
 
         throw new IllegalArgumentException("action argument is not valid");
+    }
+
+    private boolean isButtonEnable(WebElement nameButton) {
+        return !waitForElementVisible(nameButton)
+                .getAttribute("class")
+                .contains("button-disabled");
     }
 }
