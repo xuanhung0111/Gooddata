@@ -39,7 +39,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 public class EmbeddedAdTest extends GoodSalesAbstractTest {
 
     private static final String EMBEDDED_URI = "analyze/embedded/#/%s/reportId/edit";
-    private static final String PERMISSION_ERROR_MESSAGE = "Sorry, you don't have access to this page.";
+    private static final String PERMISSION_ERROR_MESSAGE = "SORRY, YOU DON'T HAVE ACCESS TO THIS PAGE.";
     private static final String IFRAME_WRAPPER_URL = "https://gdc.sitina.net/wrapper.html";
 
     @BeforeClass(alwaysRun = true)

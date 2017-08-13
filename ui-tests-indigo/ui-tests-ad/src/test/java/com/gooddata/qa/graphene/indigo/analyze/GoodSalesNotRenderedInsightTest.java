@@ -38,7 +38,7 @@ public class GoodSalesNotRenderedInsightTest extends GoodSalesAbstractAnalyseTes
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).changeReportType(type);
         //checking empty Measures bucket is not a good way to verify insight containing no metric
         //because user still can add attribute to generate aggregation metric, it's a valid case to save insight
-        assertEquals(analysisPage.getExplorerMessage(), "No measure in your insight",
+        assertEquals(analysisPage.getExplorerMessage(), "NO MEASURE IN YOUR INSIGHT",
                 "Missing metric message was not displayed");
         assertFalse(analysisPage.getPageHeader().isSaveButtonEnabled(), "The save button is enabled");
     }

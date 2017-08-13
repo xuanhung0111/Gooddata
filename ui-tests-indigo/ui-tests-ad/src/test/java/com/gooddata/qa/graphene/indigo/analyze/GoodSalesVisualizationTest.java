@@ -68,13 +68,13 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
     @Test(dependsOnGroups = {"init"})
     public void testWithAttribute() {
         assertEquals(analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
-                .getExplorerMessage(), "No measure in your insight");
+                .getExplorerMessage(), "NO MEASURE IN YOUR INSIGHT");
 
         assertEquals(analysisPage.changeReportType(ReportType.BAR_CHART)
-                .getExplorerMessage(), "No measure in your insight");
+                .getExplorerMessage(), "NO MEASURE IN YOUR INSIGHT");
 
         assertEquals(analysisPage.changeReportType(ReportType.LINE_CHART)
-                .getExplorerMessage(), "No measure in your insight");
+                .getExplorerMessage(), "NO MEASURE IN YOUR INSIGHT");
 
         TableReport report = analysisPage.changeReportType(ReportType.TABLE)
                 .waitForReportComputing().getTableReport();
@@ -127,7 +127,7 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACCOUNT).waitForReportComputing();
         assertTrue(analysisPage.isExplorerMessageVisible());
-        assertEquals(analysisPage.getExplorerMessage(), "Too many data points to display");
+        assertEquals(analysisPage.getExplorerMessage(), "TOO MANY DATA POINTS TO DISPLAY");
         analysisPage.resetToBlankState();
     }
 
@@ -233,7 +233,7 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
     @Test(dependsOnGroups = {"init"})
     public void exportVisualizationWithOneAttributeInChart() {
         assertEquals(analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).getExplorerMessage(),
-                "No measure in your insight");
+                "NO MEASURE IN YOUR INSIGHT");
         assertFalse(analysisPage.getPageHeader().isExportButtonEnabled());
     }
 
