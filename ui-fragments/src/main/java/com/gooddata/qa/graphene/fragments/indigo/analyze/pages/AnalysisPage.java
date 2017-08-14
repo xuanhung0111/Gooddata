@@ -14,6 +14,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -21,6 +22,7 @@ import org.openqa.selenium.support.FindBy;
 import java.util.function.Supplier;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.*;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertTrue;
 
@@ -52,6 +54,10 @@ public class AnalysisPage extends AbstractFragment {
 
     @FindBy(className = "s-bucket-filters")
     private FiltersBucket filterBuckets;
+
+    public static By SUCCESS_MESSAGE_LOCATOR = By.cssSelector("gd-message.success");
+
+    public static By ERROR_MESSAGE_LOCATOR = By.cssSelector("gd-message.error");
 
     public static final String MAIN_CLASS = "adi-editor";
 
@@ -324,21 +330,37 @@ public class AnalysisPage extends AbstractFragment {
 
     public AnalysisPage saveInsight() {
         getPageHeader().saveInsight();
+        waitForSaveFinished();
         return this;
     }
 
     public AnalysisPage saveInsight(final String insight) {
         getPageHeader().saveInsight(insight);
+        waitForSaveFinished();
         return this;
     }
 
     public AnalysisPage saveInsightAs(final String insight) {
         getPageHeader().saveInsightAs(insight);
+        waitForSaveFinished();
         return this;
     }
 
     public AnalysisPage setInsightTitle(final String title) {
         getPageHeader().setInsightTitle(title);
         return this;
+    }
+
+    private void waitForSaveFinished() {
+        int timeoutInSeconds = 10;
+        try {
+            waitForElementVisible(SUCCESS_MESSAGE_LOCATOR, browser, timeoutInSeconds);
+            waitForElementNotPresent(SUCCESS_MESSAGE_LOCATOR);
+        } catch (TimeoutException e) {
+            if (isElementVisible(ERROR_MESSAGE_LOCATOR, browser)) {
+                throw new RuntimeException("Indigo saving failed");
+            }
+            //do nothing, exception could be thrown because the success message flashes so quickly that we missed it.
+        }
     }
 }
