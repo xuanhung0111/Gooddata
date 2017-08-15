@@ -26,13 +26,13 @@ public class MainEditor extends AbstractFragment {
     private WebElement explorerMessage;
 
     private static final String CSS_EXPLORER_MESSAGE = ".adi-canvas-message h2";
-    private static final String CSS_REPORT = ".adi-chart-container:not(.invisible)";
+    private static final String CSS_REPORT_EMPTY = ".s-blank-canvas-message";
     private static final By BY_TABLE_REPORT = By.className("indigo-table-component-content");
     private static final By BY_CHART_REPORT = By.className("adi-report-visualization");
     private static final By BY_REPORT_COMPUTING = By.className("adi-computing");
 
     public boolean isEmpty() {
-        return !isElementPresent(cssSelector(CSS_REPORT), browser);
+        return isElementPresent(cssSelector(CSS_REPORT_EMPTY), browser);
     }
 
     public TableReport getTableReport() {
