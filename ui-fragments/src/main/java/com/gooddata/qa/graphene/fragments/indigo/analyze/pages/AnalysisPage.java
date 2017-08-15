@@ -24,6 +24,7 @@ import java.util.function.Supplier;
 import static com.gooddata.qa.graphene.utils.WaitUtils.*;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -55,13 +56,13 @@ public class AnalysisPage extends AbstractFragment {
     @FindBy(className = "s-bucket-filters")
     private FiltersBucket filterBuckets;
 
-    public static By SUCCESS_MESSAGE_LOCATOR = By.cssSelector("gd-message.success");
-
-    public static By ERROR_MESSAGE_LOCATOR = By.cssSelector("gd-message.error");
-
     public static final String MAIN_CLASS = "adi-editor";
 
     private static final By BY_TRASH_PANEL = className("s-trash");
+
+    private static final By SUCCESS_MESSAGE_LOCATOR = cssSelector("gd-message.success");
+
+    private static final By ERROR_MESSAGE_LOCATOR = cssSelector("gd-message.error");
 
     public static AnalysisPage getInstance(SearchContext context) {
         return Graphene.createPageFragment(AnalysisPage.class,
