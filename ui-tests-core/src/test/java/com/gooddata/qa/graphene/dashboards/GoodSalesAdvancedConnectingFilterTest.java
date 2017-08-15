@@ -1,16 +1,16 @@
 package com.gooddata.qa.graphene.dashboards;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CLOSED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CREATED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Arrays.asList;
 import static org.joda.time.DateTime.now;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CREATED;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CLOSED;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_SNAPSHOT;
 
 import java.util.List;
 import java.util.UUID;
@@ -688,6 +688,35 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         assertEquals(getProductFilter().getCurrentValue(), PRODUCT_EDUCATIONLY);
     }
 
+    @Test(dependsOnGroups = {"precondition"})
+    public void checkDateFilterConnectedAfterReassignSameValue() {
+        initDashboardsPage()
+                .addNewDashboard(generateDashboard())
+                .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR, THIS)
+                .addTimeFilterToDashboard(DATE_DIMENSION_CLOSED, DateGranularity.YEAR, THIS);
+
+        moveElementToRightPlace(getDateCreatedFilter().getRoot(), DashboardWidgetDirection.RIGHT);
+
+        dashboardsPage
+                .addNewTab(DASHBOARD_TAB)
+                .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR, LAST)
+                .addTimeFilterToDashboard(DATE_DIMENSION_CLOSED, DateGranularity.YEAR, THIS);
+
+        moveElementToRightPlace(getDateCreatedFilter().getRoot(), DashboardWidgetDirection.RIGHT);
+        dashboardsPage.saveDashboard();
+
+        dashboardsPage.editDashboard();
+        getDateCreatedFilter().editTimeFilterValue(THIS);
+        dashboardsPage.saveDashboard();
+        assertEquals(getDateCreatedFilter().getCurrentValue(), CURRENT_YEAR);
+
+        getDateCreatedFilter().changeTimeFilterValueByClickInTimeLine(YEAR_OF_DATA);
+        dashboardsPage.openTab(0);
+
+        takeScreenshot(browser, "Date-filter-connected-between tabs-after-reassign-same-value", getClass());
+        assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_OF_DATA);
+    }
+
     private String generateDashboard() {
         return "Dashboard-" + UUID.randomUUID().toString().substring(0, 6);
     }
@@ -698,7 +727,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
     }
 
     private TableReport getReport() {
-        return dashboardsPage.getReport(REPORT, TableReport.class);
+        return dashboardsPage.getReport(REPORT, TableReport.class).waitForReportLoading();
     }
 
     private FilterWidget getDateCreatedFilter() {
