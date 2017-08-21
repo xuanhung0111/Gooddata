@@ -4,7 +4,7 @@ import com.gooddata.qa.graphene.add.DataloadProcessTest;
 import com.gooddata.qa.graphene.add.DataloadResourcesPermissionTest;
 import com.gooddata.qa.graphene.add.SqlDiffTest;
 import com.gooddata.qa.graphene.add.schedule.CreateScheduleTest;
-import com.gooddata.qa.graphene.add.schedule.DatasetDetailTest;
+import com.gooddata.qa.graphene.add.schedule.execution.dialog.LoadDatasetWithoutTSColumnTest;
 import com.gooddata.qa.graphene.add.schedule.IncrementalLoadTest;
 import com.gooddata.qa.graphene.add.schedule.LoadDatasetTest;
 import com.gooddata.qa.graphene.add.schedule.PresenceOfTimestampColumnTest;
@@ -24,7 +24,7 @@ public class UITestsRegistry {
         suites.put("all", new Object[] {
             CreateScheduleTest.class,
             ScheduleDetailTest.class,
-            DatasetDetailTest.class,
+            LoadDatasetWithoutTSColumnTest.class,
             LoadDatasetTest.class,
             SqlDiffTest.class,
             DataloadProcessTest.class,

@@ -48,6 +48,10 @@ public class RunOneOffDialog extends ConfirmationDialog {
         return this;
     }
 
+    public boolean hasNoMode() {
+        return getModes().isEmpty();
+    }
+
     public String getIncrementalLoadHelperText() {
         return waitForElementVisible(By.className("helper-text"), getRoot()).getText();
     }
