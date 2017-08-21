@@ -1,23 +1,5 @@
 package com.gooddata.qa.graphene.filters;
 
-import com.gooddata.md.Fact;
-import com.gooddata.qa.graphene.AbstractDashboardWidgetTest;
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
-import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
-import org.apache.commons.io.IOUtils;
-import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.List;
-
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
 import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.postEtlPullIntegration;
@@ -25,6 +7,29 @@ import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.List;
+
+import org.apache.commons.io.IOUtils;
+import org.json.JSONException;
+import org.openqa.selenium.WebElement;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import com.gooddata.md.Fact;
+import com.gooddata.qa.graphene.AbstractDashboardWidgetTest;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.SelectionConfigPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel.Tab;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 
 public class DashboardFiscalDateFilterTest extends AbstractDashboardWidgetTest {
 
@@ -65,24 +70,24 @@ public class DashboardFiscalDateFilterTest extends AbstractDashboardWidgetTest {
     public void shouldShowCustomLabels() {
         initDashboardsPage().selectDashboard(DASHBOARD_NAME).editDashboard();
         FilterWidget timeFilter = getFilter(FILTER_NAME);
-        assertTrue(timeFilter.getCurrentValue().startsWith("FY"), "display fiscal filter label incorrectly");
+        assertTrue(timeFilter.getCurrentValue().startsWith("FY"), "Display fiscal filter label incorrectly.");
 
         TimeFilterPanel timeFilterPanel = timeFilter.openPanel().getTimeFilterPanel();
         List<String> selectedTimelineItemNames = timeFilterPanel.getSelectedTimelineItemNames();
 
-        assertTrue(isCustomYearLabels(selectedTimelineItemNames), "display fiscal filter label on timeline incorrectly");
+        assertTrue(isCustomYearLabels(selectedTimelineItemNames), "Display fiscal filter label on timeline incorrectly.");
     }
 
     @Test(dependsOnGroups = {"fiscalDateInit"})
     public void shouldShowCustomLabelsInViewMode() {
         initDashboardsPage().selectDashboard(DASHBOARD_NAME);
         FilterWidget timeFilter = getFilter(FILTER_NAME);
-        assertTrue(timeFilter.getCurrentValue().startsWith("FY"), "display fiscal filter label incorrectly");
+        assertTrue(timeFilter.getCurrentValue().startsWith("FY"), "Display fiscal filter label incorrectly.");
 
         TimeFilterPanel timeFilterPanel = timeFilter.openPanel().getTimeFilterPanel();
         List<String> selectedTimelineItemNames = timeFilterPanel.getSelectedTimelineItemNames();
 
-        assertTrue(isCustomYearLabels(selectedTimelineItemNames), "display fiscal filter label on timeline incorrectly");
+        assertTrue(isCustomYearLabels(selectedTimelineItemNames), "Display fiscal filter label on timeline incorrectly.");
     }
 
     @Test(dependsOnGroups = {"fiscalDateInit"})
@@ -93,15 +98,15 @@ public class DashboardFiscalDateFilterTest extends AbstractDashboardWidgetTest {
         // Quarter
         timeFilter.editDefaultTimeFilterValue(TimeFilterPanel.DateGranularity.QUARTER, THIS);
         int quarter = Integer.parseInt(timeFilter.getCurrentValue().split("/")[0].toString(), 10);
-        assertTrue((quarter >= 1) && (quarter <= 4), "display fiscal filter label for quarter incorrectly.");
+        assertTrue((quarter >= 1) && (quarter <= 4), "Display fiscal filter label for quarter incorrectly.");
 
         // Month
         timeFilter.editDefaultTimeFilterValue(TimeFilterPanel.DateGranularity.MONTH, THIS);
-        assertTrue(timeFilter.getCurrentValue().matches("\\D{3}\\s\\d{4}"), "display fiscal filter label for month incorrectly.");
+        assertTrue(timeFilter.getCurrentValue().matches("\\D{3}\\s\\d{4}"), "Display fiscal filter label for month incorrectly.");
 
         // Week
         timeFilter.editDefaultTimeFilterValue(TimeFilterPanel.DateGranularity.WEEK, THIS);
-        assertTrue(timeFilter.getCurrentValue().startsWith("W"));
+        assertTrue(timeFilter.getCurrentValue().startsWith("W"), "Display fiscal filter label for week incorrectly.");
     }
 
     @Test(dependsOnGroups = {"fiscalDateInit"})
@@ -109,12 +114,12 @@ public class DashboardFiscalDateFilterTest extends AbstractDashboardWidgetTest {
         initDashboardsPage().selectDashboard(DASHBOARD_NAME);
         FilterWidget timeFilter = getFilter(FILTER_NAME);
         System.out.println("date description " + timeFilter.getCurrentValue());
-        assertTrue(timeFilter.getCurrentValue().startsWith("FY"), "display fiscal filter label incorrectly");
+        assertTrue(timeFilter.getCurrentValue().startsWith("FY"), "Display fiscal filter label incorrectly.");
 
         TimeFilterPanel timeFilterPanel = timeFilter.openPanel().getTimeFilterPanel().selectTimeLine(INPUT_YEAR);
         List<String> selectedTimelineItemNames = timeFilterPanel.getSelectedTimelineItemNames();
 
-        assertTrue(isCustomYearLabels(selectedTimelineItemNames), "display fiscal filter label on timeline incorrectly");
+        assertTrue(isCustomYearLabels(selectedTimelineItemNames), "Display fiscal filter label on timeline incorrectly.");
         assertEquals(timeFilterPanel.getFromValue(), "01/01/2007");
         assertEquals(timeFilterPanel.getToValue(), "12/30/2007");
     }
@@ -150,8 +155,57 @@ public class DashboardFiscalDateFilterTest extends AbstractDashboardWidgetTest {
                 .submit();
         report.waitForReportLoading();
 
-        assertTrue(report.getAttributeElements().toString().contains(INPUT_YEAR));
-        assertFalse(report.getAttributeElements().toString().contains("FY2006"));
+        assertTrue(report.getAttributeElements().toString().contains(INPUT_YEAR), INPUT_YEAR + " should be displayed in the report.");
+        assertFalse(report.getAttributeElements().toString().contains("FY2006"), "FY2006 shouldn't displayed in the report.");
+    }
+
+    @Test(dependsOnGroups = {"fiscalDateInit"})
+    public void disableDatePicker() {
+        initDashboardsPage().selectDashboard(DASHBOARD_NAME).editDashboard();
+        FilterWidget timeFilter = getFilter(FILTER_NAME);
+        configureSelectionDateFilter(timeFilter.getRoot(), false, true);
+
+        TimeFilterPanel timeFilterPanel = timeFilter.openPanel().getTimeFilterPanel();
+        assertTrue(timeFilterPanel.isDatePickerIconNotPresent(), "Calendar icon shouldn't be displayed.");
+
+        timeFilterPanel.clickOnFromInput();
+        assertTrue(timeFilterPanel.isDatePickerNotPresent(), "Date picker shouldn't be displayed.");
+
+        timeFilterPanel.clickOnToInput();
+        assertTrue(timeFilterPanel.isDatePickerNotPresent(), "Date picker shouldn't be displayed.");
+    }
+
+    @Test(dependsOnGroups = {"fiscalDateInit"})
+    public void enableDatePicker() {
+        initDashboardsPage().selectDashboard(DASHBOARD_NAME).editDashboard();
+        FilterWidget timeFilter = getFilter(FILTER_NAME);
+        configureSelectionDateFilter(timeFilter.getRoot(), false, false);
+
+        TimeFilterPanel timeFilterPanel = timeFilter.openPanel().getTimeFilterPanel();
+        assertFalse(timeFilterPanel.isDatePickerIconNotPresent(), "Calendar icon isn't displayed.");
+
+        timeFilterPanel.clickOnFromInput();
+        assertFalse(timeFilterPanel.isDatePickerNotPresent(), "Date picker isn't displayed.");
+
+        timeFilterPanel.clickOnToInput();
+        assertFalse(timeFilterPanel.isDatePickerNotPresent(), "Date picker isn't displayed.");
+    }
+
+    @Test(dependsOnGroups = {"fiscalDateInit"})
+    public void hideFromTo() {
+        initDashboardsPage().selectDashboard(DASHBOARD_NAME).editDashboard();
+        FilterWidget timeFilter = getFilter(FILTER_NAME);
+
+        configureSelectionDateFilter(timeFilter.getRoot(), true, true);
+        assertTrue(timeFilter.openPanel().getTimeFilterPanel().isFromToNotVisible(), "From/To inputs still be displayed.");
+    }
+
+    private void configureSelectionDateFilter(WebElement timeFilter, boolean isHideDateRange, boolean isHideDatePicker) {
+        WidgetConfigPanel widgetConfigPanel = WidgetConfigPanel.openConfigurationPanelFor(timeFilter, browser);
+        widgetConfigPanel.getTab(Tab.SELECTION, SelectionConfigPanel.class)
+                .setHideDateRange(isHideDateRange)
+                .setHideDatePicker(isHideDatePicker);
+        widgetConfigPanel.saveConfiguration();
     }
 
     private boolean isCustomYearLabels(List<String> labels) {
