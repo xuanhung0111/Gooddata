@@ -17,11 +17,11 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.Select
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.AttributeFilterPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.DashboardEditWidgetToolbarPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 
 public class FilterWidget extends AbstractFragment {
 
-    @FindBy(tagName = "button")
+    @FindBy(css = "button.description:not(.gdc-hidden)")
     private WebElement button;
 
     @FindBy(className = "titleContainer")
@@ -39,6 +39,7 @@ public class FilterWidget extends AbstractFragment {
 
     public FilterWidget openEditPanel() {
         if (!isOpen()) {
+            waitForElementVisible(button);
             DashboardEditWidgetToolbarPanel.openEditPanelFor(this.getRoot(), browser);
         }
         return this;
@@ -84,9 +85,10 @@ public class FilterWidget extends AbstractFragment {
         return this;
     }
 
-    public FilterWidget editTimeFilterValue(String timeLine) {
+    public FilterWidget editDefaultTimeFilterValue(DateGranularity granularity, String timeLine) {
         openEditPanel()
             .getTimeFilterPanel()
+            .selectDateGranularity(granularity)
             .selectTimeLine(timeLine)
             .submit();
         return this;
@@ -120,6 +122,7 @@ public class FilterWidget extends AbstractFragment {
     }
 
     public String getCurrentValue() {
+        waitForElementVisible(button);
         return getRoot().getText().split("\n")[1];
     }
 

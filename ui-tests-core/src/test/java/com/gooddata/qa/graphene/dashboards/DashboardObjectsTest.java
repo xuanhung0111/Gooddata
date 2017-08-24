@@ -59,7 +59,7 @@ public class DashboardObjectsTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"changeStateLabelTest", "createvariableTest"})
     public void addDashboardObjectsTest() {;
-        createMetric(METRIC_NAME, 
+        createMetric(METRIC_NAME,
                 format("SELECT SUM([%s])", getMdService().getObjUri(getProject(), Fact.class, title(FACT_NAME))),
                 DEFAULT_METRIC_FORMAT);
 

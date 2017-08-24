@@ -26,6 +26,9 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPan
 
 public class DashboardEditBar extends AbstractFragment {
 
+    private static final By BY_FISCAL_MESSAGE_LOADING = By.className("fiscalMessageLoading");
+    private static final By FILTER_MENU_ITEM_LOADING = By.cssSelector("li.s-loading___");
+
     @FindBy(css = ".s-btn-save")
     private WebElement saveButton;
 
@@ -158,6 +161,7 @@ public class DashboardEditBar extends AbstractFragment {
         }
 
         openFilterMenu().select("Date");
+        waitForElementNotVisible(BY_FISCAL_MESSAGE_LOADING);
         waitForFragmentVisible(dashboardFilter).addTimeFilter(dateDimension, dateGranularity, timeLine);
 
         return this;
@@ -284,6 +288,7 @@ public class DashboardEditBar extends AbstractFragment {
 
     private SimpleMenu openFilterMenu() {
         waitForElementVisible(addFilterMenu).click();
+        waitForElementNotPresent(FILTER_MENU_ITEM_LOADING);
         return SimpleMenu.getInstance(browser);
     }
 }

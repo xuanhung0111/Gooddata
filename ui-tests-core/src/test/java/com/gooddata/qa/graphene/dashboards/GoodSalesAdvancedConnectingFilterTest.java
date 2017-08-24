@@ -706,7 +706,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         dashboardsPage.saveDashboard();
 
         dashboardsPage.editDashboard();
-        getDateCreatedFilter().editTimeFilterValue(THIS);
+        getDateCreatedFilter().editDefaultTimeFilterValue(DateGranularity.YEAR, THIS);
         dashboardsPage.saveDashboard();
         assertEquals(getDateCreatedFilter().getCurrentValue(), CURRENT_YEAR);
 
