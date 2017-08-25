@@ -11,6 +11,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.gooddata.fixture.ResourceManagement.ResourceTemplate;
 import com.gooddata.md.Attribute;
 import com.gooddata.project.ProjectValidationResults;
 
@@ -25,7 +26,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.md.Attribute;
 import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
 import com.gooddata.md.report.Report;
@@ -33,7 +33,6 @@ import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.project.Project;
 import com.gooddata.project.ProjectDriver;
 import com.gooddata.qa.fixture.Fixture;
-import com.gooddata.qa.fixture.GdcFixture;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.utils.graphene.Screenshots;
@@ -67,7 +66,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     // keep this param for tests depending on other templates (e.g.: connectors test)
     protected String projectTemplate = "";
 
-    protected Fixture appliedFixture;
+    protected ResourceTemplate appliedFixture;
     protected int projectCreateCheckIterations = DEFAULT_PROJECT_CHECK_LIMIT;
 
     // validations are enabled by default on any child class
@@ -121,9 +120,9 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         }
 
         if (!Objects.isNull(appliedFixture)) {
-            log.info(appliedFixture.getName() + " fixture is being used");
+            log.info(appliedFixture.getPath() + " fixture is being used");
 
-            GdcFixture fixture = new GdcFixture(appliedFixture);
+            Fixture fixture = new Fixture(appliedFixture);
             fixture.setGoodDataClient(getGoodDataClient());
             fixture.setRestApiClient(getRestApiClient());
 

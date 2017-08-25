@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene;
 
+import com.gooddata.fixture.ResourceManagement.ResourceTemplate;
 import com.gooddata.md.report.AttributeInGrid;
 import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.MetricElement;
-import com.gooddata.qa.fixture.Fixture;
 import org.testng.annotations.BeforeClass;
 
 import java.util.Arrays;
@@ -24,7 +24,7 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
     @BeforeClass(alwaysRun = true)
     public void initProperties() {
         projectTitle = "GoodSales-test";
-        appliedFixture = Fixture.GOODSALES;
+        appliedFixture = ResourceTemplate.GOODSALES;
 
         // going to be removed when https://jira.intgdc.com/browse/QA-6503 is done
         expectedGoodSalesDashboardsAndTabs = new HashMap<>();

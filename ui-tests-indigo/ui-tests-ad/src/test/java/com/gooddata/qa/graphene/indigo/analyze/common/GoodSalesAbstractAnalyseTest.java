@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze.common;
 
-import com.gooddata.qa.fixture.Fixture;
+import com.gooddata.fixture.ResourceManagement.ResourceTemplate;
 import org.testng.annotations.BeforeClass;
 
 public abstract class GoodSalesAbstractAnalyseTest extends AbstractAnalyseTest {
@@ -8,8 +8,8 @@ public abstract class GoodSalesAbstractAnalyseTest extends AbstractAnalyseTest {
     @BeforeClass(alwaysRun = true)
     public void initProperties() {
         super.initProperties();
-        appliedFixture = Fixture.GOODSALES;
-        projectTitle += appliedFixture.getName() + "-";
+        appliedFixture = ResourceTemplate.GOODSALES;
+        projectTitle += appliedFixture.getPath() + "-";
     }
 
     @Override
