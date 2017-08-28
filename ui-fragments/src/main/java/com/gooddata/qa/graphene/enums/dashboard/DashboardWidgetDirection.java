@@ -1,38 +1,63 @@
 package com.gooddata.qa.graphene.enums.dashboard;
 
-import org.openqa.selenium.Keys;
+import org.jboss.arquillian.drone.api.annotation.Default;
+import org.jboss.arquillian.graphene.context.GrapheneContext;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public enum DashboardWidgetDirection {
 
-    NONE,
-    LEFT("left: 0px", Keys.LEFT),
-    RIGHT("left: 630px", Keys.RIGHT),
-    UP("top: 0px", Keys.UP),
-    MIDDLE("top: 60px", Keys.DOWN),
-    DOWN("top: 120px", Keys.DOWN);
+    LEFT("(left): (\\d+)px", 0),
+    RIGHT("(left): (\\d+)px", 630),
+    UP("(top): (\\d+)px", 0),
+    MIDDLE("(top): (\\d+)px", 60),
+    DOWN("(top): (\\d+)px", 120);
 
-    private String direction;
-    private Keys key;
+    private String pattern;
+    private int expectedCoordinates;
 
-    private DashboardWidgetDirection(String direction, Keys key) {
-        this.direction = direction;
-        this.key = key;
+    DashboardWidgetDirection(String pattern, int expectedCoordinates) {
+        this.pattern = pattern;
+        this.expectedCoordinates = expectedCoordinates;
     }
 
-    private DashboardWidgetDirection() {}
-
     public void moveElementToRightPlace(WebElement element) {
-        if (direction == null) {
-            return;
+        WebDriver driver = GrapheneContext.getContextFor(Default.class).getWebDriver(WebDriver.class);
+
+        Map<String, Integer> distance = getDistance(element);
+        new Actions(driver).clickAndHold(element)
+                .moveByOffset(distance.get("x"), distance.get("y"))
+                .release()
+                .perform();
+    }
+
+    private Map<String, Integer> getDistance(WebElement element) {
+        Map<String, Integer> distance = new HashMap<>();
+
+        Pattern p = Pattern.compile(this.pattern);
+        Matcher m = p.matcher(element.getAttribute("style"));
+
+        if (!m.find()) {
+            throw new RuntimeException("Not found pattern: " + this.pattern + " in element HTML");
         }
 
-        if (this != UP) {
-            UP.moveElementToRightPlace(element);
+        int x = 0;
+        int y = 0;
+
+        if (m.group(1).equals("left")) {
+            x = this.expectedCoordinates - Integer.parseInt(m.group(2));
+        } else {
+            y = this.expectedCoordinates - Integer.parseInt(m.group(2));
         }
 
-        while (!element.getAttribute("style").contains(direction)) {
-            element.sendKeys(Keys.SHIFT, key);
-        }
+        distance.put("x", x);
+        distance.put("y", y);
+        return distance;
     }
 }
