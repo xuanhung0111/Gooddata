@@ -113,7 +113,7 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
             .editMetricFormat("#,##0.00USD");
         FiltersConfigPanel filtersConfigPanel = widgetConfigPanel.getTab(Tab.FILTERS, FiltersConfigPanel.class);
         assertTrue(isEqualCollection(filtersConfigPanel.getAllFilters(),
-                asList("Date dimension (Created)", VARIABLE_NAME, ATTR_PRODUCT)));
+                asList(DATE_DIMENSION_CREATED, VARIABLE_NAME, ATTR_PRODUCT)));
         filtersConfigPanel.removeFiltersFromSelectedList(ATTR_PRODUCT);
         widgetConfigPanel.getTab(Tab.METRIC, MetricConfigPanel.class)
             .selectMetric(METRIC_VARIABLE, "Created");
