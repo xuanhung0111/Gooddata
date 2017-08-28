@@ -1,24 +1,33 @@
 package com.gooddata.qa.graphene.fragments.dashboards.widget.filter;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.utils.ElementUtils;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
-
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.utils.ElementUtils;
 
 public class TimeFilterPanel extends AbstractFragment {
 
     private static final By LOCATOR = By.cssSelector(".yui3-c-tabtimefilterbase:not(.gdc-hidden)");
+    private static final By FROM_DATE_PICKER_ICON = By.cssSelector(".fromInput .datepicker-icon");
+    private static final By TO_DATE_PICKER_ICON = By.cssSelector(".toInput .datepicker-icon");
+    private static final By DATE_PICKER = By.cssSelector(".c-call:not(.gdc-hidden)");
+    private static final By INTERVAL = By.cssSelector(".interval");
+    private static final By BY_FISCAL_MESSAGE_LOADING = By.cssSelector(".fiscalMessageLoading:not(.gdc-hidden)");
 
     @FindBy(css = ".s-granularity span")
     private List<WebElement> dateGranularitys;
@@ -35,22 +44,18 @@ public class TimeFilterPanel extends AbstractFragment {
     @FindBy(css = ".timeline .arrow-left")
     private WebElement leftArrow;
 
-    @FindBy(css = "div.fromInput:not(.loading) input.input")
+    @FindBy(css = ".fromInput:not(.loading) input")
     private WebElement filterTimeFromInput;
 
-    @FindBy(css = "div.toInput:not(.loading) input.input")
+    @FindBy(css = ".toInput:not(.loading) input")
     private WebElement filterTimeToInput;
-
-    @FindBy(css = "div.fromInput label.label")
-    private WebElement fromLabel;
-
-    @FindBy(css = "div.toInput label.label")
-    private WebElement toLabel;
 
     @FindBy(css = ".s-btn-apply,.s-btn-add")
     private WebElement applyButton;
 
     public static TimeFilterPanel getInstance(SearchContext searchContext) {
+        //wait for loading progress finished
+        waitForElementNotPresent(BY_FISCAL_MESSAGE_LOADING);
         return Graphene.createPageFragment(TimeFilterPanel.class, waitForElementVisible(LOCATOR, searchContext));
     }
 
@@ -94,6 +99,28 @@ public class TimeFilterPanel extends AbstractFragment {
         waitForElementVisible(filterTimeToInput).clear();
         filterTimeToInput.sendKeys(endTime);
         submit();
+    }
+
+    public boolean isDatePickerIconNotPresent() {
+        return (!isElementPresent(FROM_DATE_PICKER_ICON, getRoot()) && !isElementPresent(TO_DATE_PICKER_ICON, getRoot()));
+    }
+
+    public boolean isDatePickerNotPresent() {
+        return !isElementPresent(DATE_PICKER, browser);
+    }
+
+    public TimeFilterPanel clickOnFromInput() {
+        waitForElementVisible(filterTimeFromInput).click();
+        return this;
+    }
+
+    public TimeFilterPanel clickOnToInput() {
+        waitForElementVisible(filterTimeToInput).click();
+        return this;
+    }
+
+    public boolean isFromToNotVisible() {
+        return (!isElementVisible(INTERVAL, getRoot()));
     }
 
     public void submit() {
