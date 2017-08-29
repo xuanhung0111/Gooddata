@@ -98,6 +98,8 @@ public class TimeFilterPanel extends AbstractFragment {
         filterTimeFromInput.sendKeys(startTime);
         waitForElementVisible(filterTimeToInput).clear();
         filterTimeToInput.sendKeys(endTime);
+        //click out of the filterTimeToInput to make it lost focus, So it is applied the input value in sendKeys
+        waitForElementVisible(By.className("dateExample2"), getRoot()).click();
         submit();
     }
 
