@@ -73,6 +73,10 @@ public class GoodSalesSaveInsightTest extends GoodSalesAbstractAnalyseTest {
                 "Save dialog exists");
         //make sure data is cleared before open insight
         assertTrue(analysisPage.resetToBlankState().isBlankState());
+        //insight name will be cut down if length of name over 256
+        if(insightName.length() > 256) {
+            insightName = insightName.substring(0, 255);
+        }
         assertEquals(analysisPage.openInsight(insightName).getChartReport().getTrackersCount(),
                 expectedTrackerCount);
     }

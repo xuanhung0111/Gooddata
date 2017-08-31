@@ -57,7 +57,7 @@ public abstract class AbstractInsightSelectionPanel extends AbstractFragment {
     }
 
     private boolean compareShortenedTitle(String insightItem, String searchString) {
-        return searchString.startsWith(insightItem.split("…")[0]);
+        return searchString.startsWith(insightItem.split("…")[0]) && searchString.endsWith(insightItem.split("…")[1]);
     }
 
     private boolean isShortenedTitle(String insightName) {
