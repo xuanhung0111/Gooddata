@@ -213,12 +213,15 @@ public class ReportPage extends AbstractFragment {
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException("Cannot find folder: " + folder))
             .click();
+        // wait for Folder location be highlighted
+        waitForElementHighLighted(folder);
         return this;
     }
 
     public ReportPage selectMetric(String metric) {
         return selectMetric(metric, e -> {
             e.click();
+            waitForElementHighLighted(metric);
             //wait for metric details displayed in third column of SND dialog
             //or warning dialog of "You have reached the limit of metrics in report"
             waitForSndMetricDetail();
@@ -244,7 +247,10 @@ public class ReportPage extends AbstractFragment {
     }
 
     public ReportPage selectAttribute(String attribute) {
-        return selectAttribute(attribute, WebElement::click);
+        return selectAttribute(attribute, e -> {
+            e.click();
+            waitForElementHighLighted(attribute);
+        });
     }
 
     public ReportPage deselectAttribute(String attribute) {
@@ -995,5 +1001,12 @@ public class ReportPage extends AbstractFragment {
         final WebElement metricContainer = waitForElementVisible(METRICS_CONTAINER_LOCATOR, browser);
         return waitForElementVisible(cssSelector(".s-grid-" + simplifyText(metric) + " .metricName"),
                 metricContainer);
+    }
+
+    private void waitForElementHighLighted(String element) {
+        Predicate<WebDriver> highlightedElement = browser ->
+                isElementVisible(By.cssSelector(".s-grid-" + simplifyText(element) + ".highlight"), getRoot())
+                || isElementVisible(By.className("t-reportEditorMessage"), browser);
+        Graphene.waitGui().until(highlightedElement);
     }
 }
