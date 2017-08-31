@@ -114,6 +114,7 @@ public class TableReport extends AbstractDashboardReport {
     }
 
     public List<String> getAttributeElements() {
+        waitForReportLoading();
         waitForTableReportExecutionProgress();
         return getElementTexts(attributeElementInGrid);
     }
@@ -216,6 +217,7 @@ public class TableReport extends AbstractDashboardReport {
                 continue;
 
             e.findElement(cssSelector("span")).click();
+            waitForReportLoading();
             return;
         }
         throw new IllegalArgumentException("No metric value to drill on");
@@ -223,6 +225,7 @@ public class TableReport extends AbstractDashboardReport {
 
     public TableReport drillOnMetricValue(String value) {
         getMetricElement(value).click();
+        waitForReportLoading();
         return this;
     }
 
