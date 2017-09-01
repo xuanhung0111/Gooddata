@@ -73,7 +73,6 @@ public final class GoodSalesUtils {
     public static final String ATTR_YEAR_CLOSE = "Year (Closed)";
     public static final String ATTR_DATE_SNAPSHOT = "Date (Snapshot)";
     public static final String ATTR_YEAR_SNAPSHOT = "Year (Snapshot)";
-    public static final String ATTR_DATE_DIMENSION_SNAPSHOT = "Date dimension (Snapshot)";
     public static final String ATTR_QUARTER_YEAR_SNAPSHOT = "Quarter/Year (Snapshot)";
     public static final String ATTR_MONTH_YEAR_SNAPSHOT = "Month/Year (Snapshot)";
     public static final String ATTR_QUARTER_YEAR_CREATED = "Quarter/Year (Created)";
@@ -97,9 +96,8 @@ public final class GoodSalesUtils {
     public static final String VARIABLE_STATUS = "Status";
 
     // date dimensions
-    public static final String DATE_DIMENSION_CREATED = "Date dimension (Created)";
-    public static final String DATE_DIMENSION_CLOSED = "Date dimension (Closed)";
-    public static final String DATE_DIMENSION_SNAPSHOT = "Date dimension (Snapshot)";
-    public static final String DATE_DIMENSION_ACTIVITY = "Date dimension (Activity)";
-    public static final String DATE_DIMENSION_TIMELINE = "Date dimension (Timeline)";
+    public static final String DATE_DIMENSION_CREATED = "Date (Created)";
+    public static final String DATE_DIMENSION_CLOSED = "Date (Closed)";
+    public static final String DATE_DIMENSION_SNAPSHOT = "Date (Snapshot)";
+    public static final String DATE_DIMENSION_ACTIVITY = "Date (Activity)";
 }

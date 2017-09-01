@@ -146,7 +146,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
 
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
             assertTrue(isEqualCollection(report.openReportInfoViewPanel().getAllFilterNames(),
-                    singleton("Date dimension (Snapshot)")));
+                    singleton(DATE_DIMENSION_SNAPSHOT)));
             assertTrue(report.getRoot().findElement(By.cssSelector("div[title='2012']")).isDisplayed());
             assertTrue(report.getRoot().findElements(By.cssSelector("div[title='2011']")).isEmpty());
             report.closeReportInfoViewPanel();
@@ -161,7 +161,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
 
             dashboardsPage.editDashboard();
             report = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            report.removeFilters("Date dimension (Snapshot)");
+            report.removeFilters(DATE_DIMENSION_SNAPSHOT);
             dashboardsPage.saveDashboard();
 
             report = dashboardsPage.getContent().getLatestReport(TableReport.class);
