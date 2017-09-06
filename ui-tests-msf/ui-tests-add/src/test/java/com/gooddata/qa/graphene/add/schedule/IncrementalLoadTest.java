@@ -5,6 +5,7 @@ import static com.gooddata.qa.utils.http.RestUtils.getResource;
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasItem;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -93,10 +94,11 @@ public class IncrementalLoadTest extends AbstractDataloadProcessTest {
                 defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person)));
 
         executeSchedule(loadPersonSchedule);
-        assertEquals(initScheduleDetail(loadPersonSchedule)
-                .getDatasetDropdown()
-                .expand()
-                .getLSLTSOf(DATASET_PERSON), lastLSLTS);
+
+        DatasetDropdown dropdown = initScheduleDetail(loadPersonSchedule)
+                .getDatasetDropdown().expand();
+        assertEquals(dropdown.getLSLTSOf(DATASET_PERSON), lastLSLTS);
+        assertThat(dropdown.getDatasetGroups().get("INCREMENTAL LOAD"), hasItem(DATASET_PERSON));
 
         Attribute personAttr = getMdService().getObj(getProject(), Attribute.class, title(ATTR_PERSON));
         assertThat(getAttributeValues(personAttr),

@@ -8,6 +8,7 @@ import java.util.Collection;
 
 import com.gooddata.qa.graphene.entity.add.IncrementalPeriod;
 import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
@@ -66,6 +67,15 @@ public class DataloadScheduleDetail extends AbstractScheduleDetail {
 
     public Collection<String> getSelectedDatasets() {
         return waitForFragmentVisible(datasetUploadSection).getSelectedDatasets();
+    }
+
+    public String getNonExistingDatasetsMessage() {
+        return waitForElementVisible(By.cssSelector(".dataset-nonexisting .message"), getRoot()).getText();
+    }
+
+    public DataloadScheduleDetail removeNonExistingDatasets() {
+        waitForElementVisible(By.cssSelector(".remove-dataset-button button"), getRoot()).click();
+        return this;
     }
 
     private DataloadScheduleDetail executeSchedule(LoadMode mode, IncrementalPeriod period, SyncDatasets syncDatasets) {
