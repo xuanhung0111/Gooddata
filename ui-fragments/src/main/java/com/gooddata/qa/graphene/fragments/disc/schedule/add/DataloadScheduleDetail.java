@@ -6,6 +6,7 @@ import static java.util.Objects.nonNull;
 
 import java.util.Collection;
 
+import com.gooddata.qa.graphene.entity.add.IncrementalPeriod;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -31,27 +32,11 @@ public class DataloadScheduleDetail extends AbstractScheduleDetail {
     }
 
     public DataloadScheduleDetail executeSchedule(LoadMode mode, SyncDatasets syncDatasets) {
-        int executionItems = executionHistoryItems.size();
+        return executeSchedule(mode, null, syncDatasets);
+    }
 
-        RunOneOffDialog dialog = triggerRunOneOffDialog();
-        if (nonNull(mode)) {
-            dialog.setMode(mode);
-        }
-        if (nonNull(syncDatasets)) {
-            DatasetDropdown dropdown = dialog.getDatasetDropdown().expand();
-            if (nonNull(syncDatasets.getDatasets())) {
-                dropdown.selectDatasets(syncDatasets.getDatasets());
-            } else {
-                dropdown.selectAllDatasets();
-            }
-            dropdown.submit();
-
-        }
-        dialog.confirm();
-
-        Predicate<WebDriver> scheduleExecuted = browser -> executionHistoryItems.size() == executionItems + 1;
-        Graphene.waitGui().until(scheduleExecuted);
-        return this;
+    public DataloadScheduleDetail executeSchedule(IncrementalPeriod period) {
+        return executeSchedule(LoadMode.INCREMENTAL, period, null);
     }
 
     public DataloadScheduleDetail executeSchedule(LoadMode mode) {
@@ -81,5 +66,38 @@ public class DataloadScheduleDetail extends AbstractScheduleDetail {
 
     public Collection<String> getSelectedDatasets() {
         return waitForFragmentVisible(datasetUploadSection).getSelectedDatasets();
+    }
+
+    private DataloadScheduleDetail executeSchedule(LoadMode mode, IncrementalPeriod period, SyncDatasets syncDatasets) {
+        int executionItems = executionHistoryItems.size();
+
+        RunOneOffDialog dialog = triggerRunOneOffDialog();
+        if (nonNull(mode)) {
+            dialog.setMode(mode);
+        }
+
+        if (nonNull(period)) {
+            if (nonNull(period.getFrom())) {
+                dialog.setIncrementalStartTime(period.getFrom());
+            }
+            if (nonNull(period.getTo())) {
+                dialog.setIncrementalEndTime(period.getTo());
+            }
+        }
+
+        if (nonNull(syncDatasets)) {
+            DatasetDropdown dropdown = dialog.getDatasetDropdown().expand();
+            if (nonNull(syncDatasets.getDatasets())) {
+                dropdown.selectDatasets(syncDatasets.getDatasets());
+            } else {
+                dropdown.selectAllDatasets();
+            }
+            dropdown.submit();
+        }
+        dialog.confirm();
+
+        Predicate<WebDriver> scheduleExecuted = browser -> executionHistoryItems.size() == executionItems + 1;
+        Graphene.waitGui().until(scheduleExecuted);
+        return this;
     }
 }

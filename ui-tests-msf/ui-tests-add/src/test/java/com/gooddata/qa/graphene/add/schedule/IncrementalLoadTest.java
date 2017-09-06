@@ -33,8 +33,6 @@ import com.gooddata.qa.graphene.fragments.disc.schedule.add.RunOneOffDialog.Load
 
 public class IncrementalLoadTest extends AbstractDataloadProcessTest {
 
-    private static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
-
     private CsvFile opportunity;
     private CsvFile person;
 
@@ -53,8 +51,8 @@ public class IncrementalLoadTest extends AbstractDataloadProcessTest {
                         .withFacts(FACT_AGE))
                 .buildMaql());
 
-        String time = parseDateTime(LocalDateTime.now(), DATE_PATTERN);
-        lastLSLTS = parseDateTime(LocalDateTime.now().plusSeconds(5), DATE_PATTERN);
+        String time = parseDateTime(LocalDateTime.now(), TIMESTAMP_FORMAT);
+        lastLSLTS = parseDateTime(LocalDateTime.now().plusSeconds(5), TIMESTAMP_FORMAT);
 
         opportunity = new CsvFile(DATASET_OPPORTUNITY)
                 .columns(new CsvFile.Column(ATTR_OPPORTUNITY), new CsvFile.Column(FACT_PRICE),
@@ -107,8 +105,8 @@ public class IncrementalLoadTest extends AbstractDataloadProcessTest {
 
     @Test(dependsOnGroups = {"setFirstLSLTS"})
     public void checkBasicIncrementalLoad() {
-        String time = parseDateTime(LocalDateTime.now(), DATE_PATTERN);
-        lastLSLTS = parseDateTime(LocalDateTime.now().plusSeconds(5), DATE_PATTERN);
+        String time = parseDateTime(LocalDateTime.now(), TIMESTAMP_FORMAT);
+        lastLSLTS = parseDateTime(LocalDateTime.now().plusSeconds(5), TIMESTAMP_FORMAT);
         person.rows("P3", "20", time)
                 .rows("P4", "20", lastLSLTS);
 
@@ -193,8 +191,8 @@ public class IncrementalLoadTest extends AbstractDataloadProcessTest {
     public void checkIncrementalLoadWithPrefixTable() throws ParseException, JSONException, IOException {
         getAdsHelper().associateAdsWithProject(ads, testParams.getProjectId(), "", "gDC_");
 
-        String time = parseDateTime(LocalDateTime.now(), DATE_PATTERN);
-        lastLSLTS = parseDateTime(LocalDateTime.now().plusSeconds(5), DATE_PATTERN);
+        String time = parseDateTime(LocalDateTime.now(), TIMESTAMP_FORMAT);
+        lastLSLTS = parseDateTime(LocalDateTime.now().plusSeconds(5), TIMESTAMP_FORMAT);
 
         person.setName("gDc_" + DATASET_PERSON)
                 .rows("P8", "20", time)

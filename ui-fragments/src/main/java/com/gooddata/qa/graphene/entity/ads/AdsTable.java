@@ -78,9 +78,6 @@ public class AdsTable {
     }
 
     private String insertData() {
-        System.out.println("Data of Ads table: " + getName());
-        dataToInsert.stream().forEach(System.out::println);
-
         return dataToInsert.stream()
                 .map(this::parseDataInRowAsCorrectType)
                 .map(row -> "INSERT into ${table} values (" + row.stream().collect(joining(", ")) + ");")

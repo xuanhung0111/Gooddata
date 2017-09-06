@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.add.schedule;
+package com.gooddata.qa.graphene.add.schedule.execution.dialog;
 
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.utils.http.RestUtils.getResource;
@@ -35,9 +35,7 @@ import com.gooddata.qa.graphene.fragments.disc.schedule.add.DatasetDropdown;
 import com.gooddata.qa.graphene.fragments.disc.schedule.add.RunOneOffDialog;
 import com.gooddata.qa.graphene.fragments.disc.schedule.add.RunOneOffDialog.LoadMode;
 
-public class RunOneOffDialogTest extends AbstractDataloadProcessTest {
-
-    private static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
+public class DefaultLoadTest extends AbstractDataloadProcessTest {
 
     private static final String FULL_LOAD = "Dataset with id: dataset.%s will be loaded in full mode.";
     private static final String INCREMENTAL_LOAD = "Dataset with id: dataset.%s will be loaded in incremental mode.";
@@ -62,13 +60,13 @@ public class RunOneOffDialogTest extends AbstractDataloadProcessTest {
                         .withFacts(FACT_AGE))
                 .buildMaql());
 
-        opportunityLSLTS = parseDateTime(LocalDateTime.now(), DATE_PATTERN);
+        opportunityLSLTS = parseDateTime(LocalDateTime.now(), TIMESTAMP_FORMAT);
         opportunity = new CsvFile(DATASET_OPPORTUNITY)
                 .columns(new CsvFile.Column(ATTR_OPPORTUNITY), new CsvFile.Column(FACT_PRICE),
                         new CsvFile.Column(X_TIMESTAMP_COLUMN))
                 .rows("OP1", "100", opportunityLSLTS);
 
-        personLSLTS = parseDateTime(LocalDateTime.now().plusSeconds(2), DATE_PATTERN);
+        personLSLTS = parseDateTime(LocalDateTime.now().plusSeconds(2), TIMESTAMP_FORMAT);
         person = new CsvFile(DATASET_PERSON)
                 .columns(new CsvFile.Column(ATTR_PERSON), new CsvFile.Column(FACT_AGE),
                         new CsvFile.Column(X_TIMESTAMP_COLUMN))
@@ -144,7 +142,7 @@ public class RunOneOffDialogTest extends AbstractDataloadProcessTest {
 
     @Test(dependsOnGroups = {"fullLoad"})
     public void checkDefaultLoadWorkAsIncrementalLoad() throws ParseException, IOException {
-        personLSLTS = parseDateTime(LocalDateTime.now(), DATE_PATTERN);
+        personLSLTS = parseDateTime(LocalDateTime.now(), TIMESTAMP_FORMAT);
         person.rows("P2", "20", personLSLTS);
 
         executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
@@ -196,7 +194,7 @@ public class RunOneOffDialogTest extends AbstractDataloadProcessTest {
     public void checkDefaultLoadInCombinationCase() throws ParseException, IOException {
         opportunity.rows("OP2", "100", opportunityLSLTS);
 
-        personLSLTS = parseDateTime(LocalDateTime.now(), DATE_PATTERN);
+        personLSLTS = parseDateTime(LocalDateTime.now(), TIMESTAMP_FORMAT);
         person.rows("P4", "20", personLSLTS);
 
         executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
@@ -252,7 +250,7 @@ public class RunOneOffDialogTest extends AbstractDataloadProcessTest {
 
     @Test(dependsOnGroups = {"fullLoad"})
     public void checkDefaultLoadUsedForAutoTrigger() throws ParseException, IOException {
-        personLSLTS = parseDateTime(LocalDateTime.now(), DATE_PATTERN);
+        personLSLTS = parseDateTime(LocalDateTime.now(), TIMESTAMP_FORMAT);
         person.rows("P6", "20", personLSLTS);
 
         executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,

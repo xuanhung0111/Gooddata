@@ -39,6 +39,7 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
     protected static final String DATASET_PERSON = "person";
 
     protected static final String X_TIMESTAMP_COLUMN = "timestamp";
+    protected static final String TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss";
     protected static final String X_CLIENT_ID_COLUMN = "clientId";
 
     protected static final String ATTR_OPPORTUNITY = "opportunity";
@@ -132,6 +133,10 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
 
     protected String parseDateTime(LocalDateTime dateTime, String pattern) {
         return dateTime.format(DateTimeFormatter.ofPattern(pattern));
+    }
+
+    protected LocalDateTime parseDateTime(String dateTime, String pattern) {
+        return LocalDateTime.parse(dateTime, DateTimeFormatter.ofPattern(pattern));
     }
 
     private Optional<DataloadProcess> findDataloadProcess() {
