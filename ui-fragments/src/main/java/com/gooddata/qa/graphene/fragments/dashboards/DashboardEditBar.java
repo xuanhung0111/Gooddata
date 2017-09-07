@@ -1,10 +1,10 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.util.List;
 
@@ -25,6 +25,8 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.Widget
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 
 public class DashboardEditBar extends AbstractFragment {
+
+    private static final By FILTER_MENU_ITEM_LOADING = By.cssSelector("li.s-loading___");
 
     @FindBy(css = ".s-btn-save")
     private WebElement saveButton;
@@ -284,6 +286,7 @@ public class DashboardEditBar extends AbstractFragment {
 
     private SimpleMenu openFilterMenu() {
         waitForElementVisible(addFilterMenu).click();
+        waitForElementNotPresent(FILTER_MENU_ITEM_LOADING);
         return SimpleMenu.getInstance(browser);
     }
 }

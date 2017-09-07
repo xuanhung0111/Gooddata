@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 
 import java.util.ArrayList;
@@ -57,6 +57,22 @@ public class SavedViewWidget extends AbstractFragment{
         } catch(Exception e) {
             return false;
         }
+    }
+
+    public SavedViewWidget renameSavedView(String currentName, String newName) {
+        openSavedViewMenu();
+        getSavedViewPopupMenu().openContextMenuOfSavedView(currentName);
+        getSavedViewPopupMenu().getSavedFiltersContextMenu().openRenameDialog();
+        getDashboardSaveActiveViewDialog().rename(newName);
+        return this;
+    }
+
+    public SavedViewWidget deleteSavedView(String name) {
+        openSavedViewMenu();
+        getSavedViewPopupMenu().openContextMenuOfSavedView(name);
+        getSavedViewPopupMenu().getSavedFiltersContextMenu().openDeleteDialog();
+        getSavedViewDeleteConfirmDialog().deleteSavedView();
+        return this;
     }
 
     public boolean isUnsavedViewButtonPresent() {
@@ -249,7 +265,7 @@ public class SavedViewWidget extends AbstractFragment{
         private SavedFiltersContextMenu savedFiltersContextMenu;
 
         public WebElement getSavedCurrentViewButton() {
-            return savedCurrentViewButton;
+            return waitForElementVisible(savedCurrentViewButton);
         }
 
         public boolean isNoSavedViewPresent() {

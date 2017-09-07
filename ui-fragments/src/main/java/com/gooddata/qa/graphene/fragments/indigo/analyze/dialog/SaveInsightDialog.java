@@ -47,9 +47,17 @@ public class SaveInsightDialog extends AbstractFragment {
         return this;
     }
 
+    public String getName() {
+        return waitForElementVisible(nameTextBox).getText();
+    }
+
     public void cancel() {
         waitForElementVisible(cancelButton).click();
         waitForElementNotVisible(cancelButton);
+    }
+
+    public boolean isSubmitButtonDisabled() {
+        return submitButton.getAttribute("class").contains("disabled");
     }
 
 }

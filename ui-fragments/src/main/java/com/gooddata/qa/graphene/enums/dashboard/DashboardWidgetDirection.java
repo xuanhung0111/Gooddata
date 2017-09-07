@@ -32,7 +32,7 @@ public enum DashboardWidgetDirection {
         }
 
         while (!element.getAttribute("style").contains(direction)) {
-            element.sendKeys(Keys.SHIFT, key);
+            element.sendKeys(Keys.chord(Keys.SHIFT, key));
         }
     }
 }

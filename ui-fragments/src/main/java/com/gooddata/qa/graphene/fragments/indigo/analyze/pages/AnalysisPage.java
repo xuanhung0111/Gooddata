@@ -335,6 +335,10 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
+    public boolean isSaveInsightEnabled() {
+        return getPageHeader().isSaveButtonEnabled();
+    }
+
     public AnalysisPage saveInsight(final String insight) {
         getPageHeader().saveInsight(insight);
         waitForSaveFinished();

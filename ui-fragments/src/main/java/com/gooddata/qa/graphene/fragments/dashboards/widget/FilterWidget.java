@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.fragments.dashboards.widget;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import java.util.List;
 
@@ -17,11 +17,11 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.Select
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.AttributeFilterPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.DashboardEditWidgetToolbarPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 
 public class FilterWidget extends AbstractFragment {
 
-    @FindBy(tagName = "button")
+    @FindBy(css = "button.description:not(.gdc-hidden)")
     private WebElement button;
 
     @FindBy(className = "titleContainer")
@@ -39,7 +39,16 @@ public class FilterWidget extends AbstractFragment {
 
     public FilterWidget openEditPanel() {
         if (!isOpen()) {
+            waitForElementVisible(button);
             DashboardEditWidgetToolbarPanel.openEditPanelFor(this.getRoot(), browser);
+        }
+        return this;
+    }
+
+    public FilterWidget openConfigPanel() {
+        if (!isOpen()) {
+            waitForElementVisible(button);
+            WidgetConfigPanel.openConfigurationPanelFor(this.getRoot(), browser);
         }
         return this;
     }
@@ -84,6 +93,15 @@ public class FilterWidget extends AbstractFragment {
         return this;
     }
 
+    public FilterWidget editDefaultTimeFilterValue(DateGranularity granularity, String timeLine) {
+        openEditPanel()
+            .getTimeFilterPanel()
+            .selectDateGranularity(granularity)
+            .selectTimeLine(timeLine)
+            .submit();
+        return this;
+    }
+
     /**
      * Change values permanently by click pencil icon to open and
      * Select attribute values in default Attribute filter panel.
@@ -112,6 +130,7 @@ public class FilterWidget extends AbstractFragment {
     }
 
     public String getCurrentValue() {
+        waitForElementVisible(button);
         return getRoot().getText().split("\n")[1];
     }
 
