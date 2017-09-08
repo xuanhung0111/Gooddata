@@ -355,7 +355,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     }
 
     private void addReportToDashboard(String name) {
-        addReportToDashboard(name, DashboardWidgetDirection.NONE);
+        addReportToDashboard(name, null);
     }
 
     private void addReportToDashboard(String name, DashboardWidgetDirection direction) {
@@ -368,7 +368,9 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         dashboardEditBar.addReportToDashboard(name);
 
         WebElement latestReport = dashboardsPage.getContent().getLatestReport(TableReport.class).getRoot();
-        direction.moveElementToRightPlace(latestReport);
+        if (direction != null) {
+            direction.moveElementToRightPlace(latestReport);
+        }
         dashboardEditBar.saveDashboard();
         checkRedBar(browser);
     }
@@ -379,7 +381,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
                 .selectDashboard(TEST_DASHBOAD_FILTERS)
                 .addAttributeFilterToDashboard(type, attribute);
 
-        if (direction == DashboardWidgetDirection.NONE) {
+        if (direction == null) {
             dashboardsPage.saveDashboard();
             checkRedBar(browser);
             return;
@@ -394,7 +396,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     }
 
     private void addAttributeFilterToDashboard(String attribute, DashAttributeFilterTypes type) {
-        addAttributeFilterToDashboard(attribute, type, DashboardWidgetDirection.NONE);
+        addAttributeFilterToDashboard(attribute, type, null);
     }
 
     private Collection<WebElement> getRowElementsFrom(TableReport report) {
