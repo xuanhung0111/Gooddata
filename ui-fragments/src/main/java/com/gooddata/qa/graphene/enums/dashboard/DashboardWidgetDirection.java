@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.enums.dashboard;
 
+import com.gooddata.qa.utils.browser.BrowserUtils;
 import org.jboss.arquillian.drone.api.annotation.Default;
 import org.jboss.arquillian.graphene.context.GrapheneContext;
 import org.openqa.selenium.WebDriver;
@@ -28,10 +29,8 @@ public enum DashboardWidgetDirection {
     }
 
     public void moveElementToRightPlace(WebElement element) {
-        WebDriver driver = GrapheneContext.getContextFor(Default.class).getWebDriver(WebDriver.class);
-
         Map<String, Integer> distance = getDistance(element);
-        new Actions(driver).clickAndHold(element)
+        new Actions(BrowserUtils.getBrowserContext()).clickAndHold(element)
                 .moveByOffset(distance.get("x"), distance.get("y"))
                 .release()
                 .perform();
