@@ -40,7 +40,7 @@ public class MetricConfiguration extends AbstractFragment {
     @FindBy(className = "s-show-pop")
     private WebElement compareToSamePeriod;
 
-    private static final By BY_REMOVE_ATTRIBUTE_FILTER = By.className("remove-attribute-filter");
+    private static final By BY_REMOVE_ATTRIBUTE_FILTER = By.className("s-remove-attribute-filter");
     public static final By BY_ATTRIBUTE_FILTER_PICKER = By.className("adi-attr-filter-picker");
     private static final By BY_ATTRIBUTE_FILTER_BUTTON = By.className("adi-attr-filter-button");
     private static final By BY_FACT_AGGREGATION = By.className("s-fact-aggregation-switch");
