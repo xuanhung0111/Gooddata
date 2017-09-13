@@ -91,7 +91,7 @@ public class PartialExportAndImportProjectTest extends AbstractProjectTest {
         initReportsPage().openReport(SIMPLE_REPORT);
         reportPage.waitForReportExecutionProgress();
         final String simpleReportUri = getObjdUri(browser.getCurrentUrl());
-        reportPage.selectReportVisualisation(ReportTypes.BAR).saveReport();
+        reportPage.selectReportVisualisation(ReportTypes.BAR).waitForReportExecutionProgress().saveReport();
 
         final String exportToken = exportPartialProject(simpleReportUri, DEFAULT_PROJECT_CHECK_LIMIT);
 
