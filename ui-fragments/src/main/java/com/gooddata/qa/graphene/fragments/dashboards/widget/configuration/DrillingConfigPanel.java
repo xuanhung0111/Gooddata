@@ -70,6 +70,26 @@ public class DrillingConfigPanel extends AbstractFragment {
         return result;
     }
 
+    public Pair<String, String> getSettingsOnLastItemPanel() {
+        ItemPanel panel = getLasItemPanel();
+        return Pair.of(panel.getLeftItemValue(), panel.getRightItemValue());
+    }
+
+    public List<Pair<String, String>> getAllInnerDrillSettingsOnLastPanel() {
+        return getLasItemPanel().getAllInnerDrillSettings();
+    }
+
+    public DrillingConfigPanel addInnerDrillToLastItemPanel(Pair<List<String>, String> innerDrillSetting) {
+        addInnerDrill(getLasItemPanel(), innerDrillSetting);
+        return this;
+    }
+
+    private ItemPanel addInnerDrill(ItemPanel selectedPanel, Pair<List<String>, String> innerDrillSetting) {
+        return selectedPanel.openNewInnerDrillPanel()
+                .selectLeftItem(innerDrillSetting.getLeft())
+                .selectRightItem(innerDrillSetting.getRight(), null);
+    }
+
     private ItemPanel addNewDrillingPanel() {
         waitForElementVisible(addDrillingButton).click();
 
@@ -77,11 +97,15 @@ public class DrillingConfigPanel extends AbstractFragment {
         scrollElementIntoView(
                 waitForElementVisible(By.className("s-btn-select_metric___attribute___"), getRoot()), browser);
 
-        return getItemPanelByIndex(drillItemPanelList.size() - 1);
+        return getLasItemPanel();
     }
 
     private ItemPanel getItemPanelByIndex(int index) {
         return Graphene.createPageFragment(ItemPanel.class, drillItemPanelList.get(index));
+    }
+
+    private ItemPanel getLasItemPanel() {
+        return getItemPanelByIndex(drillItemPanelList.size() - 1);
     }
 
     private ItemPanel getItemPanelBySelectedValues(List<String> leftValues, String rightValue) {
@@ -115,6 +139,12 @@ public class DrillingConfigPanel extends AbstractFragment {
         @FindBy(className = "deleteButton ")
         private WebElement deleteButton;
 
+        @FindBy(className = "innerDrills")
+        private List<ItemPanel> innerDrillItemPanelList;
+
+        @FindBy(className = "addMoreDetail")
+        private WebElement addNewInnerDrill;
+
         private ItemPanel selectLeftItem(List<String> names) {
             openLeftPopup().searchAndSelectItems(names).submitPanel();
 
@@ -123,7 +153,11 @@ public class DrillingConfigPanel extends AbstractFragment {
 
         private ItemPanel selectRightItem(String name, String group) {
             SelectItemPopupPanel panel = openRightPopup();
-            panel.changeGroup(group);
+
+            if (!isNull(group)) {
+                panel.changeGroup(group);
+            }
+
             panel.searchAndSelectItem(name).submitPanel();
 
             return this;
@@ -158,6 +192,17 @@ public class DrillingConfigPanel extends AbstractFragment {
 
         private void delete() {
             waitForElementVisible(deleteButton).click();
+        }
+
+        private ItemPanel openNewInnerDrillPanel() {
+            waitForElementVisible(addNewInnerDrill).click();
+            return innerDrillItemPanelList.get(innerDrillItemPanelList.size() -1);
+        }
+
+        private List<Pair<String, String>> getAllInnerDrillSettings() {
+            return innerDrillItemPanelList.stream()
+                    .map(panel -> Pair.of(panel.getLeftItemValue(), panel.getRightItemValue()))
+                    .collect(Collectors.toList());
         }
     }
 }

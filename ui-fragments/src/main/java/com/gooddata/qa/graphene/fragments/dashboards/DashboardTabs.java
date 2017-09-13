@@ -91,6 +91,14 @@ public class DashboardTabs extends AbstractFragment {
     }
 
     /**
+     * Get working dashboard tab
+     * @return working tab
+     */
+    public DashboardTab getSelectedTab() {
+        return getTab(getSelectedTabIndex());
+    }
+
+    /**
      * Method to get label of tab with given index
      *
      * @param i - tab index
