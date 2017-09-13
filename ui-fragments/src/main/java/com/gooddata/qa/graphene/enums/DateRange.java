@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
-import java.util.TimeZone;
 
 public enum DateRange {
     LAST_7_DAYS("Last 7 days"),
@@ -23,7 +22,7 @@ public enum DateRange {
 
     private String date;
 
-    private static final ZoneId ZONE_ID = ZoneId.of("America/Los_Angeles");
+    public static final ZoneId ZONE_ID = ZoneId.of("America/Los_Angeles");
 
     DateRange(String date) {
         this.date = date;

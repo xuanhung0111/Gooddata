@@ -347,7 +347,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             assertEquals(tableReportInDialog.getAttributesHeader(), Arrays.asList(ATTR_YEAR_ACTIVITY, ATTR_PRIORITY));
             assertSetEquals(tableReportInDialog.getMetricsHeader(), Sets.newHashSet(METRIC_NUMBER_OF_ACTIVITIES),
                     "Metric headers are not correct!");
-            assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(Arrays.asList(DRILL_ACTIVITY_REPORT, 
+            assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(Arrays.asList(DRILL_ACTIVITY_REPORT,
                     "Email with AirSplat on Apr-21-11"), ">>"));
             drillDialog.closeDialog();
 
@@ -365,7 +365,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             assertEquals(tableReportInDialog.getAttributesHeader(), Arrays.asList(ATTR_YEAR_SNAPSHOT, ATTR_STAGE_NAME));
             assertSetEquals(tableReportInDialog.getMetricsHeader(), Sets.newHashSet(METRIC_AMOUNT, METRIC_AVG_AMOUNT),
                     "Metric headers are not correct!");
-            assertEquals(drillDialog.getBreadcrumbsString(), 
+            assertEquals(drillDialog.getBreadcrumbsString(),
                     StringUtils.join(Arrays.asList(DRILL_ACTIVITY_REPORT, "2011"), ">>"));
             drillDialog.closeDialog();
         } finally {

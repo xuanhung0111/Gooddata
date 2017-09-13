@@ -8,12 +8,19 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 public class Tab implements MdObject {
     private String title = "First Tab";
     private List<JSONObject> items = new ArrayList<>();
 
-    public Tab addItem(JSONObject item) {
-        items.add(item);
+    public Tab addItem(TabItem item) {
+        items.add(item.getMdObject());
+        return this;
+    }
+
+    public Tab addItems(List<TabItem> tabItems) {
+        items.addAll(tabItems.stream().map(TabItem::getMdObject).collect(toList()));
         return this;
     }
 

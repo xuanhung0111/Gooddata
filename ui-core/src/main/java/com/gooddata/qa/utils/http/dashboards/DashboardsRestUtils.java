@@ -122,7 +122,7 @@ public final class DashboardsRestUtils {
     };
 
     /**
-     * Create dashboard
+     * Create an empty dashboard
      * 
      * @param restApiClient
      * @param projectId
@@ -138,6 +138,25 @@ public final class DashboardsRestUtils {
                     .getJSONObject("projectDashboard")
                     .getJSONObject("meta")
                     .getString("uri");
+    }
+
+    /**
+     * create a dashboard with given content
+     *
+     * @param restApiClient
+     * @param projectId
+     * @param content
+     * @return
+     * @throws JSONException
+     * @throws IOException
+     */
+    public static String createDashboard(final RestApiClient restApiClient, final String projectId,
+                                         JSONObject content) throws JSONException, IOException {
+        return getJsonObject(restApiClient,
+                restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId), content.toString()))
+                .getJSONObject("projectDashboard")
+                .getJSONObject("meta")
+                .getString("uri");
     }
 
     /**

@@ -17,7 +17,7 @@ import com.gooddata.project.ProjectValidationResults;
 
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterType;
-import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
+import com.gooddata.qa.mdObjects.dashboard.filter.FloatingFilterConstraint;
 import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.utils.java.Builder;
 import org.json.JSONException;
@@ -339,20 +339,31 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         }).build();
     }
 
-    protected ReportItem createTableReportItem(String reportUri, List<String> appliedFilters) {
-        return Builder.of(ReportItem::new).with(item -> {
-            item.setObjUri(reportUri);
-            item.setAppliedFilterIds(appliedFilters);
+    protected FilterItemContent createDateFilter(Attribute date, int from, int to) {
+        return Builder.of(FilterItemContent::new).with(item -> {
+            item.setObjUri(date.getDefaultDisplayForm().getUri());
+            item.setMultiple(true);
+            item.setType(FilterType.TIME);
+            item.setFilterConstraint(new FloatingFilterConstraint(from, to));
         }).build();
     }
 
-    protected FilterItem createFilterItem(FilterItemContent item) {
-        return Builder.of(FilterItem::new).with(filterItem -> filterItem.setContentId(item.getId())).build();
+    protected ReportItem createReportItem(String reportUri) {
+        return createReportItem(reportUri, null);
+    }
+
+    protected ReportItem createReportItem(String reportUri, List<String> filterIds) {
+        return Builder.of(ReportItem::new).with(item -> {
+            item.setObjUri(reportUri);
+            if (!Objects.isNull(filterIds)) {
+                item.setAppliedFilterIds(filterIds);
+            }
+        }).build();
     }
 
     //------------------------- DASHBOARD MD OBJECTS - END ------------------------
 
-    protected String createTableReport(ReportDefinition reportDefinition) {
+    protected String createReport(ReportDefinition reportDefinition) {
         ReportDefinition definition = getMdService().createObj(getProject(), reportDefinition);
         return getMdService().createObj(getProject(), new Report(definition.getTitle(), definition)).getUri();
     }
