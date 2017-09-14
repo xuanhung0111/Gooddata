@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -46,6 +47,13 @@ public class WidgetConfigPanel extends AbstractFragment {
         return waitForCollectionIsNotEmpty(tabs);
     }
 
+    public List<String> getTabNames() {
+        return waitForCollectionIsNotEmpty(tabs)
+                .stream()
+                .map(tab -> tab.getText())
+                .collect(Collectors.toList());
+    }
+
     public <T extends AbstractFragment> T getTab(final Tab tab, Class<T> clazz) {
         waitForCollectionIsNotEmpty(tabs);
         WebElement tabElement = Iterables.find(tabs, new Predicate<WebElement>() {
@@ -84,6 +92,7 @@ public class WidgetConfigPanel extends AbstractFragment {
     public enum Tab {
         DRILLING("Drilling", "s-Drilling"),
         PARENT_FILTERS("Parent Filters", "s-Parent"),
+        AVAILABLE_VALUES("Available Values", "s-Available"),
         SELECTION("Selection", "s-Selection"),
         FILTERS("Filters", "filterTab"),
         GROUP("Group", "filterTab"),

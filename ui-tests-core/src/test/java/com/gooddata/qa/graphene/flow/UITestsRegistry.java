@@ -12,6 +12,7 @@ import com.gooddata.qa.graphene.account.UserAccountSettingTest;
 import com.gooddata.qa.graphene.account.UserProfileInformationTest;
 import com.gooddata.qa.graphene.filters.DashboardFilterVisualTest;
 import com.gooddata.qa.graphene.filters.DashboardFiscalDateFilterTest;
+import com.gooddata.qa.graphene.filters.MetricAvailableFilterTest;
 import com.gooddata.qa.graphene.i18n.LocalizationTest;
 import com.gooddata.qa.graphene.manage.AttributeLabelsTest;
 import com.gooddata.qa.graphene.manage.ComputedAttributesTest;
@@ -105,6 +106,7 @@ public class UITestsRegistry {
             GoodSalesFilterGroupTest.class,
             DashboardFilterVisualTest.class,
             DashboardFiscalDateFilterTest.class,
+            MetricAvailableFilterTest.class,
             DashboardSavedFiltersTest.class,
             GoodSalesAdvancedConnectingFilterTest.class,
             GoodSalesDefaultFilterMiscTest.class,
@@ -155,6 +157,7 @@ public class UITestsRegistry {
                     GoodSalesFilterGroupTest.class,
                     DashboardFilterVisualTest.class,
                     DashboardFiscalDateFilterTest.class,
+                    MetricAvailableFilterTest.class,
                     GoodSalesDashboardWidgetManipulationTest.class,
                     DashboardSavedFiltersTest.class,
                     GoodSalesKeyMetricTest.class,
