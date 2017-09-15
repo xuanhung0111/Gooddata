@@ -16,6 +16,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
@@ -44,6 +45,11 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
     @BeforeClass
     public void setProjectTitle() {
         projectTitle += "Date-Filtering-On-Insight-Test";
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
     }
 
     @Override
@@ -97,6 +103,29 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
         panel.disableDateFilter();
         assertFalse(indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().isDateDataSetDropdownVisible(),
                 "State of date filter is not disabled");
+    }
+
+    @Test(dependsOnGroups = {"dashboardsInit"})
+    public void testDateFilterStatusWithEditor() throws JSONException {
+        logoutAndLoginAs(true, UserRoles.EDITOR);
+
+        try {
+            initIndigoDashboardsPageWithWidgets().switchToEditMode()
+                    .selectWidgetByHeadline(Insight.class, TEST_INSIGHT);
+
+            ConfigurationPanel panel = indigoDashboardsPage.getConfigurationPanel();
+            assertTrue(panel.getFilterByDateFilter().isChecked(), "Default state of date filter item is not checked");
+
+            panel.disableDateFilter();
+
+            indigoDashboardsPage.cancelEditModeWithChanges().switchToEditMode()
+                    .selectWidgetByHeadline(Insight.class, TEST_INSIGHT);
+            assertTrue(panel.getFilterByDateFilter().isChecked(),
+                    "Default state of date filter item is not checked");
+
+        } finally {
+            logoutAndLoginAs(true, UserRoles.ADMIN);
+        }
     }
 
     @Test(dependsOnGroups = {"dashboardsInit"})
