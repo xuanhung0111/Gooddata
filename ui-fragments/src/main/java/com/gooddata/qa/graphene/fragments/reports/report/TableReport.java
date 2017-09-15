@@ -173,6 +173,13 @@ public class TableReport extends AbstractDashboardReport {
 
     public List<String> getRawMetricElements() {
         waitForReportLoading();
+        //wait for display metric value
+        Graphene.waitGui().until(new Predicate<WebDriver>() {
+            @Override
+            public boolean apply(WebDriver input) {
+                return !metricValuesInGrid.isEmpty();
+            }
+        });
         return metricValuesInGrid.stream()
             .map(e -> e.getAttribute("title"))
             .collect(toList());
