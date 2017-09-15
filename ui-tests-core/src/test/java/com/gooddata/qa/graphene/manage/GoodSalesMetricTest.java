@@ -18,18 +18,19 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_CLOSE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_DAYS_TO_CLOSE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_DURATION;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_PROBABILITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_VELOCITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_BEST_CASE;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_DAYS_TO_CLOSE;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_DURATION;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPEN_OPPS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPPORTUNITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON_OPPS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PROBABILITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_VELOCITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_WIN_RATE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_WON;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_CREATED;
@@ -176,13 +177,13 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
             customMetricInfo.withName(metric + " " + getCurrentDateString());
 
             if (metric.in(asList(MetricTypes.COVAR, MetricTypes.COVARP, MetricTypes.RSQ))) {
-                customMetricInfo.withFacts(METRIC_VELOCITY, METRIC_DURATION);
+                customMetricInfo.withFacts(FACT_VELOCITY, FACT_DURATION);
 
             } else if (metric.in(asList(MetricTypes.MAX, MetricTypes.RUNMAX))) {
-                customMetricInfo.withFacts(METRIC_DAYS_TO_CLOSE);
+                customMetricInfo.withFacts(FACT_DAYS_TO_CLOSE);
 
             } else if (metric.in(asList(MetricTypes.MIN, MetricTypes.RUNMIN))) {
-                customMetricInfo.withFacts(METRIC_DURATION);
+                customMetricInfo.withFacts(FACT_DURATION);
 
             } else if (metric== MetricTypes.FORECAST) {
                 customMetricInfo.withMetrics(METRIC_AMOUNT);
@@ -190,7 +191,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
             } else {
                 customMetricInfo.withFacts(METRIC_AMOUNT);
                 if (metric == MetricTypes.CORREL) {
-                    customMetricInfo.addMoreFacts(METRIC_PROBABILITY);
+                    customMetricInfo.addMoreFacts(FACT_PROBABILITY);
                 }
             }
 

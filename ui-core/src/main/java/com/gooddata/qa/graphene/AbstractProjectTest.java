@@ -11,14 +11,19 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.gooddata.GoodData;
 import com.gooddata.fixture.ResourceManagement.ResourceTemplate;
 import com.gooddata.md.Attribute;
+import com.gooddata.md.Fact;
+import com.gooddata.project.Environment;
 import com.gooddata.project.ProjectValidationResults;
-
+import com.gooddata.qa.fixture.FixtureException;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterType;
 import com.gooddata.qa.mdObjects.dashboard.filter.FloatingFilterConstraint;
+import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
+import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
 import com.gooddata.qa.utils.java.Builder;
 import org.json.JSONException;
 import org.testng.ITestContext;
@@ -122,12 +127,9 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         if (!Objects.isNull(appliedFixture)) {
             log.info(appliedFixture.getPath() + " fixture is being used");
 
-            Fixture fixture = new Fixture(appliedFixture);
-            fixture.setGoodDataClient(getGoodDataClient());
-            fixture.setRestApiClient(getRestApiClient());
-
-            testParams.setProjectId(fixture.deploy(projectTitle, testParams.getAuthorizationToken(),
-                    testParams.getProjectDriver(), testParams.getProjectEnvironment()));
+            testParams.setProjectId(createProjectUsingFixture(getGoodDataClient(), getRestApiClient(), projectTitle,
+                    appliedFixture, testParams.getAuthorizationToken(), testParams.getProjectDriver(),
+                    testParams.getProjectEnvironment()));
         } else {
             // keep old approach for tests depending on other templates (e.g.: connectors test)
             if (!canAccessGreyPage(browser)) {
@@ -266,8 +268,30 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         return getGoodDataClient().getProjectService().getProjectById(testParams.getProjectId());
     }
 
-    protected Metric createMetric(String name, String expression, String format) {
-        return getMdService().createObj(getProject(), new Metric(name, expression, format));
+    /**
+     * Create project with specific fixture
+     *
+     * @param goodDataClient
+     * @param restApiClient
+     * @param title
+     * @param appliedFfixture
+     * @param authorizationToken
+     * @param projectDriver
+     * @param environment
+     * @return project id
+     * @throws IOException
+     * @throws JSONException
+     */
+    protected String createProjectUsingFixture(final GoodData goodDataClient, final RestApiClient restApiClient,
+            final String title, final ResourceTemplate appliedFfixture, final String authorizationToken,
+            final ProjectDriver projectDriver, final Environment environment) throws IOException, JSONException {
+        if (Objects.isNull(appliedFfixture)) {
+            throw new FixtureException("Fixture is null");
+        }
+        Fixture fixture = new Fixture(appliedFfixture);
+        fixture.setGoodDataClient(goodDataClient);
+        fixture.setRestApiClient(restApiClient);
+        return fixture.deploy(title, authorizationToken, projectDriver, environment);
     }
 
     protected Collection<String> getAttributeValues(Attribute attribute) {
@@ -311,6 +335,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
                 integrationEntry);
     }
 
+    //------------------------- SUPPORT GET OBJECTS - BEGIN -------------------------
     protected Attribute getAttributeByTitle(String title) {
         return getMdService().getObj(getProject(), Attribute.class, title(title));
     }
@@ -318,10 +343,22 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     protected Attribute getAttributeByIdentifier(String id) {
         return getMdService().getObj(getProject(), Attribute.class, identifier(id));
     }
-
     protected Metric getMetricByTitle(String title) {
         return getMdService().getObj(getProject(), Metric.class, title(title));
     }
+
+    protected Metric getMetricByIdentifier(String id) {
+        return getMdService().getObj(getProject(), Metric.class, identifier(id));
+    }
+
+    protected Fact getFactByTitle(String title) {
+        return getMdService().getObj(getProject(), Fact.class, title(title));
+    }
+
+    protected Fact getFactByIdentifier(String id) {
+        return getMdService().getObj(getProject(), Fact.class, identifier(id));
+    }
+    //------------------------- SUPPORT GET OBJECTS - END -------------------------
 
     //------------------------- DASHBOARD MD OBJECTS - BEGIN -------------------------
     protected FilterItemContent createSingleValueFilter(Attribute attribute) {
@@ -361,12 +398,38 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         }).build();
     }
 
+    protected FilterItem createFilterItem(FilterItemContent item) {
+        return Builder.of(FilterItem::new).with(filterItem -> filterItem.setContentId(item.getId())).build();
+    }
+
+    protected FilterItem createFilterItem(FilterItemContent item, TabItem.ItemPosition itemPosition) {
+        return Builder.of(FilterItem::new).with(filterItem -> {
+            filterItem.setContentId(item.getId());
+            filterItem.setPosition(itemPosition);
+        }).build();
+    }
     //------------------------- DASHBOARD MD OBJECTS - END ------------------------
+
+
+
+    //------------------------- REPORT, METRIC MD OBJECTS - BEGIN ------------------------
 
     protected String createReport(ReportDefinition reportDefinition) {
         ReportDefinition definition = getMdService().createObj(getProject(), reportDefinition);
         return getMdService().createObj(getProject(), new Report(definition.getTitle(), definition)).getUri();
     }
+
+    public static final String DEFAULT_METRIC_FORMAT = "#,##0";
+
+    protected Metric createMetric(String name, String expression) {
+        return createMetric(name, expression, DEFAULT_METRIC_FORMAT);
+    }
+
+    protected Metric createMetric(String name, String expression, String format) {
+        return getMdService().createObj(getProject(), new Metric(name, expression, format));
+    }
+
+    //------------------------- REPORT, METRIC MD OBJECTS - END ------------------------
 
     private String getWebDavServerUrl(final RestApiClient restApiClient, final String serverRootUrl)
             throws IOException, JSONException {
