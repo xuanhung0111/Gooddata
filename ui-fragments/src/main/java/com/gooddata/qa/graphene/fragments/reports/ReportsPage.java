@@ -211,14 +211,8 @@ public class ReportsPage extends AbstractFragment {
     }
 
     public PersonalInfo getReportOwnerInfoFrom(String reportName) {
-        ReportEntry report = getReport(reportName);
-
-        Predicate<WebDriver> isHovered = browser -> {
-            getActions().moveToElement(report.getOwner()).perform();
-            return isElementVisible(By.cssSelector("a:hover"), report.getRoot());
-        };
-        Graphene.waitGui().until(isHovered);
-
+        AccountCard.makeDismiss();
+        getActions().moveToElement(getReport(reportName).getOwner()).perform();
         return AccountCard.getInstance(browser).getUserInfo();
     }
 

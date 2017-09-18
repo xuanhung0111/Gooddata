@@ -1,18 +1,19 @@
 package com.gooddata.qa.graphene.fragments.account;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static org.openqa.selenium.By.cssSelector;
-
+import com.gooddata.qa.graphene.entity.account.PersonalInfo;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.entity.account.PersonalInfo;
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import static com.gooddata.qa.graphene.utils.ElementUtils.makeSureNoPopupVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 public class AccountCard extends AbstractFragment {
+
+    private static final By LOCATOR = By.className("c-accountCard");
 
     @FindBy(css = ".fullName")
     private WebElement fullName;
@@ -21,8 +22,11 @@ public class AccountCard extends AbstractFragment {
     private WebElement contactInfo;
 
     public static final AccountCard getInstance(SearchContext context) {
-        return Graphene.createPageFragment(AccountCard.class,
-                waitForElementVisible(cssSelector(".bd div.userInfo"), context));
+        return Graphene.createPageFragment(AccountCard.class, waitForElementVisible(LOCATOR, context));
+    }
+
+    public static void makeDismiss() {
+        makeSureNoPopupVisible(LOCATOR);
     }
 
     public PersonalInfo getUserInfo() {
