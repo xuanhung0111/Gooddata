@@ -12,7 +12,8 @@ public enum ProjectFeatureFlags {
     DISABLE_SAVED_FILTERS("disableSavedFilters"),
     ENABLE_CHANGE_LANGUAGE("enableChangeLanguage"),
     HIDE_KPI_ALERT_LINK("hideKPIAlertLinks"),
-    FISCAL_CALENDAR_ENABLED("fiscalCalendarEnabled");
+    FISCAL_CALENDAR_ENABLED("fiscalCalendarEnabled"),
+    USE_AVAILABLE_ENABLED("useAvailableEnabled");
 
     private final String featureFlag;
 
