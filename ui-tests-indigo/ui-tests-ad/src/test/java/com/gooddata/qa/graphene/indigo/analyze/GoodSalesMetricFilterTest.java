@@ -63,17 +63,14 @@ public class GoodSalesMetricFilterTest extends GoodSalesAbstractAnalyseTest {
                 METRIC_NUMBER_OF_ACTIVITIES, ATTR_DEPARTMENT));
         assertEquals(metricConfiguration.getFilterText(),
                 format("%s: Inside Sales", ATTR_DEPARTMENT));
-        assertFalse(metricConfiguration.canAddAnotherFilter());
 
         analysisPage.undo()
             .waitForReportComputing();
         metricConfiguration.expandConfiguration();
-        assertFalse(metricConfiguration.canAddAnotherFilter());
 
         analysisPage.redo()
             .waitForReportComputing();
         metricConfiguration.expandConfiguration();
-        assertFalse(metricConfiguration.canAddAnotherFilter());
         analysisPage.waitForReportComputing();
         checkingOpenAsReport("replaceAttributeFilterByNewOne");
     }
@@ -147,6 +144,5 @@ public class GoodSalesMetricFilterTest extends GoodSalesAbstractAnalyseTest {
                 METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE));
         assertEquals(metricConfiguration.getFilterText(),
                 format("%s: Email, Phone Call, Web Meeting\n(3)", ATTR_ACTIVITY_TYPE));
-        assertFalse(metricConfiguration.canAddAnotherFilter());
     }
 }

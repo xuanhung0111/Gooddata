@@ -37,6 +37,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
 
     private static final String FIRST_DASHBOARD_NAME  = "Dashboard 1";
     private static final String SECOND_DASHBOARD_NAME = "Dashboard 2";
+    private static final String DATE_PAYDATE_FILTER = "DATE (PAYDATE)";
 
     private static final int    THIS_YEAR             = Calendar.getInstance().get(Calendar.YEAR);
     private static final String LAST_YEAR             = String.valueOf(THIS_YEAR - 1);
@@ -131,7 +132,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         assertTrue(viewPopupMenu.isNoSavedViewPresent(),
                           "'No Saved Views' is not shown in saved view menu!");
 
-        FilterWidget timeFilter = dashboardsPage.getFilterWidget("date_dimension");
+        FilterWidget timeFilter = dashboardsPage.getFilterWidgetByName(DATE_PAYDATE_FILTER);
         timeFilter.changeTimeFilterValueByClickInTimeLine(LAST_YEAR);
         assertTrue(savedViewWidget.isUnsavedViewButtonPresent(),
                           "Saved filter view does not show as 'Unsaved View'!");
@@ -171,7 +172,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         initDashboardsPage();
         dashboardsPage.selectDashboard(FIRST_DASHBOARD_NAME);
         // change filter value so Selenium can loads all saved views
-        dashboardsPage.getFilterWidget("date_dimension").changeTimeFilterValueByClickInTimeLine(PENULTIMATE_YEAR);
+        dashboardsPage.getFilterWidgetByName(DATE_PAYDATE_FILTER).changeTimeFilterValueByClickInTimeLine(PENULTIMATE_YEAR);
 
         // try to rename a saved view but canceling at the end.
         SavedViewWidget savedViewWidget = dashboardsPage.getSavedViewWidget();
@@ -213,7 +214,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         initDashboardsPage();
         dashboardsPage.selectDashboard(FIRST_DASHBOARD_NAME);
         // change filter value so Selenium can loads all saved views
-        dashboardsPage.getFilterWidget("date_dimension").changeTimeFilterValueByClickInTimeLine(String.valueOf(THIS_YEAR - 3));
+        dashboardsPage.getFilterWidgetByName(DATE_PAYDATE_FILTER).changeTimeFilterValueByClickInTimeLine(String.valueOf(THIS_YEAR - 3));
 
         SavedViewWidget savedViewWidget = dashboardsPage.getSavedViewWidget();
         savedViewWidget.openSavedViewMenu();
@@ -243,7 +244,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         initDashboardsPage();
         dashboardsPage.selectDashboard(FIRST_DASHBOARD_NAME);
         // change filter value so Selenium can loads all saved views
-        FilterWidget filter = dashboardsPage.getFilterWidget("date_dimension");
+        FilterWidget filter = dashboardsPage.getFilterWidgetByName(DATE_PAYDATE_FILTER);
         filter.changeTimeFilterValueByClickInTimeLine(String.valueOf(THIS_YEAR - 4));
 
         // verify things in delete dialog and canceling at the end
@@ -286,7 +287,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         initDashboardsPage();
         // Add more saved view for first dashboard
         dashboardsPage.selectDashboard(FIRST_DASHBOARD_NAME);
-        dashboardsPage.getFilterWidget("date_dimension").changeTimeFilterValueByClickInTimeLine(PENULTIMATE_YEAR);
+        dashboardsPage.getFilterWidgetByName(DATE_PAYDATE_FILTER).changeTimeFilterValueByClickInTimeLine(PENULTIMATE_YEAR);
         SavedViewWidget savedViewWidget = dashboardsPage.getSavedViewWidget();
         savedViewWidget.openSavedViewMenu();
         savedViewWidget.saveCurrentView(PENULTIMATE_YEAR);

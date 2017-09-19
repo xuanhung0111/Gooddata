@@ -221,6 +221,9 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
                 .addReportToDashboard(report);
         dashboardsPage.getContent()
                 .getLatestReport(TableReport.class)
+        //wait for report loading finish before adding drilling. Otherwise, the select item popup panel on 
+        //drilling setting is disappeared when report finishes loading (might be due to lost focus)
+                .waitForReportLoading()
                 .addDrilling(Pair.of(singletonList(drillDownValue), drillDownReport), "Reports");
         dashboardsPage.getDashboardEditBar().saveDashboard();
     }

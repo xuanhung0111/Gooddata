@@ -2,10 +2,10 @@ package com.gooddata.qa.graphene.add.schedule;
 
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.utils.http.RestUtils.getResource;
-import static com.gooddata.qa.utils.http.process.ProcessRestUtils.executeProcess;
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasItem;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -30,11 +30,9 @@ import com.gooddata.qa.graphene.entity.model.LdmModel;
 import com.gooddata.qa.graphene.enums.process.Parameter;
 import com.gooddata.qa.graphene.fragments.disc.schedule.add.DataloadScheduleDetail;
 import com.gooddata.qa.graphene.fragments.disc.schedule.add.DatasetDropdown;
-import com.gooddata.qa.graphene.fragments.disc.schedule.add.ExecuteADDConfirmDialog.LoadMode;
+import com.gooddata.qa.graphene.fragments.disc.schedule.add.RunOneOffDialog.LoadMode;
 
 public class IncrementalLoadTest extends AbstractDataloadProcessTest {
-
-    private static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     private CsvFile opportunity;
     private CsvFile person;
@@ -54,8 +52,8 @@ public class IncrementalLoadTest extends AbstractDataloadProcessTest {
                         .withFacts(FACT_AGE))
                 .buildMaql());
 
-        String time = parseDateTime(LocalDateTime.now(), DATE_PATTERN);
-        lastLSLTS = parseDateTime(LocalDateTime.now().plusSeconds(5), DATE_PATTERN);
+        String time = parseDateTime(LocalDateTime.now(), TIMESTAMP_FORMAT);
+        lastLSLTS = parseDateTime(LocalDateTime.now().plusSeconds(5), TIMESTAMP_FORMAT);
 
         opportunity = new CsvFile(DATASET_OPPORTUNITY)
                 .columns(new CsvFile.Column(ATTR_OPPORTUNITY), new CsvFile.Column(FACT_PRICE),
@@ -73,9 +71,8 @@ public class IncrementalLoadTest extends AbstractDataloadProcessTest {
 
     @Test(dependsOnGroups = {"precondition"})
     public void checkDatasetNotSetLSLTS() {
-        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity));
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
+        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
+                defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity)));
 
         Schedule schedule = createScheduleForManualTrigger(generateScheduleName(),
                 SyncDatasets.custom(DATASET_OPPORTUNITY));
@@ -93,15 +90,15 @@ public class IncrementalLoadTest extends AbstractDataloadProcessTest {
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"setFirstLSLTS"})
     public void setLSLTSForDataset() {
-        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person));
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
+        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
+                defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person)));
 
         executeSchedule(loadPersonSchedule);
-        assertEquals(initScheduleDetail(loadPersonSchedule)
-                .getDatasetDropdown()
-                .expand()
-                .getLSLTSOf(DATASET_PERSON), lastLSLTS);
+
+        DatasetDropdown dropdown = initScheduleDetail(loadPersonSchedule)
+                .getDatasetDropdown().expand();
+        assertEquals(dropdown.getLSLTSOf(DATASET_PERSON), lastLSLTS);
+        assertThat(dropdown.getDatasetGroups().get("INCREMENTAL LOAD"), hasItem(DATASET_PERSON));
 
         Attribute personAttr = getMdService().getObj(getProject(), Attribute.class, title(ATTR_PERSON));
         assertThat(getAttributeValues(personAttr),
@@ -110,14 +107,13 @@ public class IncrementalLoadTest extends AbstractDataloadProcessTest {
 
     @Test(dependsOnGroups = {"setFirstLSLTS"})
     public void checkBasicIncrementalLoad() {
-        String time = parseDateTime(LocalDateTime.now(), DATE_PATTERN);
-        lastLSLTS = parseDateTime(LocalDateTime.now().plusSeconds(5), DATE_PATTERN);
+        String time = parseDateTime(LocalDateTime.now(), TIMESTAMP_FORMAT);
+        lastLSLTS = parseDateTime(LocalDateTime.now().plusSeconds(5), TIMESTAMP_FORMAT);
         person.rows("P3", "20", time)
                 .rows("P4", "20", lastLSLTS);
 
-        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person));
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
+        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
+                defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person)));
 
         executeSchedule(loadPersonSchedule);
 
@@ -136,10 +132,8 @@ public class IncrementalLoadTest extends AbstractDataloadProcessTest {
         opportunity.rows("OPP_ERROR", "100");
         person.rows("P_ERROR", "19");
 
-        Parameters parameters = getDefaultParameters()
-                .addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity, person));
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
+        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
+                defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity, person)));
 
         Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.ALL);
 
@@ -179,10 +173,8 @@ public class IncrementalLoadTest extends AbstractDataloadProcessTest {
                 .rows("P6", "20", time2)
                 .rows("P7", "25", time3);
 
-        Parameters parameters = getDefaultParameters()
-                .addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person));
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
+        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
+                defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person)));
 
 
         executeSchedule(loadPersonSchedule);
@@ -201,17 +193,15 @@ public class IncrementalLoadTest extends AbstractDataloadProcessTest {
     public void checkIncrementalLoadWithPrefixTable() throws ParseException, JSONException, IOException {
         getAdsHelper().associateAdsWithProject(ads, testParams.getProjectId(), "", "gDC_");
 
-        String time = parseDateTime(LocalDateTime.now(), DATE_PATTERN);
-        lastLSLTS = parseDateTime(LocalDateTime.now().plusSeconds(5), DATE_PATTERN);
+        String time = parseDateTime(LocalDateTime.now(), TIMESTAMP_FORMAT);
+        lastLSLTS = parseDateTime(LocalDateTime.now().plusSeconds(5), TIMESTAMP_FORMAT);
 
         person.setName("gDc_" + DATASET_PERSON)
                 .rows("P8", "20", time)
                 .rows("P9", "20", lastLSLTS);
 
-        Parameters parameters = getDefaultParameters()
-                .addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person));
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
+        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
+                defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person)));
 
         try {
             executeSchedule(loadPersonSchedule);
@@ -238,10 +228,8 @@ public class IncrementalLoadTest extends AbstractDataloadProcessTest {
                 .rows("P1_NO_TS", "18")
                 .rows("P2_NO_TS", "20");
 
-        Parameters parameters = getDefaultParameters()
-                .addParameter(Parameter.SQL_QUERY, SqlBuilder.build(personWithNoTS));
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
+        Parameters parameters = defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(personWithNoTS));
+        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE, parameters);
 
         try {
             executeSchedule(loadPersonSchedule);
@@ -258,8 +246,7 @@ public class IncrementalLoadTest extends AbstractDataloadProcessTest {
 
         } finally {
             parameters.addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person));
-            executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                    parameters.getParameters(), parameters.getSecureParameters());
+            executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE, parameters);
 
             executeSchedule(loadPersonSchedule, LoadMode.FULL);
         }

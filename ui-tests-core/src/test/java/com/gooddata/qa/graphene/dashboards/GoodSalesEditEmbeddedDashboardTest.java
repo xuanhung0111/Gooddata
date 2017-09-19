@@ -2,21 +2,24 @@ package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.qa.browser.BrowserUtils.switchToMainWindow;
+import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CLOSED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CREATED;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Collections.singletonList;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.assertEquals;
-import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
-import static com.gooddata.qa.browser.BrowserUtils.switchToMainWindow;
 
+import java.util.Calendar;
 import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -36,7 +39,9 @@ import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbedDashboardDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
+import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.DashboardEditWidgetToolbarPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 import com.gooddata.qa.graphene.fragments.manage.MetricEditorDialog;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.EmbeddedReportPage;
@@ -45,9 +50,10 @@ import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
     private static final String EMBEDDED_DASHBOARD = "embedded-dashboard";
-
     private static final String METRIC_AMOUNT = "Amount";
     private static final String ATTR_PRODUCT = "Product";
+    private static final String THIS_YEAR = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
+    private static final String LAST_YEAR = String.valueOf(Calendar.getInstance().get(Calendar.YEAR) - 1);
 
     private static final String RED_BAR_MESSAGE =
             "Please remove this report from all dashboards and email distribution lists before deleting.";
@@ -59,6 +65,12 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
     public void initData() {
         EmbedDashboardDialog embeddedDialog = initDashboardsPage()
                 .addNewDashboard("New Dashboard")
+                .addNewTab("1st_filter_report")
+                .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR, "this")
+                .addNewTab("2nd_filter_report")
+                .addTimeFilterToDashboard(DATE_DIMENSION_CLOSED, DateGranularity.YEAR, "this")
+                .turnSavedViewOption(true)
+                .saveDashboard()
                 .openEmbedDashboardDialog();
 
         embeddedCode = embeddedDialog.getEmbedCode();
@@ -246,6 +258,62 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
         takeScreenshot(browser, "Delete-report-in-embedded-Domain-page", getClass());
         assertFalse(embeddedReportsPage.openFolder(reportFolder).isReportVisible(report.getTitle()),
                 "Report is still not deleted");
+    }
+
+    @Test(dependsOnGroups = "precondition")
+    public void createAndDeleteSavedView() {
+        EmbeddedDashboard embeddedDashboard = initEmbeddedDashboardUsingEmbeddedHtmlLink();
+        SavedViewWidget savedViewWidget = embeddedDashboard.getSavedViewWidget();
+        embeddedDashboard.openTab(1).getFirstFilter().changeTimeFilterValueByClickInTimeLine(LAST_YEAR);
+
+        assertTrue(savedViewWidget.isUnsavedViewButtonPresent(), 
+                "Unsaved View Button does not present");
+
+        savedViewWidget.openSavedViewMenu().saveCurrentView("Filter View");
+        assertEquals(embeddedDashboard.getSavedViewWidget().getCurrentSavedView(), "Filter View");
+
+        savedViewWidget.renameSavedView("Filter View", "Rename View");
+        assertEquals(savedViewWidget.getCurrentSavedView(), "Rename View");
+
+        savedViewWidget.deleteSavedView("Rename View");
+        assertTrue(savedViewWidget.isUnsavedViewButtonPresent(), "Unsaved View Button does not present");
+    }
+
+    @Test(dependsOnGroups = "precondition")
+    public void showNotificationWhenSavedViewIsTurnedOff() {
+        EmbeddedDashboard embeddedDashboard = initEmbeddedDashboardUsingEmbeddedHtmlLink();
+        embeddedDashboard.openTab(1).editDashboard();
+
+        assertFalse(embeddedDashboard.hasSavedViewDisabledNotification(),
+                "Notification 'Saved Views disabled' is displayed");
+
+        embeddedDashboard.turnSavedViewOption(false);
+        assertTrue(embeddedDashboard.hasSavedViewDisabledNotification(),
+                "Notification 'Saved Views disabled' is not shown");
+        assertEquals(embeddedDashboard.getDashboardEditBar().getSavedViewDisabledNotification().getText(),
+                "Saved Views disabled");
+
+        embeddedDashboard.turnSavedViewOption(true);
+        assertFalse(embeddedDashboard.hasSavedViewDisabledNotification(),
+                "Notification 'Saved Views disabled' is displayed");
+    }
+
+    @Test(dependsOnGroups = "precondition")
+    public void checkFilterAppliedWhenSwitchSavedView() {
+        EmbeddedDashboard embeddedDashboard = initEmbeddedDashboardUsingEmbeddedHtmlLink();
+        SavedViewWidget savedViewWidget = embeddedDashboard.getSavedViewWidget();
+        embeddedDashboard.openTab(1).getFirstFilter().changeTimeFilterValueByClickInTimeLine(LAST_YEAR);
+        embeddedDashboard.openTab(2).getFirstFilter().changeTimeFilterValueByClickInTimeLine(LAST_YEAR);
+        savedViewWidget.openSavedViewMenu().saveCurrentView("Other_View");
+        assertEquals(savedViewWidget.getCurrentSavedView(), "Other_View");
+
+        savedViewWidget.openSavedViewMenu().selectSavedView("Default View (reset filters)");
+        assertEquals(embeddedDashboard.getFirstFilter().getCurrentValue(), THIS_YEAR);
+        assertEquals(embeddedDashboard.openTab(1).getFirstFilter().getCurrentValue(), THIS_YEAR);
+
+        savedViewWidget.openSavedViewMenu().selectSavedView("Other_View");
+        assertEquals(embeddedDashboard.getFirstFilter().getCurrentValue(), LAST_YEAR);
+        assertEquals(embeddedDashboard.openTab(2).getFirstFilter().getCurrentValue(), LAST_YEAR);
     }
 
     private EmbeddedDashboard initEmbeddedDashboard(String dashboardName) {

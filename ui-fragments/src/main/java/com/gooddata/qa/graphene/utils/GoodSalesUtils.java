@@ -121,9 +121,8 @@ public final class GoodSalesUtils {
     public static final String VARIABLE_QUOTA = "Quota";
 
     // date dimensions
-    public static final String DATE_DIMENSION_CREATED = "Date dimension (Created)";
-    public static final String DATE_DIMENSION_CLOSED = "Date dimension (Closed)";
-    public static final String DATE_DIMENSION_SNAPSHOT = "Date dimension (Snapshot)";
-    public static final String DATE_DIMENSION_ACTIVITY = "Date dimension (Activity)";
-    public static final String DATE_DIMENSION_TIMELINE = "Date dimension (Timeline)";
+    public static final String DATE_DIMENSION_CREATED = "Date (Created)";
+    public static final String DATE_DIMENSION_CLOSED = "Date (Closed)";
+    public static final String DATE_DIMENSION_SNAPSHOT = "Date (Snapshot)";
+    public static final String DATE_DIMENSION_ACTIVITY = "Date (Activity)";
 }

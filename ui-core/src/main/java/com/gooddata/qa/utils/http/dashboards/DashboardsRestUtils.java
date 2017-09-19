@@ -20,6 +20,7 @@ import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
 import com.gooddata.qa.utils.http.RestApiClient;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.google.common.collect.Lists;
 /**
  * REST utilities for old dashboards task
@@ -39,6 +40,7 @@ public final class DashboardsRestUtils {
     private static final String DASHBOARD_EDIT_MODE_LINK = "/gdc/md/%s/obj/%s?mode=edit";
     private static final String VARIABLE_LINK = "/gdc/md/%s/variables/item";
     private static final String GET_VARIABLE_LINK = "/gdc/md/%s/query/prompts";
+    private static final String PROJECT_DASHBOARDS_URI = "/gdc/md/%s/query/projectdashboards";
 
     private static final Supplier<String> MUF_OBJ =  () -> {
         try {
@@ -118,6 +120,20 @@ public final class DashboardsRestUtils {
             }}.toString();
         } catch (JSONException e) {
             throw new IllegalStateException("There is an exception during json object initialization! ", e);
+        }
+    };
+
+    private static final Supplier<String> SET_DEFAULT_DASHBOARD_CONTENT = () -> {
+        try {
+            return new JSONObject() {{
+                put("defaults", new JSONObject() {{
+                    put("projectUri", "/gdc/projects/${projectID}");
+                    put("dashboardUri", "${dashboardUri}");
+                    put("tabId", "${tabId}");
+                }});
+            }}.toString();
+        } catch (JSONException e) {
+            throw new IllegalStateException("There is an exception during json object initialization!", e);
         }
     };
 
@@ -324,6 +340,64 @@ public final class DashboardsRestUtils {
         }
 
         throw new RuntimeException("No variable matches with title: " + title);
+    }
+
+    public static String getDashboardUri(RestApiClient restApiClient, String projectId, String title)
+            throws JSONException, IOException {
+        JSONArray dashboards = getJsonObject(restApiClient, format(PROJECT_DASHBOARDS_URI, projectId))
+                .getJSONObject("query")
+                .getJSONArray("entries");
+
+        for (int i = 0; i < dashboards.length(); i++) {
+            if (title.equals(dashboards.getJSONObject(i).getString("title"))) {
+                return dashboards.getJSONObject(i).getString("link");
+            }
+        }
+
+        throw new RuntimeException("No dashboard matches with title: " + title);
+    }
+
+    public static String getTabId(RestApiClient restApiClient, String projectId, String dashboardTitle, String tabTitle)
+            throws JSONException, IOException {
+        JSONArray tabs = getJsonObject(restApiClient, getDashboardUri(restApiClient, projectId, dashboardTitle))
+                .getJSONObject("projectDashboard")
+                .getJSONObject("content")
+                .getJSONArray("tabs");
+
+        for (int i = 0; i < tabs.length(); i++) {
+            if (tabTitle.equals(tabs.getJSONObject(i).getString("title"))) {
+                return tabs.getJSONObject(i).getString("identifier");
+            }
+        }
+
+        throw new RuntimeException("No tab matches with title: " + tabTitle);
+    }
+
+    /**
+     * Set default dashboard content
+     * 
+     * @param restApiClient
+     * @param projectID
+     * @param dashboardName
+     * @throws tabName
+     * @throws JSONException
+     * @throws IOException
+     * @return default link
+     */
+    public static void setDefaultDashboardForDomainUser(final RestApiClient restApiClient, final String projectID,
+            final String dashboardName, final String tabName) throws ParseException, JSONException, IOException {
+        final String defaultUserUri = UserManagementRestUtils
+                .getCurrentUserProfile(restApiClient)
+                .getJSONObject("links")
+                .getString("self")
+                .concat("/settings/defaults");
+        final String dashboardUri = getDashboardUri(restApiClient, projectID, dashboardName);
+        final String tabID = getTabId(restApiClient, projectID, dashboardName, tabName);
+        final String content = SET_DEFAULT_DASHBOARD_CONTENT.get()
+                .replace("${projectID}", projectID)
+                .replace("${dashboardUri}", dashboardUri)
+                .replace("${tabId}", tabID);
+        executeRequest(restApiClient, restApiClient.newPutMethod(defaultUserUri, content), HttpStatus.NO_CONTENT);
     }
 
     /**

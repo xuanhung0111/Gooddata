@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
@@ -26,7 +27,7 @@ import com.gooddata.qa.graphene.entity.disc.Parameters;
 import com.gooddata.qa.graphene.enums.process.Parameter;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
 import com.gooddata.qa.graphene.fragments.disc.schedule.add.DataloadScheduleDetail;
-import com.gooddata.qa.graphene.fragments.disc.schedule.add.ExecuteADDConfirmDialog.LoadMode;
+import com.gooddata.qa.graphene.fragments.disc.schedule.add.RunOneOffDialog.LoadMode;
 import com.gooddata.warehouse.Warehouse;
 
 public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
@@ -38,6 +39,7 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
     protected static final String DATASET_PERSON = "person";
 
     protected static final String X_TIMESTAMP_COLUMN = "timestamp";
+    protected static final String TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss";
     protected static final String X_CLIENT_ID_COLUMN = "clientId";
 
     protected static final String ATTR_OPPORTUNITY = "opportunity";
@@ -50,6 +52,7 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
 
     protected Warehouse ads;
     protected DataloadProcess updateAdsTableProcess;
+    protected Supplier<Parameters> defaultParameters;
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"initDataload"})
     public void setup() throws ParseException, JSONException, IOException {
@@ -59,6 +62,11 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
 
         updateAdsTableProcess = getProcessService().createProcess(getProject(),
                 new DataloadProcess(generateProcessName(), ProcessType.GRAPH), PackageFile.ADS_TABLE.loadFile());
+
+        defaultParameters = () -> new Parameters()
+                .addParameter(Parameter.ADS_URL, format(ADS_DB_CONNECTION_URL, testParams.getHost(), ads.getId()))
+                .addParameter(Parameter.ADS_USER, testParams.getUser())
+                .addSecureParameter(Parameter.ADS_PASSWORD, testParams.getPassword());
     }
 
     @AfterClass(alwaysRun = true)
@@ -119,19 +127,16 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
         return initDiscProjectDetailPage().getDataloadProcess().openSchedule(schedule.getName());
     }
 
-    protected Parameters getDefaultParameters() {
-        return new Parameters()
-                .addParameter(Parameter.ADS_URL, format(ADS_DB_CONNECTION_URL, testParams.getHost(), ads.getId()))
-                .addParameter(Parameter.ADS_USER, testParams.getUser())
-                .addSecureParameter(Parameter.ADS_PASSWORD, testParams.getPassword());
-    }
-
     protected String getAdsToken() {
         return testParams.loadProperty("dss.authorizationToken");
     }
 
     protected String parseDateTime(LocalDateTime dateTime, String pattern) {
         return dateTime.format(DateTimeFormatter.ofPattern(pattern));
+    }
+
+    protected LocalDateTime parseDateTime(String dateTime, String pattern) {
+        return LocalDateTime.parse(dateTime, DateTimeFormatter.ofPattern(pattern));
     }
 
     private Optional<DataloadProcess> findDataloadProcess() {

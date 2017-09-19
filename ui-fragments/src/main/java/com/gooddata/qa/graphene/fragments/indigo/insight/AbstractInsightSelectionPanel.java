@@ -41,12 +41,32 @@ public abstract class AbstractInsightSelectionPanel extends AbstractFragment {
         if (!searchInsight(insightName)) {
             throw new RuntimeException("Can't find insight: " + insightName);
         }
-
         return getInsightItems().stream()
                 // find by either non-shortened title or fallback to s-class if not found (item shoretened)
-                .filter(e -> e.getName().equals(insightName) || e.matchesTitle(insightName))
+                .filter(e -> {
+                    // handle shortened Isight name
+                    String insightItem = e.getName();
+                    if (isShortenedTitle(insightItem)) {
+                        return compareShortenedTitle(insightItem,insightName);
+                    } else {
+                        return e.getName().equals(insightName) || e.matchesTitle(insightName);
+                    }
+                })
                 .findFirst()
                 .get();
+    }
+
+    private boolean compareShortenedTitle(String insightItem, String searchString) {
+        return searchString.startsWith(insightItem.split("…")[0]) && searchString.endsWith(insightItem.split("…")[1]);
+    }
+
+    private boolean isShortenedTitle(String insightName) {
+        if (insightName.contains("…")) {
+            log.info("shortened Insight name: " + insightName);
+            return true;
+        }
+
+        return false;
     }
 
     public boolean searchInsight(final String insight) {

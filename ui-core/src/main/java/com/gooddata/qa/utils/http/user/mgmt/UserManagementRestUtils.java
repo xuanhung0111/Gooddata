@@ -76,6 +76,23 @@ public final class UserManagementRestUtils {
         }
     };
 
+    private static final Supplier<String> UPDATE_USER_STATUS_CONTENT = () -> {
+        try {
+            return new JSONObject() {{
+                put("user", new JSONObject() {{
+                    put("content", new JSONObject() {{
+                        put("status", "${status}");
+                    }});
+                    put("links", new JSONObject() {{
+                        put("self", "/gdc/account/profile/${email}");
+                    }});
+                }});
+            }}.toString();
+        } catch (JSONException e) {
+            throw new IllegalStateException("There is an exception during json object initialization! ", e);
+        }
+    };
+
     private static final Supplier<String> UPDATE_USER_INFO_CONTENT_BODY = () -> {
         try {
             return new JSONObject() {{
@@ -340,7 +357,27 @@ public final class UserManagementRestUtils {
                 users.add(new JSONObject(json).getString("user"));
         }
         return users;
-    } 
+    }
+
+    /**
+     * Disable or enable user to project
+     * 
+     * @param restApiClient
+     * @param projectId
+     * @param email
+     * @param status (ENABLED or DISABLE)
+     */
+    public static void updateUserStatusInProject(final RestApiClient restApiClient, final String projectId,
+            final String email, final UserStatus status) throws ParseException, JSONException, IOException {
+        final String usersUri = format(USERS_LINK, projectId);
+        final String contentBody = UPDATE_USER_STATUS_CONTENT.get()
+                .replace("${status}", status.toString())
+                .replace("${email}", email);
+        final JSONObject result = getJsonObject(restApiClient, restApiClient.newPostMethod(usersUri, contentBody));
+        if (result.getJSONObject("projectUsersUpdateResult").getString("successful").equals("[]")) {
+                throw new RuntimeException("Update user status failed");
+        }
+    }
 
     /**
      * Add user to project with specific role
@@ -451,5 +488,9 @@ public final class UserManagementRestUtils {
     private static JSONObject getInvitationContent(final RestApiClient restApiClient, final String invitationUri)
             throws JSONException, IOException {
         return getJsonObject(restApiClient, invitationUri).getJSONObject("invitation").getJSONObject("content");
+    }
+
+    public enum UserStatus {
+        ENABLED, DISABLED
     }
 }

@@ -1,13 +1,15 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAllInsightNames;
-import static java.util.Collections.singleton;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static java.util.Arrays.asList;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -23,7 +25,7 @@ import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTe
 public class GoodSalesUndoRedoSavedInsightTest extends GoodSalesAbstractAnalyseTest {
 
     private static final String INSIGHT_TEST = "Insight-Test";
-    private static final String UNTITLED_INSIGHT = "Untitled insight";
+    private static final String INSIGHT_TEST_WITH_METRIC_ONLY = "Insight-With-Metric-Only";
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -31,125 +33,160 @@ public class GoodSalesUndoRedoSavedInsightTest extends GoodSalesAbstractAnalyseT
     }
 
     @Test(dependsOnGroups = { "init" })
-    public void addMetricAndAttribute() throws JSONException, IOException {
+    public void newCreatedInsightNotAppliedUndo() {
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addAttribute(ATTR_ACTIVITY_TYPE)
+                .waitForReportComputing()
+                .saveInsight("Newly created insight");
+        assertFalse(analysisPage.getPageHeader().isUndoButtonEnabled(), "The undo button is still enabled");
+    }
+
+    @Test(dependsOnGroups = { "init" })
+    public void prepareSavedInsightsForUndoRedoTest() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .saveInsight(INSIGHT_TEST);
-        checkUndoRedoAfterSaveInsight(UNTITLED_INSIGHT);
-        assertEquals(analysisPage.openInsight(INSIGHT_TEST)
-                .waitForReportComputing().getChartReport().getTrackersCount(), 4, "Chart content is not as expected");
+        initAnalysePage().addMetric(METRIC_SNAPSHOT_BOP)
+                .waitForReportComputing()
+                .saveInsight(INSIGHT_TEST_WITH_METRIC_ONLY);
     }
 
-    @Test(dependsOnGroups = { "init" })
+    @Test(dependsOnMethods = { "prepareSavedInsightsForUndoRedoTest" })
+    public void addMetric() throws JSONException, IOException {
+        final String insightName = "Test-Saved-Insight-After-Adding-Metric";
+        analysisPage.openInsight(INSIGHT_TEST)
+                .saveInsightAs(insightName)
+                .addMetric(METRIC_SNAPSHOT_BOP)
+                .waitForReportComputing()
+                .saveInsight();
+        checkUndoRedoAfterSaveInsight();
+        assertEquals(analysisPage.openInsight(insightName)
+                .waitForReportComputing().getChartReport().getTrackersCount(), 8, "Chart content is not as expected");
+    }
+
+    @Test(dependsOnMethods = { "prepareSavedInsightsForUndoRedoTest" })
+    public void addAttribute() throws JSONException, IOException {
+        final String insightName = "Test-Saved-Insight-After-Adding-Attribute";
+        analysisPage.openInsight(INSIGHT_TEST_WITH_METRIC_ONLY)
+                .saveInsightAs(insightName)
+                .addAttribute(ATTR_DEPARTMENT)
+                .waitForReportComputing()
+                .saveInsight();
+        checkUndoRedoAfterSaveInsight();
+        assertEquals(analysisPage.openInsight(insightName)
+                .waitForReportComputing().getChartReport().getTrackersCount(), 2, "Chart content is not as expected");
+    }
+    @Test(dependsOnMethods = { "prepareSavedInsightsForUndoRedoTest" })
     public void addFilterToMetric() throws JSONException, IOException {
-        final String insight = "Test-Saved-Insight-After-Adding-Filtered-Metric";
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        final String insightName = "Test-Saved-Insight-After-Adding-Filtered-Metric";
+        analysisPage.openInsight(INSIGHT_TEST)
+                .saveInsightAs(insightName)
                 .getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration()
                 .addFilter(ATTR_ACTIVITY_TYPE, "In Person Meeting", "Web Meeting");
-        analysisPage.waitForReportComputing().saveInsight(insight);
-        checkUndoRedoAfterSaveInsight(UNTITLED_INSIGHT);
+        analysisPage.waitForReportComputing().saveInsight();
+        checkUndoRedoAfterSaveInsight();
         assertEquals(
-                analysisPage.openInsight(insight)
+                analysisPage.openInsight(insightName)
                         .waitForReportComputing()
                         .getChartReport()
                         .getDataLabels(),
-                singleton("69,571"));
+                asList("35,975", "33,596"));
     }
 
-    @Test(dependsOnMethods = { "addMetricAndAttribute" })
+    @Test(dependsOnMethods = { "prepareSavedInsightsForUndoRedoTest" })
     public void removeAttribute() throws JSONException, IOException {
-        final String insight = "Test-Saved-Insight-After-Removing-Attribute";
+        final String insightName = "Test-Saved-Insight-After-Removing-Attribute";
         analysisPage.openInsight(INSIGHT_TEST)
-                .saveInsightAs(insight)
+                .saveInsightAs(insightName)
                 .removeAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .saveInsight();
-        checkUndoRedoAfterSaveInsight(insight);
-        assertEquals(analysisPage.openInsight(insight)
+        checkUndoRedoAfterSaveInsight();
+        assertEquals(analysisPage.openInsight(insightName)
                 .waitForReportComputing().getChartReport().getTrackersCount(), 1, "Chart content is not as expected");
     }
 
-    @Test(dependsOnMethods = { "addMetricAndAttribute" })
+    @Test(dependsOnMethods = { "prepareSavedInsightsForUndoRedoTest" })
     public void replaceAttribute() throws JSONException, IOException {
-        final String insight = "Test-Saved-Insight-After-Replacing-Attribute";
+        final String insightName = "Test-Saved-Insight-After-Replacing-Attribute";
         analysisPage.openInsight(INSIGHT_TEST)
-                .saveInsightAs(insight)
+                .saveInsightAs(insightName)
                 .replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_REGION)
                 .waitForReportComputing()
                 .saveInsight();
-        checkUndoRedoAfterSaveInsight(insight);
-        assertEquals(analysisPage.openInsight(insight)
+        checkUndoRedoAfterSaveInsight();
+        assertEquals(analysisPage.openInsight(insightName)
                 .waitForReportComputing().getChartReport().getTrackersCount(), 2, "Chart content is not as expected");
     }
 
-    @Test(dependsOnMethods = { "addMetricAndAttribute" })
+    @Test(dependsOnMethods = { "prepareSavedInsightsForUndoRedoTest" })
     public void changeTimeFilter() throws JSONException, IOException, ParseException {
-        final String insight = "Test-Saved-Insight-After-Changing-Time-Filter";
+        final String insightName = "Test-Saved-Insight-After-Changing-Time-Filter";
         analysisPage.openInsight(INSIGHT_TEST)
-                .saveInsightAs(insight)
+                .saveInsightAs(insightName)
                 .addDateFilter()
                 .getFilterBuckets()
                 .configDateFilter("01/01/2015", "12/31/2015");
         analysisPage
                 .waitForReportComputing()
                 .saveInsight();
-        checkUndoRedoAfterSaveInsight(insight);
-        assertEquals(analysisPage.openInsight(insight)
+        checkUndoRedoAfterSaveInsight();
+        assertEquals(analysisPage.openInsight(insightName)
                 .waitForReportComputing().getChartReport().getTrackersCount(), 3, "Chart content is not as expected");
     }
 
-    @Test(dependsOnMethods = { "changeTimeFilter" })
+    @Test(dependsOnMethods = { "prepareSavedInsightsForUndoRedoTest" })
     public void changeAttributeFilter() throws JSONException, IOException {
-        final String insight = "Test-Saved-Insight-After-Changing-Attribute-Filter";
+        final String insightName = "Test-Saved-Insight-After-Changing-Attribute-Filter";
         analysisPage.openInsight(INSIGHT_TEST)
-                .saveInsightAs(insight)
+                .saveInsightAs(insightName)
                 .getFilterBuckets()
                 .configAttributeFilter(ATTR_ACTIVITY_TYPE, "Email", "Web Meeting");
         analysisPage
                 .waitForReportComputing()
                 .saveInsight();
-        checkUndoRedoAfterSaveInsight(insight);
-        assertEquals(analysisPage.openInsight(insight)
+        checkUndoRedoAfterSaveInsight();
+        assertEquals(analysisPage.openInsight(insightName)
                 .waitForReportComputing().getChartReport().getTrackersCount(), 2, "Chart content is not as expected");
     }
 
-    @Test(dependsOnMethods = { "changeAttributeFilter" })
+    @Test(dependsOnMethods = { "prepareSavedInsightsForUndoRedoTest" })
     public void changeChartType() throws JSONException, IOException {
-        final String insight = "Test-Saved-Insight-After-Changing-Chart-Type";
+        final String insightName = "Test-Saved-Insight-After-Changing-Chart-Type";
         analysisPage.openInsight(INSIGHT_TEST)
-                .saveInsightAs(insight)
+                .saveInsightAs(insightName)
                 .changeReportType(ReportType.BAR_CHART)
                 .waitForReportComputing()
                 .saveInsight();
-        checkUndoRedoAfterSaveInsight(insight);
+        checkUndoRedoAfterSaveInsight();
         assertEquals(
-                analysisPage.openInsight(insight)
+                analysisPage.openInsight(insightName)
                         .waitForReportComputing()
                         .getChartReport()
                         .getChartType(),
                 ReportType.BAR_CHART.getLabel(), "Chart type is not as expected");
     }
 
-    private void checkUndoRedoAfterSaveInsight(final String expectedPreviousTitle) throws JSONException, IOException {
+    private void checkUndoRedoAfterSaveInsight() throws JSONException, IOException {
         final AnalysisPageHeader header = analysisPage.getPageHeader();
         final String savedTitle = header.getInsightTitle();
         final int numberOfInsights = getAllInsightNames(getRestApiClient(), testParams.getProjectId()).size();
         
         analysisPage.undo();
-        assertEquals(header.getInsightTitle(), expectedPreviousTitle,
-                "The expected previous title is not displayed");
-        assertTrue(header.isUnsavedMessagePresent(), "Unsave notification is not displayed after undo");
-        assertTrue(header.isSaveButtonEnabled(), "Save button is not enable after undo");
+        assertEquals(header.getInsightTitle(), savedTitle,
+                "The expected title is NOT displayed after undo");
+        assertTrue(header.isUnsavedMessagePresent(), "Unsaved notification is not displayed after undo");
+        assertTrue(header.isSaveButtonEnabled(), "Save button is not enabled after undo");
         assertEquals(getAllInsightNames(getRestApiClient(), testParams.getProjectId()).size(),
                 numberOfInsights, "The insight does not exist after undo");
-        
+
         analysisPage.redo();
         assertEquals(header.getInsightTitle(), savedTitle,
-                "The expected title is displayed after redo");
+                "The expected title is NOT displayed after redo");
         assertFalse(header.isUnsavedMessagePresent(), "Unsave notification is displayed after redo");
-        assertFalse(header.isSaveButtonEnabled(), "Save button is enable after undo");
+        assertFalse(header.isSaveButtonEnabled(), "Save button is enabled after undo");
     }
 }

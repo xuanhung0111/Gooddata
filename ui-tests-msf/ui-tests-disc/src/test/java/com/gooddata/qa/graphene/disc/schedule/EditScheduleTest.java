@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.disc.schedule;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getBubbleMessage;
 import static com.gooddata.qa.graphene.entity.disc.Parameters.createRandomParam;
-import static com.gooddata.qa.utils.http.process.ProcessRestUtils.deteleProcess;
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
@@ -48,7 +47,7 @@ public class EditScheduleTest extends AbstractProcessTest {
                     "Schedule is not edited");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -67,7 +66,7 @@ public class EditScheduleTest extends AbstractProcessTest {
             assertEquals(scheduleDetail.getName(), customName);
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -85,7 +84,7 @@ public class EditScheduleTest extends AbstractProcessTest {
             assertEquals(getBubbleMessage(browser), "can't be blank");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -107,7 +106,7 @@ public class EditScheduleTest extends AbstractProcessTest {
                             Executable.SUCCESSFUL_GRAPH.getName()));
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -127,7 +126,7 @@ public class EditScheduleTest extends AbstractProcessTest {
             assertEquals(scheduleDetail.getSelectedExecutable(), Executable.ERROR_GRAPH);
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -149,7 +148,7 @@ public class EditScheduleTest extends AbstractProcessTest {
             assertEquals(scheduleDetail.getCronEditor().getSelectedCronType(), ScheduleCronTime.EVERY_15_MINUTES);
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -169,7 +168,7 @@ public class EditScheduleTest extends AbstractProcessTest {
             assertEquals(getBubbleMessage(browser), "Inserted cron format is invalid. Please verify and try again.");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -204,7 +203,7 @@ public class EditScheduleTest extends AbstractProcessTest {
             assertEquals(actualSecureParam.get(editedSecureParam.getKey()), "");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -234,7 +233,7 @@ public class EditScheduleTest extends AbstractProcessTest {
             assertFalse(scheduleDetail.hasParameter(editedSecureParam.getKey()), "Param is edited after cancel");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -274,7 +273,7 @@ public class EditScheduleTest extends AbstractProcessTest {
                     "Secure value is not hidden!");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -300,7 +299,7 @@ public class EditScheduleTest extends AbstractProcessTest {
             assertFalse(scheduleDetail.hasParameter(param.getKey()), "Parameter is not deleted");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -322,7 +321,7 @@ public class EditScheduleTest extends AbstractProcessTest {
             assertEquals(scheduleDetail.getRetryDelayValue(), retryDelayInMinute);
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -341,7 +340,7 @@ public class EditScheduleTest extends AbstractProcessTest {
             assertEquals(getBubbleMessage(browser), "The minimal delay is every 15 minutes.\nUse numbers only.");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -363,7 +362,7 @@ public class EditScheduleTest extends AbstractProcessTest {
             assertFalse(scheduleDetail.hasRetryDelay(), "Retry delay is not deleted");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 }

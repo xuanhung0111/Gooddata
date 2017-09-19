@@ -4,7 +4,6 @@ import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.process.ProcessRestUtils.deteleProcess;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
@@ -113,7 +112,7 @@ public class OverviewPageTest extends AbstractProcessTest {
             assertEquals(overviewPage.getStateNumber(state), 1);
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -137,7 +136,7 @@ public class OverviewPageTest extends AbstractProcessTest {
             assertThat(browser.getCurrentUrl(), containsString(testParams.getProjectId()));
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -165,7 +164,7 @@ public class OverviewPageTest extends AbstractProcessTest {
             assertEquals(initScheduleDetail(schedule).getExecutionHistoryItemNumber(), 2);
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -191,7 +190,7 @@ public class OverviewPageTest extends AbstractProcessTest {
                     "Schedule is not disabled after being disabled from overview page");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -219,7 +218,7 @@ public class OverviewPageTest extends AbstractProcessTest {
             assertEquals(initScheduleDetail(schedule).getExecutionHistoryItemNumber(), 2);
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -247,7 +246,7 @@ public class OverviewPageTest extends AbstractProcessTest {
                     .getStatusDescription(), "MANUALLY STOPPED");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -279,7 +278,7 @@ public class OverviewPageTest extends AbstractProcessTest {
             assertTrue(project.isDisabled(), role + " can access project detail page");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
         }
     }
@@ -333,7 +332,7 @@ public class OverviewPageTest extends AbstractProcessTest {
             assertEquals(project.getScheduleExecutable(customScheduleName), executable.getPath());
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 

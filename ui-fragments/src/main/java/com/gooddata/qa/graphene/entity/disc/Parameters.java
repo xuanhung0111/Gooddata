@@ -18,10 +18,8 @@ public class Parameters {
         this.secureParameters = new HashMap<>();
     }
 
-    @SuppressWarnings({ "unchecked", "serial", "rawtypes" })
-    public static final Map<String, String> SYNCHRONIZE_ALL_DATASETS = new HashMap() {{
-            put("GDC_DE_SYNCHRONIZE_ALL", "true");
-    }};
+    public static final Parameters SYNCHRONIZE_ALL_DATASETS = new Parameters()
+            .addParameter("GDC_DE_SYNCHRONIZE_ALL", "true");
 
     public static Pair<String, String> createRandomParam() {
         return Pair.of("Param-" + generateHashString(), "Value-" + generateHashString());

@@ -2,9 +2,9 @@ package com.gooddata.qa.graphene.fragments.reports.report;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
@@ -115,6 +115,7 @@ public class TableReport extends AbstractDashboardReport {
     }
 
     public List<String> getAttributeElements() {
+        waitForReportLoading();
         waitForTableReportExecutionProgress();
         return getElementTexts(attributeElementInGrid);
     }
@@ -173,6 +174,13 @@ public class TableReport extends AbstractDashboardReport {
 
     public List<String> getRawMetricElements() {
         waitForReportLoading();
+        //wait for display metric value
+        Graphene.waitGui().until(new Predicate<WebDriver>() {
+            @Override
+            public boolean apply(WebDriver input) {
+                return !metricValuesInGrid.isEmpty();
+            }
+        });
         return metricValuesInGrid.stream()
             .map(e -> e.getAttribute("title"))
             .collect(toList());
@@ -217,6 +225,7 @@ public class TableReport extends AbstractDashboardReport {
                 continue;
 
             e.findElement(cssSelector("span")).click();
+            waitForReportLoading();
             return;
         }
         throw new IllegalArgumentException("No metric value to drill on");
@@ -224,6 +233,7 @@ public class TableReport extends AbstractDashboardReport {
 
     public TableReport drillOnMetricValue(String value) {
         getMetricElement(value).click();
+        waitForReportLoading();
         return this;
     }
 
@@ -298,14 +308,11 @@ public class TableReport extends AbstractDashboardReport {
         });
         return this;
     }
+
     public TableReport waitForTableReportExecutionProgress() {
-        sleepTightInSeconds(1);
-        if(isElementPresent(cssSelector(".c-report"), browser)){
-            //in dashboard page
-            final WebElement progress = waitForElementPresent(cssSelector(".c-report-overlay"), browser);
-            Predicate<WebDriver> waitForProgress = browser -> progress.getCssValue("display").equals("none");
-            Graphene.waitGui().until(waitForProgress);
-        }
+        Stream.of(By.className("c-report-overlay"), By.id("executionProgress"))
+                .filter(by -> isElementPresent(by, browser))
+                .findFirst().ifPresent(by -> waitForElementNotVisible(by));
         return this;
     }
 

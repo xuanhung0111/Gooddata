@@ -98,7 +98,7 @@ public class GoodSalesAdvanceRangeFilterReportTest extends GoodSalesAbstractTest
                 .<RangeFilterFragment> openExistingFilter(RANGE_FILTER_DESCRIPTION, FilterFragment.RANGE_FILTER)
                 .addSubFilterByDateRange(ATTR_YEAR_SNAPSHOT, Time.LAST_YEAR)
                 .apply();
-        waitForAnalysisPageLoaded(browser);
+        reportPage.getTableReport().waitForTableReportExecutionProgress();
 
         reportPage.saveReport();
         checkRedBar(browser);

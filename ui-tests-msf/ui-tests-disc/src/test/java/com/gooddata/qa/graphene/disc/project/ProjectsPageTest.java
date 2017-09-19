@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.disc.project;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.process.ProcessRestUtils.deteleProcess;
 import static com.gooddata.qa.utils.http.project.ProjectRestUtils.createBlankProject;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -92,7 +91,7 @@ public class ProjectsPageTest extends AbstractProcessTest {
             }
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -108,7 +107,7 @@ public class ProjectsPageTest extends AbstractProcessTest {
             assertEquals(projectsPage.getProcessesInfoFrom(projectTitle), "1 processes, 1 schedules");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -130,7 +129,7 @@ public class ProjectsPageTest extends AbstractProcessTest {
             assertEquals(projectsPage.getLastSuccessfulExecutionFrom(projectTitle), executionDateTime);
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -154,7 +153,7 @@ public class ProjectsPageTest extends AbstractProcessTest {
             assertEquals(projectsPage.getLastSuccessfulExecutionFrom(projectTitle), executionDateTime);
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 

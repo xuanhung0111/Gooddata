@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.disc;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.process.ProcessRestUtils.deteleProcess;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -81,7 +80,7 @@ public class SanityTest extends AbstractProcessTest {
                     "Schedule is not created");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -101,7 +100,7 @@ public class SanityTest extends AbstractProcessTest {
                     ScheduleStatus.OK.toString());
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -129,7 +128,7 @@ public class SanityTest extends AbstractProcessTest {
                     ScheduleStatus.OK.toString());
 
         } finally {
-            deteleProcess(goodData, process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -150,7 +149,7 @@ public class SanityTest extends AbstractProcessTest {
                     ScheduleStatus.OK.toString());
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -181,7 +180,7 @@ public class SanityTest extends AbstractProcessTest {
             assertEquals(notifyItem.getMessage(), notificationRule.getMessage());
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -213,7 +212,7 @@ public class SanityTest extends AbstractProcessTest {
             assertEquals(overviewPage.getStateNumber(state), 1);
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -257,7 +256,7 @@ public class SanityTest extends AbstractProcessTest {
             }
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 

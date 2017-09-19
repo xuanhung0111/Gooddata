@@ -1,9 +1,14 @@
 package com.gooddata.qa.graphene.add.schedule;
 
+import static com.gooddata.qa.graphene.entity.disc.Parameters.createRandomParam;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getBubbleMessage;
 import static java.util.Arrays.asList;
 import static java.util.Collections.EMPTY_LIST;
 import static java.util.Collections.singletonList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -11,6 +16,7 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
@@ -204,5 +210,78 @@ public class CreateScheduleTest extends AbstractDataloadProcessTest {
                 // Schedule is already deleted in test
             }
         }
+    }
+
+    @Test(dependsOnGroups = {"precondition"})
+    public void checkParametersSectionIsDisplayed() {
+        String parameterLabels = initDiscProjectDetailPage()
+                .openCreateScheduleForm()
+                .getParameterLabels();
+        assertThat(parameterLabels, containsString("Add parameter"));
+        assertThat(parameterLabels, containsString("Add secure parameter"));
+    }
+
+    @Test(dependsOnGroups = {"precondition"})
+    public void createAndUpdateParameter() throws JSONException, IOException {
+        String schedule = "Schedule-" + generateHashString();
+        Pair<String, String> parameter = createRandomParam();
+        Pair<String, String> editedParameter = createRandomParam();
+        CreateScheduleForm createScheduleForm = initDiscProjectDetailPage()
+                .openCreateScheduleForm()
+                .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
+                .enterScheduleName(schedule);
+
+        createScheduleForm.addParameter(parameter.getKey(), parameter.getValue());
+        createScheduleForm.schedule();
+        try {
+            DataloadScheduleDetail scheduleDetail = DataloadScheduleDetail.getInstance(browser);
+            assertThat(scheduleDetail.getAllParametersInfo().entrySet(), hasItem(parameter));
+
+            scheduleDetail.getParameter(parameter.getKey())
+                    .editNameValuePair(editedParameter.getKey(), editedParameter.getValue());
+            scheduleDetail.saveChanges();
+            assertThat(scheduleDetail.getAllParametersInfo().entrySet(), hasItem(editedParameter));
+        } finally {
+            deleteScheduleByName(getDataloadProcess(), schedule);
+        }
+    }
+
+    @Test(dependsOnGroups = {"precondition"})
+    public void createParametersWithSpecialText() throws JSONException, IOException {
+        String schedule = "Schedule-" + generateHashString();
+        CreateScheduleForm createScheduleForm = initDiscProjectDetailPage()
+                .openCreateScheduleForm()
+                .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
+                .enterScheduleName(schedule);
+
+        createScheduleForm.addParameter("GDC_DATALOAD_DATASETS", "DATALOAD_DATASETS");
+        createScheduleForm.schedule();
+        assertEquals(getBubbleMessage(browser), "System parameters are not allowed.");
+        createScheduleForm.deleteParameter("GDC_DATALOAD_DATASETS");
+
+        createScheduleForm.addParameter("abc", "abc|123");
+        createScheduleForm.schedule();
+        try {
+            DataloadScheduleDetail scheduleDetail = DataloadScheduleDetail.getInstance(browser);
+            assertTrue(scheduleDetail.hasParameter("abc"), "Parameter isn't added");
+            assertEquals(scheduleDetail.getParameter("abc").getValue(), "abc|123");
+        } finally {
+            deleteScheduleByName(getDataloadProcess(), schedule);
+        }
+    }
+
+    @Test(dependsOnGroups = {"precondition"})
+    public void notSaveParameterAfterDeleted() throws JSONException, IOException {
+        String schedule = "Schedule-" + generateHashString();
+        Pair<String, String> parameter = createRandomParam();
+        CreateScheduleForm createScheduleForm = initDiscProjectDetailPage()
+                .openCreateScheduleForm()
+                .selectProcess(DEFAULT_DATAlOAD_PROCESS_NAME)
+                .enterScheduleName(schedule);
+        createScheduleForm.addParameter(parameter.getKey(), parameter.getValue());
+        createScheduleForm.schedule();
+        deleteScheduleByName(getDataloadProcess(), schedule);
+        assertFalse(initDiscProjectDetailPage().openCreateScheduleForm().hasParameter(parameter.getKey()), 
+                "Parameter is saved when delete");
     }
 }

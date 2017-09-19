@@ -33,6 +33,9 @@ public class AnalysisPageHeader extends AbstractFragment {
     @FindBy(className = "s-undo")
     private WebElement undoButton;
 
+    @FindBy(className = "s-cancel")
+    private WebElement cancelButton;
+
     @FindBy(className = "s-redo")
     private WebElement redoButton;
 
@@ -135,8 +138,12 @@ public class AnalysisPageHeader extends AbstractFragment {
         waitForElementVisible(insightTitle).click();
         final WebElement textArea = waitForElementVisible(insightTitle.findElement(tagName("textarea")));
         textArea.sendKeys(title, Keys.ENTER); //make sure the title is applied
-        Predicate<WebDriver> savedButtonEnabled = driver -> isSaveButtonEnabled();
-        Graphene.waitGui().until(savedButtonEnabled);
+
+        if (!title.trim().isEmpty()) {
+            Predicate<WebDriver> savedButtonEnabled = driver -> isSaveButtonEnabled();
+            Graphene.waitGui().until(savedButtonEnabled);
+        }
+
         return this;
     }
 
@@ -144,15 +151,13 @@ public class AnalysisPageHeader extends AbstractFragment {
         return waitForElementVisible(insightTitle).getText();
     }
 
-    public boolean saveInsight() {
+    public void saveInsight() {
         waitForElementEnabled(saveButton).click();
-        return !isUnsavedMessagePresent();
     }
 
-    public boolean saveInsight(final String insight) {
+    public void saveInsight(final String insight) {
         waitForElementEnabled(saveButton).click();
         saveWorkingInsight(insight);
-        return !isUnsavedMessagePresent();
     }
 
     public SaveInsightDialog saveWithoutSubmitting(final String insight) {
@@ -160,10 +165,9 @@ public class AnalysisPageHeader extends AbstractFragment {
         return SaveInsightDialog.getInstance(browser).enterName(insight);
     }
 
-    public boolean saveInsightAs(final String insight) {
+    public void saveInsightAs(final String insight) {
         waitForElementEnabled(saveAsButton).click();
         saveWorkingInsight(insight);
-        return !isSaveButtonEnabled() && insight.equals(getInsightTitle());
     }
 
     public boolean isUnsavedMessagePresent() {

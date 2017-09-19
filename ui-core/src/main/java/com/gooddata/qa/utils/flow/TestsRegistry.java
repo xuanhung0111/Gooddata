@@ -7,10 +7,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
@@ -91,17 +91,23 @@ public class TestsRegistry {
         testPhases.add(parseTests(tests));
     }
 
+    // The implementation of this method change from using lambda to loop due to
+    // https://bugs.openjdk.java.net/browse/JDK-8145964 (sometimes the NoClassDefFoundError exception thrown)
+    // We will have a refactor when the migration of JDK 9 is done
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private Set<String> parseTests(Object[] tests) {
-        return Stream.of(tests).map(test -> {
-                if (test instanceof Class) {
-                    return parseTest((Class) test);
-                }
-                if (test instanceof PredefineParameterTest) {
-                    return parseTest((PredefineParameterTest) test);
-                }
-                return parseTest((String) test);
-        }).collect(toSet());
+        Set<String> listAfterParsing = new HashSet<>();
+
+        for (int i = 0; i < tests.length; i++) {
+            if (tests[i] instanceof Class) {
+                listAfterParsing.add(parseTest((Class) tests[i]));
+            } else if (tests[i] instanceof PredefineParameterTest) {
+                listAfterParsing.add(parseTest((PredefineParameterTest) tests[i]));
+            } else {
+                listAfterParsing.add(parseTest((String) tests[i]));
+            }
+        }
+        return listAfterParsing;
     }
 
     private String parseTest(String testSuite) {

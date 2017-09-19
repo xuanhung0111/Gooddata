@@ -1,9 +1,8 @@
 package com.gooddata.qa.graphene.fragments.dashboards.widget.configuration;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -16,7 +15,11 @@ public class SelectionConfigPanel extends AbstractFragment {
     @FindBy(xpath = "//div[./label[.='Multiple values']]/input")
     private WebElement multipleValue;
 
-    private final static String HIDE_DATE_RANGE_CHECKBOX_CSS = ".selectionModeRow input";
+    @FindBy(css = ".selectionModeRow input")
+    private WebElement hideFromToCheckBox;
+
+    @FindBy(css = ".disabledTimeInterval input")
+    private WebElement hideCalendarPickerCheckBox;
 
     public void changeSelectionToOneValue() {
         waitForElementVisible(oneValue).click();
@@ -27,21 +30,24 @@ public class SelectionConfigPanel extends AbstractFragment {
     }
 
     public boolean isHideDateRangeSelected() {
-        return getHideDateRangeCheckbox().isSelected();
+        return waitForElementVisible(hideFromToCheckBox).isSelected();
     }
 
     public boolean isHideDateRangeSelectionVisible() {
-        return isElementVisible(By.cssSelector(HIDE_DATE_RANGE_CHECKBOX_CSS), getRoot());
+        return isElementVisible(hideFromToCheckBox);
     }
 
     public SelectionConfigPanel setHideDateRange(boolean enabled) {
         if (isHideDateRangeSelected() != enabled)
-            getHideDateRangeCheckbox().click();
+            waitForElementVisible(hideFromToCheckBox).click();
 
         return this;
     }
 
-    private WebElement getHideDateRangeCheckbox() {
-        return waitForElementVisible(By.cssSelector(HIDE_DATE_RANGE_CHECKBOX_CSS), getRoot());
+    public SelectionConfigPanel setHideDatePicker(boolean enabled) {
+        if (waitForElementVisible(hideCalendarPickerCheckBox).isSelected() != enabled)
+            hideCalendarPickerCheckBox.click();
+
+        return this;
     }
 }

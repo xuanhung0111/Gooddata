@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -118,6 +119,11 @@ public abstract class AbstractScheduleFragment extends AbstractFragment {
 
     public boolean hasParameter(String parameter) {
         return findParameter(parameter).isPresent();
+    }
+
+
+    public String getParameterLabels() {
+        return waitForElementVisible(By.className("schedule-params-actions"), getRoot()).getText();
     }
 
     private Optional<ScheduleParameter> findParameter(String parameter) {

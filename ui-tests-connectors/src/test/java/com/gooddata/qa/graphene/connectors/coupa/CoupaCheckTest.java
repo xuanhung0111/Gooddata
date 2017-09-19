@@ -7,7 +7,6 @@ import static org.apache.commons.lang.Validate.notEmpty;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
-import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -22,7 +21,6 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.connectors.AbstractConnectorsCheckTest;
 import com.gooddata.qa.graphene.enums.Connectors;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.greypages.connectors.CoupaInstanceFragment;
 import com.google.common.base.Predicate;
 
@@ -38,8 +36,6 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 
     private String coupaInstanceApiUrl;
     private String coupaInstanceApiKey;
-    private String coupaUploadUser;
-    private String coupaUploadUserPassword;
 
     @FindBy(tagName = "form")
     private CoupaInstanceFragment coupaInstance;
@@ -48,15 +44,8 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
     public void loadRequiredProperties() {
         coupaInstanceApiUrl = testParams.loadProperty("connectors.coupa.instance.apiUrl");
         coupaInstanceApiKey = testParams.loadProperty("connectors.coupa.instance.apiKey");
-        coupaUploadUser = testParams.loadProperty("connectors.coupa.uploadUser");
-        coupaUploadUserPassword = testParams.loadProperty("connectors.coupa.uploadUserPassword");
 
         connectorType = Connectors.COUPA;
-        expectedDashboardsAndTabs = new HashMap<String, String[]>();
-        expectedDashboardsAndTabs.put("Coupa Spend Optimizer", new String[]{
-                "KPIs", "Requisitions", "Approvals", "Purchase Orders", "Suppliers", "Invoices", "Commodities",
-                "Contracts", "Expenses", "Budgets", "All Spend"
-        });
 
         projectCreateCheckIterations = 120;
         integrationProcessCheckLimit = 720;
@@ -95,29 +84,6 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
         waitForElementVisible(BY_IFRAME, browser);
         browser.switchTo().frame(browser.findElement(BY_IFRAME));
         waitForElementVisible(BY_DIV_SYNCHRONIZATION_PROGRESS, browser);
-    }
-
-    @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
-            dependsOnMethods = {"testCoupaIntegrationConfiguration"})
-    public void testCoupaIntegrationWithUploadUser() throws JSONException {
-        // pardot specific configuration of API Url (with specific upload user)
-        signInAtGreyPages(coupaUploadUser, coupaUploadUserPassword);
-        testConnectorIntegrationResource();
-    }
-
-    @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
-            dependsOnMethods = {"testCoupaIntegrationWithUploadUser"})
-    public void testCoupaIntegration() throws JSONException {
-        // sign in back with demo user
-        signIn(true, UserRoles.ADMIN);
-        // process schedule
-        scheduleIntegrationProcessOrUseExisting(integrationProcessCheckLimit);
-    }
-
-    @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
-            dependsOnMethods = {"testCoupaIntegration"})
-    public void testIncrementalSynchronization() throws JSONException {
-        scheduleIntegrationProcess(integrationProcessCheckLimit);
     }
 
     /**

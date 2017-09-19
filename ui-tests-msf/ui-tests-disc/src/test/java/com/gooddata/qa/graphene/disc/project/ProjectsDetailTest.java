@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.disc.project;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.process.ProcessRestUtils.deteleProcess;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.testng.Assert.assertTrue;
@@ -64,7 +63,7 @@ public class ProjectsDetailTest extends AbstractProcessTest {
             assertTrue(projectDetailPage.hasProcess(process.getName()));
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -87,7 +86,7 @@ public class ProjectsDetailTest extends AbstractProcessTest {
             assertEquals(processDetail.getMetadata("Process ID"), process.getId());
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -114,7 +113,7 @@ public class ProjectsDetailTest extends AbstractProcessTest {
             downloadedFile = waitForProcessDownloaded(process.getId(), 64000L);
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
             downloadedFile.deleteOnExit();
         }
     }
@@ -137,7 +136,7 @@ public class ProjectsDetailTest extends AbstractProcessTest {
             assertEquals(getLast(projectDetailPage.getProcessNames()), newProcessName);
 
         } finally {
-            processes.stream().forEach(p -> deteleProcess(getGoodDataClient(), p));
+            processes.stream().forEach(p -> getProcessService().removeProcess(p));
         }
     }
 
@@ -161,7 +160,7 @@ public class ProjectsDetailTest extends AbstractProcessTest {
 
         } finally {
             try {
-                deteleProcess(getGoodDataClient(), process);
+                getProcessService().removeProcess(process);
             } catch (GoodDataException ex) {
                 // Process is already deleted in test and ignore this
             }
@@ -184,7 +183,7 @@ public class ProjectsDetailTest extends AbstractProcessTest {
             assertEquals(processDetail.getScheduleInfoFrom(Executable.SHORT_TIME_ERROR_GRAPH), NO_SCHEDULE);
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -217,7 +216,7 @@ public class ProjectsDetailTest extends AbstractProcessTest {
                     ScheduleStatus.DISABLED);
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 

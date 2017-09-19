@@ -11,7 +11,8 @@ public enum ProjectFeatureFlags {
     ENABLE_ANALYTICAL_DASHBOARDS("enableAnalyticalDashboards"),
     DISABLE_SAVED_FILTERS("disableSavedFilters"),
     ENABLE_CHANGE_LANGUAGE("enableChangeLanguage"),
-    HIDE_KPI_ALERT_LINK("hideKPIAlertLinks");
+    HIDE_KPI_ALERT_LINK("hideKPIAlertLinks"),
+    FISCAL_CALENDAR_ENABLED("fiscalCalendarEnabled");
 
     private final String featureFlag;
 

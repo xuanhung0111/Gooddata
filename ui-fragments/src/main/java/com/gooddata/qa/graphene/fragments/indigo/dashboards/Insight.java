@@ -28,7 +28,6 @@ public class Insight extends Widget {
     }
 
     public boolean isEmptyValue() {
-        return isElementPresent(By.className("gd-state-icon"), getRoot()) && isElementPresent(By.className
-                ("gd-state-text"), getRoot());
+        return isElementPresent(By.className("info-label-icon-empty"), getRoot());
     }
 }

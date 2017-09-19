@@ -103,7 +103,7 @@ public class DashboardContent extends AbstractFragment {
     }
 
     public FilterWidget getFirstFilter() {
-        return createPageFragment(FilterWidget.class, filters.get(0));
+        return createPageFragment(FilterWidget.class, waitForElementVisible(filters.get(0)));
     }
 
     public FilterWidget getFilterWidget(final String condition) {

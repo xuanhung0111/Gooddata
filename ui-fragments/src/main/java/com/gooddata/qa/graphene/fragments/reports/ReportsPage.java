@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.fragments.reports;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkGreenBar;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
@@ -22,6 +23,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -32,6 +34,7 @@ import com.gooddata.qa.graphene.fragments.account.AccountCard;
 import com.gooddata.qa.graphene.fragments.common.IpeEditor;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
+import com.google.common.base.Predicate;
 
 public class ReportsPage extends AbstractFragment {
 
@@ -82,6 +85,10 @@ public class ReportsPage extends AbstractFragment {
     public ReportsPage clickAddFolderButton() {
         waitForElementVisible(addFolderButton).click();
         return this;
+    }
+
+    public void clickReportOwner(String reportName) {
+        getReport(reportName).getOwner().click();
     }
 
     public ReportsPage addNewFolder(String folderName) {
@@ -204,25 +211,19 @@ public class ReportsPage extends AbstractFragment {
     }
 
     public PersonalInfo getReportOwnerInfoFrom(String reportName) {
-        getActions()
-            .moveToElement(reports.stream()
-                .filter(entry -> reportName.equals(entry.getLabel()))
-                .findFirst()
-                .get()
-                .getOwner())
-            .perform();
+        ReportEntry report = getReport(reportName);
+
+        Predicate<WebDriver> isHovered = browser -> {
+            getActions().moveToElement(report.getOwner()).perform();
+            return isElementVisible(By.cssSelector("a:hover"), report.getRoot());
+        };
+        Graphene.waitGui().until(isHovered);
 
         return AccountCard.getInstance(browser).getUserInfo();
     }
 
     public UserProfilePage openReportOwnerProfilePageFrom(String reportName) {
-        reports.stream()
-            .filter(entry -> reportName.equals(entry.getLabel()))
-            .findFirst()
-            .get()
-            .getOwner()
-            .click();
-
+        clickReportOwner(reportName);
         waitForUserProfilePageLoaded(browser);
         return UserProfilePage.getInstance(browser);
     }
@@ -251,12 +252,7 @@ public class ReportsPage extends AbstractFragment {
     }
 
     public ReportPage openReport(String report) {
-        reports.stream()
-            .filter(entry -> report.equals(entry.getLabel()))
-            .findFirst()
-            .get()
-            .openReport();
-
+        getReport(report).openReport();
         waitForAnalysisPageLoaded(browser);
         return ReportPage.getInstance(browser).waitForReportExecutionProgress();
     }
@@ -280,6 +276,13 @@ public class ReportsPage extends AbstractFragment {
             .filter(element -> folderName.equals(element.findElement(BY_LINK).getText()))
             .findFirst()
             .orElseThrow(() -> new NoSuchElementException("Cannot find folder: " + folderName));
+    }
+
+    private ReportEntry getReport(String reportName) {
+        return reports.stream()
+                .filter(entry -> reportName.equals(entry.getLabel()))
+                .findFirst()
+                .get();
     }
 
     public static class ReportEntry extends AbstractFragment {
