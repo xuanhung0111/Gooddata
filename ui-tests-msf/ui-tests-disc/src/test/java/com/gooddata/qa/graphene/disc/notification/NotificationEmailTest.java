@@ -1,24 +1,22 @@
 package com.gooddata.qa.graphene.disc.notification;
 
-import static com.gooddata.qa.utils.http.process.ProcessRestUtils.deteleProcess;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.graphene.entity.disc.NotificationRule.getVariablesFromMessage;
+import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
+import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileUri;
+import static com.gooddata.qa.utils.mail.ImapUtils.getEmailBody;
+import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
+import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
-import static com.gooddata.qa.utils.mail.ImapUtils.getEmailBody;
-import static com.gooddata.qa.utils.http.process.ProcessRestUtils.getLastExecutionDetail;
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileUri;
-import static java.lang.String.format;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Stream;
-import java.time.Duration;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -45,9 +43,9 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.disc.notification.NotificationRuleItem.NotificationEvent;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
+import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
 
 public class NotificationEmailTest extends AbstractProcessTest {
 
@@ -101,7 +99,8 @@ public class NotificationEmailTest extends AbstractProcessTest {
 
             JSONObject lastExecutionDetail = getLastExecutionDetail(getRestApiClient(), testParams.getProjectId(),
                     process.getId());
-            Map<String, String> variables = getVariablesFromNotificationEmail(notificationRule.getSubject());
+            Document emailContent = getNotificationEmailContent(notificationRule.getSubject());
+            Map<String, String> variables = getVariablesFromMessage(emailContent.text());
 
             assertEquals(variables.get(Variable.PROJECT.getName()), testParams.getProjectId());
             assertEquals(variables.get(Variable.USER.getName()), getUserProfileId());
@@ -116,7 +115,7 @@ public class NotificationEmailTest extends AbstractProcessTest {
                     parseDateFromPattern(lastExecutionDetail.getString("created"), DATE_FORMAT_PATTERN_2)));
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -145,7 +144,8 @@ public class NotificationEmailTest extends AbstractProcessTest {
 
             JSONObject lastExecutionDetail = getLastExecutionDetail(getRestApiClient(), testParams.getProjectId(),
                     process.getId());
-            Map<String, String> variables = getVariablesFromNotificationEmail(notificationRule.getSubject());
+            Document emailContent = getNotificationEmailContent(notificationRule.getSubject());
+            Map<String, String> variables = getVariablesFromMessage(emailContent.text());
 
             assertEquals(variables.get(Variable.PROCESS_ID.getName()), process.getId());
             assertEquals(variables.get(Variable.SCHEDULE_ID.getName()), schedule.getId());
@@ -155,7 +155,7 @@ public class NotificationEmailTest extends AbstractProcessTest {
                     parseDateFromPattern(lastExecutionDetail.getString("started"), DATE_FORMAT_PATTERN_2)));
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -184,7 +184,8 @@ public class NotificationEmailTest extends AbstractProcessTest {
 
             JSONObject lastExecutionDetail = getLastExecutionDetail(getRestApiClient(), testParams.getProjectId(),
                     process.getId());
-            Map<String, String> variables = getVariablesFromNotificationEmail(notificationRule.getSubject());
+            Document emailContent = getNotificationEmailContent(notificationRule.getSubject());
+            Map<String, String> variables = getVariablesFromMessage(emailContent.text());
 
             assertEquals(variables.get(Variable.PROCESS_ID.getName()), process.getId());
             assertEquals(variables.get(Variable.SCHEDULE_ID.getName()), schedule.getId());
@@ -193,7 +194,7 @@ public class NotificationEmailTest extends AbstractProcessTest {
                     parseDateFromPattern(lastExecutionDetail.getString("finished"), DATE_FORMAT_PATTERN_2)));
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -222,7 +223,8 @@ public class NotificationEmailTest extends AbstractProcessTest {
 
             JSONObject lastExecutionDetail = getLastExecutionDetail(getRestApiClient(), testParams.getProjectId(),
                     process.getId());
-            Map<String, String> variables = getVariablesFromNotificationEmail(notificationRule.getSubject());
+            Document emailContent = getNotificationEmailContent(notificationRule.getSubject());
+            Map<String, String> variables = getVariablesFromMessage(emailContent.text());
 
             assertEquals(variables.get(Variable.PROCESS_ID.getName()), process.getId());
             assertEquals(variables.get(Variable.SCHEDULE_ID.getName()), schedule.getId());
@@ -230,7 +232,7 @@ public class NotificationEmailTest extends AbstractProcessTest {
                     lastExecutionDetail.getJSONObject("error").getString("message").replaceAll("\n\\s+", " "));
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -257,11 +259,11 @@ public class NotificationEmailTest extends AbstractProcessTest {
 
             processDetail.openSchedule(schedule.getName()).executeSchedule().waitForExecutionFinish();
 
-            Map<String, String> variables = getVariablesFromNotificationEmail(notificationRule.getSubject());
-            assertEquals(variables.get("params.CUSTOM"), "World");
+            Document emailContent = getNotificationEmailContent(notificationRule.getSubject());
+            assertEquals(emailContent.text(), "params.CUSTOM==World");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -300,21 +302,9 @@ public class NotificationEmailTest extends AbstractProcessTest {
                             process.getName(), projectTitle, testParams.getProjectId()));
 
         } finally {
-            deteleProcess(goodData, process);
+            getProcessService().removeProcess(process);
             logoutAndLoginAs(true, UserRoles.ADMIN);
         }
-    }
-
-    private Map<String, String> getVariablesFromNotificationEmail(String emailSubject)
-            throws MessagingException, IOException {
-        Document emailContent = getNotificationEmailContent(emailSubject);
-
-        Map<String, String> variables = new HashMap<>();
-        Stream.of(emailContent.text().split(" \\| "))
-                .map(v -> v.split("=="))
-                .forEach(v -> variables.put(v[0], v[1]));
-
-        return variables;
     }
 
     private Document getNotificationEmailContent(String emailSubject) throws MessagingException, IOException {
@@ -336,5 +326,15 @@ public class NotificationEmailTest extends AbstractProcessTest {
 
     private LocalDateTime parseDateFromPattern(String date, String pattern) {
         return LocalDateTime.parse(date, DateTimeFormatter.ofPattern(pattern));
+    }
+
+    private JSONObject getLastExecutionDetail(RestApiClient restApiClient, String projectId, String processId)
+            throws JSONException, IOException {
+        return getJsonObject(restApiClient,
+                        format("/gdc/projects/%s/dataload/processes/%s/executions", projectId, processId))
+                .getJSONObject("executions")
+                .getJSONArray("items")
+                .getJSONObject(0)
+                .getJSONObject("executionDetail");
     }
 }

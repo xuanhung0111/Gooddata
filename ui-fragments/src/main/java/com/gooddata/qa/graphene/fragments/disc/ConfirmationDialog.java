@@ -15,14 +15,14 @@ public class ConfirmationDialog extends AbstractFragment {
 
     private static final By LOCATOR = By.className("gd-dialog");
 
+    @FindBy(css = ".button-bar-area button:first-child")
+    protected WebElement confirmButton;
+
     @FindBy(className = "dialog-header-area")
     private WebElement header;
 
     @FindBy(className = "dialog-body")
     private WebElement body;
-
-    @FindBy(css = ".button-bar-area button:first-child")
-    private WebElement confirmButton;
 
     @FindBy(css = ".button-bar-area button:last-child")
     private WebElement discardButton;

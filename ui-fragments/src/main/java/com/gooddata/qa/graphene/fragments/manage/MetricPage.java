@@ -1,13 +1,16 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForObjectPageLoaded;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForUserProfilePageLoaded;
 import static org.openqa.selenium.By.className;
+
+import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -17,6 +20,7 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.entity.metric.CustomMetricUI;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
+import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 
 public class MetricPage extends DataPage {
 
@@ -28,6 +32,9 @@ public class MetricPage extends DataPage {
 
     @FindBy(xpath = "//a[@class='interpolateProject']")
     private WebElement dataLink;
+
+    @FindBy(className = "dataPage-listRow")
+    private List<WebElement> metrics;
 
     private static final By METRIC_EDITOR_LOCATOR = className("metricEditorFrame");
 
@@ -106,6 +113,21 @@ public class MetricPage extends DataPage {
         waitForElementVisible(createMetricButton).click();
 
         return MetricEditorDialog.getInstance(browser);
+    }
+
+    public void clickMetricOwner(String metricName) {
+        metrics.stream()
+                .filter(metric -> metric.findElement(By.cssSelector(".title span")).getText().equals(metricName))
+                .map(metric -> metric.findElement(By.cssSelector(".author a")))
+                .findFirst()
+                .get()
+                .click();
+    }
+
+    public UserProfilePage openMetricOwnerProfilePage(String metricName) {
+        clickMetricOwner(metricName);
+        waitForUserProfilePageLoaded(browser);
+        return UserProfilePage.getInstance(browser);
     }
 
     private MetricPage backToMetricsTable() {

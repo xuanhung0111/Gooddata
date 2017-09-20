@@ -1,8 +1,9 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 
 import java.util.ArrayList;
@@ -59,6 +60,22 @@ public class SavedViewWidget extends AbstractFragment{
         }
     }
 
+    public SavedViewWidget renameSavedView(String currentName, String newName) {
+        openSavedViewMenu();
+        getSavedViewPopupMenu().openContextMenuOfSavedView(currentName);
+        getSavedViewPopupMenu().getSavedFiltersContextMenu().openRenameDialog();
+        getDashboardSaveActiveViewDialog().rename(newName);
+        return this;
+    }
+
+    public SavedViewWidget deleteSavedView(String name) {
+        openSavedViewMenu();
+        getSavedViewPopupMenu().openContextMenuOfSavedView(name);
+        getSavedViewPopupMenu().getSavedFiltersContextMenu().openDeleteDialog();
+        getSavedViewDeleteConfirmDialog().deleteSavedView();
+        return this;
+    }
+
     public boolean isUnsavedViewButtonPresent() {
         try {
             waitForElementVisible(unsavedViewButton);
@@ -71,6 +88,7 @@ public class SavedViewWidget extends AbstractFragment{
     public SavedViewWidget openSavedViewMenu() {
         waitForElementVisible(this.getRoot()).click();
         waitForElementVisible(savedViewPopupMenu.getRoot());
+        waitForElementNotPresent(By.className("loading"));
         return this;
     }
 
@@ -249,7 +267,7 @@ public class SavedViewWidget extends AbstractFragment{
         private SavedFiltersContextMenu savedFiltersContextMenu;
 
         public WebElement getSavedCurrentViewButton() {
-            return savedCurrentViewButton;
+            return waitForElementVisible(savedCurrentViewButton);
         }
 
         public boolean isNoSavedViewPresent() {

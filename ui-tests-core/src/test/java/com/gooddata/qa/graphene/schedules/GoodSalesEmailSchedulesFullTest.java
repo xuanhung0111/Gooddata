@@ -110,6 +110,11 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         takeScreenshot(browser, "Goodsales-schedules-empty-dashboard", this.getClass());
     }
 
+    @Test(dependsOnMethods = {"createEmptyDashboardSchedule"}, groups = {"schedules"})
+    public void checkEmailToField() {
+        assertEquals(initEmailSchedulesPage().openNewSchedule().getEmailToListItem().size(),0);
+    }
+
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void deleteDashboardUsedInSchedule() {
         String dashboardTitle = "Schedule dashboard";

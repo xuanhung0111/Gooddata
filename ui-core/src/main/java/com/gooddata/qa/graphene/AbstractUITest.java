@@ -127,7 +127,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
             openUrl(PAGE_LOGIN);
         }
         LoginFragment.getInstance(browser).login(username, password, true);
-        waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
+        waitForElementVisible(BY_LOGGED_USER_BUTTON, browser, 300);
         takeScreenshot(browser, "login-ui", this.getClass());
         System.out.println("Successful login with user: " + username);
     }
@@ -554,7 +554,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     protected void waitForOpeningIndigoDashboard() {
-        final By loadingLabel = className(".gd-loading-equalizer");
+        final By loadingLabel = className("gd-loading-equalizer");
         try {
             Predicate<WebDriver> isLoadingLabelPresent = browser -> isElementPresent(loadingLabel, browser);
             Graphene.waitGui().withTimeout(2, TimeUnit.SECONDS).until(isLoadingLabelPresent);

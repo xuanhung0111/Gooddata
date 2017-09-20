@@ -134,7 +134,8 @@ public abstract class AbstractTest extends Arquillian {
     }
 
     public RestApiClient getDomainUserRestApiClient() {
-        return getRestApiClient(testParams.getDomainUser(), testParams.getPassword());
+        return getRestApiClient(testParams.getDomainUser() == null ? testParams.getUser() : testParams.getDomainUser(), 
+                testParams.getPassword());
     }
 
     /**

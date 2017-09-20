@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.gooddata.qa.graphene.aqe.ValidElementsResourceTest;
-import com.gooddata.qa.graphene.dashboards.DashboardPermissionsTest;
+import com.gooddata.qa.graphene.dashboards.*;
 import com.gooddata.qa.graphene.account.GoodSalesMufOnUserProfileTest;
 import com.gooddata.qa.graphene.account.InviteUserInOtherDomainsTest;
 import com.gooddata.qa.graphene.account.ManageUserTest;
@@ -31,6 +31,7 @@ import com.gooddata.qa.graphene.dashboards.GoodSalesPersonalObjectsInDashboardWi
 import com.gooddata.qa.graphene.dashboards.GoodSalesReportWidgetOnDashboardTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesSavedViewWithAllValuesTest;
 import com.gooddata.qa.graphene.filters.DashboardFilterVisualTest;
+import com.gooddata.qa.graphene.filters.DashboardFiscalDateFilterTest;
 import com.gooddata.qa.graphene.i18n.LocalizationTest;
 import com.gooddata.qa.graphene.manage.AttributeLabelsTest;
 import com.gooddata.qa.graphene.manage.ComputedAttributesTest;
@@ -123,6 +124,7 @@ public class UITestsRegistry {
             GoodSalesConnectingFilterTest.class,
             GoodSalesFilterGroupTest.class,
             DashboardFilterVisualTest.class,
+            DashboardFiscalDateFilterTest.class,
             DashboardSavedFiltersTest.class,
             GoodSalesAdvancedConnectingFilterTest.class,
             GoodSalesDefaultFilterMiscTest.class,
@@ -172,6 +174,7 @@ public class UITestsRegistry {
                     GoodSalesAdvancedConnectingFilterTest.class,
                     GoodSalesFilterGroupTest.class,
                     DashboardFilterVisualTest.class,
+                    DashboardFiscalDateFilterTest.class,
                     GoodSalesDashboardWidgetManipulationTest.class,
                     DashboardSavedFiltersTest.class,
                     GoodSalesKeyMetricTest.class,
@@ -182,6 +185,7 @@ public class UITestsRegistry {
                     GoodSalesEditEmbeddedDashboardTest.class,
                     GoodSalesDefaultFilterMiscTest.class,
                     GoodSalesSavedViewWithAllValuesTest.class,
+                    GoodSalesDashboardRestrictedFacts.class,
                     GoodSalesHideDateRangeSelectionTest.class,
                     DrillToHiddenDashboardTabTest.class,
                     DrillToHiddenDashboardTabTest.class,

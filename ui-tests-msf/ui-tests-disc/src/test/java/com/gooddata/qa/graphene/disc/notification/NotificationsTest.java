@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.disc.notification;
 
-import static com.gooddata.qa.utils.http.process.ProcessRestUtils.deteleProcess;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -37,7 +36,7 @@ public class NotificationsTest extends AbstractProcessTest {
                     "No event (eg. schedule start, finish, fail, etc.) will trigger a notification email.");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -60,7 +59,7 @@ public class NotificationsTest extends AbstractProcessTest {
             assertEquals(getBubbleMessage(browser), INVALID_EMAIL_MESSAGE);
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -89,7 +88,7 @@ public class NotificationsTest extends AbstractProcessTest {
                     "The event name is invalid.\n\nPlease insert alphanumeric characters only. No spaces.");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -114,7 +113,7 @@ public class NotificationsTest extends AbstractProcessTest {
             assertEquals(notifyItem.getVariables(), VariableList.PROCESS_STARTED.getVariables());
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -140,7 +139,7 @@ public class NotificationsTest extends AbstractProcessTest {
             assertEquals(notifyItem.getMessage(), notificationRule.getMessage());
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -157,7 +156,7 @@ public class NotificationsTest extends AbstractProcessTest {
             assertEquals(dialog.getNotificationRuleNumber(), 0);
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -183,7 +182,7 @@ public class NotificationsTest extends AbstractProcessTest {
             assertEquals(notifyItem.getSubject(), editedSubject);
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -207,7 +206,7 @@ public class NotificationsTest extends AbstractProcessTest {
             assertEquals(notificationRuleDialog.getNotificationRuleNumber(), 0);
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 
@@ -225,7 +224,7 @@ public class NotificationsTest extends AbstractProcessTest {
             assertEquals(processDetail.getNotificationRuleDescription(), "1 notification rule");
 
         } finally {
-            deteleProcess(getGoodDataClient(), process);
+            getProcessService().removeProcess(process);
         }
     }
 

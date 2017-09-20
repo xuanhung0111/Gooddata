@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.add.schedule;
 
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.SQL_FILES;
-import static com.gooddata.qa.utils.http.process.ProcessRestUtils.executeProcess;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -33,11 +32,10 @@ public class ScheduleDetailTest extends AbstractDataloadProcessTest {
     public void initData() throws JSONException, IOException {
         setupMaql(LdmModel.loadFromFile(MAQL_FILES.getPath() + TxtFile.CREATE_LDM.getName()));
 
-        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY,
+        Parameters parameters = defaultParameters.get().addParameter(Parameter.SQL_QUERY,
                 SqlBuilder.loadFromFile(SQL_FILES.getPath() + TxtFile.ADS_TABLE.getName()));
 
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
+        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE, parameters);
     }
 
     @Test(dependsOnGroups = {"precondition"})
@@ -78,11 +76,10 @@ public class ScheduleDetailTest extends AbstractDataloadProcessTest {
 
     @Test(dependsOnGroups = {"precondition"})
     public void checkConcurrentDataLoadSchedule() {
-        Parameters parameters = getDefaultParameters().addParameter(Parameter.SQL_QUERY,
+        Parameters parameters = defaultParameters.get().addParameter(Parameter.SQL_QUERY,
                 SqlBuilder.loadFromFile(SQL_FILES.getPath() + TxtFile.LARGE_ADS_TABLE.getName()));
 
-        executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                parameters.getParameters(), parameters.getSecureParameters());
+        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE, parameters);
 
         Schedule schedule1 = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.ALL);
         Schedule schedule2 = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.ALL);
@@ -105,8 +102,7 @@ public class ScheduleDetailTest extends AbstractDataloadProcessTest {
 
             parameters.addParameter("SQL_QUERY",
                     SqlBuilder.loadFromFile(SQL_FILES.getPath() + TxtFile.ADS_TABLE.getName()));
-            executeProcess(getGoodDataClient(), updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                    parameters.getParameters(), parameters.getSecureParameters());
+            executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE, parameters);
         }
     }
 

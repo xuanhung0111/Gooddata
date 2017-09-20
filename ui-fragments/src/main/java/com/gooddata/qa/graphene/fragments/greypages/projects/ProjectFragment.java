@@ -36,9 +36,6 @@ public class ProjectFragment extends AbstractGreyPagesFragment {
     @FindBy (id="Vertica")
     private WebElement vertica;
 
-    @FindBy (id="MYSQL")
-    private WebElement mysql;
-
     @FindBy (id="PGSQL")
     private WebElement pg;
 
@@ -68,7 +65,7 @@ public class ProjectFragment extends AbstractGreyPagesFragment {
     }
 
     public String getDwhDriverSelected() {
-        return Stream.of(vertica, mysql, pg)
+        return Stream.of(vertica, pg)
                 .filter(e -> Objects.nonNull(e.getAttribute("checked")))
                 .map(e -> e.getAttribute("value"))
                 .findFirst()

@@ -97,7 +97,7 @@ public class ChartReport extends AbstractFragment {
     public List<String> getLegendColors() {
         return waitForCollectionIsNotEmpty(legendIcons).stream()
             .map(e -> e.getAttribute(LEGEND_COLOR_ATTRIBUTE))
-            .map(e -> e.replaceAll(".*background-color: (.*);.*", "$1").replace(" ", ""))
+            .map(e -> e.replaceAll(".*background-color: ([^;]*);.*", "$1").replace(" ", ""))
             .collect(toList());
     }
 

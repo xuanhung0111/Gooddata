@@ -1,4 +1,0 @@
-# Use the same project as charting performance test
-RetrieveProject(fileName="pid");
-LoadCsv(csvDataFile="../../../../../../target/perf_log.csv", hasHeader="true", configFile="dashboard_perf_model.xml");
-TransferData(incremental="true");
