@@ -149,7 +149,7 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initialize"}) 
+    @Test(dependsOnMethods = {"initialize"})
     public void accessProfilePageOfDisabledUserFromMetric() throws ParseException, JSONException, IOException {
         UserManagementRestUtils.updateUserStatusInProject(
                 getDomainUserRestApiClient(), testParams.getProjectId(),
@@ -166,7 +166,7 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initialize"}) 
+    @Test(dependsOnMethods = {"initialize"})
     public void accessProfilePageOfDisabledUserFromReport() throws ParseException, JSONException, IOException {
         UserManagementRestUtils.updateUserStatusInProject(
                 getDomainUserRestApiClient(), testParams.getProjectId(),
@@ -183,13 +183,13 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initialize"}) 
+    @Test(dependsOnMethods = {"initialize"})
     public void accessProfileOfDisabledUserButEnabledInOtherProject() throws ParseException, JSONException, IOException {
         GoodData domainGoodData = getGoodDataClient(
                 testParams.getDomainUser() == null ? testParams.getUser() : testParams.getDomainUser(),
                         testParams.getPassword());
         String sameProject = ProjectRestUtils.createProject(domainGoodData, "Copy of " + projectTitle,
-                projectTemplate,testParams.getAuthorizationToken(), testParams.getProjectDriver(), 
+                projectTemplate,testParams.getAuthorizationToken(), testParams.getProjectDriver(),
                 testParams.getProjectEnvironment());
         UserManagementRestUtils.addUserToProject(
                 getDomainUserRestApiClient(), sameProject, testParams.getEditorUser(), UserRoles.EDITOR);
