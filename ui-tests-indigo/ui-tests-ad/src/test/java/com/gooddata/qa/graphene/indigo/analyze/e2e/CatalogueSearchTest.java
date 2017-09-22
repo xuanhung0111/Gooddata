@@ -8,7 +8,6 @@ import static java.util.Arrays.asList;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
@@ -16,8 +15,9 @@ import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
 public class CatalogueSearchTest extends AbstractAdE2ETest {
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "Catalogue-Search-E2E-Test";
     }
 

@@ -15,7 +15,6 @@ import java.util.UUID;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -37,8 +36,9 @@ public class GoodSalesProjectNavigationTest extends AbstractAnalyseTest {
     private String currentProjectId;
     private String newProjectId;
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Project-navigation-" + UNIQUE_ID;
     }
 

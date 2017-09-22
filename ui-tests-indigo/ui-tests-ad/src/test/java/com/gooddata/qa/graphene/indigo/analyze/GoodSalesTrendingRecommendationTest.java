@@ -8,7 +8,6 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import org.jboss.arquillian.graphene.Graphene;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
@@ -22,8 +21,9 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
 public class GoodSalesTrendingRecommendationTest extends AbstractAnalyseTest {
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Trending-Recommendation-Test";
     }
 

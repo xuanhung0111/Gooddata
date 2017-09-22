@@ -12,16 +12,30 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.MetricSelect;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 
-public class MetricsDropdownTest extends GoodSalesAbstractDashboardTest {
+public class MetricsDropdownTest extends AbstractDashboardTest {
 
     @Override
-    protected void prepareSetupProject() throws Throwable {
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        //add more metrics to display search metric
+        createAmountMetric();
+        createAmountBOPMetric();
+        createAvgAmountMetric();
+        createNumberOfActivitiesMetric();
+        createNumberOfLostOppsMetric();
+        createNumberOfOpportunitiesMetric();
+        createNumberOfOpportunitiesBOPMetric();
+        createTimelineBOPMetric();
+        createTimelineEOPMetric();
+        createPercentOfGoalMetric();
+        createProbabilityMetric();
+        createQuotaMetric();
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkSearchStringResetAfterDropdownToggle() {
         MetricSelect ms = getMetricSelect();
 
@@ -37,7 +51,7 @@ public class MetricsDropdownTest extends GoodSalesAbstractDashboardTest {
         checkDropdownDidReset();
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkSearchStringResetAfterDropdownClose() {
         MetricSelect ms = getMetricSelect();
 
@@ -53,7 +67,7 @@ public class MetricsDropdownTest extends GoodSalesAbstractDashboardTest {
         checkDropdownDidReset();
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkSearchStringResetAfterItemSelect() {
         IndigoDashboardsPage page = initIndigoDashboardsPageWithWidgets()
                 .switchToEditMode()
@@ -69,7 +83,7 @@ public class MetricsDropdownTest extends GoodSalesAbstractDashboardTest {
         checkDropdownDidReset();
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkNoMatchingMessage() {
         MetricSelect ms = getMetricSelect();
 

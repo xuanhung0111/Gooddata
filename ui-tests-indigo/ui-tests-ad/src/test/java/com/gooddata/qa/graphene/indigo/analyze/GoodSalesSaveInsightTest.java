@@ -45,8 +45,9 @@ public class GoodSalesSaveInsightTest extends AbstractAnalyseTest {
     private static final String DATE_CLOSED_DIMENSION_INSIGHT = "Save-Insight-Containing-Date-Closed-Dimension";
     private static final String DATE_CREATED_DIMENSION_INSIGHT = "Save-Insight-Containing-Date-Created-Dimension";
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Save-Insight-Test";
     }
 

@@ -23,7 +23,6 @@ import com.gooddata.qa.utils.http.fact.FactRestUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.jsoup.nodes.Document;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -61,14 +60,16 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
 
     private String sumOfNumberMetricUri;
 
-    @BeforeClass(alwaysRun = true)
-    public void initImapUser() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
+        // init imap properties
         imapHost = testParams.loadProperty("imap.host");
         imapUser = testParams.loadProperty("imap.user");
         imapPassword = testParams.loadProperty("imap.password");
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"precondition"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
     public void inviteUserToProject() throws ParseException, IOException, JSONException {
         addUserToProject(imapUser, UserRoles.ADMIN);
         logoutAndLoginAs(imapUser, imapPassword);

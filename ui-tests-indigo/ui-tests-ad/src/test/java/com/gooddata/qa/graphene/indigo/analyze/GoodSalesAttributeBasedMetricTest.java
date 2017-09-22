@@ -10,7 +10,6 @@ import static org.testng.Assert.assertTrue;
 import java.util.stream.Stream;
 
 import org.jboss.arquillian.graphene.Graphene;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
@@ -23,8 +22,9 @@ public class GoodSalesAttributeBasedMetricTest extends AbstractAnalyseTest {
 
     private static final String COUNT_OF_ACTIVITY = "Count of " + ATTR_ACTIVITY;
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Attribute-Based-Metric-Test";
     }
 

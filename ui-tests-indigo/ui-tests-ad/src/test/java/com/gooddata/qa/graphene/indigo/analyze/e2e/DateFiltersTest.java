@@ -12,15 +12,15 @@ import java.util.Calendar;
 
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
 public class DateFiltersTest extends AbstractAdE2ETest {
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "Date-Filters-E2E-Test";
     }
 

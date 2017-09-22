@@ -40,7 +40,6 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
@@ -58,8 +57,9 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
     private static final String EXPORT_ERROR_MESSAGE = "Insight is not compatible with Report Editor. "
             + "\"Stage Name\" is in configuration twice. Remove one attribute to open as a report.";
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Visualization-Test";
     }
 

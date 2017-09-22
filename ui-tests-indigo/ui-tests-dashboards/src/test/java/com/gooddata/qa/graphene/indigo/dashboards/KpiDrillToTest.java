@@ -4,11 +4,13 @@ import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_DISMISS_BUTTON;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_WON;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_PIPELINE_ANALYSIS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_OUTLOOK;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_WHATS_CHANGED;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
@@ -47,22 +49,25 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
+import com.gooddata.qa.mdObjects.dashboard.Dashboard;
+import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.java.Builder;
 import com.google.common.base.Predicate;
 
-public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
+public class KpiDrillToTest extends AbstractDashboardTest {
 
     private static final KpiConfiguration kpiWithDrillTo = new KpiConfiguration.Builder()
         .metric(METRIC_LOST)
-        .dataSet(DATE_CREATED)
+        .dataSet(DATE_DATASET_CREATED)
         .comparison(Kpi.ComparisonType.NO_COMPARISON.toString())
         .drillTo(DASH_TAB_OUTLOOK)
         .build();
 
     private static final KpiConfiguration kpiWithoutDrillTo = new KpiConfiguration.Builder()
         .metric(METRIC_AMOUNT)
-        .dataSet(DATE_CREATED)
+        .dataSet(DATE_DATASET_CREATED)
         .build();
 
     private boolean isMobileRunning;
@@ -72,12 +77,21 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
         isMobileRunning = Boolean.parseBoolean(context.getCurrentXmlTest().getParameter("isMobileRunning"));
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createAmountMetric();
+        createLostMetric();
+        createWonMetric();
+        createAvgAmountMetric();
+        addNewDashboard(DASH_PIPELINE_ANALYSIS);
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkNewlyAddedKpiHasNoDrillTo() throws JSONException, IOException {
         startIndigoDashboardEditMode().addKpi(kpiWithoutDrillTo).saveEditModeWithWidgets();
 
         try {
-
             waitForFragmentVisible(indigoDashboardsPage)
                 .switchToEditMode();
 
@@ -114,7 +128,7 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiDrillToInViewMode() throws JSONException, IOException {
         startIndigoDashboardEditMode().addKpi(kpiWithDrillTo).saveEditModeWithWidgets();
 
@@ -137,7 +151,7 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiDrillToInEditMode() throws JSONException, IOException {
         startIndigoDashboardEditMode().addKpi(kpiWithDrillTo).saveEditModeWithWidgets();
 
@@ -187,7 +201,7 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkDeleteKpiDrillTo() throws JSONException, IOException {
         startIndigoDashboardEditMode().addKpi(kpiWithDrillTo).saveEditModeWithWidgets();
 
@@ -215,7 +229,7 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkUpdateKpiDrillTo() throws JSONException, IOException {
         startIndigoDashboardEditMode().addKpi(kpiWithDrillTo).saveEditModeWithWidgets();
 
@@ -241,16 +255,20 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiDrillToToPersonalDashboardTab() throws JSONException, IOException {
+        //Create Dashboard by UI to get default private view
         String personalDashboard = "Personal dashboard";
         String personalTab = "Personal tab";
-
-        addNewTabInNewDashboard(personalDashboard, personalTab);
+        initDashboardsPage()
+            .addNewDashboard(personalDashboard)
+            .addNewTab(personalTab);
+        checkRedBar(browser);
+        dashboardsPage.saveDashboard();
 
         try {
             startIndigoDashboardEditMode()
-                    .addKpi(new KpiConfiguration.Builder().metric(METRIC_WON).dataSet(DATE_CREATED)
+                    .addKpi(new KpiConfiguration.Builder().metric(METRIC_WON).dataSet(DATE_DATASET_CREATED)
                             .comparison(Kpi.ComparisonType.NO_COMPARISON.toString()).drillTo(personalTab).build())
                     .saveEditModeWithWidgets();
 
@@ -288,17 +306,16 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void deleteDashboardAndTabAfterSettingKpiDrillTo() throws IOException, JSONException {
         String newDashboard = "New dashboard";
-        String newTab = "New tab";
 
-        addNewTabInNewDashboard(newDashboard, newTab);
+        addNewDashboard(newDashboard);
 
         try {
             startIndigoDashboardEditMode()
-                    .addKpi(new KpiConfiguration.Builder().metric(METRIC_AVG_AMOUNT).dataSet(DATE_CREATED)
-                            .comparison(Kpi.ComparisonType.NO_COMPARISON.toString()).drillTo(newTab).build())
+                    .addKpi(new KpiConfiguration.Builder().metric(METRIC_AVG_AMOUNT).dataSet(DATE_DATASET_CREATED)
+                            .comparison(Kpi.ComparisonType.NO_COMPARISON.toString()).drillTo(DASH_TAB_OUTLOOK).build())
                     .saveEditModeWithWidgets();
 
             try {
@@ -316,7 +333,7 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
                 dashboardsPage.getDashboardEditBar().saveDashboard();
 
                 DashboardsRestUtils.deleteDashboardTab(getRestApiClient(), getObjectUriFromUrl(browser.getCurrentUrl()),
-                        newTab);
+                        DASH_TAB_OUTLOOK);
 
                 initIndigoDashboardsPageWithWidgets()
                     .switchToEditMode()
@@ -330,7 +347,7 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
                 waitForDashboardPageLoaded(browser);
 
                 DashboardTabs tabs = dashboardsPage.getTabs();
-                assertThat(tabs.getAllTabNames(), not(contains(newTab)));
+                assertThat(tabs.getAllTabNames(), not(contains(DASH_TAB_OUTLOOK)));
             } finally {
                 deleteDashboardsUsingCascade(getRestApiClient(), testParams.getProjectId());
             }
@@ -341,12 +358,12 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"mobile"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void checkKpiWithDrillToRedirects() throws JSONException, IOException {
         final Metric lostMetric = getMdService().getObj(getProject(), Metric.class, title(METRIC_LOST));
         final String kpiUri =
                 createKpiUsingRest(new KpiMDConfiguration.Builder().title(lostMetric.getTitle())
-                        .metric(lostMetric.getUri()).dateDataSet(getDateDatasetUri(DATE_CREATED))
+                        .metric(lostMetric.getUri()).dateDataSet(getDateDatasetUri(DATE_DATASET_CREATED))
                         .comparisonType(ComparisonType.NO_COMPARISON).comparisonDirection(ComparisonDirection.NONE)
                         .drillToDashboard(String.format("/gdc/md/%s/obj/916", testParams.getProjectId()))
                         .drillToDashboardTab("adzD7xEmdhTx") // Outlook tab
@@ -372,7 +389,7 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"mobile"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void checkKpiWithoutDrillToDoesNotRedirect() throws JSONException, IOException {
         addWidgetToWorkingDashboard(createNumOfActivitiesKpi());
 
@@ -411,12 +428,14 @@ public class KpiDrillToTest extends GoodSalesAbstractDashboardTest {
                 .get();
     }
 
-    private void addNewTabInNewDashboard(String newDashboard, String newTab) {
-        initDashboardsPage()
-                .addNewDashboard(newDashboard)
-                .addNewTab(newTab);
-        checkRedBar(browser);
-        dashboardsPage.saveDashboard();
+    private void addNewDashboard(String newDashboard) throws JSONException, IOException {
+        Dashboard dashboard = Builder.of(Dashboard::new).with(dash -> {
+            dash.setName(newDashboard);
+            dash.addTab(Builder.of(Tab::new).with(tab -> tab.setTitle(DASH_TAB_OUTLOOK)).build());
+            dash.addTab(Builder.of(Tab::new).with(tab -> tab.setTitle(DASH_TAB_WHATS_CHANGED)).build());
+        }).build();
+
+        DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(), dashboard.getMdObject());
     }
 
     private IndigoDashboardsPage startIndigoDashboardEditMode() {

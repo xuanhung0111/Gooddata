@@ -2,9 +2,8 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFiltersPanel;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
-import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.interactions.Actions;
@@ -30,22 +29,24 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-public class AttributeFilterManipulationTest extends GoodSalesAbstractDashboardTest {
+public class AttributeFilterManipulationTest extends AbstractDashboardTest {
 
-    @BeforeClass(alwaysRun = true)
-    public void setTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Attribute-Filter-Manipulation-Test";
     }
 
     @Override
-    protected void prepareSetupProject() throws ParseException, JSONException, IOException {
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createAmountMetric();
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
-
         initIndigoDashboardsPageWithWidgets().switchToEditMode().addAttributeFilter(ATTR_ACCOUNT)
                 .saveEditModeWithWidgets();
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"}, description =
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"}, description =
             "ONE-1990: KPI/Insight apply with all filter value except selected value when selecting by only option")
     public void testFilterUsingOneValue() {
         initIndigoDashboardsPageWithWidgets().getAttributeFiltersPanel()
@@ -59,7 +60,7 @@ public class AttributeFilterManipulationTest extends GoodSalesAbstractDashboardT
                 "$18,000.00", "The kpi value is not correct");
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void allowAddingOneFilterPerAttribute() {
         assertTrue(initIndigoDashboardsPageWithWidgets().switchToEditMode().getAttributeFiltersPanel()
                 .isFilterVisible(ATTR_ACCOUNT), "Attribute filter named " + ATTR_ACCOUNT + "does not exist");
@@ -75,7 +76,7 @@ public class AttributeFilterManipulationTest extends GoodSalesAbstractDashboardT
                 1, "There is more than 1 attribute filter named " + ATTR_ACCOUNT);
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkAttributeFilterCancellingAfterDrag() throws JSONException {
         int expectedFiltersSize = initIndigoDashboardsPageWithWidgets().switchToEditMode()
                 .getAttributeFiltersPanel()
@@ -88,7 +89,7 @@ public class AttributeFilterManipulationTest extends GoodSalesAbstractDashboardT
                 expectedFiltersSize);
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"},
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"},
             description = "ONE-1993: Value of widget doesn't refresh when refreshing attribute filter" +
                     "ONE-1991: Attribute filter doesn't refresh to All value on edit mode/view mode")
     public void updateValuesOnEditModeAfterMakingChangeOnViewMode() throws IOException, JSONException {
@@ -126,7 +127,7 @@ public class AttributeFilterManipulationTest extends GoodSalesAbstractDashboardT
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"},
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"},
             description = "ONE-1996: Widgets won't re-execute when discarding edited attribute filters changes")
     public void discardChangesWhenEditingFilter() throws IOException, JSONException {
         initIndigoDashboardsPageWithWidgets().switchToEditMode().getAttributeFiltersPanel()
@@ -145,7 +146,7 @@ public class AttributeFilterManipulationTest extends GoodSalesAbstractDashboardT
         return new Object[][]{{true}, {false}};
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"}, dataProvider = "enabledEditMode")
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"}, dataProvider = "enabledEditMode")
     public void checkAttributeFilterChangeValue(boolean enabledEditMode) {
         String attributeFilterSourceConsulting = "14 West";
         String attributeFilterAgileThought = "1-800 Postcards";
@@ -182,7 +183,7 @@ public class AttributeFilterManipulationTest extends GoodSalesAbstractDashboardT
         assertEquals(attributeFiltersPanel.getAttributeFilter(ATTR_ACCOUNT).getSelectedItemsCount(), "(4)");
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void deleteAttributeFilterDiscarded() throws IOException, JSONException {
         initIndigoDashboardsPageWithWidgets().switchToEditMode().addAttributeFilter(ATTR_PRODUCT)
                 .saveEditModeWithWidgets();
@@ -204,7 +205,7 @@ public class AttributeFilterManipulationTest extends GoodSalesAbstractDashboardT
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void deleteAttributeFilter() throws IOException, JSONException {
         initIndigoDashboardsPageWithWidgets().switchToEditMode().addAttributeFilter(ATTR_PRIORITY)
                 .saveEditModeWithWidgets();
@@ -228,7 +229,7 @@ public class AttributeFilterManipulationTest extends GoodSalesAbstractDashboardT
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void cancelAttributeFilterDrag() {
         initIndigoDashboardsPageWithWidgets().switchToEditMode();
         Dimension bodySize = indigoDashboardsPage.getDashboardBodySize();

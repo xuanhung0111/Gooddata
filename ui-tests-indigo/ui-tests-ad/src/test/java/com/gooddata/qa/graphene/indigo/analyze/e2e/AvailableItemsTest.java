@@ -9,7 +9,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
@@ -18,9 +17,10 @@ import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
 public class AvailableItemsTest extends AbstractAdE2ETest {
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
-        projectTitle = "Available-Items-E2E-Test";
+    @Override
+    public void initProperties() {
+        super.initProperties();
+        projectTitle += "Available-Items-E2E-Test";
     }
 
     @Override

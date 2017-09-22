@@ -4,7 +4,6 @@ import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.browser.BrowserUtils.getCurrentBrowserAgent;
-import static com.gooddata.qa.browser.BrowserUtils.maximize;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
 
 import java.io.IOException;
@@ -14,8 +13,10 @@ import com.gooddata.GoodData;
 import com.gooddata.fixture.ResourceManagement.ResourceTemplate;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.AttributeElement;
+import com.gooddata.md.Dataset;
 import com.gooddata.md.Fact;
 import com.gooddata.project.ProjectValidationResults;
+import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.fixture.FixtureException;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterType;
@@ -26,9 +27,12 @@ import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.java.Builder;
 import org.json.JSONException;
+import org.openqa.selenium.Dimension;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.MetadataService;
@@ -85,34 +89,21 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     }
 
     @Test(groups = {"createProject"})
-    public void init() throws JSONException {
+    @Parameters({"windowSize"})
+    public void init(@Optional("maximize") String windowSize) throws JSONException {
         System.out.println("Current browser agent is: " + getCurrentBrowserAgent(browser).toUpperCase());
 
-        // Use this utility to maximize browser in chrome - MAC
-        // browser.manage().window().maximize(); do not work
-        maximize(browser);
+        // override default value of properties
+        initProperties();
+
+        // adjust window size to run on mobile mode
+        adjustWindowSize(windowSize);
 
         // sign in with admin user
         signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
     }
 
     @Test(dependsOnMethods = {"init"}, groups = {"createProject"})
-    public void configureStartPage() {
-        startPageContext = new StartPageContext() {
-
-            @Override
-            public void waitForStartPageLoaded() {
-                waitForProjectsPageLoaded(browser);
-            }
-
-            @Override
-            public String getStartPage() {
-                return PAGE_PROJECTS;
-            }
-        };
-    }
-
-    @Test(dependsOnMethods = {"configureStartPage"}, groups = {"createProject"})
     public void createProject() {
         if (testParams.isReuseProject()) {
             if (testParams.getProjectId() != null && !testParams.getProjectId().isEmpty()) {
@@ -174,12 +165,11 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         customizeProject();
     }
 
-    /**
-     * a hook to createProject group.
-     * Any extra setting which is required for a specific test class should be added here
-     */
-    protected void customizeProject() throws Throwable {
-        // should be implemented later in abstract test or test classes
+    @Test(dependsOnMethods = {"prepareProject"}, groups = {"createProject"})
+    public void assignStartPage() {
+        // start page could be any page, e.g.: analyse page, ...
+        // to make it possible, this method should be executed last in createProject group
+        configureStartPage();
     }
 
     @AfterClass(alwaysRun = true)
@@ -235,6 +225,42 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         } else {
             System.out.println("No project created -> no delete...");
         }
+    }
+
+    /**
+     * a hook to createProject group.
+     * Property values should be overridden by using this method
+     */
+    protected void initProperties() {
+        // should be implemented later in abstract test or test classes
+    }
+
+    /**
+     * a hook to createProject group.
+     * Any extra setting which is required for a specific test class should be added here
+     */
+    protected void customizeProject() throws Throwable {
+        // should be implemented later in abstract test or test classes
+    }
+
+    /**
+     * a hook to createProject group.
+     * start page context which will be loaded after finishing a test should be assigned by using this
+     * project.html is used by default
+     */
+    protected void configureStartPage() {
+        startPageContext = new StartPageContext() {
+
+            @Override
+            public void waitForStartPageLoaded() {
+                waitForProjectsPageLoaded(browser);
+            }
+
+            @Override
+            public String getStartPage() {
+                return PAGE_PROJECTS;
+            }
+        };
     }
 
     protected MetadataService getMdService() {
@@ -335,6 +361,10 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     protected Fact getFactByIdentifier(String id) {
         return getMdService().getObj(getProject(), Fact.class, identifier(id));
+    }
+
+    protected Dataset getDatasetByIdentifier(String id) {
+        return getMdService().getObj(getProject(), Dataset.class, identifier(id));
     }
 
     protected List<String> getObjIdentifiers(List<String> uris) {
@@ -460,5 +490,41 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     private boolean isCurrentUserDomainUser() {
         return UserManagementRestUtils.isDomainUser(getRestApiClient(), testParams.getUserDomain());
+    }
+
+    private void adjustWindowSize(String windowSize) {
+        // this is now using for ui-tests-dashboards only
+        // if having wide use, we should consider dimension properties
+        // drone definition: http://arquillian.org/arquillian-extension-drone/#webdriver-configuration (see property named dimensions)
+        // e.g.: https://github.com/arquillian/arquillian-extension-drone/blob/master/drone-webdriver/src/test/resources/arquillian.xml#L31
+        if ("maximize".equals(windowSize)) {
+            maximizeWindow();
+        } else {
+            String[] dimensions = windowSize.split(",");
+            if (dimensions.length == 2) {
+                try {
+                    setWindowSize(Integer.valueOf(dimensions[0]), Integer.valueOf(dimensions[1]));
+                } catch (NumberFormatException e) {
+                    System.out.println("ERROR: Invalid window size given: " + windowSize
+                            + " (fallback to maximize)");
+                    maximizeWindow();
+                }
+            } else {
+                System.out.println("ERROR: Invalid window size given: " + windowSize
+                        + " (fallback to maximize)");
+                maximizeWindow();
+            }
+        }
+    }
+
+    private void setWindowSize(final int width, final int height) {
+        log.info("resizing window to " + width + "x" + height);
+        browser.manage().window().setSize(new Dimension(width, height));
+    }
+
+    private void maximizeWindow() {
+        log.info("maximizing window");
+        // browser.manage().window().maximize(); does not work
+        BrowserUtils.maximize(browser);
     }
 }

@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
@@ -18,17 +19,18 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 
-public class KpiPopTest extends GoodSalesAbstractDashboardTest {
+public class KpiPopTest extends AbstractDashboardTest {
 
     @Override
-    protected void prepareSetupProject() throws Throwable {
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
         final List<String> kpiUris = asList(createAmountKpi(), createLostKpi(), createNumOfActivitiesKpi());
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), kpiUris);
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"mobile"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void checkKpiPopInMobile() {
         Kpi amount = initIndigoDashboardsPageWithWidgets().getWidgetByHeadline(Kpi.class, METRIC_AMOUNT);
         assertFalse(amount.hasPopSection());
@@ -60,13 +62,13 @@ public class KpiPopTest extends GoodSalesAbstractDashboardTest {
         assertEquals(numberOfActivities.getPopSection().getPeriodTitle(), "prev. month");
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkNewlyAddedKpiHasPopSection() {
         Kpi justAddedKpi = initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
             .addKpi(new KpiConfiguration.Builder()
                 .metric(METRIC_AMOUNT)
-                .dataSet(DATE_CREATED)
+                .dataSet(DATE_DATASET_CREATED)
                 .build())
             .selectLastWidget(Kpi.class);
 
@@ -81,13 +83,13 @@ public class KpiPopTest extends GoodSalesAbstractDashboardTest {
         indigoDashboardsPage.saveEditModeWithWidgets();
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiWithoutComparison() {
         Kpi kpi = initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
             .addKpi(new KpiConfiguration.Builder()
                 .metric(METRIC_AMOUNT)
-                .dataSet(DATE_CREATED)
+                .dataSet(DATE_DATASET_CREATED)
                 .comparison(Kpi.ComparisonType.NO_COMPARISON.toString())
                 .build())
             .selectLastWidget(Kpi.class);
@@ -119,13 +121,13 @@ public class KpiPopTest extends GoodSalesAbstractDashboardTest {
         };
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, dataProvider = "popProvider", groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "popProvider", groups = {"desktop"})
     public void checkKpiPopSection(Kpi.ComparisonType comparisonType, String dateFilter, String expectedPeriodTitle) {
         initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
             .addKpi(new KpiConfiguration.Builder()
                 .metric(METRIC_AMOUNT)
-                .dataSet(DATE_CREATED)
+                .dataSet(DATE_DATASET_CREATED)
                 .comparison(comparisonType.toString())
                 .build())
             .saveEditModeWithWidgets();

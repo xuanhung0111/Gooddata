@@ -36,13 +36,14 @@ public class KpiAlertInMobileTest extends AbstractDashboardTest {
     private static final String UNIQUE_NAME = "sumOfNumber-" + UUID.randomUUID().toString().substring(0, 6);
     private static final String DATASET_ID = "dataset.user";
 
-    @BeforeClass(alwaysRun = true)
+    @Override
     public void initProperties() {
-        projectTitle = "Kpi-alert-mobile-test";
+        projectTitle = "Kpi-alert-mobile-test"; // use empty project
     }
 
     @Override
-    protected void prepareSetupProject() throws Throwable {
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
         setupMaql(LdmModel.loadFromFile(KPI_ALERT_RESOURCE + "user.maql"));
 
         // Grey page cannot be accessed on mobile, should use Rest to setup dataset for project here
@@ -59,18 +60,17 @@ public class KpiAlertInMobileTest extends AbstractDashboardTest {
 
         String kpiUri = createKpiWidget(getRestApiClient(), testParams.getProjectId(),
                 new KpiMDConfiguration.Builder()
-                .title(UNIQUE_NAME)
-                .metric(sumOfNumberMetricUri)
-                .dateDataSet(dateDatasetUri)
-                .comparisonType(ComparisonType.PREVIOUS_PERIOD)
-                .comparisonDirection(ComparisonDirection.GOOD)
-                .build());
+                        .title(UNIQUE_NAME)
+                        .metric(sumOfNumberMetricUri)
+                        .dateDataSet(dateDatasetUri)
+                        .comparisonType(ComparisonType.PREVIOUS_PERIOD)
+                        .comparisonDirection(ComparisonDirection.GOOD)
+                        .build());
 
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(kpiUri));
-
     }
 
-    @Test(dependsOnGroups = "dashboardsInit", groups = "mobile")
+    @Test(dependsOnGroups = "createProject", groups = "mobile")
     public void checkAlert() throws JSONException, IOException, URISyntaxException {
         initIndigoDashboardsPageWithWidgets()
                 .getWidgetByHeadline(Kpi.class, UNIQUE_NAME)

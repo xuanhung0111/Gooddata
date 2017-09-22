@@ -7,11 +7,6 @@ import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
-import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.model.LdmModel;
@@ -24,13 +19,9 @@ public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
     private static final String UPLOADINFO_PATH = "/customer/upload_info.json";
     private static final String CSV_PATH = "/customer/customer.csv";
 
-    @BeforeClass(alwaysRun = true)
+    @Override
     public void initProperties() {
         // create empty project and customized data
-    }
-
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
         projectTitle = "Recommendations-Without-Date-Dimension-E2E-Test";
     }
 

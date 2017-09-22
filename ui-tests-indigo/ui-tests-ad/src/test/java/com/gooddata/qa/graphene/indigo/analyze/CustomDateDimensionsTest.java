@@ -20,7 +20,6 @@ import java.text.ParseException;
 import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.common.StartPageContext;
@@ -41,10 +40,9 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
     private static final String FISCAL_CSV_PATH = "/" + UPLOAD_CSV + "/fiscal_dimension_sample_test.csv";
     private static final String FISCAL_DATASET = "Fiscal Dimension Sample Test";
 
-    @BeforeClass(alwaysRun = true)
     @Override
     public void initProperties() {
-        // create empty project and use fiscal dataset instead
+        // create empty project
         projectTitle = "Custom-Date-Dimension-Test";
     }
 
@@ -52,7 +50,10 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
     protected void customizeProject() throws Throwable {
         uploadCSV(getFilePathFromResource(FISCAL_CSV_PATH));
         takeScreenshot(browser, "uploaded-" + FISCAL_DATASET +"-dataset", getClass());
+    }
 
+    @Override
+    protected void configureStartPage() {
         // set analyse page using FISCAL_DATASET as startPageContext
         startPageContext = new StartPageContext() {
 

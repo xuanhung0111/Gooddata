@@ -7,7 +7,6 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.stream.Stream;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
@@ -21,8 +20,9 @@ public class CatalogueFilterTest extends AbstractAdE2ETest {
     private String dates = ".type-date";
     private String header = ".adi-catalogue-header";
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "Catalogue-Filter-E2E-Test";
     }
 

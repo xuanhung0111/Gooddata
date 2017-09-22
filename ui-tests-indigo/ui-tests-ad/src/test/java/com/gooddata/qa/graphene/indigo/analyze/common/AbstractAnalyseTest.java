@@ -7,12 +7,10 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import org.openqa.selenium.support.FindBy;
-import org.testng.annotations.BeforeClass;
 
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
-import org.testng.annotations.Test;
 
 public abstract class AbstractAnalyseTest extends GoodSalesAbstractTest {
 
@@ -21,13 +19,13 @@ public abstract class AbstractAnalyseTest extends GoodSalesAbstractTest {
     @FindBy(className = AnalysisPage.MAIN_CLASS)
     protected AnalysisPage analysisPage;
 
-    @BeforeClass(alwaysRun = true)
+    @Override
     public void initProperties() {
         super.initProperties(); // GS fixture is used by default
     }
 
     @Override
-    protected void customizeProject() throws Throwable {
+    protected void configureStartPage() {
         // set analyse page as start page context
         startPageContext = new StartPageContext() {
 

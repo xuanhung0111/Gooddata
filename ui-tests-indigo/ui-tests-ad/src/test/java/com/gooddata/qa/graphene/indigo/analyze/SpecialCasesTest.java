@@ -7,7 +7,6 @@ import static org.testng.Assert.assertEquals;
 
 import java.util.stream.Stream;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
@@ -23,7 +22,6 @@ public class SpecialCasesTest extends AbstractAnalyseTest {
     private static final String ACCOUNT = "Account";
     private static final String DEPARTMENT = "Department";
 
-    @BeforeClass(alwaysRun = true)
     @Override
     public void initProperties() {
         // create empty project and customized data

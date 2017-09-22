@@ -1,5 +1,10 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_ACTIVITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CLOSED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_TIMELINE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static  com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_OPP_FIRST_SNAPSHOT ;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -20,7 +25,6 @@ import java.util.List;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Metric;
@@ -30,16 +34,25 @@ import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import com.google.common.collect.Ordering;
 
-public class DateDatasetRecommendationTest extends GoodSalesAbstractDashboardTest {
+public class DateDatasetRecommendationTest extends AbstractDashboardTest {
 
     private static String INSIGHT_WITHOUT_DATE_FILTER = "Insight-Without-Date-Filter";
 
-    @BeforeClass
-    public void setProjectTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Date-Filter-Recommendation-Test";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+        createOppFirstSnapshotMetric();
+        createActiveLevelReport();
     }
 
     @AfterMethod
@@ -56,7 +69,7 @@ public class DateDatasetRecommendationTest extends GoodSalesAbstractDashboardTes
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void selectMostRelevantDateDimention() throws ParseException, JSONException, IOException {
         createInsight(getRestApiClient(), testParams.getProjectId(),
                 new InsightMDConfiguration(INSIGHT_WITHOUT_DATE_FILTER, ReportType.COLUMN_CHART).setMeasureBucket(
@@ -66,19 +79,19 @@ public class DateDatasetRecommendationTest extends GoodSalesAbstractDashboardTes
                 .waitForWidgetsLoading();
 
         takeScreenshot(browser, "Select-Most-Relevant-Date-Dimension", getClass());
-        assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_ACTIVITY,
+        assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_DATASET_ACTIVITY,
                 "Most relevant date dimension is not selected");
         assertTrue(indigoDashboardsPage.getConfigurationPanel().isDateDataSetSelectCollapsed(),
                 "Date dataset select is not collapsed");
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testOrderOfRecommendedDateDimensions() throws ParseException, JSONException, IOException {
         createInsightUsingDateFilter("Insight-Using-Date-Filter-Snapshot-1", METRIC_OPP_FIRST_SNAPSHOT,
-                DATE_SNAPSHOT);
+                DATE_DATASET_SNAPSHOT);
         createInsightUsingDateFilter("Insight-Using-Date-Filter-Snapshot-2", METRIC_OPP_FIRST_SNAPSHOT,
-                DATE_SNAPSHOT);
-        createInsightUsingDateFilter("Insight-Using-Date-Filter-Closed", METRIC_OPP_FIRST_SNAPSHOT, DATE_CLOSED);
+                DATE_DATASET_SNAPSHOT);
+        createInsightUsingDateFilter("Insight-Using-Date-Filter-Closed", METRIC_OPP_FIRST_SNAPSHOT, DATE_DATASET_CLOSED);
 
         createInsight(getRestApiClient(), testParams.getProjectId(),
                 new InsightMDConfiguration(INSIGHT_WITHOUT_DATE_FILTER, ReportType.COLUMN_CHART).setMeasureBucket(
@@ -90,12 +103,12 @@ public class DateDatasetRecommendationTest extends GoodSalesAbstractDashboardTes
         DateDimensionSelect dropDown = indigoDashboardsPage.getConfigurationPanel().openDateDataSet();
         takeScreenshot(browser, "Order-Of-Recommended-Date-Dimensions", getClass());
         assertEquals(dropDown.getDateDimensionGroup("RECOMMENDED").getDateDimensions(),
-                asList(DATE_SNAPSHOT, DATE_CLOSED), "The recommended dimensions are not sorted by most relevant");
+                asList(DATE_DATASET_SNAPSHOT, DATE_DATASET_CLOSED), "The recommended dimensions are not sorted by most relevant");
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testOrderOfOtherDateDimensions() throws ParseException, JSONException, IOException {
-        createInsightUsingDateFilter("Insight-Using-Date-Filter-Closed", METRIC_OPP_FIRST_SNAPSHOT, DATE_CLOSED);
+        createInsightUsingDateFilter("Insight-Using-Date-Filter-Closed", METRIC_OPP_FIRST_SNAPSHOT, DATE_DATASET_CLOSED);
 
         createInsight(getRestApiClient(), testParams.getProjectId(),
                 new InsightMDConfiguration(INSIGHT_WITHOUT_DATE_FILTER, ReportType.COLUMN_CHART).setMeasureBucket(
@@ -110,14 +123,14 @@ public class DateDatasetRecommendationTest extends GoodSalesAbstractDashboardTes
                 "The Other date dimensions are not sorted by alphabetical order");
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testMaximumNumberOfRecommendations() throws ParseException, JSONException, IOException {
         createInsightUsingDateFilter("Insight-Using-Date-Filter-Snapshot", METRIC_OPP_FIRST_SNAPSHOT,
-                DATE_SNAPSHOT);
+                DATE_DATASET_SNAPSHOT);
         createInsightUsingDateFilter("Insight-Using-Date-Filter-Activity", METRIC_OPP_FIRST_SNAPSHOT,
-                DATE_ACTIVITY);
-        createInsightUsingDateFilter("Insight-Using-Date-Filter-Closed", METRIC_OPP_FIRST_SNAPSHOT, DATE_CLOSED);
-        createInsightUsingDateFilter("Insight-Using-Date-Filter-Created", METRIC_OPP_FIRST_SNAPSHOT, DATE_CREATED);
+                DATE_DATASET_ACTIVITY);
+        createInsightUsingDateFilter("Insight-Using-Date-Filter-Closed", METRIC_OPP_FIRST_SNAPSHOT, DATE_DATASET_CLOSED);
+        createInsightUsingDateFilter("Insight-Using-Date-Filter-Created", METRIC_OPP_FIRST_SNAPSHOT, DATE_DATASET_CREATED);
 
         createInsight(getRestApiClient(), testParams.getProjectId(),
                 new InsightMDConfiguration(INSIGHT_WITHOUT_DATE_FILTER, ReportType.COLUMN_CHART).setMeasureBucket(
@@ -129,12 +142,13 @@ public class DateDatasetRecommendationTest extends GoodSalesAbstractDashboardTes
         DateDimensionSelect dateDimensionSelect = indigoDashboardsPage.getConfigurationPanel().openDateDataSet();
         takeScreenshot(browser, "Maximum-Number-Of-Recommendations", getClass());
         assertEquals(dateDimensionSelect.getDateDimensionGroup("RECOMMENDED").getDateDimensions(),
-                asList(DATE_ACTIVITY, DATE_CLOSED, DATE_CREATED), "The recommended dimensions are not correct");
+                asList(DATE_DATASET_ACTIVITY, DATE_DATASET_CLOSED, DATE_DATASET_CREATED),
+                        "The recommended dimensions are not correct");
         assertEquals(dateDimensionSelect.getDateDimensionGroup("OTHER").getDateDimensions(),
-                asList(DATE_SNAPSHOT, DATE_TIMELINE), "The other dimensions are not correct");
+                asList(DATE_DATASET_SNAPSHOT, DATE_DATASET_TIMELINE), "The other dimensions are not correct");
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testDateDatasetHavingNoGroup() throws ParseException, JSONException, IOException {
         createInsight(getRestApiClient(), testParams.getProjectId(),
                 new InsightMDConfiguration(INSIGHT_WITHOUT_DATE_FILTER, ReportType.COLUMN_CHART).setMeasureBucket(
@@ -148,7 +162,8 @@ public class DateDatasetRecommendationTest extends GoodSalesAbstractDashboardTes
         takeScreenshot(browser, "Date-Dateset-Having-No-Group", getClass());
         assertTrue(
                 isEqualCollection(dropDown.getDateDimensionGroup("DEFAULT").getDateDimensions(),
-                        asList(DATE_ACTIVITY, DATE_CLOSED, DATE_CREATED, DATE_SNAPSHOT, DATE_TIMELINE)),
+                        asList(DATE_DATASET_ACTIVITY, DATE_DATASET_CLOSED, DATE_DATASET_CREATED,
+                                DATE_DATASET_SNAPSHOT, DATE_DATASET_TIMELINE)),
                 "The date dimensions which belong to no group are not correct");
     }
 

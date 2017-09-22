@@ -53,6 +53,7 @@ public final class GoodSalesUtils {
     public static final String METRIC_EXPECTED = "Expected";
     public static final String METRIC_EXPECTED_WON = "Expected + Won";
     public static final String METRIC_EXPECTED_WON_VS_QUOTA = "Expected + Won vs. Quota";
+    public static final String METRIC_AMOUNT_BOP = "Amount [BOP]";
 
     // attributes
     public static final String ATTR_PRODUCT = "Product";
@@ -116,6 +117,7 @@ public final class GoodSalesUtils {
     public static final String REPORT_AMOUNT_BY_PRODUCT = "Sum of all deals by Product";
     public static final String REPORT_TOP_SALES_REPS_BY_WON_AND_LOST = "Top Reps. by Won and Lost";
     public static final String REPORT_AMOUNT_BY_DATE_CLOSED = "Sum of all deals by Date Closed";
+    public static final String REPORT_ACTIVITY_LEVEL = "Activiy Level";
 
     // variables
     public static final String VARIABLE_STATUS = "Status";
@@ -126,4 +128,11 @@ public final class GoodSalesUtils {
     public static final String DATE_DIMENSION_CLOSED = "Date (Closed)";
     public static final String DATE_DIMENSION_SNAPSHOT = "Date (Snapshot)";
     public static final String DATE_DIMENSION_ACTIVITY = "Date (Activity)";
+
+    // date dataset
+    public static final String DATE_DATASET_CREATED = "Created";
+    public static final String DATE_DATASET_CLOSED = "Closed";
+    public static final String DATE_DATASET_ACTIVITY = "Activity";
+    public static final String DATE_DATASET_SNAPSHOT = "Snapshot";
+    public static final String DATE_DATASET_TIMELINE = "Timeline";
 }

@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_ACTIVITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Collections.singletonList;
@@ -15,13 +17,19 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.ConfigurationPanel;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 
-public class DateFilterOnCategoryBucketTest extends GoodSalesAbstractDashboardTest {
+public class DateFilterOnCategoryBucketTest extends AbstractDashboardTest {
 
     private static final String INSIGHT_HAVING_ATTRIBUTE_CONFIGURATION = "Insight-Having-Attribute-Configuration";
     private static final String INSIGHT_HAVING_TREND_BY_CONFIGURATION = "Insight-Having-Trend-By-Configuration";
     private static final String INSIGHT_HAVING_VIEW_BY_CONFIGURATION = "Insight-Having-View-By-Configuration";
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+    }
 
     @DataProvider
     public Object[][] categoryTypes() {
@@ -32,11 +40,11 @@ public class DateFilterOnCategoryBucketTest extends GoodSalesAbstractDashboardTe
         };
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, dataProvider = "categoryTypes")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "categoryTypes")
     public void createInsight(String insightName, CategoryType type) {
         AnalysisPage page =
                 initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().waitForReportComputing();
-        page.getAttributesBucket().changeDateDimension(DATE_CREATED);
+        page.getAttributesBucket().changeDateDimension(DATE_DATASET_CREATED);
         page.waitForReportComputing().changeReportType(type.getReportType()).waitForReportComputing()
                 .saveInsight(insightName);
     }
@@ -54,14 +62,14 @@ public class DateFilterOnCategoryBucketTest extends GoodSalesAbstractDashboardTe
     public void selectDateDatasetOnInsight(String insightName) {
         initIndigoDashboardsPage().getSplashScreen().startEditingWidgets().addInsight(insightName)
                 .waitForWidgetsLoading();
-        checkSelectedDateDataset(DATE_CREATED, "Selected-Date-Dataset-On-" + insightName);
+        checkSelectedDateDataset(DATE_DATASET_CREATED, "Selected-Date-Dataset-On-" + insightName);
     }
 
     @Test(dependsOnMethods = {"createInsight"}, dataProvider = "InsightNames")
     public void testDateDatasetGroups(String insightName) {
         initIndigoDashboardsPage().getSplashScreen().startEditingWidgets().addInsight(insightName)
                 .waitForWidgetsLoading();
-        checkDateDatasetGroups(singletonList(DATE_CREATED), singletonList(DATE_ACTIVITY),
+        checkDateDatasetGroups(singletonList(DATE_DATASET_CREATED), singletonList(DATE_DATASET_ACTIVITY),
                 "Date-Dataset-Groups-On-" + insightName);
     }
 
@@ -88,7 +96,7 @@ public class DateFilterOnCategoryBucketTest extends GoodSalesAbstractDashboardTe
 
         private ReportType chartType;
 
-        private CategoryType(ReportType chartType) {
+        CategoryType(ReportType chartType) {
             this.chartType = chartType;
         }
 

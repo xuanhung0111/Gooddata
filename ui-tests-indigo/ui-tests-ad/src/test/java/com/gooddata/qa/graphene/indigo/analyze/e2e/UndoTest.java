@@ -12,7 +12,6 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.stream.IntStream;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
@@ -22,8 +21,9 @@ import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
 public class UndoTest extends AbstractAdE2ETest {
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "Undo-E2E-Test";
     }
 

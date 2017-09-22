@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.jboss.arquillian.graphene.Graphene;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -35,8 +34,9 @@ public class GoodSalesFactBasedMetricTest extends AbstractAnalyseTest {
     private static final String SUM_OF_AMOUNT = "Sum of " + FACT_AMOUNT;
     private static final String SUM_OF_ACTIVITY_DATE = "Sum of " + FACT_ACTIVITY_DATE;
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Fact-Based-Metric-Test";
     }
 

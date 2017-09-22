@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_OUTLOOK;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForStringInUrl;
@@ -19,23 +19,23 @@ import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
-public class HeaderTest extends GoodSalesAbstractDashboardTest {
-
-    @Override
-    protected void setStartPageContext() {
-        // do nothing. In other words, we turn on using start page context to apply configuration at
-        // the end of each test
-    }
+public class HeaderTest extends AbstractDashboardTest {
 
     @Override
     protected void setDashboardFeatureFlags() {
         // do nothing because feature flag has been set inside tests
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createAmountMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiLinkMissingIfFeatureFlagOff() throws JSONException {
         try {
             ProjectRestUtils.setFeatureFlagInProjectAndCheckResult(getGoodDataClient(), testParams.getProjectId(),
@@ -55,7 +55,7 @@ public class HeaderTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiLinkExistingAlthoughFeatureFlagOff() throws JSONException, IOException {
         try {
             ProjectRestUtils.setFeatureFlagInProjectAndCheckResult(getGoodDataClient(), testParams.getProjectId(),
@@ -68,9 +68,8 @@ public class HeaderTest extends GoodSalesAbstractDashboardTest {
                 .addKpi(
                     new KpiConfiguration.Builder()
                         .metric(METRIC_AMOUNT)
-                        .dataSet(DATE_CREATED)
+                        .dataSet(DATE_DATASET_CREATED)
                         .comparison(Kpi.ComparisonType.NO_COMPARISON.toString())
-                        .drillTo(DASH_TAB_OUTLOOK)
                         .build())
                 .saveEditModeWithWidgets();
 
@@ -102,7 +101,7 @@ public class HeaderTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkLogout() throws JSONException {
         try {
             // load old dashboards first to avoid redirect to projects.html

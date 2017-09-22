@@ -11,7 +11,6 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.Collection;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
@@ -26,8 +25,9 @@ public class GoodSalesDropAttributeTest extends AbstractAnalyseTest {
     private static final String PRIORITY = "Priority";
     private static final String REGION = "Region";
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Drop-Attribute-Test";
     }
 

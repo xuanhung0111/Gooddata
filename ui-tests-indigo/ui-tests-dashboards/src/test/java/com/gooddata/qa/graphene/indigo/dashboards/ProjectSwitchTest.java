@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
+import static com.gooddata.fixture.ResourceManagement.ResourceTemplate.GOODSALES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -15,16 +16,15 @@ import java.util.UUID;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
-public class ProjectSwitchTest extends GoodSalesAbstractDashboardTest {
+public class ProjectSwitchTest extends AbstractDashboardTest {
     private static final String UNIQUE_ID = UUID.randomUUID().toString().substring(0, 10);
     private static final String NEW_PROJECT_NAME = "New-project-switch-" + UNIQUE_ID;
 
@@ -32,23 +32,27 @@ public class ProjectSwitchTest extends GoodSalesAbstractDashboardTest {
     private String newProjectId;
 
     @Override
-    protected void prepareSetupProject() throws Throwable {
-        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
-    }
-
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    protected void initProperties() {
+        super.initProperties();
         // note that during project creation, dwh driver name is appended to project title
         projectTitle = "Project-switch-" + UNIQUE_ID;
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
     public void getMoreProject() {
         currentProjectId = testParams.getProjectId();
 
-        newProjectId = ProjectRestUtils.createProject(getGoodDataClient(), NEW_PROJECT_NAME,
-                projectTemplate, testParams.getAuthorizationToken(), testParams.getProjectDriver(),
-                testParams.getProjectEnvironment());
+//        newProjectId = ProjectRestUtils.createProject(getGoodDataClient(), NEW_PROJECT_NAME,
+//                null, testParams.getAuthorizationToken(), testParams.getProjectDriver(),
+//                testParams.getProjectEnvironment());
+
+        newProjectId = createProjectUsingFixture(NEW_PROJECT_NAME, GOODSALES);
     }
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"switchProject", "desktop", "mobile"})
@@ -92,8 +96,10 @@ public class ProjectSwitchTest extends GoodSalesAbstractDashboardTest {
                 .getSplashScreen();
 
         logout();
-        signIn(false, UserRoles.ADMIN);
-
+        // signInUI() is unstable when running on mobile
+        // BY_LOGGED_USER_BUTTON somehow is not found in that case
+        signIn(true, UserRoles.ADMIN);
+        initDashboardsPage();
         takeScreenshot(browser, "Last-visited-project-is-updated-with-project-" + NEW_PROJECT_NAME, getClass());
         assertThat(browser.getCurrentUrl(), containsString(newProjectId));
 

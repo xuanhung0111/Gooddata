@@ -8,7 +8,6 @@ import com.gooddata.md.Metric;
 import com.gooddata.md.ObjNotFoundException;
 
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,8 +26,8 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
 
     protected Map<String, String[]> expectedGoodSalesDashboardsAndTabs;
 
-    @BeforeClass(alwaysRun = true)
-    public void initProperties() {
+    @Override
+    protected void initProperties() {
         projectTitle = "GoodSales ";
         appliedFixture = GOODSALES;
 
@@ -99,6 +98,20 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
                 singletonList(new MetricElement(getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES)))));
     }
 
+    protected String createActiveLevelReport() {
+        try {
+            getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES);
+        } catch (ObjNotFoundException e) {
+            createAmountMetric();
+        }
+        return createReport(GridReportDefinitionContent.create(REPORT_ACTIVITY_LEVEL,
+                singletonList(METRIC_GROUP),
+                Arrays.asList(
+                        new AttributeInGrid(getAttributeByTitle(ATTR_DATE_ACTIVITY)),
+                        new AttributeInGrid(getAttributeByTitle(ATTR_ACTIVITY_TYPE))),
+                singletonList(new MetricElement(getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES)))));
+    }
+
     //------------------------- REPORT MD OBJECTS - END  ------------------------
 
     //------------------------- VARIABLE MD OBJECTS - BEGIN  ------------------------
@@ -130,7 +143,21 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
                 format("SELECT SUM([%s]) where [%s]= [%s]",
                         getFactByTitle(FACT_AMOUNT).getUri(),
                         getFactByTitle(FACT_OPP_SNAPSHOT_DATE).getUri(),
-                        getMetricByTitle(METRIC_SNAPSHOT_EOP).getUri()));
+                        getMetricByTitle(METRIC_SNAPSHOT_EOP).getUri()), "$#,##0.00");
+    }
+
+    protected Metric createAmountBOPMetric() {
+        try {
+            getMetricByTitle(METRIC_SNAPSHOT_BOP);
+        } catch (ObjNotFoundException e) {
+            createSnapshotBOPMetric();
+        }
+        //SELECT SUM(Amount) where Opp. Snapshot (Date)=_Snapshot [BOP]
+        return createMetric(METRIC_AMOUNT_BOP,
+                format("SELECT SUM([%s]) where [%s]= [%s]",
+                        getFactByTitle(FACT_AMOUNT).getUri(),
+                        getFactByTitle(FACT_OPP_SNAPSHOT_DATE).getUri(),
+                        getMetricByTitle(METRIC_SNAPSHOT_BOP).getUri()), "$#,##0.00");
     }
 
     protected Metric createTimelineEOPMetric() {
@@ -615,5 +642,4 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
                 "$#,##0.00");
     }
     //------------------------- METRIC MD OBJECTS - END  ------------------------
-
 }

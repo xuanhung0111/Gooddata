@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
@@ -33,8 +32,9 @@ public class GoodSalesUndoTest extends AbstractAnalyseTest {
     private static final String ACTIVITY = "Activity";
     private static final String CREATED = "Created";
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Undo-Test";
     }
 

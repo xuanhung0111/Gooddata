@@ -11,7 +11,6 @@ import static org.testng.Assert.assertEquals;
 import java.util.List;
 
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
@@ -45,8 +44,9 @@ public class ColorPaletteTest extends AbstractAdE2ETest {
             "rgb(239,197,194)"
     );
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "Color-Palette-E2E-Test";
     }
 

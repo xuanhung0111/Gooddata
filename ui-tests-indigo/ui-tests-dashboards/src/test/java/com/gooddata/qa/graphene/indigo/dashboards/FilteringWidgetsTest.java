@@ -11,14 +11,13 @@ import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalytical
 
 import java.io.IOException;
 
-import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.FilterByItem;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteWidgetsUsingCascade;
@@ -31,15 +30,18 @@ import static org.hamcrest.Matchers.is;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
-public class FilteringWidgetsTest extends GoodSalesAbstractDashboardTest {
+public class FilteringWidgetsTest extends AbstractDashboardTest {
 
     @Override
-    protected void prepareSetupProject() throws ParseException, JSONException, IOException {
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+        createAmountMetric();
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
                 singletonList(createAmountKpi()));
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"setupFilters", "desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"setupFilters", "desktop"})
     public void setupFilters() {
         initIndigoDashboardsPage()
                 .switchToEditMode()

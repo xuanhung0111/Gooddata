@@ -15,7 +15,6 @@ import static org.hamcrest.Matchers.not;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
@@ -24,8 +23,9 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
 public class GoodSalesMetricFilterTest extends AbstractAnalyseTest {
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Metric-Filter-Test";
     }
 

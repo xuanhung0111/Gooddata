@@ -16,9 +16,9 @@ import com.gooddata.md.Metric;
 import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.MetricSelect;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 
-public class MetricsAccessibilityTest extends GoodSalesAbstractDashboardTest {
+public class MetricsAccessibilityTest extends AbstractDashboardTest {
 
     private static final String PUBLIC_METRIC_OF_ADMIN = "admin-public-metric";
     private static final String PRIVATE_METRIC_OF_ADMIN = "admin-private-metric";
@@ -28,7 +28,25 @@ public class MetricsAccessibilityTest extends GoodSalesAbstractDashboardTest {
 
     private static final String SIMPLE_METRIC_EXPRESSION = "SELECT 1";
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        //add more metrics to display search metric
+        createNumberOfActivitiesMetric();
+        createAmountMetric();
+        createTimelineEOPMetric();
+        createLostMetric();
+        createNumberOfLostOppsMetric();
+        createNumberOfOpportunitiesMetric();
+        createTimelineBOPMetric();
+        createNumberOfOpportunitiesBOPMetric();
+        createWonMetric();
+        createPercentOfGoalMetric();
+        createQuotaMetric();
+        createProbabilityMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void prepareMetrics() {
         createPublicMetric(getGoodDataClient(), PUBLIC_METRIC_OF_ADMIN);
         createPrivateMetric(getGoodDataClient(), PRIVATE_METRIC_OF_ADMIN);
