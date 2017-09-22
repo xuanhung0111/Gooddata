@@ -24,7 +24,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
         projectTitle = "Date-Filters-E2E-Test";
     }
 
-    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
+    @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_be_possible_to_add_and_remove_date_from_filter_bucket() {
         assertTrue(analysisPage.addDateFilter()
             // try to drag a second date filter
@@ -34,7 +34,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
             .isEmpty());
     }
 
-    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
+    @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_reflect_changes_in_category_bucket() {
         analysisPage.addDate()
             .getAttributesBucket()
@@ -48,7 +48,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
         assertEquals(getValueFrom(".s-filter-date-date-dataset-switch"), "Created");
     }
 
-    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
+    @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_display_picker() {
         analysisPage.addDateFilter()
             .getFilterBuckets()
@@ -57,7 +57,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
         assertTrue(isElementPresent(cssSelector(".s-filter-picker"), browser));
     }
 
-    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
+    @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_keep_selection_if_date_dimensions_reloaded_in_the_background() {
         analysisPage.addDateFilter()
             .getFilterBuckets()
@@ -67,7 +67,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
         assertEquals(getValueFrom(".s-filter-date-date-dataset-switch"), "Created");
     }
 
-    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
+    @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_prefill_interval_filters_when_floating_filter_is_selected() {
         analysisPage.addDateFilter()
             .getFilterBuckets()
@@ -81,7 +81,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
         assertTrue(isElementPresent(cssSelector(".s-filter-picker .s-interval-to input"), browser));
     }
 
-    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
+    @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_support_date_ranges() throws ParseException {
         assertTrue(analysisPage.addDateFilter()
             .getFilterBuckets()
@@ -89,7 +89,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
             .getDateFilterText().contains("Nov 17, 2015 - Nov 19, 2015"));
     }
 
-    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
+    @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_correct_ranges_when_editing() {
         analysisPage.addDateFilter()
             .getFilterBuckets()

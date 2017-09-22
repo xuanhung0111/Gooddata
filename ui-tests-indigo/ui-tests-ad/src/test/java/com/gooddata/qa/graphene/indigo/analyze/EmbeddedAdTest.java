@@ -47,6 +47,12 @@ public class EmbeddedAdTest extends GoodSalesAbstractTest {
         projectTitle += "Embedded-Ad-Test";
     }
 
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+    }
+
     @Test(dependsOnGroups = { "createProject" })
     public void viewEnbeddedAdUsingEditorRole() throws JSONException {
         logoutAndLoginAs(true, UserRoles.EDITOR);

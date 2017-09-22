@@ -12,8 +12,7 @@ public class EmptyCatalogueTest extends AbstractAdE2ETest {
 
     @BeforeClass(alwaysRun = true)
     public void initProperties() {
-        super.initProperties();
-        projectTemplate = "";
+        // create empty project using default name
     }
 
     @BeforeClass(alwaysRun = true)
@@ -21,7 +20,7 @@ public class EmptyCatalogueTest extends AbstractAdE2ETest {
         projectTitle = "Empty-Catalogue-E2E-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_finish_loading_when_there_are_no_metrics_attributes_or_facts() {
         waitForElementPresent(cssSelector(".s-catalogue-loaded"), browser);
     }

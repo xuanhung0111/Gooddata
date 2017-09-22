@@ -27,7 +27,13 @@ public class ComparisonRecommendationTest extends AbstractAdE2ETest {
         projectTitle = "Comparison-Recommendation-E2E-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void should_apply_first_attribute_and_hide_recommendation() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
@@ -39,7 +45,7 @@ public class ComparisonRecommendationTest extends AbstractAdE2ETest {
         assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_apply_first_attribute_and_show_other_recommendations() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
@@ -53,7 +59,7 @@ public class ComparisonRecommendationTest extends AbstractAdE2ETest {
         assertTrue(isElementPresent(cssSelector(".s-recommendation-contribution"), browser));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_have_initial_value_selected_after_resetting_report() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();

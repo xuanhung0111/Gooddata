@@ -59,12 +59,14 @@ public class Fixture {
         version = FIXTURE_DEFAULT_VERSION;
     }
 
-    public void setRestApiClient(RestApiClient restApiClient) {
+    public Fixture setRestApiClient(RestApiClient restApiClient) {
         this.restApiClient = restApiClient;
+        return this;
     }
 
-    public void setGoodDataClient(GoodData goodDataClient) {
+    public Fixture setGoodDataClient(GoodData goodDataClient) {
         this.goodDataClient = goodDataClient;
+        return this;
     }
 
     public String deploy(String title, String authToken, ProjectDriver driver, Environment environment) {

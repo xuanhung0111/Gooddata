@@ -37,19 +37,31 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.google.common.collect.Lists;
 
-public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesTableReportTest extends AbstractAnalyseTest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
         projectTitle += "Table-Report-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfOpportunitiesMetric();
+        createNumberOfActivitiesMetric();
+        createNumberOfLostOppsMetric();
+        createNumberOfOpenOppsMetric();
+        createNumberOfWonOppsMetric();
+        createQuotaMetric();
+        createSnapshotBOPMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void createTableReportWithMoreThan3Metrics() {
         List<String> headers = analysisPage.changeReportType(ReportType.TABLE)
             .addMetric(METRIC_NUMBER_OF_LOST_OPPS)
@@ -79,7 +91,7 @@ public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
             });
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkReportContentWhenAdd3Metrics1Attribute() {
         TableReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addMetric(METRIC_QUOTA)
@@ -103,7 +115,7 @@ public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
         BrowserUtils.switchToFirstTab(browser);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createReportWithManyAttributes() {
         List<List<String>> adReportContent = analysisPage.changeReportType(ReportType.TABLE)
             .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -116,7 +128,7 @@ public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
         assertEquals(adReportContent, getTableReportContentInReportPage());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void filterReportIncludeManyAttributes() {
         analysisPage.changeReportType(ReportType.TABLE)
             .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -132,7 +144,7 @@ public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
         assertEquals(adReportContent, getTableReportContentInReportPage());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void orderDataInTableReport() {
         List<List<String>> content = sortReportBaseOnHeader(
                 analysisPage.changeReportType(ReportType.TABLE)
@@ -185,11 +197,11 @@ public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
                 asList("Web Meeting", "Inside Sales", "9,665", "$3,300,000")));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testFormat() throws ParseException, JSONException, IOException {
         String oldFormat = initMetricPage().openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES)
                 .getMetricFormat();
-        String metricUri = format("/gdc/md/%s/obj/14636", testParams.getProjectId());
+        String metricUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
         DashboardsRestUtils.changeMetricFormat(getRestApiClient(), metricUri, oldFormat + "[red]");
 
         try {
@@ -206,7 +218,7 @@ public class GoodSalesTableReportTest extends GoodSalesAbstractAnalyseTest {
         }
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void makeSureReportRenderWhenSortingTabular() {
         analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)

@@ -30,7 +30,13 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
         projectTitle = "Error-States-E2E-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void should_apply__period_over_period__recommendation() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
@@ -52,7 +58,7 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
         assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_honor_period_change_for__period_over_period() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
@@ -68,7 +74,7 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
         analysisPage.waitForReportComputing();
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_hide_widget_after_apply() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
@@ -89,7 +95,7 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
         assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-with-period"), browser));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_disable_pop_checkbox_if_date_and_attribute_are_moved_to_bucket() {
         MetricConfiguration configuration = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addDate()
@@ -103,7 +109,7 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
         assertFalse(configuration.isPopEnabled());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_hide_the_recommendation_if_something_in_stack_bucket() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -114,7 +120,7 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
         assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_hide_the_recommendation_if_date_in_categories_and_something_in_stack_bucket() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate()
@@ -125,7 +131,7 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
         assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_show_recommendations_if_categories_empty_and_something_in_stack_bucket() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addStack(ATTR_ACTIVITY_TYPE)

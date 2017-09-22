@@ -15,9 +15,9 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 
-public class GoodSalesNotRenderedInsightTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesNotRenderedInsightTest extends AbstractAnalyseTest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -33,7 +33,7 @@ public class GoodSalesNotRenderedInsightTest extends GoodSalesAbstractAnalyseTes
         };
     }
 
-    @Test(dependsOnGroups = { "init" }, dataProvider = "chartTypeDataProvider")
+    @Test(dependsOnGroups = { "createProject" }, dataProvider = "chartTypeDataProvider")
     public void testNotSavableMissingMetricInsight(ReportType type) {
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).changeReportType(type);
         //checking empty Measures bucket is not a good way to verify insight containing no metric
@@ -43,7 +43,7 @@ public class GoodSalesNotRenderedInsightTest extends GoodSalesAbstractAnalyseTes
         assertFalse(analysisPage.isSaveInsightEnabled(), "The save button is enabled");
     }
 
-    @Test(dependsOnGroups = { "init" })
+    @Test(dependsOnGroups = { "createProject" })
     public void saveMissingMetricTableInsight() throws JSONException, IOException {
         final String insight = "Test-Save-Table-Insight-Missing-Metric";
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).changeReportType(ReportType.TABLE).waitForReportComputing();

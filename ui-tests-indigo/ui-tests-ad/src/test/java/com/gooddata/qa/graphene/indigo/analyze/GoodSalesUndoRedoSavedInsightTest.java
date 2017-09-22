@@ -20,9 +20,9 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 
-public class GoodSalesUndoRedoSavedInsightTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesUndoRedoSavedInsightTest extends AbstractAnalyseTest {
 
     private static final String INSIGHT_TEST = "Insight-Test";
     private static final String INSIGHT_TEST_WITH_METRIC_ONLY = "Insight-With-Metric-Only";
@@ -32,7 +32,14 @@ public class GoodSalesUndoRedoSavedInsightTest extends GoodSalesAbstractAnalyseT
         projectTitle += "Undo-And-Save-Insight-Test";
     }
 
-    @Test(dependsOnGroups = { "init" })
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+        createSnapshotBOPMetric();
+    }
+
+    @Test(dependsOnGroups = { "createProject" })
     public void newCreatedInsightNotAppliedUndo() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -41,7 +48,7 @@ public class GoodSalesUndoRedoSavedInsightTest extends GoodSalesAbstractAnalyseT
         assertFalse(analysisPage.getPageHeader().isUndoButtonEnabled(), "The undo button is still enabled");
     }
 
-    @Test(dependsOnGroups = { "init" })
+    @Test(dependsOnGroups = { "createProject" })
     public void prepareSavedInsightsForUndoRedoTest() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)

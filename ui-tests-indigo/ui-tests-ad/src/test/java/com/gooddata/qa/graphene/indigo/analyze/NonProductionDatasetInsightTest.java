@@ -21,17 +21,20 @@ public class NonProductionDatasetInsightTest extends AbstractAnalyseTest {
     private static final String PRODUCTION_DATASET = "Production data";
 
     @BeforeClass(alwaysRun = true)
-    public void initialize() {
-        projectTitle += "NonProductionDatasetInsightTest";
+    @Override
+    public void initProperties() {
+        // create empty project and customized data
+        projectTitle = "NonProductionDatasetInsightTest";
     }
 
     @Override
-    public void prepareSetupProject() {
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
         uploadCSV(getFilePathFromResource(PAYROLL_CSV_PATH));
         takeScreenshot(browser, "uploaded-" + PAYROLL_DATASET + "-dataset", getClass());
     }
 
-    @Test(dependsOnGroups = {"init"},
+    @Test(dependsOnGroups = {"createProject"},
             description = "Graphene test for bug ONE-1464 Get error when opening viz belong to non-production dataset")
     public void openInsightContainingNonProductionDataset() {
         final String insight = "Open-Insight-Containing-Non-Production-Dataset-Test";
@@ -53,7 +56,7 @@ public class NonProductionDatasetInsightTest extends AbstractAnalyseTest {
                 "The chart renders incorrectly");
     }
 
-    @Test(dependsOnGroups = {"init"},
+    @Test(dependsOnGroups = {"createProject"},
             description = "CL-9954 Unable to add filter for measure in existing viz that belongs to non-production")
     public void makeSureCanAddFilterForMeasure() {
         final String insight = "Cover bug CL-9954";

@@ -27,18 +27,26 @@ import com.gooddata.md.Metric;
 import com.gooddata.md.Restriction;
 import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
 import com.gooddata.qa.graphene.fragments.manage.MetricPage;
 
-public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
         projectTitle += "Catalogue-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+        createAmountMetric();
+        createPercentOfGoalMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void testFilteringFieldsInCatalog() {
         final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
 
@@ -63,7 +71,7 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
         );
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testCreateReportWithFieldsInCatalogFilter() {
         final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
 
@@ -75,7 +83,7 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
     }
 
-    @Test(dependsOnGroups = {"init"}, description = "https://jira.intgdc.com/browse/CL-6942")
+    @Test(dependsOnGroups = {"createProject"}, description = "https://jira.intgdc.com/browse/CL-6942")
     public void testCaseSensitiveSortInAttributeMetric() {
         initManagePage();
         String attribute = getMdService().getObjUri(getProject(), Attribute.class,
@@ -94,7 +102,7 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
         }
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkXssInMetricAttribute() {
         String xssAttribute = "<button>" + ATTR_IS_WON + "</button>";
         String xssMetric = "<button>" + METRIC_PERCENT_OF_GOAL + "</button>";
@@ -149,34 +157,34 @@ public class GoodSalesCatalogueTest extends GoodSalesAbstractAnalyseTest {
         }
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testHiddenUnrelatedObjects() {
         final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE);
         assertTrue(cataloguePanel.search(""));
-        assertThat(cataloguePanel.getUnrelatedItemsHiddenCount(), equalTo(48));
+        assertThat(cataloguePanel.getUnrelatedItemsHiddenCount(), equalTo(21));
 
         assertThat(cataloguePanel.filterCatalog(CatalogFilterType.MEASURES)
-            .getUnrelatedItemsHiddenCount(), equalTo(39));
+            .getUnrelatedItemsHiddenCount(), equalTo(12));
         assertThat(cataloguePanel.filterCatalog(CatalogFilterType.ATTRIBUTES)
                 .getUnrelatedItemsHiddenCount(), equalTo(9));
 
         assertFalse(cataloguePanel.filterCatalog(CatalogFilterType.ALL)
                 .search("Amo"));
-        assertThat(cataloguePanel.getUnrelatedItemsHiddenCount(), equalTo(4));
+        assertThat(cataloguePanel.getUnrelatedItemsHiddenCount(), equalTo(2));
 
         assertFalse(cataloguePanel.filterCatalog(CatalogFilterType.MEASURES)
                 .search("Amo"));
-        assertThat(cataloguePanel.getUnrelatedItemsHiddenCount(), equalTo(4));
+        assertThat(cataloguePanel.getUnrelatedItemsHiddenCount(), equalTo(2));
 
         assertFalse(cataloguePanel.filterCatalog(CatalogFilterType.ATTRIBUTES)
                 .search("Amo"));
         assertThat(cataloguePanel.getUnrelatedItemsHiddenCount(), equalTo(0));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void searchNonExistent() {
         Stream.of(CatalogFilterType.values()).forEach(type -> {
             assertFalse(analysisPage.getCataloguePanel().filterCatalog(type)

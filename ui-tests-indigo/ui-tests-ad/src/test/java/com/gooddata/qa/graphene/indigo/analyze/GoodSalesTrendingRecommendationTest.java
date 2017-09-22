@@ -17,17 +17,23 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.Filters
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.TrendingRecommendation;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
-public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesTrendingRecommendationTest extends AbstractAnalyseTest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
         projectTitle += "Trending-Recommendation-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void testOverrideDateFilter() {
         final FiltersBucket FiltersBucketReact = analysisPage.getFilterBuckets();
 
@@ -48,7 +54,7 @@ public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalys
         checkingOpenAsReport("testOverrideDateFilter");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void applyParameter() {
         ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing().getChartReport();
@@ -78,7 +84,7 @@ public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalys
         checkingOpenAsReport("applyParameter");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void displayInColumnChartWithOnlyMetric() {
         ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing().getChartReport();

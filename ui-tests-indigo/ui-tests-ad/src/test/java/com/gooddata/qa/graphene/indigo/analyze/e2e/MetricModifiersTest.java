@@ -21,7 +21,14 @@ public class MetricModifiersTest extends AbstractAdE2ETest {
         projectTitle = "Metric-Modifiers-E2E-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+        createQuotaMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void should_be_turned_off_when_second_metric_is_added() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate()

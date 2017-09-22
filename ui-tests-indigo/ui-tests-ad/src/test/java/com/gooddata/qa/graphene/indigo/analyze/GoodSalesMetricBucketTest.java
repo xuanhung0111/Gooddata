@@ -21,10 +21,10 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
-public class GoodSalesMetricBucketTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
 
     private static final String EXPECTED = "Expected";
     private static final String REMAINING_QUOTA = "Remaining Quota";
@@ -34,7 +34,16 @@ public class GoodSalesMetricBucketTest extends GoodSalesAbstractAnalyseTest {
         projectTitle += "Metric-Bucket-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createAmountMetric();
+        createNumberOfActivitiesMetric();
+        createQuotaMetric();
+        createSnapshotBOPMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void checkSeriesStateTransitions() {
         ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addDate()
@@ -62,7 +71,7 @@ public class GoodSalesMetricBucketTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("checkSeriesStateTransitions");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testBuiltInMetric() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES);
         MetricConfiguration activitiesConfiguration = analysisPage.getMetricsBucket()
@@ -84,7 +93,7 @@ public class GoodSalesMetricBucketTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("testBuiltInMetric");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testMetricFromAttribute() {
         analysisPage.addMetric(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE);
 
@@ -97,7 +106,7 @@ public class GoodSalesMetricBucketTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("testMetricFromAttribute");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void showInPercentAndPop() {
         MetricConfiguration metricConfiguration = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate()
@@ -148,7 +157,7 @@ public class GoodSalesMetricBucketTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("showInPercentAndPop");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void disablePopCheckboxOnDroppingNonDateAttribute() {
         MetricConfiguration metricConfiguration = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -166,7 +175,7 @@ public class GoodSalesMetricBucketTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("disablePopCheckboxOnDroppingNonDateAttribute");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void uncheckSelectedPopWhenReplaceAttribute() {
         MetricConfiguration metricConfiguration = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate()

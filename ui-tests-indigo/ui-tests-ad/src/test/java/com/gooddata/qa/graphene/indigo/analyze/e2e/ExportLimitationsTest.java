@@ -16,7 +16,13 @@ public class ExportLimitationsTest extends AbstractAdE2ETest {
         projectTitle = "Export-Limitations-E2E-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void should_disable_export_button_if_stacking_and_slicing_by_the_same_attribute() {
         assertFalse(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             // Drag exactly the same attribute to the category and stack
@@ -27,7 +33,7 @@ public class ExportLimitationsTest extends AbstractAdE2ETest {
             .isExportButtonEnabled());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_disable_export_if_the_same_metric_is_in_metric_bucket_twice() {
         assertFalse(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)

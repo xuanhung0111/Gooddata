@@ -13,8 +13,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import java.net.URISyntaxException;
-
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -26,7 +24,6 @@ import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
-import java.io.IOException;
 import java.lang.reflect.Method;
 
 public class MultipleDatasetsTest extends AbstractAnalyseTest {
@@ -44,15 +41,17 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
     private static final String AMOUNT = "Amount";
     private static final String HIGH_PRICE = "High Price";
     private static final String MARKET = "Market";
-    
 
     @BeforeClass(alwaysRun = true)
-    public void initialize() {
-        projectTitle += "Multiple-Datasets-Test";
+    @Override
+    public void initProperties() {
+        // create empty project and customized data
+        projectTitle = "Multiple-Datasets-Test";
     }
 
     @Override
-    public void prepareSetupProject() throws JSONException, URISyntaxException, IOException {
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
         setupProductionData();
         uploadPayrollDataset();
     }
@@ -68,7 +67,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
         }
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void analyzeReportOnProductionData() {
         ChartReport report = analysisPage.addMetric("Close Price", FieldType.FACT)
                 .addDate()
@@ -86,7 +85,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
         assertEquals(filtersBucketReact.getFilterText("Industry"), "Industry: Apparel Stores, Consumer Services\n(2)");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void analyzeReportOnPayrollData() {
         analysisPage.getCataloguePanel().changeDataset(PAYROLL_DATASET);
 
@@ -106,7 +105,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
         assertEquals(filtersBucketReact.getFilterText("County"), "County: Austin, Clover");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void searchDataAfterSelectDataset() {
         final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
 
@@ -123,7 +122,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
         assertFalse(cataloguePanel.search("Id"));
     }
 
-    @Test(dependsOnGroups = {"init"},
+    @Test(dependsOnGroups = {"createProject"},
             description = "CL-9815: Filter for metric is undefined after switching dataset")
     public void addMetricFilterAfterSwitchingDataset() {
         analysisPage.addMetric(HIGH_PRICE, FieldType.FACT).addAttribute(MARKET).waitForReportComputing();
@@ -141,7 +140,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
                 "Metric filter was not applied");
     }
 
-    @Test(dependsOnGroups = {"init"},
+    @Test(dependsOnGroups = {"createProject"},
             description = "CL-9957: Get error when working on viz containing unrelated date")
     public void showPercentOnInsightContainingUnrelatedDate() {
         //need a dataset containing no date
@@ -163,7 +162,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
         assertEquals(analysisPage.getChartReport().getDataLabels(), singletonList("100.00%"));
     }
 
-    private void setupProductionData() throws JSONException, URISyntaxException, IOException {
+    private void setupProductionData() throws JSONException {
         postMAQL(getResourceAsString(MAQL_PATH), DEFAULT_PROJECT_CHECK_LIMIT);
         setupData(QUOTES_CSV_PATH, UPLOAD_INFO_PATH);
     }

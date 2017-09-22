@@ -115,6 +115,7 @@ public final class GoodSalesUtils {
     public static final String REPORT_ACTIVITIES_BY_TYPE = "Activities by Type";
     public static final String REPORT_AMOUNT_BY_PRODUCT = "Sum of all deals by Product";
     public static final String REPORT_TOP_SALES_REPS_BY_WON_AND_LOST = "Top Reps. by Won and Lost";
+    public static final String REPORT_AMOUNT_BY_DATE_CLOSED = "Sum of all deals by Date Closed";
 
     // variables
     public static final String VARIABLE_STATUS = "Status";

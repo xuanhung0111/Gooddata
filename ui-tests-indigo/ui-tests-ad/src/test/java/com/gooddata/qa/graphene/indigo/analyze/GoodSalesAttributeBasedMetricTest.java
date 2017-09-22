@@ -17,9 +17,9 @@ import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 
-public class GoodSalesAttributeBasedMetricTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesAttributeBasedMetricTest extends AbstractAnalyseTest {
 
     private static final String COUNT_OF_ACTIVITY = "Count of " + ATTR_ACTIVITY;
 
@@ -28,7 +28,7 @@ public class GoodSalesAttributeBasedMetricTest extends GoodSalesAbstractAnalyseT
         projectTitle += "Attribute-Based-Metric-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createSimpleMetricFromAttribute() {
         final MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
 
@@ -57,7 +57,7 @@ public class GoodSalesAttributeBasedMetricTest extends GoodSalesAbstractAnalyseT
         checkingOpenAsReport("createSimpleMetricFromAttribute");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void showInPercent() {
         assertTrue(analysisPage.addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -77,7 +77,7 @@ public class GoodSalesAttributeBasedMetricTest extends GoodSalesAbstractAnalyseT
         checkingOpenAsReport("showInPercent");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void dragSameAttributeBasedMetrics() {
         assertTrue(analysisPage.addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
                 .addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
@@ -87,7 +87,7 @@ public class GoodSalesAttributeBasedMetricTest extends GoodSalesAbstractAnalyseT
                 .getTrackersCount() > 0);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void shouldNotCreateDuplicateMetricFromAttribute() {
         final String identifier = Stream.of(analysisPage.addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
             .waitForReportComputing()

@@ -20,17 +20,24 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.Attribu
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
-public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesAttributeFilterTest extends AbstractAnalyseTest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
         projectTitle += "Attribute-Filter-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+        createAmountMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void filterOnAttribute() {
         final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
 
@@ -53,7 +60,7 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
         assertEquals(filtersBucketReact.getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": Email, Web Meeting\n(2)");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void addFilterNotHideRecommendation() {
         assertEquals(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -74,7 +81,7 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("addFilterNotHideRecommendation");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void filterOnDateAndAttribute() {
         final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
 
@@ -93,7 +100,7 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("filterOnDateAndAttribute");
     }
 
-    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
+    @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void addAttributeToFilterBucket() {
         final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
 
@@ -109,7 +116,7 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("addAttributeToFilterBucket");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testAttributeReplaceDate() {
         final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
 
@@ -122,7 +129,7 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
         assertTrue(filtersBucketReact.isFilterVisible(ATTR_ACTIVITY_TYPE));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testReplaceAttribute() {
         final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
 
@@ -138,7 +145,7 @@ public class GoodSalesAttributeFilterTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("testReplaceAttribute");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkRelatedDateShownCorrectly() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
 

@@ -18,10 +18,10 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
-public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesDropAttributeTest extends AbstractAnalyseTest {
 
     private static final String PRIORITY = "Priority";
     private static final String REGION = "Region";
@@ -31,7 +31,13 @@ public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
         projectTitle += "Drop-Attribute-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void dropAttributeToReportHaveOneMetric() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -44,7 +50,7 @@ public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
         assertEquals(report.getTrackersCount(), 8);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void dropThirdAttributeToBucket() {
         dropAttributeToReportHaveOneMetric();
 
@@ -58,7 +64,7 @@ public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("dropThirdAttributeToBucket");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void removeAttributeOnXBucket() {
         dropAttributeToReportHaveOneMetric();
 
@@ -67,7 +73,7 @@ public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
         assertFalse(addedAttributes.contains(ATTR_ACTIVITY_TYPE));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void recommendNextStep() {
         dropAttributeToReportHaveOneMetric();
 
@@ -93,7 +99,7 @@ public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("recommendNextStep");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void applyAttributeFiltersInReport() {
         dropAttributeToReportHaveOneMetric();
         analysisPage.getFilterBuckets().configAttributeFilter(ATTR_ACTIVITY_TYPE, "Email", "Phone Call")
@@ -103,7 +109,7 @@ public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("applyAttributeFiltersInReport");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void reportVisualization() {
         dropAttributeToReportHaveOneMetric();
         final StacksBucket stacksBucket = analysisPage.getStacksBucket();
@@ -118,7 +124,7 @@ public class GoodSalesDropAttributeTest extends GoodSalesAbstractAnalyseTest {
         assertFalse(isElementPresent(className(StacksBucket.CSS_CLASS), browser));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testUndoRedo() {
         dropAttributeToReportHaveOneMetric();
         final StacksBucket stacksBucket = analysisPage.getStacksBucket();

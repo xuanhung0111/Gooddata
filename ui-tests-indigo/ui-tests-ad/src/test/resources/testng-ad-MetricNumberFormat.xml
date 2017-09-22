@@ -4,15 +4,9 @@
         <groups>
             <run>
                 <include name="metricFormat" />
-                <include name="precondition" />
-                <include name="init" />
                 <include name="createProject" />
                 <include name="arquillian" />
             </run>
-            <dependencies>
-                <group name="metricFormat" depends-on="precondition" />
-                <group name="precondition" depends-on="init" />
-            </dependencies>
         </groups>
         <classes>
             <class name="com.gooddata.qa.graphene.indigo.analyze.GoodSalesMetricNumberFormatTest" />

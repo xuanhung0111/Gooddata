@@ -28,9 +28,9 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect.Dat
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 
-public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnalyseTest {
 
     private static final String RECOMMENDED = "RECOMMENDED";
     private static final String OTHER = "OTHER";
@@ -50,8 +50,12 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends GoodSalesAbs
     private Metric metric2;
     private Metric metric3;
 
-    @Test(dependsOnGroups = {"init"})
-    public void initData() {
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createAmountMetric();
+        createAmountByDateClosedReport();
+
         final String amountFactUri = getMdService().getObjUri(getProject(), Fact.class, title(METRIC_AMOUNT));
         final String expression = format("SELECT SUM([%s])", amountFactUri);
 
@@ -64,7 +68,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends GoodSalesAbs
         snapshotDateUri = getMdService().getObjUri(getProject(), Dataset.class, identifier("snapshot.dataset.dt"));
     }
 
-    @Test(dependsOnMethods = {"initData"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkRecommendedForKpiMetricInViewBy() throws JSONException, IOException {
         final String kpiUri = createKpi(metric1.getTitle(), metric1.getUri(), createdDateUri);
         final String indigoDashboardUri = createAnalyticalDashboard(
@@ -93,7 +97,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends GoodSalesAbs
         }
     }
 
-    @Test(dependsOnMethods = {"initData"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkRecommendedForKpiMetricInFilterBucket() throws JSONException, IOException {
         final String kpiUri = createKpi(metric1.getTitle(), metric1.getUri(), createdDateUri);
         final String indigoDashboardUri = createAnalyticalDashboard(
@@ -126,7 +130,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends GoodSalesAbs
         }
     }
 
-    @Test(dependsOnMethods = {"initData"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkRecommendedForInsightMetricInViewBy() throws JSONException, IOException {
         try {
             analysisPage
@@ -134,7 +138,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends GoodSalesAbs
                     .addDate()
                     .waitForReportComputing()
                  // Prepare an insight which metric1 already combines with a date dimensions for test case
-                    .saveInsight(INSIGHT) 
+                    .saveInsight(INSIGHT)
                     .resetToBlankState()
                     .addMetric(metric1.getTitle())
                     .addDate();
@@ -153,7 +157,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends GoodSalesAbs
         }
     }
 
-    @Test(dependsOnMethods = {"initData"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkRecommendedForInsightMetricInFilterBucket() throws JSONException, IOException {
         try {
             analysisPage
@@ -184,7 +188,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends GoodSalesAbs
         }
     }
 
-    @Test(dependsOnMethods = {"initData"})
+    @Test(dependsOnGroups = {"createProject"})
     public void notShowRecommendedWithMetricNotCombineDate() {
         analysisPage.addMetric(metric1.getTitle()).addDate();
 
@@ -214,7 +218,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends GoodSalesAbs
         assertEquals(dateDatasetSelect.getHiddenDescription(), HIDDEN_DATE_DIMENSION_DESCRIPTION);
     }
 
-    @Test(dependsOnMethods = {"initData"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkMultipleMetricsCombineSameDateInViewBy() throws JSONException, IOException {
         final String kpiUri1 = createKpi(metric1.getTitle(), metric1.getUri(), createdDateUri);
         final String kpiUri2 = createKpi(metric2.getTitle(), metric2.getUri(), createdDateUri);
@@ -243,7 +247,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends GoodSalesAbs
         }
     }
 
-    @Test(dependsOnMethods = {"initData"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkMultipleMetricsCombineSameDateInFilterBucket() throws JSONException, IOException {
         final String kpiUri1 = createKpi(metric1.getTitle(), metric1.getUri(), createdDateUri);
         final String kpiUri2 = createKpi(metric2.getTitle(), metric2.getUri(), createdDateUri);
@@ -282,8 +286,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends GoodSalesAbs
             {metric1, metric2, "Multiple-metrics"}
         };
     }
-
-    @Test(dependsOnMethods = {"initData"}, dataProvider = "metricProvider1")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "metricProvider1")
     public void checkMetricsCombineDifferenceDateInViewBy(Metric metric1, Metric metric2, String metricType)
             throws JSONException, IOException {
         final String kpiUri1 = createKpi(metric1.getTitle(), metric1.getUri(), createdDateUri);
@@ -314,7 +317,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends GoodSalesAbs
         }
     }
 
-    @Test(dependsOnMethods = {"initData"}, dataProvider = "metricProvider1")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "metricProvider1")
     public void checkMetricsCombineDifferenceDateInFilterBucket(Metric metric1, Metric metric2,
             String metricType) throws JSONException, IOException {
         final String kpiUri1 = createKpi(metric1.getTitle(), metric1.getUri(), createdDateUri);
@@ -348,7 +351,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends GoodSalesAbs
         }
     }
 
-    @Test(dependsOnMethods = {"initData"}, dataProvider = "metricProvider1")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "metricProvider1")
     public void checkRecommendedDateDisplayTheMostFrequentUsage(Metric metric1, Metric metric2, String metricType)
             throws JSONException, IOException {
         final String kpiUri1 = createKpi(metric1.getTitle(), metric1.getUri(), createdDateUri);
@@ -385,7 +388,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends GoodSalesAbs
         };
     }
 
-    @Test(dependsOnMethods = {"initData"}, dataProvider = "metricProvider2")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "metricProvider2")
     public void notShowRecommendedWithMetricsCombineAllDateInViewBy(Metric metric1, Metric metric2, Metric metric3,
             String metricType) throws JSONException, IOException {
         final String kpiUri1 = createKpi(metric1.getTitle(), metric1.getUri(), createdDateUri);
@@ -415,7 +418,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends GoodSalesAbs
         }
     }
 
-    @Test(dependsOnMethods = {"initData"}, dataProvider = "metricProvider2")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "metricProvider2")
     public void notShowRecommendedWithMetricsCombineAllDateInFilterBucket(Metric metric1, Metric metric2, Metric metric3,
             String metricType) throws JSONException, IOException {
         final String kpiUri1 = createKpi(metric1.getTitle(), metric1.getUri(), createdDateUri);
@@ -448,7 +451,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends GoodSalesAbs
         }
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkUnrelatedDateNotHide() throws JSONException, IOException {
         try {
             analysisPage
@@ -472,7 +475,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends GoodSalesAbs
         }
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkRecommendedAfterSettingShowInPercentForMetric() {
         analysisPage.addMetric(METRIC_AMOUNT).addDate();
 

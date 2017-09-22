@@ -238,7 +238,7 @@ public final class DashboardsRestUtils {
      * @return attributeUri
      */
     public static String createFilterVariable(final RestApiClient restApiClient, final String projectId,
-            final String name, final String attributeUri) throws ParseException, JSONException, IOException {
+            final String name, final String attributeUri) {
         return createFilterVariable(restApiClient, projectId, name, attributeUri, null);
     }
 
@@ -252,26 +252,33 @@ public final class DashboardsRestUtils {
      * @return attributeUri
      */
     public static String createFilterVariable(final RestApiClient restApiClient, final String projectId,
-            final String name, final String attributeUri, final String expression)
-            throws ParseException, JSONException, IOException {
-        final String content = new JSONObject() {{
-            put("prompt", new JSONObject() {{
-                put("content", new JSONObject() {{
-                    put("attribute", attributeUri);
-                    put("type", "filter");
+            final String name, final String attributeUri, final String expression) {
+        String objUri;
+        try {
+            final String content = new JSONObject() {{
+                put("prompt", new JSONObject() {{
+                    put("content", new JSONObject() {{
+                        put("attribute", attributeUri);
+                        put("type", "filter");
+                    }});
+                    put("meta", new JSONObject() {{
+                        put("tags", "");
+                        put("deprecated", 0);
+                        put("summary", "");
+                        put("isProduction", 1);
+                        put("title", name);
+                        put("category", "prompt");
+                    }});
                 }});
-                put("meta", new JSONObject() {{
-                    put("tags", "");
-                    put("deprecated", 0);
-                    put("summary", "");
-                    put("isProduction", 1);
-                    put("title", name);
-                    put("category", "prompt");
-                }});
-            }});
-        }}.toString();
+            }}.toString();
 
-        return createVariable(restApiClient, projectId, content, "filter", expression == null? "TRUE" : expression);
+            objUri = createVariable(restApiClient, projectId,
+                    content, "filter", expression == null ? "TRUE" : expression);
+        } catch (JSONException | IOException e) {
+            throw new RuntimeException("There is an error while creating filter variable", e);
+        }
+
+        return objUri;
     }
 
     /**
@@ -284,24 +291,31 @@ public final class DashboardsRestUtils {
      * @return attributeUri
      */
     public static String createNumericVariable(final RestApiClient restApiClient, final String projectId,
-            final String name, final String defaultValue) throws ParseException, JSONException, IOException {
-        final String content = new JSONObject() {{
-            put("prompt", new JSONObject() {{
-                put("content", new JSONObject() {{
-                    put("type", "scalar");
+                                               final String name, final String defaultValue) {
+        String objUri;
+        try {
+            final String content = new JSONObject() {{
+                put("prompt", new JSONObject() {{
+                    put("content", new JSONObject() {{
+                        put("type", "scalar");
+                    }});
+                    put("meta", new JSONObject() {{
+                        put("tags", "");
+                        put("deprecated", 0);
+                        put("summary", "");
+                        put("isProduction", 1);
+                        put("title", name);
+                        put("category", "prompt");
+                    }});
                 }});
-                put("meta", new JSONObject() {{
-                    put("tags", "");
-                    put("deprecated", 0);
-                    put("summary", "");
-                    put("isProduction", 1);
-                    put("title", name);
-                    put("category", "prompt");
-                }});
-            }});
-        }}.toString();
+            }}.toString();
 
-        return createVariable(restApiClient, projectId, content, "scalar", defaultValue);
+            objUri = createVariable(restApiClient, projectId, content, "scalar", defaultValue);
+        } catch (JSONException | IOException e) {
+            throw new RuntimeException("There is an error while creating numeric variable", e);
+        }
+
+        return objUri;
     }
 
     private static String createVariable(final RestApiClient restApiClient, final String projectId,
@@ -327,19 +341,21 @@ public final class DashboardsRestUtils {
         return variableUri;
     }
 
-    public static String getVariableUri(RestApiClient restApiClient, String projectId, String title)
-            throws JSONException, IOException {
-        JSONArray variables = getJsonObject(restApiClient, format(GET_VARIABLE_LINK, projectId))
-                .getJSONObject("query")
-                .getJSONArray("entries");
+    public static String getVariableUri(RestApiClient restApiClient, String projectId, String title) {
+        try {
+            JSONArray variables = getJsonObject(restApiClient, format(GET_VARIABLE_LINK, projectId))
+                    .getJSONObject("query")
+                    .getJSONArray("entries");
 
-        for (int i = 0; i < variables.length(); i++) {
-            if (title.equals(variables.getJSONObject(i).getString("title"))) {
-                return variables.getJSONObject(i).getString("link");
+            for (int i = 0; i < variables.length(); i++) {
+                if (title.equals(variables.getJSONObject(i).getString("title"))) {
+                    return variables.getJSONObject(i).getString("link");
+                }
             }
+            throw new RuntimeException("No variable matches with title: " + title);
+        } catch (IOException | JSONException e) {
+            throw new RuntimeException("there is error while searching", e);
         }
-
-        throw new RuntimeException("No variable matches with title: " + title);
     }
 
     public static String getDashboardUri(RestApiClient restApiClient, String projectId, String title)
@@ -379,7 +395,7 @@ public final class DashboardsRestUtils {
      * @param restApiClient
      * @param projectID
      * @param dashboardName
-     * @throws tabName
+     * @param tabName
      * @throws JSONException
      * @throws IOException
      * @return default link

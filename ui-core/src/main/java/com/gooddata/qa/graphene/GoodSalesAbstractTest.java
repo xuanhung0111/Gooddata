@@ -9,12 +9,12 @@ import com.gooddata.md.ObjNotFoundException;
 
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.gooddata.fixture.ResourceManagement.ResourceTemplate.GOODSALES;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.*;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.*;
@@ -29,9 +29,8 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
 
     @BeforeClass(alwaysRun = true)
     public void initProperties() {
-        projectTitle = "GoodSales-test";
-        // uncomment when fixture migration is completed
-        // appliedFixture = ResourceTemplate.GOODSALES;
+        projectTitle = "GoodSales ";
+        appliedFixture = GOODSALES;
 
         // going to be removed when https://jira.intgdc.com/browse/QA-6503 is done
         projectTemplate = GOODSALES_TEMPLATE;
@@ -40,24 +39,6 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
                 DASH_TAB_OUTLOOK, DASH_TAB_WHATS_CHANGED, DASH_TAB_WATERFALL_ANALYSIS, DASH_TAB_LEADERBOARDS, DASH_TAB_ACTIVITIES, DASH_TAB_SALES_VELOCITY,
                 DASH_TAB_QUARTERLY_TRENDS, DASH_TAB_SEASONALITY, DASH_TAB_AND_MORE
         });
-    }
-
-    /**
-     * Create necessary metrics, reports, dashboards, variables used in tests
-     */
-    @Test(dependsOnMethods = {"createAndUseDynamicUser"}, groups = {"createProject"})
-    public void setupBusinessObjects() {
-        log.info("Creating business objects in GoodSales Project");
-        createBusinessObject();
-    }
-
-    /**
-     * A hook for creating business objects in GoodSales Project.
-     * Exceptions thrown from utility functions should be handled inside the method.
-     */
-    protected void createBusinessObject() {
-        //this is the metric used most in test classes using GoodSales data.
-        //createAmountMetric();
     }
 
     //------------------------- REPORT MD OBJECTS - BEGIN  ------------------------
@@ -94,6 +75,18 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
                 singletonList(new MetricElement(getMetricByTitle(METRIC_AMOUNT)))));
     }
 
+    protected String createAmountByDateClosedReport() {
+        try {
+            getMetricByTitle(METRIC_AMOUNT);
+        } catch (ObjNotFoundException e) {
+            createAmountMetric();
+        }
+        return createReport(GridReportDefinitionContent.create(REPORT_AMOUNT_BY_PRODUCT,
+                singletonList(METRIC_GROUP),
+                singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_DATE_CLOSE))),
+                singletonList(new MetricElement(getMetricByTitle(METRIC_AMOUNT)))));
+    }
+
     protected String createActivitiesByTypeReport() {
         try {
             getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES);
@@ -109,11 +102,11 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
     //------------------------- REPORT MD OBJECTS - END  ------------------------
 
     //------------------------- VARIABLE MD OBJECTS - BEGIN  ------------------------
-    protected String createQuoteVariable() throws IOException, JSONException {
+    protected String createQuoteVariable() {
         return createNumericVariable(getRestApiClient(), testParams.getProjectId(), VARIABLE_QUOTA, "3300000");
     }
 
-    protected String createStatusVariable() throws IOException, JSONException {
+    protected String createStatusVariable() {
         return createFilterVariable(getRestApiClient(), testParams.getProjectId(),
                 VARIABLE_STATUS, getAttributeByIdentifier("attr.stage.status").getUri());
     }
@@ -201,7 +194,7 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
     protected Metric createTimelineBOPMetric() {
         // SELECT MIN(Timeline (Date)) BY ALL IN ALL OTHER DIMENSIONS EXCEPT Date (Timeline)
         return createMetric(METRIC_TIMELINE_BOP,
-                format("SELECT MIN([%s]) BY ALL IN ALL OTHER DIMENSIONS EXCEPT Date ([%s])",
+                format("SELECT MIN([%s]) BY ALL IN ALL OTHER DIMENSIONS EXCEPT [%s]",
                         getFactByTitle(FACT_TIMELINE_DATE).getUri(),
                         getAttributeByTitle(ATTR_DATE_TIMELINE).getUri()));
     }
@@ -256,7 +249,7 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
                                 .getUri()));
     }
 
-    protected Metric createPercentOfGoalMetric() throws IOException, JSONException {
+    protected Metric createPercentOfGoalMetric() {
         try {
             getMetricByTitle(METRIC_WON);
         } catch (ObjNotFoundException e) {
@@ -276,7 +269,7 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
                 "[=null]--;[<.3][red]#,##0.0%;[>.8][green]#,##0.0%;#,##0.0%");
     }
 
-    protected Metric createQuotaMetric() throws IOException, JSONException {
+    protected Metric createQuotaMetric() {
         String variableUri = "";
         try {
             variableUri = getVariableUri(getRestApiClient(), testParams.getProjectId(), VARIABLE_QUOTA);
@@ -284,9 +277,7 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
             variableUri = createQuoteVariable();
         }
         // Select Quota by all other
-        return createMetric(METRIC_QUOTA,
-                format("Select [%s] by all other",
-                        variableUri));
+        return createMetric(METRIC_QUOTA, format("Select [%s] by all other", variableUri), "$#,##0");
     }
 
     protected Metric createLostMetric() {
@@ -414,7 +405,7 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
         Attribute attributeIsActive = getAttributeByTitle(ATTR_IS_ACTIVE);
         // SELECT AVG((SELECT (Velocity/1) BY Opportunity)) BY Opportunity where Is Active?=true
         return createMetric(METRIC_STAGE_VELOCITY,
-                format("SELECT AVG((SELECT (Velocity/1) BY Opportunity)) BY Opportunity where Is Active?=true",
+                format("SELECT AVG((SELECT ([%s]/1) BY [%s])) BY [%s] where [%s]=[%s]",
                         getFactByTitle(FACT_VELOCITY).getUri(),
                         getAttributeByTitle(ATTR_OPPORTUNITY).getUri(),
                         getAttributeByTitle(ATTR_OPPORTUNITY).getUri(),
