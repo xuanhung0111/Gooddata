@@ -56,7 +56,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
 
     private static final String EXPORT_ERROR_MESSAGE = "Insight is not compatible with Report Editor. "
-            + "\"Stage Name\" is in configuration twice. Remove one attribute to Open as Report.";
+            + "\"Stage Name\" is in configuration twice. Remove one attribute to open as a report.";
 
     private static final String PERCENT_OF_GOAL_URI = "/gdc/md/%s/obj/8136";
 
