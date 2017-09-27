@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.qa.graphene.fragments.dashboards.PermissionsDialog.ALERT_INFOBOX_CSS_SELECTOR;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_PIPELINE_ANALYSIS;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
@@ -16,6 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -31,7 +31,6 @@ import com.gooddata.qa.graphene.fragments.dashboards.PermissionsDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
 import com.gooddata.qa.graphene.utils.WaitUtils;
 import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.google.common.collect.Lists;
 
@@ -45,26 +44,19 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests", "sanity"}, priority = 0)
     public void checkBackToTheOnlyOneVisibileDashboard() throws IOException, JSONException {
+        String dashboardName = "Admin Unpublished Dashboard";
         try {
-            selectDashboard(DASH_PIPELINE_ANALYSIS);
+            String dashboardUri = createDashboard(getRestApiClient(), dashboardName);
             publishDashboard(false);
-            String dashboardUrl = browser.getCurrentUrl();
 
             logout();
-            signIn(false, UserRoles.EDITOR);
-            createDashboard(getRestApiClient(testParams.getEditorUser(), testParams.getPassword()),
-                    "Only one dashboard of Editor");
+            signIn(true, UserRoles.EDITOR);
 
             // Editor loads the dashboard url of Admin
-            System.out.println("Loading page ... " + dashboardUrl);
-            browser.get(dashboardUrl);
+            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + DASHBOARD_PAGE_SUFFIX + "|" + dashboardUri);
+
             waitForDashboardPageLoaded(browser);
-            waitForElementVisible(dashboardsPage.getRoot());
-            String dashboardName = dashboardsPage.getDashboardName();
-
-            assertEquals(dashboardName, DASH_PIPELINE_ANALYSIS);
-
-            selectDashboard("Only one dashboard of Editor");
+            assertEquals(dashboardsPage.getDashboardName(), dashboardName);
         } finally {
             logout();
             signIn(false, UserRoles.ADMIN);
@@ -185,7 +177,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
      * check dashboard names visible to viewer - should see both - both are visible to every1
      * @throws IOException 
      */
-    @Test(dependsOnGroups = {"admin-tests"}, groups = {"viewer-tests", "sanity"})
+    @Test(dependsOnGroups = {"admin-tests"}, groups = {"viewer-tests", "sanity"}, alwaysRun = true)
     public void prepareEditorAndViewerTests() throws JSONException, IOException {
         initDashboardsPage();
 
@@ -773,10 +765,11 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         }
     }
 
-    private void createDashboard(RestApiClient restApiClient, String name) throws JSONException, IOException {
+    private String createDashboard(RestApiClient restApiClient, String name) throws JSONException, IOException {
         String dashboardURI = DashboardsRestUtils.createDashboard(restApiClient, testParams.getProjectId(), name);
         //refresh page to update the dashboards has just been created
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + DASHBOARD_PAGE_SUFFIX + "|" + dashboardURI);
         WaitUtils.waitForDashboardPageLoaded(browser);
+        return dashboardURI;
     }
 }
