@@ -13,7 +13,7 @@ describe "Dockerfile" do
   end
 
   packages = ['xorg-x11-server-Xvfb', 'xorg-x11-xinit',
-              'chromedriver-2.29-1*', 'chromium-56.0.2916.0-1*',
+              'chromedriver-2.22-1*', 'chromium-52.0.2743.0-1*',
               'firefox-45.0.2-1', 'dejavu-sans-fonts', 'dejavu-sans-mono-fonts',
               'dejavu-serif-fonts', 'phantomjs', 'maven-bin']
 
