@@ -1,10 +1,10 @@
 package com.gooddata.qa.graphene.fragments.common;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.clickElementByVisibleLocator;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.ElementUtils.clickElementByVisibleLocator;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
 
@@ -144,7 +144,7 @@ public class SelectItemPopupPanel extends AbstractFragment {
 
     // Just use this action when the expected item not visible in list
     public SelectItemPopupPanel searchItem(final String searchText) {
-        final int currentItems = waitForCollectionIsNotEmpty(items).size();
+        final int currentItems = waitForCollectionIsNotEmpty(getItemElements()).size();
 
         waitForElementVisible(searchInput).clear();
         searchInput.sendKeys(searchText);
@@ -158,7 +158,7 @@ public class SelectItemPopupPanel extends AbstractFragment {
         // In this case, we should wait until the items displayed and less than the full list.
         // There still has a risk in this approach when the list contains only items with the same search pattern.
         // This makes the list after search is same as before (Just a special case and never happen in reality)
-        Predicate<WebDriver> itemFound = browser -> waitForCollectionIsNotEmpty(items).size() < currentItems;
+        Predicate<WebDriver> itemFound = browser -> waitForCollectionIsNotEmpty(getItemElements()).size() < currentItems;
         Graphene.waitGui().until(itemFound);
 
         return this;
@@ -177,14 +177,18 @@ public class SelectItemPopupPanel extends AbstractFragment {
         return this;
     }
 
+    public boolean isSearchInputVisible() {
+        return waitForElementVisible(searchInput).isDisplayed();
+    }
+
     private Stream<WebElement> getAllItemCheckboxes() {
-        return waitForCollectionIsNotEmpty(items)
+        return waitForCollectionIsNotEmpty(getItemElements())
                 .stream()
                 .map(e -> e.findElement(By.tagName("input")));
     }
 
     private SelectItemPopupPanel selectItem(final String item) {
-        final WebElement itemElement = findItemFrom(item, items).get();
+        final WebElement itemElement = findItemFrom(item, getItemElements()).get();
         final By byCheckbox = By.tagName("input");
 
         if (!isElementPresent(byCheckbox, itemElement)) {
@@ -224,6 +228,6 @@ public class SelectItemPopupPanel extends AbstractFragment {
         if (!waitForElementVisible(searchInput).getAttribute("value").trim().isEmpty())
             clearSearchInput();
 
-        return waitForCollectionIsNotEmpty(items);
+        return waitForCollectionIsNotEmpty(getItemElements());
     }
 }

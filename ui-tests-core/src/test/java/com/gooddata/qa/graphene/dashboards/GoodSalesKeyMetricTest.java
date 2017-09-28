@@ -1,9 +1,10 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CREATED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -13,7 +14,6 @@ import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createFi
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Calendar.YEAR;
-import static java.util.Collections.singleton;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.xpath;
@@ -37,8 +37,8 @@ import com.gooddata.md.Metric;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardAddWidgetPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardAddWidgetPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.FiltersConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.MetricConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.MetricStyleConfigPanel;
@@ -98,13 +98,15 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
 
         waitForElementVisible(className("s-btn-widget"), browser).click();
         Graphene.createPageFragment(DashboardAddWidgetPanel.class,
-                waitForElementVisible(className("yui3-c-adddashboardwidgetpickerpanel-content"), browser))
+                waitForElementVisible(DashboardAddWidgetPanel.LOCATOR, browser))
                 .initWidget(WidgetTypes.KEY_METRIC_WITH_TREND);
 
         WidgetConfigPanel widgetConfigPanel = Graphene.createPageFragment(WidgetConfigPanel.class,
                 waitForElementVisible(WidgetConfigPanel.LOCATOR, browser));
         MetricConfigPanel metricConfigPanel = widgetConfigPanel.getTab(Tab.METRIC, MetricConfigPanel.class);
         metricConfigPanel.selectMetric(METRIC_AMOUNT, "Created");
+
+        waitForKeyMetricUpdateValue();
         assertTrue(waitForFragmentVisible(metricConfigPanel).isWhenDropdownVisibled());
         assertFalse(waitForFragmentVisible(metricConfigPanel).isWhenDropdownEnabled());
         assertTrue(waitForFragmentVisible(metricConfigPanel).isLinkExternalFilterVisible());
@@ -162,7 +164,8 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
     private void waitForKeyMetricUpdateValue() {
         sleepTight(1000); // need buffer time to make sure css class 'reloading' appear in DOM
         Predicate<WebDriver> valueLoaded = browser -> !waitForElementPresent(
-                HEADLINE_WIDGET_LOCATOR, browser).getAttribute("class").contains("reloading");
+                HEADLINE_WIDGET_LOCATOR, browser).getAttribute("class").contains("reloading") &&
+                !isElementPresent(className("c-report-overlap"), browser);
         Graphene.waitGui().until(valueLoaded);
     }
 }
