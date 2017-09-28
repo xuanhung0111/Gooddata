@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static org.openqa.selenium.By.cssSelector;
+import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -19,6 +20,8 @@ import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class DashboardAddWidgetPanel extends AbstractFragment {
+
+    public static final By LOCATOR = className("yui3-c-adddashboardwidgetpickerpanel-content");
 
     @FindBy(xpath = "//div[contains(@class, 'yui3-c-dashboardwidgetconfigpanel')]")
     private WebElement widgetConfigPanel;

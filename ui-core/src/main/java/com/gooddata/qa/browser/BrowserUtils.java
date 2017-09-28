@@ -1,5 +1,7 @@
 package com.gooddata.qa.browser;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+
 import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +20,8 @@ public class BrowserUtils {
     }
 
     public static void switchToLastTab(WebDriver browser) {
+        //Wait for loading browser of new tab
+        sleepTightInSeconds(1);
         List<String> windowHandles = BrowserUtils.getWindowHandles(browser);
         browser.switchTo().window(windowHandles.get(windowHandles.size() - 1));
     }

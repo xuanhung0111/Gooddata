@@ -17,6 +17,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.ConfigurationPanel;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.DataProvider;
@@ -33,6 +34,11 @@ import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashbo
 public class DateFilteringTest extends GoodSalesAbstractDashboardTest {
 
     private static final String DEFAULT_METRIC_FORMAT = "#,##0";
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
+    }
 
     @Override
     protected void prepareSetupProject() throws ParseException, JSONException, IOException {
@@ -171,6 +177,32 @@ public class DateFilteringTest extends GoodSalesAbstractDashboardTest {
 
         takeScreenshot(browser, "Default date interval after logout then sign in again", getClass());
         assertEquals(dateFilter.getSelection(), dateFilterValue);
+    }
+
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    public void testDateFilterStatusWithEditor() throws JSONException {
+        logoutAndLoginAs(true, UserRoles.EDITOR);
+
+        try {
+            initIndigoDashboardsPageWithWidgets().switchToEditMode().waitForDateFilter()
+                    .selectByName(DATE_FILTER_THIS_YEAR);
+            
+            Kpi kpi = indigoDashboardsPage.selectLastWidget(Kpi.class);
+            assertEquals(kpi.getValue(), "–");
+
+            ConfigurationPanel panel = indigoDashboardsPage.getConfigurationPanel();
+            assertTrue(panel.getFilterByDateFilter().isChecked(), "The date filter is not checked by default");
+
+            panel.disableDateFilter();
+
+            assertTrue(kpi.waitForContentLoading().getValue().matches("^\\$(\\d{1,3})(,\\d{3})*(\\.\\d{1,})?$"),
+                    "The value format of kpi is not a valid currency format");
+
+            indigoDashboardsPage.cancelEditModeWithChanges().switchToEditMode().selectLastWidget(Kpi.class);
+            assertTrue(panel.getFilterByDateFilter().isChecked(), "The date filter is not checked by default");
+        } finally {
+            logoutAndLoginAs(true, UserRoles.ADMIN);
+        }
     }
 
     private Metric createFilteredOutMetric() {

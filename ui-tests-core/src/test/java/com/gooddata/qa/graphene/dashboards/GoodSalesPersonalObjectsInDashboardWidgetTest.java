@@ -94,7 +94,7 @@ public class GoodSalesPersonalObjectsInDashboardWidgetTest extends GoodSalesAbst
         waitForElementVisible(className("s-btn-widget"), browser).click();
 
         Graphene.createPageFragment(DashboardAddWidgetPanel.class,
-                waitForElementVisible(className("yui3-c-adddashboardwidgetpickerpanel-content"), browser))
+                waitForElementVisible(DashboardAddWidgetPanel.LOCATOR, browser))
                 .initWidget(type);
 
         waitForElementVisible(className("s-btn-select_metric___"), browser).click();

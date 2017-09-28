@@ -495,10 +495,13 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends GoodSalesAbs
                 .getAttributesBucket()
                 .getDateDatasetSelect();
         List<DateDimensionGroup> groups = dateDatasetSelect.getDateDimensionGroups();
+        recommended = dateDatasetSelect.getDateDimensionGroup(RECOMMENDED);
+        other = dateDatasetSelect.getDateDimensionGroup(OTHER);
 
-        takeScreenshot(browser, "Recommended-date-not-show-after-setting-show-in-percent-for-metric", getClass());
-        assertEquals(groups.size(), 1);
-        assertEquals(groups.get(0).getDateDimensions(), asList(CLOSED, CREATED, SNAPSHOT));
+        takeScreenshot(browser, "Recommended-date-still-Shown-after-setting-show-in-percent-for-metric", getClass());
+        assertEquals(groups.size(), 2);
+        assertEquals(recommended.getDateDimensions(), singletonList(CLOSED));
+        assertEquals(other.getDateDimensions(), asList(CREATED, SNAPSHOT));
         assertEquals(dateDatasetSelect.getHiddenDescription(), HIDDEN_DATE_DIMENSION_DESCRIPTION);
     }
 

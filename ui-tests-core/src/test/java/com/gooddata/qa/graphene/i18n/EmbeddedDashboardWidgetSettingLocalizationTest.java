@@ -125,7 +125,7 @@ public class EmbeddedDashboardWidgetSettingLocalizationTest extends GoodSalesAbs
     private DashboardAddWidgetPanel openAddWidgetPanel() {
         waitForElementVisible(className("s-btn-widget"), browser).click();
         return Graphene.createPageFragment(DashboardAddWidgetPanel.class,
-                waitForElementVisible(className("yui3-c-adddashboardwidgetpickerpanel-content"), browser));
+                waitForElementVisible(DashboardAddWidgetPanel.LOCATOR, browser));
     }
 
     private void checkLocalizationThroughTabs(List<WebElement> tabs) {

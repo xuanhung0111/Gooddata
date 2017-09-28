@@ -13,6 +13,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
@@ -53,6 +55,11 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
     }
 
     @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
+    }
+
+    @Override
     protected void prepareSetupProject() throws ParseException, JSONException, IOException {
         String insightWidget = createInsightWidget(new InsightMDConfiguration(TEST_INSIGHT, ReportType.COLUMN_CHART)
                 .setMeasureBucket(singletonList(MeasureBucket.getSimpleInstance(getMdService().getObj(getProject(),
@@ -62,7 +69,46 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
                 asList(createAmountKpi(), insightWidget));
     }
 
+    @DataProvider(name = "widgetTypeProvider")
+    public Object[][] getWidgetTypeProvider() {
+        return new Object[][] {
+            {Kpi.class.getCanonicalName(), METRIC_AMOUNT},
+            {Insight.class.getCanonicalName(), TEST_INSIGHT}
+        };
+    }
 
+    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"}, dataProvider = "widgetTypeProvider")
+    public void checkStatusOfAttributeOnConfigurationPanelWithEditor(final String clazz, final String headLine)
+            throws ClassNotFoundException, IOException, JSONException {
+        logoutAndLoginAs(true, UserRoles.EDITOR);
+
+        try {
+            Class widget = Class.forName(clazz);
+
+            initIndigoDashboardsPageWithWidgets().switchToEditMode().addAttributeFilter(ATTR_ACCOUNT)
+                    .selectWidgetByHeadline(widget, headLine);
+
+            FilterByItem accountFilter = indigoDashboardsPage.getConfigurationPanel()
+                    .getFilterByAttributeFilter(ATTR_ACCOUNT);
+            assertTrue(accountFilter.isChecked(), "The account attribute filter is not checked by default");
+
+            accountFilter.setChecked(false);
+            indigoDashboardsPage.saveEditModeWithWidgets();
+
+            indigoDashboardsPage.switchToEditMode().selectWidgetByHeadline(widget, headLine);
+            assertFalse(accountFilter.isChecked(), "The account attribute filter is not unchecked");
+
+            accountFilter.setChecked(true);
+
+            indigoDashboardsPage.cancelEditModeWithChanges().switchToEditMode()
+                    .selectWidgetByHeadline(widget, headLine);
+
+            assertFalse(accountFilter.isChecked(), "The account attribute filter is checked");
+        } finally {
+            indigoDashboardsPage.deleteAttributeFilter(ATTR_ACCOUNT).saveEditModeWithWidgets();
+            logoutAndLoginAs(true, UserRoles.ADMIN);
+        }
+    }
 
     @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "mobile"})
     public void checkDashboardWithNoAttributeFilters() {
