@@ -158,7 +158,7 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
     @Test(dependsOnGroups = {"init"})
     public void displayWhenDraggingFirstMetric() {
         WebElement metric = analysisPage.getCataloguePanel()
-                .searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC);
+                .searchAndGet(METRIC_SNAPSHOT_BOP, FieldType.METRIC);
 
         Supplier<WebElement> trendRecommendation = () ->
             waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
