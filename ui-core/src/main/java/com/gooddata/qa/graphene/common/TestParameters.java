@@ -218,7 +218,7 @@ public class TestParameters {
     public boolean isProductionEnvironment() {
         return Stream.of("whitelabeled\\.intgdc\\.com", ".*secure.*\\.gooddata\\.com",
                 ".*\\.eu\\.gooddata\\.com", "gdcwltesteu\\.getgooddata\\.com",
-                ".*\\.ca\\.gooddata\\.com")
+                ".*\\.na\\.prodgdc\\.com", ".*\\.ca\\.gooddata\\.com")
                 .anyMatch(this.host::matches);
     }
 
