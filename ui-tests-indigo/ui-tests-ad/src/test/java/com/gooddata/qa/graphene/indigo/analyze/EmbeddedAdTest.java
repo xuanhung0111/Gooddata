@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
@@ -169,7 +170,7 @@ public class EmbeddedAdTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = { "createProject" })
     public void testChartRenderUsingRecommendation() {
         embedAdToWrapperPage(getEmbeddedAdUrl());
-        getEmbeddedAnalysisPage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
+        getEmbeddedAnalysisPage().addMetric(METRIC_SNAPSHOT_BOP).waitForReportComputing();
 
         // use any recommendation
         Graphene.createPageFragment(RecommendationContainer.class,
