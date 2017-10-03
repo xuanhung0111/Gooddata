@@ -24,7 +24,7 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
         projectTitle = "Fact-Based-Metrics-E2E-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_drop_fact_on_the_metrics_bucket() {
         analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT)
             .getMetricsBucket()
@@ -32,7 +32,7 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
             .expandConfiguration();
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_remove_created_metric() {
         analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT)
             .getMetricsBucket()
@@ -44,7 +44,7 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
             .isEmpty());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_change_aggregation_function() {
         MetricConfiguration configuration = analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT)
             .waitForReportComputing()
@@ -66,7 +66,7 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
         expectBucketItemTitle("Max " + FACT_AMOUNT);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_drop_the_same_fact_multiple_times() {
         assertEquals(analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT)
             .addMetric(FACT_AMOUNT, FieldType.FACT)
@@ -76,7 +76,7 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
             .size(), 3);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_allow_to_have_two_different_metrics_from_one_fact() {
         analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT)
             .getMetricsBucket()
@@ -95,7 +95,7 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
             .getLegends(), asList("Max " + FACT_AMOUNT, "Min " + FACT_AMOUNT));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_undo_aggregation_change() {
         analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT)
             .getMetricsBucket()
@@ -120,7 +120,7 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
         expectAggregationSelected("SUM", "opportunitysnapshot_amount");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_create_fact_based_metric_via_single_metric_shortcut() {
         assertEquals(analysisPage.drag(analysisPage.getCataloguePanel().searchAndGet(FACT_AMOUNT, FieldType.FACT),
                 () -> waitForElementVisible(cssSelector(".s-recommendation-metric-canvas"), browser))
@@ -130,7 +130,7 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
             .size(), 1);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_create_fact_based_metric_via_trending_shortcut() {
         assertEquals(analysisPage.drag(analysisPage.getCataloguePanel().searchAndGet(FACT_AMOUNT, FieldType.FACT),
                 () -> waitForElementVisible(cssSelector(".s-recommendation-metric-over-time-canvas"), browser))

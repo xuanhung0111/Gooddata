@@ -39,9 +39,10 @@ public class TableTest extends AbstractAdE2ETest {
     }
 
     @Override
-    public void prepareSetupProject() {
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
         Metric metric;
-
         if (testParams.isReuseProject()) {
             metric = getMdService().getObj(getProject(), Metric.class, title("__EMPTY__"));
         } else {
@@ -52,7 +53,7 @@ public class TableTest extends AbstractAdE2ETest {
         emptyMetricUri = metric.getUri();
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void it_should_be_blank_by_default() throws ParseException, JSONException, IOException {
         DashboardsRestUtils.changeMetricFormat(getRestApiClient(), emptyMetricUri, "#,##0");
 
@@ -63,7 +64,7 @@ public class TableTest extends AbstractAdE2ETest {
         assertTrue(waitForElementPresent(cssSelector(".s-cell-0-0"), browser).getText().trim().isEmpty());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void it_should_be_empty_if_formatted() throws ParseException, JSONException, IOException {
         DashboardsRestUtils.changeMetricFormat(getRestApiClient(), emptyMetricUri, "[=null] empty");
 
@@ -74,7 +75,7 @@ public class TableTest extends AbstractAdE2ETest {
         assertEquals(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim(), "empty");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_show_zeros_as_usual() throws ParseException, JSONException, IOException {
         DashboardsRestUtils.changeMetricFormat(getRestApiClient(), emptyMetricUri, "[=null] 0.00 $");
 
@@ -85,7 +86,7 @@ public class TableTest extends AbstractAdE2ETest {
         assertEquals(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim(), "0.00 $");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_show_table_correctly_when_filter_is_removed() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addFilter(ATTR_ACTIVITY_TYPE)
@@ -99,7 +100,7 @@ public class TableTest extends AbstractAdE2ETest {
         assertFalse(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim().isEmpty());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_be_ordered_by_first_column_in_asc_by_default() {
         beforeOrderingTable();
 
@@ -109,7 +110,7 @@ public class TableTest extends AbstractAdE2ETest {
         assertEquals(waitForElementVisible(cssSelector(".s-cell-1-0"), browser).getText().trim(), "In Person Meeting");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_order_the_table_by_attribute() {
         beforeOrderingTable();
 
@@ -120,7 +121,7 @@ public class TableTest extends AbstractAdE2ETest {
         assertEquals(waitForElementVisible(cssSelector(".s-cell-1-0"), browser).getText().trim(), "Phone Call");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_order_the_table_by_metric() {
         beforeOrderingTable();
 
@@ -137,7 +138,7 @@ public class TableTest extends AbstractAdE2ETest {
         assertEquals(values, sortedValues);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void clean_sorting_if_column_removed() {
         beforeOrderingTable();
 
@@ -147,7 +148,7 @@ public class TableTest extends AbstractAdE2ETest {
         assertTrue(analysisPage.getTableReport().isHeaderSortedUp(ATTR_ACTIVITY_TYPE));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_shift_keep_sorting_on_metric_if_attribute_added() {
         beforeOrderingTable();
 
@@ -157,7 +158,7 @@ public class TableTest extends AbstractAdE2ETest {
         assertTrue(analysisPage.getTableReport().isHeaderSortedDown(METRIC_NUMBER_OF_ACTIVITIES));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_order_the_table_in_asc_order_if_same_column_clicked_twice() {
         beforeOrderingTable();
 
@@ -170,7 +171,7 @@ public class TableTest extends AbstractAdE2ETest {
         assertEquals(waitForElementVisible(cssSelector(".s-cell-1-0"), browser).getText().trim(), "In Person Meeting");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_order_the_table_only_by_one_column_at_the_time() {
         beforeOrderingTable();
 
@@ -183,7 +184,7 @@ public class TableTest extends AbstractAdE2ETest {
         assertEquals(waitForElementVisible(cssSelector(".s-cell-1-0"), browser).getText().trim(), "In Person Meeting");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_work_with_undo_redo() {
         beforeOrderingTable();
 
@@ -202,7 +203,7 @@ public class TableTest extends AbstractAdE2ETest {
         assertEquals(waitForElementVisible(cssSelector(".s-cell-1-0"), browser).getText().trim(), "In Person Meeting");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_drag_more_than_one_attribute_to_category() {
         assertEquals(analysisPage.changeReportType(ReportType.TABLE)
             .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -213,7 +214,7 @@ public class TableTest extends AbstractAdE2ETest {
             .size(), 3);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_not_be_possible_to_drag_more_than_one_attribute_to_bar__view_by() {
         assertEquals(analysisPage.changeReportType(ReportType.BAR_CHART)
             .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -224,7 +225,7 @@ public class TableTest extends AbstractAdE2ETest {
             .size(), 1);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_move_stacks_to_categories_when_switching_to_table() {
         assertEquals(analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
             .addStack(ATTR_ACCOUNT)
@@ -234,7 +235,7 @@ public class TableTest extends AbstractAdE2ETest {
             .size(), 2);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_move_second_category_to_stacks_and_remove_to_rest_when_switching_to_chart() {
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
             .addStack(ATTR_ACCOUNT)

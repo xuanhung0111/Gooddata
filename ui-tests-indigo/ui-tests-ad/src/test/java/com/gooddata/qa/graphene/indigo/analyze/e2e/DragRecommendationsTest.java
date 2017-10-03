@@ -20,7 +20,13 @@ public class DragRecommendationsTest extends AbstractAdE2ETest {
         projectTitle = "Drag-Recommendations-E2E-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void should_render_column_chart_after_a_metric_is_dragged_to_main_recommendation() {
         // D&D the first metric to the initial metric recommendation
         analysisPage.drag(analysisPage.getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC),
@@ -32,7 +38,7 @@ public class DragRecommendationsTest extends AbstractAdE2ETest {
                 ".adi-components .visualization-column .s-property-y.s-id-metricvalues"), browser));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_render_date_sliced_metric_column_chart_after_a_metric_is_dragged_to_the_overtime_recommendation() {
         String quarterYearActivityLabel = ".s-id-" + getAttributeDisplayFormIdentifier("Quarter/Year (Activity)", "Short");
         // D&D the first metric to the metric overtime recommendation
@@ -60,7 +66,7 @@ public class DragRecommendationsTest extends AbstractAdE2ETest {
         assertFalse(isElementPresent(cssSelector(".adi-components .visualization-column .s-property-where"), browser));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_render_attribute_elements_table_after_an_attribute_is_dragged_to_main_recommendation() {
         // D&D the first metric to the metric overtime recommendation
         analysisPage.drag(analysisPage.getCataloguePanel().getDate(),

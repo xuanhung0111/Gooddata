@@ -16,16 +16,16 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 
-public class GoodSalesAttributeBucketTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesAttributeBucketTest extends AbstractAnalyseTest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
         projectTitle += "Attribute-Bucket-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void replaceAttributeByNewOne() {
         final AttributesBucket categoriesBucket = analysisPage.getAttributesBucket();
         final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
@@ -66,7 +66,7 @@ public class GoodSalesAttributeBucketTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("replaceAttributeByNewOne");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void switchAttributesBetweenAxisAndStackBy() {
         final AttributesBucket categoriesBucket = analysisPage.getAttributesBucket();
         final StacksBucket stacksBucket = analysisPage.getStacksBucket();

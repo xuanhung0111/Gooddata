@@ -24,11 +24,11 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.Analysi
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
-public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesUndoTest extends AbstractAnalyseTest {
 
     private static final String ACTIVITY = "Activity";
     private static final String CREATED = "Created";
@@ -38,7 +38,14 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
         projectTitle += "Undo-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createAmountMetric();
+        createNumberOfActivitiesMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void testAfterAddMetric() {
         ReportState baseState = ReportState.getCurrentState(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES));
 
@@ -49,7 +56,7 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
         checkUndoRedoForReport(baseState, true);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testAfterAddAtribute() {
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE);
 
@@ -59,7 +66,7 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
         assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testAfterRemoveMetricAndAttribute() {
         ReportState baseState = ReportState.getCurrentState(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES));
 
@@ -79,7 +86,7 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
         checkUndoRedoForReport(baseState, false);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testAfterChangeDateDimensionOnBucket() {
         final AttributesBucket categoriesBucket = analysisPage.getAttributesBucket();
 
@@ -96,7 +103,7 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
         assertEquals(categoriesBucket.getSelectedDimensionSwitch(), CREATED);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testAfterChangeDateDimensionInFilter() {
         final FiltersBucket FiltersBucketReact = analysisPage.getFilterBuckets();
 
@@ -121,7 +128,7 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
         assertEquals(panel.getSelectedDimensionSwitch(), CREATED);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testAfterAddFilter() {
         int actionsCount = 0;
         final FiltersBucket FiltersBucketReact = analysisPage.getFilterBuckets();
@@ -158,7 +165,7 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
         assertTrue(pageHeader.isRedoButtonEnabled());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testAfterChangeReportType() {
         analysisPage.changeReportType(ReportType.TABLE);
         assertTrue(analysisPage.isReportTypeSelected(ReportType.TABLE));
@@ -170,7 +177,7 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
         assertTrue(analysisPage.isReportTypeSelected(ReportType.TABLE));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testAfterReset() {
         ReportState baseState = ReportState.getCurrentState(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE));
@@ -178,7 +185,7 @@ public class GoodSalesUndoTest extends GoodSalesAbstractAnalyseTest {
         checkUndoRedoForReport(baseState, true);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testUndoNotApplicableOnNonActiveSession() {
         ReportState baseState = ReportState.getCurrentState(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES));
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE);

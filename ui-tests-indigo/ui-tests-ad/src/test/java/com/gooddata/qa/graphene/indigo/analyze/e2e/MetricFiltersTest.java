@@ -30,7 +30,14 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
         projectTitle = "Metric-Filters-E2E-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric(); 
+        createNumberOfLostOppsMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_filter_metric_by_attribute() {
         assertEquals(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
@@ -40,7 +47,7 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
             .getFilterText(), ATTR_ACTIVITY_TYPE + ": Email");
     }
 
-    @Test(dependsOnGroups = {"init"},
+    @Test(dependsOnGroups = {"createProject"},
             enabled = false,
             description = "https://jira.intgdc.com/browse/AQE-1233?focusedCommentId=642059&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-642059")
     public void should_not_be_possible_to_filter_metric_by_unavailable_attribute() {
@@ -55,7 +62,7 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
         assertFalse(attributes.contains(ATTR_ACTIVITY_TYPE));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_remove_filter() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
@@ -66,7 +73,7 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
         assertFalse(isElementPresent(cssSelector(".s-filter-button"), browser));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_show_tooltip() {
         String description = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
@@ -82,7 +89,7 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
         assertTrue(description.contains("Web Meeting"));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_restore_filter_creation() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
@@ -105,7 +112,7 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
             .getFilterText().contains(ATTR_ACTIVITY_TYPE));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_restore_attribute_elements_settings() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
@@ -128,7 +135,7 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
         assertTrue(isElementPresent(cssSelector(".s-filter-item[title='In Person Meeting']:not(.is-selected)"), browser));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_show_total_count_in_attribute_filter_label_correctly() {
         String labelCount = ".s-attribute-filter-label .s-total-count";
 

@@ -1,35 +1,17 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e.common;
 
 import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 
 import org.testng.annotations.BeforeClass;
 
 import com.gooddata.md.Attribute;
-import com.gooddata.qa.graphene.common.StartPageContext;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 
-public abstract class AbstractAdE2ETest extends GoodSalesAbstractAnalyseTest {
+public abstract class AbstractAdE2ETest extends AbstractAnalyseTest {
 
     @BeforeClass(alwaysRun = true)
     public void speedUpTestRun() {
         validateAfterClass = false;
-    }
-
-    @Override
-    public void initStartPage() {
-        startPageContext = new StartPageContext() {
-
-            @Override
-            public void waitForStartPageLoaded() {
-                waitForFragmentVisible(analysisPage);
-            }
-
-            @Override
-            public String getStartPage() {
-                return PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/reportId/edit";
-            }
-        };
     }
 
     protected String getAttributeDisplayFormIdentifier(String title) {

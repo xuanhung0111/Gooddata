@@ -5,16 +5,16 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import com.gooddata.qa.browser.BrowserUtils;
-import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+import org.testng.annotations.Test;
 
-public abstract class AbstractAnalyseTest extends AbstractProjectTest {
+public abstract class AbstractAnalyseTest extends GoodSalesAbstractTest {
 
     protected static final String DATE = "Date";
 
@@ -23,15 +23,12 @@ public abstract class AbstractAnalyseTest extends AbstractProjectTest {
 
     @BeforeClass(alwaysRun = true)
     public void initProperties() {
-        projectTitle = "[Indigo Analyse] ";
+        super.initProperties(); // GS fixture is used by default
     }
 
-    /* A hook for setup test project */
-    @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
-    public abstract void prepareSetupProject() throws Throwable;
-
-    @Test(dependsOnMethods = {"prepareSetupProject"}, groups = {"init"})
-    public void initStartPage() {
+    @Override
+    protected void customizeProject() throws Throwable {
+        // set analyse page as start page context
         startPageContext = new StartPageContext() {
 
             @Override

@@ -16,9 +16,9 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.manage.MetricPage;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 
-public class GoodSalesMetricVisibilityTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesMetricVisibilityTest extends AbstractAnalyseTest {
 
     private static final String RATIO_METRIC = "Ratio metric";
 
@@ -27,10 +27,15 @@ public class GoodSalesMetricVisibilityTest extends GoodSalesAbstractAnalyseTest 
         projectTitle += "Metric-Visibility-Test";
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {"precondition"})
-    public void createPrivateMetric() {
-        assertTrue(deleteMetric(RATIO_METRIC));
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfOpenOppsMetric();
+        createNumberOfWonOppsMetric();
+    }
 
+    @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
+    public void createPrivateMetric() {
         String expectedMaql = "SELECT " + METRIC_NUMBER_OF_WON_OPPS + " / " + METRIC_NUMBER_OF_OPEN_OPPS;
         assertTrue(initMetricPage()
             .createRatioMetric(RATIO_METRIC, METRIC_NUMBER_OF_WON_OPPS, METRIC_NUMBER_OF_OPEN_OPPS)

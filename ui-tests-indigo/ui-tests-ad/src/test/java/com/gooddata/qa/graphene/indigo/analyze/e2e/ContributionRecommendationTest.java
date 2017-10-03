@@ -25,7 +25,13 @@ public class ContributionRecommendationTest extends AbstractAdE2ETest {
         projectTitle = "Contribution-Recommendation-E2E-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void should_apply_in_percent_recommendation() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)

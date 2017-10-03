@@ -23,7 +23,13 @@ public class ResetButtonTest extends AbstractAdE2ETest {
         projectTitle = "Reset-Button-E2E-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void should_clear_bar_visualization() {
         // Render bar chart
         analysisPage.changeReportType(ReportType.BAR_CHART)
@@ -36,7 +42,7 @@ public class ResetButtonTest extends AbstractAdE2ETest {
         analysisPage.resetToBlankState();
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_clear_table_visualization_properly() {
         // Render table
         analysisPage.changeReportType(ReportType.TABLE)
@@ -47,7 +53,7 @@ public class ResetButtonTest extends AbstractAdE2ETest {
         analysisPage.resetToBlankState();
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_stay_clear_when_dragged_to_a_non_accepting_bucket() {
         // The category bucket DOES NOT accept a metric
         assertTrue(analysisPage.drag(analysisPage.getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC),
@@ -55,7 +61,7 @@ public class ResetButtonTest extends AbstractAdE2ETest {
                 .isBlankState());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_reset_selected_date_dimension() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate()

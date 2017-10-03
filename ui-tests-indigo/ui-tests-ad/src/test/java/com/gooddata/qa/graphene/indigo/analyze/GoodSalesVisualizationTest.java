@@ -13,6 +13,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPP
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON_OPPS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PERCENT_OF_GOAL;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_QUOTA;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_BEST_CASE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
@@ -20,7 +21,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.changeMetricFormat;
-import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -48,24 +48,36 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 
-public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
     private static final String EXPORT_ERROR_MESSAGE = "Insight is not compatible with Report Editor. "
             + "\"Stage Name\" is in configuration twice. Remove one attribute to open as a report.";
-
-    private static final String PERCENT_OF_GOAL_URI = "/gdc/md/%s/obj/8136";
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
         projectTitle += "Visualization-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createAmountMetric();
+        createNumberOfActivitiesMetric();
+        createNumberOfLostOppsMetric();
+        createNumberOfOpenOppsMetric();
+        createNumberOfOpportunitiesBOPMetric();
+        createNumberOfWonOppsMetric();
+        createPercentOfGoalMetric();
+        createQuotaMetric();
+        createBestCaseMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void testWithAttribute() {
         assertEquals(analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
                 .getExplorerMessage(), "NO MEASURE IN YOUR INSIGHT");
@@ -83,7 +95,7 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("testWithAttribute");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testResetFunction() {
         ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing().getChartReport();
@@ -103,7 +115,7 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
         analysisPage.resetToBlankState();
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void disableExportForUnexportableVisualization() {
         final AnalysisPageHeader pageHeader = analysisPage.getPageHeader();
         ChartReport report = analysisPage.addMetric(METRIC_AMOUNT)
@@ -121,7 +133,7 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
         assertEquals(pageHeader.getExportButtonTooltipText(), EXPORT_ERROR_MESSAGE);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void resetSpecialReports() {
         analysisPage.resetToBlankState();
 
@@ -131,7 +143,7 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
         analysisPage.resetToBlankState();
     }
 
-    @Test(dependsOnGroups = {"init"}, description = "https://jira.intgdc.com/browse/CL-6401")
+    @Test(dependsOnGroups = {"createProject"}, description = "https://jira.intgdc.com/browse/CL-6401")
     public void gridlinesShouldBeCheckedWhenExportBarChart() {
         analysisPage.addMetric(METRIC_AMOUNT)
                 .addAttribute(ATTR_STAGE_NAME)
@@ -157,12 +169,12 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
         browser.switchTo().window(currentWindowHandle);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkXssInMetricData() throws ParseException, JSONException, IOException {
         String oldFormat = initMetricPage().openMetricDetailPage(METRIC_PERCENT_OF_GOAL)
                 .getMetricFormat();
 
-        String uri = format(PERCENT_OF_GOAL_URI, testParams.getProjectId());
+        String uri = getMetricByTitle(METRIC_PERCENT_OF_GOAL).getUri();
         changeMetricFormat(getRestApiClient(), uri, "<script> alert('test'); </script> #,##0.00");
 
         try {
@@ -182,7 +194,7 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
         }
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void exportCustomDiscovery() {
         assertTrue(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -230,14 +242,14 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
         browser.switchTo().window(currentWindowHandle);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void exportVisualizationWithOneAttributeInChart() {
         assertEquals(analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).getExplorerMessage(),
                 "NO MEASURE IN YOUR INSIGHT");
         assertFalse(analysisPage.getPageHeader().isExportButtonEnabled());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void switchReportHasOneMetricManyAttributes() {
         analysisPage.changeReportType(ReportType.TABLE)
             .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -261,7 +273,7 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
         assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void switchReportHasManyMetricsManyAttributes() {
         analysisPage.changeReportType(ReportType.TABLE)
             .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -285,7 +297,7 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
         assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void switchReportWithDateAttributes() {
         final StacksBucket stacksBucket = analysisPage.getStacksBucket();
         final AttributesBucket categoriesBucket = analysisPage.getAttributesBucket();
@@ -347,22 +359,22 @@ public class GoodSalesVisualizationTest extends GoodSalesAbstractAnalyseTest {
         assertEquals(categoriesBucket.getItemNames(), asList(DATE));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void addStackByIfMoreThanOneMetricInReport() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addMetric("Best Case").addAttribute("Region");
+        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addMetric(METRIC_BEST_CASE).addAttribute("Region");
 
         final StacksBucket stacksBucket = analysisPage.getStacksBucket();
         assertTrue(stacksBucket.isDisabled());
         assertEquals(stacksBucket.getWarningMessage(), "TO STACK BY, AN INSIGHT CAN HAVE ONLY ONE MEASURE");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void addSecondMetricIfAttributeInStackBy() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE).addStack(ATTR_DEPARTMENT);
         assertEquals(analysisPage.getMetricsBucket().getWarningMessage(), "TO ADD ADDITIONAL MEASURE, REMOVE FROM STACK BY");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createChartReportWithMoreThan3Metrics() {
         List<String> legends = analysisPage.addMetric(METRIC_NUMBER_OF_LOST_OPPS)
                 .addMetric(METRIC_NUMBER_OF_OPEN_OPPS)

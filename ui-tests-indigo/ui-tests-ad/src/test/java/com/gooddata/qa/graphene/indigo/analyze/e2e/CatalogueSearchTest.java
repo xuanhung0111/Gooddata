@@ -21,12 +21,22 @@ public class CatalogueSearchTest extends AbstractAdE2ETest {
         projectTitle = "Catalogue-Search-E2E-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfLostOppsMetric(); 
+        createNumberOfOpenOppsMetric(); 
+        createNumberOfWonOppsMetric();
+        createAvgAmountMetric();
+        createWinRateMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void should_show_empty_catalogue_if_no_catalogue_item_is_matched() {
         assertFalse(analysisPage.getCataloguePanel().search("xyz"));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_show_only_matched_items() {
         CataloguePanel panel = analysisPage.getCataloguePanel();
 
@@ -37,7 +47,7 @@ public class CatalogueSearchTest extends AbstractAdE2ETest {
         assertFalse(panel.search("Dada"));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_be_case_insensitive() {
         CataloguePanel panel = analysisPage.getCataloguePanel();
 
@@ -46,7 +56,7 @@ public class CatalogueSearchTest extends AbstractAdE2ETest {
                 .containsAll(asList(METRIC_NUMBER_OF_LOST_OPPS, METRIC_NUMBER_OF_OPEN_OPPS, METRIC_NUMBER_OF_WON_OPPS)));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_cancel_search() {
         CataloguePanel panel = analysisPage.getCataloguePanel();
 

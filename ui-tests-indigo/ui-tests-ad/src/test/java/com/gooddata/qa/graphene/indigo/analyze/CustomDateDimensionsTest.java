@@ -42,12 +42,18 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
     private static final String FISCAL_DATASET = "Fiscal Dimension Sample Test";
 
     @BeforeClass(alwaysRun = true)
-    public void initialize() {
-        projectTitle += "Custom-Date-Dimension-Test";
+    @Override
+    public void initProperties() {
+        // create empty project and use fiscal dataset instead
+        projectTitle = "Custom-Date-Dimension-Test";
     }
 
     @Override
-    public void initStartPage() {
+    protected void customizeProject() throws Throwable {
+        uploadCSV(getFilePathFromResource(FISCAL_CSV_PATH));
+        takeScreenshot(browser, "uploaded-" + FISCAL_DATASET +"-dataset", getClass());
+
+        // set analyse page using FISCAL_DATASET as startPageContext
         startPageContext = new StartPageContext() {
 
             @Override
@@ -63,13 +69,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
         };
     }
 
-    @Override
-    public void prepareSetupProject() {
-        uploadCSV(getFilePathFromResource(FISCAL_CSV_PATH));
-        takeScreenshot(browser, "uploaded-" + FISCAL_DATASET +"-dataset", getClass());
-    }
-
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void datePresetsAppliedInReport() {
         final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
 
@@ -90,7 +90,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
         }
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void dateRangeAppliedInReport() throws ParseException {
         analysisPage.addMetric(NUMBER, FieldType.FACT)
             .addDate()
@@ -100,7 +100,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
         checkingOpenAsReport("dateRangeAppliedInReport");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void applyRecommendation() {
         analysisPage.addMetric(NUMBER, FieldType.FACT).waitForReportComputing();
 
@@ -117,7 +117,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
         checkingOpenAsReport("applyRecommendation");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testGranularityOfDate() {
         analysisPage.addMetric(NUMBER, FieldType.FACT)
             .addDate()
@@ -135,7 +135,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
         assertThat(headers, equalTo(asList("month/year (retaildate)", "sum of number")));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testPopAndPercentOnCustomDate() {
         ChartReport report = analysisPage.addMetric(NUMBER, FieldType.FACT)
             .addDate()
