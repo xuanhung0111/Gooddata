@@ -12,6 +12,7 @@ import org.testng.annotations.Test;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -48,7 +49,7 @@ public class GoodSalesPopComparisonTest extends GoodSalesAbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"init"})
     public void applyWeekGranularityToHideCompareRecommendation() {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES);
+        initAnalysePage().addMetric(METRIC_SNAPSHOT_BOP);
 
         RecommendationContainer container = Graphene.createPageFragment(RecommendationContainer.class,
                 waitForElementVisible(RecommendationContainer.LOCATOR, browser));
