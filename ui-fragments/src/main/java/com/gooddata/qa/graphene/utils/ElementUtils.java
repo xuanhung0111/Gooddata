@@ -2,9 +2,7 @@ package com.gooddata.qa.graphene.utils;
 
 import com.gooddata.qa.utils.browser.BrowserUtils;
 import com.google.common.base.Predicate;
-import org.jboss.arquillian.drone.api.annotation.Default;
 import org.jboss.arquillian.graphene.Graphene;
-import org.jboss.arquillian.graphene.context.GrapheneContext;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
@@ -12,14 +10,11 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
-import java.awt.AWTException;
-import java.awt.Robot;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.stream.Collectors.toList;
 
@@ -111,16 +106,20 @@ public final class ElementUtils {
     }
 
     public static void makeSureNoPopupVisible(By popupElement) {
-        // Move mouse to offset (-1,-1) on screen to make sure there is no bubble displayed before
-        // moving to target element
-        try {
-            new Robot().mouseMove(-1, -1);
+        WebDriver browser = BrowserUtils.getBrowserContext();
+        Actions actions = new Actions(browser);
 
-            Predicate<WebDriver> isDismissed = browser -> !isElementVisible(popupElement, browser);
+        if (isElementVisible(popupElement, browser)) {
+            // In case another popup exists, we need to move outside popup at (x: -10, y: -10) to make it disappear
+            actions.moveToElement(browser.findElement(popupElement), -10, -10).perform();
+
+            Predicate<WebDriver> isDismissed = context -> !isElementVisible(popupElement, context);
             Graphene.waitGui().until(isDismissed);
 
-        } catch (AWTException e) {
-            throw new RuntimeException("There is an error when moving mouse on screen");
+        } else {
+            // In case popup not visible but the current mouse context is point at the element to hover on,
+            // then the next hover action seem to be useless. So we need to move outside the elemnt before hover it again
+            actions.moveByOffset(-50, -50).perform();
         }
     }
 }
