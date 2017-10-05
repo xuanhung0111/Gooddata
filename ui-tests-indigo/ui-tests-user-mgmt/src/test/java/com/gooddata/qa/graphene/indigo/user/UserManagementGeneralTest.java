@@ -208,6 +208,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = { "initialize" }, groups = { "verifyUI", "sanity" })
     public void verifyUserGroupsList() {
         List<String> groups = asList(GROUP1, GROUP2, GROUP3);
+        initDashboardsPage();
         UserManagementPage userManagementPage = initUserManagementPage();
 
         takeScreenshot(browser, "All-user-groups-list", getClass());
