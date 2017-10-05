@@ -31,6 +31,10 @@ public class BrowserUtils {
         browser.switchTo().window(windowHandles.get(0));
     }
 
+    public static void closeCurrentTab(WebDriver browser) {
+        browser.close();
+    }
+
     public static String getCurrentBrowserAgent(WebDriver browser) {
         Capabilities capabilities = ((RemoteWebDriver) browser).getCapabilities();
 
