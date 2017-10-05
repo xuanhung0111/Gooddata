@@ -1,8 +1,6 @@
 package com.gooddata.qa.graphene;
 
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
-import static com.gooddata.qa.browser.BrowserUtils.getCurrentBrowserAgent;
-import static com.gooddata.qa.browser.BrowserUtils.maximize;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
 
@@ -69,12 +67,6 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     @Test(groups = {"createProject"})
     public void init() throws JSONException {
-        System.out.println("Current browser agent is: " + getCurrentBrowserAgent(browser).toUpperCase());
-
-        // Use this utility to maximize browser in chrome - MAC
-        // browser.manage().window().maximize(); do not work
-        maximize(browser);
-
         // sign in with admin user
         signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
     }

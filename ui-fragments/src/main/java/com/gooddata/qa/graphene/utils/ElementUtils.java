@@ -1,18 +1,7 @@
 package com.gooddata.qa.graphene.utils;
 
-import static java.util.stream.Collectors.toList;
-
-import java.awt.AWTException;
-import java.awt.Robot;
-
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Stream;
-
+import com.gooddata.qa.utils.browser.BrowserUtils;
+import com.google.common.base.Predicate;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -21,8 +10,13 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
-import com.gooddata.qa.utils.browser.BrowserUtils;
-import com.google.common.base.Predicate;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Stream;
+
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static java.util.stream.Collectors.toList;
 
 public final class ElementUtils {
 
@@ -108,14 +102,20 @@ public final class ElementUtils {
     }
 
     public static void makeSureNoPopupVisible() {
-        // Move mouse to offset (-1,-1) on screen to make sure there is no bubble displayed before
-        // moving to target element
-        try {
-            new Robot().mouseMove(-1, -1);
-            waitForElementNotPresent(BY_BUBBLE_CONTENT);
+        WebDriver browser = BrowserUtils.getBrowserContext();
+        Actions actions = new Actions(browser);
 
-        } catch (AWTException e) {
-            throw new RuntimeException("There is an error when moving mouse on screen");
+        if (isElementVisible(BY_BUBBLE_CONTENT, browser)) {
+            // In case another popup exists, we need to move outside popup at (x: -10, y: -10) to make it disappear
+            actions.moveToElement(browser.findElement(BY_BUBBLE_CONTENT), -10, -10).perform();
+
+            Predicate<WebDriver> isDismissed = context -> !isElementVisible(BY_BUBBLE_CONTENT, context);
+            Graphene.waitGui().until(isDismissed);
+
+        } else {
+            // In case popup not visible but the current mouse context is point at the element to hover on,
+            // then the next hover action seem to be useless. So we need to move outside the elemnt before hover it again
+            actions.moveByOffset(-50, -50).perform();
         }
     }
 }
