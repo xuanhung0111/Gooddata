@@ -96,10 +96,8 @@ public class ProjectSwitchTest extends AbstractDashboardTest {
                 .getSplashScreen();
 
         logout();
-        // signInUI() is unstable when running on mobile
-        // BY_LOGGED_USER_BUTTON somehow is not found in that case
-        signIn(true, UserRoles.ADMIN);
-        initDashboardsPage();
+        signIn(false, UserRoles.ADMIN);
+
         takeScreenshot(browser, "Last-visited-project-is-updated-with-project-" + NEW_PROJECT_NAME, getClass());
         assertThat(browser.getCurrentUrl(), containsString(newProjectId));
 
