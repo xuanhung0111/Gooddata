@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -36,9 +35,9 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.FilterType;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.InsightItem;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 
-public class InsightOnDashboardTest extends GoodSalesAbstractDashboardTest {
+public class InsightOnDashboardTest extends AbstractDashboardTest {
 
     private static final String TEST_INSIGHT = "Test-Insight";
     private static final String RENAMED_TEST_INSIGHT = "Renamed-Test-Insight";
@@ -47,12 +46,19 @@ public class InsightOnDashboardTest extends GoodSalesAbstractDashboardTest {
     private static final List<String> INSIGHTS_FOR_FILTER_TEST = asList(INSIGHT_CREATED_BY_EDITOR,
             INSIGHT_CREATED_BY_MAIN_USER);
 
-    @BeforeClass
-    public void setProjectTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Insight-On-Dashboard-Test";
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"setupDashboardENV"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"setupDashboardENV"})
     public void testBlankStateInEditMode() {
         initIndigoDashboardsPage().getSplashScreen().startEditingWidgets();
         // ignore checking existing of insight panel
@@ -292,7 +298,7 @@ public class InsightOnDashboardTest extends GoodSalesAbstractDashboardTest {
 
         assertEquals(
                 getAllInsightNames(getRestApiClient(), testParams.getProjectId()).stream()
-                        .filter(e -> INSIGHTS_FOR_FILTER_TEST.contains(e)).count(),
+                        .filter(INSIGHTS_FOR_FILTER_TEST::contains).count(),
                 2, "The number of created insights is not correct");
     }
 
@@ -323,8 +329,13 @@ public class InsightOnDashboardTest extends GoodSalesAbstractDashboardTest {
             .searchInsight("Insight-Created-By");
 
         assertEquals(
-                indigoDashboardsPage.getInsightSelectionPanel().waitForInsightListVisible().getInsightItems().stream()
-                        .filter(e -> INSIGHTS_FOR_FILTER_TEST.stream().anyMatch(t -> e.matchesTitle(t))).count(),
+                indigoDashboardsPage.getInsightSelectionPanel()
+                        .waitForInsightListVisible()
+                        .getInsightItems()
+                        .stream()
+                        .filter(insight -> INSIGHTS_FOR_FILTER_TEST.stream()
+                                .anyMatch(insight::matchesTitle))
+                        .count(),
                 2, "The expected insights are not displayed");
     }
 

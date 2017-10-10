@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -24,9 +25,9 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 
-public class EmbeddingDashboardPostMessageTest extends GoodSalesAbstractDashboardTest {
+public class EmbeddingDashboardPostMessageTest extends AbstractDashboardTest {
     private static final By FANCYBOX_OVERLAY_LOADED = By.className("fancybox-overlay-fixed");
     private static final By FANCYBOX_LOADED = By.className("fancybox-opened");
 
@@ -38,7 +39,13 @@ public class EmbeddingDashboardPostMessageTest extends GoodSalesAbstractDashboar
         dashboardOnlyUser = createAndAddUserToProject(UserRoles.DASHBOARD_ONLY);
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createAmountMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void testPostMessageForDashboardLoadEvent() throws JSONException, IOException {
         String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
                 singletonList(createAmountKpi()));
@@ -58,14 +65,14 @@ public class EmbeddingDashboardPostMessageTest extends GoodSalesAbstractDashboar
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testPostMessageForCreateAndDeleteDashboard() throws JSONException, IOException {
         try {
             initEmbeddedIndigoDashboardPageByIframe()
                     .waitForDashboardLoad()
                     .addKpi(new KpiConfiguration.Builder()
                             .metric(METRIC_AMOUNT)
-                            .dataSet(DATE_CREATED)
+                            .dataSet(DATE_DATASET_CREATED)
                             .build())
                     .saveEditModeWithWidgets();
 
@@ -92,7 +99,7 @@ public class EmbeddingDashboardPostMessageTest extends GoodSalesAbstractDashboar
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testPostMessageWithUserNotBelongToProject() throws JSONException, IOException {
         String user = createDynamicUserFrom(testParams.getUser());
         String password= testParams.getPassword();
@@ -121,7 +128,7 @@ public class EmbeddingDashboardPostMessageTest extends GoodSalesAbstractDashboar
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testPostMessageForUpdateDashboard() throws JSONException, IOException {
         String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
                 singletonList(createAmountKpi()));
@@ -133,7 +140,7 @@ public class EmbeddingDashboardPostMessageTest extends GoodSalesAbstractDashboar
                     .switchToEditMode()
                     .addKpi(new KpiConfiguration.Builder()
                             .metric(METRIC_AMOUNT)
-                            .dataSet(DATE_CREATED)
+                            .dataSet(DATE_DATASET_CREATED)
                             .build())
                     .saveEditModeWithWidgets();
 
@@ -159,7 +166,7 @@ public class EmbeddingDashboardPostMessageTest extends GoodSalesAbstractDashboar
         };
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, dataProvider = "editDeniedUserProvider")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "editDeniedUserProvider")
     public void testPostMessageForEditDeniedUser(UserRoles role) throws JSONException, IOException {
         String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
                 singletonList(createAmountKpi()));
@@ -240,7 +247,7 @@ public class EmbeddingDashboardPostMessageTest extends GoodSalesAbstractDashboar
 
         private String name;
 
-        private PostMessageEvent(String name) {
+        PostMessageEvent(String name) {
             this.name = name;
         }
 

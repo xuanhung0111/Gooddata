@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -30,9 +31,9 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 
-public class EmbeddingSingleDashboardTest extends GoodSalesAbstractDashboardTest {
+public class EmbeddingSingleDashboardTest extends AbstractDashboardTest {
 
     private static final String DASH_PIPELINE_ANALYSIS_URI = "/gdc/md/%s/obj/916";
     private static final String TAB_OUTLOOK_IDENTIFIER = "adzD7xEmdhTx";
@@ -41,6 +42,13 @@ public class EmbeddingSingleDashboardTest extends GoodSalesAbstractDashboardTest
             + "\nAsk your administrator to grant you permissions.";
 
     private String dashboardOnlyUser;
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createAmountMetric();
+        createLostMetric();
+    }
 
     @DataProvider(name = "editPermissionProvider")
     public Object[][] getEditPermissionProvider() {
@@ -52,7 +60,7 @@ public class EmbeddingSingleDashboardTest extends GoodSalesAbstractDashboardTest
         };
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, dataProvider = "editPermissionProvider")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "editPermissionProvider")
     public void loginEmbeddedDashboardWithEditPermission(UserRoles role, EmbeddedType type)
             throws JSONException, IOException {
         String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
@@ -74,7 +82,7 @@ public class EmbeddingSingleDashboardTest extends GoodSalesAbstractDashboardTest
                     .switchToEditMode()
                     .addKpi(new KpiConfiguration.Builder()
                             .metric(METRIC_LOST)
-                            .dataSet(DATE_CREATED)
+                            .dataSet(DATE_DATASET_CREATED)
                             .build())
                     .saveEditModeWithWidgets();
 
@@ -91,7 +99,7 @@ public class EmbeddingSingleDashboardTest extends GoodSalesAbstractDashboardTest
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, dataProvider = "editPermissionProvider")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "editPermissionProvider")
     public void loginEmbeddedWithEmptyDashboardByEditPermission(UserRoles role, EmbeddedType type) throws JSONException {
         if (role != UserRoles.ADMIN) {
             logoutAndLoginAs(role);
@@ -121,7 +129,7 @@ public class EmbeddingSingleDashboardTest extends GoodSalesAbstractDashboardTest
         };
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, dataProvider = "viewPermissionProvider")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "viewPermissionProvider")
     public void loginEmbeddedDashboardWithViewPermission(UserRoles role, EmbeddedType type)
             throws JSONException, IOException {
         String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
@@ -143,7 +151,7 @@ public class EmbeddingSingleDashboardTest extends GoodSalesAbstractDashboardTest
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, dataProvider = "viewPermissionProvider")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "viewPermissionProvider")
     public void loginEmbeddedWithEmptyDashboardByViewPermission(UserRoles role, EmbeddedType type)
             throws JSONException {
         logoutAndLoginAs(role);
@@ -167,7 +175,7 @@ public class EmbeddingSingleDashboardTest extends GoodSalesAbstractDashboardTest
         };
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, dataProvider = "embeddedTypeProvider")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "embeddedTypeProvider")
     public void loginEmbeddedDashboardWithUnauthorizedUser(EmbeddedType type)
             throws ParseException, JSONException, IOException {
         String unauthorizedUser = createDynamicUserFrom(testParams.getUser());
@@ -189,7 +197,7 @@ public class EmbeddingSingleDashboardTest extends GoodSalesAbstractDashboardTest
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, dataProvider = "embeddedTypeProvider")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "embeddedTypeProvider")
     public void checkHeaderNotDisplay(EmbeddedType type) {
         initEmbeddedIndigoDashboardPageByType(type).waitForDashboardLoad();
 
@@ -197,13 +205,13 @@ public class EmbeddingSingleDashboardTest extends GoodSalesAbstractDashboardTest
         assertFalse(Header.isVisible(browser), "Header is visible on embedded dashboard");
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, dataProvider = "embeddedTypeProvider")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "embeddedTypeProvider")
     public void checkDrillToDashboard(EmbeddedType type) throws JSONException, IOException {
         final Metric amountMetric = getMdService().getObj(getProject(), Metric.class, title(METRIC_AMOUNT));
         final String drillKpiUri = createKpiUsingRest(new KpiMDConfiguration.Builder()
                 .title(amountMetric.getTitle())
                 .metric(amountMetric.getUri())
-                .dateDataSet(getDateDatasetUri(DATE_CREATED))
+                .dateDataSet(getDateDatasetUri(DATE_DATASET_CREATED))
                 .comparisonType(ComparisonType.NO_COMPARISON)
                 .comparisonDirection(ComparisonDirection.NONE)
                 .drillToDashboard(format(DASH_PIPELINE_ANALYSIS_URI, testParams.getProjectId()))
@@ -237,7 +245,7 @@ public class EmbeddingSingleDashboardTest extends GoodSalesAbstractDashboardTest
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, dataProvider = "embeddedTypeProvider")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "embeddedTypeProvider")
     public void setAlertInEmbeddedDashboard(EmbeddedType type) throws JSONException, IOException {
         String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
                 singletonList(createAmountKpi()));

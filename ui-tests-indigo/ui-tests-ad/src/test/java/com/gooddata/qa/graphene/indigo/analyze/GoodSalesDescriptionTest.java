@@ -16,7 +16,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -30,14 +29,11 @@ import java.util.List;
 public class GoodSalesDescriptionTest extends AbstractAnalyseTest {
 
     private static final String ACTIVITY_DATE = "Activity (Date)";
+    private HashMap<String, String> identifiersMap = new HashMap<>();
 
-    private String metricUri;
-    private String variableUri;
-
-    private HashMap<String, String> identifiersMap= new HashMap<>();
-
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Description-Test";
     }
 

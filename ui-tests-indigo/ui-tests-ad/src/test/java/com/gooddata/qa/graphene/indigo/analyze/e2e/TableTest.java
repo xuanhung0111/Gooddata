@@ -20,7 +20,6 @@ import java.util.stream.IntStream;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Metric;
@@ -33,8 +32,9 @@ public class TableTest extends AbstractAdE2ETest {
 
     private String emptyMetricUri;
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "Table-E2E-Test";
     }
 

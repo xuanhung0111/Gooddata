@@ -25,7 +25,6 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Attribute;
@@ -47,12 +46,13 @@ public class KpiPopChangeValueExceedLimitTest extends AbstractDashboardTest {
 
     private static final String KPI_ERROR_DATA_RESOURCE = "/kpi-error-data/";
 
-    @BeforeClass(alwaysRun = true)
+    @Override
     public void initProperties() {
+        // create empty project
         projectTitle = "Kpi-pop-change-value-exceed-limit-or-infinity-test";
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"precondition"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
     public void uploadDatasetFromCsv() throws IOException, JSONException, URISyntaxException {
         // The fixed data in CSV file will be invalid and make this test failed
         // when the time pass to another period.
@@ -64,7 +64,7 @@ public class KpiPopChangeValueExceedLimitTest extends AbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnMethods = {"uploadDatasetFromCsv"}, dependsOnGroups = {"dashboardsInit"},
+    @Test(dependsOnMethods = {"uploadDatasetFromCsv"}, dependsOnGroups = {"createProject"},
             groups = {"precondition"})
     public void setupDashboardWithKpi() throws JSONException, IOException {
         String numberFactUri = getMdService().getObjUri(getProject(), Fact.class, title("number"));

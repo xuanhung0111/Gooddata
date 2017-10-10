@@ -11,7 +11,6 @@ import static org.testng.Assert.assertTrue;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
@@ -23,8 +22,9 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
     private static final String ACTIVITY = "Activity";
     private static final String CREATED = "Created";
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Date-Dimension-Test";
     }
 

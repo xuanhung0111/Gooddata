@@ -20,7 +20,6 @@ import java.util.List;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -36,8 +35,9 @@ public class GoodSalesMetricNumberFormatTest extends AbstractAnalyseTest {
     private String percentOfGoalUri;
     private String oldPercentOfGoalMetricFormat;
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Metric-Number-Format-Test";
     }
 

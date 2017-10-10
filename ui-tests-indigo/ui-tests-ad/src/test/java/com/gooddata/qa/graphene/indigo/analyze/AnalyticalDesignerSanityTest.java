@@ -26,7 +26,6 @@ import java.util.function.Supplier;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
@@ -43,8 +42,9 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 
 public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "Indigo-GoodSales-Demo-Sanity-Test";
     }
 

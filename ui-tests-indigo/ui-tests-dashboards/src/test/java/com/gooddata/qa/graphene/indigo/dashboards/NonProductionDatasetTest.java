@@ -17,7 +17,6 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Attribute;
@@ -57,9 +56,10 @@ public class NonProductionDatasetTest extends AbstractDashboardTest {
 
     private static final String DATASET_PAYDATE = "Paydate";
 
-    @BeforeClass
-    public void setProjectTitle() {
-        projectTitle += "Non-Production-Dataset-Test";
+    @Override
+    public void initProperties() {
+        // create empty project
+        projectTitle = "Non-Production-Dataset-Test";
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
@@ -90,7 +90,7 @@ public class NonProductionDatasetTest extends AbstractDashboardTest {
                         Formatter.DEFAULT.toString()));
     }
 
-    @Test(dependsOnGroups = {"precondition", "dashboardsInit"}, groups = {"basic-test"})
+    @Test(dependsOnGroups = {"precondition"}, groups = {"basic-test"})
     public void testMeasureOptions() {
         assertEquals(initIndigoDashboardsPage()
             .getSplashScreen()
@@ -101,7 +101,7 @@ public class NonProductionDatasetTest extends AbstractDashboardTest {
             .getValues(), asList(METRIC_AMOUNT_SUM, METRIC_DEPARTMENT_COUNT), "The measure options are not correct");
     }
 
-    @Test(dependsOnGroups = {"precondition", "dashboardsInit"}, groups = {"basic-test"})
+    @Test(dependsOnGroups = {"precondition"}, groups = {"basic-test"})
     public void testDatasetOptions() {
         assertEquals(initIndigoDashboardsPage()
             .getSplashScreen()
@@ -138,7 +138,7 @@ public class NonProductionDatasetTest extends AbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"precondition"})
     public void selectSingleDateDimensionAsDefault() throws JSONException, IOException {
         String insight = "Insight-without-date-filter";
 
@@ -158,7 +158,7 @@ public class NonProductionDatasetTest extends AbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testScrollBarAppearenceOnDateDataset() throws JSONException, IOException {
         String insight = "Insight-Relating-11-dates";
         uploadCSV(getFilePathFromResource(DATASET_CONTAINING_11_DATES_CSV_PATH));
@@ -183,7 +183,7 @@ public class NonProductionDatasetTest extends AbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"},
+    @Test(dependsOnGroups = {"createProject"},
             description = "CL-10287: Cannot add KPIs that doesn't relate to date")
     public void addKpiUsingDatasetWithoutDate() {
         uploadCSV(getFilePathFromResource(WITHOUT_DATE_CSV_PATH));

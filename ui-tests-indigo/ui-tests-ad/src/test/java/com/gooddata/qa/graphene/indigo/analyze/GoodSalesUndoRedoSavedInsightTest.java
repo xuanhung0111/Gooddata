@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.text.ParseException;
 
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
@@ -27,8 +26,9 @@ public class GoodSalesUndoRedoSavedInsightTest extends AbstractAnalyseTest {
     private static final String INSIGHT_TEST = "Insight-Test";
     private static final String INSIGHT_TEST_WITH_METRIC_ONLY = "Insight-With-Metric-Only";
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Undo-And-Save-Insight-Test";
     }
 

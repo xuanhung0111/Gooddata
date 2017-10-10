@@ -13,24 +13,22 @@ import static org.testng.Assert.assertTrue;
 import java.util.List;
 
 import org.json.JSONException;
-import org.openqa.selenium.TimeoutException;
-import org.testng.SkipException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.indigo.HamburgerMenu;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 
-public class ResponsiveNavigationTest extends GoodSalesAbstractDashboardTest {
+public class ResponsiveNavigationTest extends AbstractDashboardTest {
 
     @Override
-    protected void prepareSetupProject() throws Throwable {
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"mobile"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void checkHamburgerMenuDisplayed() {
         if (!isDeviceSupportHamburgerMenu()) return;
 
@@ -42,7 +40,7 @@ public class ResponsiveNavigationTest extends GoodSalesAbstractDashboardTest {
         indigoDashboardsPage.closeHamburgerMenu();
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"mobile"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void checkHamburgerMenuItems() {
         if (!isDeviceSupportHamburgerMenu()) return;
 
@@ -51,7 +49,7 @@ public class ResponsiveNavigationTest extends GoodSalesAbstractDashboardTest {
         assertTrue(pages.contains("Dashboards"));
         indigoDashboardsPage.closeHamburgerMenu();
 
-        pages.stream().forEach(page -> {
+        pages.forEach(page -> {
             log.info("Navigate to page: " + page);
 
             navigateToEachHamburgerMenuItem(page);
@@ -61,7 +59,7 @@ public class ResponsiveNavigationTest extends GoodSalesAbstractDashboardTest {
         });
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"mobile"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void checkLogout() throws JSONException {
         if (!isDeviceSupportHamburgerMenu()) return;
 
@@ -73,16 +71,16 @@ public class ResponsiveNavigationTest extends GoodSalesAbstractDashboardTest {
             browser.get(currentUrl);
             waitForStringInUrl(ACCOUNT_PAGE);
         } finally {
-            signIn(false, UserRoles.ADMIN);
+            signIn(true, UserRoles.ADMIN);
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkHamburgerMenuNotPresentInDesktop() {
         assertFalse(initIndigoDashboardsPage().isHamburgerMenuLinkPresent());
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void testNavigateToIndigoDashboardWithoutLogin() throws JSONException {
         try {
             initDashboardsPage();
@@ -95,7 +93,7 @@ public class ResponsiveNavigationTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void accessDashboardsFromTopMenu() throws JSONException {
         initDashboardsPage();
         assertTrue(isElementPresent(className(ApplicationHeaderBar.KPIS_LINK_CLASS), browser));

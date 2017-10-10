@@ -14,7 +14,6 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -42,7 +41,6 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
     private static final String HIGH_PRICE = "High Price";
     private static final String MARKET = "Market";
 
-    @BeforeClass(alwaysRun = true)
     @Override
     public void initProperties() {
         // create empty project and customized data

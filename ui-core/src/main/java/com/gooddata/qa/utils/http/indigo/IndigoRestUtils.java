@@ -205,17 +205,20 @@ public class IndigoRestUtils {
      * @param restApiClient
      * @param projectId
      * @param insightConfig
-     * @return
-     * @throws ParseException
-     * @throws JSONException
-     * @throws IOException
+     * @return insight uri
      */
     public static String createInsight(final RestApiClient restApiClient, final String projectId,
-            final InsightMDConfiguration insightConfig) throws ParseException, JSONException, IOException {
-        return getJsonObject(restApiClient,
-                restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId),
-                        initInsightObject(insightConfig).toString())).getJSONObject("visualization")
-                                .getJSONObject("meta").getString("uri");
+                                       final InsightMDConfiguration insightConfig) {
+        String jsonObject;
+        try {
+            jsonObject = getJsonObject(restApiClient,
+                    restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId),
+                            initInsightObject(insightConfig).toString())).getJSONObject("visualization")
+                    .getJSONObject("meta").getString("uri");
+        } catch (ParseException | JSONException | IOException e) {
+            throw new RuntimeException("There error while creating Insight", e);
+        }
+        return jsonObject;
     }
 
     /**
@@ -272,21 +275,23 @@ public class IndigoRestUtils {
      * @param projectId
      * @param widgetUris
      * @return new analytical dashboard uri
-     * @throws org.json.JSONException
-     * @throws java.io.IOException
      */
     public static String createAnalyticalDashboard(final RestApiClient restApiClient, final String projectId,
-            final Collection<String> widgetUris) throws JSONException, IOException {
-
+                                                   final Collection<String> widgetUris) {
         // TODO: consider better with .put() and have clever template
         final String widgets = new JSONArray(widgetUris).toString();
         final String content = ANALYTICAL_DASHBOARD_BODY.get().replace("\"widgets\":[]", "\"widgets\":" + widgets);
-
-        return getJsonObject(restApiClient,
-                restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId), content))
+        String uri;
+        try {
+            uri = getJsonObject(restApiClient,
+                    restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId), content))
                     .getJSONObject("analyticalDashboard")
                     .getJSONObject("meta")
                     .getString("uri");
+        } catch (JSONException | IOException e) {
+            throw new RuntimeException("There is error while getting JSON object", e);
+        }
+        return uri;
     }
 
     /**

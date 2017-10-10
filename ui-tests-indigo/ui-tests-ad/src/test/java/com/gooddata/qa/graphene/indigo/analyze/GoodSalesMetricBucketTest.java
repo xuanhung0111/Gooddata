@@ -16,7 +16,6 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.Arrays;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
@@ -26,11 +25,9 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
 public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
 
-    private static final String EXPECTED = "Expected";
-    private static final String REMAINING_QUOTA = "Remaining Quota";
-
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Metric-Bucket-Test";
     }
 

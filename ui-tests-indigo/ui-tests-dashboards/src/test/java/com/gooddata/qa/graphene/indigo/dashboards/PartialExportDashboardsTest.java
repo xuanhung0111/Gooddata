@@ -27,7 +27,7 @@ public class PartialExportDashboardsTest extends AbstractDashboardTest {
         projectTemplate = "/projectTemplates/OnboardingWalkMe/3";
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void createKpiLinkToDashboardTab() {
         initIndigoDashboardsPage()
             .getSplashScreen()
@@ -42,7 +42,7 @@ public class PartialExportDashboardsTest extends AbstractDashboardTest {
             .saveEditModeWithWidgets();
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void exportDashboardsToAnotherProject() throws JSONException, IOException {
         final String oldPid = testParams.getProjectId();
 

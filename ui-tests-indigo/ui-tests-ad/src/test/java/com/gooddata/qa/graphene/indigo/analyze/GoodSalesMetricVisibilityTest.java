@@ -11,7 +11,6 @@ import java.io.IOException;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.user.UserRoles;
@@ -22,8 +21,9 @@ public class GoodSalesMetricVisibilityTest extends AbstractAnalyseTest {
 
     private static final String RATIO_METRIC = "Ratio metric";
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Metric-Visibility-Test";
     }
 

@@ -10,7 +10,6 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -19,8 +18,9 @@ import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 
 public class GoodSalesNotRenderedInsightTest extends AbstractAnalyseTest {
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Not-Rendered-Insight-Test";
     }
 

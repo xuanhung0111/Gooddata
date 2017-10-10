@@ -4,6 +4,8 @@ import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -29,9 +31,9 @@ import com.gooddata.md.Metric;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.DateFilter;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 
-public class DateFilteringTest extends GoodSalesAbstractDashboardTest {
+public class DateFilteringTest extends AbstractDashboardTest {
 
     private static final String DEFAULT_METRIC_FORMAT = "#,##0";
 
@@ -41,12 +43,12 @@ public class DateFilteringTest extends GoodSalesAbstractDashboardTest {
     }
 
     @Override
-    protected void prepareSetupProject() throws ParseException, JSONException, IOException {
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
-        
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "mobile"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop", "mobile"})
     public void checkDateFilterDefaultState() {
         // Dashboard created via REST api has no date filter settings which
         // is identical to the stored "All time" date filter
@@ -58,7 +60,7 @@ public class DateFilteringTest extends GoodSalesAbstractDashboardTest {
         assertEquals(dateFilterSelection, DATE_FILTER_ALL_TIME);
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "mobile"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop", "mobile"})
     public void checkDateFilterChangeValue() {
         DateFilter dateFilter = initIndigoDashboardsPageWithWidgets().waitForDateFilter();
 
@@ -71,7 +73,7 @@ public class DateFilteringTest extends GoodSalesAbstractDashboardTest {
         assertEquals(dateFilterSelection, DATE_FILTER_THIS_YEAR);
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = "desktop")
+    @Test(dependsOnGroups = {"createProject"}, groups = "desktop")
     public void testInfoMessage() {
         DateFilter dateFilter = initIndigoDashboardsPage()
                 .waitForDateFilter();
@@ -91,7 +93,7 @@ public class DateFilteringTest extends GoodSalesAbstractDashboardTest {
         assertTrue(dateFilter.isInfoMessageDisplayed());
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = "desktop")
+    @Test(dependsOnGroups = {"createProject"}, groups = "desktop")
     public void testDateFilterSwitchToEditMode() {
         initIndigoDashboardsPageWithWidgets()
                 .switchToEditMode()
@@ -113,22 +115,22 @@ public class DateFilteringTest extends GoodSalesAbstractDashboardTest {
         assertEquals(selectionAfterEditModeSwitch, DATE_FILTER_THIS_YEAR);
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = "desktop")
+    @Test(dependsOnGroups = {"createProject"}, groups = "desktop")
     public void testFilterDateByPreset() throws JSONException, IOException {
         Metric attributeFilterMetric = createAttributeFilterMetric();
         Metric timeMacrosMetric = createTimeMacrosMetric();
         Metric filteredOutMetric = createFilteredOutMetric();
 
         String attributeFilterKpiUri = addWidgetToWorkingDashboard(
-                createKpiUsingRest(createDefaultKpiConfiguration(attributeFilterMetric, DATE_CREATED)));
+                createKpiUsingRest(createDefaultKpiConfiguration(attributeFilterMetric, DATE_DATASET_CREATED)));
         String timeMacrosKpiUri = addWidgetToWorkingDashboard(
-                createKpiUsingRest(createDefaultKpiConfiguration(timeMacrosMetric, DATE_SNAPSHOT)));
+                createKpiUsingRest(createDefaultKpiConfiguration(timeMacrosMetric, DATE_DATASET_SNAPSHOT)));
         String filteredOutKpiUri = addWidgetToWorkingDashboard(
-                createKpiUsingRest(createDefaultKpiConfiguration(filteredOutMetric, DATE_SNAPSHOT)));
+                createKpiUsingRest(createDefaultKpiConfiguration(filteredOutMetric, DATE_DATASET_SNAPSHOT)));
 
         try {
             DateFilter dateFilter = initIndigoDashboardsPageWithWidgets().waitForDateFilter();
-            dateFilter.getValues().stream()
+            dateFilter.getValues()
                     .forEach(filter -> {
                         dateFilter.selectByName(filter);
                         indigoDashboardsPage.waitForWidgetsLoading();
@@ -151,7 +153,7 @@ public class DateFilteringTest extends GoodSalesAbstractDashboardTest {
         };
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = "desktop", dataProvider = "dateFilterProvider")
+    @Test(dependsOnGroups = {"createProject"}, groups = "desktop", dataProvider = "dateFilterProvider")
     public void checkDefaultDateInterval(String dateFilterValue) throws JSONException {
         setDefaultDateFilter(dateFilterValue);
 
@@ -179,7 +181,7 @@ public class DateFilteringTest extends GoodSalesAbstractDashboardTest {
         assertEquals(dateFilter.getSelection(), dateFilterValue);
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void testDateFilterStatusWithEditor() throws JSONException {
         logoutAndLoginAs(true, UserRoles.EDITOR);
 

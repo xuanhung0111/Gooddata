@@ -10,7 +10,7 @@ import static org.testng.Assert.assertEquals;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidget;
@@ -18,17 +18,18 @@ import static java.util.Collections.singletonList;
 
 import java.io.IOException;
 
-public class VisualizationsTest extends GoodSalesAbstractDashboardTest {
+public class VisualizationsTest extends AbstractDashboardTest {
 
     private final String VISUALIZATION_TITLE = "last_dummy_viz";
     private final String VISUALIZATION_TYPE_BAR = "bar";
 
     @Override
-    protected void prepareSetupProject() throws Throwable {
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void setupVisualizations() throws JSONException, IOException {
         createVisualizationWidget(getRestApiClient(), testParams.getProjectId(),
                 new VisualizationMDConfiguration.Builder()
