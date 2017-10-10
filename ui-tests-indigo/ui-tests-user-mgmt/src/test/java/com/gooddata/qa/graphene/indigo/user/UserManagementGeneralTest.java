@@ -16,6 +16,8 @@ import java.util.List;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
+import com.gooddata.qa.graphene.AbstractProjectTest;
+import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -24,7 +26,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.browser.BrowserUtils;
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.dashboard.PublishType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
@@ -43,7 +44,7 @@ import com.gooddata.qa.utils.mail.ImapClient;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
-public class UserManagementGeneralTest extends GoodSalesAbstractTest {
+public class UserManagementGeneralTest extends AbstractProjectTest {
 
     private static final String DASHBOARD_TEST = "New Dashboard";
     private static final String DELETE_GROUP_DIALOG_CONTENT = "The group with associated permissions will be "
@@ -51,9 +52,6 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     private static final String GROUP1 = "Group1";
     private static final String GROUP2 = "Group2";
     private static final String GROUP3 = "Group3";
-
-    private String editorUser;
-    private String viewerUser;
 
     private static final String CHANGE_GROUP_SUCCESSFUL_MESSAGE = "Group membership successfully changed.";
     private static final String DEACTIVATE_SUCCESSFUL_MESSAGE = "The selected users have been deactivated.";
@@ -77,29 +75,39 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     @BeforeClass(alwaysRun = true)
     @Override
     public void enableDynamicUser() {
-        // always turn on dynamic user on this test or we have to fix the test logic to adapt when turn of that feature
+        // always turn on dynamic user on this test or we have to fix the test logic to adapt when turn off that feature
         useDynamicUser = true;
     }
 
-    @BeforeClass(alwaysRun = true)
-    public void setProjectTitle() {
-        projectTitle = "User-management-general" + System.currentTimeMillis();
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
+        createAndAddUserToProject(UserRoles.VIEWER);
     }
 
-    @Test(dependsOnGroups = { "createProject" }, groups = { "initialize", "sanity" })
-    public void initData() throws JSONException, IOException {
-        editorUser = testParams.getEditorUser();
-        viewerUser = testParams.getViewerUser();
-
+    @Override
+    protected void initProperties() {
+        projectTitle = "User-management-general" + System.currentTimeMillis(); // use empty project
         imapHost = testParams.loadProperty("imap.host");
         imapUser = testParams.loadProperty("imap.user");
         imapPassword = testParams.loadProperty("imap.password");
-
-        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.DISPLAY_USER_MANAGEMENT, true);
     }
 
-    @Test(dependsOnMethods = { "initData" }, groups = { "initialize", "sanity" })
+    @Override
+    protected void customizeProject() throws Throwable {
+        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.DISPLAY_USER_MANAGEMENT, true);
+
+        //we need to upload dummy data so we can work with Dashboard page.
+        String csvFilePath = new CsvFile("data.csv")
+                .columns(new CsvFile.Column("Att1"), new CsvFile.Column("Fact1"))
+                .rows("Anh", "100")
+                .rows("Nguyen", "200")
+                .saveToDisc(testParams.getCsvFolder());
+        uploadCSV(csvFilePath);
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = { "initialize", "sanity" })
     public void prepareUserManagementAdminAndDashboard() throws 
             ParseException, IOException, JSONException {
         initDashboardsPage();
@@ -113,8 +121,8 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         initDashboardsPage();
 
         initUserManagementPage().addUsersToGroup(GROUP1, testParams.getUser())
-            .addUsersToGroup(GROUP2, editorUser)
-            .addUsersToGroup(GROUP3, viewerUser);
+            .addUsersToGroup(GROUP2, testParams.getEditorUser())
+            .addUsersToGroup(GROUP3, testParams.getViewerUser());
     }
 
     @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement" })
@@ -193,7 +201,8 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         userManagementPage.openInviteUserDialog().cancelInvitation();
         takeScreenshot(browser, "Verify-user-management-ui", getClass());
         assertEquals(userManagementPage.getUsersCount(), 4);
-        userManagementPage.selectUsers(testParams.getUser(), editorUser, viewerUser, testParams.getDomainUser());
+        userManagementPage.selectUsers(testParams.getUser(), testParams.getEditorUser(),
+                testParams.getViewerUser(), testParams.getDomainUser());
         userManagementPage.openGroupDialog(GroupDialog.State.CREATE).closeDialog();
     }
 
@@ -234,7 +243,8 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
             assertEquals(UserManagementPage.getInstance(browser).startAddingUser().getAllSidebarActiveLinks(),
                     asList("Active", "All active users"));
             assertTrue(compareCollections(UserManagementPage.getInstance(browser).getAllUserEmails(), 
-                    asList(testParams.getUser(), editorUser, viewerUser, testParams.getDomainUser())));
+                    asList(testParams.getUser(), testParams.getEditorUser(),
+                            testParams.getViewerUser(), testParams.getDomainUser())));
         } finally {
             UserManagementRestUtils.deleteUserGroup(restApiClient, groupUri);
         }
@@ -277,11 +287,12 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         initUserManagementPage();
 
         for (String group : groups) {
-            assertEquals(UserManagementPage.getInstance(browser).addUsersToGroup(group, testParams.getUser(), editorUser, viewerUser)
+            assertEquals(UserManagementPage.getInstance(browser)
+                    .addUsersToGroup(group, testParams.getUser(), testParams.getEditorUser(), testParams.getViewerUser())
                     .getMessageText(), CHANGE_GROUP_SUCCESSFUL_MESSAGE);
         }
 
-        List<String> expectedUsers = asList(testParams.getUser(), editorUser, viewerUser);
+        List<String> expectedUsers = asList(testParams.getUser(), testParams.getEditorUser(), testParams.getViewerUser());
         for (String group : groups) {
             assertTrue(compareCollections(UserManagementPage.getInstance(browser).openSpecificGroupPage(group)
                     .getAllUserEmails(), expectedUsers));
@@ -326,18 +337,19 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
             initDashboardsPage();
             String adminText = UserRoles.ADMIN.getName();
 
-            initUserManagementPage().changeRoleOfUsers(UserRoles.ADMIN, editorUser, viewerUser);
+            initUserManagementPage()
+                    .changeRoleOfUsers(UserRoles.ADMIN, testParams.getEditorUser(), testParams.getViewerUser());
             Predicate<WebDriver> changeRoleSuccessfully = 
                     browser -> String.format(CHANGE_ROLE_SUCCESSFUL_MESSAGE, adminText)
                         .equals(UserManagementPage.getInstance(browser).getMessageText());
             Graphene.waitGui().until(changeRoleSuccessfully);
 
-            for (String email : asList(editorUser, viewerUser)) {
+            for (String email : asList(testParams.getEditorUser(), testParams.getViewerUser())) {
                 assertEquals(UserManagementPage.getInstance(browser).getUserRole(email), adminText);
             }
         } finally {
-            UserManagementPage.getInstance(browser).changeRoleOfUsers(UserRoles.EDITOR, editorUser);
-            initUserManagementPage().changeRoleOfUsers(UserRoles.VIEWER, viewerUser);
+            UserManagementPage.getInstance(browser).changeRoleOfUsers(UserRoles.EDITOR, testParams.getEditorUser());
+            initUserManagementPage().changeRoleOfUsers(UserRoles.VIEWER, testParams.getViewerUser());
         }
     }
 
@@ -352,7 +364,8 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         Graphene.waitGui().until(changeRoleFailed);
 
         takeScreenshot(browser, "User-cannot-change-role-of-himself", getClass());
-        assertEquals(UserManagementPage.getInstance(browser).getUserRole(testParams.getUser()), UserRoles.ADMIN.getName());
+        assertEquals(UserManagementPage.getInstance(browser)
+                .getUserRole(testParams.getUser()), UserRoles.ADMIN.getName());
     }
 
     @Test(dependsOnMethods = { "inviteUserToProject" }, groups = { "userManagement" }, alwaysRun = true)
@@ -395,7 +408,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
 
         initDashboardsPage();
         initUserManagementPage().openInviteUserDialog().invitePeople(UserRoles.ADMIN, "Invite existing editor user",
-                editorUser);
+                testParams.getEditorUser());
         takeScreenshot(browser, "Invite-user-with-invalid-email", getClass());
         assertEquals(UserManagementPage.getInstance(browser).getMessageText(), EXSITING_USER_MESSAGE,
                 "Confirm message is not correct when adding exsiting user into the project!");
@@ -415,10 +428,11 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = { "checkUserCannotDeactivateHimself" }, groups = { "activeUser", "sanity" }, alwaysRun = true)
     public void deactivateUsers() {
-        List<String> emailsList = asList(editorUser, viewerUser);
+        List<String> emailsList = asList(testParams.getEditorUser(), testParams.getViewerUser());
 
         initDashboardsPage();
-        UserManagementPage userManagementPage = initUserManagementPage().deactivateUsers(editorUser, viewerUser);
+        UserManagementPage userManagementPage = initUserManagementPage()
+                .deactivateUsers(testParams.getEditorUser(), testParams.getViewerUser());
         takeScreenshot(browser, "Deactivate-users", getClass());
         assertEquals(userManagementPage.getMessageText(), DEACTIVATE_SUCCESSFUL_MESSAGE);
         assertFalse(userManagementPage.getAllUserEmails().containsAll(emailsList));
@@ -430,13 +444,14 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     public void activateUsers() {
         initDashboardsPage();
         assertEquals(initUserManagementPage().filterUserState(UserStates.DEACTIVATED)
-                .activateUsers(editorUser, viewerUser)
+                .activateUsers(testParams.getEditorUser(), testParams.getViewerUser())
                 .getMessageText(), ACTIVATE_SUCCESSFUL_MESSAGE);
         UserManagementPage.getInstance(browser).waitForEmptyGroup();
 
         UserManagementPage userManagementPage = initUserManagementPage();
         takeScreenshot(browser, "Users-activate-successfully", getClass());
-        assertTrue(userManagementPage.getAllUserEmails().containsAll(asList(editorUser, viewerUser)));
+        assertTrue(userManagementPage.getAllUserEmails().containsAll(
+                asList(testParams.getEditorUser(), testParams.getViewerUser())));
     }
 
     @Test(dependsOnGroups = { "verifyUI" }, groups = { "sanity" })
@@ -565,7 +580,8 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         takeScreenshot(browser, "Group-is-not-deleted", getClass());
         assertEquals(userManagementPage.getUserGroupsCount(), customGroupCount);
 
-        List<String> emailsList = asList(testParams.getDomainUser(), testParams.getUser(), editorUser, viewerUser);
+        List<String> emailsList = asList(testParams.getDomainUser(), testParams.getUser(),
+                testParams.getEditorUser(), testParams.getViewerUser());
 
         userManagementPage.openSpecificGroupPage(GROUP1).deleteUserGroup();
         takeScreenshot(browser, "Group-is-deleted", getClass());
@@ -578,10 +594,12 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         initDashboardsPage();
         UserManagementPage userManagementPage = initUserManagementPage();
 
-        List<String> emailsList = asList(testParams.getDomainUser(), testParams.getUser(), editorUser, viewerUser);
+        List<String> emailsList = asList(testParams.getDomainUser(), testParams.getUser(),
+                testParams.getEditorUser(), testParams.getViewerUser());
         while (UserManagementPage.getInstance(browser).getUserGroupsCount() > 0) {
-            UserManagementPage.getInstance(browser).openSpecificGroupPage(UserManagementPage.getInstance(browser).getAllUserGroups().get(0))
-                .deleteUserGroup();
+            UserManagementPage.getInstance(browser)
+                    .openSpecificGroupPage(UserManagementPage.getInstance(browser).getAllUserGroups().get(0))
+                    .deleteUserGroup();
         }
 
         takeScreenshot(browser, "All-groups-are-deleted", getClass());
@@ -602,12 +620,6 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     public void turnOffUserManagementFeature() throws IOException, JSONException {
         ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.DISPLAY_USER_MANAGEMENT, false);
-    }
-
-    @Override
-    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
-        createAndAddUserToProject(UserRoles.EDITOR);
-        createAndAddUserToProject(UserRoles.VIEWER);
     }
 
     private void checkEditorCannotAccessUserGroupsLinkInDashboardPage(PermissionsDialog permissionsDialog) {
