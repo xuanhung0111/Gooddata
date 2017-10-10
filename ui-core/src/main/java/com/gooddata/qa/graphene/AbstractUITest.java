@@ -127,7 +127,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
             openUrl(PAGE_LOGIN);
         }
         LoginFragment.getInstance(browser).login(username, password, true);
-        waitForElementVisible(BY_LOGGED_USER_BUTTON, browser, 300);
+        waitForElementVisible(className("logo-anchor"), browser);
         takeScreenshot(browser, "login-ui", this.getClass());
         System.out.println("Successful login with user: " + username);
     }
