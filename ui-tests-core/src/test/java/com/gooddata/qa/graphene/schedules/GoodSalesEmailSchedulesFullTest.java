@@ -38,6 +38,7 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Part;
 
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
@@ -84,6 +85,11 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     private static final String INCOMPUTABLE_REPORT = "Incomputable report";
     private static final String TOO_LARGE_REPORT = "Too large report";
 
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws IOException, JSONException {
+        addUserToProject(imapUser, UserRoles.ADMIN);
+    }
+
     @BeforeClass(alwaysRun = true)
     public void setUp() {
         String identification = ": " + testParams.getHost() + " - " + testParams.getTestIdentification();
@@ -100,11 +106,17 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         messages.put(mufReportTitle += identification, emptyMessage);
     }
 
-    @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
+    public void signInImapUser() throws JSONException {
+        logout();
+        signInAtGreyPages(imapUser, imapPassword);
+    }
+
+    @Test(dependsOnGroups = {"precondition"}, groups = {"schedules"})
     public void createEmptyDashboardSchedule() {
         initDashboardsPage();
         dashboardsPage.addNewDashboard("Empty dashboard");
-        initEmailSchedulesPage().scheduleNewDashboardEmail(testParams.getUser(), emptyDashboardTitle,
+        initEmailSchedulesPage().scheduleNewDashboardEmail(imapUser, emptyDashboardTitle,
                 "Scheduled email test - empty dashboard.", "First Tab");
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-empty-dashboard", this.getClass());
@@ -115,10 +127,10 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         assertEquals(initEmailSchedulesPage().openNewSchedule().getEmailToListItem().size(),0);
     }
 
-    @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
+    @Test(dependsOnGroups = {"precondition"}, groups = {"schedules"})
     public void deleteDashboardUsedInSchedule() {
         String dashboardTitle = "Schedule dashboard";
-        initEmailSchedulesPage().scheduleNewDashboardEmail(testParams.getUser(), dashboardTitle,
+        initEmailSchedulesPage().scheduleNewDashboardEmail(imapUser, dashboardTitle,
                 "Scheduled email test - dashboard.", "Outlook");
 
         try {
@@ -151,7 +163,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         waitForFragmentVisible(initEmailSchedulesPage()).deleteSchedule(emptyDashboardTitle);
     }
 
-    @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
+    @Test(dependsOnGroups = {"precondition"}, groups = {"schedules"})
     public void scheduleEmptyReport() {
         initReportsPage();
         String expression = "SELECT AVG([/gdc/md/${pid}/obj/1145]) where [/gdc/md/${pid}/obj/1093] not in "
@@ -166,13 +178,13 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
-        initEmailSchedulesPage().scheduleNewReportEmail(testParams.getUser(), noDataReportTitle,
+        initEmailSchedulesPage().scheduleNewReportEmail(imapUser, noDataReportTitle,
                 "Scheduled email test - no data report.", NO_DATA_REPORT, ExportFormat.ALL);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-no-data-report", this.getClass());
     }
 
-    @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
+    @Test(dependsOnGroups = {"precondition"}, groups = {"schedules"})
     public void scheduleIncomputableReport() {
         initReportsPage();
         Metric amountMetric = getMdService().getObj(getProject(), Metric.class, identifier("ah1EuQxwaCqs"));
@@ -184,13 +196,13 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
-        initEmailSchedulesPage().scheduleNewReportEmail(testParams.getUser(), incomputableReportTitle,
+        initEmailSchedulesPage().scheduleNewReportEmail(imapUser, incomputableReportTitle,
                 "Scheduled email test - incomputable report.", INCOMPUTABLE_REPORT, ExportFormat.PDF);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-incomputable-report", this.getClass());
     }
 
-    @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
+    @Test(dependsOnGroups = {"precondition"}, groups = {"schedules"})
     public void scheduleTooLargeReport() {
         initReportsPage();
         Attribute account = getMdService().getObj(getProject(), Attribute.class, identifier("attr.account.id"));
@@ -206,13 +218,13 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
-        initEmailSchedulesPage().scheduleNewReportEmail(testParams.getUser(), tooLargeReportTitle,
+        initEmailSchedulesPage().scheduleNewReportEmail(imapUser, tooLargeReportTitle,
                 "Scheduled email test - incomputable report.", TOO_LARGE_REPORT, ExportFormat.PDF);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-too-large-report", this.getClass());
     }
 
-    @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
+    @Test(dependsOnGroups = {"precondition"}, groups = {"schedules"})
     public void scheduleReportApplyFilteredVariable() {
         initVariablePage().createVariable(new AttributeVariable("FVariable")
             .withAttribute("Activity Type").withAttributeValues("Email"));
@@ -224,13 +236,13 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         reportPage.addFilter(FilterItem.Factory.createPromptFilter("FVariable", "Email"));
         reportPage.saveReport();
 
-        initEmailSchedulesPage().scheduleNewReportEmail(testParams.getUser(), filteredVariableReportTitle,
+        initEmailSchedulesPage().scheduleNewReportEmail(imapUser, filteredVariableReportTitle,
                 "Scheduled email test - Filtered variable report.", "Filtered variable report", ExportFormat.CSV);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-filtered-variable-report", this.getClass());
     }
 
-    @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
+    @Test(dependsOnGroups = {"precondition"}, groups = {"schedules"})
     public void scheduleReportApplyNumericVariable() {
         String variableUri = initVariablePage().createVariable(new NumericVariable("NVariable").withDefaultNumber(2012));
 
@@ -246,13 +258,13 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
-        initEmailSchedulesPage().scheduleNewReportEmail(testParams.getUser(), numericVariableReportTitle,
+        initEmailSchedulesPage().scheduleNewReportEmail(imapUser, numericVariableReportTitle,
                 "Scheduled email test - Numeric variable report.", report, ExportFormat.CSV);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-numeric-variable-report", this.getClass());
     }
 
-    @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
+    @Test(dependsOnGroups = {"precondition"}, groups = {"schedules"})
     public void scheduleMufReport() throws IOException, JSONException {
         initEmailSchedulesPage();
         Attribute product = getMdService().getObj(getProject(), Attribute.class, identifier("attr.product.id"));
@@ -266,7 +278,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         conditions.put(product.getUri(), singletonList(explorerUri));
         String mufUri =
                 createSimpleMufObjByUri(getRestApiClient(), getProject().getId(), "Product user filter", conditions);
-        addMufToUser(getRestApiClient(), getProject().getId(), testParams.getUser(), mufUri);
+        addMufToUser(getRestApiClient(), getProject().getId(), imapUser, mufUri);
 
         ReportDefinition definition = GridReportDefinitionContent.create(report, singletonList(METRIC_GROUP),
                 singletonList(new AttributeInGrid(product.getDefaultDisplayForm().getUri(), product.getTitle())),
@@ -274,13 +286,13 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
-        initEmailSchedulesPage().scheduleNewReportEmail(testParams.getUser(), mufReportTitle,
+        initEmailSchedulesPage().scheduleNewReportEmail(imapUser, mufReportTitle,
                 "Scheduled email test - MUF report.", report, ExportFormat.CSV);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-muf-report", this.getClass());
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"verify-UI"})
+    @Test(dependsOnGroups = {"precondition"}, groups = {"verify-UI"})
     public void deleteReport() {
         String title = "verify-UI-title";
         String report = "# test report";
@@ -293,7 +305,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
-        initEmailSchedulesPage().scheduleNewReportEmail(testParams.getUser(), title,
+        initEmailSchedulesPage().scheduleNewReportEmail(imapUser, title,
                 "Scheduled email test - report.", report, ExportFormat.ALL);
 
         try {
@@ -316,11 +328,11 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"verify-UI"})
+    @Test(dependsOnGroups = {"precondition"}, groups = {"verify-UI"})
     public void editSchedule() {
         String title = "verify-UI-title";
         String updatedTitle = title + "Updated";
-        initEmailSchedulesPage().scheduleNewReportEmail(testParams.getUser(), title,
+        initEmailSchedulesPage().scheduleNewReportEmail(imapUser, title,
                 "Scheduled email test - report.", "Actual QTD", ExportFormat.CSV);
 
         try {
@@ -344,10 +356,10 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"verify-UI"})
+    @Test(dependsOnGroups = {"precondition"}, groups = {"verify-UI"})
     public void changeScheduleTime() {
         String title = "verify-UI-title";
-        initEmailSchedulesPage().scheduleNewReportEmail(testParams.getUser(), title,
+        initEmailSchedulesPage().scheduleNewReportEmail(imapUser, title,
                 "Scheduled email test - report.", "Actual QTD", ExportFormat.ALL);
 
         try {
@@ -382,11 +394,11 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     public void waitForScheduleMessages() throws MessagingException, IOException {
         try (ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword)) {
             System.out.println("ACCELERATE scheduled mails processing");
-            ScheduleEmailRestUtils.accelerate(getRestApiClient(), testParams.getProjectId());
+            ScheduleEmailRestUtils.accelerate(getRestApiClient(imapUser, imapPassword), testParams.getProjectId());
             checkMailbox(imapClient);
         } finally {
             System.out.println("DECELERATE scheduled mails processing");
-            ScheduleEmailRestUtils.decelerate(getRestApiClient(), testParams.getProjectId());
+            ScheduleEmailRestUtils.decelerate(getRestApiClient(imapUser, imapPassword), testParams.getProjectId());
         }
     }
 
