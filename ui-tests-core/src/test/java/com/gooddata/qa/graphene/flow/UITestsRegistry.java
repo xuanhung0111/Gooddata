@@ -57,6 +57,7 @@ import com.gooddata.qa.graphene.reports.GoodsalesMufReportTest;
 import com.gooddata.qa.graphene.reports.ReportWithEmptyValuesInTimeDimensionTest;
 import com.gooddata.qa.graphene.reports.SimpleCompAttributesTest;
 import com.gooddata.qa.graphene.reports.TimeFormattingTest;
+import com.gooddata.qa.graphene.schedules.GoodSalesScheduleDashboardTest;
 import com.gooddata.qa.graphene.schedules.GoodSalesScheduleDialogFiltersTest;
 import com.gooddata.qa.graphene.schedules.GoodSalesScheduleDialogRecurrenceTest;
 import com.gooddata.qa.graphene.rolap.GoodSalesMetadataDeletedTest;
@@ -74,14 +75,8 @@ public class UITestsRegistry {
                     SimpleProjectEtlTest.class,
                     GoodSalesDashboardTest.class,
                     GoodSalesReportsTest.class,
-
-                    new PredefineParameterTest("testng-imap-GoodSales-email-schedule.xml")
-                        .param("GRAPHENE_USER", "gd.scheduledemail@gmail.com")
-                        .param("GRAPHENE_PASSWORD", "$CHECKLIST_SCHEDULED_EMAIL_USER_PASSWORD")
-                        .param("QA_TEST_USER", "gd.scheduledemail@gmail.com")
-                        .param("QA_TEST_PASSWORD", "$CHECKLIST_SCHEDULED_EMAIL_USER_PASSWORD")
-                        .param("VAULT_QA_TEST_SECRET_PATH", "secret/v1/google/all/imap_user"),
-                   "testng-imap-project-n-users-sanity-test.xml"
+                    "testng-imap-GoodSales-email-schedule.xml",
+                    "testng-imap-project-n-users-sanity-test.xml"
             });
             //separate localization test into one phase so it does not affect to other tests
             put("localization", new Object[] {
@@ -202,21 +197,11 @@ public class UITestsRegistry {
         });
 
         suites.put("schedules", new Object[] {
-            new PredefineParameterTest("testng-imap-GoodSales-email-schedule-full.xml")
-                .param("GRAPHENE_USER", "gd.scheduledemail@gmail.com")
-                .param("GRAPHENE_PASSWORD", "$CHECKLIST_SCHEDULED_EMAIL_USER_PASSWORD")
-                .param("QA_TEST_USER", "gd.scheduledemail@gmail.com")
-                .param("QA_TEST_PASSWORD", "$CHECKLIST_SCHEDULED_EMAIL_USER_PASSWORD")
-                .param("VAULT_QA_TEST_SECRET_PATH", "secret/v1/google/all/imap_user"),
-            new PredefineParameterTest("testng-imap-GoodSales-email-unsubscribe.xml")
-                .param("GRAPHENE_USER", "gd.scheduledemail@gmail.com")
-                .param("GRAPHENE_PASSWORD", "$CHECKLIST_SCHEDULED_EMAIL_USER_PASSWORD")
-                .param("QA_TEST_USER", "gd.scheduledemail@gmail.com")
-                .param("QA_TEST_PASSWORD", "$CHECKLIST_SCHEDULED_EMAIL_USER_PASSWORD")
-                .param("VAULT_QA_TEST_SECRET_PATH", "secret/v1/google/all/imap_user"),
             GoodSalesScheduleDialogRecurrenceTest.class,
             GoodSalesScheduleDialogFiltersTest.class,
-            "testng-imap-GoodSales-email-schedule-dashboard.xml"
+            GoodSalesScheduleDashboardTest.class,
+            "testng-imap-GoodSales-email-unsubscribe.xml",
+            "testng-imap-GoodSales-email-schedule-full.xml"
         });
 
         suites.put("misc", new Object[] {

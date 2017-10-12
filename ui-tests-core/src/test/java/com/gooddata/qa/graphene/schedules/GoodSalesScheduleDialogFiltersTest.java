@@ -5,6 +5,7 @@ package com.gooddata.qa.graphene.schedules;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkGreenBar;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -40,6 +41,12 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
     @BeforeClass
     public void getCustomSubject() {
         customSubject = testParams.getTestIdentification();
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"schedules"})
+    public void verifyEmptySchedules() {
+        assertEquals(initEmailSchedulesPage().getNumberOfGlobalSchedules(), 0, "There is no schedule.");
+        Screenshots.takeScreenshot(browser, "Goodsales-no-schedules", this.getClass());
     }
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
