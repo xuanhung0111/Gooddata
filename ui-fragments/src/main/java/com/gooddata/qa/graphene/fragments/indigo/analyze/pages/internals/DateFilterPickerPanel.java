@@ -30,10 +30,10 @@ public class DateFilterPickerPanel extends AbstractFragment {
     @FindBy(className = "s-tab-range")
     private WebElement dateRangeSection;
 
-    @FindBy(css = ".adi-date-input-from > input")
+    @FindBy(css = ".adi-date-input-from .input-text")
     private WebElement fromDate;
 
-    @FindBy(css = ".adi-date-input-to > input")
+    @FindBy(css = ".adi-date-input-to .input-text")
     private WebElement toDate;
 
     @FindBy(css = ".adi-date-input-from > span")
