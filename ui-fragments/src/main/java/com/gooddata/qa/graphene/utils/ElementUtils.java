@@ -107,19 +107,11 @@ public final class ElementUtils {
 
     public static void makeSureNoPopupVisible(By popupElement) {
         WebDriver browser = BrowserUtils.getBrowserContext();
-        Actions actions = new Actions(browser);
 
-        if (isElementVisible(popupElement, browser)) {
-            // In case another popup exists, we need to move outside popup at (x: -10, y: -10) to make it disappear
-            actions.moveToElement(browser.findElement(popupElement), -10, -10).perform();
+        // Move outside HTML body at position (-1, -1) to make sure no popup displayed
+        new Actions(browser).moveToElement(browser.findElement(By.tagName("body")), -1, -1).perform();
 
-            Predicate<WebDriver> isDismissed = context -> !isElementVisible(popupElement, context);
-            Graphene.waitGui().until(isDismissed);
-
-        } else {
-            // In case popup not visible but the current mouse context is point at the element to hover on,
-            // then the next hover action seem to be useless. So we need to move outside the elemnt before hover it again
-            actions.moveByOffset(-50, -50).perform();
-        }
+        Predicate<WebDriver> isDismissed = context -> !isElementVisible(popupElement, context);
+        Graphene.waitGui().until(isDismissed);
     }
 }
