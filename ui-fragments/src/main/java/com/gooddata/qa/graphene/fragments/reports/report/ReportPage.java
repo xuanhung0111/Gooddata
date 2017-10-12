@@ -302,7 +302,7 @@ public class ReportPage extends AbstractFragment {
 
     public ReportPage confirmCreateReportInDialog() {
         WebElement confirmDialogCreateButton = waitForElementVisible(cssSelector(
-                ".s-saveReportDialog .s-btn-create"), browser);
+                ".s-saveReportDialog.s-is-loaded .s-btn-create"), browser);
         waitForElementVisible(confirmDialogCreateButton).click();
         waitForElementNotVisible(confirmDialogCreateButton);
 
@@ -918,7 +918,10 @@ public class ReportPage extends AbstractFragment {
 
         Select operation = new Select(
                 waitForElementVisible(xpath("//select[contains(@class,'s-sme-objSelect')]"), browser));
-        waitForCollectionIsNotEmpty(operation.getOptions());
+        Predicate<WebDriver> isSelectable = browser ->
+                operation.getFirstSelectedOption().getText().trim().equals("--- select a fact  ---");
+        Graphene.waitGui().until(isSelectable);
+
         operation.selectByVisibleText(metricOnFact);
     }
 
