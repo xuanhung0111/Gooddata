@@ -469,8 +469,8 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
                         + "(SelectWon by all other whereQuarter/Year (Closed)= This -2 andQuarter/Year (Snapshot)=Quarter/Year (Closed) ))+ "
                         + "(( select Wonwhere Quarter/Year (Closed)= This -3 and Quarter/Year (Snapshot) =Quarter/Year (Closed) ) /"
                         + "(SelectWon by all other whereQuarter/Year (Closed)= This -3 and Quarter/Year (Snapshot)=Quarter/Year (Closed) )))/3")
-                        .replaceAll("Quarter/Year (Closed)", "[" + getAttributeByTitle(ATTR_QUARTER_YEAR_CLOSED).getUri() + "]")
-                        .replaceAll("Quarter/Year (Snapshot)", "[" + getAttributeByTitle(ATTR_QUARTER_YEAR_SNAPSHOT).getUri() + "]")
+                        .replaceAll("Quarter\\/Year \\(Closed\\)", "[" + getAttributeByTitle(ATTR_QUARTER_YEAR_CLOSED).getUri() + "]")
+                        .replaceAll("Quarter\\/Year \\(Snapshot\\)", "[" + getAttributeByTitle(ATTR_QUARTER_YEAR_SNAPSHOT).getUri() + "]")
                         .replaceAll("Won", "[" + getMetricByTitle(METRIC_WON).getUri() + "]"),
                 "[=null]--;[color=999999]#,##0.0%");
     }
