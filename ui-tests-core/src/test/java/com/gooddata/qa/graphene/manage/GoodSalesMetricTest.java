@@ -10,8 +10,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_QUARTER_YEAR_CLOSED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_QUARTER_YEAR_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_QUARTER_YEAR_SNAPSHOT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_SNAPSHOT_EOP1;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_SNAPSHOT_EOP2;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_HISTORY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
@@ -31,6 +29,8 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPP
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON_OPPS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PROBABILITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_EOP1;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_EOP2;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_WIN_RATE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_WON;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_CREATED;
@@ -544,7 +544,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     @DataProvider(name = "greatestLeastProvider")
     public Object[][] greatestLeastProvider() {
         return new Object[][] {
-            {"GREATEST_LEAST_basic", asList(METRIC_SNAPSHOT_BOP, ATTR_SNAPSHOT_EOP1, ATTR_SNAPSHOT_EOP2),
+            {"GREATEST_LEAST_basic", asList(METRIC_SNAPSHOT_BOP, METRIC_SNAPSHOT_EOP1, METRIC_SNAPSHOT_EOP2),
                     getResultInGreatestLeastBasic()},
             {"GREATEST_LEAST_no_aggregation", asList(METRIC_NUMBER_OF_OPPORTUNITIES, METRIC_NUMBER_OF_OPEN_OPPS, NEGATIVE), asList(
                     asList("262", "262", "-38", "262", "-38"),

@@ -184,6 +184,61 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
                         getMetricByTitle(METRIC_TIMELINE_EOP).getUri()));
     }
 
+    protected Metric createSnapshotEOP1Metric() {
+        try {
+            getMetricByTitle(METRIC_TIMELINE_EOP);
+        } catch (ObjNotFoundException e) {
+            createTimelineEOPMetric();
+        }
+        try {
+            getMetricByTitle(METRIC_TIMELINE_BOP);
+        } catch (ObjNotFoundException e) {
+            createTimelineBOPMetric();
+        }
+        try {
+            getMetricByTitle(METRIC_SNAPSHOT_EOP);
+        } catch (ObjNotFoundException e) {
+            createSnapshotEOPMetric();
+        }
+        // SELECT MAX(Opp. Snapshot (Date)) BY ALL IN ALL OTHER DIMENSIONS EXCEPT Date (Snapshot)
+        // where Opp. Snapshot (Date)<=_Timeline [EOP]and Opp. Snapshot (Date)>=_Timeline [BOP]and
+        // Opp. Snapshot (Date)<_Snapshot [EOP]
+        return createMetric(METRIC_SNAPSHOT_EOP1,
+                format("SELECT MAX([%s]) BY ALL IN ALL OTHER DIMENSIONS EXCEPT [%s] where [%s]<=[%s] " +
+                                "and [%s]>=[%s] and [%s]<[%s]",
+                        getFactByTitle(FACT_OPP_SNAPSHOT_DATE).getUri(),
+                        getAttributeByTitle(ATTR_DATE_SNAPSHOT).getUri(),
+                        getFactByTitle(FACT_OPP_SNAPSHOT_DATE).getUri(),
+                        getMetricByTitle(METRIC_TIMELINE_EOP).getUri(),
+                        getFactByTitle(FACT_OPP_SNAPSHOT_DATE).getUri(),
+                        getMetricByTitle(METRIC_TIMELINE_BOP).getUri(),
+                        getFactByTitle(FACT_OPP_SNAPSHOT_DATE).getUri(),
+                        getMetricByTitle(METRIC_SNAPSHOT_EOP).getUri()));
+    }
+
+    protected Metric createSnapshotEOP2Metric() {
+        try {
+            getMetricByTitle(METRIC_TIMELINE_EOP);
+        } catch (ObjNotFoundException e) {
+            createTimelineEOPMetric();
+        }
+        try {
+            getMetricByTitle(METRIC_SNAPSHOT_EOP1);
+        } catch (ObjNotFoundException e) {
+            createSnapshotEOP1Metric();
+        }
+        // SELECT MAX(Opp. Snapshot (Date)) BY ALL IN ALL OTHER DIMENSIONS EXCEPT Date (Snapshot)
+        // where Opp. Snapshot (Date)<=_Timeline [EOP]and Opp. Snapshot (Date)<_Snapshot [EOP-1]
+        return createMetric(METRIC_SNAPSHOT_EOP2,
+                format("SELECT MAX([%s]) BY ALL IN ALL OTHER DIMENSIONS EXCEPT [%s] where [%s]<=[%s] and [%s]<[%s]",
+                        getFactByTitle(FACT_OPP_SNAPSHOT_DATE).getUri(),
+                        getAttributeByTitle(ATTR_DATE_SNAPSHOT).getUri(),
+                        getFactByTitle(FACT_OPP_SNAPSHOT_DATE).getUri(),
+                        getMetricByTitle(METRIC_TIMELINE_EOP).getUri(),
+                        getFactByTitle(FACT_OPP_SNAPSHOT_DATE).getUri(),
+                        getMetricByTitle(METRIC_SNAPSHOT_EOP1).getUri()));
+    }
+
     protected Metric createNumberOfLostOppsMetric() {
         try {
             getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES);
