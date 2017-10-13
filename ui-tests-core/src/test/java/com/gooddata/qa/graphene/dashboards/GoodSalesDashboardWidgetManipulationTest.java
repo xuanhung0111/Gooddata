@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_ACTIVITIES_BY_TYPE;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -12,7 +13,6 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
@@ -27,11 +27,15 @@ import com.gooddata.qa.graphene.fragments.reports.report.ChartReport;
 
 public class GoodSalesDashboardWidgetManipulationTest extends GoodSalesAbstractTest {
 
-    private static final String ACTIVITIES_BY_TYPE_REPORT = "Activities by Type";
-
-    @BeforeClass
-    public void setProjectTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-dashboard-widget-manipulation";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        createActivitiesByTypeReport();
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -44,7 +48,7 @@ public class GoodSalesDashboardWidgetManipulationTest extends GoodSalesAbstractT
         dashboardsPage.editDashboard();
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
 
-        dashboardEditBar.addReportToDashboard(ACTIVITIES_BY_TYPE_REPORT);
+        dashboardEditBar.addReportToDashboard(REPORT_ACTIVITIES_BY_TYPE);
         WebElement report = dashboardsPage.getContent().getLatestReport(ChartReport.class).getRoot();
         DashboardWidgetDirection.LEFT.moveElementToRightPlace(report);
 

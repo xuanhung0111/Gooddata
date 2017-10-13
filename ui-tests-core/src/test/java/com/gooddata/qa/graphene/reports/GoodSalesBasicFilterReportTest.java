@@ -3,18 +3,18 @@ package com.gooddata.qa.graphene.reports;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileUri;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileUri;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.GoodData;
@@ -60,9 +59,15 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
     private List<String> listAttributeValues = Lists
             .newArrayList("Interest", "Discovery", "Short List", "Negotiation");
 
-    @BeforeClass
-    public void setProjectTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-basic-filter-report-test";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
     }
 
     @Test(dependsOnGroups = "createProject")

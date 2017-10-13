@@ -4,8 +4,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.postEtlPullIntegration;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +15,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -44,13 +41,13 @@ public class SimpleCompAttributesTest extends AbstractProjectTest {
         };
     }
 
-    @BeforeClass
+    @Override
     public void initProperties() {
         projectTitle = "SimpleProject-test-compAttrs";
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void loadProject() throws JSONException, URISyntaxException, IOException {
+    @Override
+    protected void customizeProject() throws Throwable {
         // create model
         URL maqlResource = getClass().getResource("/etl/maql-simple.txt");
         postMAQL(IOUtils.toString(maqlResource), statusPollingCheckIterations);
@@ -76,7 +73,7 @@ public class SimpleCompAttributesTest extends AbstractProjectTest {
         postEtlPullIntegration(getRestApiClient(), testParams.getProjectId(), parseIntegrationEntry(webdavURL));
     }
 
-    @Test(dependsOnMethods = {"loadProject"}, dataProvider = "defaultRelations")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "defaultRelations")
     public void createRel(String attributeTitle, String attrIdentifier, String relation, String relationAs) throws JSONException {
         String createMAQL = "alter attribute {" + attrIdentifier + "} add relations " + relation + relationAs + ";";
         postMAQL(createMAQL, statusPollingCheckIterations);

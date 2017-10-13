@@ -5,7 +5,6 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import org.openqa.selenium.WebElement;
@@ -37,13 +36,13 @@ public class DynamicImageTest extends AbstractProjectTest {
     private final static String IMAGE_SOURCE_3 =
             "source=web&url=https://s3.amazonaws.com/gdc-testing/images/publicImage3.png";
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void uploadCsvFile() {
+    @Override
+    protected void customizeProject() throws Throwable {
         uploadCSV(ResourceUtils.getFilePathFromResource("/" + ResourceDirectory.DYNAMIC_IMAGES + "/image_url.csv"));
         takeScreenshot(browser, "uploaded-image-file", getClass());
     }
 
-    @Test(dependsOnMethods = {"uploadCsvFile"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testImageFromPubliclyAccessibleImages() {
         initAttributePage().initAttribute(IMAGE)
                 .setDrillToAttribute(NAME)

@@ -29,8 +29,8 @@ public class ReportWithEmptyValuesInTimeDimensionTest extends AbstractProjectTes
     private final static String BACHELORS_DEGREE = "Bachelors Degree";
     private final static String OF_ALL_ROWS = "of All Rows";
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void setupProject() {
+    @Override
+    protected void customizeProject() throws Throwable {
         uploadCSV(ResourceUtils.getFilePathFromResource("/" + ResourceDirectory.PAYROLL_CSV + "/payroll_null_date.csv"));
         takeScreenshot(browser, "uploaded-payroll-file", getClass());
 
@@ -49,7 +49,7 @@ public class ReportWithEmptyValuesInTimeDimensionTest extends AbstractProjectTes
                 .withHows(new HowItem("Year (Paydate)", HowItem.Position.LEFT)));
     }
 
-    @Test(dependsOnMethods = {"setupProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testRollupAggregation() {
         final TableReport table = initReportsPage().openReport(SIMPLE_REPORT).getTableReport();
 
@@ -67,7 +67,7 @@ public class ReportWithEmptyValuesInTimeDimensionTest extends AbstractProjectTes
                 "Rollup values are not correct");
     }
 
-    @Test(dependsOnMethods = {"setupProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testAverageAggregation() {
         final TableReport table = initReportsPage().openReport(SIMPLE_REPORT).getTableReport();
 

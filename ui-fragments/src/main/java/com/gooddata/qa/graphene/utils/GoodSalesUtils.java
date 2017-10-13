@@ -30,6 +30,8 @@ public final class GoodSalesUtils {
     public static final String METRIC_NUMBER_OF_OPPORTUNITIES_BOP = "# of Opportunities [BOP]";
     public static final String METRIC_NUMBER_OF_WON_OPPS = "# of Won Opps.";
     public static final String METRIC_NUMBER_OF_WON = "# of Won"; //metric name in report, originally METRIC_NUMBER_OF_WON_OPPS
+    public static final String METRIC_NUMBER_OF_OPPS_WON_IN_PERIOD = "# Opps. [won] in Period";
+    public static final String METRIC_NUMBER_OF_OPPS_LOST_IN_PERIOD = "# Opps. [lost] in Period";
     public static final String METRIC_SNAPSHOT_BOP = "_Snapshot [BOP]";
     public static final String METRIC_SNAPSHOT_EOP = "_Snapshot [EOP]";
     public static final String METRIC_SNAPSHOT_EOP1 = "_Snapshot [EOP-1]";
@@ -56,6 +58,8 @@ public final class GoodSalesUtils {
     public static final String METRIC_EXPECTED_WON = "Expected + Won";
     public static final String METRIC_EXPECTED_WON_VS_QUOTA = "Expected + Won vs. Quota";
     public static final String METRIC_AMOUNT_BOP = "Amount [BOP]";
+    public static final String METRIC_PERCENT_OF_PIPLINE = "% of Pipeline";
+    public static final String METRIC_TOP_5 = "Top 5";
 
     // attributes
     public static final String ATTR_PRODUCT = "Product";
@@ -90,6 +94,7 @@ public final class GoodSalesUtils {
 
     public static final String ATTR_QUARTER_YEAR_CREATED = "Quarter/Year (Created)";
     public static final String ATTR_MONTH_CREATED = "Month (Created)";
+    public static final String ATTR_MONTH_SNAPSHOT = "Month (Snapshot)";
     public static final String ATTR_MONTH_YEAR_CREATED = "Month/Year (Created)";
     public static final String ATTR_DATE_CREATED = "Date (Created)";
     public static final String ATTR_YEAR_CREATED = "Year (Created)";
@@ -107,6 +112,8 @@ public final class GoodSalesUtils {
     public static final String FACT_ACTIVITY_DATE = "Activity (Date)";
     public static final String FACT_TIMELINE_DATE = "Timeline (Date)";
     public static final String FACT_OPP_SNAPSHOT_DATE = "Opp. Snapshot (Date)";
+    public static final String FACT_OPP_CLOSE_DATE = "Opp. Close (Date)";
+
     public static final String FACT_VELOCITY = "Velocity";
     public static final String FACT_DURATION = "Duration";
     public static final String FACT_DAYS_TO_CLOSE = "Days to Close";
@@ -118,6 +125,13 @@ public final class GoodSalesUtils {
     public static final String REPORT_TOP_SALES_REPS_BY_WON_AND_LOST = "Top Reps. by Won and Lost";
     public static final String REPORT_AMOUNT_BY_DATE_CLOSED = "Sum of all deals by Date Closed";
     public static final String REPORT_ACTIVITY_LEVEL = "Activiy Level";
+    public static final String REPORT_TOP_5_OPEN_BY_CASH = "Top 5 Open (by $)";
+    public static final String REPORT_SALES_SEASONALITY = "Sales Seasonality";
+    public static final String REPORT_NO_DATA= "No Data Report";
+    public static final String REPORT_INCOMPUTABLE = "Incomputable report";
+    public static final String REPORT_TOO_LARGE = "Too large report";
+    public static final String REPORT_TOP_5_WON_BY_CASH = "Top 5 Won (by $)";
+    public static final String REPORT_TOP_5_LOST_BY_CASH = "Top 5 Lost (by $)";
 
     // variables
     public static final String VARIABLE_STATUS = "Status";
@@ -128,6 +142,7 @@ public final class GoodSalesUtils {
     public static final String DATE_DIMENSION_CLOSED = "Date (Closed)";
     public static final String DATE_DIMENSION_SNAPSHOT = "Date (Snapshot)";
     public static final String DATE_DIMENSION_ACTIVITY = "Date (Activity)";
+    public static final String DATE_DIMENSION_TIMELINE = "Date (Timeline)";
 
     // date dataset
     public static final String DATE_DATASET_CREATED = "Created";

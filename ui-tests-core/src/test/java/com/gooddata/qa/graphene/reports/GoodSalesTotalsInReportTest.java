@@ -58,8 +58,11 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
     private final static String SHORT_LIST = "Short List";
     private final static String OF_ALL_COLUMNS = "of All Columns";
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void createReport() {
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
+        createProbabilityMetric();
+
         //create report on UI due to attribute order
         initReportCreation().createReport(new UiReportDefinition()
                 .withName(SIMPLE_REPORT)
@@ -98,7 +101,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
         };
     }
 
-    @Test(dependsOnMethods = {"createReport"}, dataProvider = "rowTotalDataProvider")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "rowTotalDataProvider")
     public void addAndRemoveRowTotalOnAttributeHeader(final AggregationType type,
             final List<Float> totalValuesOfAllRows, final List<Float> totalValuesOfEachStage) {
         final TableReport table = initReportsPage().openReport(SIMPLE_REPORT).getTableReport();
@@ -150,7 +153,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
         };
     }
 
-    @Test(dependsOnMethods = {"createReport"}, dataProvider = "columnTotalDataProvider")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "columnTotalDataProvider")
     public void addAndRemoveColumnTotalOnAttributeHeader(final AggregationType type,
             List<Float> totalValuesOfAllColumns) {
 
@@ -209,7 +212,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
       };
   }
 
-    @Test(dependsOnMethods = {"createReport"}, dataProvider = "singleMetricTotalDataProvider")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "singleMetricTotalDataProvider")
     public void addAndRemoveTotalsForSingleMetric(final AggregationType type,
             final List<Float> otherMetricTotalValues,final List<Float> totalValues) {
 
@@ -242,7 +245,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
                 "Total headers & values have not been removed");
     }
 
-    @Test(dependsOnMethods = {"createReport"})
+    @Test(dependsOnGroups = {"createProject"})
     public void removeTotalsFromMetric() {
         final TableReport table = initReportsPage().openReport(SIMPLE_REPORT).getTableReport();
 
@@ -263,7 +266,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
                 "Totals values have not been removed");
     }
 
-    @Test(dependsOnMethods = {"createReport"})
+    @Test(dependsOnGroups = {"createProject"})
     public void cancelAddingTotals() {
         initReportsPage().openReport(SIMPLE_REPORT).getTableReport().openContextMenuFromCellValue(YEAR_2011);
 
@@ -299,7 +302,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
         };
     }
 
-    @Test(dependsOnMethods = {"createReport"}, dataProvider = "totalsOfTotalsDataProvider")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "totalsOfTotalsDataProvider")
     public void addTotalsOfTotals(final AggregationType type, final List<Float> totalValues) {
         final TableReport table = initReportsPage().openReport(SIMPLE_REPORT).getTableReport();
 

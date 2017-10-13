@@ -18,7 +18,6 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Fact;
@@ -31,18 +30,15 @@ import com.google.common.collect.Lists;
 
 public class TimeFormattingTest extends AbstractProjectTest {
 
-    @BeforeClass(alwaysRun = true)
+    @Override
     public void initProperties() {
         projectTitle = "Time-formatting-test";
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void setupProject() {
+    @Override
+    protected void customizeProject() throws Throwable {
         uploadCSV(ResourceUtils.getFilePathFromResource("/" + UPLOAD_CSV + "/customer.csv"));
-    }
 
-    @Test(dependsOnMethods = {"setupProject"})
-    public void createMetrics() {
         createMetric("PhoneTime", "SELECT MIN([" + getMdService().getObjUri(getProject(),
                 Fact.class, identifier("fact.csv_customer.phone_time")) + "])", "#,##0.00");
 
@@ -55,7 +51,7 @@ public class TimeFormattingTest extends AbstractProjectTest {
                 Fact.class, identifier("fact.csv_customer.phone_time_formatted")) + "])", timeFormatted);
     }
 
-    @Test(dependsOnMethods = {"createMetrics"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testTimeFormatting() throws InvalidFormatException, IOException {
         initReportsPage();
         UiReportDefinition reportDefinition = new UiReportDefinition()

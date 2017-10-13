@@ -52,14 +52,11 @@ public class CopyReportTableTest extends AbstractProjectTest {
         getClipboard().setContents(new StringSelection(""), null);
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void uploadCsvFile() {
+    @Override
+    protected void customizeProject() throws Throwable {
         uploadCSV(ResourceUtils.getFilePathFromResource("/" + ResourceDirectory.PAYROLL_CSV + "/payroll.csv"));
         takeScreenshot(browser, "uploaded-payroll-file", getClass());
-    }
 
-    @Test(dependsOnMethods = {"uploadCsvFile"})
-    public void setUpProject() {
         final String amountUri = getMdService()
                 .getObj(getProject(), Fact.class, title(AMOUNT))
                 .getUri();
@@ -78,7 +75,7 @@ public class CopyReportTableTest extends AbstractProjectTest {
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
     }
 
-    @Test(dependsOnMethods = {"setUpProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void copySingleCell() throws HeadlessException, UnsupportedFlavorException, IOException {
         initReportsPage().openReport(SIMPLE_REPORT).getTableReport().copyMetricCell(DEFAULT_FORMAT_VALUE);
         takeScreenshot(browser, "copy-single-cell-on-report-page", getClass());
@@ -95,7 +92,7 @@ public class CopyReportTableTest extends AbstractProjectTest {
         assertEquals(getClipboardContent(), DEFAULT_FORMAT_VALUE);
     }
 
-    @Test(dependsOnMethods = {"setUpProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void copyFormattedCell()
             throws HeadlessException, UnsupportedFlavorException, IOException, ParseException, JSONException {
 

@@ -43,13 +43,13 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
     private String reportHavingOneMetric;
     private String reportHavingTwoMetrics;
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void initData() {
+    @Override
+    protected void customizeProject() throws Throwable {
         reportHavingOneMetric = createAmountByProductReport();
         reportHavingTwoMetrics = createTopSalesRepsByWonAndLostReport();
     }
 
-    @Test(dependsOnMethods = {"initData"})
+    @Test(dependsOnGroups = {"createProject"})
     public void deleteDashboard() throws IOException, JSONException {
         String dashUri = DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
                 initDashboardHavingDrillSetting(DASHBOARD_HAS_DRILL_SETTINGS).getMdObject());
@@ -69,7 +69,7 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initData"})
+    @Test(dependsOnGroups = {"createProject"})
     public void deleteTab() throws IOException, JSONException {
         String dashUri = DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
                 initDashboardHavingDrillSetting(DASHBOARD_HAS_DRILL_SETTINGS).getMdObject());
@@ -91,7 +91,7 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initData"})
+    @Test(dependsOnGroups = {"createProject"})
     public void drillToDeletedTab() throws IOException, JSONException {
         String dashUri = DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
                 initDashboardHavingDrillSetting(DASHBOARD_HAS_DRILL_SETTINGS).getMdObject());
@@ -121,7 +121,7 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initData"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testDrillSettingsAfterDeletingTab() throws IOException, JSONException {
         String dashUri = DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
                 initDashboardHavingDrillSetting(DASHBOARD_HAS_DRILL_SETTINGS).getMdObject());
@@ -149,7 +149,7 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initData"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testInnerDrillSettingsAfterDeletingTab() throws IOException, JSONException {
         String dashboardName = "Dashboard having further drill setting";
 

@@ -18,13 +18,10 @@ import org.testng.annotations.Test;
 import org.threeten.extra.YearQuarter;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.*;
 
 import static com.gooddata.qa.graphene.enums.DateRange.ZONE_ID;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CLOSED;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_AMOUNT_BY_PRODUCT;
 import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.TOP_RIGHT;
 import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
@@ -35,14 +32,14 @@ import static org.testng.Assert.assertTrue;
 
 public class DrillToDashBoardTabApplyingDateFilterTest extends GoodSalesAbstractTest {
 
-    private final String DASHBOARD_HAVING_SAME_DATE_DIMENSION_AND_RANGE = "Dashboard having SAME date dimension and " +
+    private final String DASHBOARD_HAVING_SAME_DATE_DIMENSION_AND_RANGE = "SAME date dimension and " +
             "SAME range";
-    private final String DASHBOARD_HAVING_SAME_DATE_DIMENSION_AND_DIFF_RANGE = "Dashboard having SAME date dimension " +
+    private final String DASHBOARD_HAVING_SAME_DATE_DIMENSION_AND_DIFF_RANGE = "SAME date dimension " +
             "and DIFFERENT range";
-    private final String DASHBOARD_HAVING_DIFF_DATE_DIMENSION_AND_SAME_RANGE = "Dashboard having DIFFERENT date " +
-            "dimension and SAME range";
-    private final String DASHBOARD_HAVING_DIFF_DATE_DIMENSION_AND_DIFF_RANGE = "Dashboard having DIFFERENT date " +
-            "dimension and DIFFERENT range";
+    private final String DASHBOARD_HAVING_DIFF_DATE_DIMENSION_AND_SAME_RANGE = "DIFFERENT date dimension " +
+            "and SAME range";
+    private final String DASHBOARD_HAVING_DIFF_DATE_DIMENSION_AND_DIFF_RANGE = "DIFFERENT date dimension " +
+            "and DIFFERENT range";
 
     private final String SOURCE_TAB = "Source Tab";
     private final String TARGET_TAB = "Target Tab";
@@ -51,10 +48,13 @@ public class DrillToDashBoardTabApplyingDateFilterTest extends GoodSalesAbstract
 
     private final String DATA_FILTERED_BY_YEAR_2014 = "2014";
 
+    private static final String DATE_DIMENSION_CLOSED = "Date dimension (Closed)";
+    private static final String DATE_DIMENSION_SNAPSHOT = "Date dimension (Snapshot)";
+
     private String testReportUri;
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void initData() {
+    @Override
+    protected void customizeProject() throws Throwable {
         testReportUri = createAmountByProductReport();
     }
 
@@ -98,7 +98,7 @@ public class DrillToDashBoardTabApplyingDateFilterTest extends GoodSalesAbstract
         };
     }
 
-    @Test(dependsOnMethods = {"initData"}, dataProvider = "drillToDashboardData")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "drillToDashboardData")
     public void drillToTabHavingDateFilter(String dashboard, Pair<String, String> filterValuesToChange,
                                            Pair<String, String> expectedFilterValue,
                                            int expectedReportRowCount) throws IOException, JSONException {
@@ -114,6 +114,8 @@ public class DrillToDashBoardTabApplyingDateFilterTest extends GoodSalesAbstract
             reportOnSourceTab.addDrilling(Pair.of(singletonList(ATTR_PRODUCT), TARGET_TAB), DASHBOARD_DRILLING_GROUP);
             dashboardsPage.saveDashboard();
 
+            // wait for saving dashboard
+            reportOnSourceTab.waitForTableReportExecutionProgress();
             changeFilterValues(filterValuesToChange.getLeft(), filterValuesToChange.getRight());
 
             // att to drill to is CompuSci
@@ -134,7 +136,7 @@ public class DrillToDashBoardTabApplyingDateFilterTest extends GoodSalesAbstract
         }
     }
 
-    @Test(dependsOnMethods = {"initData"})
+    @Test(dependsOnGroups = {"createProject"})
     public void drillToTabOnAnotherDashboard() throws IOException, JSONException {
         String firstDash = "Dashboard 1";
         String secondDash = "Dashboard 2";
@@ -176,6 +178,8 @@ public class DrillToDashBoardTabApplyingDateFilterTest extends GoodSalesAbstract
             reportOnFirstDash.addDrilling(Pair.of(singletonList(ATTR_PRODUCT), TARGET_TAB), DASHBOARD_DRILLING_GROUP);
             dashboardsPage.saveDashboard();
 
+            // wait for saving dashboard
+            reportOnFirstDash.waitForTableReportExecutionProgress();
             changeFilterValues(DATE_DIMENSION_CLOSED, DATA_FILTERED_BY_YEAR_2014);
             reportOnFirstDash.waitForTableReportExecutionProgress().drillOnAttributeValue();
 

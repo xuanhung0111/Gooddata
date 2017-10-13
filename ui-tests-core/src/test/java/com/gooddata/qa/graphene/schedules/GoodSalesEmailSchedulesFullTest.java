@@ -3,13 +3,21 @@
  */
 package com.gooddata.qa.graphene.schedules;
 
-import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_DISMISS_BUTTON;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR_WARNING;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.CheckUtils.logRedBarMessageInfo;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_ACTIVITIES_BY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_INCOMPUTABLE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_NO_DATA;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOO_LARGE;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -39,6 +47,10 @@ import javax.mail.MessagingException;
 import javax.mail.Part;
 
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.mdObjects.dashboard.Dashboard;
+import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.java.Builder;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
@@ -71,19 +83,17 @@ import com.google.common.base.Predicate;
 public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSchedulesTest {
 
     private String emptyDashboardTitle = "Empty-Dashboard";
-    private String noDataReportTitle = "No-Data-Report";
-    private String incomputableReportTitle = "Incomputable-Report";
-    private String tooLargeReportTitle = "Too-Large-Report";
     private String filteredVariableReportTitle = "Filtered-Variable-Report";
     private String numericVariableReportTitle = "Numeric-Variable-Report";
     private String mufReportTitle = "MUF-Report";
+    private String noDataReportTitle = REPORT_NO_DATA;
+    private String incomputableReportTitle = REPORT_INCOMPUTABLE;
+    private String tooLargeReportTitle = REPORT_TOO_LARGE;
+
+    private static final String DASHBOARD_HAVING_TAB = "Dashboard having tab";
 
     private Map<String, List<Message>> messages;
     private Map<String, MessageContent> attachments = new HashMap<String, MessageContent>();
-
-    private static final String NO_DATA_REPORT = "No data report";
-    private static final String INCOMPUTABLE_REPORT = "Incomputable report";
-    private static final String TOO_LARGE_REPORT = "Too large report";
 
     @Override
     protected void addUsersWithOtherRolesToProject() throws IOException, JSONException {
@@ -104,6 +114,23 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         messages.put(filteredVariableReportTitle += identification, emptyMessage);
         messages.put(numericVariableReportTitle += identification, emptyMessage);
         messages.put(mufReportTitle += identification, emptyMessage);
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        createNumberOfActivitiesMetric();
+        createAmountMetric();
+        createEmptyReport();
+        createIncomputableReport();
+        createTooLargeReport();
+        createActivitiesByTypeReport();
+
+        Dashboard dashboard = Builder.of(Dashboard::new).with(dash -> {
+            dash.setName(DASHBOARD_HAVING_TAB);
+            dash.addTab(Builder.of(Tab::new).with(tab -> tab.setTitle("Tab")).build());
+        }).build();
+
+        DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(), dashboard.getMdObject());
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
@@ -131,11 +158,11 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     public void deleteDashboardUsedInSchedule() {
         String dashboardTitle = "Schedule dashboard";
         initEmailSchedulesPage().scheduleNewDashboardEmail(imapUser, dashboardTitle,
-                "Scheduled email test - dashboard.", "Outlook");
+                "Scheduled email test - dashboard.", DASHBOARD_HAVING_TAB);
 
         try {
             initDashboardsPage();
-            dashboardsPage.selectDashboard("Pipeline Analysis");
+            dashboardsPage.selectDashboard(DASHBOARD_HAVING_TAB);
             dashboardsPage.editDashboard();
             dashboardsPage.getDashboardEditBar().tryToDeleteDashboard();
             Graphene.waitGui().until(new Predicate<WebDriver>() {
@@ -165,61 +192,24 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"schedules"})
     public void scheduleEmptyReport() {
-        initReportsPage();
-        String expression = "SELECT AVG([/gdc/md/${pid}/obj/1145]) where [/gdc/md/${pid}/obj/1093] not in "
-                + "([/gdc/md/${pid}/obj/1093/elements?id=13], [/gdc/md/${pid}/obj/1093/elements?id=7], "
-                + "[/gdc/md/${pid}/obj/1093/elements?id=11])";
-
-        Metric metric = getMdService().createObj(getProject(), new Metric("NO DATA",
-                expression.replace("${pid}", testParams.getProjectId()), "#,##0"));
-        ReportDefinition definition = GridReportDefinitionContent.create(NO_DATA_REPORT,
-                singletonList(METRIC_GROUP), Collections.<AttributeInGrid>emptyList(),
-                singletonList(new MetricElement(metric)));
-        definition = getMdService().createObj(getProject(), definition);
-        getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
-
         initEmailSchedulesPage().scheduleNewReportEmail(imapUser, noDataReportTitle,
-                "Scheduled email test - no data report.", NO_DATA_REPORT, ExportFormat.ALL);
+                "Scheduled email test - no data report.", REPORT_NO_DATA, ExportFormat.ALL);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-no-data-report", this.getClass());
     }
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"schedules"})
     public void scheduleIncomputableReport() {
-        initReportsPage();
-        Metric amountMetric = getMdService().getObj(getProject(), Metric.class, identifier("ah1EuQxwaCqs"));
-        Attribute activity = getMdService().getObj(getProject(), Attribute.class, identifier("attr.activity.id"));
-        ReportDefinition definition = GridReportDefinitionContent.create(INCOMPUTABLE_REPORT,
-                singletonList(METRIC_GROUP),
-                singletonList(new AttributeInGrid(activity.getDefaultDisplayForm().getUri(), activity.getTitle())),
-                singletonList(new MetricElement(amountMetric)));
-        definition = getMdService().createObj(getProject(), definition);
-        getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
-
         initEmailSchedulesPage().scheduleNewReportEmail(imapUser, incomputableReportTitle,
-                "Scheduled email test - incomputable report.", INCOMPUTABLE_REPORT, ExportFormat.PDF);
+                "Scheduled email test - incomputable report.", REPORT_INCOMPUTABLE, ExportFormat.PDF);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-incomputable-report", this.getClass());
     }
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"schedules"})
     public void scheduleTooLargeReport() {
-        initReportsPage();
-        Attribute account = getMdService().getObj(getProject(), Attribute.class, identifier("attr.account.id"));
-        Attribute activity = getMdService().getObj(getProject(), Attribute.class, identifier("attr.activity.id"));
-        Attribute activityType =
-                getMdService().getObj(getProject(), Attribute.class, identifier("attr.activity.activitytype"));
-        ReportDefinition definition = GridReportDefinitionContent.create(TOO_LARGE_REPORT,
-                singletonList(METRIC_GROUP),
-                asList(new AttributeInGrid(account.getDefaultDisplayForm().getUri(), account.getTitle()),
-                        new AttributeInGrid(activity.getDefaultDisplayForm().getUri(), activity.getTitle()),
-                        new AttributeInGrid(activityType.getDefaultDisplayForm().getUri(), activityType.getTitle())),
-                Collections.<MetricElement>emptyList());
-        definition = getMdService().createObj(getProject(), definition);
-        getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
-
         initEmailSchedulesPage().scheduleNewReportEmail(imapUser, tooLargeReportTitle,
-                "Scheduled email test - incomputable report.", TOO_LARGE_REPORT, ExportFormat.PDF);
+                "Scheduled email test - too large report.", REPORT_TOO_LARGE, ExportFormat.PDF);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-too-large-report", this.getClass());
     }
@@ -227,11 +217,11 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     @Test(dependsOnGroups = {"precondition"}, groups = {"schedules"})
     public void scheduleReportApplyFilteredVariable() {
         initVariablePage().createVariable(new AttributeVariable("FVariable")
-            .withAttribute("Activity Type").withAttributeValues("Email"));
+            .withAttribute(ATTR_ACTIVITY_TYPE).withAttributeValues("Email"));
 
         initReportsPage();
         UiReportDefinition rd = new UiReportDefinition().withName("Filtered variable report")
-                .withHows("Activity Type").withWhats("# of Activities");
+                .withHows(ATTR_ACTIVITY_TYPE).withWhats(METRIC_NUMBER_OF_ACTIVITIES);
         createReport(rd, "Filtered variable report");
         reportPage.addFilter(FilterItem.Factory.createPromptFilter("FVariable", "Email"));
         reportPage.saveReport();
@@ -247,11 +237,11 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         String variableUri = initVariablePage().createVariable(new NumericVariable("NVariable").withDefaultNumber(2012));
 
         String report = "Sum amount in 2012";
-        String expression = "SELECT SUM ([/gdc/md/${pid}/obj/1279])"
-                + " WHERE [/gdc/md/${pid}/obj/513] = [" + variableUri + "]";
-        Metric metric = getMdService().createObj(getProject(), new Metric(report,
-                expression.replace("${pid}", testParams.getProjectId()), "#,##0"));
-        Attribute yearSnapshot = getMdService().getObj(getProject(), Attribute.class, identifier("snapshot.year"));
+        String expression = format("SELECT SUM([%s]) WHERE [%s] = [%s]",
+                getMetricByTitle(METRIC_AMOUNT).getUri(), getAttributeByTitle(ATTR_YEAR_SNAPSHOT).getUri(), variableUri);
+
+        Metric metric = createMetric(report, expression, "#,##0");
+        Attribute yearSnapshot = getAttributeByIdentifier("snapshot.year");
         ReportDefinition definition = GridReportDefinitionContent.create(report, singletonList(METRIC_GROUP),
                 singletonList(new AttributeInGrid(yearSnapshot.getDefaultDisplayForm().getUri(), yearSnapshot.getTitle())),
                 singletonList(new MetricElement(metric)));
@@ -267,14 +257,14 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     @Test(dependsOnGroups = {"precondition"}, groups = {"schedules"})
     public void scheduleMufReport() throws IOException, JSONException {
         initEmailSchedulesPage();
-        Attribute product = getMdService().getObj(getProject(), Attribute.class, identifier("attr.product.id"));
-        Metric amountMetric = getMdService().getObj(getProject(), Metric.class, identifier("ah1EuQxwaCqs"));
+        Attribute product = getAttributeByTitle(ATTR_PRODUCT);
+        Metric amountMetric = getMetricByTitle(METRIC_AMOUNT);
         String report = "MUF report";
 
         final String explorerUri = getMdService().getAttributeElements(product).stream()
                 .filter(e -> e.getTitle().equals("Explorer")).findFirst().get().getUri();
 
-        Map<String, Collection<String>> conditions = new HashMap<String, Collection<String>>();
+        Map<String, Collection<String>> conditions = new HashMap();
         conditions.put(product.getUri(), singletonList(explorerUri));
         String mufUri =
                 createSimpleMufObjByUri(getRestApiClient(), getProject().getId(), "Product user filter", conditions);
@@ -298,7 +288,8 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         String report = "# test report";
 
         initReportsPage();
-        Metric amountMetric = getMdService().getObj(getProject(), Metric.class, identifier("ah1EuQxwaCqs"));
+        Metric amountMetric = getMetricByTitle(METRIC_AMOUNT);
+
         ReportDefinition definition = GridReportDefinitionContent.create(report, singletonList(METRIC_GROUP),
                 Collections.<AttributeInGrid>emptyList(),
                 singletonList(new MetricElement(amountMetric)));
@@ -333,7 +324,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         String title = "verify-UI-title";
         String updatedTitle = title + "Updated";
         initEmailSchedulesPage().scheduleNewReportEmail(imapUser, title,
-                "Scheduled email test - report.", "Actual QTD", ExportFormat.CSV);
+                "Scheduled email test - report.", REPORT_ACTIVITIES_BY_TYPE, ExportFormat.CSV);
 
         try {
             EmailSchedulePage.getInstance(browser).openSchedule(title)
@@ -360,7 +351,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     public void changeScheduleTime() {
         String title = "verify-UI-title";
         initEmailSchedulesPage().scheduleNewReportEmail(imapUser, title,
-                "Scheduled email test - report.", "Actual QTD", ExportFormat.ALL);
+                "Scheduled email test - report.", REPORT_ACTIVITIES_BY_TYPE, ExportFormat.ALL);
 
         try {
             String timeDescription = "";
@@ -415,7 +406,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     @Test(dependsOnMethods = {"waitForScheduleMessages"})
     public void verifyNoDataReport() {
         String error = format("Report '%s' produced an empty result during conversion to '%s' format",
-                NO_DATA_REPORT, "html");
+                REPORT_NO_DATA, "html");
         assertTrue(attachments.get(noDataReportTitle).body.contains(error),
                 "Cannot find message: [" + error + "] in email!");
     }
@@ -423,14 +414,14 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     @Test(dependsOnMethods = {"waitForScheduleMessages"})
     public void verifyIncomputableReport() {
         String error = format("Report '%s' you wanted to export to '%s' format is not currently computable",
-                INCOMPUTABLE_REPORT, "pdf");
+                REPORT_INCOMPUTABLE, "pdf");
         assertTrue(attachments.get(incomputableReportTitle).body.contains(error),
                 "Cannot find message: [" + error + "] in email!");
     }
 
     @Test(dependsOnMethods = {"waitForScheduleMessages"})
     public void verifyTooLargeReport() {
-        String error = format("Report '%s' cannot be exported to '%s' format as it is too large", TOO_LARGE_REPORT,
+        String error = format("Report '%s' cannot be exported to '%s' format as it is too large", REPORT_TOO_LARGE,
                 "pdf");
         assertTrue(attachments.get(tooLargeReportTitle).body.contains(error),
                 "Cannot find message: [" + error + "] in email!");

@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.i18n;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkLocalization;
 
+import com.gooddata.qa.graphene.TemplateAbstractTest;
 import org.json.JSONException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -12,7 +13,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.graphene.utils.WaitUtils;
 
-public class LocalizationTest extends GoodSalesAbstractTest {
+public class LocalizationTest extends TemplateAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
     public void changeLanguage() throws JSONException {

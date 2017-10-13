@@ -11,7 +11,6 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Fact;
@@ -37,13 +36,14 @@ public class AttributeLabelsTest extends AbstractProjectTest {
     @FindBy(tagName = "form")
     protected ConfigureSFDCCredentials sfdc;
 
-    @BeforeClass
-    public void setProjectTitle() {
+    @Override
+    protected void initProperties() {
+        // use empty project
         projectTitle = "SimpleProject-test-attribute-labels";
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void initDataTest() {
+    @Override
+    protected void customizeProject() throws Throwable {
         uploadCSV(getFilePathFromResource("/" + PAYROLL_CSV + "/attribute_labels.csv"));
         takeScreenshot(browser, "uploaded-attribute_labels", getClass());
     }
@@ -56,13 +56,13 @@ public class AttributeLabelsTest extends AbstractProjectTest {
                 testParams.loadProperty("sfdc.password") + testParams.loadProperty("sfdc.securityToken"));
     }
 
-    @Test(dependsOnMethods = {"initDataTest"})
+    @Test(dependsOnGroups = {"createProject"})
     public void changeAttributeToImageTest() {
         changeAttributeLabel(IMAGE_ATTRIBUTE, AttributeLabelTypes.IMAGE);
         changeAttributeLabel(IMAGE_SFDC_ATTRIBUTE, AttributeLabelTypes.IMAGE);
     }
 
-    @Test(dependsOnMethods = {"initDataTest"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createTestMetric() {
         createMetric(SUM_OF_AMOUNT_METRIC, 
                 format("SELECT SUM([%s])", getMdService().getObjUri(getProject(), Fact.class, title(AMOUNT_FACT))),
@@ -102,7 +102,7 @@ public class AttributeLabelsTest extends AbstractProjectTest {
 
     }
 
-    @Test(dependsOnMethods = {"initDataTest"})
+    @Test(dependsOnGroups = {"createProject"})
     public void changeAttributeToHyperlinkTest() {
         changeAttributeLabel(HYPERLINK_ATTRIBUTE, AttributeLabelTypes.HYPERLINK);
         initAttributePage().verifyHyperLink(HYPERLINK_ATTRIBUTE);

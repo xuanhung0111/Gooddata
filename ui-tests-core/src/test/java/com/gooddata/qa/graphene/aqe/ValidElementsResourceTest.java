@@ -1,25 +1,37 @@
 package com.gooddata.qa.graphene.aqe;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CLOSED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_TIMELINE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_MONTH_YEAR_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_PIPELINE_ANALYSIS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOP_5_LOST_BY_CASH;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOP_5_OPEN_BY_CASH;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOP_5_WON_BY_CASH;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
+import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.List;
 
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
+import com.gooddata.qa.mdObjects.dashboard.Dashboard;
+import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
+import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
+import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.java.Builder;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
@@ -38,15 +50,30 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 
 public class ValidElementsResourceTest extends GoodSalesAbstractTest {
 
-    @BeforeClass(alwaysRun = true)
-    public void setProjectTitle() {
+    private final String TOP_5_REPORTS_DASHBOARD = "Top 5 reports dashboard";
+    private String top5WonReportUri;
+    private String top5OpenReportUri;
+    private String top5LostReportUri;
+
+    @Override
+    protected void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-test-valid-elements-resource";
     }
 
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
+        createStatusVariable();
+        top5WonReportUri = createTop5WonByCashReport();
+        top5OpenReportUri = createTop5OpenByCashReport();
+        top5LostReportUri = createTop5LostByCashReport();
+    }
+
     /*
-     * This test is to cover the following bug: "AQE-1028 - Get 500 Internal Error when creating
-     * filtered variable with some attribute elements
-     */
+    * This test is to cover the following bug: "AQE-1028 - Get 500 Internal Error when creating
+    * filtered variable with some attribute elements
+    */
     @Test(dependsOnGroups = {"createProject"})
     public void checkForFilteredVariable() {
         initVariablePage().createVariable(new AttributeVariable("Test variable" + System.currentTimeMillis())
@@ -100,34 +127,42 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
      * "AQE-1030 - Get 400 bad request when filtering by Date"
      */
     @Test(dependsOnGroups = {"createProject"})
-    public void checkTimeFilter() {
-        String top5OpenByMoneyReport = "Top 5 Open (by $)";
-        String top5WonByMoneyReport = "Top 5 Won (by $)";
-        String top5LostByMoneyReport = "Top 5 Lost (by $)";
+    public void checkTimeFilter() throws IOException, JSONException {
         List<String> reportAttributeValues = asList("Paramore-Redd Online Marketing > Explorer",
                         "Medical Transaction Billing > Explorer", "AccountNow > Explorer",
                         "Mortgagebot > Educationly", "Dennis Corporation > WonderKid");
         List<Float> reportMetricValues = asList(13.1f, 820.7f, 693.5f, 484.9f,
                         483.1f, 36.7f, 2.3f, 1.9f, 1.4f, 1.3f);
+
         System.out.println("Verifying element resource of time filter ...");
-        openDashboardTab(1);
+        String workingDashboard = DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
+                initTop5Dashboard().getMdObject());
+        try {
+            initDashboardsPage().selectDashboard(TOP_5_REPORTS_DASHBOARD).editDashboard()
+                    .addTimeFilterToDashboard(DATE_DIMENSION_CLOSED, TimeFilterPanel.DateGranularity.QUARTER, "this")
+                    .addTimeFilterToDashboard(DATE_DIMENSION_TIMELINE, TimeFilterPanel.DateGranularity.QUARTER, "this")
+                    .saveDashboard();
 
-        getFilterWidget("Close Quarter").changeTimeFilterByEnterFromAndToDate("01/01/2008", "12/30/2014");
-        Screenshots.takeScreenshot(browser, "AQE-Check time filter", this.getClass());
-        sleepTightInSeconds(2);
-        checkRedBar(browser);
+            getFilterWidget(DATE_DIMENSION_TIMELINE).changeTimeFilterByEnterFromAndToDate("10/01/2017", "12/31/2017");
+            getFilterWidget(DATE_DIMENSION_CLOSED).changeTimeFilterByEnterFromAndToDate("01/01/2008", "12/30/2014");
+            Screenshots.takeScreenshot(browser, "AQE-Check time filter", this.getClass());
+            sleepTightInSeconds(2);
+            checkRedBar(browser);
 
-        TableReport dashboardTableReport = getDashboardTableReport(top5OpenByMoneyReport);
-        assertTrue(CollectionUtils.isEqualCollection(dashboardTableReport.getAttributeElements(),
-                            reportAttributeValues),
-                            "Attribute values in report 'Top 5 Open (by $)' are not properly");
-        assertTrue(CollectionUtils.isEqualCollection(dashboardTableReport.getMetricElements(),
-                            reportMetricValues),
-                            "Metric values in report 'Top 5 Open (by $)' are not properly");
+            TableReport dashboardTableReport = getDashboardTableReport(REPORT_TOP_5_OPEN_BY_CASH);
+            assertTrue(CollectionUtils.isEqualCollection(dashboardTableReport.getAttributeElements(),
+                    reportAttributeValues),
+                    "Attribute values in report 'Top 5 Open (by $)' are not properly");
+            assertTrue(CollectionUtils.isEqualCollection(dashboardTableReport.getMetricElements(),
+                    reportMetricValues),
+                    "Metric values in report 'Top 5 Open (by $)' are not properly");
 
-        assertTrue(getDashboardTableReport(top5WonByMoneyReport).isNoData(), 
-                          "The message in report is not properly.");
-        assertTrue(getDashboardTableReport(top5LostByMoneyReport).isNoData());
+            assertTrue(getDashboardTableReport(REPORT_TOP_5_WON_BY_CASH).isNoData(),
+                    "The message in report is not properly.");
+            assertTrue(getDashboardTableReport(REPORT_TOP_5_LOST_BY_CASH).isNoData());
+        } finally {
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), workingDashboard);
+        }
     }
 
     /*
@@ -136,37 +171,41 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
      */
     @Test(dependsOnGroups = {"createProject"})
     public void checkVariableFilterDashboard() throws ParseException, IOException, JSONException {
-        String top5OpenByMoney = "Top 5 Open (by $)";
         String newAdminUser = createAndAddUserToProject(UserRoles.ADMIN);
+        String workingDashboard = DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
+                initTop5Dashboard().getMdObject());
 
-        initDashboardsPage();
-        dashboardsPage.selectDashboard(DASH_PIPELINE_ANALYSIS);
-        dashboardsPage.getTabs().openTab(1);
+        try {
+            initDashboardsPage().selectDashboard(TOP_5_REPORTS_DASHBOARD).editDashboard()
+                    .addAttributeFilterToDashboard(DashAttributeFilterTypes.PROMPT, "Status")
+                    .addTimeFilterToDashboard(DATE_DIMENSION_CLOSED, TimeFilterPanel.DateGranularity.QUARTER, "this")
+                    .addTimeFilterToDashboard(DATE_DIMENSION_TIMELINE, TimeFilterPanel.DateGranularity.QUARTER, "this")
+                    .saveDashboard();
 
-        dashboardsPage
-                .editDashboard()
-                .addAttributeFilterToDashboard(DashAttributeFilterTypes.PROMPT, "Status")
-                .saveDashboard();
+            logout();
+            signInAtGreyPages(newAdminUser, testParams.getPassword());
+            try {
+                initDashboardsPage().selectDashboard(TOP_5_REPORTS_DASHBOARD);
+                assertTrue(CollectionUtils.isEqualCollection(getFilterWidget(ATTR_STATUS).getAllAttributeValues(),
+                        asList("Open")), "Variable filter is applied incorrectly");
+                getFilterWidget(DATE_DIMENSION_TIMELINE).changeTimeFilterByEnterFromAndToDate("10/01/2017", "12/31/2017");
+                getFilterWidget(DATE_DIMENSION_CLOSED).changeTimeFilterByEnterFromAndToDate("10/01/2014", "12/31/2014");
+                sleepTightInSeconds(5);
 
-        logout();
-        signInAtGreyPages(newAdminUser, testParams.getPassword());
-
-        openDashboardTab(1);
-        assertTrue(CollectionUtils.isEqualCollection(getFilterWidget(ATTR_STATUS).getAllAttributeValues(),
-                asList("Open")), "Variable filter is applied incorrecly");
-        getFilterWidget("Close Quarter").changeTimeFilterByEnterFromAndToDate("10/01/2014", "12/31/2014");
-        sleepTightInSeconds(5);
-
-        checkRedBar(browser);
-        Screenshots.takeScreenshot(browser, "AQE-Check variable filter at dashboard", this.getClass());
-        assertTrue(CollectionUtils.isEqualCollection(getDashboardTableReport(top5OpenByMoney)
-                .getAttributeElements(), asList("Brighton Cromwell > WonderKid")),
-                "Attribute values in report 'Top 5 Open (by $)' are not properly");
-        assertTrue(CollectionUtils.isEqualCollection(getDashboardTableReport(top5OpenByMoney)
-                .getMetricElements(), asList(8.6f, 100.0f)),
-                "Metric values in report 'Top 5 Open (by $)' are not properly");
-
-       logoutAndLoginAs(true, UserRoles.ADMIN);
+                checkRedBar(browser);
+                Screenshots.takeScreenshot(browser, "AQE-Check variable filter at dashboard", this.getClass());
+                assertTrue(CollectionUtils.isEqualCollection(getDashboardTableReport(REPORT_TOP_5_OPEN_BY_CASH)
+                                .getAttributeElements(), asList("Brighton Cromwell > WonderKid")),
+                        "Attribute values in report 'Top 5 Open (by $)' are not properly");
+                assertTrue(CollectionUtils.isEqualCollection(getDashboardTableReport(REPORT_TOP_5_OPEN_BY_CASH)
+                                .getMetricElements(), asList(8.6f, 100.0f)),
+                        "Metric values in report 'Top 5 Open (by $)' are not properly");
+            } finally {
+                logoutAndLoginAs(true, UserRoles.ADMIN);
+            }
+        } finally {
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), workingDashboard);
+        }
     }
 
     // This test is to cover the bug "AQE-1033 - Get 400 bad request when adding filter into report"
@@ -218,7 +257,6 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
     }
 
     private FilterWidget getFilterWidget(String filterName) {
-        browser.navigate().refresh();
         waitForDashboardPageLoaded(browser);
         for (FilterWidget filter : dashboardsPage.getFilters()) {
             if (!filter.getRoot().getAttribute("class").contains("s-" + simplifyText(filterName)))
@@ -237,5 +275,25 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
 
     private TableReport getDashboardTableReport(String reportName) {
         return dashboardsPage.getContent().getReport(reportName, TableReport.class);
+    }
+
+    private Dashboard initTop5Dashboard() {
+        return Builder.of(Dashboard::new).with(dashboard -> {
+            dashboard.setName(TOP_5_REPORTS_DASHBOARD);
+            dashboard.addTab(Builder.of(Tab::new).with(tab -> {
+                tab.addItem(Builder.of(ReportItem::new).with(item -> {
+                    item.setObjUri(top5OpenReportUri);
+                    item.setPosition(TabItem.ItemPosition.TOP_LEFT);
+                }).build());
+                tab.addItem(Builder.of(ReportItem::new).with(item -> {
+                    item.setObjUri(top5WonReportUri);
+                    item.setPosition(TabItem.ItemPosition.TOP_RIGHT);
+                }).build());
+                tab.addItem(Builder.of(ReportItem::new).with(item -> {
+                    item.setObjUri(top5LostReportUri);
+                    item.setPosition(TabItem.ItemPosition.RIGHT);
+                }).build());
+            }).build());
+        }).build();
     }
 }

@@ -4,11 +4,21 @@
 package com.gooddata.qa.graphene.schedules;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkGreenBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import com.gooddata.qa.mdObjects.dashboard.Dashboard;
+import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
+import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
+import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
+import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
+import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.java.Builder;
 import org.json.JSONException;
 import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.AfterClass;
@@ -26,6 +36,8 @@ import com.gooddata.qa.utils.http.RestUtils;
 
 public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSchedulesTest {
 
+    private static final String DASHBOARD_HAVING_FILTER = "Dashboard having filter";
+
     @FindBy(tagName = "fieldset")
     protected QueryScheduledEmailsFragment queryScheduledEmailsFragment;
 
@@ -41,6 +53,33 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
     @BeforeClass
     public void getCustomSubject() {
         customSubject = testParams.getTestIdentification();
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        String reportUri = createAmountByProductReport();
+        FilterItemContent regionFilter = createSingleValueFilter(getAttributeByTitle(ATTR_REGION));
+        Dashboard dashboard = Builder.of(Dashboard::new).with(dash -> {
+            dash.setName(DASHBOARD_HAVING_FILTER);
+            dash.addTab(Builder.of(Tab::new)
+                    .with(tab -> {
+                        FilterItem filterItem = Builder.of(FilterItem::new).with(item -> {
+                            item.setContentId(regionFilter.getId());
+                            item.setPosition(TabItem.ItemPosition.RIGHT);
+                        }).build();
+
+                        tab.addItem(Builder.of(ReportItem::new).with(reportItem -> {
+                            reportItem.setObjUri(reportUri);
+                            reportItem.setPosition(TabItem.ItemPosition.LEFT);
+                            reportItem.setAppliedFilterIds(singletonList(filterItem.getId()));
+                        }).build());
+                        tab.addItem(filterItem);
+                    })
+                    .build());
+            dash.addFilter(regionFilter);
+        }).build();
+
+        DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(), dashboard.getMdObject());
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"schedules"})
@@ -132,7 +171,7 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
 
     private void setupSchedule(DashboardScheduleDialog dialog) {
         dialog.showCustomForm();
-        dialog.selectTabs(new int[]{1});
+        dialog.selectTabs(new int[]{0});
         dialog.selectTime(1);
         dialog.setCustomEmailSubject(customSubject);
     }

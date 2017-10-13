@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.filters;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static org.testng.Assert.assertTrue;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
@@ -7,10 +8,19 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 
 import java.util.List;
 
+import com.gooddata.md.ProjectDashboard;
+import com.gooddata.qa.graphene.utils.GoodSalesUtils;
+import com.gooddata.qa.mdObjects.dashboard.Dashboard;
+import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
+import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
+import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
+import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
+import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.java.Builder;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
@@ -21,9 +31,30 @@ public class DashboardFilterVisualTest extends GoodSalesAbstractTest {
 
     private static final By BY_SELECT_ONLY_LINK = By.className("selectOnly");
 
-    @BeforeClass
-    public void setProjectTitle() {
+    @Override
+    protected void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-dashboard-filter-visual";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        FilterItemContent productFilter = createMultipleValuesFilter(getAttributeByTitle(ATTR_PRODUCT));
+
+        Dashboard dashboard = Builder.of(Dashboard::new).with(dash -> {
+            dash.addTab(Builder.of(Tab::new)
+                    .with(tab -> tab.addItem(
+                            Builder.of(FilterItem::new)
+                                    .with(item -> {
+                                        item.setContentId(productFilter.getId());
+                                        item.setPosition(TabItem.ItemPosition.TOP);
+                                    }).build()
+                    )).build());
+            dash.addFilter(productFilter);
+        }).build();
+
+        // dashboard is set as default dashboard
+        DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(), dashboard.getMdObject());
     }
 
     @Test(dependsOnGroups = {"createProject"})

@@ -17,7 +17,6 @@ import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
@@ -33,8 +32,9 @@ public class ProjectSwitchingTest extends AbstractProjectTest {
     private String currentProjectId;
     private String newProjectId;
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    protected void initProperties() {
+        // use empty project
         projectTitle = "Project-switch-" + UNIQUE_ID;
     }
 

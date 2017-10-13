@@ -10,7 +10,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
@@ -25,9 +24,15 @@ public class GoodSalesAddingFilterFromReportContextMenuTest extends GoodSalesAbs
 
     private static final String REPORT_NAME = "Report";
 
-    @BeforeClass
-    public void setProjectTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-adding-filter-from-report-context-menu-test";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
     }
 
     @Test(dependsOnGroups = "createProject")

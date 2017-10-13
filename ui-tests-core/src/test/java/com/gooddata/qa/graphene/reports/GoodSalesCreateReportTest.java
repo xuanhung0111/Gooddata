@@ -2,8 +2,8 @@ package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
@@ -16,11 +16,12 @@ import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.name;
 
 import java.io.IOException;
+import java.util.List;
 
+import com.gooddata.qa.utils.http.RestUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.Keys;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.GoodData;
@@ -62,9 +63,15 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
     private Project project;
     private MetadataService mdService;
 
-    @BeforeClass
-    public void setProjectTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-test-create-report";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        createNumberOfActivitiesMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -237,11 +244,21 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void checkLimitMetrics() {
+    public void checkLimitMetrics() throws IOException, JSONException {
+        List<Metric> metrics = asList(
+                createNumberOfLostOppsMetric(), createNumberOfOpenOppsMetric(),
+                 createNumberOfOpportunitiesBOPMetric(),createNumberOfWonOppsMetric(),
+                createPercentOfGoalMetric(), createAvgAmountMetric(),
+                createAvgWonMetric(), createBestCaseMetric(),
+                createDaysUntilCloseMetric(), createLostMetric(),
+                createExpectedWonMetric(), createQuotaMetric(),
+                createStageDurationMetric(), createStageVelocityMetric(),
+                createWinRateMetric(), createExpectedWonVsQuotaMetric());
+
         initReportCreation();
 
-        reportPage.initPage()
-            .openWhatPanel();
+        try {
+        reportPage.initPage().openWhatPanel();
         asList("# of Activities", "# of Lost Opps.", "# of Open Opps.", "# of Opportunities",
                 "# of Opportunities [BOP]", "# of Won Opps.", "% of Goal", "Amount", "Avg. Amount", "Avg. Won",
                 "Best Case", "Days until Close", "Expected", "Lost", "Expected + Won", "Quota", "Stage Duration",
@@ -249,6 +266,11 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
 
         reportPage.selectMetric("Expected + Won vs. Quota");
         assertThat(getErrorMessage(), startsWith(METRIC_LIMIT_MESSAGE));
+        } finally {
+            for (Metric metric : metrics) {
+                RestUtils.deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), metric.getUri());
+            }
+        }
     }
 
     private String getErrorMessage() {

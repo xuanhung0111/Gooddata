@@ -53,7 +53,7 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
             + "values are displayed: as plain text, hyperlinks, or images (in reports), or as geographic "
             + "regions (in Geo chart widgets). Type options are unavailable for date attributes. More info.";
 
-    private static final String MORE_INFO_LINK = "https://help.gooddata.com/display/doc/GoodData+Help";
+    private static final String MORE_INFO_LINK = "https://help.gooddata.com/display/doc/GoodData+Help?lang=en";
 
     private static final String EDUCATIONLY = "Educationly";
     private static final String DIRECT_SALES = "Direct Sales";
@@ -78,9 +78,10 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
     private Report reportWithSingleAttribute;
     private Report reportWithMultipleAttribute;
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void initReport() {
-        Metric amountMetric = getMdService().getObj(getProject(), Metric.class, title(METRIC_AMOUNT));
+    @Override
+    protected void customizeProject() throws Throwable {
+        Metric amountMetric = createAmountMetric();
+
         Attribute productAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_PRODUCT));
         Attribute departmentAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_DEPARTMENT));
 
@@ -111,7 +112,7 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
         assertFalse(canSelectType, "Date attribute label type is not disabled");
     }
 
-    @Test(dependsOnMethods = {"initReport"})
+    @Test(dependsOnGroups = {"createProject"})
     public void changeLabelOfAttributeUsedInReport() {
         try {
             setAttributeLabelType(ATTR_PRODUCT, PRODUCT_LABEL, AttributeLabelTypes.HYPERLINK);
@@ -178,7 +179,7 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
 
         String link = attributeDetailPage.getLabelTypeInfoLink();
         takeScreenshot(browser, "More-info-link-shows", getClass());
-        assertEquals(link, MORE_INFO_LINK);
+        assertEquals(link, MORE_INFO_LINK); // English language is used by default
     }
 
     @DataProvider(name = "filterSelectionTypeProvider")
@@ -189,7 +190,7 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
         };
     }
 
-    @Test(dependsOnMethods = {"initReport"}, dataProvider = "filterSelectionTypeProvider")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "filterSelectionTypeProvider")
     public void changeAttributeLabelUsedInDashboardSingleFilter(Report report, String filterSelectionType) {
         final String dashboard = generateDashboardName();
 
@@ -231,7 +232,7 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
         };
     }
 
-    @Test(dependsOnMethods = {"initReport"}, dataProvider = "multipleFilterTypeProvider")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "multipleFilterTypeProvider")
     public void changeAttributeLabelUsedInDashboardMultipleFilter(Report report, String filterType) {
         final String dashboard = generateDashboardName();
 

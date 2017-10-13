@@ -54,8 +54,9 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
     private static final String SAVED_VIEW = "New saved view";
     private static final String UN_SAVED_VIEW = "* Unsaved View";
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
-    public void createReport() {
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
         createReport(new UiReportDefinition()
                 .withName(REPORT)
                 .withWhats(METRIC_AMOUNT)
@@ -101,7 +102,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_2014);
     }
 
-    @Test(dependsOnGroups = {"precondition"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkReportRenderWithDateFilterBetweenDuplicatedTabs() {
         initDashboardsPage()
                 .addNewDashboard(generateDashboard())
@@ -134,7 +135,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         assertEquals(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
     }
 
-    @Test(dependsOnGroups = {"precondition"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkReportRenderWithDateFilterBetweenSameTabs() {
         initDashboardsPage()
                 .addNewDashboard(generateDashboard())
@@ -199,7 +200,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         assertEquals(getDateCreatedFilter().getCurrentValue(), CURRENT_YEAR);
     }
 
-    @Test(dependsOnGroups = {"precondition"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkReportRenderWithDifferenceDateFilterBetweenTabs() {
         initDashboardsPage()
                 .addNewDashboard(generateDashboard())
@@ -233,7 +234,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         assertTrue(getReport().isNoData(), "Report is not render correctly");
     }
 
-    @Test(dependsOnGroups = {"precondition"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkReportRenderWithDifferenceDateValuesBetweenTabs() {
         initDashboardsPage()
                 .addNewDashboard(generateDashboard())
@@ -266,7 +267,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         assertTrue(getReport().isNoData(), "Report is not render correctly");
     }
 
-    @Test(dependsOnGroups = {"precondition"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkDateFiltersConnectBetweenDuplicatedTab() {
         initDashboardsPage()
                 .addNewDashboard(generateDashboard())
@@ -307,7 +308,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         assertEquals(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
     }
 
-    @Test(dependsOnGroups = {"precondition"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkDateFiltersConnectBetweenSameTabs() {
         initDashboardsPage()
                 .addNewDashboard(generateDashboard())
@@ -341,7 +342,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         assertEquals(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
     }
 
-    @Test(dependsOnGroups = {"precondition"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkDifferenceDateFiltersNotConnectBetweenTabs() {
         initDashboardsPage()
                 .addNewDashboard(generateDashboard())
@@ -377,7 +378,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         assertEquals(getReport().getAttributeElements(), asList("Inside Sales", "CompuSci"));
     }
 
-    @Test(dependsOnGroups = {"precondition"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkDifferenceDateFilterValuesNotConnectBetweenTabs() {
         initDashboardsPage()
                 .addNewDashboard(generateDashboard())
@@ -411,7 +412,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         assertEquals(getReport().getAttributeElements(), asList("Inside Sales", "CompuSci"));
     }
 
-    @Test(dependsOnGroups = {"precondition"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkFiltersCombinationConnectBetweenDuplicatedTabs() {
         initDashboardsPage()
                 .addNewDashboard(generateDashboard())
@@ -470,7 +471,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         assertEquals(getProductFilter().getCurrentValue(), PRODUCT_COMPUSCI);
     }
 
-    @Test(dependsOnGroups = {"precondition"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkReportRenderWithFiltersCombinationBetweenDuplicatedTabs() {
         initDashboardsPage()
                 .addNewDashboard(generateDashboard())
@@ -505,7 +506,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         assertEquals(getReport().getAttributeElements(), COMBINATION_ATTRIBUTE_FILTER_VALUES);
     }
 
-    @Test(dependsOnGroups = {"precondition"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkReportRenderWithFiltersCombinationBetweenSameTabs() {
         initDashboardsPage()
                 .addNewDashboard(generateDashboard())
@@ -539,7 +540,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         assertEquals(getReport().getAttributeElements(), COMBINATION_ATTRIBUTE_FILTER_VALUES);
     }
 
-    @Test(dependsOnGroups = {"precondition"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkDifferenceFiltersCombinationNotConnectBetweenTabs() {
         initDashboardsPage()
                 .addNewDashboard(generateDashboard())
@@ -573,7 +574,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         assertEquals(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
     }
 
-    @Test(dependsOnGroups = {"precondition"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkDifferenceFilterValuesCombinationNotConnectBetweenTabs() {
         initDashboardsPage()
                 .addNewDashboard(generateDashboard())
@@ -688,7 +689,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         assertEquals(getProductFilter().getCurrentValue(), PRODUCT_EDUCATIONLY);
     }
 
-    @Test(dependsOnGroups = {"precondition"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkDateFilterConnectedAfterReassignSameValue() {
         initDashboardsPage()
                 .addNewDashboard(generateDashboard())

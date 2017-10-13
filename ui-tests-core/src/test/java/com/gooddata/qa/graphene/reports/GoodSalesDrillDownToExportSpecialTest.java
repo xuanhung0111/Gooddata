@@ -10,15 +10,13 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPP_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON_OPPS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PRODUCTIVE_REPS;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.VARIABLE_STATUS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_SALES_SEASONALITY;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForExportReport;
 import static java.util.Arrays.asList;
@@ -42,7 +40,6 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.supercsv.io.CsvListReader;
 import org.supercsv.prefs.CsvPreference;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -72,12 +69,26 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
     private static final String REPORT_NOT_COMPUTABLE_MESSAGE = "Report not computable due to improper metric definition";
     private static final String REPORT_NO_DATA_MESSAGE = "No data match the filtering criteria";
     private static final String RAW_FORMAT = "raw";
-    private static final String SALES_SEASONALITY= "Sales Seasonality";
     private static final String DRILL_DOWN_VALUE = "2,647";
 
-    @BeforeClass
-    public void setProjectTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-drill-down-to-export-special-test";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        createNumberOfActivitiesMetric();
+        createWonMetric();
+        createNumberOfWonOppsMetric();
+        createProductiveRepsMetric();
+        createLostMetric();
+        createAvgAmountMetric();
+        createAvgWonMetric();
+        createStatusVariable();
+
+        createSalesSeasonalityReport();
     }
 
     @Test(dependsOnGroups = { "createProject" })
@@ -107,11 +118,13 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
 
     @Test(dependsOnGroups = { "createProject" })
     public void testCreatingEmptyReport() {
-        initReportCreation().createReport(new UiReportDefinition()
-                .withName(EMPTY_REPORT)
-                .withWhats(METRIC_LOST)
-                .withHows(ATTR_STATUS)
-                .withFilters(FilterItem.Factory.createPromptFilter(VARIABLE_STATUS)));
+        createReport(GridReportDefinitionContent.create(EMPTY_REPORT,
+                singletonList(METRIC_GROUP),
+                singletonList(new AttributeInGrid(getAttributeByIdentifier("attr.stage.status"))),
+                singletonList(new MetricElement(getMetricByTitle(METRIC_LOST)))));
+
+        initReportsPage().openReport(EMPTY_REPORT);
+        reportPage.addFilter(FilterItem.Factory.createPromptFilter("Status"));
         assertEquals(reportPage.waitForReportExecutionProgress().getDataReportHelpMessage(), REPORT_NO_DATA_MESSAGE,
                 "The created report is not empty type");
     }
@@ -127,7 +140,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
     @Test(dependsOnMethods = { "testCreatingLargeReport" }, dataProvider = "exportFormatDataProvider")
     public void testRedBarVisibleForExportLargeReport(ExportFormat format) throws JSONException, IOException {
         final String dashboard = "Dashboard-For-Export-Large-Report-Using-" + format.getLabel();
-        createDashboardForExportTest(dashboard, SALES_SEASONALITY, METRIC_NUMBER_OF_WON, TOO_LARGE_REPORT);
+        createDashboardForExportTest(dashboard, REPORT_SALES_SEASONALITY, METRIC_NUMBER_OF_WON_OPPS, TOO_LARGE_REPORT);
         try {
             setDrillReportTargetAsExport(format.getName());
             dashboardsPage.getContent().getLatestReport(TableReport.class).drillOnMetricValue(DRILL_DOWN_VALUE);
@@ -140,7 +153,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
     @Test(dependsOnMethods = { "testCreatingIncomputableReport" }, dataProvider = "exportFormatDataProvider")
     public void testRedBarVisibleForExportIncomputableReport(ExportFormat format) throws JSONException, IOException {
         final String dashboard = "Dashboard-For-Export-Incomputable-Report-Using-" + format.getLabel();
-        createDashboardForExportTest(dashboard, SALES_SEASONALITY, METRIC_NUMBER_OF_WON, INCOMPUTABLE_REPORT);
+        createDashboardForExportTest(dashboard, REPORT_SALES_SEASONALITY, METRIC_NUMBER_OF_WON_OPPS, INCOMPUTABLE_REPORT);
         try {
             setDrillReportTargetAsExport(format.getName());
             dashboardsPage.getContent().getLatestReport(TableReport.class).drillOnMetricValue(DRILL_DOWN_VALUE);
@@ -153,7 +166,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
     @Test(dependsOnMethods = { "testCreatingEmptyReport" }, dataProvider = "exportFormatDataProvider")
     public void testRedBarNotVisibleForExportEmptyReport(ExportFormat format) throws JSONException, IOException {
         final String dashboard = "Dashboard-For-Export-Empty-Report-Using-" + format.getLabel();
-        createDashboardForExportTest(dashboard, SALES_SEASONALITY, METRIC_NUMBER_OF_WON, EMPTY_REPORT);
+        createDashboardForExportTest(dashboard, REPORT_SALES_SEASONALITY, METRIC_NUMBER_OF_WON_OPPS, EMPTY_REPORT);
         try {
             setDrillReportTargetAsExport(format.getName());
             dashboardsPage.getContent().getLatestReport(TableReport.class).drillOnMetricValue(DRILL_DOWN_VALUE);

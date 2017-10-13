@@ -1,29 +1,31 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_SNAPSHOT;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
+import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createFilterVariable;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
+import static java.util.Collections.singletonList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.Calendar;
 
 import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.GridReportDefinitionContent;
+import com.gooddata.md.report.MetricElement;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
-import com.gooddata.qa.graphene.entity.report.HowItem;
-import com.gooddata.qa.graphene.entity.report.HowItem.Position;
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
@@ -47,36 +49,35 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
 
     private static final int YEAR_OF_DATA = 2011;
 
-    @BeforeClass
-    public void setProjectTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-test-connecting-filter";
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
-    public void createVariable() {
-        initVariablePage().createVariable(new AttributeVariable(V_STAGE).withAttribute(ATTR_STAGE_NAME));
-    }
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
 
-    @Test(dependsOnMethods = {"createVariable"}, groups = {"init"})
-    public void createReports() {
-        // *** create report 1 ***
-        initReportsPage();
-        UiReportDefinition rd =
-                new UiReportDefinition().withName(REPORT_1).withWhats(METRIC_AMOUNT).withHows(ATTR_STAGE_NAME)
-                        .withHows(new HowItem(ATTR_YEAR_SNAPSHOT, Position.TOP));
-        createReport(rd, REPORT_1);
+        createFilterVariable(getRestApiClient(), testParams.getProjectId(),
+                V_STAGE, getAttributeByTitle(ATTR_STAGE_NAME).getUri());
 
-        // *** create report 2 ***
-        initReportsPage();
-        rd = new UiReportDefinition().withName(REPORT_2).withWhats(METRIC_AMOUNT).withHows(ATTR_STAGE_NAME);
-        createReport(rd, REPORT_2);
+        createReport(GridReportDefinitionContent.create(REPORT_1,
+                singletonList(METRIC_GROUP),
+                Arrays.asList(
+                        new AttributeInGrid(getAttributeByTitle(ATTR_STAGE_NAME)),
+                        new AttributeInGrid(getAttributeByTitle(ATTR_YEAR_SNAPSHOT))),
+                singletonList(new MetricElement(getMetricByTitle(METRIC_AMOUNT)))));
+
+        createReport(GridReportDefinitionContent.create(REPORT_2,
+                singletonList(METRIC_GROUP),
+                singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_STAGE_NAME))),
+                singletonList(new MetricElement(getMetricByTitle(METRIC_AMOUNT)))));
+        initReportsPage().openReport(REPORT_2);
         reportPage.addFilter(FilterItem.Factory.createPromptFilter(V_STAGE, "Interest", "Discovery",
                 "Short List", "Risk Assessment", "Conviction", "Negotiation", "Closed Won", "Closed Lost"));
         reportPage.saveReport();
-    }
 
-    @Test(dependsOnMethods = {"createReports"}, groups = {"init"})
-    public void prepareDashboard() {
         initDashboardsPage();
 
         dashboardsPage.addNewDashboard(TEST_DASHBOARD);
@@ -90,7 +91,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
         dashboardEditBar.saveDashboard();
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void linkDashboardFilterBetweenTabs() {
         makeCopyFromDashboard(TEST_DASHBOARD);
 
@@ -151,7 +152,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void disconnectBetweenSingleOptionAndMultipleFilter() {
         makeCopyFromDashboard(TEST_DASHBOARD);
 
@@ -185,7 +186,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testFilterInDuplicateTab() {
         initDashboardsPage();
         dashboardsPage.addNewDashboard(TMP_DASHBOARD);
@@ -245,7 +246,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testFilterInCopyTab() {
         initDashboardsPage();
         dashboardsPage.addNewDashboard(DB1);

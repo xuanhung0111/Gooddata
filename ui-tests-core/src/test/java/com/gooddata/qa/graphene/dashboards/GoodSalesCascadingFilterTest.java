@@ -1,9 +1,7 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_MONTH_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPP_SNAPSHOT;
@@ -12,6 +10,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_QUARTER_YEAR_SN
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
@@ -27,7 +26,6 @@ import static org.testng.Assert.assertTrue;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.GoodData;
@@ -45,10 +43,10 @@ import com.gooddata.qa.graphene.entity.report.HowItem;
 import com.gooddata.qa.graphene.entity.report.HowItem.Position;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardContent;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditFilter;
-import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.GroupConfigPanel;
@@ -69,9 +67,15 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
     private static final String DATE_TEST_DASHBOARD = "DateTestDashboard";
     private static final String TMP_DASHBOARD = "TmpDashboard";
 
-    @BeforeClass
-    public void setProjectTitle() {
-        projectTitle = "GoodSales-test-cascading-filter";
+    @Override
+    public void initProperties() {
+        super.initProperties();
+        projectTitle += "test-cascading-filter";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
@@ -80,10 +84,10 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
         Project project = goodDataClient.getProjectService().getProjectById(testParams.getProjectId());
         MetadataService mdService = goodDataClient.getMetadataService();
 
-        Metric amountMetric = mdService.getObj(project, Metric.class, identifier("ah1EuQxwaCqs"));
-        Attribute account = mdService.getObj(project, Attribute.class, identifier("attr.account.id"));
-        Attribute stageName = mdService.getObj(project, Attribute.class, identifier("attr.stage.name"));
-        Attribute product = mdService.getObj(project, Attribute.class, identifier("attr.product.id"));
+        Metric amountMetric = getMetricByTitle(METRIC_AMOUNT);
+        Attribute account = getAttributeByTitle(ATTR_ACCOUNT);
+        Attribute stageName = getAttributeByTitle(ATTR_STAGE_NAME);
+        Attribute product = getAttributeByTitle(ATTR_PRODUCT);
 
         // *** create report 1 ***
         ReportDefinition definition =

@@ -5,8 +5,10 @@ package com.gooddata.qa.graphene.schedules;
 
 import static org.testng.Assert.assertTrue;
 
-import java.io.IOException;
-
+import com.gooddata.qa.mdObjects.dashboard.Dashboard;
+import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.java.Builder;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
@@ -21,6 +23,7 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmailSchedulesTest {
+    private final String DASHBOARD_HAVING_TAB = "Dashboard having tab";
     private final String SCHEDULE_INFO = "^This dashboard will be sent %s .* to %s as a PDF attachment.$";
     private DashboardScheduleDialog dashboardScheduleDialog;
     private AbstractRecurrenceTestCase[] CASES = new AbstractRecurrenceTestCase[]{
@@ -64,13 +67,25 @@ public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmai
             )
     };
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"schedules"})
-    public void setFeatureFlags() throws JSONException, IOException {
-        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS, true);
+    @Override
+    protected void initProperties() {
+        super.initProperties();
     }
 
-    @Test(dependsOnGroups = {"schedules"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS, true);
+
+        Dashboard dashboard = Builder.of(Dashboard::new).with(dash -> {
+            dash.setName(DASHBOARD_HAVING_TAB);
+            dash.addTab(Builder.of(Tab::new).with(tab -> tab.setTitle("Tab")).build());
+        }).build();
+
+        DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(), dashboard.getMdObject());
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void testRecurrences() throws IllegalArgumentException, JSONException {
         logout();
         signIn(true, UserRoles.ADMIN); // login with gray pages to reload application and have feature flag set

@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.connectors;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
+import com.gooddata.qa.graphene.TemplateAbstractTest;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.enums.Connectors;
 import com.gooddata.qa.graphene.fragments.greypages.connectors.ConnectorFragment;
@@ -26,7 +27,7 @@ import static org.hamcrest.Matchers.is;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 
-public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
+public abstract class AbstractConnectorsCheckTest extends TemplateAbstractTest {
 
     private static final String PAGE_GDC_CONNECTORS = "gdc/projects/${projectId}/connectors";
 

@@ -9,7 +9,6 @@ import static java.util.Arrays.asList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertTrue;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
@@ -26,13 +25,18 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
     private static final String TESTING_REPORT_TABLE = "Testing report table";
     private static final String TESTING_REPORT_CHART = "Testing report chart";
 
-    @BeforeClass
-    public void setProjectTitle() {
-        projectTitle = "GoodSales-" + TEST_CELL_LIMIT;
+    @Override
+    public void initProperties() {
+        super.initProperties();
+        projectTitle += TEST_CELL_LIMIT;
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void createTestingReports() {
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
+        createQuotaMetric();
+
+        //using UI to create report with some special configures
         initReportsPage();
         createReport(
                 new UiReportDefinition()
@@ -47,20 +51,19 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
 
         initReportCreation();
         reportPage.initPage()
-            .setReportName(TESTING_REPORT_CHART)
-            .openWhatPanel()
-            .selectMetric(METRIC_AMOUNT)
-            .openHowPanel()
-            .selectAttribute(ATTR_ACCOUNT)
-            .doneSndPanel()
-            .selectReportVisualisation(ReportTypes.LINE)
-            .forceRenderChartReport()
-            .finishCreateReport();
+                .setReportName(TESTING_REPORT_CHART)
+                .openWhatPanel()
+                .selectMetric(METRIC_AMOUNT)
+                .openHowPanel()
+                .selectAttribute(ATTR_ACCOUNT)
+                .doneSndPanel()
+                .selectReportVisualisation(ReportTypes.LINE)
+                .forceRenderChartReport()
+                .finishCreateReport();
         checkRedBar(browser);
     }
 
-
-    @Test(dependsOnMethods = {"createTestingReports"})
+    @Test(dependsOnGroups = {"createProject"})
     public void tableCellLimitAndShowAnyway() {
         try {
             addReportToNewDashboard(TESTING_REPORT_TABLE, TEST_CELL_LIMIT + TESTING_REPORT_TABLE);
@@ -76,7 +79,7 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createTestingReports"})
+    @Test(dependsOnGroups = {"createProject"})
     public void chartCellLimitAndShowAnyway() {
         try {
             addReportToNewDashboard(TESTING_REPORT_CHART, TEST_CELL_LIMIT + TESTING_REPORT_CHART);

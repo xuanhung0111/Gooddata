@@ -5,7 +5,6 @@ import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.getVariableUri;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileUri;
@@ -37,8 +36,8 @@ import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
-import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
+import com.gooddata.qa.utils.http.RestApiClient;
 
 public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWidgetTest {
 
@@ -67,33 +66,33 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         multipleChoice = parseBoolean(context.getCurrentXmlTest().getParameter("multipleChoice"));
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
-    public void initData() throws JSONException, IOException {
+    @Override
+    protected void customizeProject() throws Throwable {
         initVariablePage().createVariable(new AttributeVariable(DF_VARIABLE)
                 .withAttribute(ATTR_STAGE_NAME)
                 .withAttributeValues(asList(INTEREST, DISCOVERY, SHORT_LIST, RISK_ASSESSMENT)));
 
-        Metric amountMetric = getMdService().getObj(getProject(), Metric.class, title(METRIC_AMOUNT));
+        Metric amountMetric = createAmountMetric();
 
-        Attribute stageNameAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_STAGE_NAME));
+        Attribute stageNameAttribute = getAttributeByTitle(ATTR_STAGE_NAME);
         Attribute departmentAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_DEPARTMENT));
 
         String promptFilterUri = getVariableUri(getRestApiClient(), testParams.getProjectId(), DF_VARIABLE);
 
         createReportViaRest(GridReportDefinitionContent.create(REPORT_WITH_ADDITIONAL_ATTRIBUTE,
                 singletonList(METRIC_GROUP),
-                asList(new AttributeInGrid(stageNameAttribute.getDefaultDisplayForm().getUri(), stageNameAttribute.getTitle()),
+                asList(new AttributeInGrid(stageNameAttribute.getDefaultDisplayForm().getUri(), ATTR_STAGE_NAME),
                         new AttributeInGrid(departmentAttribute.getDefaultDisplayForm().getUri(), departmentAttribute.getTitle())),
                 singletonList(new MetricElement(amountMetric))));
 
         createReportViaRest(GridReportDefinitionContent.create(REPORT_WITH_PROMPT_FILTER,
                 singletonList(METRIC_GROUP),
-                singletonList(new AttributeInGrid(stageNameAttribute.getDefaultDisplayForm().getUri(), stageNameAttribute.getTitle())),
+                singletonList(new AttributeInGrid(stageNameAttribute.getDefaultDisplayForm().getUri(), ATTR_STAGE_NAME)),
                 singletonList(new MetricElement(amountMetric)),
                 singletonList(new Filter(format("[%s]", promptFilterUri)))));
     }
 
-    @Test(dependsOnGroups = {"precondition"}, groups = {"initSavedView"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"initSavedView"})
     public void initDashboardWithSavedView() {
         initDashboardsPage()
                 .addNewDashboard(DASHBOARD_WITH_SAVED_VIEW)
@@ -198,7 +197,7 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), INTEREST);
     }
 
-    @Test(dependsOnGroups = {"precondition"}, groups = {"df-single", "df-multiple"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"df-single", "df-multiple"})
     public void setInitialValueForFilterGroupOnSavedView() {
         initDashboardsPage()
                 .addNewDashboard(generateDashboardName())
@@ -244,7 +243,7 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(SHORT_LIST));
     }
 
-    @Test(dependsOnGroups = {"precondition"}, groups = {"df-single", "df-multiple"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"df-single", "df-multiple"})
     public void addAdditionalFilterFromSavedView() {
         initDashboardsPage()
                 .addNewDashboard(generateDashboardName())
@@ -295,7 +294,7 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         }
     }
 
-    @Test(dependsOnGroups = {"precondition"}, groups = {"df-single", "df-multiple"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"df-single", "df-multiple"})
     public void setInitialValueForAdditionalFilterFromSavedView() {
         initDashboardsPage()
                 .addNewDashboard(generateDashboardName())
@@ -330,7 +329,7 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         assertEquals(getReport(REPORT_WITH_ADDITIONAL_ATTRIBUTE).getAttributeElements(), asList(DISCOVERY, INSIDE_SALES));
     }
 
-    @Test(dependsOnGroups = {"precondition"}, groups = {"df-multiple"}, description = "Verify default view of "
+    @Test(dependsOnGroups = {"createProject"}, groups = {"df-multiple"}, description = "Verify default view of "
             + "viewer user updated depend on permission of variable filter for this user in multiple choice mode")
     public void checkViewerDefaultViewUpdatedInMultipleChoiceMode() throws JSONException, ParseException, IOException {
         final String dashboard = generateDashboardName();
@@ -373,7 +372,7 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         }
     }
 
-    @Test(dependsOnGroups = {"precondition"}, groups = {"df-single"}, description = "Verify default view of "
+    @Test(dependsOnGroups = {"createProject"}, groups = {"df-single"}, description = "Verify default view of "
             + "viewer user updated depend on permission of variable filter for this user in single choice mode")
     public void checkViewerDefaultViewUpdatedInSingleChoiceMode() throws ParseException, JSONException, IOException {
         final String dashboard = generateDashboardName();
@@ -407,7 +406,7 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         }
     }
 
-    @Test(dependsOnGroups = {"precondition"}, groups = {"df-multiple"}, description = "Verify saved view of viewer "
+    @Test(dependsOnGroups = {"createProject"}, groups = {"df-multiple"}, description = "Verify saved view of viewer "
             + "user updated well after admin change permission of variable filter for this user in multiple choice mode")
     public void checkViewerSavedViewUpdatedInMultipleChoiceMode() throws JSONException, ParseException, IOException {
         final String dashboard = generateDashboardName();
@@ -457,7 +456,7 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         }
     }
 
-    @Test(dependsOnGroups = {"precondition"}, groups = {"df-single"}, description = "Verify saved view of viewer "
+    @Test(dependsOnGroups = {"createProject"}, groups = {"df-single"}, description = "Verify saved view of viewer "
             + "user updated well after admin change permission of variable filter for this user in single choice mode")
     public void checkViewerSavedViewUpdatedInSingleChoiceMode() throws JSONException, ParseException, IOException {
         final String dashboard = generateDashboardName();
@@ -501,7 +500,7 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         }
     }
 
-    @Test(dependsOnGroups = {"precondition"}, groups = {"df-multiple"}, description = "Verify viewer default view work "
+    @Test(dependsOnGroups = {"createProject"}, groups = {"df-multiple"}, description = "Verify viewer default view work "
             + "properly in case the value is out of range of variable filter when switch from saved view to")
     public void checkViewerDefaultViewInSpecialCase() throws JSONException, ParseException, IOException {
         final String dashboard = generateDashboardName();

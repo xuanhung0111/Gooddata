@@ -7,7 +7,6 @@ import java.io.IOException;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
@@ -21,16 +20,17 @@ public class LeaveProjectTest extends AbstractProjectTest {
     private final static String ERROR_MESSAGE = "You cannot leave the project because you are the only administrator in it.";
     private String anotherAdminUser;
 
-    @BeforeClass
-    public void setProjectTitle() {
-        projectTitle += "GoodSales-Leave-Project-Test";
-    }
-
     @Override
     public void enableDynamicUser() {
         // these tests are working on another project & user
         // turn off using dynamic user to simplify workflow and increase readability
         useDynamicUser = false;
+    }
+
+    @Override
+    protected void initProperties() {
+        // use empty project
+        projectTitle = "Leave-Project-Test";
     }
 
     @Override

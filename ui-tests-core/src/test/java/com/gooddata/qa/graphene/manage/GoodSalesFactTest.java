@@ -7,7 +7,6 @@ import static org.testng.Assert.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
@@ -18,9 +17,10 @@ import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 
 public class GoodSalesFactTest extends GoodSalesAbstractTest {
 
-    @BeforeClass
-    public void setProjectTitle() {
-        projectTitle = "GoodSales-test-fact";
+    @Override
+    protected void initProperties() {
+        super.initProperties();
+        projectTitle += "Fact Test";
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = { "object-tests" })

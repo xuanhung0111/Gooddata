@@ -1,2 +1,2 @@
 alter attribute {attr.opportunitysnapshot.forecastcategory} drop relations to {attr.stagehistory.id};
-alter attribute {attr.opportunitysnapshot.forecastcategory} add relations to {attr.stagehistory.id} as if (IFNULL({fact.stagehistory.duration}, 9999) < 0 )then {attr.opportunitysnapshot.forecastcategory?8} else {attr.opportunitysnapshot.forecastcategory?966650} end;
+alter attribute {attr.opportunitysnapshot.forecastcategory} add relations to {attr.stagehistory.id} as if (IFNULL({fact.stagehistory.duration}, 9999) < 0 )then {attr.opportunitysnapshot.forecastcategory?165682} else {attr.opportunitysnapshot.forecastcategory?165680} end;
