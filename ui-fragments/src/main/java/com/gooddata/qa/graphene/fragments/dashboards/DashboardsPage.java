@@ -252,8 +252,8 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     public void deleteDashboardTab(int tabIndex) {
-        tabs.openTab(tabIndex);
         editDashboard();
+        tabs.openTab(tabIndex);
         boolean nonEmptyTab = browser.findElements(emptyTabPlaceholder).size() == 0;
         tabs.selectDropDownMenu(tabIndex);
         waitForElementVisible(BY_TAB_DROPDOWN_MENU, browser).findElement(BY_TAB_DROPDOWN_DELETE_BUTTON).click();
