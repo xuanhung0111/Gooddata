@@ -32,6 +32,8 @@ public final class GoodSalesUtils {
     public static final String METRIC_NUMBER_OF_WON = "# of Won"; //metric name in report, originally METRIC_NUMBER_OF_WON_OPPS
     public static final String METRIC_SNAPSHOT_BOP = "_Snapshot [BOP]";
     public static final String METRIC_SNAPSHOT_EOP = "_Snapshot [EOP]";
+    public static final String METRIC_SNAPSHOT_EOP1 = "_Snapshot [EOP-1]";
+    public static final String METRIC_SNAPSHOT_EOP2 = "_Snapshot [EOP-2]";
     public static final String METRIC_TIMELINE_EOP = "_Timeline [EOP]";
     public static final String METRIC_TIMELINE_BOP = "_Timeline [BOP]";
     public static final String METRIC_PERCENT_OF_GOAL = "% of Goal";
@@ -71,8 +73,6 @@ public final class GoodSalesUtils {
     public static final String ATTR_IS_WON = "Is Won?";
     public static final String ATTR_OPPORTUNITY = "Opportunity";
     public static final String ATTR_OPP_SNAPSHOT = "Opp. Snapshot";
-    public static final String ATTR_SNAPSHOT_EOP1 = "_Snapshot [EOP-1]";
-    public static final String ATTR_SNAPSHOT_EOP2 = "_Snapshot [EOP-2]";
     public static final String ATTR_SALES_REP = "Sales Rep";
     public static final String ATTR_PRIORITY = "Priority";
     public static final String ATTR_FORECAST_CATEGORY = "Forecast Category";
