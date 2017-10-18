@@ -919,7 +919,7 @@ public class ReportPage extends AbstractFragment {
         Select operation = new Select(
                 waitForElementVisible(xpath("//select[contains(@class,'s-sme-objSelect')]"), browser));
         Predicate<WebDriver> isSelectable = browser ->
-                operation.getFirstSelectedOption().getText().trim().equals("--- select a fact  ---");
+                operation.getFirstSelectedOption().getText().contains("select a fact");
         Graphene.waitGui().until(isSelectable);
 
         operation.selectByVisibleText(metricOnFact);
