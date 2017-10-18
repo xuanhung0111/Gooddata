@@ -120,8 +120,15 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
     }
 
     protected String createStatusVariable() {
-        return createFilterVariable(getRestApiClient(), testParams.getProjectId(),
-                VARIABLE_STATUS, getAttributeByIdentifier("attr.stage.status").getUri());
+        Attribute attributeStatus = getAttributeByIdentifier("attr.stage.status");
+        String defaultValuesExpression = format("[%s] IN ([%s])", attributeStatus.getUri(),
+                getMdService().getAttributeElements(attributeStatus).stream()
+                        .filter(element -> "Open".equals(element.getTitle()))
+                        .findFirst()
+                        .get()
+                        .getUri());
+        return createFilterVariable(getRestApiClient(), testParams.getProjectId(), VARIABLE_STATUS,
+                attributeStatus.getUri(), defaultValuesExpression);
     }
     //------------------------- VARIABLE MD OBJECTS - END  ------------------------
 
