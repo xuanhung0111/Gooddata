@@ -2,9 +2,7 @@ package com.gooddata.qa.graphene.utils;
 
 import com.gooddata.qa.utils.browser.BrowserUtils;
 import com.google.common.base.Predicate;
-import org.jboss.arquillian.drone.api.annotation.Default;
 import org.jboss.arquillian.graphene.Graphene;
-import org.jboss.arquillian.graphene.context.GrapheneContext;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
@@ -12,14 +10,11 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
-import java.awt.AWTException;
-import java.awt.Robot;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.stream.Collectors.toList;
 
@@ -111,16 +106,12 @@ public final class ElementUtils {
     }
 
     public static void makeSureNoPopupVisible(By popupElement) {
-        // Move mouse to offset (-1,-1) on screen to make sure there is no bubble displayed before
-        // moving to target element
-        try {
-            new Robot().mouseMove(-1, -1);
+        WebDriver browser = BrowserUtils.getBrowserContext();
 
-            Predicate<WebDriver> isDismissed = browser -> !isElementVisible(popupElement, browser);
-            Graphene.waitGui().until(isDismissed);
+        // Move outside HTML body at position (-1, -1) to make sure no popup displayed
+        new Actions(browser).moveToElement(browser.findElement(By.tagName("body")), -1, -1).perform();
 
-        } catch (AWTException e) {
-            throw new RuntimeException("There is an error when moving mouse on screen");
-        }
+        Predicate<WebDriver> isDismissed = context -> !isElementVisible(popupElement, context);
+        Graphene.waitGui().until(isDismissed);
     }
 }

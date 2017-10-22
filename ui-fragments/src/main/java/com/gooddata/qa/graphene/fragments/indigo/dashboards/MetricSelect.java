@@ -1,11 +1,9 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-
-import org.openqa.selenium.By;
-import org.openqa.selenium.interactions.Actions;
-
 import com.gooddata.qa.graphene.fragments.common.AbstractReactDropDown;
+import org.openqa.selenium.By;
+
+import static com.gooddata.qa.graphene.utils.ElementUtils.getTooltipFromElement;
 
 public class MetricSelect extends AbstractReactDropDown {
 
@@ -24,7 +22,6 @@ public class MetricSelect extends AbstractReactDropDown {
     }
 
     public String getTooltip(String name) {
-        new Actions(browser).moveToElement(getElementByName(name)).perform();
-        return waitForElementVisible(TOOLTIP_LOCATOR, browser).getText();
+        return getTooltipFromElement(getElementByName(name), browser);
     }
 }

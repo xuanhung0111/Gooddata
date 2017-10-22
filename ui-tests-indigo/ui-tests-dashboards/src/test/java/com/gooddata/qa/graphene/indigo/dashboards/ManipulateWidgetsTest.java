@@ -26,7 +26,7 @@ import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 public class ManipulateWidgetsTest extends AbstractDashboardTest {
 
     private static final String TEST_HEADLINE = "Test headline";
-    private static final String HINT_FOR_EDIT_NAME_BORDER_COLOR = "rgba(177, 193, 209, 0.5)";
+    private static final String HINT_FOR_EDIT_NAME_BORDER_COLOR = "rgba\\(177, 193, 209, 0\\.(498\\d+|5)\\)";
     private static final String LONG_NAME_METRIC = "# test metric with longer name is shortened";
     private static final String PATTERN_OF_METRIC_NAME = "is shortened";
 
@@ -219,7 +219,8 @@ public class ManipulateWidgetsTest extends AbstractDashboardTest {
 
         String hintColor = kpi.hoverToHeadline();
         takeScreenshot(browser, "Kpi shows hint for editable name when hover to headline", this.getClass());
-        assertEquals(hintColor, HINT_FOR_EDIT_NAME_BORDER_COLOR);
+        assertTrue(hintColor.matches(HINT_FOR_EDIT_NAME_BORDER_COLOR),
+                "Hint color not matches! Expected: " + HINT_FOR_EDIT_NAME_BORDER_COLOR + " but actual: " + hintColor);
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})

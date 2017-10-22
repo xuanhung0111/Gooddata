@@ -15,6 +15,8 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Part;
 
+import com.gooddata.qa.graphene.enums.user.UserRoles;
+import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -28,6 +30,11 @@ import com.gooddata.qa.utils.mail.ImapUtils;
 
 public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedulesTest {
 
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws IOException, JSONException {
+        addUserToProject(imapUser, UserRoles.ADMIN);
+    }
+
     private String reportTitle = "Normal-Report";
     private String dashboardTitle = "UI-Graphene-core-Dashboard";
 
@@ -40,17 +47,23 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
                 new File(System.getProperty("maven.project.build.directory", "./target/attachments"));
     }
 
-    @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"schedules"})
+    public void signInImapUser() throws JSONException {
+        logout();
+        signInAtGreyPages(imapUser, imapPassword);
+    }
+
+    @Test(dependsOnMethods = {"signInImapUser"}, groups = {"schedules"})
     public void createDashboardSchedule() {
-        initEmailSchedulesPage().scheduleNewDashboardEmail(testParams.getUser(), dashboardTitle,
+        initEmailSchedulesPage().scheduleNewDashboardEmail(imapUser, dashboardTitle,
                 "Scheduled email test - dashboard.", "Outlook");
         checkRedBar(browser);
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard", this.getClass());
     }
 
-    @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
+    @Test(dependsOnMethods = {"signInImapUser"}, groups = {"schedules"})
     public void createReportSchedule() {
-        initEmailSchedulesPage().scheduleNewReportEmail(testParams.getUser(), reportTitle,
+        initEmailSchedulesPage().scheduleNewReportEmail(imapUser, reportTitle,
                 "Scheduled email test - report.", "Activities by Type", ExportFormat.ALL);
         checkRedBar(browser);
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-report", this.getClass());
@@ -74,11 +87,11 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
     public void waitForMessages() throws MessagingException {
         try (ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword)) {
             System.out.println("ACCELERATE scheduled mails processing");
-            ScheduleEmailRestUtils.accelerate(getRestApiClient(), testParams.getProjectId());
+            ScheduleEmailRestUtils.accelerate(getRestApiClient(imapUser, imapPassword), testParams.getProjectId());
             checkMailbox(imapClient);
         } finally {
             System.out.println("DECELERATE scheduled mails processing");
-            ScheduleEmailRestUtils.decelerate(getRestApiClient(), testParams.getProjectId());
+            ScheduleEmailRestUtils.decelerate(getRestApiClient(imapUser, imapPassword), testParams.getProjectId());
         }
     }
 

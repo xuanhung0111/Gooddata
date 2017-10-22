@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -37,7 +38,7 @@ public class GoodSalesTrendingRecommendationTest extends AbstractAnalyseTest {
     public void testOverrideDateFilter() {
         final FiltersBucket FiltersBucketReact = analysisPage.getFilterBuckets();
 
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        analysisPage.addMetric(METRIC_SNAPSHOT_BOP)
             .addDateFilter();
         assertEquals(FiltersBucketReact.getFilterText("Activity"), "Activity: All time");
         FiltersBucketReact.configDateFilter("Last 12 months");
@@ -56,10 +57,10 @@ public class GoodSalesTrendingRecommendationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void applyParameter() {
-        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = analysisPage.addMetric(METRIC_SNAPSHOT_BOP)
                 .waitForReportComputing().getChartReport();
         final MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
-                .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
+                .getMetricConfiguration(METRIC_SNAPSHOT_BOP)
                 .expandConfiguration();
 
         assertEquals(report.getTrackersCount(), 1);

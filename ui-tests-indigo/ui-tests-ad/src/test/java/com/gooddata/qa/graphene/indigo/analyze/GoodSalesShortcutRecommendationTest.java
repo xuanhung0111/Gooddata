@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.indigo.analyze;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -67,7 +68,7 @@ public class GoodSalesShortcutRecommendationTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"})
     public void testTrendShortcut() {
         WebElement metric = analysisPage.getCataloguePanel()
-                .searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC);
+                .searchAndGet(METRIC_SNAPSHOT_BOP, FieldType.METRIC);
 
         Supplier<WebElement> trendRecommendation = () ->
             waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
@@ -88,7 +89,7 @@ public class GoodSalesShortcutRecommendationTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"})
     public void displayWhenDraggingFirstMetric() {
         WebElement metric = analysisPage.getCataloguePanel()
-                .searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC);
+                .searchAndGet(METRIC_SNAPSHOT_BOP, FieldType.METRIC);
 
         Supplier<WebElement> trendRecommendation = () ->
             waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
