@@ -11,6 +11,8 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -119,11 +121,19 @@ public class KpiAlertEvaluateTest extends AbstractDashboardTest {
     }
 
     private String getDashboardLinkFromEmail(Document email) {
-        return email.getElementsByAttributeValueMatching("class", "s-kpi-link").first().attr("href");
+        String dashboardUrl = email.getElementsByAttributeValueMatching("class", "s-kpi-link").first().attr("href");
+
+        Pattern pattern = Pattern.compile("https://.*\\.com/");
+        Matcher matcher = pattern.matcher(dashboardUrl);
+        if (!matcher.find()) {
+            throw new RuntimeException("Dashboard link not contain test host domain!");
+        }
+
+        return dashboardUrl.replace(matcher.group(), "");
     }
 
     private IndigoDashboardsPage openDashboardFromLink(String link) {
-        browser.get(link);
+        openUrl(link);
         waitForOpeningIndigoDashboard();
         return IndigoDashboardsPage.getInstance(browser).waitForDashboardLoad();
     }

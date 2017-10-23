@@ -6,7 +6,10 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.base.Predicate;
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -46,11 +49,14 @@ public class DashboardTabs extends AbstractFragment {
                 break;
             scrollLeftButton.click();
         }
-        WebElement tab = getTabWebElement(i);
+        DashboardTab tab = tabs.get(i);
         // if tab is not visible, we cannot get its label
-        while (getTabLabel(i).isEmpty())
+        while (tab.getLabel().isEmpty())
             scrollRightButton.click();
-        tab.click();
+        tab.getRoot().click();
+
+        Predicate<WebDriver> isSelected = browser -> tab.isSelected();
+        Graphene.waitGui().until(isSelected);
     }
 
     /**

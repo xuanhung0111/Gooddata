@@ -483,8 +483,8 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
         DateDimensionGroup recommended = dateDatasetSelect.getDateDimensionGroup(RECOMMENDED);
         DateDimensionGroup other = dateDatasetSelect.getDateDimensionGroup(OTHER);
 
-        assertEquals(recommended.getDateDimensions(), singletonList(CLOSED));
-        assertEquals(other.getDateDimensions(), asList(CREATED, SNAPSHOT));
+        assertEquals(recommended.getDateDimensions(), asList(CLOSED, SNAPSHOT));
+        assertEquals(other.getDateDimensions(), singletonList(CREATED));
         assertEquals(dateDatasetSelect.getHiddenDescription(), HIDDEN_DATE_DIMENSION_DESCRIPTION);
 
         analysisPage
@@ -503,8 +503,8 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
 
         takeScreenshot(browser, "Recommended-date-still-Shown-after-setting-show-in-percent-for-metric", getClass());
         assertEquals(groups.size(), 2);
-        assertEquals(recommended.getDateDimensions(), singletonList(CLOSED));
-        assertEquals(other.getDateDimensions(), asList(CREATED, SNAPSHOT));
+        assertEquals(recommended.getDateDimensions(), asList(CLOSED, SNAPSHOT));
+        assertEquals(other.getDateDimensions(), singletonList(CREATED));
         assertEquals(dateDatasetSelect.getHiddenDescription(), HIDDEN_DATE_DIMENSION_DESCRIPTION);
     }
 

@@ -171,11 +171,19 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
         initDashboardsPage();
         selectDashboard(DASHBOARD_TEST);
         publishDashboard(false);
+
+        int browserTabs = BrowserUtils.getWindowHandles(browser).size();
+
         dashboardsPage.openPermissionsDialog().openAddGranteePanel().openUserManagementPage();
-        Sleeper.sleepTightInSeconds(1);
-        BrowserUtils.switchToLastTab(browser);
-        UserManagementPage.getInstance(browser).waitForUsersContentLoaded();
-        BrowserUtils.switchToFirstTab(browser);
+        waitForNewTabOpen(browserTabs);
+
+        try {
+            BrowserUtils.switchToLastTab(browser);
+            UserManagementPage.getInstance(browser).waitForUsersContentLoaded();
+        } finally {
+            BrowserUtils.closeCurrentTab(browser);
+            BrowserUtils.switchToFirstTab(browser);
+        }
     }
 
     @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement" })
@@ -693,5 +701,10 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
         assertEquals(UserManagementPage.getInstance(browser).getStateGroupMessage(), EMPTY_GROUP_STATE_MESSAGE);
         assertTrue(UserManagementPage.getInstance(browser).getAllUserGroups().contains(group));
         assertTrue(UserManagementPage.getInstance(browser).getAllSidebarActiveLinks().contains(group));
+    }
+
+    private void waitForNewTabOpen(int currentTabs) {
+        Predicate<WebDriver> newTabOpen = browser -> BrowserUtils.getWindowHandles(browser).size() > currentTabs;
+        Graphene.waitGui().until(newTabOpen);
     }
 }

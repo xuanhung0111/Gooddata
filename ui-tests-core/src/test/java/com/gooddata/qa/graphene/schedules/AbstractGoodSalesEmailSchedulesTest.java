@@ -51,12 +51,6 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
         imapPassword = testParams.loadProperty("imap.password");
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"schedules"})
-    public void verifyEmptySchedules() {
-        assertEquals(initEmailSchedulesPage().getNumberOfGlobalSchedules(), 0, "There is no schedule.");
-        Screenshots.takeScreenshot(browser, "Goodsales-no-schedules", this.getClass());
-    }
-
     protected Part findPartByContentType(List<Part> parts, String contentType) throws MessagingException {
         for (Part part : parts) {
             if (part.getContentType().contains(contentType.toUpperCase())) {
@@ -128,7 +122,7 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
      */
     private void setSchedule(String scheduleUri, String schedule) {
         System.out.println("Update scheduledMail: " + scheduleUri);
-        RestUtils.executeRequest(restApiClient, restApiClient.newPostMethod(scheduleUri, schedule));
+        RestUtils.executeRequest(getRestApiClient(imapUser, imapPassword), restApiClient.newPostMethod(scheduleUri, schedule));
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
