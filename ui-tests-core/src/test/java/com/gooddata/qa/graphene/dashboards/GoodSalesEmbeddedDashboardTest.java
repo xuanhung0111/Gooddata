@@ -272,7 +272,8 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = "createAdditionalProject")
+    // this test is disabled until https://jira.intgdc.com/browse/QA-6823 is fixed
+    @Test(dependsOnMethods = "createAdditionalProject", enabled = false)
     public void drillingOnEmbeddedDashboard() {
         // check drill to attribute
         String attributeValueToDrill = "2009";
