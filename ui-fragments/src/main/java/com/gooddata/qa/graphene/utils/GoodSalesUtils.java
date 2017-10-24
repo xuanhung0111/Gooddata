@@ -43,8 +43,10 @@ public final class GoodSalesUtils {
     public static final String METRIC_AMOUNT = "Amount";
     public static final String METRIC_LOST = "Lost";
     public static final String METRIC_PROBABILITY = "Probability";
+    public static final String METRIC_PROBABILITY_BOP = "Probability [BOP]";
     public static final String METRIC_WIN_RATE = "Win Rate";
     public static final String METRIC_BEST_CASE = "Best Case";
+    public static final String METRIC_BEST_CASE_BOP = "Best Case [BOP]";
     public static final String METRIC_WON = "Won";
     public static final String METRIC_AVG_AMOUNT = "Avg. Amount";
     public static final String METRIC_PRODUCTIVE_REPS = "Productive Reps";
@@ -60,6 +62,7 @@ public final class GoodSalesUtils {
     public static final String METRIC_AMOUNT_BOP = "Amount [BOP]";
     public static final String METRIC_PERCENT_OF_PIPLINE = "% of Pipeline";
     public static final String METRIC_TOP_5 = "Top 5";
+    public static final String METRIC_CLOSE_EOP = "_Close [EOP]";
 
     // attributes
     public static final String ATTR_PRODUCT = "Product";
@@ -132,6 +135,8 @@ public final class GoodSalesUtils {
     public static final String REPORT_TOO_LARGE = "Too large report";
     public static final String REPORT_TOP_5_WON_BY_CASH = "Top 5 Won (by $)";
     public static final String REPORT_TOP_5_LOST_BY_CASH = "Top 5 Lost (by $)";
+    public static final String REPORT_NEW_LOST_DRILL_IN = "New Lost [Drill-In]";
+    public static final String REPORT_NEW_WON_DRILL_IN = "New Won [Drill-In]";
 
     // variables
     public static final String VARIABLE_STATUS = "Status";

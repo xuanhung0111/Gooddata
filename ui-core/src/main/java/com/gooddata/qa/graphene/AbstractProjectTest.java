@@ -359,6 +359,10 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         return getMdService().getObj(getProject(), Attribute.class, title(title));
     }
 
+    protected Attribute getAttributeByUri(String uri) {
+        return getMdService().getObjByUri(uri, Attribute.class);
+    }
+
     protected Attribute getAttributeByIdentifier(String id) {
         return getMdService().getObj(getProject(), Attribute.class, identifier(id));
     }
@@ -382,6 +386,10 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         return getMdService().getObj(getProject(), Dataset.class, identifier(id));
     }
 
+    protected Dataset getDatasetByTitle(String title) {
+        return getMdService().getObj(getProject(), Dataset.class, title(title));
+    }
+
     protected List<String> getObjIdentifiers(List<String> uris) {
         try {
             JSONArray array = RestUtils.getJsonObject(getRestApiClient(),
@@ -399,6 +407,10 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         } catch (IOException | JSONException e) {
             throw new RuntimeException("there is an error while searching obj", e);
         }
+    }
+
+    protected Report getReportByTitle(String title) {
+        return getMdService().getObj(getProject(), Report.class, title(title));
     }
     //------------------------- SUPPORT GET OBJECTS - END -------------------------
 

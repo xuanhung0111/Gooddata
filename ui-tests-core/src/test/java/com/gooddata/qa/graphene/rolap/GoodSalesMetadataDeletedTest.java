@@ -1,120 +1,91 @@
 package com.gooddata.qa.graphene.rolap;
 
-import static com.gooddata.md.Restriction.title;
+import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_WON;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPPORTUNITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_VELOCITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPPORTUNITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON_OPPS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_QUOTA;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_WIN_RATE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_ACTIVITIES_BY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_ACTIVITY_LEVEL;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_AMOUNT_BY_DATE_CLOSED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_NEW_LOST_DRILL_IN;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_NEW_WON_DRILL_IN;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_SALES_SEASONALITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.VARIABLE_QUOTA;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.VARIABLE_STATUS;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.UrlParserUtils.getObjId;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static java.util.Collections.singletonList;
 import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.gooddata.qa.graphene.TemplateAbstractTest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
-import org.springframework.http.HttpStatus;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.md.report.Report;
+import com.gooddata.md.Attribute;
+import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.GridReportDefinitionContent;
+import com.gooddata.md.report.MetricElement;
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.attribute.ComputedAttributeDefinition;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
 import com.gooddata.qa.graphene.fragments.manage.FactDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.graphene.fragments.manage.VariablesPage;
 import com.gooddata.qa.utils.CssUtils;
+import com.gooddata.qa.utils.http.InvalidStatusCodeException;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.gooddata.qa.utils.http.rolap.RolapRestUtils;
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
-
-public class GoodSalesMetadataDeletedTest extends TemplateAbstractTest {
+public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
 
     private static final int STATUS_POLLING_CHECK_ITERATIONS = 60;
-    private static final String WIN_RATE_METRIC = "Win Rate";
     private static final String DASHBOARD_NAME = "Test metadata deleted";
-
-    private static final String OPPORTUNITY_SNAPSHOT_DATASET = "OpportunitySnapshot";
-
-    private static final String NEW_PIPELINE_DRILL_IN_REPORT = "New Pipeline [Drill-In]";
-    private static final String MOVED_IN_PIPELINE_DRILL_IN_REPORT = "Moved In Pipeline [Drill - In]";
-    private static final String STARTING_PIPELINE_REPORT = "Starting Pipeline [hl]";
-    private static final String ACTIVITIES_BY_TYPE_REPORT = "Activities by Type";
-    private static final String NEW_WON_DRILL_IN_REPORT = "New Won [Drill-In]";
-    private static final String NEW_LOST_DRILL_IN_REPORT = "New Lost [Drill-In]";
-
     private static final String COMMENT = "comment";
-
     private static final String OBJECT_ID_NOT_FOUND = "Object ID %s not found";
     private static final String REQUESTED_DASHBOARD_NOT_EXIST = "The dashboard you have requested does not exist.";
     private static final String DROP_OBJECT_ERROR_MESSAGE = "Can't delete object (%s) while referenced by "
             + "dependent objects (%s).";
 
-    private static final AttributeInfo IS_WON_ATTRIBUTE = new AttributeInfo()
-            .withId("1089")
-            .withName("Is Won?")
-            .<AttributeInfo>withIdentifier("attr.stage.iswon")
-            .withDataset("Stage")
-            .withLabelIds("1090")
-            .withElements(new AttributeElementInfo("false", "955128"),
-                    new AttributeElementInfo("true", "955127"));
-
-    private static final AttributeInfo ACCOUNT_ATTRIBUTE = new AttributeInfo().withId("969").withName("Account");
-
-    private static final FactInfo VELOCITY_FACT = new FactInfo().withName("Velocity").withId("1176")
-            .<FactInfo>withIdentifier("fact.stagehistory.velocity").withDataset("stagehistory");
-
-    private static final MetricInfo NUMBER_OF_OPPORTUNITIES_METRIC = new MetricInfo().withId("2825")
-            .withName("# of Opportunities").<MetricInfo>withIdentifier("afdV48ABh8CN")
-            .withAffectedMetric("# of Won Opps.")
-            .withAffectedReports("Top 5 Lost (by $)", "Total Lost [hl]", "Quarterly Win Rate");
-
-    private static final DatasetInfo PRODUCT_DATASET = new DatasetInfo().withId("947").withName("Product")
-            .<DatasetInfo>withIdentifier("dataset.product").withAttributes("Product");
-
-    private static final DatasetInfo STAGE_DATASET = new DatasetInfo().withId("1083").withName("Stage")
-            .<DatasetInfo>withIdentifier("dataset.stage")
-            .withAttributes("Is Active?", "Is Won?", "Stage Name");
-
-    private static final DatasetInfo ACCOUNT_DATASET = new DatasetInfo().withId("967").withName("Account")
-            .<DatasetInfo>withIdentifier("dataset.account").withAttributes("Account");
-
-    private static final DatasetInfo DATE_ACTIVITY_DATASET = new DatasetInfo().withId("708")
-            .withName("Date (Activity)").<DatasetInfo>withIdentifier("activity.dataset.dt");
-
-    private static final DatasetInfo DATE_CREATED_DATASET = new DatasetInfo().withId("164")
-            .withName("Date (Created)").<DatasetInfo>withIdentifier("created.dataset.dt");
-
-    private static final VariableInfo QUOTA_VARIABLE = new VariableInfo().withId("1306").withName("Quota")
-            .<VariableInfo>withIdentifier("acCEy9XbdbeO").withAffectedMetric("Quota")
-            .withAffectedReport("Actual Performance vs. Goal");
-
-    private static final VariableInfo STATUS_VARIABLE = new VariableInfo().withId("16168").withName("Status")
-            .withIdentifier("ae1zQEAYe8gT");
-
-    @BeforeClass
-    public void setProjectTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-metadata-deteled";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        createQuoteVariable();
+        createStatusVariable();
+        createNewLostDrillInReport();
+        createNewWonDrillInReport();
+        createActivitiesByTypeReport();
+        createWinRateMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
@@ -124,16 +95,17 @@ public class GoodSalesMetadataDeletedTest extends TemplateAbstractTest {
             String reportSchedule = "report";
 
             initDashboardsPage();
-            addReportToNewDashboard(ACTIVITIES_BY_TYPE_REPORT, DASHBOARD_NAME);
+            addReportToNewDashboard(REPORT_ACTIVITIES_BY_TYPE, DASHBOARD_NAME);
 
             initEmailSchedulesPage().scheduleNewDashboardEmail(testParams.getUser(), dashboardSchedule, "test", DASHBOARD_NAME)
-                .scheduleNewReportEmail(testParams.getUser(), reportSchedule, "test", ACTIVITIES_BY_TYPE_REPORT, ExportFormat.ALL);
+                .scheduleNewReportEmail(testParams.getUser(), reportSchedule, "test", REPORT_ACTIVITIES_BY_TYPE, ExportFormat.ALL);
 
             initEmailSchedulesPage().deleteSchedule(dashboardSchedule)
                 .deleteSchedule(reportSchedule);
 
-            assertFalse(isObjectDeleted(ACTIVITIES_BY_TYPE_REPORT, Places.REPORT));
-            assertFalse(isObjectDeleted(DASHBOARD_NAME, Places.DASHBOARD));
+            assertFalse(isObjectDeleted(getReportByTitle(REPORT_ACTIVITIES_BY_TYPE).getUri()));
+            assertFalse(isObjectDeleted(DashboardsRestUtils.getDashboardUri(getRestApiClient(), testParams.getProjectId(), 
+                    DASHBOARD_NAME)));
         } finally {
             tryDeleteDashboard();
         }
@@ -143,49 +115,69 @@ public class GoodSalesMetadataDeletedTest extends TemplateAbstractTest {
     public void deleteComment() throws IOException, JSONException {
         String[] objectLinks = {
             DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT,
-                    getMdService().getObjUri(getProject(), Report.class, title(NEW_LOST_DRILL_IN_REPORT))),
-            DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT, ACCOUNT_ATTRIBUTE.id),
+                    getReportByTitle(REPORT_NEW_LOST_DRILL_IN).getUri()),
+            DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT, 
+                    getAttributeByTitle(ATTR_ACCOUNT).getUri()),
             DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT,
-                    NUMBER_OF_OPPORTUNITIES_METRIC.id),
-            DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT, ACCOUNT_DATASET.id),
-            DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT, QUOTA_VARIABLE.id),
-            DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT, VELOCITY_FACT.id)
+                    getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri()),
+            DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT, 
+                    getDatasetByTitle("Account").getUri()),
+            DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT, 
+                    DashboardsRestUtils.getVariableUri(getRestApiClient(), testParams.getProjectId(), VARIABLE_QUOTA)),
+            DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT, 
+                    getFactByTitle(FACT_VELOCITY).getUri())
         };
 
-        dropAllComments(objectLinks, DropStrategy.CASCADE);
+        for (String link: objectLinks) {
+            dropObject(getIdentifierFromObjLink(link, COMMENT), DropStrategy.CASCADE);
+        }
 
-        assertFalse(isObjectDeleted(NEW_LOST_DRILL_IN_REPORT, Places.REPORT));
-        assertFalse(isObjectDeleted(ACCOUNT_DATASET.name, Places.DATASET));
-        assertFalse(isObjectDeleted(ACCOUNT_ATTRIBUTE.name, Places.ATTRIBUTE));
-        assertFalse(isObjectDeleted(NUMBER_OF_OPPORTUNITIES_METRIC.name, Places.METRIC));
-        assertFalse(isObjectDeleted(VELOCITY_FACT.name, Places.FACT));
-        assertFalse(isObjectDeleted(QUOTA_VARIABLE.name, Places.VARIABLE));
+        assertFalse(isObjectDeleted(getReportByTitle(REPORT_NEW_LOST_DRILL_IN).getUri()));
+        assertFalse(isObjectDeleted(getDatasetByTitle("Account").getUri()));
+        assertFalse(isObjectDeleted(getAttributeByTitle(ATTR_ACCOUNT).getUri()));
+        assertFalse(isObjectDeleted(getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri()));
+        assertFalse(isObjectDeleted(getFactByTitle(FACT_VELOCITY).getUri()));
+        assertFalse(isObjectDeleted(DashboardsRestUtils.getVariableUri(getRestApiClient(), testParams.getProjectId(), 
+                VARIABLE_QUOTA)));
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
     public void deleteAttribute() throws JSONException, IOException {
-        String userFilterUri = createUserFilterFrom(IS_WON_ATTRIBUTE);
-        String computedAttributeName = createComputedAttributeUsing(IS_WON_ATTRIBUTE);
-        String filterVariableName = createFilterVariableUsingAttribute(IS_WON_ATTRIBUTE).getRight();
-        String metricName = createMetricUsing(IS_WON_ATTRIBUTE);
-        String reportName =
-                createReportUsing(new UiReportDefinition().withName("Report " + System.currentTimeMillis())
-                        .withHows(IS_WON_ATTRIBUTE.name));
+        Attribute attributeIsWon = getAttributeByTitle(ATTR_IS_WON);
+        String firstElement = getMdService()
+                .getAttributeElements(attributeIsWon).stream()
+                .findFirst()
+                .get()
+                .getTitle();
+        String computedAttributeName = createComputedAttributeUsing(ATTR_IS_WON);
+        String filterVariableName = createFilterVariableUsingAttribute(ATTR_IS_WON, firstElement).getRight();
+        String metricName = createMetricUsing(ATTR_IS_WON, firstElement);
+        String reportName = createReportUsing(new UiReportDefinition().withName("Report " + System.currentTimeMillis())
+                .withHows(ATTR_IS_WON));
+        String metricNameUri = getMetricByTitle(metricName).getUri();
+        String reportNameUri = getReportByTitle(reportName).getUri();
+        String filterVariableNameUri = DashboardsRestUtils.getVariableUri(getRestApiClient(), testParams.getProjectId(), 
+                filterVariableName);
         try {
-            createDashboardWithAttributeFilter(DashAttributeFilterTypes.ATTRIBUTE, IS_WON_ATTRIBUTE.name);
+            createDashboardWithAttributeFilter(DashAttributeFilterTypes.ATTRIBUTE, ATTR_IS_WON);
             String savedViewName = createSavedView("true");
+            List<Pair<String, Integer>> labelUris = getObjectElementsByID(Integer.parseInt(getObjId(
+                    getAttributeByTitle(ATTR_IS_WON).getDefaultDisplayForm().getUri())));
 
-            dropObject(IS_WON_ATTRIBUTE.identifier, DropStrategy.CASCADE);
-            assertTrue(isObjectDeleted(userFilterUri, Places.GREY_PAGE));
-            assertFalse(isObjectDeleted(IS_WON_ATTRIBUTE.dataset, Places.DATASET));
-            assertFalse(isObjectDeleted(computedAttributeName, Places.ATTRIBUTE));
-            assertTrue(isObjectDeleted(filterVariableName, Places.VARIABLE));
-            assertTrue(isObjectDeleted(metricName, Places.METRIC));
-            assertTrue(isObjectDeleted(reportName, Places.REPORT));
-            assertTrue(isObjectDeleted(IS_WON_ATTRIBUTE.name, Places.DASHBOARD_FILTER));
-            assertFalse(isObjectDeleted(savedViewName, Places.SAVED_VIEW));
-            for (String labelUri : IS_WON_ATTRIBUTE.getLabelUriFormats()) {
-                assertTrue(isObjectDeleted(String.format(labelUri, testParams.getProjectId()), Places.GREY_PAGE));
+            dropObject(getAttributeByTitle(ATTR_IS_WON).getIdentifier(), DropStrategy.CASCADE);
+            assertFalse(isObjectDeleted(getDatasetByTitle("Stage").getUri()));
+            assertFalse(isObjectDeleted(getAttributeByTitle(computedAttributeName).getUri()));
+            assertTrue(isObjectDeleted(filterVariableNameUri));
+            assertTrue(isObjectDeleted(metricNameUri));
+            assertTrue(isObjectDeleted(reportNameUri));
+
+            initDashboardsPage();
+            dashboardsPage.selectDashboard(DASHBOARD_NAME);
+            assertTrue(dashboardsPage.getContent().getFilterWidget(CssUtils.simplifyText(ATTR_IS_WON)) == null);
+            assertFalse(!dashboardsPage.getSavedViewWidget().openSavedViewMenu().getSavedViewPopupMenu()
+                    .getAllSavedViewNames().contains(savedViewName));
+            for (Pair<String, Integer> labelUri : labelUris) {
+                assertTrue(isObjectDeleted(String.format(labelUri.getRight().toString(), testParams.getProjectId())));
             }
         } finally {
             tryDeleteDashboard();
@@ -194,24 +186,41 @@ public class GoodSalesMetadataDeletedTest extends TemplateAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
     public void deleteFact() throws JSONException, IOException {
-        String metricName = createMetricUsing(VELOCITY_FACT, SimpleMetricTypes.SUM);
+        initFactPage();
+        ObjectsTable.getInstance(id(ObjectTypes.FACT.getObjectsTableID()), browser).selectObject(FACT_VELOCITY);
+        String metricName = FactDetailPage.getInstance(browser).createSimpleMetric(SimpleMetricTypes.SUM, FACT_VELOCITY);
+        String metricUri = getMetricByTitle(metricName).getUri();
+        String identifierVelocityFact = getFactByTitle(FACT_VELOCITY).getIdentifier(); 
 
-        dropObject(VELOCITY_FACT.identifier, DropStrategy.CASCADE);
-        assertFalse(isObjectDeleted(VELOCITY_FACT.dataset, Places.DATASET));
-        assertTrue(isObjectDeleted(metricName, Places.METRIC));
+        dropObject(identifierVelocityFact, DropStrategy.CASCADE);
+        assertFalse(isObjectDeleted(getDatasetByTitle("stagehistory").getUri()));
+        assertTrue(isObjectDeleted(metricUri));
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
     public void deletePrompt() throws JSONException, IOException {
-        dropObject(QUOTA_VARIABLE.identifier, DropStrategy.CASCADE);
-        assertTrue(isObjectDeleted(QUOTA_VARIABLE.affectedMetric, Places.METRIC));
-        assertTrue(isObjectDeleted(QUOTA_VARIABLE.affectedReport, Places.REPORT));
+        final String ReportUsingQuotaVariable = "Quote Report";
+        //Create metric and report using Quote variable
+        createQuotaMetric();
+        createReport(GridReportDefinitionContent.create(ReportUsingQuotaVariable,
+                singletonList(METRIC_GROUP),
+                singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_OPPORTUNITY))),
+                singletonList(new MetricElement(getMetricByTitle(METRIC_QUOTA)))));
+
+        String quotaMetricUri = getMetricByTitle(METRIC_QUOTA).getUri();
+        String reportUsingQuotaVariableUri = getReportByTitle(ReportUsingQuotaVariable).getUri();
+
+        dropObject(getIdentifierFromObjLink(DashboardsRestUtils.getVariableUri(getRestApiClient(), 
+                testParams.getProjectId(), VARIABLE_QUOTA), "prompt"), DropStrategy.CASCADE);
+        assertTrue(isObjectDeleted(quotaMetricUri));
+        assertTrue(isObjectDeleted(reportUsingQuotaVariableUri));
 
         try {
-            createDashboardWithAttributeFilter(DashAttributeFilterTypes.PROMPT, STATUS_VARIABLE.name);
+            createDashboardWithAttributeFilter(DashAttributeFilterTypes.PROMPT, VARIABLE_STATUS);
 
-            dropObject(STATUS_VARIABLE.identifier, DropStrategy.CASCADE);
-            assertTrue(isObjectDeleted(STATUS_VARIABLE.name, Places.DASHBOARD_FILTER));
+            dropObject(getIdentifierFromObjLink(DashboardsRestUtils.getVariableUri(getRestApiClient(), 
+                    testParams.getProjectId(), VARIABLE_STATUS), "prompt"), DropStrategy.CASCADE);
+            assertTrue(isObjectDeleted(VARIABLE_STATUS));
         } finally {
             tryDeleteDashboard();
         }
@@ -219,17 +228,23 @@ public class GoodSalesMetadataDeletedTest extends TemplateAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
     public void deleteMetric() throws JSONException, IOException {
-        try {
-            createDashboardWithGeoChart(NUMBER_OF_OPPORTUNITIES_METRIC.name);
+        //create report using won opp. metric
+        createSalesSeasonalityReport();
 
-            dropObject(NUMBER_OF_OPPORTUNITIES_METRIC.identifier, DropStrategy.CASCADE);
-            assertTrue(isObjectDeleted(NUMBER_OF_OPPORTUNITIES_METRIC.affectedMetric, Places.METRIC));
-            for (String report : NUMBER_OF_OPPORTUNITIES_METRIC.affectedReports) {
-                assertTrue(isObjectDeleted(report, Places.REPORT));
-            }
-            assertTrue(isObjectDeleted("geo chart", Places.DASHBOARD_GEO));
+        String metricNumberOfWonOppsUri = getMetricByTitle(METRIC_NUMBER_OF_WON_OPPS).getUri();
+        String reportTop5WonByCashUri = getReportByTitle(REPORT_SALES_SEASONALITY).getUri();
+        try {
+            createDashboardWithGeoChart(METRIC_NUMBER_OF_WON_OPPS);
+            dropObject(getMetricByTitle(METRIC_NUMBER_OF_WON_OPPS).getIdentifier(), DropStrategy.CASCADE);
+            assertTrue(isObjectDeleted(metricNumberOfWonOppsUri));
+            assertTrue(isObjectDeleted(reportTop5WonByCashUri));
+            initDashboardsPage();
+            dashboardsPage.selectDashboard(DASHBOARD_NAME);
+            assertTrue(dashboardsPage.getContent().getNumberOfReports() == 0);
+
         } finally {
             tryDeleteDashboard();
+            createNumberOfOpportunitiesMetric();
         }
     }
 
@@ -237,13 +252,14 @@ public class GoodSalesMetadataDeletedTest extends TemplateAbstractTest {
     public void deleteReport() throws JSONException, IOException {
         String reportSchedule = null;
         try {
-            addReportToNewDashboard(NEW_WON_DRILL_IN_REPORT, DASHBOARD_NAME);
-            reportSchedule = createReportSchedule(NEW_WON_DRILL_IN_REPORT);
+            addReportToNewDashboard(REPORT_NEW_WON_DRILL_IN, DASHBOARD_NAME);
+            reportSchedule = createReportSchedule(REPORT_NEW_WON_DRILL_IN);
 
-            dropObject(getMdService().getObj(getProject(), Report.class, title(NEW_WON_DRILL_IN_REPORT))
-                    .getIdentifier(), DropStrategy.CASCADE);
-            assertTrue(isObjectDeleted(NEW_WON_DRILL_IN_REPORT, Places.DASHBOARD_REPORT));
-            assertFalse(isObjectDeleted(reportSchedule, Places.SCHEDULE_EMAIL));
+            dropObject(getReportByTitle(REPORT_NEW_WON_DRILL_IN).getIdentifier(), DropStrategy.CASCADE);
+            initDashboardsPage();
+            dashboardsPage.selectDashboard(DASHBOARD_NAME);
+            assertTrue(dashboardsPage.getContent().getNumberOfReports() == 0);
+            assertFalse(!initEmailSchedulesPage().isGlobalSchedulePresent(reportSchedule));
         } finally {
             tryDeleteDashboard();
             deleteSchedule(reportSchedule);
@@ -252,19 +268,21 @@ public class GoodSalesMetadataDeletedTest extends TemplateAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
     public void deleteDashboard() throws IOException, JSONException {
-        addReportToNewDashboard(NEW_LOST_DRILL_IN_REPORT, DASHBOARD_NAME);
+        addReportToNewDashboard(REPORT_NEW_LOST_DRILL_IN, DASHBOARD_NAME);
 
         String url = browser.getCurrentUrl();
         System.out.println(url);
         String dashboardId = url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("|"));
-        String dashboardIdentifier = getIdentifierFromObjId(dashboardId, ObjectType.PROJECT_DASHBOARD);
+        String dashboardIdentifier = getIdentifierFromObjId(dashboardId, "projectDashboard");
 
         String previewUri = dashboardsPage.openEmbedDashboardDialog().getPreviewURI();
         String dashboardSchedule = createDashboardSchedule(DASHBOARD_NAME);
 
         dropObject(dashboardIdentifier, DropStrategy.CASCADE);
-        assertTrue(isObjectDeleted(previewUri, Places.DASHBOARD_EMBED));
-        assertTrue(isObjectDeleted(dashboardSchedule, Places.SCHEDULE_EMAIL));
+        browser.get(previewUri);
+        assertTrue(REQUESTED_DASHBOARD_NOT_EXIST.equals(
+                waitForElementVisible(By.cssSelector("#notFoundPage > p"), browser).getText().trim()));
+        assertTrue(!initEmailSchedulesPage().isGlobalSchedulePresent(dashboardSchedule));
     }
 
     @Test(dependsOnGroups = {"group1"}, alwaysRun = true)
@@ -275,7 +293,9 @@ public class GoodSalesMetadataDeletedTest extends TemplateAbstractTest {
 
     @Test(dependsOnMethods = {"resetLDM"}, groups = {"group2"})
     public void deleteDomainWithNoReportUsageUsingCascadeStrategy() throws IOException, JSONException {
-        deleteDomainHelper(DropStrategy.CASCADE, MOVED_IN_PIPELINE_DRILL_IN_REPORT, NEW_PIPELINE_DRILL_IN_REPORT);
+        createActivitiesByTypeReport();
+        createAmountByDateClosedReport();
+        deleteDomainHelper(DropStrategy.CASCADE, REPORT_ACTIVITIES_BY_TYPE, REPORT_AMOUNT_BY_DATE_CLOSED);
     }
 
     @Test(dependsOnMethods = {"resetLDM"}, groups = {"group2"})
@@ -288,17 +308,20 @@ public class GoodSalesMetadataDeletedTest extends TemplateAbstractTest {
 
     @Test(dependsOnMethods = {"resetLDM"}, groups = {"group2"})
     public void deleteDomainWithReportUsageUsingCascadeStrategy() throws IOException, JSONException {
+        createActiveLevelReport();
         Pair<String, String> folderIdAndName = createNewReportFolder();
         String folderId = folderIdAndName.getLeft();
         String folderName = folderIdAndName.getRight();
 
-        moveReportsToFolder(folderName, STARTING_PIPELINE_REPORT);
-        String folderIdentifier = getIdentifierFromObjId(folderId, ObjectType.DOMAIN);
+        moveReportsToFolder(folderName, REPORT_ACTIVITY_LEVEL);
+        String folderIdentifier = getIdentifierFromObjId(folderId, "domain");
 
         try {
-            addReportToNewDashboard(STARTING_PIPELINE_REPORT, DASHBOARD_NAME);
+            addReportToNewDashboard(REPORT_ACTIVITY_LEVEL, DASHBOARD_NAME);
             dropObject(folderIdentifier, DropStrategy.CASCADE);
-            assertTrue(isObjectDeleted(STARTING_PIPELINE_REPORT, Places.DASHBOARD_REPORT));
+            initDashboardsPage();
+            dashboardsPage.selectDashboard(DASHBOARD_NAME);
+            assertTrue(dashboardsPage.getContent().getNumberOfReports() == 0);
         } finally {
             tryDeleteDashboard();
         }
@@ -306,15 +329,16 @@ public class GoodSalesMetadataDeletedTest extends TemplateAbstractTest {
 
     @Test(dependsOnMethods = {"deleteDomainWithReportUsageUsingCascadeStrategy"}, groups = {"group2"})
     public void deleteDomainWithReportUsageUsingAllInStrategy() throws IOException, JSONException {
+        createActivitiesByTypeReport();
         Pair<String, String> folderIdAndName = createNewReportFolder();
         String folderId = folderIdAndName.getLeft();
         String folderName = folderIdAndName.getRight();
 
-        moveReportsToFolder(folderName, ACTIVITIES_BY_TYPE_REPORT);
-        String folderIdentifier = getIdentifierFromObjId(folderId, ObjectType.DOMAIN);
+        moveReportsToFolder(folderName, REPORT_ACTIVITIES_BY_TYPE);
+        String folderIdentifier = getIdentifierFromObjId(folderId, "domain");
 
         try {
-            addReportToNewDashboard(ACTIVITIES_BY_TYPE_REPORT, DASHBOARD_NAME);
+            addReportToNewDashboard(REPORT_ACTIVITIES_BY_TYPE, DASHBOARD_NAME);
             tryDropObject(folderIdentifier, DropStrategy.ALL_IN);
         } finally {
             tryDeleteDashboard();
@@ -323,21 +347,27 @@ public class GoodSalesMetadataDeletedTest extends TemplateAbstractTest {
 
     @Test(dependsOnMethods = {"resetLDM"}, groups = {"group2"})
     public void deleteDatasetWithNoAttributeUsageUsingCascadeStrategy() throws IOException, JSONException {
-        dropObject(PRODUCT_DATASET.identifier, DropStrategy.CASCADE);
-        for (String attribute : PRODUCT_DATASET.attributes) {
-            assertTrue(isObjectDeleted(attribute, Places.ATTRIBUTE));
+        List<String> attributeUris = getDatasetByIdentifier("dataset.product").getAttributes();
+        dropObject("dataset.product", DropStrategy.CASCADE);
+        for (String attribute : attributeUris) {
+            assertTrue(isObjectDeleted(attribute));
         }
     }
 
     @Test(dependsOnMethods = {"resetLDM"}, groups = {"group2"})
     public void deleteDatasetWithAttributeUsageUsingCascadeStrategy() throws IOException, JSONException {
+        List<String> attributeUris = getDatasetByIdentifier("dataset.stage").getAttributes();
+        String firstAttribute = getAttributeByUri(getDatasetByIdentifier("dataset.stage")
+                .getAttributes().get(0)).getTitle();
         try {
-            createDashboardWithAttributeFilter(DashAttributeFilterTypes.ATTRIBUTE, STAGE_DATASET.attributes[0]);
-
-            dropObject(STAGE_DATASET.identifier, DropStrategy.CASCADE);
-            assertTrue(isObjectDeleted(STAGE_DATASET.attributes[0], Places.DASHBOARD_FILTER));
-            for (String attribute : STAGE_DATASET.attributes) {
-                assertTrue(isObjectDeleted(attribute, Places.ATTRIBUTE));
+            createDashboardWithAttributeFilter(DashAttributeFilterTypes.ATTRIBUTE, firstAttribute);
+            
+            dropObject("dataset.stage", DropStrategy.CASCADE);
+            initDashboardsPage();
+            dashboardsPage.selectDashboard(DASHBOARD_NAME);
+            assertTrue(dashboardsPage.getContent().getFilterWidget(CssUtils.simplifyText(firstAttribute)) == null);
+            for (String attribute : attributeUris) {
+                assertTrue(isObjectDeleted(attribute));
             }
         } finally {
             tryDeleteDashboard();
@@ -348,9 +378,10 @@ public class GoodSalesMetadataDeletedTest extends TemplateAbstractTest {
     public void deleteDatasetWithAttributeUsageUsingAllInStrategy() throws JSONException,
             ParseException, IOException {
         try {
-            createDashboardWithAttributeFilter(DashAttributeFilterTypes.ATTRIBUTE, STAGE_DATASET.attributes[0]);
+            createDashboardWithAttributeFilter(DashAttributeFilterTypes.ATTRIBUTE, getAttributeByUri(
+            		getDatasetByIdentifier("dataset.stage").getAttributes().get(0)).getTitle());
 
-            tryDropObject(STAGE_DATASET.identifier, DropStrategy.ALL_IN);
+            tryDropObject("dataset.stage", DropStrategy.ALL_IN);
         } finally {
             tryDeleteDashboard();
         }
@@ -358,21 +389,22 @@ public class GoodSalesMetadataDeletedTest extends TemplateAbstractTest {
 
     @Test(dependsOnMethods = {"deleteDatasetWithAttributeUsageUsingAllInStrategy"}, groups = {"group2"})
     public void deleteDatasetWithNoAttributeUsageUsingAllInStrategy() throws JSONException, IOException {
-        dropObject(ACCOUNT_DATASET.identifier, DropStrategy.CASCADE);
-        for (String attribute : ACCOUNT_DATASET.attributes) {
-            assertTrue(isObjectDeleted(attribute, Places.ATTRIBUTE));
+    	List<String> attributeUris = getDatasetByIdentifier("dataset.account").getAttributes();
+        dropObject("dataset.account", DropStrategy.CASCADE);
+        for (String attribute : attributeUris) {
+            assertTrue(isObjectDeleted(attribute));
         }
     }
 
     @Test(dependsOnMethods = {"deleteDatasetWithNoAttributeUsageUsingAllInStrategy"}, groups = {"group2"})
     public void deleteConnectedDataset() throws IOException, JSONException {
-        assertFalse(isObjectDeleted(OPPORTUNITY_SNAPSHOT_DATASET, Places.DATASET));
+        assertFalse(isObjectDeleted(getDatasetByTitle("OpportunitySnapshot").getUri()));
     }
 
     @Test(dependsOnGroups = {"group2"})
     public void deleteDatasetContinually() throws JSONException {
-        dropObject(DATE_ACTIVITY_DATASET.identifier, DropStrategy.CASCADE);
-        dropObject(DATE_CREATED_DATASET.identifier, DropStrategy.CASCADE);
+        dropObject("activity.dataset.dt", DropStrategy.CASCADE);
+        dropObject("created.dataset.dt", DropStrategy.CASCADE);
     }
 
     private void tryDeleteDashboard() {
@@ -397,14 +429,17 @@ public class GoodSalesMetadataDeletedTest extends TemplateAbstractTest {
         Pair<String, String> folderIdAndName = createNewReportFolder();
         String folderId = folderIdAndName.getLeft();
         String folderName = folderIdAndName.getRight();
-
         moveReportsToFolder(folderName, reports);
-        String folderIdentifier = getIdentifierFromObjId(folderId, ObjectType.DOMAIN);
+        String folderIdentifier = getIdentifierFromObjId(folderId, "domain");
+        List<String> reportUris = new ArrayList<>();
+        for (String report : reports) {
+            reportUris.add(getReportByTitle(report).getUri());
+        }
 
         dropObject(folderIdentifier, strategy);
-        assertTrue(isObjectDeleted(folderName, Places.REPORT_FOLDER));
-        for (String report : reports) {
-            assertTrue(isObjectDeleted(report, Places.REPORT));
+        assertTrue(!initReportsPage().getAllFolderNames().contains(folderName));
+        for (String reportUri : reportUris) {
+            assertTrue(isObjectDeleted(reportUri));
         }
     }
 
@@ -437,83 +472,27 @@ public class GoodSalesMetadataDeletedTest extends TemplateAbstractTest {
         return subject;
     }
 
-    private String getIdentifierFromObjId(String id, ObjectType type) throws IOException, JSONException {
+    private String getIdentifierFromObjId(String id, String type) throws IOException, JSONException {
         return getIdentifierFromObjLink(String.format("/gdc/md/%s/obj/%s", testParams.getProjectId(), id), type);
     }
 
-    private String getIdentifierFromObjLink(String link, ObjectType type) throws IOException, JSONException {
+    private String getIdentifierFromObjLink(String link, String type) throws IOException, JSONException {
         JSONObject json = RestUtils.getJsonObject(getRestApiClient(), link);
-        return json.getJSONObject(type.toString()).getJSONObject("meta").getString("identifier");
+        return json.getJSONObject(type).getJSONObject("meta").getString("identifier");
     }
 
-    private String createMetricUsing(FactInfo fact, SimpleMetricTypes sum) {
-        initFactPage();
-        ObjectsTable.getInstance(id(ObjectTypes.FACT.getObjectsTableID()), browser).selectObject(fact.name);
-        return FactDetailPage.getInstance(browser).createSimpleMetric(SimpleMetricTypes.SUM, fact.name);
-    }
-
-    private boolean isObjectDeleted(String object, Places place) throws IOException, JSONException {
-        switch (place) {
-            case GREY_PAGE:
-                JSONObject json = RestUtils.getJsonObject(getRestApiClient(), object,
-                        HttpStatus.NOT_FOUND);
-                if (!json.has("error"))
-                    return false;
-                if (!object
-                        .endsWith("/obj/" + json.getJSONObject("error").getJSONArray("parameters").getString(0)))
-                    return false;
-                if (!OBJECT_ID_NOT_FOUND.equals(json.getJSONObject("error").getString("message")))
-                    return false;
-                return true;
-            case METRIC:
-                return !initMetricPage().isMetricVisible(object);
-            case ATTRIBUTE:
-                return !initAttributePage().isAttributeVisible(object);
-            case DATASET:
-                initManagePage();
-                return !ObjectsTable.getInstance(id(ObjectTypes.DATA_SETS.getObjectsTableID()), browser).getAllItems().contains(object);
-            case VARIABLE:
-                return !initVariablePage().hasVariable(object);
-            case REPORT:
-                return !initReportsPage().openFolder("All").isReportVisible(object);
-            case DASHBOARD_FILTER:
-                initDashboardsPage();
-                dashboardsPage.selectDashboard(DASHBOARD_NAME);
-                return dashboardsPage.getContent().getFilterWidget(CssUtils.simplifyText(object)) == null;
-            case SAVED_VIEW:
-                initDashboardsPage();
-                dashboardsPage.selectDashboard(DASHBOARD_NAME);
-                return !dashboardsPage.getSavedViewWidget().openSavedViewMenu().getSavedViewPopupMenu()
-                        .getAllSavedViewNames().contains(object);
-            case DASHBOARD_GEO:
-                initDashboardsPage();
-                dashboardsPage.selectDashboard(DASHBOARD_NAME);
-                return dashboardsPage.getContent().getGeoCharts().isEmpty();
-            case DASHBOARD_REPORT:
-                initDashboardsPage();
-                dashboardsPage.selectDashboard(DASHBOARD_NAME);
-                return dashboardsPage.getContent().getNumberOfReports() == 0;
-            case SCHEDULE_EMAIL:
-                return !initEmailSchedulesPage().isGlobalSchedulePresent(object);
-            case DASHBOARD_EMBED:
-                browser.get(object);
-                return REQUESTED_DASHBOARD_NOT_EXIST.equals(
-                        waitForElementVisible(By.cssSelector("#notFoundPage > p"), browser).getText().trim());
-            case REPORT_FOLDER:
-                return !initReportsPage().getAllFolderNames().contains(object);
-            case DASHBOARD:
-                initDashboardsPage();
-                return !dashboardsPage.getDashboardsNames().contains(object);
-            default:
-                return false;
+    private boolean isObjectDeleted(String object) throws IOException, JSONException {
+        JSONObject json;
+        try{
+            json = RestUtils.getJsonObject(getRestApiClient(), object);
+        } catch (InvalidStatusCodeException e) {
+            return true;
         }
-    }
-
-    private void dropAllComments(String[] objectLinks, DropStrategy strategy) throws ParseException,
-        JSONException, IOException {
-        for (String link: objectLinks) {
-            dropObject(getIdentifierFromObjLink(link, ObjectType.COMMENT), strategy);
-        }
+        if (!json.has("error") 
+            || !object.endsWith("/obj/" + json.getJSONObject("error").getJSONArray("parameters").getString(0)) 
+            || !OBJECT_ID_NOT_FOUND.equals(json.getJSONObject("error").getString("message")))
+            return false;
+        return true;
     }
 
     private void dropObject(String identifier, DropStrategy strategy) throws JSONException {
@@ -586,179 +565,33 @@ public class GoodSalesMetadataDeletedTest extends TemplateAbstractTest {
         return name;
     }
 
-    private String createMetricUsing(AttributeInfo attribute) {
+    private String createMetricUsing(String attributeTitle, String elementTitle) {
         String name = "Metric " + System.currentTimeMillis();
-        initMetricPage().createDifferentMetric(name, WIN_RATE_METRIC, attribute.name, attribute.elements[0].name);
+        initMetricPage().createDifferentMetric(name, METRIC_WIN_RATE, attributeTitle, elementTitle);
 
         return name;
     }
 
-    private Pair<String, String> createFilterVariableUsingAttribute(AttributeInfo attribute) {
+    private Pair<String, String> createFilterVariableUsingAttribute(String attributeTitle, String elementTitle) {
         String name = "Filter variable " + System.currentTimeMillis();
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
         waitForDataPageLoaded(browser);
         sleepTightInSeconds(5);
-        VariablesPage.getInstance(browser).createVariable(new AttributeVariable(name).withAttribute(attribute.name)
-                .withAttributeValues(attribute.elements[0].name));
+        VariablesPage.getInstance(browser).createVariable(new AttributeVariable(name).withAttribute(attributeTitle)
+                .withAttributeValues(elementTitle));
 
         String url = browser.getCurrentUrl();
         return Pair.of(url.substring(url.lastIndexOf("/") + 1), name);
     }
 
-    private String createComputedAttributeUsing(AttributeInfo attribute) {
+    private String createComputedAttributeUsing(String attributeTitle) {
         String name = "CA " + System.currentTimeMillis();
         initAttributePage()
             .moveToCreateAttributePage()
-            .createComputedAttribute(new ComputedAttributeDefinition().withAttribute(attribute.name)
-                    .withMetric(WIN_RATE_METRIC)
+            .createComputedAttribute(new ComputedAttributeDefinition().withAttribute(attributeTitle)
+                    .withMetric(METRIC_WIN_RATE)
                     .withName(name));
         return name;
-    }
-
-    private String createUserFilterFrom(AttributeInfo attribute) throws IOException, JSONException {
-        return DashboardsRestUtils.createSimpleMufObjByUri(getRestApiClient(),
-                testParams.getProjectId(), "User filter "+ System.currentTimeMillis(),
-                getConditionInUriFormat(attribute.getConnectionBetweenAttributeAndElements()));
-    }
-
-    private Map<String, Collection<String>> getConditionInUriFormat(final Map<String, Collection<String>> condition) {
-        final String attributeUri = "/gdc/md/%s/obj/%s";
-        final String elementUri = "/gdc/md/%s/obj/%s/elements?id=%s";
-        final Map<String, Collection<String>> conditionInUriFormat = new HashMap<String, Collection<String>>();
-
-        for (final String attributeId : condition.keySet()) {
-            conditionInUriFormat.put(String.format(attributeUri, testParams.getProjectId(), attributeId),
-                    condition.get(attributeId).stream()
-                    .map(e -> String.format(elementUri, testParams.getProjectId(), attributeId, e))
-                    .collect(Collectors.toList()));
-        }
-
-        return conditionInUriFormat;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static abstract class MetadataInfo {
-        protected String name;
-        protected String id;
-        protected String identifier;
-
-        public <T extends MetadataInfo> T withName(String name) {
-            this.name = name;
-            return (T) this;
-        }
-
-        public <T extends MetadataInfo> T withId(String id) {
-            this.id = id;
-            return (T) this;
-        }
-
-        public <T extends MetadataInfo> T withIdentifier(String identifier) {
-            this.identifier = identifier;
-            return (T) this;
-        }
-    }
-
-    private static class FactInfo extends MetadataInfo {
-        private String dataset;
-
-        public FactInfo withDataset(String dataset) {
-            this.dataset = dataset;
-            return this;
-        }
-    }
-
-    private static class MetricInfo extends MetadataInfo {
-        private String affectedMetric;
-        private String[] affectedReports;
-
-        public MetricInfo withAffectedMetric(String affectedMetric) {
-            this.affectedMetric = affectedMetric;
-            return this;
-        }
-
-        public MetricInfo withAffectedReports(String... affectedReports) {
-            this.affectedReports = affectedReports;
-            return this;
-        }
-    }
-
-    private static class VariableInfo extends MetadataInfo {
-        private String affectedMetric;
-        private String affectedReport;
-
-        public VariableInfo withAffectedMetric(String affectedMetric) {
-            this.affectedMetric = affectedMetric;
-            return this;
-        }
-
-        public VariableInfo withAffectedReport(String affectedReport) {
-            this.affectedReport = affectedReport;
-            return this;
-        }
-    }
-
-    private static class DatasetInfo extends MetadataInfo {
-        private String[] attributes;
-
-        public DatasetInfo withAttributes(String... attributes) {
-            this.attributes = attributes;
-            return this;
-        }
-    }
-
-    private static class AttributeInfo extends MetadataInfo {
-        private String[] labelIds;
-        private AttributeElementInfo[] elements;
-        private String dataset;
-
-        public AttributeInfo withLabelIds(String... labelIds) {
-            this.labelIds = labelIds;
-            return this;
-        }
-
-        public AttributeInfo withElements(AttributeElementInfo... elements) {
-            this.elements = elements;
-            return this;
-        }
-
-        public AttributeInfo withDataset(String dataset) {
-            this.dataset = dataset;
-            return this;
-        }
-
-        public Collection<String> getLabelUriFormats() {
-            return Collections2.transform(Arrays.asList(labelIds), new Function<String, String>() {
-                @Override
-                public String apply(String labelId) {
-                    return "/gdc/md/%s/obj/" + labelId;
-                }
-            });
-        }
-
-        public Map<String, Collection<String>> getConnectionBetweenAttributeAndElements() {
-            return new HashMap<String, Collection<String>>() {
-                private static final long serialVersionUID = 1L;
-                {
-                    put(id, Collections2.transform(Arrays.asList(elements),
-                            new Function<AttributeElementInfo, String>() {
-                        @Override
-                        public String apply(AttributeElementInfo attributeElement) {
-                            return attributeElement.id;
-                        }
-                    }));
-                }
-            };
-        }
-    }
-
-    private static class AttributeElementInfo {
-        private String name;
-        private String id;
-
-        public AttributeElementInfo(String name, String id) {
-            this.name = name;
-            this.id = id;
-        }
     }
 
     private static enum DropStrategy {
@@ -774,41 +607,6 @@ public class GoodSalesMetadataDeletedTest extends TemplateAbstractTest {
 
         public String getMaql(String identifier) {
             return String.format(maql, identifier);
-        }
-    }
-
-    private static enum Places {
-        GREY_PAGE,
-        ATTRIBUTE,
-        FACT,
-        VARIABLE,
-        METRIC,
-        REPORT,
-        SAVED_VIEW,
-        DASHBOARD_FILTER,
-        DATASET,
-        DASHBOARD_GEO,
-        SCHEDULE_EMAIL,
-        DASHBOARD_REPORT,
-        DASHBOARD_EMBED,
-        REPORT_FOLDER,
-        DASHBOARD;
-    }
-
-    private static enum ObjectType {
-        DOMAIN("domain"),
-        PROJECT_DASHBOARD("projectDashboard"),
-        COMMENT("comment");
-
-        private String key;
-
-        private ObjectType(String key) {
-            this.key = key;
-        }
-
-        @Override
-        public String toString() {
-            return key;
         }
     }
 }

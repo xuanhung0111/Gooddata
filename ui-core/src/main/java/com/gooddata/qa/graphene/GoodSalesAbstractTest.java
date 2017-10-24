@@ -258,7 +258,30 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
                 singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_ACTIVITY))),
                 singletonList(new MetricElement(getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES)))));
     }
+    protected String createNewLostDrillInReport() {
+        try {
+            getMetricByTitle(METRIC_LOST);
+        } catch (ObjNotFoundException e) {
+            createLostMetric();
+        }
 
+        return createReport(GridReportDefinitionContent.create(REPORT_NEW_LOST_DRILL_IN,
+                singletonList(METRIC_GROUP),
+                singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_OPPORTUNITY))),
+                singletonList(new MetricElement(getMetricByTitle(METRIC_LOST)))));
+    }
+
+    protected String createNewWonDrillInReport() {
+        try {
+            getMetricByTitle(METRIC_WON);
+        } catch (ObjNotFoundException e) {
+            createWonMetric();
+        }
+        return createReport(GridReportDefinitionContent.create(REPORT_NEW_WON_DRILL_IN,
+                singletonList(METRIC_GROUP),
+                singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_OPPORTUNITY))),
+                singletonList(new MetricElement(getMetricByTitle(METRIC_WON)))));
+    }
     //------------------------- REPORT MD OBJECTS - END  ------------------------
 
     //------------------------- VARIABLE MD OBJECTS - BEGIN  ------------------------
@@ -311,6 +334,27 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
                         getFactByTitle(FACT_AMOUNT).getUri(),
                         getFactByTitle(FACT_OPP_SNAPSHOT_DATE).getUri(),
                         getMetricByTitle(METRIC_SNAPSHOT_BOP).getUri()), "$#,##0.00");
+    }
+
+    protected Metric createBestCaseBOPMetric() {
+        Attribute attributeStatus = getAttributeByIdentifier("attr.stage.status");
+        String elementOpenOfStatus = getMdService()
+                .getAttributeElements(attributeStatus).stream()
+                .filter(element -> "Open".equals(element.getTitle()))
+                .findFirst()
+                .get()
+                .getUri();
+        try {
+            getMetricByTitle(METRIC_AMOUNT_BOP);
+        } catch (ObjNotFoundException e) {
+            createAmountBOPMetric();
+        }
+       //select Amount [BOP] where Status=Open
+        return createMetric(METRIC_BEST_CASE_BOP,
+                format("SELECT [%s] where [%s]= [%s]",
+                        getMetricByTitle(METRIC_AMOUNT_BOP).getUri(),
+                        attributeStatus.getUri(),
+                        elementOpenOfStatus), "$#,##0.00");
     }
 
     protected Metric createTimelineEOPMetric() {
@@ -448,6 +492,34 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
                         getAttributeByTitle(ATTR_DATE_SNAPSHOT).getUri(),
                         getFactByTitle(FACT_OPP_SNAPSHOT_DATE).getUri(),
                         getMetricByTitle(METRIC_TIMELINE_BOP).getUri()));
+    }
+
+    protected Metric createProbabilityBOPMetric() {
+        try {
+            getMetricByTitle(METRIC_SNAPSHOT_BOP);
+        } catch (ObjNotFoundException e) {
+            createSnapshotBOPMetric();
+        }
+        //SELECT AVG(Probability) where Opp. Snapshot (Date)=_Snapshot [BOP]
+        return createMetric(METRIC_PROBABILITY_BOP,
+                format("SELECT AVG([%s]) where [%s]= [%s]",
+                        getFactByTitle(FACT_PROBABILITY).getUri(),
+                        getFactByTitle(FACT_OPP_SNAPSHOT_DATE).getUri(),
+                        getMetricByTitle(METRIC_SNAPSHOT_BOP).getUri()), "#,##0.0%");
+    }
+
+    protected Metric createCloseEOPMetric() {
+        try {
+            getMetricByTitle(METRIC_SNAPSHOT_EOP);
+        } catch (ObjNotFoundException e) {
+            createSnapshotEOPMetric();
+        }
+        // Select max(Opp. Close (Date)) where Opp. Snapshot (Date)=_Snapshot [EOP]
+        return createMetric(METRIC_CLOSE_EOP,
+                format("SELECT max([%s]) where [%s]=[%s]",
+                        getFactByTitle(FACT_OPP_CLOSE_DATE).getUri(),
+                        getFactByTitle(FACT_OPP_SNAPSHOT_DATE).getUri(),
+                        getMetricByTitle(METRIC_SNAPSHOT_EOP).getUri()), "#,##0.00");
     }
 
     protected Metric createNumberOfOpportunitiesBOPMetric() {
