@@ -7,7 +7,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 import static com.gooddata.qa.utils.mail.ImapUtils.getLastEmail;
-import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -22,7 +21,6 @@ import javax.mail.MessagingException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.By;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
@@ -40,24 +38,20 @@ import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 public class InviteUserTest extends AbstractProjectTest {
 
     private static final String INVITATION_MESSAGE = "We invite you to our project";
-
     private static final By INVITATION_PAGE_LOCATOR = By.cssSelector(".s-invitationPage");
 
-    private String invitationSubject;
+    private int expectedMessageCount; //Use this variable to avoid connecting to inbox many times
     private RegistrationForm registrationForm;
 
-    //  Use this variable to avoid connecting to inbox many times 
-    private int expectedMessageCount;
-
-    @BeforeClass(alwaysRun = true)
-    public void initData() throws IOException, MessagingException {
-        final String uniqueString = String.valueOf(System.currentTimeMillis());
-        projectTitle += uniqueString;
+    @Override
+    protected void initProperties() {
+        projectTitle = "InviteUserTest"; // will be added hash code in AbstractProjectTest.createProject()
 
         imapHost = testParams.loadProperty("imap.host");
         imapPassword = testParams.loadProperty("imap.password");
         imapUser = testParams.loadProperty("imap.user");
 
+        String uniqueString = String.valueOf(System.currentTimeMillis());
         registrationForm = new RegistrationForm()
                 .withFirstName("FirstName " + uniqueString)
                 .withLastName("LastName " + uniqueString)
@@ -71,27 +65,24 @@ public class InviteUserTest extends AbstractProjectTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void getExpectedMessage() {
-        invitationSubject = projectTitle + " Invitation";
         expectedMessageCount = doActionWithImapClient(imapClient ->
-                imapClient.getMessagesCount(GDEmails.INVITATION, invitationSubject));
+                imapClient.getMessagesCount(GDEmails.INVITATION, getInvitationSubject()));
     }
 
     @Test(dependsOnMethods = {"getExpectedMessage"})
     public void inviteRegistedUser() throws Throwable {
         loginAndOpenProjectAndUserPage();
-
-        final String invitationLink = inviteUsers(invitationSubject, UserRoles.ADMIN,
-                INVITATION_MESSAGE, imapUser);
+        final String invitationLink = inviteUsers(UserRoles.ADMIN, imapUser);
 
         dismissStatusBarMessage();
         ProjectAndUsersPage.getInstance(browser).openInvitedUserTab();
         checkResendAndCancelInvitationAvailable(imapUser);
 
         final Email lastEmail = doActionWithImapClient(imapClient ->
-                getLastEmail(imapClient, GDEmails.INVITATION, invitationSubject, expectedMessageCount + 1));
+                getLastEmail(imapClient, GDEmails.INVITATION, getInvitationSubject(), expectedMessageCount + 1));
 
         assertEquals(lastEmail.getFrom(), GDEmails.INVITATION.getEmailAddress());
-        assertEquals(lastEmail.getSubject(), invitationSubject);
+        assertEquals(lastEmail.getSubject(), getInvitationSubject());
 
         assertTrue(lastEmail.getBody().contains(INVITATION_MESSAGE),
                 "The invitation email does not contain expected message");
@@ -136,8 +127,7 @@ public class InviteUserTest extends AbstractProjectTest {
         final String nonRegistedUser = generateEmail(imapUser);
 
         loginAndOpenProjectAndUserPage();
-        final String invitationLink = inviteUsers(invitationSubject, UserRoles.EDITOR,
-                INVITATION_MESSAGE, nonRegistedUser);
+        final String invitationLink = inviteUsers(UserRoles.EDITOR, nonRegistedUser);
 
         logout();
         openUrl(invitationLink);
@@ -166,7 +156,7 @@ public class InviteUserTest extends AbstractProjectTest {
         final String nonRegistedUser = generateEmail(imapUser);
 
         loginAndOpenProjectAndUserPage()
-            .openInviteUserDialog().inviteUsers(UserRoles.EDITOR, INVITATION_MESSAGE, nonRegistedUser);
+                .openInviteUserDialog().inviteUsers(UserRoles.EDITOR, INVITATION_MESSAGE, nonRegistedUser);
         dismissStatusBarMessage();
 
         ++expectedMessageCount;
@@ -174,7 +164,7 @@ public class InviteUserTest extends AbstractProjectTest {
         ProjectAndUsersPage.getInstance(browser).resendInvitation(nonRegistedUser);
 
         final Collection<Message> invitations = doActionWithImapClient(imapClient ->waitForMessages(
-                imapClient, GDEmails.INVITATION, invitationSubject, expectedMessageCount + 1));
+                imapClient, GDEmails.INVITATION, getInvitationSubject(), expectedMessageCount + 1));
         assertTrue(invitations.size() == expectedMessageCount + 1, "The resend invitation has not been sent");
 
         ++expectedMessageCount;
@@ -189,16 +179,16 @@ public class InviteUserTest extends AbstractProjectTest {
                 .getErrorMessage(), imapUser + " is already a member of this project");
     }
 
-    @Test(dependsOnMethods = {"inviteAlreadyPresentUser"}) 
+    @Test(dependsOnMethods = {"inviteAlreadyPresentUser"})
     public void inviteManyUsers() {
         final String nonRegistedUserA = generateEmail(imapUser);
         final String nonRegistedUserB = generateEmail(imapUser);
 
-        initProjectsAndUsersPage().openInviteUserDialog().inviteUsers(UserRoles.EDITOR,
-                INVITATION_MESSAGE, nonRegistedUserA, nonRegistedUserB);
+        initProjectsAndUsersPage().openInviteUserDialog()
+                .inviteUsers(UserRoles.EDITOR, INVITATION_MESSAGE, nonRegistedUserA, nonRegistedUserB);
 
         final Collection<Message> invitations = doActionWithImapClient(imapClient -> waitForMessages(
-                imapClient, GDEmails.INVITATION, invitationSubject, expectedMessageCount + 2));
+                imapClient, GDEmails.INVITATION, getInvitationSubject(), expectedMessageCount + 2));
         assertTrue(invitations.size() == expectedMessageCount + 2, "There are less than 2 new invitations in inbox");
 
         dismissStatusBarMessage();
@@ -206,12 +196,12 @@ public class InviteUserTest extends AbstractProjectTest {
         checkResendAndCancelInvitationAvailable(nonRegistedUserA);
         checkResendAndCancelInvitationAvailable(nonRegistedUserB);
 
-        expectedMessageCount = expectedMessageCount + 2; 
+        expectedMessageCount = expectedMessageCount + 2;
     }
 
-    private String inviteUsers(String emailSubject, UserRoles role, String message, String... emails) {
-        return doActionWithImapClient((imapClient) ->
-            ProjectAndUsersPage.getInstance(browser).inviteUsers(imapClient, invitationSubject, role, INVITATION_MESSAGE, emails));
+    private String inviteUsers(UserRoles role, String... emails) {
+        return doActionWithImapClient((imapClient) -> ProjectAndUsersPage.getInstance(browser)
+                .inviteUsers(imapClient, getInvitationSubject(), role, INVITATION_MESSAGE, emails));
     }
 
     private ProjectAndUsersPage loginAndOpenProjectAndUserPage() throws JSONException {

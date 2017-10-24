@@ -26,7 +26,6 @@ import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.Select;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -62,9 +61,15 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
 
     private static final String RED_BAR_MESSAGE = "\"%s\" name already in use. Please change the name and try again.";
 
-    @BeforeClass(alwaysRun = true)
-    public void setProjectTitle() {
-        projectTitle = "GoodSales-test-variable";
+    @Override
+    protected void initProperties() {
+        super.initProperties();
+        projectTitle += "VariableTest";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"basic"})

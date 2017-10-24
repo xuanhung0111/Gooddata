@@ -6,6 +6,9 @@ import static com.gooddata.qa.browser.BrowserUtils.switchToMainWindow;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CLOSED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CREATED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
@@ -50,8 +53,6 @@ import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
     private static final String EMBEDDED_DASHBOARD = "embedded-dashboard";
-    private static final String METRIC_AMOUNT = "Amount";
-    private static final String ATTR_PRODUCT = "Product";
     private static final String THIS_YEAR = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
     private static final String LAST_YEAR = String.valueOf(Calendar.getInstance().get(Calendar.YEAR) - 1);
 
@@ -61,8 +62,11 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
     private String embeddedCode;
     private String embedUri;
 
-    @Test(dependsOnGroups = "createProject", groups = "precondition")
-    public void initData() {
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
+        createActivitiesByTypeReport();
+        createActiveLevelReport();
         EmbedDashboardDialog embeddedDialog = initDashboardsPage()
                 .addNewDashboard("New Dashboard")
                 .addNewTab("1st_filter_report")
@@ -77,7 +81,7 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
         embedUri = embeddedDialog.getPreviewURI().replace("dashboard.html", "embedded.html");
     }
 
-    @Test(dependsOnGroups = "precondition")
+    @Test(dependsOnGroups = "createProject")
     public void editEmbeddedDashboardUsingEmbeddedHtmlLink() {
         final String report = "Report-" + System.currentTimeMillis();
 
@@ -106,7 +110,7 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
         assertTrue(embeddedDashboard.getContent().isEmpty(), "Report is not deleted successfully");
     }
 
-    @Test(dependsOnGroups = "precondition")
+    @Test(dependsOnGroups = "createProject")
     public void initEmbeddedDashboardWithIframe() {
         initDashboardsPage()
                 .addNewDashboard(EMBEDDED_DASHBOARD)
@@ -181,7 +185,7 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
         final String localMetric = createMetric("localMetric", "Select 1", "#,##0").getTitle();
         final String deleteLocalMetricMessage = "Are you sure you want to delete this metric? This action cannot be undone.";
 
-        final String globalMetric = "# of Lost Opps.";
+        final String globalMetric = METRIC_NUMBER_OF_ACTIVITIES;
         final String deleteGlobalMetricMessage = "This metric is used in other reports. "
                 + "If you delete this metric, it will remain valid in these reports. However, "
                 + "it will no longer be possible to add it to new reports.";
@@ -260,7 +264,7 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
                 "Report is still not deleted");
     }
 
-    @Test(dependsOnGroups = "precondition")
+    @Test(dependsOnGroups = "createProject")
     public void createAndDeleteSavedView() {
         EmbeddedDashboard embeddedDashboard = initEmbeddedDashboardUsingEmbeddedHtmlLink();
         SavedViewWidget savedViewWidget = embeddedDashboard.getSavedViewWidget();
@@ -279,7 +283,7 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
         assertTrue(savedViewWidget.isUnsavedViewButtonPresent(), "Unsaved View Button does not present");
     }
 
-    @Test(dependsOnGroups = "precondition")
+    @Test(dependsOnGroups = "createProject")
     public void showNotificationWhenSavedViewIsTurnedOff() {
         EmbeddedDashboard embeddedDashboard = initEmbeddedDashboardUsingEmbeddedHtmlLink();
         embeddedDashboard.openTab(1).editDashboard();
@@ -298,7 +302,7 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
                 "Notification 'Saved Views disabled' is displayed");
     }
 
-    @Test(dependsOnGroups = "precondition")
+    @Test(dependsOnGroups = "createProject")
     public void checkFilterAppliedWhenSwitchSavedView() {
         EmbeddedDashboard embeddedDashboard = initEmbeddedDashboardUsingEmbeddedHtmlLink();
         SavedViewWidget savedViewWidget = embeddedDashboard.getSavedViewWidget();

@@ -1,46 +1,43 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_AMOUNT_BY_PRODUCT;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import java.io.IOException;
 
-import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Fact;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
-import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-
-import com.gooddata.qa.utils.http.fact.FactRestUtils;
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
+import com.gooddata.qa.utils.http.fact.FactRestUtils;
 
 public class GoodSalesDashboardRestrictedFacts extends GoodSalesAbstractTest {
 
-    private static final String REPORT_NAME = "Expected + Won";
-    private static final String REPORT_FILE_NAME = "Expected _ Won";
+    private static final long expectedTabularReportExportPDFSize = 26000L;
+    private static final long expectedTabularReportExportCSVSize = 175L;
 
-    private static final long expectedTabularReportExportPDFSize = 20000L;
-    private static final long expectedTabularReportExportCSVSize = 50L;
-
-    @BeforeClass(alwaysRun = true)
-    public void setProjectTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-restricted-facts-test";
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
-    public void setupPrecondition() throws ParseException, JSONException, IOException {
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountByProductReport();
         FactRestUtils.setFactRestricted(getRestApiClient(), getProject(), getMdService().getObjUri(getProject(), Fact.class, title(FACT_AMOUNT)));
     }
 
-    @Test(dependsOnMethods = {"setupPrecondition"}, groups = {"restricted-fact"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"restricted-fact"})
     public void checkDashboardRenderedCorrectly() {
         initDashboardsPage();
         waitForDashboardPageLoaded(browser);
@@ -48,15 +45,15 @@ public class GoodSalesDashboardRestrictedFacts extends GoodSalesAbstractTest {
         checkRedBar(browser);
     }
 
-    @Test(dependsOnMethods = {"setupPrecondition"}, groups = {"restricted-fact"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"restricted-fact"})
     public void exportRestrictedReport() {
         ReportPage my_report = initReportsPage()
-                .openReport(REPORT_NAME);
+                .openReport(REPORT_AMOUNT_BY_PRODUCT);
 
         // export to pdf
         my_report.exportReport(ExportFormat.PDF_PORTRAIT);
         checkRedBar(browser);
-        verifyReportExport(ExportFormat.PDF_PORTRAIT, REPORT_FILE_NAME, expectedTabularReportExportPDFSize);
+        verifyReportExport(ExportFormat.PDF_PORTRAIT, REPORT_AMOUNT_BY_PRODUCT, expectedTabularReportExportPDFSize);
 
         // export to csv
         my_report.exportReport(ExportFormat.CSV);
@@ -71,11 +68,11 @@ public class GoodSalesDashboardRestrictedFacts extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"unsetRestrictedFact"}, groups = {"unrestricted-fact"})
     public void exportReport() {
         ReportPage my_report = initReportsPage()
-                .openReport(REPORT_NAME);
+                .openReport(REPORT_AMOUNT_BY_PRODUCT);
 
         // export to csv
         my_report.exportReport(ExportFormat.CSV);
         checkRedBar(browser);
-        verifyReportExport(ExportFormat.CSV, REPORT_FILE_NAME, expectedTabularReportExportCSVSize);
+        verifyReportExport(ExportFormat.CSV, REPORT_AMOUNT_BY_PRODUCT, expectedTabularReportExportCSVSize);
     }
 }

@@ -1,11 +1,9 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import static com.gooddata.md.Restriction.title;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.getVariableUri;
@@ -26,7 +24,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.gooddata.md.Attribute;
 import com.gooddata.md.Metric;
 import com.gooddata.md.report.AttributeInGrid;
 import com.gooddata.md.report.Filter;
@@ -37,8 +34,8 @@ import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
-import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
+import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
 
 public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
@@ -64,24 +61,23 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
         multipleChoice = parseBoolean(context.getCurrentXmlTest().getParameter("multipleChoice"));
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
-    public void initData() throws JSONException, IOException {
+    @Override
+    protected void customizeProject() throws Throwable {
         initVariablePage().createVariable(new AttributeVariable(DF_VARIABLE)
                 .withAttribute(ATTR_STAGE_NAME)
                 .withAttributeValues(asList(INTEREST, DISCOVERY, SHORT_LIST, RISK_ASSESSMENT)));
 
-        Metric amountMetric = getMdService().getObj(getProject(), Metric.class, title(METRIC_AMOUNT));
-        Attribute stageNameAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_STAGE_NAME));
+        Metric amountMetric = createAmountMetric();
         String promptFilterUri = getVariableUri(getRestApiClient(), testParams.getProjectId(), DF_VARIABLE);
 
         createReportViaRest(GridReportDefinitionContent.create(REPORT,
                 singletonList(METRIC_GROUP),
-                singletonList(new AttributeInGrid(stageNameAttribute.getDefaultDisplayForm().getUri(), stageNameAttribute.getTitle())),
+                singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_STAGE_NAME).getDefaultDisplayForm().getUri(), ATTR_STAGE_NAME)),
                 singletonList(new MetricElement(amountMetric))));
 
         createReportViaRest(GridReportDefinitionContent.create(REPORT_WITH_PROMPT_FILTER,
                 singletonList(METRIC_GROUP),
-                singletonList(new AttributeInGrid(stageNameAttribute.getDefaultDisplayForm().getUri(), stageNameAttribute.getTitle())),
+                singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_STAGE_NAME).getDefaultDisplayForm().getUri(), ATTR_STAGE_NAME)),
                 singletonList(new MetricElement(amountMetric)),
                 singletonList(new Filter(format("[%s]", promptFilterUri)))));
     }
@@ -94,7 +90,7 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
         };
     }
 
-    @Test(dependsOnGroups = {"precondition"}, dataProvider = "filterProvider", groups = {"df-single", "df-multiple"})
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "filterProvider", groups = {"df-single", "df-multiple"})
     public void checkDefaultFilterApplied(DashAttributeFilterTypes type, String name, String report) {
         initDashboardsPage()
                 .addNewDashboard(generateDashboardName())
@@ -125,7 +121,7 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
         assertEquals(getReport(report).getAttributeElements(), singletonList(SHORT_LIST));
     }
 
-    @Test(dependsOnGroups = {"precondition"}, groups = {"df-single", "df-multiple"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"df-single", "df-multiple"})
     public void setInitialDashViewForViewer() throws JSONException {
         final String dashBoard = generateDashboardName();
 
@@ -166,7 +162,7 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
         }
     }
 
-    @Test(dependsOnGroups = {"precondition"}, groups = {"df-single", "df-multiple"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"df-single", "df-multiple"})
     public void setInitialDashViewForAttribute() throws JSONException {
         final String dashBoard = generateDashboardName();
 
@@ -191,7 +187,7 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
         assertEquals(getFilter(ATTR_DEPARTMENT).getCurrentValue(), DIRECT_SALES);
     }
 
-    @Test(dependsOnGroups = {"precondition"}, groups = {"df-single", "df-multiple"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"df-single", "df-multiple"})
     public void notApplyValueDashViewForAttributeInPreviewMode() throws JSONException {
         final String dashBoard = generateDashboardName();
 
@@ -222,7 +218,7 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
         }
     }
 
-    @Test(dependsOnGroups = {"precondition"}, groups = {"df-single", "df-multiple"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"df-single", "df-multiple"})
     public void turnOnDashboardSavedViewAfterSettingDefaultFilter() throws JSONException {
         final String dashBoard = generateDashboardName();
 
@@ -257,7 +253,7 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
         }
     }
 
-    @Test(dependsOnGroups = {"precondition"}, groups = {"df-single", "df-multiple"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"df-single", "df-multiple"})
     public void checkDashboardRenderWithDefaultFilter() {
         initDashboardsPage()
                 .addNewDashboard(generateDashboardName())
@@ -286,7 +282,7 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
         assertEquals(getReport(REPORT).getAttributeElements(), singletonList(DISCOVERY));
     }
 
-    @Test(dependsOnGroups = {"precondition"}, groups = {"df-single", "df-multiple"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"df-single", "df-multiple"})
     public void setInitialValueForFilterGroup() {
         initDashboardsPage()
                 .addNewDashboard(generateDashboardName())

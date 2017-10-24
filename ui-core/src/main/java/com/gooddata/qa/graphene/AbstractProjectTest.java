@@ -71,9 +71,6 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     protected static final int DEFAULT_PROJECT_CHECK_LIMIT = 60; // 5 minutes
 
     protected String projectTitle = "simple-project";
-    // keep this param for tests depending on other templates (e.g.: connectors test)
-    protected String projectTemplate = "";
-
     protected ResourceTemplate appliedFixture;
     protected int projectCreateCheckIterations = DEFAULT_PROJECT_CHECK_LIMIT;
 
@@ -104,7 +101,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     }
 
     @Test(dependsOnMethods = {"init"}, groups = {"createProject"})
-    public void createProject() {
+    public void createProject() throws Throwable {
         if (testParams.isReuseProject()) {
             if (testParams.getProjectId() != null && !testParams.getProjectId().isEmpty()) {
                 log.info("Project will be re-used, id: " + testParams.getProjectId());
@@ -114,15 +111,8 @@ public abstract class AbstractProjectTest extends AbstractUITest {
             }
         }
 
-        if (Objects.isNull(appliedFixture)) {
-            log.info("Using REST api to create an empty project.");
-            testParams.setProjectId(ProjectRestUtils.createProject(getGoodDataClient(), projectTitle,
-                    null, testParams.getAuthorizationToken(), testParams.getProjectDriver(),
-                    testParams.getProjectEnvironment()));
-        } else {
-            log.info("Using fixture named " + appliedFixture.getPath() + " to create project");
-            testParams.setProjectId(createProjectUsingFixture(projectTitle, appliedFixture));
-        }
+        // strategy using to create a new project should be defined by this hook
+        createNewProject();
 
         projectTitle = testParams.getProjectId().substring(0, 6) + "-" + projectTitle;
         ProjectRestUtils.updateProjectTitle(getRestApiClient(), getProject(), projectTitle);
@@ -237,6 +227,22 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     /**
      * a hook to createProject group.
+     * this helps user define what is the strategy to create a new project
+     */
+    protected void createNewProject() throws Throwable{
+        if (Objects.isNull(appliedFixture)) {
+            log.info("Using REST api to create an empty project.");
+            testParams.setProjectId(ProjectRestUtils.createProject(getGoodDataClient(), projectTitle,
+                    null, testParams.getAuthorizationToken(), testParams.getProjectDriver(),
+                    testParams.getProjectEnvironment()));
+        } else {
+            log.info("Using fixture named " + appliedFixture.getPath() + " to create project");
+            testParams.setProjectId(createProjectUsingFixture(projectTitle, appliedFixture));
+        }
+    }
+
+    /**
+     * a hook to createProject group.
      * Any extra setting which is required for a specific test class should be added here
      */
     protected void customizeProject() throws Throwable {
@@ -337,6 +343,15 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         } catch (JSONException | IOException | URISyntaxException e) {
             throw new RuntimeException("There is error while setupData");
         }
+    }
+
+    /**
+     * Project title is updated internally in createProject group. Use this method to get Invitation subject
+     * @return invitation subject
+     */
+
+    protected String getInvitationSubject() {
+        return projectTitle + " Invitation";
     }
 
     //------------------------- SUPPORT GET OBJECTS - BEGIN -------------------------

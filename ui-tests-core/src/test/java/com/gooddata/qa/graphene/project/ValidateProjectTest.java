@@ -2,10 +2,13 @@ package com.gooddata.qa.graphene.project;
 
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
@@ -27,8 +30,9 @@ import com.gooddata.project.ProjectDriver;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.fragments.greypages.md.validate.ValidateFragment;
-import com.gooddata.qa.graphene.utils.GoodSalesUtils;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
+
+import static com.gooddata.fixture.ResourceManagement.ResourceTemplate.GOODSALES;
 
 public class ValidateProjectTest extends AbstractProjectTest {
 
@@ -39,8 +43,9 @@ public class ValidateProjectTest extends AbstractProjectTest {
     private String currentProjectId;
     private int validateTimeoutInSecond;
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
-    public void initData() {
+    @Override
+    protected void initProperties() {
+        // use empty project
         currentProjectId = testParams.getProjectId();
 
         validateAfterClass = false;
@@ -48,22 +53,22 @@ public class ValidateProjectTest extends AbstractProjectTest {
                 testParams.getDefaultTimeout() : testParams.getExtendedTimeout();
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void validateBlankProject() {
         String validateStatus = initValidatePage().validate(validateTimeoutInSecond);
         takeScreenshot(browser, "Validate-blank-project", getClass());
         assertEquals(validateStatus, VALIDATE_STATUS);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void validateGoodSalesProject() {
-        String projectId = ProjectRestUtils.createProject(getGoodDataClient(), projectTitle, GoodSalesUtils.GOODSALES_TEMPLATE,
-                testParams.getAuthorizationToken(), testParams.getProjectDriver(), testParams.getProjectEnvironment());
+        String projectId = createProjectUsingFixture(projectTitle, GOODSALES);
         testParams.setProjectId(projectId);
 
         try {
-            Attribute stageNameAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_STAGE_NAME));
-            Metric amountMetric = getMdService().getObj(getProject(), Metric.class, title(METRIC_AMOUNT));
+            Attribute stageNameAttribute = getAttributeByTitle(ATTR_STAGE_NAME);
+            Metric amountMetric = createMetric(METRIC_NUMBER_OF_ACTIVITIES, format("SELECT COUNT([%s])",
+                    getAttributeByTitle(ATTR_ACTIVITY).getUri()));
 
             Report report = createReportViaRest(GridReportDefinitionContent.create(REPORT,
                     singletonList(METRIC_GROUP),
@@ -87,7 +92,7 @@ public class ValidateProjectTest extends AbstractProjectTest {
         }
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void validateProjectUsingUploadData() throws IOException {
         String projectId = ProjectRestUtils.createBlankProject(getGoodDataClient(), projectTitle,
                 testParams.getAuthorizationToken(), testParams.getProjectDriver(), testParams.getProjectEnvironment());

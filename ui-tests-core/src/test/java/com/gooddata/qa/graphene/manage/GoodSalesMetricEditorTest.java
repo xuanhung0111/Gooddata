@@ -19,7 +19,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 
 import java.util.List;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -34,9 +33,17 @@ public class GoodSalesMetricEditorTest extends GoodSalesAbstractTest {
     private static final String MY_METRICS = "My Metrics";
     private static final String LABEL_ACCOUNT = "Account";
 
-    @BeforeClass
-    public void setProjectTitle() {
+    @Override
+    protected void initProperties() {
+        super.initProperties();
         projectTitle += "Metric-Editor-Improvement-Test";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        createNumberOfActivitiesMetric();
+        createStageDurationMetric();
+        createStageVelocityMetric();
     }
 
     @DataProvider
@@ -108,7 +115,7 @@ public class GoodSalesMetricEditorTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "CL-10114: Folder is in white when hovering on it")
     public void testHeaderColorWhenHovering() {
-        String header = "Activities";
+        String header = "My Metrics";
         MetricEditorDialog dialog =
                 initMetricPage().openMetricEditor().clickShareMetricLink().hoverOnHeader(header);
 

@@ -2,7 +2,7 @@ package com.gooddata.qa.mdObjects.dashboard.tab;
 
 enum ItemSize {
     FILTER_ITEM(190, 40),
-    REPORT_ITEM(220, 310);
+    REPORT_ITEM(250, 350);
 
     private int sizeX;
     private int sizeY;

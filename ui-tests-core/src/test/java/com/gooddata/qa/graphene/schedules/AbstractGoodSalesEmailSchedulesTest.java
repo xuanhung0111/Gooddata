@@ -4,7 +4,6 @@
 package com.gooddata.qa.graphene.schedules;
 
 import static java.util.Arrays.asList;
-import static org.testng.Assert.assertEquals;
 import static java.lang.String.format;
 
 import java.io.File;
@@ -26,12 +25,9 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.GDEmails;
-import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
@@ -44,8 +40,9 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
 
     protected File attachmentsDirectory;
 
-    @BeforeClass(alwaysRun = true)
-    public void setUpImap() throws Exception {
+    @Override
+    protected void initProperties() {
+        super.initProperties();
         imapHost = testParams.loadProperty("imap.host");
         imapUser = testParams.loadProperty("imap.user");
         imapPassword = testParams.loadProperty("imap.password");

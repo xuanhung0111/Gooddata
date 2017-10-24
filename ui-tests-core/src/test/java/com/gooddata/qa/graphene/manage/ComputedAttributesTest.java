@@ -17,7 +17,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_MONTH_YEAR_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_SALES_REP;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_EXPECTED_PERCENT_OF_GOAL;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON_OPPS;
@@ -38,7 +37,6 @@ import java.util.stream.Collectors;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -97,9 +95,21 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             .withBucket(new AttributeBucket(2, "Great", "250"))
             .withBucket(new AttributeBucket(3, "Best"));
 
-    @BeforeClass(alwaysRun = true)
-    public void setProjectTitle() {
+    @Override
+    protected void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-test-computed-attribute";
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        createExpectedPercentOfGoalMetric();
+        createNumberOfWonOppsMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"}, priority = 0,
@@ -111,9 +121,10 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
                     .withAttribute(ATTR_STAGE_NAME)
                     .withMetric(METRIC_EXPECTED_PERCENT_OF_GOAL)
                     .withName(computedAttr));
+        // comine created computedAtt with any att to make an empty report
         createReport(new UiReportDefinition()
             .withName("Test computed attr in complex metric")
-            .withHows(computedAttr, ATTR_STATUS), "Test computed attr in complex metric");
+            .withHows(computedAttr, ATTR_DEPARTMENT), "Test computed attr in complex metric");
         assertEquals(waitForFragmentVisible(reportPage)
                 .waitForReportExecutionProgress()
                 .getDataReportHelpMessage(),
@@ -183,7 +194,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
         Screenshots.takeScreenshot(browser, "project-model", this.getClass());
 
-        verifyLDMModelProject(33320);
+        verifyLDMModelProject(33304);
     }
 
     @Test(dependsOnMethods = {"createComputedAttributeTest"}, priority = 1)
@@ -539,11 +550,6 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         } finally {
             getMdService().removeObjByUri(attributeUri);
         }
-    }
-
-    @Override
-    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
-        createAndAddUserToProject(UserRoles.EDITOR);
     }
 
     private void waitForDataModelImageDisplayed() {

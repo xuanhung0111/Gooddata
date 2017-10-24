@@ -2,9 +2,9 @@ package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
@@ -33,7 +33,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.WebElement;
 import org.springframework.http.HttpStatus;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Attribute;
@@ -48,9 +47,9 @@ import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardContent;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
-import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
@@ -58,14 +57,14 @@ import com.google.common.base.Function;
 
 public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstractTest {
 
-    private static final String SHORT_LIST_ID = "1251";
-    private static final String RISK_ASSESSMENT_ID = "966645";
-    private static final String CONVICTION_ID = "966646";
-    private static final String INTEREST_ID = "966643";
-    private static final String DISCOVERY_ID = "966644";
-    private static final String NEGOTIATION_ID = "966647";
-    private static final String CLOSED_WON_ID = "966648";
-    private static final String CLOSED_LOST_ID = "966649";
+    private static final String SHORT_LIST_ID = "168751";
+    private static final String RISK_ASSESSMENT_ID = "166425";
+    private static final String CONVICTION_ID = "166442";
+    private static final String INTEREST_ID = "166498";
+    private static final String DISCOVERY_ID = "166647";
+    private static final String NEGOTIATION_ID = "166450";
+    private static final String CLOSED_WON_ID = "165679";
+    private static final String CLOSED_LOST_ID = "165872";
 
     private static final String METRIC_AVAILABLE = "MetricAvailable";
     private static final String REPORT_1 = "Report1";
@@ -82,25 +81,22 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
     private Attribute stageName;
     private Metric amountMetric;
 
-    @BeforeClass
-    public void setProjectTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-test-filter-dropdown-attribute-value";
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
-    public void initialization() {
-        amountMetric = getMdService().getObj(getProject(), Metric.class, identifier("ah1EuQxwaCqs"));
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
         stageName = getMdService().getObj(getProject(), Attribute.class, identifier("attr.stage.name"));
-    }
+        amountMetric = getMetricByTitle(METRIC_AMOUNT);
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
-    public void createVariable() {
+        // *** create variable ***
         initVariablePage().createVariable(new AttributeVariable(F_STAGE_NAME).withAttribute(ATTR_STAGE_NAME)
                 .withAttributeValues("Discovery", "Risk Assessment"));
-    }
 
-    @Test(dependsOnMethods = {"initialization", "createVariable"}, groups = {"init"})
-    public void prepareMetricAndReports() throws IOException, JSONException {
         // *** create metric available ***
         metricAvailable = getMdService().createObj(getProject(), new Metric(METRIC_AVAILABLE,
                 buildFirstMetricExpression(amountMetric.getUri(), stageName.getUri()), "#,##0.00"));
@@ -124,7 +120,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
         reportPage.saveReport();
     }
 
-    @Test(dependsOnMethods = {"prepareMetricAndReports"}, groups = {"init"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
     public void createUseAvailableDashboardWithOneReport() throws IOException, JSONException {
         initDashboardsPage();
 

@@ -37,6 +37,7 @@ import com.gooddata.qa.graphene.filters.MetricAvailableFilterTest;
 import com.gooddata.qa.graphene.i18n.LocalizationTest;
 import com.gooddata.qa.graphene.manage.AttributeLabelsTest;
 import com.gooddata.qa.graphene.manage.ComputedAttributesTest;
+import com.gooddata.qa.graphene.manage.GoodSalesAttributeLabelsTest;
 import com.gooddata.qa.graphene.manage.GoodSalesFactTest;
 import com.gooddata.qa.graphene.manage.GoodSalesFolderTest;
 import com.gooddata.qa.graphene.manage.GoodSalesManageObjectsTest;
@@ -214,6 +215,7 @@ public class UITestsRegistry {
             GoodSalesVariableTest.class,
             MetricEditorTest.class,
             GoodSalesMetricEditorTest.class,
+            GoodSalesAttributeLabelsTest.class,
             "testng-manage-aggregation-metric-test.xml",
             "testng-manage-different-granularity-logical-metric-test.xml",
             "testng-manage-filter-share-ratio-metric-test.xml",

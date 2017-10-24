@@ -1,8 +1,14 @@
 package com.gooddata.qa.graphene.reports;
 
-import static com.gooddata.md.Restriction.title;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PROBABILITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_QUARTER_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_ACTIVE;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -18,8 +24,6 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
 import com.gooddata.md.report.AttributeInGrid;
 import com.gooddata.md.report.GridReportDefinitionContent;
@@ -41,12 +45,7 @@ import com.gooddata.qa.graphene.fragments.reports.report.TableReport.Sort;
 public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
 
     private final static String RUNNING_TOTAL = "Running-Totals";
-    private final static String AMOUNT = "Amount";
-    private final static String PROBABILITY = "Probability";
-    private final static String STAGE_NAME = "Stage Name";
     private final static String YEAR_2011 = "2011";
-    private final static String YEAR_SNAPSHOT = "Year (Snapshot)";
-    private final static String QUARTER_YEAR_SNAPSHOT = "Quarter/Year (Snapshot)";
     private final static String RUNNING_SUM = "Running Sum";
     private final static String RUNNING_AVERAGE = "Running Average";
     private final static String RUNNING_MINIMUM = "Running Minimum";
@@ -56,18 +55,20 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
     private final static String SHORT_LIST = "Short List";
     private final static String Q1_2011 = "Q1/2011";
     private final static String Q2_2011 = "Q2/2011";
-    private final static String STATUS = "Status";
-    private final static String AVG_AMOUNT = "Avg. Amount";
-    
-    @Test(dependsOnGroups = "createProject")
-    public void createRunningTotalReport() {
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
+        createProbabilityMetric();
+        createAvgAmountMetric();
+
         //create report using UI due to attribute position
         initReportCreation().createReport(new UiReportDefinition()
                 .withName(RUNNING_TOTAL)
-                .withWhats(PROBABILITY)
-                .withWhats(AMOUNT)
-                .withHows(new HowItem(STAGE_NAME, Position.LEFT, INTEREST, DISCOVERY, SHORT_LIST))
-                .withHows(new HowItem(YEAR_SNAPSHOT, Position.TOP, YEAR_2011)));
+                .withWhats(METRIC_PROBABILITY)
+                .withWhats(METRIC_AMOUNT)
+                .withHows(new HowItem(ATTR_STAGE_NAME, Position.LEFT, INTEREST, DISCOVERY, SHORT_LIST))
+                .withHows(new HowItem(ATTR_YEAR_SNAPSHOT, Position.TOP, YEAR_2011)));
     }
 
     @DataProvider(name = "runningTotalDataProvider")
@@ -84,7 +85,7 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
         };
     }
 
-    @Test(dependsOnMethods = "createRunningTotalReport", dataProvider = "runningTotalDataProvider")
+    @Test(dependsOnGroups = "createProject", dataProvider = "runningTotalDataProvider")
     public void addRunningTotalsToReport(final String type,
             final String runningTotalHeader, final List<Float> runningTotalValues) {
 
@@ -108,7 +109,7 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
         assertEquals(table.getMetricElements(), metricValues, type + " values has not been removed");
     }
 
-    @Test(dependsOnMethods = "createRunningTotalReport")
+    @Test(dependsOnGroups = "createProject")
     public void customizeMetricAndAttributeInRunningSumReport() {
         final TableReport table = initReportsPage().openReport(RUNNING_TOTAL).getTableReport();
 
@@ -117,8 +118,8 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
 
         reportPage.waitForReportExecutionProgress()
                 .openWhatPanel()
-                .selectMetric(AVG_AMOUNT)
-                .deselectMetric(PROBABILITY) //minimize number of metrics to avoid handling scroll bar
+                .selectMetric(METRIC_AVG_AMOUNT)
+                .deselectMetric(METRIC_PROBABILITY) //minimize number of metrics to avoid handling scroll bar
                 .doneSndPanel()
                 .waitForReportExecutionProgress();
 
@@ -130,7 +131,7 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
                 "Running sum values are calculated for new metric");
 
         reportPage.openHowPanel()
-                .selectAttributes(singletonList(new HowItem(QUARTER_YEAR_SNAPSHOT, Position.TOP, Q1_2011, Q2_2011)))
+                .selectAttributes(singletonList(new HowItem(ATTR_QUARTER_YEAR_SNAPSHOT, Position.TOP, Q1_2011, Q2_2011)))
                 .doneSndPanel()
                 .waitForReportExecutionProgress();
 
@@ -146,16 +147,15 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = "createProject")
     public void testRunningTotalIsNotMetric() {
         final String metricAlias = "Amount-Sum";
-        final Attribute stageName = getMdService().getObj(getProject(), Attribute.class, title(STAGE_NAME));
-        final String amountUri = getMdService().getObjUri(getProject(), Fact.class, title(AMOUNT));
 
         final Metric amountSum = getMdService()
                 .createObj(getProject(), new Metric(metricAlias,
-                        MetricTypes.SUM.getMaql().replaceFirst("__fact__", format("[%s]", amountUri)), "#,##0.00"));
+                        MetricTypes.SUM.getMaql().replaceFirst("__fact__", format("[%s]", 
+                                getMetricByTitle(METRIC_AMOUNT).getUri())), "#,##0.00"));
 
         final String reportName = "Report-for-testing-running-totals";
         ReportDefinition definition = GridReportDefinitionContent.create(reportName, singletonList(METRIC_GROUP),
-                singletonList(new AttributeInGrid(stageName.getDefaultDisplayForm().getUri(), stageName.getTitle())),
+                singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_STAGE_NAME).getDefaultDisplayForm().getUri(), ATTR_STAGE_NAME)),
                 singletonList(new MetricElement(amountSum)));
 
         definition = getMdService().createObj(getProject(), definition);
@@ -205,10 +205,10 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
         //create report using UI due to attribute position
         initReportCreation().createReport(new UiReportDefinition()
                 .withName(reportName)
-                .withWhats(AMOUNT)
-                .withHows(new HowItem(STAGE_NAME, Position.LEFT, INTEREST, DISCOVERY, SHORT_LIST))
-                .withHows(new HowItem(STATUS, Position.LEFT))
-                .withHows(new HowItem(YEAR_SNAPSHOT, Position.TOP, YEAR_2011)));
+                .withWhats(METRIC_AMOUNT)
+                .withHows(new HowItem(ATTR_STAGE_NAME, Position.LEFT, INTEREST, DISCOVERY, SHORT_LIST))
+                .withHows(new HowItem(ATTR_IS_ACTIVE, Position.LEFT))
+                .withHows(new HowItem(ATTR_YEAR_SNAPSHOT, Position.TOP, YEAR_2011)));
 
         final TableReport table = initReportsPage().openReport(reportName).getTableReport();
         table.openContextMenuFromCellValue(YEAR_2011).aggregateTableData(AggregationType.SUM, "of All Rows");
@@ -223,7 +223,7 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
                 3903521.33f, 3903521.33f, 16427388.57f, 0.0f, 3436167.70f, 0.0f, 3903521.33f, 0.0f, 23767077.60f, 0.0f),
                 "The total values are computed incorrectly");
 
-        table.sortByHeader(AMOUNT, Sort.DESC);
+        table.sortByHeader(METRIC_AMOUNT, Sort.DESC);
         takeScreenshot(browser, "not-calculate-running-totals-for-total-columns", getClass());
         assertEquals(table.getTotalValues(), asList(23767077.60f, 0.0f));
     }
@@ -234,19 +234,19 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
         //create report using UI due to attribute position
         initReportCreation().createReport(new UiReportDefinition()
                 .withName(reportName)
-                .withWhats(AMOUNT)
-                .withHows(new HowItem(STAGE_NAME, Position.LEFT, INTEREST, DISCOVERY, SHORT_LIST))
-                .withHows(new HowItem(YEAR_SNAPSHOT, Position.TOP)));
+                .withWhats(METRIC_AMOUNT)
+                .withHows(new HowItem(ATTR_STAGE_NAME, Position.LEFT, INTEREST, DISCOVERY, SHORT_LIST))
+                .withHows(new HowItem(ATTR_YEAR_SNAPSHOT, Position.TOP)));
 
         final TableReport table = initReportsPage().openReport(reportName).getTableReport();
         table.openContextMenuFromCellValue(YEAR_2011).aggregateTableData(AggregationType.RUNNING, RUNNING_SUM);
         table.clickOnAttributeToOpenDrillReport(YEAR_2011);
 
         reportPage.waitForReportExecutionProgress().openFilterPanel()
-                .addFilter(FilterItem.Factory.createAttributeFilter(QUARTER_YEAR_SNAPSHOT, Q1_2011, Q2_2011));
+                .addFilter(FilterItem.Factory.createAttributeFilter(ATTR_QUARTER_YEAR_SNAPSHOT, Q1_2011, Q2_2011));
 
         takeScreenshot(browser, "drill-on-report-containing-running-totals", getClass());
-        assertTrue(table.getAttributesHeader().contains(QUARTER_YEAR_SNAPSHOT) && table.getAttributeElements()
+        assertTrue(table.getAttributesHeader().contains(ATTR_QUARTER_YEAR_SNAPSHOT) && table.getAttributeElements()
                 .containsAll(asList(Q1_2011, Q2_2011)), "The drill values are not displayed");
 
         assertEquals(table.getMetricElements(),
@@ -257,8 +257,8 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
         browser.navigate().back();
         reportPage.waitForReportExecutionProgress()
                 .openWhatPanel()
-                .selectMetric(AMOUNT)
-                .addDrillStep(STATUS)
+                .selectMetric(METRIC_AMOUNT)
+                .addDrillStep(ATTR_IS_ACTIVE)
                 .doneSndPanel()
                 .waitForReportExecutionProgress();
 

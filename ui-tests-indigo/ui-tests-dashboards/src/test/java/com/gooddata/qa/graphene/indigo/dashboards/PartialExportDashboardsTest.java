@@ -5,6 +5,7 @@ import static java.util.Objects.nonNull;
 
 import java.io.IOException;
 
+import com.gooddata.qa.graphene.TemplateAbstractTest;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -19,7 +20,7 @@ import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertTrue;
 
-public class PartialExportDashboardsTest extends AbstractDashboardTest {
+public class PartialExportDashboardsTest extends TemplateAbstractTest {
 
     @BeforeClass(alwaysRun = true)
     public void initProperties() {

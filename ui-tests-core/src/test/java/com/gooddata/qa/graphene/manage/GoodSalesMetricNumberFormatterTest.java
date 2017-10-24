@@ -10,7 +10,6 @@ import java.util.List;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
@@ -26,9 +25,15 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
 
     private static final By METRIC_DETAIL_FORMAT_LOCATOR = By.cssSelector(".c-metricDetailFormat .formatter");
 
-    @BeforeClass
-    public void setProjectTitle() {
+    @Override
+    protected void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-test-metric-number-formatter";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        createNumberOfActivitiesMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"})

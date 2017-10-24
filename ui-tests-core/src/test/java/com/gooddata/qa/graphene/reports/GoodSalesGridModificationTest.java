@@ -65,8 +65,10 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
     private final static String REPORT_NOT_COMPUTABLE_MESSAGE = "Report not computable due to improper metric definition";
     private final static String DISPLAY_LABEL = "http://www.google.com";
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void setupProject() {
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
+        createProbabilityMetric();
         final Attribute stageName = getMdService().getObj(getProject(), Attribute.class, title(ATTR_STAGE_NAME));
 
         final String amountUri = getMdService()
@@ -96,7 +98,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
     }
 
-    @Test(dependsOnMethods = {"setupProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void breakDownMetricValue() {
         initReportsPage().openReport(SIMPLE_REPORT).getTableReport()
                 .openContextMenuFromCellValue("770,636,605.83")
@@ -114,7 +116,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
                 "The expected metric elements are not displayed");
     }
 
-    @Test(dependsOnMethods = {"setupProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void drillOnGridMenu() {
         initReportsPage().openReport(SIMPLE_REPORT)
                 .getTableReport()
@@ -130,7 +132,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
                 "The filter has not been added");
     }
 
-    @Test(dependsOnMethods = {"setupProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void filterOnGridMenu() {
         assertTrue(
                 initReportsPage().openReport(SIMPLE_REPORT).getTableReport()
@@ -144,7 +146,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
                 "The metrics elements are not as expected");
     }
 
-    @Test(dependsOnMethods = {"setupProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void addAttributeUsingGridMenu() {
         initReportsPage().openReport(SIMPLE_REPORT).getTableReport()
                 .openContextMenuFromCellValue(INTEREST)

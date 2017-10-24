@@ -28,10 +28,17 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
     
     private static final String TEST_DASHBOAD_NAME = "test-drill-report-to-export";
     private static final String REPORT_NAME = "Drill report to export";
-    
-    @BeforeClass
-    public void setProjectTitle() {
+
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-test-drill-report-to-export";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
+        createNumberOfActivitiesMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"})

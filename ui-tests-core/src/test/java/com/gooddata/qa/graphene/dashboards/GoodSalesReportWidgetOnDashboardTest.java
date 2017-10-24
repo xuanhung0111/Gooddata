@@ -1,18 +1,19 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOP_5_OPEN_BY_CASH;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileUri;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileUri;
 
 import java.io.IOException;
 
@@ -21,7 +22,6 @@ import org.json.JSONException;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
@@ -29,8 +29,8 @@ import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.NumericVariable;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.StyleConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel.Tab;
@@ -42,14 +42,19 @@ import com.gooddata.qa.utils.http.RestApiClient;
 public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest {
 
     private static final String REPORT = "Test report";
-
-    private static final String TOP_5_OPEN_REPORT = "Top 5 Open (by $)";
-
     private static final String VARIABLE_NAME = "variable";
 
-    @BeforeClass(alwaysRun = true)
-    public void setProjectTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-dashboard-report-widget";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
+        createNumberOfActivitiesMetric();
+        createTop5OpenByCashReport();
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -90,13 +95,13 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
     @Test(dependsOnGroups = {"createProject"})
     public void editReportFromDashboard() {
         initDashboardsPage();
-        dashboardsPage.addNewDashboard(TOP_5_OPEN_REPORT);
+        dashboardsPage.addNewDashboard(REPORT_TOP_5_OPEN_BY_CASH);
 
         try {
             dashboardsPage.editDashboard();
 
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-            dashboardEditBar.addReportToDashboard(TOP_5_OPEN_REPORT);
+            dashboardEditBar.addReportToDashboard(REPORT_TOP_5_OPEN_BY_CASH);
             dashboardEditBar.saveDashboard();
             takeScreenshot(browser, "editReportFromDashboard - table report in dashboard", getClass());
 
@@ -124,7 +129,7 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
             browser.switchTo().window(currentWindowHandle);
 
             refreshDashboardsPage();
-            dashboardsPage.selectDashboard(TOP_5_OPEN_REPORT);
+            dashboardsPage.selectDashboard(REPORT_TOP_5_OPEN_BY_CASH);
             takeScreenshot(browser, "editReportFromDashboard - headline report in dashboard", getClass());
             OneNumberReport headlineReport = dashboardsPage.getContent().getLatestReport(OneNumberReport.class);
             assertThat(headlineReport.getDescription(), equalTo("Top 5"));
@@ -180,7 +185,7 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
             int dashboardWidgetsCount = dashboardEditBar.getDashboardWidgetsCount();
 
             dashboardEditBar
-                    .addReportToDashboard(TOP_5_OPEN_REPORT)
+                    .addReportToDashboard(REPORT_TOP_5_OPEN_BY_CASH)
                     .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, "Account");
             assertEquals(dashboardEditBar.getDashboardWidgetsCount(), dashboardWidgetsCount + 2);
             dashboardEditBar.saveDashboard();

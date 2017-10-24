@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene;
 
 import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.Filter;
 import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.Attribute;
@@ -10,8 +11,6 @@ import com.gooddata.md.ObjNotFoundException;
 import org.json.JSONException;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.gooddata.fixture.ResourceManagement.ResourceTemplate.GOODSALES;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
@@ -24,23 +23,97 @@ import java.io.IOException;
 
 public class GoodSalesAbstractTest extends AbstractProjectTest {
 
-    protected Map<String, String[]> expectedGoodSalesDashboardsAndTabs;
-
     @Override
     protected void initProperties() {
         projectTitle = "GoodSales ";
         appliedFixture = GOODSALES;
-
-        // going to be removed when https://jira.intgdc.com/browse/QA-6503 is done
-        projectTemplate = GOODSALES_TEMPLATE;
-        expectedGoodSalesDashboardsAndTabs = new HashMap<>();
-        expectedGoodSalesDashboardsAndTabs.put(DASH_PIPELINE_ANALYSIS, new String[]{
-                DASH_TAB_OUTLOOK, DASH_TAB_WHATS_CHANGED, DASH_TAB_WATERFALL_ANALYSIS, DASH_TAB_LEADERBOARDS, DASH_TAB_ACTIVITIES, DASH_TAB_SALES_VELOCITY,
-                DASH_TAB_QUARTERLY_TRENDS, DASH_TAB_SEASONALITY, DASH_TAB_AND_MORE
-        });
     }
 
     //------------------------- REPORT MD OBJECTS - BEGIN  ------------------------
+    protected String createTop5OpenByCashReport() {
+        try {
+            getMetricByTitle(METRIC_BEST_CASE);
+        } catch (ObjNotFoundException e) {
+            createBestCaseMetric();
+        }
+
+        Metric pipelineMetric = createPercentOfPipelineMetric(getMetricByTitle(METRIC_BEST_CASE));
+        Metric top5Metric = createTop5Metric(getMetricByTitle(METRIC_BEST_CASE));
+
+        return createReport(
+                GridReportDefinitionContent.create(
+                        REPORT_TOP_5_OPEN_BY_CASH,
+                        singletonList(METRIC_GROUP),
+                        singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_OPPORTUNITY))),
+                        Arrays.asList(
+                                new MetricElement(top5Metric),
+                                new MetricElement(pipelineMetric))));
+    }
+
+    protected String createTop5WonByCashReport() {
+        try {
+            getMetricByTitle(METRIC_WON);
+        } catch (ObjNotFoundException e) {
+            createWonMetric();
+        }
+
+        try {
+            getMetricByTitle(METRIC_NUMBER_OF_OPPS_WON_IN_PERIOD);
+        } catch (ObjNotFoundException e) {
+            createNumberOfOppsInPeriodMetric(METRIC_NUMBER_OF_OPPS_WON_IN_PERIOD, getMetricByTitle(METRIC_WON));
+        }
+
+        Metric pipelineMetric = createPercentOfPipelineMetric(getMetricByTitle(METRIC_WON));
+        Metric top5Metric = createTop5Metric(getMetricByTitle(METRIC_WON));
+
+        System.out.println("DEBUG: " + format("(SELECT [%s] BY [%s]) >= 0",
+                getMetricByTitle(METRIC_NUMBER_OF_OPPS_WON_IN_PERIOD).getUri(),
+                getAttributeByTitle(ATTR_OPPORTUNITY).getUri()));
+
+        return createReport(
+                GridReportDefinitionContent.create(
+                        REPORT_TOP_5_WON_BY_CASH,
+                        singletonList(METRIC_GROUP),
+                        singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_OPPORTUNITY))),
+                        Arrays.asList(
+                                new MetricElement(top5Metric),
+                                new MetricElement(pipelineMetric)),
+                        singletonList(new Filter(
+                                format("(SELECT [%s] BY [%s], ALL OTHER) >= 0",
+                                        getMetricByTitle(METRIC_NUMBER_OF_OPPS_WON_IN_PERIOD).getUri(),
+                                        getAttributeByTitle(ATTR_OPPORTUNITY).getUri())))));
+    }
+
+    protected String createTop5LostByCashReport() {
+        try {
+            getMetricByTitle(METRIC_LOST);
+        } catch (ObjNotFoundException e) {
+            createLostMetric();
+        }
+
+        try {
+            getMetricByTitle(METRIC_NUMBER_OF_OPPS_LOST_IN_PERIOD);
+        } catch (ObjNotFoundException e) {
+            createNumberOfOppsInPeriodMetric(METRIC_NUMBER_OF_OPPS_LOST_IN_PERIOD, getMetricByTitle(METRIC_LOST));
+        }
+
+        Metric pipelineMetric = createPercentOfPipelineMetric(getMetricByTitle(METRIC_LOST));
+        Metric top5Metric = createTop5Metric(getMetricByTitle(METRIC_LOST));
+
+        return createReport(
+                GridReportDefinitionContent.create(
+                        REPORT_TOP_5_LOST_BY_CASH,
+                        singletonList(METRIC_GROUP),
+                        singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_OPPORTUNITY))),
+                        Arrays.asList(
+                                new MetricElement(top5Metric),
+                                new MetricElement(pipelineMetric)),
+                        singletonList(new Filter(
+                                format("(SELECT [%s] BY [%s], ALL OTHER) >= 0",
+                                        getMetricByTitle(METRIC_NUMBER_OF_OPPS_LOST_IN_PERIOD).getUri(),
+                                        getAttributeByTitle(ATTR_OPPORTUNITY).getUri())))));
+    }
+
     protected String createTopSalesRepsByWonAndLostReport() {
         try {
             getMetricByTitle(METRIC_WON);
@@ -80,7 +153,7 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
         } catch (ObjNotFoundException e) {
             createAmountMetric();
         }
-        return createReport(GridReportDefinitionContent.create(REPORT_AMOUNT_BY_PRODUCT,
+        return createReport(GridReportDefinitionContent.create(REPORT_AMOUNT_BY_DATE_CLOSED,
                 singletonList(METRIC_GROUP),
                 singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_DATE_CLOSE))),
                 singletonList(new MetricElement(getMetricByTitle(METRIC_AMOUNT)))));
@@ -102,13 +175,87 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
         try {
             getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES);
         } catch (ObjNotFoundException e) {
-            createAmountMetric();
+            createNumberOfActivitiesMetric();
         }
         return createReport(GridReportDefinitionContent.create(REPORT_ACTIVITY_LEVEL,
                 singletonList(METRIC_GROUP),
                 Arrays.asList(
                         new AttributeInGrid(getAttributeByTitle(ATTR_DATE_ACTIVITY)),
                         new AttributeInGrid(getAttributeByTitle(ATTR_ACTIVITY_TYPE))),
+                singletonList(new MetricElement(getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES)))));
+    }
+
+    protected String createSalesSeasonalityReport() {
+        try {
+            getMetricByTitle(METRIC_NUMBER_OF_WON_OPPS);
+        } catch (ObjNotFoundException e) {
+            createNumberOfWonOppsMetric();
+        }
+
+        try {
+            getMetricByTitle(METRIC_AVG_WON);
+        } catch (ObjNotFoundException e) {
+            createAvgWonMetric();
+        }
+
+        try {
+            getMetricByTitle(METRIC_LOST);
+        } catch (ObjNotFoundException e) {
+            createLostMetric();
+        }
+
+        try {
+            getMetricByTitle(METRIC_WON);
+        } catch (ObjNotFoundException e) {
+            createWonMetric();
+        }
+        return  createReport(GridReportDefinitionContent.create(REPORT_SALES_SEASONALITY,
+                singletonList(METRIC_GROUP),
+                singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_MONTH_SNAPSHOT))),
+                Arrays.asList(
+                        new MetricElement(getMetricByTitle(METRIC_NUMBER_OF_WON_OPPS)),
+                        new MetricElement(getMetricByTitle(METRIC_AVG_WON)),
+                        new MetricElement(getMetricByTitle(METRIC_LOST)),
+                        new MetricElement(getMetricByTitle(METRIC_WON)))));
+    }
+
+    protected String createEmptyReport() {
+        try {
+            getMetricByTitle(METRIC_AMOUNT);
+        } catch (ObjNotFoundException e) {
+            createAmountMetric();
+        }
+
+        return createReport(GridReportDefinitionContent.create(REPORT_NO_DATA,
+                singletonList(METRIC_GROUP),
+                singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_DEPARTMENT))),
+                singletonList(new MetricElement(getMetricByTitle(METRIC_AMOUNT))),
+                singletonList(new Filter(format("(SELECT [%s]) < 0", getMetricByTitle(METRIC_AMOUNT).getUri())))));
+    }
+
+    protected String createIncomputableReport() {
+        try {
+            getMetricByTitle(METRIC_AMOUNT);
+        } catch (ObjNotFoundException e) {
+            createAmountMetric();
+        }
+
+        return createReport(GridReportDefinitionContent.create(REPORT_INCOMPUTABLE,
+                singletonList(METRIC_GROUP),
+                singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_ACTIVITY))),
+                singletonList(new MetricElement(getMetricByTitle(METRIC_AMOUNT)))));
+    }
+
+    protected String createTooLargeReport() {
+        try {
+            getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES);
+        } catch (ObjNotFoundException e) {
+            createNumberOfActivitiesMetric();
+        }
+
+        return createReport(GridReportDefinitionContent.create(REPORT_TOO_LARGE,
+                singletonList(METRIC_GROUP),
+                singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_ACTIVITY))),
                 singletonList(new MetricElement(getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES)))));
     }
 
@@ -135,8 +282,7 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
     //------------------------- METRIC MD OBJECTS - BEGIN  ------------------------
     protected Metric createNumberOfActivitiesMetric() {
         return createMetric(METRIC_NUMBER_OF_ACTIVITIES,
-                format("SELECT COUNT([%s])",
-                        getAttributeByTitle(ATTR_ACTIVITY).getUri()));
+                format("SELECT COUNT([%s])", getAttributeByTitle(ATTR_ACTIVITY).getUri()));
     }
 
     protected Metric createAmountMetric() {
@@ -702,6 +848,66 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
                         getMetricByTitle(METRIC_EXPECTED).getUri(),
                         getMetricByTitle(METRIC_WON).getUri()),
                 "$#,##0.00");
+    }
+
+    private Metric createNumberOfOppsInPeriodMetric(String name, Metric metric) {
+        try {
+            getMetricByTitle(METRIC_SNAPSHOT_EOP);
+        } catch (ObjNotFoundException e) {
+            createSnapshotEOPMetric();
+        }
+
+        try {
+            getMetricByTitle(METRIC_TIMELINE_BOP);
+        } catch (ObjNotFoundException e) {
+            createTimelineBOPMetric();
+        }
+
+        try {
+            getMetricByTitle(METRIC_TIMELINE_EOP);
+        } catch (ObjNotFoundException e) {
+            createTimelineEOPMetric();
+        }
+
+        return createMetric(name,
+                new String("SELECT [# of Won Opps.]" +
+                        "WHERE (" +
+                        "SELECT MAX([Opp. Close (Date)]) BY [Opportunity]" +
+                        "WHERE [Opp. Snapshot (Date)] = [_Snapshot [EOP]]) >= [_Timeline [BOP]]" +
+                        "AND (SELECT MAX([Opp. Close (Date)]) BY [Opportunity]" +
+                        "WHERE [Opp. Snapshot (Date)] = [_Snapshot [EOP]]) <= [_Timeline [EOP]]")
+                        .replaceAll("# of Won Opps\\.", metric.getUri())
+                        .replaceAll("Opp\\. Close \\(Date\\)", getFactByTitle(FACT_OPP_CLOSE_DATE).getUri())
+                        .replaceAll("Opportunity", getAttributeByTitle(ATTR_OPPORTUNITY).getUri())
+                        .replaceAll("Opp\\. Snapshot \\(Date\\)", getFactByTitle(FACT_OPP_SNAPSHOT_DATE).getUri())
+                        .replaceAll("_Snapshot \\[EOP\\]", getMetricByTitle(METRIC_SNAPSHOT_EOP).getUri())
+                        .replaceAll("_Timeline \\[BOP\\]", getMetricByTitle(METRIC_TIMELINE_BOP).getUri())
+                        .replaceAll("_Timeline \\[EOP\\]", getMetricByTitle(METRIC_TIMELINE_EOP).getUri()));
+    }
+
+    private Metric createPercentOfPipelineMetric(Metric metric) {
+        // SELECT (select [metric] where Top (5) in (select [metric] by Opportunity) ) /( select [metric] by all other)
+        return createMetric(METRIC_PERCENT_OF_PIPLINE,
+                format("SELECT (SELECT [%s] WHERE TOP (5) IN (SELECT [%s] BY [%s]) ) /( SELECT [%s]BY ALL OTHER)",
+                        metric.getUri(),
+                        metric.getUri(),
+                        getAttributeByTitle(ATTR_OPPORTUNITY).getUri(),
+                        metric.getUri()),
+                "$#,##0.0%");
+    }
+
+    private Metric createTop5Metric(Metric metric) {
+        // SELECT [metric] where Top (5) in (select [metric] by Opportunity)
+        return createMetric(METRIC_TOP_5,
+                format("SELECT [%s] WHERE TOP (5) IN (SELECT [%s] BY [%s])",
+                        metric.getUri(),
+                        metric.getUri(),
+                        getAttributeByTitle(ATTR_OPPORTUNITY).getUri()),
+                "[=null]--;\r\n" +
+                        "[>=1000000000]$#,,,.0 B;\r\n" +
+                        "[>=1000000]$#,,.0 M;\r\n" +
+                        "[>=1000]$#,.0 K;\r\n" +
+                        "$#,##0");
     }
     //------------------------- METRIC MD OBJECTS - END  ------------------------
 }

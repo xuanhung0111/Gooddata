@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.gooddata.md.AttributeElement;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -58,13 +59,12 @@ public class MetricAvailableFilterTest extends AbstractDashboardWidgetTest {
 
     @BeforeClass(alwaysRun = true)
     public void initProperties() {
+        // use empty project
         projectTitle = "Metric Available Test";
-        projectTemplate = "";
-        expectedGoodSalesDashboardsAndTabs = null;
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"prepareData"})
-    public void prepareMetricAvailableData() {
+    @Override
+    protected void customizeProject() throws Throwable {
         // upload payroll.csv
         uploadCSV(ResourceUtils.getFilePathFromResource("/payroll-csv/payroll.csv"));
         takeScreenshot(browser, "uploaded-payroll-file", getClass());
@@ -79,19 +79,19 @@ public class MetricAvailableFilterTest extends AbstractDashboardWidgetTest {
         Attribute state = getMdService().getObj(getProject(), Attribute.class, title(STATE));
         List<String> attrEleUris = getMdService().getAttributeElements(state).stream()
                 .filter(attrEle -> STATE_INPUTS.contains(attrEle.getTitle()))
-                .map(attrEle -> attrEle.getUri())
+                .map(AttributeElement::getUri)
                 .collect(Collectors.toList());
 
         createMetric(METRIC_AVAILABLE, format("SELECT [%s] WHERE [%s] IN ([%s], [%s], [%s], [%s])",
-            amountSumMetric.getUri(), state.getUri(), attrEleUris.get(0), attrEleUris.get(1), attrEleUris.get(2),
-            attrEleUris.get(3)), DEFAULT_METRIC_FORMAT);
+                amountSumMetric.getUri(), state.getUri(), attrEleUris.get(0), attrEleUris.get(1), attrEleUris.get(2),
+                attrEleUris.get(3)), DEFAULT_METRIC_FORMAT);
 
         // turn on the "useAvailableEnabled" feature flag
         setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.USE_AVAILABLE_ENABLED, true);
     }
 
-    @Test(dependsOnGroups = {"prepareData"})
+    @Test(dependsOnGroups = {"createProject"})
     public void hasAvailableValuesTab() throws IOException, JSONException {
         try {
             addAndEditNewDashboard();
@@ -113,7 +113,7 @@ public class MetricAvailableFilterTest extends AbstractDashboardWidgetTest {
         }
     }
 
-    @Test(dependsOnGroups = {"prepareData"})
+    @Test(dependsOnGroups = {"createProject"})
     public void verifyAvailableValuesTabContents() throws IOException, JSONException {
         try {
             addAndEditNewDashboard();
@@ -131,7 +131,7 @@ public class MetricAvailableFilterTest extends AbstractDashboardWidgetTest {
         }
     }
 
-    @Test(dependsOnGroups = {"prepareData"})
+    @Test(dependsOnGroups = {"createProject"})
     public void verifyMetricPickerDropDown() throws IOException, JSONException {
         try {
             addAndEditNewDashboard();
@@ -148,7 +148,7 @@ public class MetricAvailableFilterTest extends AbstractDashboardWidgetTest {
         }
     }
 
-    @Test(dependsOnGroups = {"prepareData"})
+    @Test(dependsOnGroups = {"createProject"})
     public void verifyRestrictingAtributeValesByMetrics() throws IOException, JSONException {
         // Create report
         createReport(new UiReportDefinition()
@@ -181,7 +181,7 @@ public class MetricAvailableFilterTest extends AbstractDashboardWidgetTest {
         }
     }
 
-    @Test(dependsOnGroups = {"prepareData"})
+    @Test(dependsOnGroups = {"createProject"})
     public void verifySelectedMetricIsHiddenFromMetricPicker() throws IOException, JSONException {
         try {
             addAndEditNewDashboard();

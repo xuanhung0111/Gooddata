@@ -55,8 +55,14 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
 
     private final static String TARGET_PROJECT_TITLE = "Target-Project";
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void setUpProject() {
+    @Override
+    protected void initProperties() {
+        // use empty project
+        projectTitle = "ExportAndImportProjectTest";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
         uploadCSV(ResourceUtils.getFilePathFromResource("/" + ResourceDirectory.PAYROLL_CSV + "/payroll.csv"));
         takeScreenshot(browser, "uploaded-payroll-file", getClass());
 
@@ -81,7 +87,7 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
         editBar.saveDashboard();
     }
 
-    @Test(dependsOnMethods = {"setUpProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testExportImportProject() throws JSONException {
         final String exportToken = exportProject(true, true, false, DEFAULT_PROJECT_CHECK_LIMIT);
         ProjectRestUtils.deleteProject(getGoodDataClient(), testParams.getProjectId());
@@ -102,8 +108,8 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
                         PARTIAL_HIGH_SCHOOL)), "There is difference between actual and expected attributes");
         takeScreenshot(browser, "imported-dashboard", getClass());
 
-        assertTrue(initVariablePage().hasVariable(SIMPLE_NUMERIC_VARIABLE) &&
-                VariablesPage.getInstance(browser).hasVariable(SIMPLE_FILTERED_VARIABLE),
+        assertTrue(initVariablePage().hasVariable(SIMPLE_NUMERIC_VARIABLE)
+                        && VariablesPage.getInstance(browser).hasVariable(SIMPLE_FILTERED_VARIABLE),
                 "Imported variables are not exist");
 
         assertTrue(initMetricPage().isMetricVisible(SUM_METRIC), "Imported metric is not exist");
@@ -114,10 +120,9 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
         initReportsPage().openReport(SIMPLE_REPORT);
 
         //use List.equals due to checking attribute order on report
-        assertTrue(reportPage.getTableReport()
-                .getAttributeElements()
-                .equals(asList(BACHELORS_DEGREE, GRADUATE_DEGREE, HIGH_SCHOOL_DEGREE, PARTIAL_COLLEGE, PARTIAL_HIGH_SCHOOL)),
-                "There is difference between actual and expected attributes");
+        assertTrue(reportPage.getTableReport().getAttributeElements().equals(
+                asList(BACHELORS_DEGREE, GRADUATE_DEGREE, HIGH_SCHOOL_DEGREE, PARTIAL_COLLEGE,
+                        PARTIAL_HIGH_SCHOOL)), "There is difference between actual and expected attributes");
 
         initReportCreation().createReport(new UiReportDefinition()
                 .withName(REPORT_WITH_EXISTING_OBJS)
@@ -125,10 +130,11 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
                 .withHows(EDUTCATION)
                 .withFilters(FilterItem.Factory.createPromptFilter(SIMPLE_FILTERED_VARIABLE)));
 
-        assertTrue(isEqualCollection(reportPage.getTableReport()
-                .getAttributeElements(),
-                asList(PARTIAL_COLLEGE, PARTIAL_HIGH_SCHOOL)),
+        assertTrue(
+                isEqualCollection(reportPage.getTableReport().getAttributeElements(),
+                        asList(PARTIAL_COLLEGE, PARTIAL_HIGH_SCHOOL)),
                 "There is difference between actual and expected attributes");
+
         takeScreenshot(browser, "Simple-report-with-existing-objects", getClass());
 
         initMetricPage().createAggregationMetric(MetricTypes.SUM, new CustomMetricUI()
@@ -146,9 +152,9 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
                 .withHows(POSITION)
                 .withFilters(FilterItem.Factory.createPromptFilter(attributeVariableName)));
 
-        assertTrue(isEqualCollection(reportPage.getTableReport()
-                .getAttributeElements(),
-                asList(STORE_MANAGER, VP_FINANCE)),
+        assertTrue(
+                isEqualCollection(reportPage.getTableReport().getAttributeElements(),
+                        asList(STORE_MANAGER, VP_FINANCE)),
                 "There is difference between actual and expected attributes");
         takeScreenshot(browser, "Simple-report-with-new-objects", getClass());
     }
@@ -168,10 +174,11 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
 
         filterWidget.changeAttributeFilterValues(PARTIAL_HIGH_SCHOOL);
 
-        assertTrue(isEqualCollection(dashboardsPage.getContent()
-                .getReport(SIMPLE_REPORT, TableReport.class)
-                .getAttributeElements(),
-                singletonList(PARTIAL_HIGH_SCHOOL)),
+        assertTrue(
+                isEqualCollection(dashboardsPage.getContent()
+                                .getReport(SIMPLE_REPORT, TableReport.class)
+                                .getAttributeElements(),
+                        singletonList(PARTIAL_HIGH_SCHOOL)),
                 "There is difference between actual and expected attributes");
         takeScreenshot(browser, "report-after-using-filter", getClass());
     }

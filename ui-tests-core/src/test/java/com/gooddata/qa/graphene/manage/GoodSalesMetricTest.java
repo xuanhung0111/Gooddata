@@ -12,7 +12,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_QUARTER_YEAR_CR
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_QUARTER_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_HISTORY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_CLOSE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
@@ -69,7 +68,6 @@ import org.json.JSONException;
 import org.supercsv.io.CsvListReader;
 import org.supercsv.io.ICsvListReader;
 import org.supercsv.prefs.CsvPreference;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -122,9 +120,28 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
-    @BeforeClass(alwaysRun = true)
-    public void setProjectTitle() {
+    @Override
+    protected void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-test-metric";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
+        createAvgAmountMetric();
+        createBestCaseMetric();
+        createLostMetric();
+        createNumberOfOpportunitiesMetric();
+        createNumberOfOpenOppsMetric();
+        createNumberOfWonOppsMetric();
+        createProbabilityMetric();
+        createSnapshotBOPMetric();
+        createWinRateMetric();
+        createWonMetric();
+        createNumberOfActivitiesMetric();
+        createSnapshotEOP1Metric();
+        createSnapshotEOP2Metric();
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"filter-share-ratio-metric"})
@@ -257,8 +274,9 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
             createCustomMetric(customMetricInfo, metric, NUMERIC);
 
             if (metric == MetricTypes.IFNULL) {
-                checkMetricValuesInReport(customMetricInfo.getName(), ATTR_STATUS, getMetricValues(metric),
-                        asList(METRIC_LOST, "Open", METRIC_WON));
+                // have 2 attributes named Status which belongs to different datasets
+                checkMetricValuesInReport(customMetricInfo.getName(), ATTR_DEPARTMENT, getMetricValues(metric),
+                        asList("Direct Sales", "Inside Sales"));
                 continue;
             }
 
@@ -270,7 +288,6 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
             checkMetricValuesInReport(customMetricInfo.getName(), ATTR_PRODUCT, getMetricValues(metric),
                     PRODUCT_VALUES);
-            
         }
     }
 
@@ -480,7 +497,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"non-UI-metric"}, dataProvider = "likeProvider")
-    public void testLikeFunctions(MetricTypes metricType, String pattern, List<List<String>> expectedResult) 
+    public void testLikeFunctions(MetricTypes metricType, String pattern, List<List<String>> expectedResult)
             throws IOException {
         Metric metricObj = getMdService().getObj(getProject(), Metric.class, Restriction.title("# of Activities"));
         Attribute attrObj = getMdService().getObj(getProject(), Attribute.class, Restriction.title("Activity Type"));
@@ -675,18 +692,18 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"testRollingWindowMetrics"}, groups = {"non-UI-metric"})
-    public void testRollingWindowMetricsWithInvalidMetricExpression() 
+    public void testRollingWindowMetricsWithInvalidMetricExpression()
             throws ParseException, JSONException, IOException {
         Metric amount = getMdService().getObj(getProject(), Metric.class, Restriction.title(METRIC_AMOUNT));
         Metric m1 = getMdService().getObj(getProject(), Metric.class, Restriction.title("M1"));
-        String metricExpression = 
+        String metricExpression =
                 "SELECT RUNSUM( [" + amount.getUri() + "] ) ROWS BETWEEN 5.5 PRECEDING AND CURRENT ROW";
         try {
             DashboardsRestUtils.changeMetricExpression(getRestApiClient(), m1.getUri(), metricExpression);
         } catch (InvalidStatusCodeException e) {
             //expected the invalid status code exception should be thrown
             //when editing metric expression into invalid
-            assertTrue(e.getMessage().contains("expected code [200], but got [400]"), 
+            assertTrue(e.getMessage().contains("expected code [200], but got [400]"),
                     "Invalid metric expression is accepted");
             return;
         }
@@ -728,7 +745,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                 year, withPFExceptValues, attributeValues);
         addFilterAndCheckReport(attributeValues, withPFExceptValues,
                 ATTR_PRODUCT, "CompuSci", "Educationly", "Explorer");
-        addFilterAndCheckReport(attributeValues, withPFExceptValues, 
+        addFilterAndCheckReport(attributeValues, withPFExceptValues,
                 ATTR_STAGE_NAME, "Interest", "Discovery", "Short List");
         addFilterAndCheckReport(attributeValues, asList(1.7967886E7f, 6.2103956E7f, 8.0406328E7f),
                 ATTR_DEPARTMENT, "Direct Sales");
@@ -1016,7 +1033,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
             String uri = getMdService().getObjUri(getProject(), Metric.class, Restriction.title(metric));
             greatestMaql = greatestMaql.replaceFirst("__metric__", format("[%s]", uri));
             leastMaql = leastMaql.replaceFirst("__metric__", format("[%s]", uri));
-        };
+        }
 
         String greatestMetric = MetricTypes.GREATEST.getLabel() + System.currentTimeMillis();
         String leastMetric = MetricTypes.LEAST.getLabel() + System.currentTimeMillis();
@@ -1033,7 +1050,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
             case EXP:
                 return asList(1.76f, 1.74f, 1.7f, 1.77f, 1.79f, 1.69f);
             case IFNULL:
-                return asList(0f, 35844131.93f, 0f, 42470571.16f, 35844131.93f, 38310753.45f);
+                return asList(28861384.07f, 6982747.86f, 80406324.96f, 36219131.58f);
             case LOG:
                 return asList(6.73f, 6.64f, 7.31f, 6.22f, 6.08f, 6.48f);
             case LN:

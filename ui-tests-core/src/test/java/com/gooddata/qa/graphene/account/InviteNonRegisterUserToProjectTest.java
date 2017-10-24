@@ -26,7 +26,6 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
@@ -63,13 +62,14 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
     private RegistrationForm registrationForm;
     private String invitationUser;
 
-    @BeforeClass(alwaysRun = true)
-    public void initData() {
+    @Override
+    protected void initProperties() {
+        // use empty project
         imapHost = testParams.loadProperty("imap.host");
         imapUser = testParams.loadProperty("imap.user");
         imapPassword = testParams.loadProperty("imap.password");
-
         invitationUser = generateEmail(imapUser);
+
         String registrationString = String.valueOf(System.currentTimeMillis());
 
         registrationForm = new RegistrationForm()

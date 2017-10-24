@@ -61,10 +61,16 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
 
     private String amountByProductReportUri;
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void initData() {
+    @Override
+    protected void customizeProject() throws Throwable {
         amountByProductReportUri = createAmountByProductReport();
-        initDashboardFilterObjects();
+
+        //init Dashboard Filter Objects
+        stageNameAsSingleFilter = createSingleValueFilter(getAttributeByTitle(ATTR_STAGE_NAME));
+        accountAsMultipleFilter = createMultipleValuesFilter(getAttributeByTitle(ATTR_ACCOUNT));
+        stageNameAsMultipleFilter = createMultipleValuesFilter(getAttributeByTitle(ATTR_STAGE_NAME));
+        accountAsSingleFilter = createSingleValueFilter(getAttributeByTitle(ATTR_ACCOUNT));
+        productAsSingleFilter = createSingleValueFilter(getAttributeByTitle(ATTR_PRODUCT));
     }
 
     @DataProvider
@@ -110,7 +116,7 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
         };
     }
 
-    @Test(dependsOnMethods = {"initData"}, dataProvider = "drillToDashboardData")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "drillToDashboardData")
     public void testDrillToDashboardTab(String dashboard, List<Pair<String, List<String>>> filterValuesToChange,
                                         List<Pair<String, List<String>>> expectedFilterValues,
                                         int expectedReportSize) throws IOException, JSONException {
@@ -168,14 +174,6 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
         } finally {
             deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashboardUri);
         }
-    }
-
-    private void initDashboardFilterObjects() {
-        stageNameAsSingleFilter = createSingleValueFilter(getAttributeByTitle(ATTR_STAGE_NAME));
-        accountAsMultipleFilter = createMultipleValuesFilter(getAttributeByTitle(ATTR_ACCOUNT));
-        stageNameAsMultipleFilter = createMultipleValuesFilter(getAttributeByTitle(ATTR_STAGE_NAME));
-        accountAsSingleFilter = createSingleValueFilter(getAttributeByTitle(ATTR_ACCOUNT));
-        productAsSingleFilter = createSingleValueFilter(getAttributeByTitle(ATTR_PRODUCT));
     }
 
     private Tab initDashboardTab(String name, List<TabItem> items) {

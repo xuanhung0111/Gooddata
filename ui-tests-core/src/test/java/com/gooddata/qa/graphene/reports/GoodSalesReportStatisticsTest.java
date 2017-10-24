@@ -24,7 +24,6 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.testng.annotations.Test;
 
-import com.gooddata.md.Attribute;
 import com.gooddata.md.Metric;
 import com.gooddata.md.report.AttributeInGrid;
 import com.gooddata.md.report.GridReportDefinitionContent;
@@ -46,19 +45,22 @@ public class GoodSalesReportStatisticsTest extends GoodSalesAbstractTest {
 
     final static By SIDE_BAR_SELECTOR = By.className("s-sidebar-open");
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void createSimpleReport() {
-        final Metric amountMetric = getMdService().getObj(getProject(), Metric.class, title(METRIC_AMOUNT));
-        final Attribute saleRep = getMdService().getObj(getProject(), Attribute.class, title(SALES_REP));
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
+        createNumberOfActivitiesMetric();
+        createNumberOfLostOppsMetric();
+        createNumberOfOpenOppsMetric();
+        createNumberOfOpportunitiesBOPMetric();
 
         ReportDefinition definition = GridReportDefinitionContent.create(SIMPLE_REPORT, singletonList(METRIC_GROUP),
-                singletonList(new AttributeInGrid(saleRep.getDefaultDisplayForm().getUri(), saleRep.getTitle())),
-                singletonList(new MetricElement(amountMetric)));
+                singletonList(new AttributeInGrid(getAttributeByTitle(SALES_REP).getDefaultDisplayForm().getUri(), SALES_REP)),
+                singletonList(new MetricElement(getMetricByTitle(METRIC_AMOUNT))));
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
     }
 
-    @Test(dependsOnMethods = {"createSimpleReport"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testReportStatistics() {
         assertTrue(initReportsPage().openReport(SIMPLE_REPORT).showConfiguration().getReportStatistic().contains("0 Filters"));
         reportPage.addFilter(FilterItem.Factory.createAttributeFilter(SALES_REP,
@@ -71,7 +73,7 @@ public class GoodSalesReportStatisticsTest extends GoodSalesAbstractTest {
         checkUsedDataLink(SALES_REP, DataType.ATTRIBUTE);
     }
 
-    @Test(dependsOnMethods = {"createSimpleReport"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testReportUsage() {
         final String simpleDashboard = "Simple-Dashboard";
         final String scheduleEmailSubject = "Report-Usage-Test";
@@ -91,10 +93,10 @@ public class GoodSalesReportStatisticsTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"})
     public void switchWideAndNarrowWorkspace() {
         final String largeReport = "Large-Report";
-        final Attribute opportunity = getMdService().getObj(getProject(), Attribute.class, title(ATTR_OPPORTUNITY));
 
         ReportDefinition definition = GridReportDefinitionContent.create(largeReport, singletonList(METRIC_GROUP),
-                singletonList(new AttributeInGrid(opportunity.getDefaultDisplayForm().getUri(), opportunity.getTitle())),
+                singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_OPPORTUNITY).getDefaultDisplayForm().getUri(), 
+                        ATTR_OPPORTUNITY)),
                 createGridElements());
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));

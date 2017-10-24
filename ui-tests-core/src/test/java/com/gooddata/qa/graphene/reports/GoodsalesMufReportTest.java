@@ -38,8 +38,8 @@ public class GoodsalesMufReportTest extends GoodSalesAbstractTest {
 
     private String combinedMufExpression;
 
-    @Test(dependsOnGroups = "createProject")
-    public void initData() {
+    @Override
+    protected void customizeProject() throws Throwable {
         stageNameAttribute = getMdService().getObj(getProject(), Attribute.class, identifier("attr.stage.name"));
         stageNameValue = getMdService()
                 .getAttributeElements(stageNameAttribute)
@@ -70,7 +70,7 @@ public class GoodsalesMufReportTest extends GoodSalesAbstractTest {
         };
     }
 
-    @Test(dependsOnMethods = "initData", dataProvider = "mufProvider", groups = "combinedMuf")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "mufProvider", groups = "combinedMuf")
     public void checkMufApplied(String mufName, String expression, String attribute, String attributeValue)
             throws ParseException, JSONException, IOException {
 

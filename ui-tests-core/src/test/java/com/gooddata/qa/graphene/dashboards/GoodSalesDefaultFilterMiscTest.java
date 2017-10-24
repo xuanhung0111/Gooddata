@@ -1,11 +1,10 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import static com.gooddata.md.Restriction.title;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_PIPELINE_ANALYSIS;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_OUTLOOK;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.getVariableUri;
 import static java.lang.String.format;
@@ -13,14 +12,10 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 
-import java.io.IOException;
 
-import org.json.JSONException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.md.Metric;
 import com.gooddata.md.report.AttributeInGrid;
 import com.gooddata.md.report.Filter;
 import com.gooddata.md.report.GridReportDefinitionContent;
@@ -29,6 +24,10 @@ import com.gooddata.qa.graphene.AbstractDashboardWidgetTest;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
+import com.gooddata.qa.mdObjects.dashboard.Dashboard;
+import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.java.Builder;
 
 public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest {
 
@@ -44,24 +43,30 @@ public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest 
     private static final String DIRECT_SALES = "Direct Sales";
     private static final String ALL = "All";
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void initData() throws JSONException, IOException {
+    @Override
+    protected void customizeProject() throws Throwable {
         initVariablePage().createVariable(new AttributeVariable(DF_VARIABLE)
                 .withAttribute(ATTR_STAGE_NAME)
                 .withAttributeValues(asList(INTEREST, DISCOVERY, SHORT_LIST, RISK_ASSESSMENT)));
 
-        Metric amountMetric = getMdService().getObj(getProject(), Metric.class, title(METRIC_AMOUNT));
-        Attribute stageNameAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_STAGE_NAME));
         String promptFilterUri = getVariableUri(getRestApiClient(), testParams.getProjectId(), DF_VARIABLE);
 
         createReportViaRest(GridReportDefinitionContent.create(REPORT_WITH_PROMPT_FILTER,
                 singletonList(METRIC_GROUP),
-                singletonList(new AttributeInGrid(stageNameAttribute.getDefaultDisplayForm().getUri(), stageNameAttribute.getTitle())),
-                singletonList(new MetricElement(amountMetric)),
+                singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_STAGE_NAME).getDefaultDisplayForm().getUri(), 
+                        ATTR_STAGE_NAME)),
+                singletonList(new MetricElement(createAmountMetric())),
                 singletonList(new Filter(format("[%s]", promptFilterUri)))));
+
+        Dashboard dashboard = Builder.of(Dashboard::new).with(dash -> {
+            dash.setName(DASH_PIPELINE_ANALYSIS);
+            dash.addTab(Builder.of(Tab::new).with(tab -> tab.setTitle(DASH_TAB_OUTLOOK)).build());
+        }).build();
+
+        DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(), dashboard.getMdObject());
     }
 
-    @Test(dependsOnMethods = {"initData"})
+    @Test(dependsOnGroups = {"createProject"})
     public void switchBetweenDefaultFilterMultipleAndSingleOption() {
         final String dashboard = generateDashboardName();
 
@@ -101,7 +106,7 @@ public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest 
         };
     }
 
-    @Test(dependsOnMethods = {"initData"}, dataProvider = "filterCombinationProvider")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "filterCombinationProvider")
     public void combineSingleAndMultipleFilterWithoutUsingGroup(FilterCombination combinationType) {
         final String dashboard = generateDashboardName();
 
@@ -133,7 +138,7 @@ public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest 
         assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(DISCOVERY));
     }
 
-    @Test(dependsOnMethods = {"initData"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkFilterGroupValueWhenSwitchingTabs() {
         final String dashboard = generateDashboardName();
 
@@ -162,7 +167,7 @@ public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest 
         assertEquals(getFilter(ATTR_DEPARTMENT).getCurrentValue(), DIRECT_SALES);
     }
 
-    @Test(dependsOnMethods = {"initData"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkFilterGroupConnectedBetweenSameTabs() {
         final String dashboard = generateDashboardName();
 
@@ -193,7 +198,7 @@ public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest 
         assertEquals(getFilter(ATTR_DEPARTMENT).getCurrentValue(), DIRECT_SALES);
     }
 
-    @Test(dependsOnMethods = {"initData"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkFilterGroupConnectedBetweenDuplicatedTabs() {
         final String dashboard = generateDashboardName();
 
@@ -216,7 +221,7 @@ public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest 
         assertEquals(getFilter(ATTR_DEPARTMENT).getCurrentValue(), DIRECT_SALES);
     }
 
-    @Test(dependsOnMethods = {"initData"})
+    @Test(dependsOnGroups = {"createProject"})
     public void checkFilterGroupValueAfterCopyTab() {
         final String dashboard = generateDashboardName();
 
@@ -239,7 +244,7 @@ public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest 
         assertEquals(getFilter(ATTR_DEPARTMENT).getCurrentValue(), DIRECT_SALES);
     }
 
-    @Test(dependsOnMethods = {"initData"})
+    @Test(dependsOnGroups = {"createProject"})
     public void setInitialValueForConnectedFilters() {
         final String dashboard = generateDashboardName();
 
