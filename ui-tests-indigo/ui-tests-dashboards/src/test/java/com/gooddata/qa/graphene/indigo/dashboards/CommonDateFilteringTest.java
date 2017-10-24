@@ -93,7 +93,8 @@ public class CommonDateFilteringTest extends AbstractDashboardTest {
                 .getDataLabels(), expectedValues, "The insight is affected by common date filter");
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    // this test is disabled until https://jira.intgdc.com/browse/QA-6803 is fixed
+    @Test(dependsOnGroups = {"createProject"}, enabled = false)
     public void overrideFilterIfInsightUsingSameDateDataset() throws ParseException, JSONException, IOException {
         createInsightUsingDateFilter(INSIGHT_USING_DATE_FILTER);
 
@@ -111,7 +112,8 @@ public class CommonDateFilteringTest extends AbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    // this test is disabled until https://jira.intgdc.com/browse/QA-6803 is fixed
+    @Test(dependsOnGroups = {"createProject"}, enabled = false)
     public void combineFiltersIfInsightUsingDifferentDateDataset()
             throws JSONException, IOException, ParseException {
         createInsightUsingDateFilter(INSIGHT_USING_DATE_FILTER);
@@ -191,7 +193,8 @@ public class CommonDateFilteringTest extends AbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    // this test is disabled until https://jira.intgdc.com/browse/QA-6803 is fixed
+    @Test(dependsOnGroups = {"createProject"}, enabled = false)
     public void keepDateFilterAfterEditingDateDimensionOnAD() throws ParseException, JSONException, IOException {
         createInsightUsingDateFilter(INSIGHT_USING_DATE_FILTER);
 

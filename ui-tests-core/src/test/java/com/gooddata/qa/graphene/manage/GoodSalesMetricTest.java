@@ -180,7 +180,8 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         checkMetricValuesInReport(metricName, asList(3.61f));
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"aggregation-metric"})
+    // this test is disabled until https://jira.intgdc.com/browse/QA-6886 is fixed
+    @Test(dependsOnGroups = {"createProject"}, groups = {"aggregation-metric"}, enabled = false)
     public void createAggregationMetricTest() {
         CustomMetricUI customMetricInfo = new CustomMetricUI()
             .withAttributes(ATTR_STAGE_NAME, ATTR_STAGE_HISTORY);
