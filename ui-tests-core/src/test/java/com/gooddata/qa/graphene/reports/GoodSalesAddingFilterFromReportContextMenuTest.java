@@ -1,17 +1,5 @@
 package com.gooddata.qa.graphene.reports;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPPORTUNITY;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.not;
-
-import org.testng.annotations.Test;
-
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.RangeFilterItem.RangeType;
 import com.gooddata.qa.graphene.entity.filter.RankingFilterItem.Ranking;
@@ -19,6 +7,18 @@ import com.gooddata.qa.graphene.entity.report.HowItem;
 import com.gooddata.qa.graphene.entity.report.HowItem.Position;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
+import org.testng.annotations.Test;
+
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPPORTUNITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 
 public class GoodSalesAddingFilterFromReportContextMenuTest extends GoodSalesAbstractTest {
 
@@ -62,7 +62,7 @@ public class GoodSalesAddingFilterFromReportContextMenuTest extends GoodSalesAbs
     @Test(dependsOnMethods = "addAndRemoveReportFilterInSndDialog")
     public void addAttributeFilterFromAttributeHeader() {
         initReport().getTableReport()
-                .openContextMenuFromCellValue("2010")
+                .openContextMenuFrom("2010", CellType.ATTRIBUTE_VALUE)
                 .selectItem("Show only \"2010\"");
         waitForReportLoaded();
 
@@ -73,7 +73,7 @@ public class GoodSalesAddingFilterFromReportContextMenuTest extends GoodSalesAbs
         assertThat(reportPage.getFilters(), hasItem("Year (Snapshot) is 2010"));
 
         reportPage.getTableReport()
-                .openContextMenuFromCellValue("2010")
+                .openContextMenuFrom("2010", CellType.ATTRIBUTE_VALUE)
                 .selectItem("Remove filter (Show All)");
         waitForReportLoaded();
 
@@ -87,7 +87,7 @@ public class GoodSalesAddingFilterFromReportContextMenuTest extends GoodSalesAbs
     @Test(dependsOnMethods = "addAndRemoveReportFilterInSndDialog")
     public void addRankingFilterFromMetricHeader() {
         initReport().getTableReport()
-                .openContextMenuFromCellValue(METRIC_AMOUNT)
+                .openContextMenuFrom(METRIC_AMOUNT, CellType.METRIC_HEADER)
                 .hoverToItem("Numbers in column")
                 .addRankingFilter(Ranking.TOP, 6);
         waitForReportLoaded();
@@ -102,7 +102,7 @@ public class GoodSalesAddingFilterFromReportContextMenuTest extends GoodSalesAbs
     @Test(dependsOnMethods = "addAndRemoveReportFilterInSndDialog")
     public void addRangeFilterFromAttributeHeader() {
         initReport().getTableReport()
-                .openContextMenuFromCellValue("2010")
+                .openContextMenuFrom("2010", CellType.ATTRIBUTE_VALUE)
                 .hoverToItem(METRIC_AMOUNT + " in 2010")
                 .addRangeFilter(RangeType.IS_GREATER_THAN, 27000);
         waitForReportLoaded();
@@ -123,7 +123,6 @@ public class GoodSalesAddingFilterFromReportContextMenuTest extends GoodSalesAbs
     }
 
     private void waitForReportLoaded() {
-        reportPage.getTableReport()
-                .waitForReportLoading();
+        reportPage.getTableReport().waitForLoaded();
     }
 }

@@ -1,26 +1,5 @@
 package com.gooddata.qa.graphene.reports;
 
-import static com.gooddata.md.Restriction.title;
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.changeMetricFormat;
-import static java.lang.String.format;
-import static java.util.Collections.singletonList;
-import static org.testng.Assert.assertEquals;
-
-import java.awt.HeadlessException;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
-
-import org.apache.http.ParseException;
-import org.json.JSONException;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
-
 import com.gooddata.md.Attribute;
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
@@ -35,6 +14,26 @@ import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.io.ResourceUtils;
+import org.apache.http.ParseException;
+import org.json.JSONException;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+import java.awt.HeadlessException;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
+
+import static com.gooddata.md.Restriction.title;
+import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.changeMetricFormat;
+import static java.lang.String.format;
+import static java.util.Collections.singletonList;
+import static org.testng.Assert.assertEquals;
 
 public class CopyReportTableTest extends AbstractProjectTest {
 
@@ -77,7 +76,7 @@ public class CopyReportTableTest extends AbstractProjectTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void copySingleCell() throws HeadlessException, UnsupportedFlavorException, IOException {
-        initReportsPage().openReport(SIMPLE_REPORT).getTableReport().copyMetricCell(DEFAULT_FORMAT_VALUE);
+        initReportsPage().openReport(SIMPLE_REPORT).getTableReport().copyMetricValue(DEFAULT_FORMAT_VALUE);
         takeScreenshot(browser, "copy-single-cell-on-report-page", getClass());
         assertEquals(getClipboardContent(), DEFAULT_FORMAT_VALUE);
         clearClipboard();
@@ -86,8 +85,8 @@ public class CopyReportTableTest extends AbstractProjectTest {
                 .addReportToDashboard(SIMPLE_REPORT)
                 .saveDashboard();
         final TableReport table = dashboardsPage.getContent().getReport(SIMPLE_REPORT, TableReport.class);
-        table.waitForReportLoading();
-        table.copyMetricCell(DEFAULT_FORMAT_VALUE);
+        table.waitForLoaded();
+        table.copyMetricValue(DEFAULT_FORMAT_VALUE);
         takeScreenshot(browser, "copy-single-cell-on-dahboard-page", getClass());
         assertEquals(getClipboardContent(), DEFAULT_FORMAT_VALUE);
     }
@@ -98,7 +97,7 @@ public class CopyReportTableTest extends AbstractProjectTest {
 
         changeMetricFormat(getRestApiClient(), amountSum.getUri(), Formatter.COLORS.toString());
         try {
-            initReportsPage().openReport(SIMPLE_REPORT).getTableReport().copyMetricCell(CONDITION_FORMAT_VALUE);
+            initReportsPage().openReport(SIMPLE_REPORT).getTableReport().copyMetricValue(CONDITION_FORMAT_VALUE);
             takeScreenshot(browser, "copy-formatted-cell", getClass());
             assertEquals(getClipboardContent(), CONDITION_FORMAT_VALUE);
         } finally {

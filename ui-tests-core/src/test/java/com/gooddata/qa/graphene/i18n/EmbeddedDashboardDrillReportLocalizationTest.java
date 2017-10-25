@@ -1,21 +1,21 @@
 package com.gooddata.qa.graphene.i18n;
 
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.entity.report.WhatItem;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
+import com.gooddata.qa.graphene.fragments.reports.report.EmbeddedReportPage;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
+import org.jboss.arquillian.graphene.Graphene;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkLocalization;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-
-import org.jboss.arquillian.graphene.Graphene;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.entity.report.WhatItem;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
-import com.gooddata.qa.graphene.fragments.reports.report.EmbeddedReportPage;
-import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 
 public class EmbeddedDashboardDrillReportLocalizationTest extends GoodSalesAbstractLocalizationTest {
 
@@ -58,7 +58,7 @@ public class EmbeddedDashboardDrillReportLocalizationTest extends GoodSalesAbstr
         initEmbeddedDashboard()
             .getContent()
             .getReport(REPORT_NAME, TableReport.class)
-            .drillOnMetricValue();
+            .drillOnFirstValue(CellType.METRIC_VALUE);
 
         DashboardDrillDialog drillDialog = Graphene.createPageFragment(DashboardDrillDialog.class,
                 waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
@@ -66,19 +66,19 @@ public class EmbeddedDashboardDrillReportLocalizationTest extends GoodSalesAbstr
         checkLocalization(browser);
 
         drillDialog.changeChartType("Line chart");
-        tableReport.waitForReportLoading();
+        tableReport.waitForLoaded();
         checkLocalization(browser);
 
         drillDialog.changeChartType("Bar chart");
-        tableReport.waitForReportLoading();
+        tableReport.waitForLoaded();
         checkLocalization(browser);
 
         drillDialog.changeChartType("Pie chart");
-        tableReport.waitForReportLoading();
+        tableReport.waitForLoaded();
         checkLocalization(browser);
 
         drillDialog.changeChartType("Table");
-        tableReport.waitForReportLoading();
+        tableReport.waitForLoaded();
         checkLocalization(browser);
 
         drillDialog.clickOnBreadcrumbs(REPORT_NAME);

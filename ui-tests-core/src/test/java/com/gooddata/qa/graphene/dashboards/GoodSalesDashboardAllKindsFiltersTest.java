@@ -1,29 +1,5 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_SNAPSHOT;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
-import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotEquals;
-import static org.testng.Assert.assertTrue;
-
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
-import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.testng.annotations.Test;
-
 import com.gooddata.GoodData;
 import com.gooddata.md.Metric;
 import com.gooddata.project.Project;
@@ -36,8 +12,8 @@ import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.entity.variable.NumericVariable;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.AttributeFilterPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
@@ -45,6 +21,29 @@ import com.gooddata.qa.graphene.fragments.manage.VariableDetailPage;
 import com.gooddata.qa.graphene.fragments.reports.report.AbstractReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.CssUtils;
+import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.testng.annotations.Test;
+
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
+import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotEquals;
+import static org.testng.Assert.assertTrue;
 
 public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest {
 
@@ -121,7 +120,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
 
             // reload table report unless will get ArrayIndexOutOfBoundException: Index 1: Size 1
             report = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            report.waitForReportLoading();
+            report.waitForLoaded();
             assertTrue(getRowElementsFrom(report).size() == 1);
 
             dashboardsPage.editDashboard();
@@ -160,7 +159,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             filter.changeTimeFilterValueByClickInTimeLine("2011");
 
             report = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            report.waitForReportLoading();
+            report.waitForLoaded();
             assertTrue(report.getRoot().findElements(By.cssSelector("div[title='2012']")).isEmpty());
             assertTrue(report.getRoot().findElement(By.cssSelector("div[title='2011']")).isDisplayed());
 
@@ -170,7 +169,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             dashboardsPage.saveDashboard();
 
             report = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            report.waitForReportLoading();
+            report.waitForLoaded();
             assertTrue(report.getRoot().findElement(By.cssSelector("div[title='2010']")).isDisplayed());
             getFilterWidget("filter-time").changeTimeFilterValueByClickInTimeLine("2011");
             assertTrue(report.getRoot().findElement(By.cssSelector("div[title='2010']")).isDisplayed());
@@ -320,8 +319,8 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         try {
             addReportToDashboard("Report 4");
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            List<String> years = report.getAttributeElements();
-            List<String> nVarValues = report.getRawMetricElements().subList(3, 3 + years.size());
+            List<String> years = report.getAttributeValues();
+            List<String> nVarValues = report.getRawMetricValues().subList(3, 3 + years.size());
             Iterator<String> yearsIterator = years.iterator();
             Iterator<String> nVarIterator = nVarValues.iterator();
 

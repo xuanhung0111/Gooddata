@@ -2,12 +2,14 @@ package com.gooddata.qa.graphene.fragments.reports.filter;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.openqa.selenium.By.id;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
@@ -24,6 +26,10 @@ public class ContextMenu extends AbstractFragment {
 
     @FindBy(css = "#ctxMenu .yui3-menu-header")
     private List<WebElement> headers;
+
+    public static final ContextMenu getInstance(SearchContext context) {
+        return Graphene.createPageFragment(ContextMenu.class, waitForElementVisible(id("ctxMenu"), context));
+    }
 
     public ContextMenu hoverToItem(String item) {
         new Actions(browser).moveToElement(getItemElement(item)).perform();

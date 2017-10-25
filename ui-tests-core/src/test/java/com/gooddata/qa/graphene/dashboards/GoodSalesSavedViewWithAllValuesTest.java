@@ -1,25 +1,5 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRIORITY;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
-import static com.gooddata.qa.utils.asserts.AssertUtils.assertHeadersEqual;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static org.testng.Assert.assertEquals;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.apache.http.ParseException;
-import org.json.JSONException;
-import org.openqa.selenium.WebElement;
-import org.testng.annotations.Test;
-
 import com.gooddata.md.Attribute;
 import com.gooddata.md.Metric;
 import com.gooddata.md.Restriction;
@@ -34,6 +14,25 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
+import com.gooddata.qa.utils.asserts.AssertUtils;
+import org.apache.http.ParseException;
+import org.json.JSONException;
+import org.openqa.selenium.WebElement;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRIORITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.testng.Assert.assertEquals;
 
 public class GoodSalesSavedViewWithAllValuesTest extends AbstractDashboardWidgetTest {
     private final static String TEST_DASHBOARD = "Dashboard-Having-Report-And-Attribute-Filters";
@@ -96,9 +95,9 @@ public class GoodSalesSavedViewWithAllValuesTest extends AbstractDashboardWidget
                     asList(ATTR_STATUS, ATTR_PRIORITY), ATTR_PRIORITY + " and " + ATTR_STATUS + " are not displayed");
 
             dialog.saveCurrentView("View after changing filter to all values", true);
-            assertHeadersEqual(getReport(REPORT).getAttributeElements(), asList(COMPLETED, LOW, NORMAL, DEFERRED,
+            AssertUtils.assertIgnoreCase(getReport(REPORT).getAttributeValues(), asList(COMPLETED, LOW, NORMAL, DEFERRED,
                     HIGH, IN_PROGRESS, NORMAL));
-            assertEquals(getReport(REPORT).getMetricElements(), asList(30510.0f, 31020.0f, 31109.0f, 31116.0f));
+            assertEquals(getReport(REPORT).getMetricValues(), asList(30510.0f, 31020.0f, 31109.0f, 31116.0f));
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
         }
@@ -126,10 +125,10 @@ public class GoodSalesSavedViewWithAllValuesTest extends AbstractDashboardWidget
                     singletonList(ATTR_STATUS), ATTR_STATUS + "is not displayed");
 
             dialog.saveCurrentView("View having no change on all values filter", true);
-            assertHeadersEqual(getReport(REPORT).getAttributeElements(), asList(COMPLETED, LOW, NORMAL, DEFERRED,
+            AssertUtils.assertIgnoreCase(getReport(REPORT).getAttributeValues(), asList(COMPLETED, LOW, NORMAL, DEFERRED,
                     HIGH, IN_PROGRESS, NORMAL));
 
-            assertEquals(getReport(REPORT).getMetricElements(), asList(30510.0f, 31020.0f, 31109.0f, 31116.0f));
+            assertEquals(getReport(REPORT).getMetricValues(), asList(30510.0f, 31020.0f, 31109.0f, 31116.0f));
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
         }

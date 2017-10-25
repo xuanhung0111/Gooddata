@@ -1,12 +1,33 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
+import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.testng.annotations.Test;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.Supplier;
+
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY;
-
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -16,29 +37,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.function.Supplier;
-
-import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.testng.annotations.Test;
-
-import com.gooddata.qa.graphene.enums.indigo.FieldType;
-import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
-import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
-import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 
 public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
@@ -201,10 +199,10 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
                         com.gooddata.qa.graphene.fragments.reports.report.TableReport.class,
                         waitForElementVisible(By.id("gridContainerTab"), browser));
 
-        Iterator<String> attributes = tableReport.getAttributeElements().iterator();
+        Iterator<String> attributes = tableReport.getAttributeValues().iterator();
 
         sleepTight(2000); // wait for metric values is calculated and loaded
-        Iterator<String> metrics = tableReport.getRawMetricElements().iterator();
+        Iterator<String> metrics = tableReport.getRawMetricValues().iterator();
 
         List<List<String>> content = new ArrayList<>();
         while (attributes.hasNext() && metrics.hasNext()) {
@@ -213,8 +211,8 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
         assertThat(content, equalTo(analysisContent));
 
-        List<String> headers = tableReport.getAttributesHeader();
-        headers.addAll(tableReport.getMetricsHeader());
+        List<String> headers = tableReport.getAttributeHeaders();
+        headers.addAll(tableReport.getMetricHeaders());
         Iterator<String> reportheaders = headers.iterator();
 
         while (analysisHeaders.hasNext() && reportheaders.hasNext()) {

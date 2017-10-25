@@ -101,7 +101,7 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
         logoutAndopenActivationLink(getLinkInLastInvitation(expectedMessageCount + 1));
         createSimpleReport();
 
-        final List<String> attributes = reportPage.getTableReport().getAttributeElements();
+        final List<String> attributes = reportPage.getTableReport().getAttributeValues();
         final long attributeCount = attributes.stream()
                 .filter(s -> s.equals("Partial College") || s.equals("Partial High School"))
                 .collect(Collectors.counting());
@@ -143,7 +143,7 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
             waitForDashboardPageLoaded(browser);
 
             createSimpleReport();
-            final List<String> attributes = reportPage.getTableReport().getAttributeElements();
+            final List<String> attributes = reportPage.getTableReport().getAttributeValues();
             final long attributeCount = attributes.stream()
                     .filter(s -> s.equals("Partial College")).collect(Collectors.counting());
             assertTrue(attributeCount == 1, "The MUF has been not applied");

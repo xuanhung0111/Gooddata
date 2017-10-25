@@ -1,16 +1,5 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_CREATED;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_QUOTA;
-import static java.util.Arrays.asList;
-import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
-import static org.testng.Assert.assertTrue;
-
-import org.testng.annotations.Test;
-
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.HowItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
@@ -18,6 +7,16 @@ import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.reports.report.ChartReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.utils.Sleeper;
+import org.testng.annotations.Test;
+
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_CREATED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_QUOTA;
+import static java.util.Arrays.asList;
+import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
+import static org.testng.Assert.assertTrue;
 
 public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
 
@@ -72,8 +71,8 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
             assertTrue(report.isCellLimit());
             report.showAnyway();
 
-            assertTrue(isEqualCollection(asList(METRIC_AMOUNT, METRIC_QUOTA), report.getMetricsHeader()));
-            assertTrue(isEqualCollection(asList(ATTR_ACCOUNT, ATTR_DATE_CREATED), report.getAttributesHeader()));
+            assertTrue(isEqualCollection(asList(METRIC_AMOUNT, METRIC_QUOTA), report.getMetricHeaders()));
+            assertTrue(isEqualCollection(asList(ATTR_ACCOUNT, ATTR_DATE_CREATED), report.getAttributeHeaders()));
         } finally {
             dashboardsPage.deleteDashboard();
         }

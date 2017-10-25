@@ -1,25 +1,7 @@
 package com.gooddata.qa.graphene.filters;
 
-import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
-import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
-import static java.lang.String.format;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import com.gooddata.md.AttributeElement;
-import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
 import com.gooddata.md.Attribute;
+import com.gooddata.md.AttributeElement;
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
 import com.gooddata.qa.graphene.AbstractDashboardWidgetTest;
@@ -34,6 +16,23 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.Widget
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel.Tab;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.io.ResourceUtils;
+import org.json.JSONException;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
+import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
+import static java.lang.String.format;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 public class MetricAvailableFilterTest extends AbstractDashboardWidgetTest {
 
@@ -163,7 +162,7 @@ public class MetricAvailableFilterTest extends AbstractDashboardWidgetTest {
 
             TableReport report = getReport(AMOUNT_SUM_BY_STATE);
             DashboardWidgetDirection.DOWN.moveElementToRightPlace(report.getRoot());
-            List<String> attributeElementsBeforeFilter = report.getAttributeElements();
+            List<String> attributeElementsBeforeFilter = report.getAttributeValues();
 
             WidgetConfigPanel widgetConfigPanel = addStateAttributeAndOpenConfigPanel();
 
@@ -174,7 +173,7 @@ public class MetricAvailableFilterTest extends AbstractDashboardWidgetTest {
             dashboardsPage.getDashboardEditBar().saveDashboard();
             assertEquals(getFilter(STATE).getAllAttributeValues(), STATE_INPUTS,
                          "List of state value should be limit by metric!");
-            assertEquals(report.getAttributeElements(), attributeElementsBeforeFilter,
+            assertEquals(report.getAttributeValues(), attributeElementsBeforeFilter,
                          "Report should be rendered with all values of state");
         } finally {
             deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashboardUri);

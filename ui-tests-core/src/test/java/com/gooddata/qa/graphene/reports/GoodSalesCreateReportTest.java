@@ -1,29 +1,5 @@
 package com.gooddata.qa.graphene.reports;
 
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.startsWith;
-import static org.openqa.selenium.By.cssSelector;
-import static org.openqa.selenium.By.name;
-
-import java.io.IOException;
-import java.util.List;
-
-import com.gooddata.qa.utils.http.RestUtils;
-import org.apache.http.ParseException;
-import org.json.JSONException;
-import org.openqa.selenium.Keys;
-import org.testng.annotations.Test;
-
 import com.gooddata.GoodData;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.Fact;
@@ -39,7 +15,30 @@ import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
+import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import org.apache.http.ParseException;
+import org.json.JSONException;
+import org.openqa.selenium.Keys;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.util.List;
+
+import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.startsWith;
+import static org.openqa.selenium.By.cssSelector;
+import static org.openqa.selenium.By.name;
 
 public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
 
@@ -162,7 +161,7 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
             .changeDisplayLabel("Order")
             .doneSndPanel()
             .getTableReport()
-            .getAttributeElements(), equalTo(asList("101", "102", "103", "104", "105", "106", "107", "108")));
+            .getAttributeValues(), equalTo(asList("101", "102", "103", "104", "105", "106", "107", "108")));
 
     }
 

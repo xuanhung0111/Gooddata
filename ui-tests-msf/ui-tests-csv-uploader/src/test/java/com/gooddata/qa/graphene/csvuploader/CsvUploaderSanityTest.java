@@ -21,7 +21,7 @@ public class CsvUploaderSanityTest extends AbstractCsvUploaderTest {
     @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
     public void verifyDataAfterUpload() {
         createReport(new UiReportDefinition().withName("Report").withHows("Education"), "Education Report");
-        assertTrue(isEqualCollection(waitForFragmentVisible(reportPage).getTableReport().getAttributeElements(),
+        assertTrue(isEqualCollection(waitForFragmentVisible(reportPage).getTableReport().getAttributeValues(),
                 asList("Bachelors Degree", "Graduate Degree", "High School Degree", "Partial College",
                         "Partial High School")));
     }

@@ -1,29 +1,5 @@
 package com.gooddata.qa.graphene.manage;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_CREATED;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_WON;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static com.gooddata.md.Restriction.title;
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
-
-import java.io.IOException;
-import java.util.Collection;
-
-import org.apache.http.ParseException;
-import org.json.JSONException;
-import org.openqa.selenium.By;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
 import com.gooddata.md.Attribute;
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
@@ -40,9 +16,33 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage.AttributeLabel;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.graphene.fragments.manage.VariableDetailPage;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
+import org.apache.http.ParseException;
+import org.json.JSONException;
+import org.openqa.selenium.By;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.util.Collection;
+
+import static com.gooddata.md.Restriction.title;
+import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_CREATED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_WON;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
 
@@ -122,7 +122,7 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
                     .openReport(reportWithSingleAttribute.getTitle())
                     .getTableReport();
             takeScreenshot(browser, "Report-updated-correctly-after-changing-attribute-label", getClass());
-            report.verifyAttributeIsHyperlinkInReport();
+            assertTrue(report.isDrillableToExternalPage(CellType.ATTRIBUTE_VALUE), "cannot drill report to external page");
 
         } finally {
             setAttributeLabelType(ATTR_PRODUCT, PRODUCT_LABEL, AttributeLabelTypes.TEXT);
@@ -213,11 +213,11 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
                     .getFilterWidgetByName(ATTR_PRODUCT)
                     .changeAttributeFilterValues(EDUCATIONLY);
 
-            getReport(report.getTitle()).waitForReportLoading();
+            getReport(report.getTitle()).waitForLoaded();
             takeScreenshot(browser, "Selection-type:" + filterSelectionType + 
                     "-works-correctly-after-change-attribute-label-type", getClass());
             assertEquals(getFilter(ATTR_PRODUCT).getCurrentValue(), EDUCATIONLY);
-            assertEquals(getReport(report.getTitle()).getAttributeElements(), singletonList(EDUCATIONLY));
+            assertEquals(getReport(report.getTitle()).getAttributeValues(), singletonList(EDUCATIONLY));
 
         } finally {
             setAttributeLabelType(ATTR_PRODUCT, PRODUCT_LABEL, AttributeLabelTypes.TEXT);
@@ -264,12 +264,12 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
                 applyValuesForGroupFilter();
             }
 
-            getReport(report.getTitle()).waitForReportLoading();
+            getReport(report.getTitle()).waitForLoaded();
             takeScreenshot(browser,
                     "Multiple-filter:" + filterType + "-works-correctly-after-change-attribute-label-type", getClass());
             assertEquals(getFilter(ATTR_PRODUCT).getCurrentValue(), EDUCATIONLY);
             assertEquals(getFilter(ATTR_DEPARTMENT).getCurrentValue(), DIRECT_SALES);
-            assertEquals(getReport(report.getTitle()).getAttributeElements(), asList(EDUCATIONLY, DIRECT_SALES));
+            assertEquals(getReport(report.getTitle()).getAttributeValues(), asList(EDUCATIONLY, DIRECT_SALES));
 
         } finally {
             setAttributeLabelType(ATTR_PRODUCT, PRODUCT_LABEL, AttributeLabelTypes.TEXT);
@@ -309,7 +309,7 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
 
             getFilter(ATTR_FIRSTNAME).changeAttributeFilterValues(FIRSTNAME_VALUE);
             assertEquals(getFilter(ATTR_FIRSTNAME).getCurrentValue(), FIRSTNAME_VALUE);
-            assertEquals(getReport(report.getTitle()).getAttributeElements(), singletonList(FIRSTNAME_VALUE));
+            assertEquals(getReport(report.getTitle()).getAttributeValues(), singletonList(FIRSTNAME_VALUE));
 
             setAttributeLabelType(ATTR_FIRSTNAME, FIRSTNAME_LABEL, AttributeLabelTypes.HYPERLINK);
 
@@ -322,11 +322,11 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
 
             initDashboardsPage();
             getFilter(ATTR_FIRSTNAME).changeAttributeFilterValues(FIRSTNAME_VALUE_UPDATE);
-            getReport(report.getTitle()).waitForReportLoading();
+            getReport(report.getTitle()).waitForLoaded();
 
             takeScreenshot(browser, "Data-updated-correctly-after-changing-attribute-label", getClass());
             assertEquals(getFilter(ATTR_FIRSTNAME).getCurrentValue(), FIRSTNAME_VALUE_UPDATE);
-            assertEquals(getReport(report.getTitle()).getAttributeElements(), singletonList(FIRSTNAME_VALUE_UPDATE));
+            assertEquals(getReport(report.getTitle()).getAttributeValues(), singletonList(FIRSTNAME_VALUE_UPDATE));
 
         } finally {
             testParams.setProjectId(currentProjectId);

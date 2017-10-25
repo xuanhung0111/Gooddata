@@ -1,33 +1,32 @@
 package com.gooddata.qa.graphene.reports;
 
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createMufObjectByUri;
-import static com.gooddata.qa.utils.CssUtils.simplifyText;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.addMufToUser;
-import static org.testng.Assert.assertEquals;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.md.Restriction.identifier;
-import static java.lang.String.format;
-import static java.lang.String.valueOf;
-import static org.joda.time.DateTime.now;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasItems;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.UUID;
-
-import org.apache.http.ParseException;
-import org.json.JSONException;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
 import com.gooddata.md.Attribute;
 import com.gooddata.md.AttributeElement;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import org.apache.http.ParseException;
+import org.json.JSONException;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
+
+import static com.gooddata.md.Restriction.identifier;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.addMufToUser;
+import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createMufObjectByUri;
+import static java.lang.String.format;
+import static java.lang.String.valueOf;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
+import static org.joda.time.DateTime.now;
+import static org.testng.Assert.assertEquals;
 
 public class GoodsalesMufReportTest extends GoodSalesAbstractTest {
     private Attribute stageNameAttribute;
@@ -87,7 +86,7 @@ public class GoodsalesMufReportTest extends GoodSalesAbstractTest {
                 .withHows(attribute),
                 reportName);
 
-        List<String> attributeElements = reportPage.getTableReport().getAttributeElements();
+        List<String> attributeElements = reportPage.getTableReport().getAttributeValues();
 
         takeScreenshot(browser, mufName + "-applied-with-report", getClass());
         assertEquals(attributeElements.size(), 1);
@@ -104,7 +103,7 @@ public class GoodsalesMufReportTest extends GoodSalesAbstractTest {
         attributeElements = dashboardsPage
                 .getContent()
                 .getLatestReport(TableReport.class)
-                .getAttributeElements();
+                .getAttributeValues();
 
         takeScreenshot(browser, mufName + "-applied-with-report-in-dashboard", getClass());
         assertEquals(attributeElements.size(), 1);
@@ -133,7 +132,7 @@ public class GoodsalesMufReportTest extends GoodSalesAbstractTest {
                 .withHows(stageNameAttribute.getTitle(), yearCreatedAttribute.getTitle()),
                 reportName);
 
-        final List<String> attributeElements = reportPage.getTableReport().getAttributeElements();
+        final List<String> attributeElements = reportPage.getTableReport().getAttributeValues();
 
         takeScreenshot(browser, "Combined-muf-applied-with-report", getClass());
         assertEquals(attributeElements.size(), 2);

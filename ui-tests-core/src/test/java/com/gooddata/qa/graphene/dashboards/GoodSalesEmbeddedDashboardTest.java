@@ -1,5 +1,45 @@
 package com.gooddata.qa.graphene.dashboards;
 
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.entity.report.WhatItem;
+import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
+import com.gooddata.qa.graphene.enums.report.ReportTypes;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
+import com.gooddata.qa.graphene.fragments.dashboards.EmbedDashboardDialog;
+import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.EmbeddedWidget;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.StyleConfigPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel.Tab;
+import com.gooddata.qa.graphene.fragments.login.LoginFragment;
+import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
+import com.gooddata.qa.graphene.fragments.reports.report.ChartReport;
+import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
+import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
+import com.google.common.collect.Lists;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.http.ParseException;
+import org.jboss.arquillian.graphene.Graphene;
+import org.json.JSONException;
+import org.openqa.selenium.WebElement;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.List;
+
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
@@ -18,46 +58,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.List;
-
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.http.ParseException;
-import org.jboss.arquillian.graphene.Graphene;
-import org.json.JSONException;
-import org.openqa.selenium.WebElement;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.entity.report.WhatItem;
-import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
-import com.gooddata.qa.graphene.enums.report.ExportFormat;
-import com.gooddata.qa.graphene.enums.report.ReportTypes;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
-import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
-import com.gooddata.qa.graphene.fragments.dashboards.EmbedDashboardDialog;
-import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.EmbeddedWidget;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.StyleConfigPanel;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel.Tab;
-import com.gooddata.qa.graphene.fragments.login.LoginFragment;
-import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
-import com.gooddata.qa.graphene.fragments.reports.report.ChartReport;
-import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
-import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
-import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
-import com.google.common.collect.Lists;
 
 public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
@@ -117,8 +117,8 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     public void prepareReportsForEmbeddedDashboard() {
         createReport(tabularReportDef, tabularReportDef.getName());
         TableReport tabularReport = reportPage.getTableReport();
-        attributeValues = tabularReport.getAttributeElements();
-        metricValues = tabularReport.getMetricElements();
+        attributeValues = tabularReport.getAttributeValues();
+        metricValues = tabularReport.getMetricValues();
         createReport(chartReportDef, chartReportDef.getName());
         createReport(headlineReportDef, headlineReportDef.getName());
         OneNumberReport headlineReport = reportPage.getHeadlineReport();
@@ -191,8 +191,8 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         TableReport tableReport = embeddedDashboard.openTab(TABULAR_REPORT_TAB_INDEX)
                 .getReport(tabularReportDef.getName(), TableReport.class);
 
-        assertThat(tableReport.getAttributeElements(), is(attributeValues));
-        assertThat(tableReport.getMetricElements(), is(metricValues));
+        assertThat(tableReport.getAttributeValues(), is(attributeValues));
+        assertThat(tableReport.getMetricValues(), is(metricValues));
 
         embeddedDashboard
                 .openTab(CHART_REPORT_TAB_INDEX)
@@ -279,55 +279,55 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         List<String> drilledDownReportAttributeValues =
                 Lists.newArrayList("Q1/2009", "Q2/2009", "Q3/2009", "Q4/2009");
         List<Float> drilledDownReportMetricValues =
-                Lists.newArrayList(1279125.6F, 1881130.8F, 2381755.0F, 3114457.0F, 8656468.0F);
+                Lists.newArrayList(1279125.6F, 1881130.8F, 2381755.0F, 3114457.0F);
 
         String metricValueToDrill = "$2,773,426.95";
         List<String> drilledInReportAttributeValues = Lists.newArrayList("Lost", "Open", "Won");
         List<Float> drilledInReportMetricValues =
-                Lists.newArrayList(1980676.11F, 326592.22F, 466158.62F, 2773426.95F);
+                Lists.newArrayList(1980676.11F, 326592.22F, 466158.62F);
 
         EmbeddedDashboard embeddedDashboard =
                 embedDashboardToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Drill On Embedded Dashboard");
 
         embeddedDashboard
                 .getReport(tabularReportDef.getName(), TableReport.class)
-                .drillOnAttributeValue(attributeValueToDrill);
+                .drillOn(attributeValueToDrill, CellType.ATTRIBUTE_VALUE);
 
         DashboardDrillDialog drillDialog = Graphene.createPageFragment(DashboardDrillDialog.class,
                 waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
 
-        TableReport drilledTableReport = drillDialog.getReport(TableReport.class).waitForReportLoading();
+        TableReport drilledTableReport = drillDialog.getReport(TableReport.class).waitForLoaded();
 
-        assertThat(drilledTableReport.getAttributeElements(), is(drilledDownReportAttributeValues));
-        assertThat(drilledTableReport.getMetricElements(), is(drilledDownReportMetricValues));
+        assertThat(drilledTableReport.getAttributeValues(), is(drilledDownReportAttributeValues));
+        assertThat(drilledTableReport.getMetricValues(), is(drilledDownReportMetricValues));
 
         drillDialog.closeDialog();
 
         embeddedDashboard
                 .getReport(tabularReportDef.getName(), TableReport.class)
-                .drillOnMetricValue(metricValueToDrill);
+                .drillOn(metricValueToDrill, CellType.METRIC_VALUE);
 
         drillDialog = Graphene
                 .createPageFragment(DashboardDrillDialog.class, waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
 
-        drilledTableReport = drillDialog.getReport(TableReport.class).waitForReportLoading();
+        drilledTableReport = drillDialog.getReport(TableReport.class).waitForLoaded();
 
-        assertThat(drilledTableReport.getAttributeElements(), is(drilledInReportAttributeValues));
-        assertThat(drilledTableReport.getMetricElements(), is(drilledInReportMetricValues));
+        assertThat(drilledTableReport.getAttributeValues(), is(drilledInReportAttributeValues));
+        assertThat(drilledTableReport.getMetricValues(), is(drilledInReportMetricValues));
 
         drillDialog.closeDialog();
 
         // check drill to report
         embeddedDashboard.openTab(4)
                 .getReport(drillingReportDef.getName(), TableReport.class)
-                .drillOnAttributeValue("Email");
+                .drillOn("Email", CellType.ATTRIBUTE_VALUE);
         drillDialog = Graphene.createPageFragment(DashboardDrillDialog.class,
                 waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
 
-        drilledTableReport = drillDialog.getReport(TableReport.class).waitForReportLoading();
-        assertThat(drilledTableReport.getAttributeElements(), is(Lists.newArrayList("2008", "2009", "2010", "2011",
+        drilledTableReport = drillDialog.getReport(TableReport.class).waitForLoaded();
+        assertThat(drilledTableReport.getAttributeValues(), is(Lists.newArrayList("2008", "2009", "2010", "2011",
                 "2012")));
-        assertThat(drilledTableReport.getMetricElements(), is(Lists.newArrayList(2773426.95F, 8656468.20F,
+        assertThat(drilledTableReport.getMetricValues(), is(Lists.newArrayList(2773426.95F, 8656468.20F,
                 29140409.09F, 60270072.20F, 15785080.10F)));
     }
 
@@ -347,15 +347,15 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
         TableReport tableReport = embeddedDashboard.getReport(tabularReportDef.getName(), TableReport.class);
 
-        assertThat(tableReport.getAttributeElements(), is(newArrayList(filteredAttributeValues)));
-        assertThat(tableReport.getMetricElements(), is(filteredMetricValues));
+        assertThat(tableReport.getAttributeValues(), is(newArrayList(filteredAttributeValues)));
+        assertThat(tableReport.getMetricValues(), is(filteredMetricValues));
 
         embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
 
         tableReport = embeddedDashboard.getReport(tabularReportDef.getName(), TableReport.class);
 
-        assertThat(tableReport.getAttributeElements(), is(newArrayList(filteredAttributeValues)));
-        assertThat(tableReport.getMetricElements(), is(filteredMetricValues));
+        assertThat(tableReport.getAttributeValues(), is(newArrayList(filteredAttributeValues)));
+        assertThat(tableReport.getMetricValues(), is(filteredMetricValues));
     }
 
     @Test(dependsOnMethods = "createAdditionalProject")
@@ -408,16 +408,16 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
         TableReport tableReport = embeddedDashboard.getReport(tabularReportDef.getName(), TableReport.class);
 
-        assertThat(tableReport.getAttributeElements(), is(newArrayList(filteredAttributeValues)));
-        assertThat(tableReport.getMetricElements(), is(filteredMetricValues));
+        assertThat(tableReport.getAttributeValues(), is(newArrayList(filteredAttributeValues)));
+        assertThat(tableReport.getMetricValues(), is(filteredMetricValues));
 
         embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
 
         embeddedDashboard.getFirstFilter().changeAttributeFilterValues(filteredAttributeValues);
-        tableReport = embeddedDashboard.getReport(tabularReportDef.getName(), TableReport.class).waitForReportLoading();
+        tableReport = embeddedDashboard.getReport(tabularReportDef.getName(), TableReport.class).waitForLoaded();
 
-        assertThat(tableReport.getAttributeElements(), is(newArrayList(filteredAttributeValues)));
-        assertThat(tableReport.getMetricElements(), is(filteredMetricValues));
+        assertThat(tableReport.getAttributeValues(), is(newArrayList(filteredAttributeValues)));
+        assertThat(tableReport.getMetricValues(), is(filteredMetricValues));
     }
 
     @Test(dependsOnMethods = "createAdditionalProject")
@@ -450,8 +450,8 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
                 waitForElementVisible(ReportPage.LOCATOR, browser))
                 .getTableReport();
 
-        assertThat(tableReport.getAttributeElements(), is(attributeValues));
-        assertThat(tableReport.getMetricElements(), is(metricValues));
+        assertThat(tableReport.getAttributeValues(), is(attributeValues));
+        assertThat(tableReport.getMetricValues(), is(metricValues));
 
         embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
 
@@ -462,8 +462,8 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         tableReport = Graphene.createPageFragment(ReportPage.class, waitForElementVisible(ReportPage.LOCATOR, browser))
                 .getTableReport();
 
-        assertThat(tableReport.getAttributeElements(), is(attributeValues));
-        assertThat(tableReport.getMetricElements(), is(metricValues));
+        assertThat(tableReport.getAttributeValues(), is(attributeValues));
+        assertThat(tableReport.getMetricValues(), is(metricValues));
     }
 
     @Test(dependsOnMethods = "createAdditionalProject")

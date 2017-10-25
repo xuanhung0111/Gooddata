@@ -14,6 +14,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 
 import java.io.IOException;
 import java.util.List;
@@ -74,13 +75,12 @@ public class DrillToHiddenDashboardTabTest extends GoodSalesAbstractTest {
     public void testDrillReportToHiddenTab() throws JSONException {
         signIn(true, UserRoles.EDITOR);
         try {
-            TableReport report = initDashboardsPage().selectDashboard(PUBLIC_DASHBOARD).getContent()
+            initDashboardsPage().selectDashboard(PUBLIC_DASHBOARD).getContent()
                     .getLatestReport(TableReport.class)
-                    .drillOnAttributeValue()
-                    .waitForTableReportExecutionProgress();
+                    .drillOnFirstValue(CellType.ATTRIBUTE_VALUE)
+                    .waitForLoaded();
 
-            assertEquals(dashboardsPage.getContent().getLatestReport(TableReport.class)
-                            .waitForTableReportExecutionProgress().getReportTiTle(),
+            assertEquals(dashboardsPage.getContent().getLatestReport(TableReport.class).getReportTiTle(),
                     REPORT_TOP_SALES_REPS_BY_WON_AND_LOST);
         } finally {
             logout();

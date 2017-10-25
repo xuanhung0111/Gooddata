@@ -10,6 +10,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -38,6 +39,10 @@ public class DashboardDrillDialog extends AbstractFragment {
     private static final By REPORT_LOCATOR = By.cssSelector(".report");
     private static final String LOADING = "Loading...";
     public static final By LOCATOR = By.cssSelector(".c-drillDialog");
+
+    public static final DashboardDrillDialog getInstance(SearchContext context) {
+        return Graphene.createPageFragment(DashboardDrillDialog.class, waitForElementVisible(LOCATOR, context));
+    }
 
     public <T extends AbstractReport> T getReport(Class<T> clazz) {
         return Graphene.createPageFragment(clazz, waitForElementVisible(REPORT_LOCATOR, browser));

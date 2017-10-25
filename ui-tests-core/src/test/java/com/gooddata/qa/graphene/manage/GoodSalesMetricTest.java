@@ -1,8 +1,55 @@
 package com.gooddata.qa.graphene.manage;
 
+import com.gooddata.md.Attribute;
+import com.gooddata.md.Metric;
+import com.gooddata.md.Restriction;
+import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.GridReportDefinitionContent;
+import com.gooddata.md.report.MetricElement;
+import com.gooddata.md.report.Report;
+import com.gooddata.md.report.ReportDefinition;
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.entity.filter.FilterItem;
+import com.gooddata.qa.graphene.entity.metric.CustomMetricUI;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
+import com.gooddata.qa.graphene.fragments.manage.MetricPage;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
+import com.gooddata.qa.graphene.utils.Sleeper;
+import com.gooddata.qa.utils.http.InvalidStatusCodeException;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.report.ReportExportFormat;
+import com.gooddata.report.ReportService;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.http.ParseException;
+import org.json.JSONException;
+import org.supercsv.io.CsvListReader;
+import org.supercsv.io.ICsvListReader;
+import org.supercsv.prefs.CsvPreference;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.entity.metric.CustomMetricUI.buildAttributeValue;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_CLOSE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_MONTH_YEAR_SNAPSHOT;
@@ -32,9 +79,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_EOP1
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_EOP2;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_WIN_RATE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_WON;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_CREATED;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_CLOSE;
-
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
@@ -47,51 +91,6 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.http.ParseException;
-import org.json.JSONException;
-import org.supercsv.io.CsvListReader;
-import org.supercsv.io.ICsvListReader;
-import org.supercsv.prefs.CsvPreference;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
-import com.gooddata.md.Attribute;
-import com.gooddata.md.Metric;
-import com.gooddata.md.Restriction;
-import com.gooddata.md.report.AttributeInGrid;
-import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
-import com.gooddata.md.report.Report;
-import com.gooddata.md.report.ReportDefinition;
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.entity.filter.FilterItem;
-import com.gooddata.qa.graphene.entity.metric.CustomMetricUI;
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
-import com.gooddata.qa.graphene.enums.report.ExportFormat;
-import com.gooddata.qa.graphene.fragments.manage.MetricPage;
-import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
-import com.gooddata.qa.graphene.utils.Sleeper;
-import com.gooddata.qa.utils.http.InvalidStatusCodeException;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
-import com.gooddata.report.ReportExportFormat;
-import com.gooddata.report.ReportService;
 
 public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
@@ -803,18 +802,18 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         UiReportDefinition reportDefinition = new UiReportDefinition().withName("Report-" + metricName)
                 .withWhats(metricName).withHows(ATTR_STAGE_NAME);
         createReport(reportDefinition, "screenshot-" + "report_" + customMetricInfo.getName());
-        reportPage.getTableReport().drillOnAttributeValue("Short List");
+        reportPage.getTableReport().drillOn("Short List", CellType.ATTRIBUTE_VALUE);
         Sleeper.sleepTight(1000); // Wait for drill report is present
 
         TableReport drillReport = reportPage.getTableReport();
-        drillReport.waitForReportLoading();
+        drillReport.waitForLoaded();
         List<Float> drillReportMetrics = asList(1.72400224E8f, 1.16374376E8f, 2.88774592E8f);
         List<String> drillReportAttributes = asList("Direct Sales", "Inside Sales");
-        System.out.println("Drill metrics: " + drillReport.getMetricElements());
-        System.out.println("Drill attribues: " + drillReport.getAttributeElements());
-        assertTrue(isEqualCollection(drillReport.getMetricElements(), drillReportMetrics),
+        System.out.println("Drill metrics: " + drillReport.getMetricValues());
+        System.out.println("Drill attribues: " + drillReport.getAttributeValues());
+        assertTrue(isEqualCollection(drillReport.getMetricValues(), drillReportMetrics),
                 "Metric values list of drill report is incorrrect");
-        assertTrue(isEqualCollection(drillReport.getAttributeElements(), drillReportAttributes),
+        assertTrue(isEqualCollection(drillReport.getAttributeValues(), drillReportAttributes),
                 "Metric values list of drill report is incorrrect");
     }
 
@@ -856,13 +855,13 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
         initReportsPage().openReport(reportName);
-        List<Float> metricValuesinGrid = reportPage.getTableReport().getMetricElements();
+        List<Float> metricValuesinGrid = reportPage.getTableReport().getMetricValues();
         takeScreenshot(browser, "check-metric" + "-" + metric.getTitle(), this.getClass());
         System.out.println("Actual metric values:   " + metricValuesinGrid);
         System.out.println("Expected metric values: " + metricValues);
         assertEquals(metricValuesinGrid, metricValues, "Metric values list is incorrrect");
         if (attributeValues != null) {
-            List<String> attributeValuesinGrid = reportPage.getTableReport().getAttributeElements();
+            List<String> attributeValuesinGrid = reportPage.getTableReport().getAttributeValues();
             assertEquals(attributeValuesinGrid, attributeValues);
         }
     }
@@ -887,13 +886,13 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
             reportPage.addFilter(FilterItem.Factory.createAttributeFilter(ATTR_MONTH_YEAR_SNAPSHOT, "Apr 2012"))
                     .saveReport();
         }
-        List<Float> metricValuesinGrid = reportPage.getTableReport().getMetricElements();
+        List<Float> metricValuesinGrid = reportPage.getTableReport().getMetricValues();
         takeScreenshot(browser, "check-metric" + "-" + metricName, this.getClass());
         System.out.println("Actual metric values:   " + metricValuesinGrid);
         System.out.println("Expected metric values: " + metricValues);
         assertEquals(metricValuesinGrid, metricValues, "Metric values list is incorrrect");
         if (attributeValues != null) {
-            List<String> attributeValuesinGrid = reportPage.getTableReport().getAttributeElements();
+            List<String> attributeValuesinGrid = reportPage.getTableReport().getAttributeValues();
             assertEquals(attributeValuesinGrid, attributeValues);
         }
         reportPage.saveReport();
@@ -976,9 +975,9 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         reportPage.addFilter(FilterItem.Factory.createAttributeFilter(filter, filterValues))
                 .saveReport();
         TableReport report = reportPage.getTableReport();
-        assertTrue(CollectionUtils.isEqualCollection(report.getMetricElements(), metricValues),
+        assertTrue(CollectionUtils.isEqualCollection(report.getMetricValues(), metricValues),
                 "Metric values list is incorrrect");
-        assertTrue(CollectionUtils.isEqualCollection(report.getAttributeElements(), attributeValues),
+        assertTrue(CollectionUtils.isEqualCollection(report.getAttributeValues(), attributeValues),
                 "Attribute values list is incorrrect");
     }
 

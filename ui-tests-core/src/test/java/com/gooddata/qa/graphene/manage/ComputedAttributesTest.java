@@ -1,45 +1,5 @@
 package com.gooddata.qa.graphene.manage;
 
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.changeMetricExpression;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForObjectPageLoaded;
-import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.ElementUtils.getBubbleMessage;
-import static org.openqa.selenium.By.id;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_MONTH_YEAR_CREATED;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_SALES_REP;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_EXPECTED_PERCENT_OF_GOAL;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON_OPPS;
-import static com.gooddata.md.Restriction.title;
-import static java.lang.String.format;
-import static java.util.stream.Collectors.joining;
-import static java.util.Arrays.asList;
-import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.apache.http.ParseException;
-import org.json.JSONException;
-import org.openqa.selenium.By;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
 import com.gooddata.md.Attribute;
 import com.gooddata.md.AttributeElement;
 import com.gooddata.md.Fact;
@@ -59,11 +19,51 @@ import com.gooddata.qa.graphene.fragments.manage.AttributePage;
 import com.gooddata.qa.graphene.fragments.manage.CreateAttributePage;
 import com.gooddata.qa.graphene.fragments.manage.MetricDetailsPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
-import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import org.apache.http.ParseException;
+import org.json.JSONException;
+import org.openqa.selenium.By;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getBubbleMessage;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_MONTH_YEAR_CREATED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_SALES_REP;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_EXPECTED_PERCENT_OF_GOAL;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON_OPPS;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForObjectPageLoaded;
+import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.changeMetricExpression;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.joining;
+import static org.openqa.selenium.By.id;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 
 public class ComputedAttributesTest extends GoodSalesAbstractTest {
@@ -290,9 +290,9 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         createReport(new UiReportDefinition().withName(REPORT_NAME).withWhats("Amount")
                 .withHows(COMPUTED_ATTRIBUTE_NAME), REPORT_NAME);
         Screenshots.takeScreenshot(browser, "report-created-with-computed-attribute", this.getClass());
-        List<String> attributeHeaders = reportPage.getTableReport().getAttributesHeader();
-        List<String> attributeValues = reportPage.getTableReport().getAttributeElements();
-        List<Float> metricValues = reportPage.getTableReport().getMetricElements();
+        List<String> attributeHeaders = reportPage.getTableReport().getAttributeHeaders();
+        List<String> attributeValues = reportPage.getTableReport().getAttributeValues();
+        List<Float> metricValues = reportPage.getTableReport().getMetricValues();
         assertEquals(attributeHeaders, Arrays.asList(COMPUTED_ATTRIBUTE_NAME), "Attribute name is incorrrect");
         assertEquals(attributeValues, Arrays.asList("Best", "Good", "Great", "Poor"),
                 "Attribute values are incorrrect " + attributeValues);
@@ -317,15 +317,15 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         checkRedBar(browser);
 
         TableReport report = openTableReport(name);
-        assertEquals(report.getAttributesHeader(), asList(attribute));
+        assertEquals(report.getAttributeHeaders(), asList(attribute));
         assertTrue(reportPage.getFilters().isEmpty());
 
         report = drillOnAttributeFromReport(report,value);
-        assertEquals(report.getAttributesHeader(), asList(target));
+        assertEquals(report.getAttributeHeaders(), asList(target));
         assertEquals(reportPage.getFilters(), asList(attribute + " is " + value));
 
         report = backToPreviousReport();
-        assertEquals(report.getAttributesHeader(), asList(attribute));
+        assertEquals(report.getAttributeHeaders(), asList(attribute));
         assertTrue(reportPage.getFilters().isEmpty());
     }
 
@@ -337,9 +337,9 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             .addFilter(FilterItem.Factory.createAttributeFilter("Year (Created)", "2011"));
         Screenshots.takeScreenshot(browser, "report-created-with-computed-attribute-and-applied-list-filter",
                 this.getClass());
-        List<String> attributeHeaders = reportPage.getTableReport().getAttributesHeader();
-        List<String> attributeValues = reportPage.getTableReport().getAttributeElements();
-        List<Float> metricValues = reportPage.getTableReport().getMetricElements();
+        List<String> attributeHeaders = reportPage.getTableReport().getAttributeHeaders();
+        List<String> attributeValues = reportPage.getTableReport().getAttributeValues();
+        List<Float> metricValues = reportPage.getTableReport().getMetricValues();
         assertEquals(attributeHeaders, Arrays.asList(COMPUTED_ATTRIBUTE_NAME), "Attribute name is incorrrect");
         assertEquals(attributeValues, Arrays.asList("Good", "Poor"), "Attribute values are incorrrect "
                 + attributeValues);
@@ -358,9 +358,9 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         reportPage.saveReport();
         Screenshots.takeScreenshot(browser, "report-created-with-computed-attribute-and-applied-variable-filter",
                 this.getClass());
-        List<String> attributeHeaders = reportPage.getTableReport().getAttributesHeader();
-        List<String> attributeValues = reportPage.getTableReport().getAttributeElements();
-        List<Float> metricValues = reportPage.getTableReport().getMetricElements();
+        List<String> attributeHeaders = reportPage.getTableReport().getAttributeHeaders();
+        List<String> attributeValues = reportPage.getTableReport().getAttributeValues();
+        List<Float> metricValues = reportPage.getTableReport().getMetricValues();
         assertEquals(attributeHeaders, Arrays.asList(COMPUTED_ATTRIBUTE_NAME), "Attribute name is incorrrect");
         assertEquals(attributeValues, Arrays.asList("Best", "Good", "Great", "Poor"),
                 "Attribute values are incorrrect " + attributeValues);
@@ -381,9 +381,9 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             dashboardsPage.getFirstFilter().changeAttributeFilterValues("Closed Won");
             sleepTight(2000);
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            List<String> attributeHeaders = tableReport.getAttributesHeader();
-            List<String> attributeValues = tableReport.getAttributeElements();
-            List<Float> metricValues = tableReport.getMetricElements();
+            List<String> attributeHeaders = tableReport.getAttributeHeaders();
+            List<String> attributeValues = tableReport.getAttributeValues();
+            List<Float> metricValues = tableReport.getMetricValues();
             assertEquals(attributeHeaders, Arrays.asList(COMPUTED_ATTRIBUTE_NAME), "Attribute name is incorrrect");
             assertEquals(attributeValues, Arrays.asList("Best", "Good", "Great", "Poor"),
                     "Attribute values are incorrrect " + attributeValues);
@@ -409,9 +409,9 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             dashboardsPage.getFirstFilter().changeAttributeFilterValues("Best", "Great");
             sleepTight(2000);
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            List<String> attributeHeaders = tableReport.getAttributesHeader();
-            List<String> attributeValues = tableReport.getAttributeElements();
-            List<Float> metricValues = tableReport.getMetricElements();
+            List<String> attributeHeaders = tableReport.getAttributeHeaders();
+            List<String> attributeValues = tableReport.getAttributeValues();
+            List<Float> metricValues = tableReport.getMetricValues();
             System.out.println(metricValues);
             assertEquals(attributeHeaders, Arrays.asList(COMPUTED_ATTRIBUTE_NAME), "Attribute name is incorrrect");
             assertEquals(attributeValues, Arrays.asList("Best", "Great"), "Attribute values are incorrrect "
@@ -434,9 +434,9 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             initReportsPage().openReport(REPORT_NAME);
             Screenshots.takeScreenshot(browser, "editor-user-report-created-with-computed-attribute",
                     this.getClass());
-            List<String> attributeHeaders = reportPage.getTableReport().getAttributesHeader();
-            List<String> attributeValues = reportPage.getTableReport().getAttributeElements();
-            List<Float> metricValues = reportPage.getTableReport().getMetricElements();
+            List<String> attributeHeaders = reportPage.getTableReport().getAttributeHeaders();
+            List<String> attributeValues = reportPage.getTableReport().getAttributeValues();
+            List<Float> metricValues = reportPage.getTableReport().getMetricValues();
             assertEquals(attributeHeaders, Arrays.asList(COMPUTED_ATTRIBUTE_NAME), "Attribute name is incorrrect");
             assertEquals(attributeValues, Arrays.asList("Best", "Good", "Great", "Poor"),
                     "Attribute values are incorrrect " + attributeValues);
@@ -456,9 +456,9 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             initReportsPage().openReport(REPORT_NAME);
             Screenshots.takeScreenshot(browser, "editor-user-report-created-with-computed-attribute",
                     this.getClass());
-            attributeHeaders = reportPage.getTableReport().getAttributesHeader();
-            attributeValues = reportPage.getTableReport().getAttributeElements();
-            metricValues = reportPage.getTableReport().getMetricElements();
+            attributeHeaders = reportPage.getTableReport().getAttributeHeaders();
+            attributeValues = reportPage.getTableReport().getAttributeValues();
+            metricValues = reportPage.getTableReport().getMetricValues();
             assertEquals(attributeHeaders, Arrays.asList(COMPUTED_ATTRIBUTE_NAME), "Attribute name is incorrrect");
             assertEquals(attributeValues, Arrays.asList("Best", "Good", "Great", "Poor"),
                     "Attribute values are incorrrect " + attributeValues);
@@ -486,9 +486,9 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         initReportsPage().openReport(REPORT_NAME);
         Screenshots.takeScreenshot(browser, "delete-metric-and-attribute-used-in-computed-attribute",
                 this.getClass());
-        List<String> attributeHeaders = reportPage.getTableReport().getAttributesHeader();
-        List<String> attributeValues = reportPage.getTableReport().getAttributeElements();
-        List<Float> metricValues = reportPage.getTableReport().getMetricElements();
+        List<String> attributeHeaders = reportPage.getTableReport().getAttributeHeaders();
+        List<String> attributeValues = reportPage.getTableReport().getAttributeValues();
+        List<Float> metricValues = reportPage.getTableReport().getMetricValues();
         assertEquals(attributeHeaders, Arrays.asList(COMPUTED_ATTRIBUTE_NAME), "Attribute name is incorrrect");
         assertEquals(attributeValues, Arrays.asList("Best", "Good", "Great", "Poor"),
                 "Attribute values are incorrrect " + attributeValues);
@@ -504,9 +504,9 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
         initReportsPage().openReport(CA_VARIABLE_REPORT_NAME);
         Screenshots.takeScreenshot(browser, "delete-variable-used-in-computed-attribute-report", this.getClass());
-        List<String> attributeHeaders = reportPage.getTableReport().getAttributesHeader();
-        List<String> attributeValues = reportPage.getTableReport().getAttributeElements();
-        List<Float> metricValues = reportPage.getTableReport().getMetricElements();
+        List<String> attributeHeaders = reportPage.getTableReport().getAttributeHeaders();
+        List<String> attributeValues = reportPage.getTableReport().getAttributeValues();
+        List<Float> metricValues = reportPage.getTableReport().getMetricValues();
         assertEquals(attributeHeaders, Arrays.asList(COMPUTED_ATTRIBUTE_NAME), "Attribute name is incorrrect");
         assertEquals(attributeValues, Arrays.asList("Best", "Good", "Great", "Poor"),
                 "Attribute values are incorrrect " + attributeValues);
@@ -544,7 +544,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
                     .withName("Simple-report")
                     .withHows(computedAttribute, ATTR_DEPARTMENT),
                     "Report-renders-well-with-computed-attribute-without-metric");
-            assertEquals(reportPage.getTableReport().getAttributeElements(),
+            assertEquals(reportPage.getTableReport().getAttributeValues(),
                     asList("Large", "Direct Sales", "Inside Sales"));
 
         } finally {
@@ -590,7 +590,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     }
 
     private TableReport drillOnAttributeFromReport(TableReport report, String value) {
-        report.drillOnAttributeValue(value);
+        report.drillOn(value, CellType.ATTRIBUTE_VALUE);
         return ReportPage.getInstance(browser).waitForReportExecutionProgress().getTableReport();
     }
 

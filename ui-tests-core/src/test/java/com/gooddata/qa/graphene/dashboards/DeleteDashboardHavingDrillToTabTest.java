@@ -6,6 +6,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.DrillingConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
@@ -108,7 +109,7 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
             tabs.getTab(SOURCE_TAB).open();
 
             dashboardsPage.getContent().getLatestReport(TableReport.class)
-                    .drillOnAttributeValue().waitForTableReportExecutionProgress();
+                    .drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
             Screenshots.takeScreenshot(browser, "drillToDeletedTab", this.getClass());
 
             // get new instance of DashboardTabs object to ensure tabs are updated
@@ -190,8 +191,7 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
 
             tabs.getTab(SOURCE_TAB).open();
             dashboardsPage.editDashboard();
-            TableReport report = dashboardsPage.getContent()
-                    .getLatestReport(TableReport.class).waitForTableReportExecutionProgress();
+            TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
 
             DrillingConfigPanel drillingConfigPanel = WidgetConfigPanel
                     .openConfigurationPanelFor(report.getRoot(), browser)
@@ -237,8 +237,7 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
 
     private void addDrillSettingsToLatestReport(DrillSetting setting) {
         TableReport report = dashboardsPage.getContent()
-                .getLatestReport(TableReport.class)
-                .waitForTableReportExecutionProgress();
+                .getLatestReport(TableReport.class);
 
         dashboardsPage.editDashboard();
 

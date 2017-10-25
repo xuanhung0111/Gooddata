@@ -1,15 +1,31 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import com.gooddata.qa.browser.BrowserUtils;
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.google.common.collect.Lists;
+import org.apache.http.ParseException;
+import org.jboss.arquillian.graphene.Graphene;
+import org.json.JSONException;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Stream;
+
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_LOST_OPPS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPEN_OPPS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPPORTUNITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON_OPPS;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_QUOTA;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
@@ -22,23 +38,6 @@ import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.stream.Stream;
-
-import org.apache.http.ParseException;
-import org.jboss.arquillian.graphene.Graphene;
-import org.json.JSONException;
-import org.testng.annotations.Test;
-
-import com.gooddata.qa.browser.BrowserUtils;
-import com.gooddata.qa.graphene.enums.indigo.FieldType;
-import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
-import com.google.common.collect.Lists;
 
 public class GoodSalesTableReportTest extends AbstractAnalyseTest {
 
@@ -234,8 +233,8 @@ public class GoodSalesTableReportTest extends AbstractAnalyseTest {
     private List<List<String>> getTableContentFromReportPage(
             com.gooddata.qa.graphene.fragments.reports.report.TableReport tableReport) {
         List<List<String>> content = Lists.newArrayList();
-        List<String> attributes = tableReport.getAttributeElements();
-        List<String> metrics = tableReport.getRawMetricElements();
+        List<String> attributes = tableReport.getAttributeValues();
+        List<String> metrics = tableReport.getRawMetricValues();
         int totalAttributes = attributes.size();
         int i = 0;
         for (String attr: attributes) {
@@ -268,15 +267,7 @@ public class GoodSalesTableReportTest extends AbstractAnalyseTest {
         waitForFragmentVisible(reportPage);
 
         try {
-            com.gooddata.qa.graphene.fragments.reports.report.TableReport report = reportPage.getTableReport();
-            List<List<String>> attributesByRow = report.getAttributeElementsByRow();
-            List<String> metrics = report.getRawMetricElements();
-
-            for (int i = 0; i < metrics.size(); i++) {
-                attributesByRow.get(i).add(metrics.get(i));
-            }
-
-            return attributesByRow;
+            return reportPage.getTableReport().getDataContent();
         } finally {
             browser.close();
             browser.switchTo().window(currentWindowHandle);

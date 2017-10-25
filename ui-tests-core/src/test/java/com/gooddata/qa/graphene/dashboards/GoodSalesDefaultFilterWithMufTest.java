@@ -1,32 +1,5 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
-import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
-import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.utils.asserts.AssertUtils.assertHeadersEqual;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.addMufToUser;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createMufObjectByUri;
-import static com.gooddata.qa.utils.http.variable.VariableRestUtils.getVariableUri;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.removeAllMufFromUser;
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.joining;
-import static org.testng.Assert.assertEquals;
-
-import java.io.IOException;
-
-import org.apache.http.ParseException;
-import org.json.JSONException;
-import org.testng.ITestContext;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
 import com.gooddata.md.report.AttributeInGrid;
 import com.gooddata.md.report.Filter;
 import com.gooddata.md.report.GridReportDefinitionContent;
@@ -38,6 +11,32 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
+import com.gooddata.qa.utils.asserts.AssertUtils;
+import org.apache.http.ParseException;
+import org.json.JSONException;
+import org.testng.ITestContext;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+
+import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.addMufToUser;
+import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createMufObjectByUri;
+import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.removeAllMufFromUser;
+import static com.gooddata.qa.utils.http.variable.VariableRestUtils.getVariableUri;
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.joining;
+import static org.testng.Assert.assertEquals;
 
 public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTest {
 
@@ -125,7 +124,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             getFilter(MUF_DF_VARIABLE).editAttributeFilterValues(COMPUSCI, PHOENIXSOFT);
 
             dashboardsPage.saveDashboard();
-            assertHeadersEqual(getReport(REPORT_MUF).getAttributeElements(), asList(COMPUSCI, PHOENIXSOFT));
+            AssertUtils.assertIgnoreCase(getReport(REPORT_MUF).getAttributeValues(), asList(COMPUSCI, PHOENIXSOFT));
 
             logoutAndLoginAs(canAccessGreyPage(browser), role);
             initDashboardsPage().selectDashboard(DASHBOARD_MUF);
@@ -133,7 +132,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             takeScreenshot(browser, "DF-is-updated-with-muf-value-in-default-view-with-" + role, getClass());
             assertEquals(getFilter(ATTR_PRODUCT).getCurrentValue(), String.join(", ", COMPUSCI, EDUCATIONLY));
             assertEquals(getFilter(MUF_DF_VARIABLE).getCurrentValue(), COMPUSCI);
-            assertHeadersEqual(getReport(REPORT_MUF).getAttributeElements(), singletonList(COMPUSCI));
+            AssertUtils.assertIgnoreCase(getReport(REPORT_MUF).getAttributeValues(), singletonList(COMPUSCI));
 
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
             initDashboardsPage().selectDashboard(DASHBOARD_MUF).editDashboard();
@@ -141,7 +140,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             getFilter(MUF_DF_VARIABLE).editAttributeFilterValues(PHOENIXSOFT);
 
             dashboardsPage.saveDashboard();
-            assertHeadersEqual(getReport(REPORT_MUF).getAttributeElements(), singletonList(PHOENIXSOFT));
+            AssertUtils.assertIgnoreCase(getReport(REPORT_MUF).getAttributeValues(), singletonList(PHOENIXSOFT));
 
             logoutAndLoginAs(canAccessGreyPage(browser), role);
             initDashboardsPage().selectDashboard(DASHBOARD_MUF);
@@ -149,7 +148,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             takeScreenshot(browser, "DF-shows-all-when-value-set-by-admin-out-of-range-with-" + role, getClass());
             assertEquals(getFilter(ATTR_PRODUCT).getCurrentValue(), ALL);
             assertEquals(getFilter(MUF_DF_VARIABLE).getCurrentValue(), ALL);
-            assertHeadersEqual(getReport(REPORT_MUF).getAttributeElements(), asList(COMPUSCI, EDUCATIONLY, EXPLORER));
+            AssertUtils.assertIgnoreCase(getReport(REPORT_MUF).getAttributeValues(), asList(COMPUSCI, EDUCATIONLY, EXPLORER));
 
         } finally {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
@@ -169,7 +168,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             getFilter(MUF_DF_VARIABLE).editAttributeFilterValues(PHOENIXSOFT);
 
             dashboardsPage.saveDashboard();
-            assertHeadersEqual(getReport(REPORT_MUF).getAttributeElements(), singletonList(PHOENIXSOFT));
+            AssertUtils.assertIgnoreCase(getReport(REPORT_MUF).getAttributeValues(), singletonList(PHOENIXSOFT));
 
             logoutAndLoginAs(canAccessGreyPage(browser), role);
             initDashboardsPage().selectDashboard(DASHBOARD_MUF);
@@ -177,7 +176,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             takeScreenshot(browser, "DF-shows-first-value-when-value-set-by-admin-out-of-range-with-" + role, getClass());
             assertEquals(getFilter(ATTR_PRODUCT).getCurrentValue(), COMPUSCI);
             assertEquals(getFilter(MUF_DF_VARIABLE).getCurrentValue(), COMPUSCI);
-            assertHeadersEqual(getReport(REPORT_MUF).getAttributeElements(), singletonList(COMPUSCI));
+            AssertUtils.assertIgnoreCase(getReport(REPORT_MUF).getAttributeValues(), singletonList(COMPUSCI));
 
         } finally {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
@@ -216,13 +215,13 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             takeScreenshot(browser, "Saved-view-shows-all-when-value-out-of-range-muf-assigned-for-" + role, getClass());
             assertEquals(getFilter(ATTR_PRODUCT).getCurrentValue(), ALL);
             assertEquals(getFilter(MUF_DF_VARIABLE).getCurrentValue(), ALL);
-            assertHeadersEqual(getReport(REPORT_MUF).getAttributeElements(), asList(COMPUSCI, EDUCATIONLY, EXPLORER));
+            AssertUtils.assertIgnoreCase(getReport(REPORT_MUF).getAttributeValues(), asList(COMPUSCI, EDUCATIONLY, EXPLORER));
 
             savedViewWidget.openSavedViewMenu().selectSavedView(savedView2);
             takeScreenshot(browser, "Saved-view-updated-with-muf-assigned-for-" + role, getClass());
             assertEquals(getFilter(ATTR_PRODUCT).getCurrentValue(), COMPUSCI);
             assertEquals(getFilter(MUF_DF_VARIABLE).getCurrentValue(), COMPUSCI);
-            assertHeadersEqual(getReport(REPORT_MUF).getAttributeElements(), singletonList(COMPUSCI));
+            AssertUtils.assertIgnoreCase(getReport(REPORT_MUF).getAttributeValues(), singletonList(COMPUSCI));
 
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
@@ -257,7 +256,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             // Due to WA-6145, filter shows all instead of first value in available list
             assertEquals(getFilter(ATTR_PRODUCT).getCurrentValue(), ALL);
             assertEquals(getFilter(MUF_DF_VARIABLE).getCurrentValue(), ALL);
-            assertHeadersEqual(getReport(REPORT_MUF).getAttributeElements(), asList(COMPUSCI, EDUCATIONLY, EXPLORER));
+            AssertUtils.assertIgnoreCase(getReport(REPORT_MUF).getAttributeValues(), asList(COMPUSCI, EDUCATIONLY, EXPLORER));
 
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);

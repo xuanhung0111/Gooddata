@@ -1,5 +1,22 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import com.gooddata.qa.browser.BrowserUtils;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisInsightSelectionPanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.FilterType;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
+import org.apache.http.ParseException;
+import org.json.JSONException;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
+
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -8,24 +25,6 @@ import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.UUID;
-
-import com.gooddata.qa.browser.BrowserUtils;
-import org.apache.http.ParseException;
-import org.json.JSONException;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
-import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisInsightSelectionPanel;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
-import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.FilterType;
-import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class GoodSalesInsightTest extends AbstractAnalyseTest {
 
@@ -345,7 +344,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
         analysisPage.exportReport();
         BrowserUtils.switchToLastTab(browser);
         try {
-            List<String> attributes = reportPage.getTableReport().waitForReportLoading().getAttributeElements();
+            List<String> attributes = reportPage.getTableReport().waitForLoaded().getAttributeValues();
             takeScreenshot(browser, "openAsReportAfterSaveInsight", getClass());
             assertEquals(attributes, asList("Email", "In Person Meeting", "Phone Call", "Web Meeting"),
                     "Report is not rendered correctly");

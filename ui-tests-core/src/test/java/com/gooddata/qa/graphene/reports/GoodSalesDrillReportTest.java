@@ -1,5 +1,32 @@
 package com.gooddata.qa.graphene.reports;
 
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.entity.report.HowItem;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.entity.report.WhatItem;
+import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
+import com.gooddata.qa.graphene.fragments.dashboards.ReportInfoViewPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
+import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
+import com.gooddata.qa.utils.asserts.AssertUtils;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Sets;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.testng.annotations.Test;
+
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
+
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY;
@@ -17,40 +44,14 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.utils.asserts.AssertUtils.assertHeadersEqual;
+import static com.gooddata.qa.utils.asserts.AssertUtils.assertIgnoreCase;
+import static com.gooddata.qa.utils.asserts.AssertUtils.assertIgnoreCaseAndIndex;
 import static java.lang.String.format;
 import static java.util.Calendar.YEAR;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.testng.annotations.Test;
-
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.entity.report.HowItem;
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.entity.report.WhatItem;
-import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
-import com.gooddata.qa.graphene.enums.report.ExportFormat;
-import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
-import com.gooddata.qa.graphene.fragments.dashboards.ReportInfoViewPanel;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
-import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
-import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Sets;
 
 public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
 
@@ -62,6 +63,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     private static final int YEAR_2010 = 2010;
     private static final int YEAR_2011 = 2011;
     private static final String YEAR_2012 = "2012";
+    private static final String ROLL_UP = "Rollup";
 
     @Override
     public void initProperties() {
@@ -96,46 +98,38 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             addReportToNewDashboard(REPORT_NAME, TEST_DASHBOAD_NAME);
 
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            assertFalse(tableReport.isRollupTotalVisible());
-            assertHeadersEqual(tableReport.getAttributesHeader(), Arrays.asList("Year (Snapshot)", "Stage Name"));
-            assertHeadersEqual(tableReport.getMetricsHeader(), Sets.newHashSet("Amount", "Avg. Amount"),
-                    "Metric headers are not correct!");
+            assertFalse(tableReport.hasValue(ROLL_UP, CellType.TOTAL_HEADER));
+            AssertUtils.assertIgnoreCase(tableReport.getAttributeHeaders(), Arrays.asList("Year (Snapshot)", "Stage Name"));
+            assertIgnoreCaseAndIndex(tableReport.getMetricHeaders(), Sets.newHashSet("Amount", "Avg. Amount"));
 
-            tableReport.clickOnAttributeToOpenDrillReport("2010");
-            DashboardDrillDialog drillDialog =
-                    Graphene.createPageFragment(DashboardDrillDialog.class,
-                            waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
+            DashboardDrillDialog drillDialog = tableReport.openDrillDialogFrom("2010", CellType.ATTRIBUTE_VALUE);
 
             tableReport = drillDialog.getReport(TableReport.class);
-            assertTrue(tableReport.isRollupTotalVisible());
-            assertHeadersEqual(tableReport.getAttributesHeader(), Arrays.asList("Quarter/Year (Snapshot)", "Stage Name"));
-            assertHeadersEqual(tableReport.getMetricsHeader(), Sets.newHashSet("Amount", "Avg. Amount"),
-                    "Metric headers are not correct!");
+            assertTrue(tableReport.hasValue(ROLL_UP, CellType.TOTAL_HEADER));
+            AssertUtils.assertIgnoreCase(tableReport.getAttributeHeaders(), Arrays.asList("Quarter/Year (Snapshot)", "Stage Name"));
+            assertIgnoreCaseAndIndex(tableReport.getMetricHeaders(), Sets.newHashSet("Amount", "Avg. Amount"));
             assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(Arrays.asList("Drill report", "2010"), ">>"));
             assertEquals(drillDialog.getChartTitles(), Arrays.asList("Table", "Line chart", "Bar chart", "Pie chart"));
             assertEquals(drillDialog.getSelectedChartTitle(), "Table");
 
             drillDialog.clickOnBreadcrumbs(REPORT_NAME);
-            assertFalse(tableReport.isRollupTotalVisible());
-            assertHeadersEqual(tableReport.getAttributesHeader(), Arrays.asList("Year (Snapshot)", "Stage Name"));
+            assertFalse(tableReport.hasValue(ROLL_UP, CellType.TOTAL_HEADER));
+            AssertUtils.assertIgnoreCase(tableReport.getAttributeHeaders(), Arrays.asList("Year (Snapshot)", "Stage Name"));
             assertEquals(drillDialog.getBreadcrumbsString(), "Drill report");
-            assertHeadersEqual(tableReport.getMetricsHeader(), Sets.newHashSet("Amount", "Avg. Amount"),
-                    "Metric headers are not correct!");
+            assertIgnoreCaseAndIndex(tableReport.getMetricHeaders(), Sets.newHashSet("Amount", "Avg. Amount"));
 
-            tableReport.drillOnMetricValue();
-            tableReport.waitForReportLoading();
-            assertHeadersEqual(tableReport.getAttributesHeader(), Arrays.asList("Account"));
-            assertHeadersEqual(tableReport.getMetricsHeader(), Sets.newHashSet("Amount"),
-                    "Metric headers are not correct!");
-            assertTrue(tableReport.isRollupTotalVisible());
+            tableReport.drillOnFirstValue(CellType.METRIC_VALUE);
+            tableReport.waitForLoaded();
+            AssertUtils.assertIgnoreCase(tableReport.getAttributeHeaders(), Arrays.asList("Account"));
+            assertIgnoreCaseAndIndex(tableReport.getMetricHeaders(), Sets.newHashSet("Amount"));
+            assertTrue(tableReport.hasValue(ROLL_UP, CellType.TOTAL_HEADER));
 
             drillDialog.closeDialog();
             tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             checkRedBar(browser);
-            assertFalse(tableReport.isRollupTotalVisible());
-            assertHeadersEqual(tableReport.getAttributesHeader(), Arrays.asList("Year (Snapshot)", "Stage Name"));
-            assertHeadersEqual(tableReport.getMetricsHeader(), Sets.newHashSet("Amount", "Avg. Amount"),
-                    "Metric headers are not correct!");
+            assertFalse(tableReport.hasValue(ROLL_UP, CellType.TOTAL_HEADER));
+            AssertUtils.assertIgnoreCase(tableReport.getAttributeHeaders(), Arrays.asList("Year (Snapshot)", "Stage Name"));
+            assertIgnoreCaseAndIndex(tableReport.getMetricHeaders(), Sets.newHashSet("Amount", "Avg. Amount"));
         } finally {
             dashboardsPage.deleteDashboard();
         }
@@ -150,24 +144,23 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             TableReport tableReport = drillDialog.getReport(TableReport.class);
 
             drillDialog.changeChartType("Line chart");
-            tableReport.waitForReportLoading();
+            tableReport.waitForLoaded();
             checkRedBar(browser);
 
             drillDialog.changeChartType("Bar chart");
-            tableReport.waitForReportLoading();
+            tableReport.waitForLoaded();
             checkRedBar(browser);
 
             drillDialog.changeChartType("Pie chart");
-            tableReport.waitForReportLoading();
+            tableReport.waitForLoaded();
             checkRedBar(browser);
 
             drillDialog.changeChartType("Table");
-            tableReport.waitForReportLoading();
+            tableReport.waitForLoaded();
             checkRedBar(browser);
-            assertHeadersEqual(tableReport.getAttributesHeader(), Arrays.asList("Quarter/Year (Snapshot)", "Stage Name"));
-            assertHeadersEqual(tableReport.getMetricsHeader(), Sets.newHashSet("Amount", "Avg. Amount"),
-                    "Metric headers are not correct!");
-            assertTrue(tableReport.isRollupTotalVisible());
+            AssertUtils.assertIgnoreCase(tableReport.getAttributeHeaders(), Arrays.asList("Quarter/Year (Snapshot)", "Stage Name"));
+            assertIgnoreCaseAndIndex(tableReport.getMetricHeaders(), Sets.newHashSet("Amount", "Avg. Amount"));
+            assertTrue(tableReport.hasValue(ROLL_UP, CellType.TOTAL_HEADER));
             drillDialog.closeDialog();
         } finally {
             dashboardsPage.deleteDashboard();
@@ -197,14 +190,12 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
                 }
             }
             waitForAnalysisPageLoaded(browser);
-            waitForElementVisible(reportPage.getRoot());
 
             TableReport tableReport = Graphene.createPageFragment(TableReport.class,
                     waitForElementVisible(By.id("gridContainerTab"), browser));
-            assertHeadersEqual(tableReport.getAttributesHeader(), Arrays.asList("Quarter/Year (Snapshot)", "Stage Name"));
-            assertHeadersEqual(tableReport.getMetricsHeader(), Sets.newHashSet("Amount", "Avg. Amount"),
-                    "Metric headers are not correct!");
-            assertTrue(tableReport.isRollupTotalVisible());
+            AssertUtils.assertIgnoreCase(tableReport.getAttributeHeaders(), Arrays.asList("Quarter/Year (Snapshot)", "Stage Name"));
+            assertIgnoreCaseAndIndex(tableReport.getMetricHeaders(), Sets.newHashSet("Amount", "Avg. Amount"));
+            assertTrue(tableReport.hasValue(ROLL_UP, CellType.TOTAL_HEADER));
             browser.close();
             browser.switchTo().window(currentWindowHandle);
 
@@ -255,8 +246,8 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
         try {
             addReportToNewDashboard("Drill-Opportunity", TEST_DASHBOAD_NAME);
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            tableReport.drillOnMetricValue();
-            tableReport.waitForReportLoading();
+            tableReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
+            tableReport.waitForLoaded();
 
             String currentWindowHandle = browser.getWindowHandle();
             // wait for google window
@@ -277,13 +268,13 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
 
             initDashboardsPage().selectDashboard(TEST_DASHBOAD_NAME);
             tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            tableReport.drillOnMetricValue();
-            tableReport.waitForReportLoading();
+            tableReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
+            tableReport.waitForLoaded();
 
             DashboardDrillDialog drillDialog = Graphene.createPageFragment(DashboardDrillDialog.class,
                     waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
             tableReport = drillDialog.getReport(TableReport.class);
-            assertHeadersEqual(tableReport.getAttributesHeader(), Arrays.asList("Account"));
+            AssertUtils.assertIgnoreCase(tableReport.getAttributeHeaders(), Arrays.asList("Account"));
             drillDialog.closeDialog();
         } finally {
             initDashboardsPage();
@@ -306,14 +297,11 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             tableReport.addDrilling(Pair.of(Arrays.asList("Stage Name"), "Account"));
             dashboardsPage.saveDashboard();
 
-            tableReport.drillOnAttributeValue();
-            drillDialog = Graphene.createPageFragment(DashboardDrillDialog.class,
-                    waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
+            drillDialog = tableReport.openDrillDialogFrom("Interest", CellType.ATTRIBUTE_VALUE);
             tableReport = drillDialog.getReport(TableReport.class);
-            assertTrue(tableReport.isRollupTotalVisible());
-            assertHeadersEqual(tableReport.getAttributesHeader(), Arrays.asList("Year (Snapshot)", "Account"));
-            assertHeadersEqual(tableReport.getMetricsHeader(), Sets.newHashSet("Amount", "Avg. Amount"),
-                    "Metric headers are not correct!");
+            assertTrue(tableReport.hasValue(ROLL_UP, CellType.TOTAL_HEADER));
+            assertIgnoreCase(tableReport.getAttributeHeaders(), Arrays.asList("Year (Snapshot)", "Account"));
+            assertIgnoreCaseAndIndex(tableReport.getMetricHeaders(), Sets.newHashSet("Amount", "Avg. Amount"));
             assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(Arrays.asList("Drill report", "Interest"), ">>"));
         } finally {
             drillDialog.closeDialog();
@@ -347,32 +335,28 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             dashboardsPage.saveDashboard();
             checkRedBar(browser);
 
-            tableReport.drillOnAttributeValue();
-            DashboardDrillDialog drillDialog = Graphene.createPageFragment(DashboardDrillDialog.class,
-                    waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
+            DashboardDrillDialog drillDialog = tableReport
+                    .openDrillDialogFrom("Email with AirSplat on Apr-21-11", CellType.ATTRIBUTE_VALUE);
             TableReport tableReportInDialog = drillDialog.getReport(TableReport.class);
-            assertTrue(tableReportInDialog.isRollupTotalVisible());
-            assertHeadersEqual(tableReportInDialog.getAttributesHeader(), Arrays.asList(ATTR_YEAR_ACTIVITY, ATTR_PRIORITY));
-            assertHeadersEqual(tableReportInDialog.getMetricsHeader(), Sets.newHashSet(METRIC_NUMBER_OF_ACTIVITIES),
-                    "Metric headers are not correct!");
+            assertTrue(tableReportInDialog.hasValue(ROLL_UP, CellType.TOTAL_HEADER));
+            AssertUtils.assertIgnoreCase(tableReportInDialog.getAttributeHeaders(), Arrays.asList(ATTR_YEAR_ACTIVITY, ATTR_PRIORITY));
+            assertIgnoreCaseAndIndex(tableReportInDialog.getMetricHeaders(), Sets.newHashSet(METRIC_NUMBER_OF_ACTIVITIES));
             assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(Arrays.asList(DRILL_ACTIVITY_REPORT,
                     "Email with AirSplat on Apr-21-11"), ">>"));
             drillDialog.closeDialog();
 
-            tableReport.drillOnMetricValue("1");
-            assertTrue(tableReportInDialog.isRollupTotalVisible());
-            assertHeadersEqual(tableReportInDialog.getAttributesHeader(), Arrays.asList(ATTR_STATUS));
-            assertHeadersEqual(tableReportInDialog.getMetricsHeader(), Sets.newHashSet(METRIC_NUMBER_OF_ACTIVITIES),
-                    "Metric headers are not correct!");
+            tableReport.openDrillDialogFrom("1", CellType.METRIC_VALUE);
+            assertTrue(tableReportInDialog.hasValue(ROLL_UP, CellType.TOTAL_HEADER));
+            AssertUtils.assertIgnoreCase(tableReportInDialog.getAttributeHeaders(), Arrays.asList(ATTR_STATUS));
+            assertIgnoreCaseAndIndex(tableReportInDialog.getMetricHeaders(), Sets.newHashSet(METRIC_NUMBER_OF_ACTIVITIES));
             assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(Arrays.asList(DRILL_ACTIVITY_REPORT,
                     "Email with AirSplat on Apr-21..."), ">>"));
             drillDialog.closeDialog();
 
-            tableReport.clickOnAttributeToOpenDrillReport("2011");
-            assertFalse(tableReportInDialog.isRollupTotalVisible());
-            assertHeadersEqual(tableReportInDialog.getAttributesHeader(), Arrays.asList(ATTR_YEAR_SNAPSHOT, ATTR_STAGE_NAME));
-            assertHeadersEqual(tableReportInDialog.getMetricsHeader(), Sets.newHashSet(METRIC_AMOUNT, METRIC_AVG_AMOUNT),
-                    "Metric headers are not correct!");
+            tableReport.openDrillDialogFrom("2011", CellType.ATTRIBUTE_VALUE);
+            assertFalse(tableReportInDialog.hasValue(ROLL_UP, CellType.TOTAL_HEADER));
+            AssertUtils.assertIgnoreCase(tableReportInDialog.getAttributeHeaders(), Arrays.asList(ATTR_YEAR_SNAPSHOT, ATTR_STAGE_NAME));
+            assertIgnoreCaseAndIndex(tableReportInDialog.getMetricHeaders(), Sets.newHashSet(METRIC_AMOUNT, METRIC_AVG_AMOUNT));
             assertEquals(drillDialog.getBreadcrumbsString(),
                     StringUtils.join(Arrays.asList(DRILL_ACTIVITY_REPORT, "2011"), ">>"));
             drillDialog.closeDialog();
@@ -386,43 +370,36 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
         try {
             addReportToNewDashboard(DRILL_ACTIVITY_REPORT, TEST_DASHBOAD_NAME);
 
+            dashboardsPage.editDashboard();
+            TableReport tableReport = dashboardsPage.getReport(DRILL_ACTIVITY_REPORT, TableReport.class);
+            DashboardWidgetDirection.LEFT.moveElementToRightPlace(tableReport.getRoot());
             dashboardsPage.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_ACTIVITY)
                     .saveDashboard();
 
-            browser.navigate().refresh();
-            waitForDashboardPageLoaded(browser);
-
             dashboardsPage.getFirstFilter().changeAttributeFilterValues("Email with Bulbs.com on Aug-06-10");
 
-            TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            tableReport.waitForReportLoading();
-
-            tableReport.drillOnAttributeValue();
-            DashboardDrillDialog drillDialog = Graphene.createPageFragment(DashboardDrillDialog.class,
-                    waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
+            DashboardDrillDialog drillDialog = tableReport
+                    .openDrillDialogFrom("Email with Bulbs.com on Aug-06-10", CellType.ATTRIBUTE_VALUE);
             TableReport tableReportInDialog = drillDialog.getReport(TableReport.class);
-            assertTrue(tableReportInDialog.isRollupTotalVisible());
-            assertHeadersEqual(tableReportInDialog.getAttributesHeader(), Arrays.asList(ATTR_YEAR_ACTIVITY, ATTR_ACTIVITY_TYPE));
-            assertHeadersEqual(tableReportInDialog.getMetricsHeader(), Sets.newHashSet(METRIC_NUMBER_OF_ACTIVITIES),
-                    "Metric headers are not correct!");
+            assertTrue(tableReportInDialog.hasValue(ROLL_UP, CellType.TOTAL_HEADER));
+            AssertUtils.assertIgnoreCase(tableReportInDialog.getAttributeHeaders(), Arrays.asList(ATTR_YEAR_ACTIVITY, ATTR_ACTIVITY_TYPE));
+            assertIgnoreCaseAndIndex(tableReportInDialog.getMetricHeaders(), Sets.newHashSet(METRIC_NUMBER_OF_ACTIVITIES));
             assertEquals(drillDialog.getBreadcrumbsString(),
                     StringUtils.join(Arrays.asList(DRILL_ACTIVITY_REPORT, "Email with Bulbs.com on Aug-0..."), ">>"));
             drillDialog.closeDialog();
 
-            tableReport.drillOnMetricValue("1");
-            assertTrue(tableReportInDialog.isRollupTotalVisible());
-            assertHeadersEqual(tableReportInDialog.getAttributesHeader(), Arrays.asList(ATTR_ACCOUNT));
-            assertHeadersEqual(tableReportInDialog.getMetricsHeader(), Sets.newHashSet(METRIC_NUMBER_OF_ACTIVITIES),
-                    "Metric headers are not correct!");
+            tableReport.openDrillDialogFrom("1", CellType.METRIC_VALUE);
+            assertTrue(tableReportInDialog.hasValue(ROLL_UP, CellType.TOTAL_HEADER));
+            AssertUtils.assertIgnoreCase(tableReportInDialog.getAttributeHeaders(), Arrays.asList(ATTR_ACCOUNT));
+            assertIgnoreCaseAndIndex(tableReportInDialog.getMetricHeaders(), Sets.newHashSet(METRIC_NUMBER_OF_ACTIVITIES));
             assertEquals(drillDialog.getBreadcrumbsString(),
                     StringUtils.join(Arrays.asList(DRILL_ACTIVITY_REPORT, "Email with Bulbs.com on Aug-0..."), ">>"));
             drillDialog.closeDialog();
 
-            tableReport.clickOnAttributeToOpenDrillReport("2010");
-            assertTrue(tableReportInDialog.isRollupTotalVisible());
-            assertHeadersEqual(tableReportInDialog.getAttributesHeader(), Arrays.asList(ATTR_QUARTER_YEAR_ACTIVITY, ATTR_ACTIVITY));
-            assertHeadersEqual(tableReportInDialog.getMetricsHeader(), Sets.newHashSet(METRIC_NUMBER_OF_ACTIVITIES),
-                    "Metric headers are not correct!");
+            tableReport.openDrillDialogFrom("2010", CellType.ATTRIBUTE_VALUE);
+            assertTrue(tableReportInDialog.hasValue(ROLL_UP, CellType.TOTAL_HEADER));
+            AssertUtils.assertIgnoreCase(tableReportInDialog.getAttributeHeaders(), Arrays.asList(ATTR_QUARTER_YEAR_ACTIVITY, ATTR_ACTIVITY));
+            assertIgnoreCaseAndIndex(tableReportInDialog.getMetricHeaders(), Sets.newHashSet(METRIC_NUMBER_OF_ACTIVITIES));
             assertEquals(drillDialog.getBreadcrumbsString(),
                     StringUtils.join(Arrays.asList(DRILL_ACTIVITY_REPORT, "2010"), ">>"));
             drillDialog.closeDialog();
@@ -446,7 +423,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             tableReport.addDrilling(Pair.of(Arrays.asList(ATTR_STAGE_NAME), TARGET_DASHBOARD_TAB_NAME), "Dashboards");
             dashboardsPage.saveDashboard();
 
-            tableReport.drillOnAttributeValue();
+            tableReport.drillOn("Interest", CellType.ATTRIBUTE_VALUE);
 
             Predicate<WebDriver> waitDrilledDashboardLoaded = browser -> dashboardsPage.getDashboardName()
                     .equals(TARGET_DASHBOAD_NAME);
@@ -494,7 +471,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
                     .getFilterWidgetByName(ATTR_ACCOUNT).changeAttributeFilterValues("101 Financial", "14 West");
             dashboardsPage.getFilterWidgetByName(ATTR_STAGE_NAME).changeAttributeFilterValues("Risk Assessment");
 
-            tableReport.drillOnAttributeValue();
+            tableReport.drillOn("Risk Assessment", CellType.ATTRIBUTE_VALUE);
 
             Predicate<WebDriver> waitDrilledDashboardLoaded = browser -> dashboardsPage.getDashboardName()
                     .equals(TARGET_DASHBOAD_NAME);
@@ -537,7 +514,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
                     .getFilterWidgetByName(DATE_DIMENSION_CREATED)
                     .changeTimeFilterValueByClickInTimeLine(YEAR_2012);
 
-            tableReport.drillOnAttributeValue();
+            tableReport.drillOn("Interest", CellType.ATTRIBUTE_VALUE);
 
             Predicate<WebDriver> waitDrilledDashboardLoaded = browser -> dashboardsPage.getDashboardName()
                     .equals(TARGET_DASHBOAD_NAME);
@@ -566,9 +543,6 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
 
     private DashboardDrillDialog drillReportYear2010() {
         TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
-        tableReport.clickOnAttributeToOpenDrillReport("2010");
-
-        return Graphene.createPageFragment(DashboardDrillDialog.class,
-                waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
+        return tableReport.openDrillDialogFrom("2010", CellType.ATTRIBUTE_VALUE);
     }
 }

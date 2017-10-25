@@ -1,11 +1,35 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
+import org.apache.http.ParseException;
+import org.jboss.arquillian.graphene.Graphene;
+import org.json.JSONException;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Stream;
+
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_WON;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_BEST_CASE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_LOST_OPPS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPEN_OPPS;
@@ -13,8 +37,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPP
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON_OPPS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PERCENT_OF_GOAL;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_QUOTA;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_BEST_CASE;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -28,29 +50,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Stream;
-
-import org.apache.http.ParseException;
-import org.jboss.arquillian.graphene.Graphene;
-import org.json.JSONException;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.testng.annotations.Test;
-
-import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
-import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
-import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 
 public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
@@ -217,10 +216,10 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
                         com.gooddata.qa.graphene.fragments.reports.report.TableReport.class,
                         waitForElementVisible(By.id("gridContainerTab"), browser));
 
-        Iterator<String> attributes = tableReport.getAttributeElements().iterator();
+        Iterator<String> attributes = tableReport.getAttributeValues().iterator();
 
         sleepTight(2000); // wait for metric values is calculated and loaded
-        Iterator<String> metrics = tableReport.getRawMetricElements().iterator();
+        Iterator<String> metrics = tableReport.getRawMetricValues().iterator();
 
         List<List<String>> content = new ArrayList<>();
         while (attributes.hasNext() && metrics.hasNext()) {
@@ -229,8 +228,8 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
         assertThat(content, equalTo(analysisContent));
 
-        List<String> headers = tableReport.getAttributesHeader();
-        headers.addAll(tableReport.getMetricsHeader());
+        List<String> headers = tableReport.getAttributeHeaders();
+        headers.addAll(tableReport.getMetricHeaders());
         Iterator<String> reportheaders = headers.iterator();
 
         while (analysisHeaders.hasNext() && reportheaders.hasNext()) {

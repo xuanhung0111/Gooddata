@@ -1,5 +1,23 @@
 package com.gooddata.qa.graphene.project;
 
+import com.gooddata.md.Attribute;
+import com.gooddata.md.Fact;
+import com.gooddata.md.Metric;
+import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.GridReportDefinitionContent;
+import com.gooddata.md.report.MetricElement;
+import com.gooddata.md.report.Report;
+import com.gooddata.md.report.ReportDefinition;
+import com.gooddata.qa.graphene.TemplateAbstractTest;
+import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
+import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
+import com.gooddata.qa.graphene.enums.report.ReportTypes;
+import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
+import org.json.JSONException;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.Test;
+
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
@@ -10,25 +28,6 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertTrue;
-
-import com.gooddata.qa.graphene.TemplateAbstractTest;
-import org.json.JSONException;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.Test;
-
-import com.gooddata.md.Attribute;
-import com.gooddata.md.Fact;
-import com.gooddata.md.Metric;
-import com.gooddata.md.report.AttributeInGrid;
-import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
-import com.gooddata.md.report.Report;
-import com.gooddata.md.report.ReportDefinition;
-import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
-import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
-import com.gooddata.qa.graphene.enums.report.ReportTypes;
-import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class PartialExportAndImportProjectTest extends TemplateAbstractTest {
 
@@ -76,9 +75,9 @@ public class PartialExportAndImportProjectTest extends TemplateAbstractTest {
 
             initReportsPage().openReport(SIMPLE_REPORT);
             //use List.equals due to checking attribute & metric order
-            assertTrue(reportPage.getTableReport().getAttributeElements().equals(asList(MIDWEST, NORTHEAST, SOUTH, WEST)),
+            assertTrue(reportPage.getTableReport().getAttributeValues().equals(asList(MIDWEST, NORTHEAST, SOUTH, WEST)),
                     "There is difference between actual and expected attributes");
-            assertTrue(reportPage.getTableReport().getMetricElements().equals(asList(3.8f, 2.8f, 7.3f, 3.7f)),
+            assertTrue(reportPage.getTableReport().getMetricValues().equals(asList(3.8f, 2.8f, 7.3f, 3.7f)),
                     "There is difference between actual and expected metric elelemts");
         } finally {
             testParams.setProjectId(sourceProjectId);

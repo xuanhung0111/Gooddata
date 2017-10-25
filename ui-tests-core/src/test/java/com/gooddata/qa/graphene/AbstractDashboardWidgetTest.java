@@ -1,12 +1,10 @@
 package com.gooddata.qa.graphene;
 
-import java.util.UUID;
-
-import org.openqa.selenium.WebElement;
-
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import org.openqa.selenium.WebElement;
+
+import java.util.UUID;
 
 public abstract class AbstractDashboardWidgetTest extends GoodSalesAbstractTest {
 

@@ -1,17 +1,5 @@
 package com.gooddata.qa.graphene.reports;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPPORTUNITY;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-
-import org.testng.annotations.Test;
-
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.filter.FloatingTime.Time;
@@ -23,6 +11,17 @@ import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.fragments.reports.filter.RangeFilterFragment;
 import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter.FilterFragment;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
+import org.testng.annotations.Test;
+
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPPORTUNITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 
 public class GoodSalesAdvanceRangeFilterReportTest extends GoodSalesAbstractTest {
 
@@ -99,7 +98,7 @@ public class GoodSalesAdvanceRangeFilterReportTest extends GoodSalesAbstractTest
                 .<RangeFilterFragment> openExistingFilter(RANGE_FILTER_DESCRIPTION, FilterFragment.RANGE_FILTER)
                 .addSubFilterByDateRange(ATTR_YEAR_SNAPSHOT, Time.LAST_YEAR)
                 .apply();
-        reportPage.getTableReport().waitForTableReportExecutionProgress();
+        reportPage.getTableReport().waitForLoaded();
 
         reportPage.saveReport();
         checkRedBar(browser);
@@ -144,7 +143,6 @@ public class GoodSalesAdvanceRangeFilterReportTest extends GoodSalesAbstractTest
     }
 
     private void waitForReportLoaded() {
-        reportPage.getTableReport()
-                .waitForReportLoading();
+        reportPage.getTableReport().waitForLoaded();
     }
 }

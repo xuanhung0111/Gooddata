@@ -1,15 +1,5 @@
 package com.gooddata.qa.graphene.reports;
 
-import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
-import static org.testng.Assert.assertTrue;
-
-import org.testng.annotations.Test;
-
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
 import com.gooddata.qa.graphene.AbstractProjectTest;
@@ -19,7 +9,17 @@ import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.fragments.reports.filter.ContextMenu;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import com.gooddata.qa.utils.io.ResourceUtils;
+import org.testng.annotations.Test;
+
+import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
+import static org.testng.Assert.assertTrue;
 
 public class ReportWithEmptyValuesInTimeDimensionTest extends AbstractProjectTest {
     
@@ -53,7 +53,7 @@ public class ReportWithEmptyValuesInTimeDimensionTest extends AbstractProjectTes
     public void testRollupAggregation() {
         final TableReport table = initReportsPage().openReport(SIMPLE_REPORT).getTableReport();
 
-        table.openContextMenuFromCellValue(BACHELORS_DEGREE)
+        table.openContextMenuFrom(BACHELORS_DEGREE, CellType.ATTRIBUTE_VALUE)
                 .aggregateTableData(ContextMenu.AggregationType.ROLLUP, OF_ALL_ROWS);
 
         reportPage.waitForReportExecutionProgress();
@@ -71,7 +71,7 @@ public class ReportWithEmptyValuesInTimeDimensionTest extends AbstractProjectTes
     public void testAverageAggregation() {
         final TableReport table = initReportsPage().openReport(SIMPLE_REPORT).getTableReport();
 
-        table.openContextMenuFromCellValue(BACHELORS_DEGREE)
+        table.openContextMenuFrom(BACHELORS_DEGREE, CellType.ATTRIBUTE_VALUE)
                 .aggregateTableData(ContextMenu.AggregationType.AVERAGE, OF_ALL_ROWS);
         reportPage.waitForReportExecutionProgress();
 

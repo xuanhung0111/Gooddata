@@ -1,18 +1,5 @@
 package com.gooddata.qa.graphene.project;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.utils.CssUtils.simplifyText;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
-import static org.testng.Assert.assertTrue;
-
-import org.json.JSONException;
-import org.openqa.selenium.WebElement;
-import org.testng.annotations.Test;
-
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.metric.CustomMetricUI;
@@ -23,13 +10,25 @@ import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.enums.dashboard.TextObject;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.manage.VariablesPage;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.io.ResourceUtils;
+import org.json.JSONException;
+import org.openqa.selenium.WebElement;
+import org.testng.annotations.Test;
+
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
+import static org.testng.Assert.assertTrue;
 
 public class ExportAndImportProjectTest extends AbstractProjectTest {
 
@@ -103,7 +102,7 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
         //use List.equals due to checking attribute order on dashboard
         assertTrue(dashboardsPage.getContent()
                 .getReport(SIMPLE_REPORT, TableReport.class)
-                .getAttributeElements()
+                .getAttributeValues()
                 .equals(asList(BACHELORS_DEGREE, GRADUATE_DEGREE, HIGH_SCHOOL_DEGREE, PARTIAL_COLLEGE,
                         PARTIAL_HIGH_SCHOOL)), "There is difference between actual and expected attributes");
         takeScreenshot(browser, "imported-dashboard", getClass());
@@ -120,9 +119,10 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
         initReportsPage().openReport(SIMPLE_REPORT);
 
         //use List.equals due to checking attribute order on report
-        assertTrue(reportPage.getTableReport().getAttributeElements().equals(
-                asList(BACHELORS_DEGREE, GRADUATE_DEGREE, HIGH_SCHOOL_DEGREE, PARTIAL_COLLEGE,
-                        PARTIAL_HIGH_SCHOOL)), "There is difference between actual and expected attributes");
+        assertTrue(reportPage.getTableReport()
+                .getAttributeValues()
+                .equals(asList(BACHELORS_DEGREE, GRADUATE_DEGREE, HIGH_SCHOOL_DEGREE, PARTIAL_COLLEGE, PARTIAL_HIGH_SCHOOL)),
+                "There is difference between actual and expected attributes");
 
         initReportCreation().createReport(new UiReportDefinition()
                 .withName(REPORT_WITH_EXISTING_OBJS)
@@ -130,9 +130,8 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
                 .withHows(EDUTCATION)
                 .withFilters(FilterItem.Factory.createPromptFilter(SIMPLE_FILTERED_VARIABLE)));
 
-        assertTrue(
-                isEqualCollection(reportPage.getTableReport().getAttributeElements(),
-                        asList(PARTIAL_COLLEGE, PARTIAL_HIGH_SCHOOL)),
+        assertTrue(isEqualCollection(reportPage.getTableReport().getAttributeValues(),
+                asList(PARTIAL_COLLEGE, PARTIAL_HIGH_SCHOOL)),
                 "There is difference between actual and expected attributes");
 
         takeScreenshot(browser, "Simple-report-with-existing-objects", getClass());
@@ -152,9 +151,8 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
                 .withHows(POSITION)
                 .withFilters(FilterItem.Factory.createPromptFilter(attributeVariableName)));
 
-        assertTrue(
-                isEqualCollection(reportPage.getTableReport().getAttributeElements(),
-                        asList(STORE_MANAGER, VP_FINANCE)),
+        assertTrue(isEqualCollection(reportPage.getTableReport().getAttributeValues(),
+                asList(STORE_MANAGER, VP_FINANCE)),
                 "There is difference between actual and expected attributes");
         takeScreenshot(browser, "Simple-report-with-new-objects", getClass());
     }
@@ -174,11 +172,10 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
 
         filterWidget.changeAttributeFilterValues(PARTIAL_HIGH_SCHOOL);
 
-        assertTrue(
-                isEqualCollection(dashboardsPage.getContent()
-                                .getReport(SIMPLE_REPORT, TableReport.class)
-                                .getAttributeElements(),
-                        singletonList(PARTIAL_HIGH_SCHOOL)),
+        assertTrue(isEqualCollection(dashboardsPage.getContent()
+                .getReport(SIMPLE_REPORT, TableReport.class)
+                .getAttributeValues(),
+                singletonList(PARTIAL_HIGH_SCHOOL)),
                 "There is difference between actual and expected attributes");
         takeScreenshot(browser, "report-after-using-filter", getClass());
     }
@@ -203,9 +200,9 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
         editBar.saveDashboard();
 
         // use List.equals due to checking attribute order
-        assertTrue(existingObjsTableReport.getAttributeElements().equals(asList(PARTIAL_COLLEGE, PARTIAL_HIGH_SCHOOL)),
+        assertTrue(existingObjsTableReport.getAttributeValues().equals(asList(PARTIAL_COLLEGE, PARTIAL_HIGH_SCHOOL)),
                 "There is difference between actual and expected attributes");
-        assertTrue(newObjsTableReport.getAttributeElements().equals(asList(STORE_MANAGER, VP_FINANCE)),
+        assertTrue(newObjsTableReport.getAttributeValues().equals(asList(STORE_MANAGER, VP_FINANCE)),
                 "There is difference between actual and expected attributes");
         takeScreenshot(browser, "added-reports-to-dashboard", getClass());
 
@@ -218,11 +215,11 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
 
         dashboardsPage.getContent().getFilterWidget(simplifyText(EDUTCATION))
                 .changeAttributeFilterValues(PARTIAL_COLLEGE);
-        assertTrue(isEqualCollection(existingObjsTableReport.getAttributeElements(), singletonList(PARTIAL_COLLEGE)),
+        assertTrue(isEqualCollection(existingObjsTableReport.getAttributeValues(), singletonList(PARTIAL_COLLEGE)),
                 "There is difference between actual and expected attributes");
 
         dashboardsPage.getContent().getFilterWidget(simplifyText(POSITION)).changeAttributeFilterValues(STORE_MANAGER);
-        assertTrue(isEqualCollection(newObjsTableReport.getAttributeElements(), singletonList(STORE_MANAGER)),
+        assertTrue(isEqualCollection(newObjsTableReport.getAttributeValues(), singletonList(STORE_MANAGER)),
                 "There is difference between actual and expected attributes");
     }
 }

@@ -6,9 +6,7 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.dialog.SaveInsightDialog;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
-
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -292,7 +290,7 @@ public class GoodSalesSaveInsightTest extends AbstractAnalyseTest {
         analysisPage.exportReport();
         BrowserUtils.switchToLastTab(browser);
         try {
-            reportPage.getTableReport().waitForReportLoading();
+            reportPage.getTableReport().waitForLoaded();
         } finally {
             BrowserUtils.switchToFirstTab(browser);
         }
