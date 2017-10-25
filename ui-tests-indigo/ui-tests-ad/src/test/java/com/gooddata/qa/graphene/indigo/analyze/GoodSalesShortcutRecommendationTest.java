@@ -37,6 +37,7 @@ public class GoodSalesShortcutRecommendationTest extends AbstractAnalyseTest {
     protected void customizeProject() throws Throwable {
         super.customizeProject();
         createNumberOfActivitiesMetric();
+        createSnapshotBOPMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"})
