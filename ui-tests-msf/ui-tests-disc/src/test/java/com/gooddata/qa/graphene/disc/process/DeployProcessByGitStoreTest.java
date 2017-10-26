@@ -29,7 +29,8 @@ public class DeployProcessByGitStoreTest extends AbstractProcessTest {
     public void deployProcessWithInvalidFormatGitPath(String gitPath) {
         DeployProcessForm deployForm = initDiscProjectDetailPage().clickDeployButton();
 
-        deployForm.selectGitOption()
+        deployForm.selectProcessType(DeployProcessForm.ProcessType.RUBY_SCRIPTS)
+                .selectGitOption()
                 .enterGitPath(gitPath)
                 .enterProcessName(generateProcessName())
                 .submit();

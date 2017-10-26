@@ -49,7 +49,7 @@ public class ProcessDetail extends AbstractProcessDetail {
 
     public ProcessDetail redeployWithZipFile(String processName, ProcessType processType, File packageFile) {
         waitForElementVisible(redeployButton).click();
-        DeployProcessForm.getInstance(browser).deployProcessWithZipFile(processName, processType, packageFile);
+        DeployProcessForm.getInstance(browser).selectZipAndDeploy(processName, processType, packageFile);
         return this;
     }
 
