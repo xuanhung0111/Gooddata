@@ -48,6 +48,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.*;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.*;
 
 public class AbstractUITest extends AbstractGreyPageTest {
@@ -127,7 +128,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
             openUrl(PAGE_LOGIN);
         }
         LoginFragment.getInstance(browser).login(username, password, true);
-        waitForElementVisible(className("logo-anchor"), browser);
+        waitForElementVisible(cssSelector("a.account-menu,.gd-header-account,.hamburger-icon,.logo-anchor"), browser);
         takeScreenshot(browser, "login-ui", this.getClass());
         System.out.println("Successful login with user: " + username);
     }
