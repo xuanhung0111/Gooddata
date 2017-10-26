@@ -11,8 +11,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.gooddata.qa.utils.http.RestUtils;
 import org.apache.http.ParseException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -371,6 +373,26 @@ public final class DashboardsRestUtils {
         }
 
         throw new RuntimeException("No dashboard matches with title: " + title);
+    }
+
+    public static void deleteAllDashboards(RestApiClient restApiClient, String projectId)
+            throws RuntimeException {
+        try {
+            JSONArray dashboards = getJsonObject(restApiClient, format(PROJECT_DASHBOARDS_URI, projectId))
+                    .getJSONObject("query")
+                    .getJSONArray("entries");
+            for (int i = 0; i < dashboards.length(); i++) {
+                final String uri = dashboards.getJSONObject(i).getString("link");
+                try {
+                    RestUtils.deleteObjectsUsingCascade(restApiClient, projectId, uri);
+                } catch (Exception ex) {
+                    log.log(Level.WARNING, "Cannot delete dashboard: " + uri, ex.getMessage());
+                }
+            }
+        } catch (JSONException | IOException e) {
+            throw new RuntimeException("Cannot retrieve dashboard from project:" + projectId);
+        }
+
     }
 
     public static String getTabId(RestApiClient restApiClient, String projectId, String dashboardTitle, String tabTitle)

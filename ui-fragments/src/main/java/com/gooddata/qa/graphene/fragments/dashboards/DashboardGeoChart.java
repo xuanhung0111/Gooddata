@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -75,5 +76,9 @@ public class DashboardGeoChart extends AbstractFragment {
             assertEquals(actualTooltipValues, expectedTooltipValues, "Tooltip values on GEO is not properly.");
             j++;
         }
+    }
+
+    public boolean isMetricNameDisplayed() {
+        return waitForElementPresent(metricName).isDisplayed();
     }
 }

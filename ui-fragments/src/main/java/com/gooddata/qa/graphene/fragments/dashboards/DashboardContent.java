@@ -55,6 +55,10 @@ public class DashboardContent extends AbstractFragment {
         return getReports().size();
     }
 
+    public int getNumberOfWidgets() {
+        return getEmbeddedWidgets().size();
+    }
+
     public <T extends AbstractReport> T getReport(int reportIndex, Class<T> clazz) {
         return createPageFragment(clazz, getReports().get(reportIndex));
     }

@@ -37,10 +37,17 @@ public class SaveAsDialog extends AbstractFragment {
     public enum PermissionType {
         ONLY_YOU, USE_EXISTING_PERMISSIONS
     }
-    
+
     public void setDashboardName(String dashboardName) {
+        if (dashboardName.isEmpty()) {
+            return;
+        }
         waitForElementVisible(dashboardNameInput).clear();
         dashboardNameInput.sendKeys(dashboardName);
+    }
+
+    public String getDashboardName() {
+        return waitForElementVisible(dashboardNameInput).getText();
     }
     
     public void setSavedViews(boolean isSavedViews) {
