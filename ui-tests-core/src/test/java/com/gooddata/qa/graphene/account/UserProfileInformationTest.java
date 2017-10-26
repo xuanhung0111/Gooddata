@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.GoodData;
@@ -61,15 +60,16 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
         createAndAddUserToProject(UserRoles.EDITOR);
     }
 
-    @BeforeClass
-    public void setProjectTitle() {
+    @Override
+    protected void initProperties() {
+        super.initProperties();
         projectTitle = "User-profile-information-test";
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"initialize"})
-    public void initialize() {
+    @Override
+    protected void customizeProject() throws Throwable {
         Attribute stageNameAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_STAGE_NAME));
-        avgAmountMetric = createMetric(getEditorGoodData(), "Average of Amount", 
+        avgAmountMetric = createMetric(getEditorGoodData(), "Average of Amount",
                 format("SELECT AVG([%s])", getMdService().getObjUri(getProject(), Fact.class, title(FACT_AMOUNT))),
                 DEFAULT_METRIC_FORMAT);
         adminReport = createReportViaRest(getGoodDataClient(), GridReportDefinitionContent.create(
@@ -84,9 +84,12 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
                 singletonList(new AttributeInGrid(stageNameAttribute.getDefaultDisplayForm()
                         .getUri(), stageNameAttribute.getTitle())),
                 singletonList(new MetricElement(avgAmountMetric))));
+
+        createStatusVariable();
+        createQuoteVariable();
     }
 
-    @Test(dependsOnGroups = { "createProject" })
+    @Test(dependsOnGroups = {"createProject"})
     public void changeUserLanguage() throws JSONException, IOException {
         setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.ENABLE_CHANGE_LANGUAGE, true);
@@ -102,7 +105,7 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnGroups = { "createProject" })
+    @Test(dependsOnGroups = {"createProject"})
     public void initGetUserInformation() {
         PersonalInfoDialog personalInfoDialog = initAccountPage().openPersonalInfoDialog();
         takeScreenshot(browser, "User info", getClass());
@@ -112,7 +115,7 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
         allVariables = ObjectsTable.getInstance(id(ObjectTypes.VARIABLE.getObjectsTableID()), browser).getAllItems();
     }
 
-    @Test(dependsOnMethods = { "initGetUserInformation", "initialize" })
+    @Test(dependsOnMethods = {"initGetUserInformation"})
     public void checkUserProfileInformation() {
         PersonalInfo personalInfo = initReportsPage().getReportOwnerInfoFrom(adminReport.getTitle());
         assertEquals(userInfo.getFullName(), personalInfo.getFullName());
@@ -149,7 +152,7 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initialize"})
+    @Test(dependsOnGroups = {"createProject"})
     public void accessProfilePageOfDisabledUserFromMetric() throws ParseException, JSONException, IOException {
         UserManagementRestUtils.updateUserStatusInProject(
                 getDomainUserRestApiClient(), testParams.getProjectId(),
@@ -166,7 +169,7 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initialize"})
+    @Test(dependsOnGroups = {"createProject"})
     public void accessProfilePageOfDisabledUserFromReport() throws ParseException, JSONException, IOException {
         UserManagementRestUtils.updateUserStatusInProject(
                 getDomainUserRestApiClient(), testParams.getProjectId(),
@@ -183,13 +186,13 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initialize"})
+    @Test(dependsOnGroups = {"createProject"})
     public void accessProfileOfDisabledUserButEnabledInOtherProject() throws ParseException, JSONException, IOException {
         GoodData domainGoodData = getGoodDataClient(
                 testParams.getDomainUser() == null ? testParams.getUser() : testParams.getDomainUser(),
                         testParams.getPassword());
         String sameProject = ProjectRestUtils.createProject(domainGoodData, "Copy of " + projectTitle,
-                projectTemplate,testParams.getAuthorizationToken(), testParams.getProjectDriver(),
+                null,testParams.getAuthorizationToken(), testParams.getProjectDriver(),
                 testParams.getProjectEnvironment());
         UserManagementRestUtils.addUserToProject(
                 getDomainUserRestApiClient(), sameProject, testParams.getEditorUser(), UserRoles.EDITOR);

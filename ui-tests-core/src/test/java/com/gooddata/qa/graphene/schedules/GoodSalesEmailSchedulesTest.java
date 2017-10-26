@@ -4,6 +4,7 @@
 package com.gooddata.qa.graphene.schedules;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_ACTIVITIES_BY_TYPE;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -16,6 +17,12 @@ import javax.mail.MessagingException;
 import javax.mail.Part;
 
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.mdObjects.dashboard.Dashboard;
+import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
+import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
+import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.java.Builder;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -30,10 +37,7 @@ import com.gooddata.qa.utils.mail.ImapUtils;
 
 public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedulesTest {
 
-    @Override
-    protected void addUsersWithOtherRolesToProject() throws IOException, JSONException {
-        addUserToProject(imapUser, UserRoles.ADMIN);
-    }
+    private static final String DASHBOARD_HAVING_TAB = "Dashboard having tab";
 
     private String reportTitle = "Normal-Report";
     private String dashboardTitle = "UI-Graphene-core-Dashboard";
@@ -47,6 +51,31 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
                 new File(System.getProperty("maven.project.build.directory", "./target/attachments"));
     }
 
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws IOException, JSONException {
+        addUserToProject(imapUser, UserRoles.ADMIN);
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        String reportUri = createActivitiesByTypeReport();
+
+        Dashboard dashboard = Builder.of(Dashboard::new).with(dash -> {
+            dash.setName(DASHBOARD_HAVING_TAB);
+            dash.addTab(
+                    Builder.of(Tab::new)
+                            .with(tab -> {
+                                tab.setTitle("Tab having report");
+                                tab.addItem(Builder.of(ReportItem::new).with(item -> {
+                                    item.setObjUri(reportUri);
+                                    item.setPosition(TabItem.ItemPosition.LEFT);
+                                }).build());
+                            }).build());
+        }).build();
+
+        DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(), dashboard.getMdObject());
+    }
+
     @Test(dependsOnGroups = {"createProject"}, groups = {"schedules"})
     public void signInImapUser() throws JSONException {
         logout();
@@ -56,7 +85,7 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
     @Test(dependsOnMethods = {"signInImapUser"}, groups = {"schedules"})
     public void createDashboardSchedule() {
         initEmailSchedulesPage().scheduleNewDashboardEmail(imapUser, dashboardTitle,
-                "Scheduled email test - dashboard.", "Outlook");
+                "Scheduled email test - dashboard.", DASHBOARD_HAVING_TAB);
         checkRedBar(browser);
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard", this.getClass());
     }
@@ -64,7 +93,7 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
     @Test(dependsOnMethods = {"signInImapUser"}, groups = {"schedules"})
     public void createReportSchedule() {
         initEmailSchedulesPage().scheduleNewReportEmail(imapUser, reportTitle,
-                "Scheduled email test - report.", "Activities by Type", ExportFormat.ALL);
+                "Scheduled email test - report.", REPORT_ACTIVITIES_BY_TYPE, ExportFormat.ALL);
         checkRedBar(browser);
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-report", this.getClass());
     }
@@ -124,7 +153,8 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
         assertEquals(dashboardAttachmentParts.size(), 1, "Dashboard message has correct number of attachments.");
         assertTrue(dashboardAttachmentParts.get(0).getContentType().contains("application/pdf".toUpperCase()),
                 "Dashboard attachment has PDF content type.");
-        verifyAttachment(dashboardAttachmentParts.get(0), "PDF", 67000);
+        // 50k is minimal size for dashboard that has Activities by Type report
+        verifyAttachment(dashboardAttachmentParts.get(0), "PDF", 50000);
     }
 
     private void verifyAttachment(Part attachment, String type, long minimalSize) throws MessagingException {

@@ -70,6 +70,19 @@ public class DashboardTabs extends AbstractFragment {
     }
 
     /**
+     * Method to get tab with given name
+     *
+     * @param name - tab name
+     * @return Dashboard Tab having given name
+     */
+    public DashboardTab getTab(String name) {
+        return tabs.stream()
+                .filter(tab -> tab.getLabel().equals(name))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("can't find given tab"));
+    }
+
+    /**
      * Method to get index of selected tab
      *
      * @return index of selected tab
@@ -81,6 +94,14 @@ public class DashboardTabs extends AbstractFragment {
             }
         }
         return -1;
+    }
+
+    /**
+     * Get working dashboard tab
+     * @return working tab
+     */
+    public DashboardTab getSelectedTab() {
+        return getTab(getSelectedTabIndex());
     }
 
     /**

@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.json.JSONException;
 import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
@@ -43,22 +42,18 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     private static final String LAST_YEAR             = String.valueOf(THIS_YEAR - 1);
     private static final String PENULTIMATE_YEAR      = String.valueOf(THIS_YEAR - 2);
 
-    @BeforeClass
-    public void initProjectTitle() {
+    @Override
+    protected void initProperties() {
         projectTitle = "SimpleProject-test-dashboard-saved-filters";
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"init-data"})
-    public void uploadCsvDataForBlankProject() {
+    @Override
+    protected void customizeProject() throws Throwable {
         uploadCSV(getFilePathFromResource("/" + PAYROLL_CSV + "/payroll.csv"));
-    }
-
-    @Test(dependsOnMethods = {"uploadCsvDataForBlankProject"}, groups = {"init-data"})
-    public void createDashboard() {
         createDashboard("Sample Dashboard");
     }
 
-    @Test(dependsOnGroups = {"init-data"}, priority = 1)
+    @Test(dependsOnGroups = {"createProject"}, priority = 1)
     public void notificationWhenSavedViewTurnedOffTest() {
         DashboardEditBar dashboardEditBar = null;
         try {
@@ -89,7 +84,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         }
     }
 
-    @Test(dependsOnGroups = {"init-data"}, priority = 2)
+    @Test(dependsOnGroups = {"createProject"}, priority = 2)
     public void checkDisableSavedFiltersFeatureFlagsTest() throws IOException, JSONException {
         try {
             ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(),
@@ -119,7 +114,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         }
     }
 
-    @Test(dependsOnGroups = {"init-data"}, priority = 3)
+    @Test(dependsOnGroups = {"createProject"}, priority = 3)
     public void createSavedFilterViewTest() {
         initNewDashboard_AddFilter_TurnOnSavedView(FIRST_DASHBOARD_NAME);
 

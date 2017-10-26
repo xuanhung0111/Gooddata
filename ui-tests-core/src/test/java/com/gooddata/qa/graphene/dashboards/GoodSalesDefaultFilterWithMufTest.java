@@ -1,11 +1,9 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import static com.gooddata.md.Restriction.title;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.addMufToUser;
@@ -28,8 +26,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.md.Metric;
 import com.gooddata.md.report.AttributeInGrid;
 import com.gooddata.md.report.Filter;
 import com.gooddata.md.report.GridReportDefinitionContent;
@@ -65,16 +61,15 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
 
     @DataProvider(name = "mufProvider")
     public Object[][] getMufProvider() throws ParseException, JSONException, IOException {
-        final Attribute productAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_PRODUCT));
         final String productValues = getMdService()
-                .getAttributeElements(productAttribute)
+                .getAttributeElements(getAttributeByTitle(ATTR_PRODUCT))
                 .subList(0, 3)
                 .stream()
                 .map(e -> e.getUri())
                 .map(e -> format("[%s]", e))
                 .collect(joining(","));
 
-        final String expression = format("[%s] IN (%s)", productAttribute.getUri(), productValues);
+        final String expression = format("[%s] IN (%s)", getAttributeByTitle(ATTR_PRODUCT).getUri(), productValues);
         final String mufUri = createMufObjectByUri(getRestApiClient(), testParams.getProjectId(), "muf", expression);
 
         return new Object[][] {
@@ -83,18 +78,18 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
         };
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
-    public void prepareDashboardForMufUser() throws JSONException, IOException {
+    @Override
+    protected void customizeProject() throws Throwable {
+        //prepare Dashboard For Muf User
         initVariablePage().createVariable(new AttributeVariable(MUF_DF_VARIABLE).withAttribute(ATTR_PRODUCT));
 
-        Metric amountMetric = getMdService().getObj(getProject(), Metric.class, title(METRIC_AMOUNT));
-        Attribute productAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_PRODUCT));
         String promptFilterUri = getVariableUri(getRestApiClient(), testParams.getProjectId(), MUF_DF_VARIABLE);
 
         createReportViaRest(GridReportDefinitionContent.create(REPORT_MUF,
                 singletonList(METRIC_GROUP),
-                singletonList(new AttributeInGrid(productAttribute.getDefaultDisplayForm().getUri(), productAttribute.getTitle())),
-                singletonList(new MetricElement(amountMetric)),
+                singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_PRODUCT).getDefaultDisplayForm().getUri(), 
+                        ATTR_PRODUCT)),
+                singletonList(new MetricElement(createAmountMetric())),
                 singletonList(new Filter(format("[%s]", promptFilterUri)))));
 
         initDashboardsPage()
@@ -117,7 +112,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
         checkRedBar(browser);
     }
 
-    @Test(dependsOnGroups = {"precondition"}, dataProvider = "mufProvider", groups = {"df-multiple"},
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "mufProvider", groups = {"df-multiple"},
             description = "Verify muf user default view shows correctly after assigned muf in multiple choice mode")
     public void checkMufUserDefaultViewInMultipleChoiceMode(String user, UserRoles role, String mufObjectUri)
             throws ParseException, IOException, JSONException {
@@ -161,7 +156,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
         }
     }
 
-    @Test(dependsOnGroups = {"precondition"}, dataProvider = "mufProvider", groups = {"df-single"}, 
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "mufProvider", groups = {"df-single"}, 
             description = "Verify muf user default view shows correctly after assigned muf in single choice mode")
     public void checkMufUserDefaultViewInSingleChoiceMode(String user, UserRoles role, String mufObjectUri)
             throws ParseException, IOException, JSONException {
@@ -189,7 +184,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
         }
     }
 
-    @Test(dependsOnGroups = {"precondition"}, dataProvider = "mufProvider", groups = {"df-multiple"},
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "mufProvider", groups = {"df-multiple"},
             description = "Verify muf user saved view shows correctly after assigned muf in multiple choice mode")
     public void checkMufUserSavedViewInMultipleChoiceMode(String user, UserRoles role, String mufObjectUri)
             throws JSONException, ParseException, IOException {
@@ -234,7 +229,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
         }
     }
 
-    @Test(dependsOnGroups = {"precondition"}, dataProvider = "mufProvider", groups = {"df-single"}, 
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "mufProvider", groups = {"df-single"}, 
             description = "Verify muf user saved view shows correctly after assigned muf in single choice mode")
     public void checkMufUserSavedViewInSingleChoiceMode(String user, UserRoles role, String mufObjectUri)
             throws JSONException, ParseException, IOException {

@@ -10,7 +10,6 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributeFilterPickerPanel;
@@ -18,12 +17,19 @@ import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
 public class AttributeFiltersTest extends AbstractAdE2ETest {
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
-        projectTitle = "Attribute-Filters-E2E-Test";
+    @Override
+    public void initProperties() {
+        super.initProperties();
+        projectTitle += "Attribute-Filters-E2E-Test";
     }
 
-    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_reset_search_results_after_closing() {
         beforeEach();
 
@@ -44,7 +50,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
         assertEquals(AttributeFilterPickerPanel.getInstance(browser).getItemNames().size(), 4);
     }
 
-    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
+    @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_be_possible_to_add_and_remove_attribute_from_filters_bucket() {
         beforeEach();
 
@@ -57,7 +63,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
             .isEmpty());
     }
 
-    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
+    @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_not_allow_moving_other_buckets_items_to_filters_bucket() {
         beforeEach();
 
@@ -72,7 +78,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
             .isEmpty());
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {"disabling-Apply-button"}, description = "covered by TestCafe")
+    @Test(dependsOnGroups = {"createProject"}, groups = {"disabling-Apply-button"}, description = "covered by TestCafe")
     public void should_disable_apply_button_if_nothing_changed() {
         assertTrue(beforeEachDisablingApplyButton()
                 .getApplyButton()
@@ -80,7 +86,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
                 .contains("disabled"));
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {"disabling-Apply-button"}, description = "covered by TestCafe")
+    @Test(dependsOnGroups = {"createProject"}, groups = {"disabling-Apply-button"}, description = "covered by TestCafe")
     public void should_disable_apply_button_if_nothing_is_selected() {
         AttributeFilterPickerPanel panel = beforeEachDisablingApplyButton();
         panel.getClearButton().click();
@@ -89,7 +95,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
                 .contains("disabled"));
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {"disabling-Apply-button"}, description = "covered by TestCafe")
+    @Test(dependsOnGroups = {"createProject"}, groups = {"disabling-Apply-button"}, description = "covered by TestCafe")
     public void should_disable_apply_button_if_everything_is_unselected() {
         AttributeFilterPickerPanel panel = beforeEachDisablingApplyButton();
         panel.getClearButton().click();
@@ -98,7 +104,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
                 .contains("disabled"));
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {"disabling-Apply-button"}, description = "covered by TestCafe")
+    @Test(dependsOnGroups = {"createProject"}, groups = {"disabling-Apply-button"}, description = "covered by TestCafe")
     public void should_not_disable_apply_button_if_selection_is_inverted() {
         AttributeFilterPickerPanel panel = beforeEachDisablingApplyButton();
         panel.select("Email");
@@ -111,7 +117,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
                 .contains("disabled"));
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {"disabling-Apply-button"}, description = "covered by TestCafe")
+    @Test(dependsOnGroups = {"createProject"}, groups = {"disabling-Apply-button"}, description = "covered by TestCafe")
     public void should_not_disable_apply_button_if_single_item_is_filtered() {
         AttributeFilterPickerPanel panel = beforeEachDisablingApplyButton();
 
@@ -125,7 +131,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
         assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": Email");
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {"disabling-Apply-button"}, description = "covered by TestCafe")
+    @Test(dependsOnGroups = {"createProject"}, groups = {"disabling-Apply-button"}, description = "covered by TestCafe")
     public void should_disable_apply_button_if_selection_is_in_different_order() {
         AttributeFilterPickerPanel panel = beforeEachDisablingApplyButton();
         panel.select("Email", "In Person Meeting");

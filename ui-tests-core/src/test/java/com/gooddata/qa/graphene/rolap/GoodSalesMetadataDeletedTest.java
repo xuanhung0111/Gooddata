@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.gooddata.qa.graphene.TemplateAbstractTest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -28,7 +29,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.report.Report;
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.attribute.ComputedAttributeDefinition;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
@@ -48,7 +48,7 @@ import com.gooddata.qa.utils.http.rolap.RolapRestUtils;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 
-public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
+public class GoodSalesMetadataDeletedTest extends TemplateAbstractTest {
 
     private static final int STATUS_POLLING_CHECK_ITERATIONS = 60;
     private static final String WIN_RATE_METRIC = "Win Rate";
@@ -268,7 +268,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"group1"}, alwaysRun = true)
-    public void resetLDM() throws JSONException, IOException {
+    public void resetLDM() throws Throwable {
         deleteProject(testParams.getProjectId());
         createProject();
     }

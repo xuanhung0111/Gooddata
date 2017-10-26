@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.jboss.arquillian.graphene.Graphene;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -27,20 +26,21 @@ import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
-public class GoodSalesFactBasedMetricTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesFactBasedMetricTest extends AbstractAnalyseTest {
 
     private static final String SUM_OF_AMOUNT = "Sum of " + FACT_AMOUNT;
     private static final String SUM_OF_ACTIVITY_DATE = "Sum of " + FACT_ACTIVITY_DATE;
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Fact-Based-Metric-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createSimpleMetricFromFact() {
         final MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
 
@@ -69,7 +69,7 @@ public class GoodSalesFactBasedMetricTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("createSimpleMetricFromFact");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testMetricAggregations() {
         MetricConfiguration metricConfiguration = analysisPage.addMetric(FACT_ACTIVITY_DATE, FieldType.FACT)
             .getMetricsBucket()
@@ -118,7 +118,7 @@ public class GoodSalesFactBasedMetricTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("testMetricAggregations");
     }
 
-    @Test(dependsOnGroups = {"init"}, description = "https://jira.intgdc.com/browse/CL-7777")
+    @Test(dependsOnGroups = {"createProject"}, description = "https://jira.intgdc.com/browse/CL-7777")
     public void testAggregationFunctionList() {
         analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT);
 
@@ -139,7 +139,7 @@ public class GoodSalesFactBasedMetricTest extends GoodSalesAbstractAnalyseTest {
         };
     }
 
-    @Test(dependsOnGroups = {"init"}, dataProvider = "factMetricCombination")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "factMetricCombination")
     public void shouldNotCreateDuplicateMetricFromFact(boolean pop, boolean percent) {
         MetricConfiguration configuration = analysisPage.addDate()
             .addMetric(FACT_ACTIVITY_DATE, FieldType.FACT)
@@ -182,7 +182,7 @@ public class GoodSalesFactBasedMetricTest extends GoodSalesAbstractAnalyseTest {
         }
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testMetricFromFact() {
         String sumOfAmount = "Sum of " + FACT_AMOUNT;
         String sumOfDuration = "Sum of " + FACT_DURATION;

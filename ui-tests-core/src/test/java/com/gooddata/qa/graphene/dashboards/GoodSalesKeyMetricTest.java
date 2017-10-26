@@ -21,15 +21,11 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import java.io.IOException;
 import java.util.Calendar;
 
-import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
-import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Attribute;
@@ -60,13 +56,15 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
 
     private static final By HEADLINE_WIDGET_LOCATOR = className("yui3-c-headlinedashboardwidget");
 
-    @BeforeClass(alwaysRun = true)
-    public void setProjectTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-key-metric-test";
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
-    public void setupPrecondition() throws ParseException, JSONException, IOException {
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
         String productUri = getMdService().getObjUri(getProject(), Attribute.class, title(ATTR_PRODUCT));
         String variableUri = createFilterVariable(getRestApiClient(), testParams.getProjectId(), VARIABLE_NAME, productUri);
 
@@ -76,7 +74,7 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
                 Metric.class, title(METRIC_AMOUNT)), variableUri), "#,##0");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = "createProject")
     public void editHeadlineWidget() {
         initDashboardsPage()
             .addNewDashboard(DASHBOARD_NAME)

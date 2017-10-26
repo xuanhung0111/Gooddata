@@ -46,7 +46,7 @@ public class AbstractDashboardReport extends AbstractReport {
 
     public void deleteDrilling(List<String> drillSourceName) {
         WidgetConfigPanel configPanel = WidgetConfigPanel.openConfigurationPanelFor(getRoot(), browser);
-        configPanel.getTab(WidgetConfigPanel.Tab.DRILLING, DrillingConfigPanel.class).deleteDrilling(
+        configPanel.getTab(WidgetConfigPanel.Tab.DRILLING, DrillingConfigPanel.class).deleteDrillingByLeftValues(
                 drillSourceName);
         configPanel.saveConfiguration();
     }

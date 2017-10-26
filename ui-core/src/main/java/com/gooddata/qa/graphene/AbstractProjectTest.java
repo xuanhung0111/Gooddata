@@ -1,31 +1,48 @@
 package com.gooddata.qa.graphene;
 
+import static com.gooddata.md.Restriction.identifier;
+import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.browser.BrowserUtils.getCurrentBrowserAgent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
 
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.gooddata.GoodData;
+import com.gooddata.fixture.ResourceManagement.ResourceTemplate;
+import com.gooddata.md.Attribute;
+import com.gooddata.md.AttributeElement;
+import com.gooddata.md.Dataset;
+import com.gooddata.md.Fact;
 import com.gooddata.project.ProjectValidationResults;
-
+import com.gooddata.qa.browser.BrowserUtils;
+import com.gooddata.qa.fixture.FixtureException;
+import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
+import com.gooddata.qa.mdObjects.dashboard.filter.FilterType;
+import com.gooddata.qa.mdObjects.dashboard.filter.FloatingFilterConstraint;
+import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
+import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
+import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
+import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.java.Builder;
 import org.json.JSONException;
+import org.openqa.selenium.Dimension;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import com.gooddata.GoodData;
-import com.gooddata.md.Attribute;
 import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.project.Project;
-import com.gooddata.project.ProjectDriver;
+import com.gooddata.qa.fixture.Fixture;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
@@ -38,6 +55,9 @@ import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -51,7 +71,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     protected static final int DEFAULT_PROJECT_CHECK_LIMIT = 60; // 5 minutes
 
     protected String projectTitle = "simple-project";
-    protected String projectTemplate = "";
+    protected ResourceTemplate appliedFixture;
     protected int projectCreateCheckIterations = DEFAULT_PROJECT_CHECK_LIMIT;
 
     // validations are enabled by default on any child class
@@ -66,75 +86,35 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     }
 
     @Test(groups = {"createProject"})
-    public void init() throws JSONException {
+    @Parameters({"windowSize"})
+    public void init(@Optional("maximize") String windowSize) throws JSONException {
+        System.out.println("Current browser agent is: " + getCurrentBrowserAgent(browser).toUpperCase());
+
+        // override default value of properties
+        initProperties();
+
+        // adjust window size to run on mobile mode
+        adjustWindowSize(windowSize);
+
         // sign in with admin user
         signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
     }
 
     @Test(dependsOnMethods = {"init"}, groups = {"createProject"})
-    public void configureStartPage() {
-        startPageContext = new StartPageContext() {
-
-            @Override
-            public void waitForStartPageLoaded() {
-                waitForProjectsPageLoaded(browser);
-            }
-
-            @Override
-            public String getStartPage() {
-                return PAGE_PROJECTS;
-            }
-        };
-    }
-
-    @Test(dependsOnMethods = {"configureStartPage"}, groups = {"createProject"})
-    public void createProject() throws JSONException {
+    public void createProject() throws Throwable {
         if (testParams.isReuseProject()) {
             if (testParams.getProjectId() != null && !testParams.getProjectId().isEmpty()) {
-                System.out.println("Project will be re-used, id: " + testParams.getProjectId());
+                log.info("Project will be re-used, id: " + testParams.getProjectId());
                 return;
             } else {
-                System.out.println("Project reuse is expected, but projectId is missing, new project will be created...");
+                log.info("Project reuse is expected, but projectId is missing, new project will be created...");
             }
         }
 
-        if (!canAccessGreyPage(browser)) {
-            System.out.println("Use REST api to create project.");
-            testParams.setProjectId(ProjectRestUtils.createProject(getGoodDataClient(), projectTitle,
-                    projectTemplate, testParams.getAuthorizationToken(), ProjectDriver.POSTGRES,
-                    testParams.getProjectEnvironment()));
-
-        } else {
-            openUrl(PAGE_GDC_PROJECTS);
-            waitForElementVisible(gpProject.getRoot());
-
-            projectTitle += "-" + testParams.getProjectDriver().name();
-            if (projectTemplate.isEmpty()) {
-                testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, null,
-                        testParams.getAuthorizationToken(), testParams.getProjectDriver(),
-                        testParams.getProjectEnvironment(), projectCreateCheckIterations));
-            } else {
-                testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, projectTemplate,
-                        testParams.getAuthorizationToken(), ProjectDriver.POSTGRES, testParams.getProjectEnvironment(),
-                        projectCreateCheckIterations));
-
-                if (testParams.getProjectDriver().equals(ProjectDriver.VERTICA)) {
-                    String exportToken = exportProject(true, true, false, projectCreateCheckIterations * 5);
-                    deleteProject(testParams.getProjectId());
-
-                    openUrl(PAGE_GDC_PROJECTS);
-                    waitForElementVisible(gpProject.getRoot());
-                    testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, null,
-                            testParams.getAuthorizationToken2(), testParams.getProjectDriver(),
-                            testParams.getProjectEnvironment(), projectCreateCheckIterations));
-                    importProject(exportToken, projectCreateCheckIterations * 5);
-                }
-            }
-            Screenshots.takeScreenshot(browser, projectTitle + "-created", this.getClass());
-        }
+        // strategy using to create a new project should be defined by this hook
+        createNewProject();
 
         projectTitle = testParams.getProjectId().substring(0, 6) + "-" + projectTitle;
-
         ProjectRestUtils.updateProjectTitle(getRestApiClient(), getProject(), projectTitle);
         log.info("Project title: " + projectTitle);
     }
@@ -168,6 +148,18 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         goodDataClient = getGoodDataClient(testParams.getUser(), testParams.getPassword());
 
         logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
+    }
+
+    @Test(dependsOnMethods = {"createAndUseDynamicUser"}, groups = {"createProject"})
+    public void prepareProject() throws Throwable {
+        customizeProject();
+    }
+
+    @Test(dependsOnMethods = {"prepareProject"}, groups = {"createProject"})
+    public void assignStartPage() {
+        // start page could be any page, e.g.: analyse page, ...
+        // to make it possible, this method should be executed last in createProject group
+        configureStartPage();
     }
 
     @AfterClass(alwaysRun = true)
@@ -225,6 +217,58 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         }
     }
 
+    /**
+     * a hook to createProject group.
+     * Property values should be overridden by using this method
+     */
+    protected void initProperties() {
+        // should be implemented later in abstract test or test classes
+    }
+
+    /**
+     * a hook to createProject group.
+     * this helps user define what is the strategy to create a new project
+     */
+    protected void createNewProject() throws Throwable{
+        if (Objects.isNull(appliedFixture)) {
+            log.info("Using REST api to create an empty project.");
+            testParams.setProjectId(ProjectRestUtils.createProject(getGoodDataClient(), projectTitle,
+                    null, testParams.getAuthorizationToken(), testParams.getProjectDriver(),
+                    testParams.getProjectEnvironment()));
+        } else {
+            log.info("Using fixture named " + appliedFixture.getPath() + " to create project");
+            testParams.setProjectId(createProjectUsingFixture(projectTitle, appliedFixture));
+        }
+    }
+
+    /**
+     * a hook to createProject group.
+     * Any extra setting which is required for a specific test class should be added here
+     */
+    protected void customizeProject() throws Throwable {
+        // should be implemented later in abstract test or test classes
+    }
+
+    /**
+     * a hook to createProject group.
+     * start page context which will be loaded after finishing a test should be assigned by using this
+     * project.html is used by default
+     */
+    protected void configureStartPage() {
+        startPageContext = new StartPageContext() {
+
+            @Override
+            public void waitForStartPageLoaded() {
+                waitForProjectsPageLoaded(browser);
+            }
+
+            @Override
+            public String getStartPage() {
+                return PAGE_PROJECTS;
+            }
+        };
+    }
+
     protected MetadataService getMdService() {
         return getGoodDataClient().getMetadataService();
     }
@@ -233,17 +277,28 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         return getGoodDataClient().getProjectService().getProjectById(testParams.getProjectId());
     }
 
-    protected Metric createMetric(String name, String expression, String format) {
-        return createMetric(getGoodDataClient(), name, expression, format);
-    }
-    
-    protected Metric createMetric(GoodData gooddata, String name, String expression, String format) {
-        return gooddata.getMetadataService().createObj(getProject(), new Metric(name, expression, format));
+    /**
+     * Create project with specific fixture
+     *
+     * @param title project title
+     * @param appliedFixture fixture which is applied to an empty project
+     * @return project id
+     */
+    protected String createProjectUsingFixture(String title, ResourceTemplate appliedFixture) {
+        if (Objects.isNull(appliedFixture)) {
+            throw new FixtureException("Fixture can't be null");
+        }
+
+        return new Fixture(appliedFixture)
+                .setGoodDataClient(getGoodDataClient())
+                .setRestApiClient(getRestApiClient())
+                .deploy(title, testParams.getAuthorizationToken(),
+                        testParams.getProjectDriver(), testParams.getProjectEnvironment());
     }
 
     protected Collection<String> getAttributeValues(Attribute attribute) {
         return getMdService().getAttributeElements(attribute)
-                .stream().map(attr -> attr.getTitle()).map(String::trim).collect(toList());
+                .stream().map(AttributeElement::getTitle).map(String::trim).collect(toList());
     }
 
     protected Report createReportViaRest(ReportDefinition defination) {
@@ -256,7 +311,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         return metadataService.createObj(getProject(), new Report(definition.getTitle(), definition));
     }
 
-    public void setupMaql(String maql) throws JSONException, IOException {
+    public void setupMaql(String maql) {
         getGoodDataClient()
                 .getModelService()
                 .updateProjectModel(getProject(), maql)
@@ -270,22 +325,155 @@ public abstract class AbstractProjectTest extends AbstractUITest {
                 .get();
     }
 
-    public void setupData(String csvPath, String uploadInfoPath)
-            throws JSONException, IOException, URISyntaxException {
-        String webdavServerUrl = getWebDavServerUrl(getRestApiClient(), getRootUrl());
+    public void setupData(String csvPath, String uploadInfoPath) {
+        try {
+            String webdavServerUrl = getWebDavServerUrl(getRestApiClient(), getRootUrl());
 
-        String webdavUrl = webdavServerUrl + "/" + UUID.randomUUID().toString();
+            String webdavUrl = webdavServerUrl + "/" + UUID.randomUUID().toString();
 
-        URL csvResource = getClass().getResource(csvPath);
-        URL uploadInfoResource = getClass().getResource(uploadInfoPath);
+            URL csvResource = getClass().getResource(csvPath);
+            URL uploadInfoResource = getClass().getResource(uploadInfoPath);
 
-        uploadFileToWebDav(csvResource, webdavUrl);
-        uploadFileToWebDav(uploadInfoResource, webdavUrl);
+            uploadFileToWebDav(csvResource, webdavUrl);
+            uploadFileToWebDav(uploadInfoResource, webdavUrl);
 
-        String integrationEntry = webdavUrl.substring(webdavUrl.lastIndexOf("/") + 1, webdavUrl.length());
-        RolapRestUtils.postEtlPullIntegration(getRestApiClient(), testParams.getProjectId(),
-                integrationEntry);
+            String integrationEntry = webdavUrl.substring(webdavUrl.lastIndexOf("/") + 1, webdavUrl.length());
+            RolapRestUtils.postEtlPullIntegration(getRestApiClient(), testParams.getProjectId(),
+                    integrationEntry);
+        } catch (JSONException | IOException | URISyntaxException e) {
+            throw new RuntimeException("There is error while setupData");
+        }
     }
+
+    /**
+     * Project title is updated internally in createProject group. Use this method to get Invitation subject
+     * @return invitation subject
+     */
+
+    protected String getInvitationSubject() {
+        return projectTitle + " Invitation";
+    }
+
+    //------------------------- SUPPORT GET OBJECTS - BEGIN -------------------------
+    protected Attribute getAttributeByTitle(String title) {
+        return getMdService().getObj(getProject(), Attribute.class, title(title));
+    }
+
+    protected Attribute getAttributeByIdentifier(String id) {
+        return getMdService().getObj(getProject(), Attribute.class, identifier(id));
+    }
+    protected Metric getMetricByTitle(String title) {
+        return getMdService().getObj(getProject(), Metric.class, title(title));
+    }
+
+    protected Metric getMetricByIdentifier(String id) {
+        return getMdService().getObj(getProject(), Metric.class, identifier(id));
+    }
+
+    protected Fact getFactByTitle(String title) {
+        return getMdService().getObj(getProject(), Fact.class, title(title));
+    }
+
+    protected Fact getFactByIdentifier(String id) {
+        return getMdService().getObj(getProject(), Fact.class, identifier(id));
+    }
+
+    protected Dataset getDatasetByIdentifier(String id) {
+        return getMdService().getObj(getProject(), Dataset.class, identifier(id));
+    }
+
+    protected List<String> getObjIdentifiers(List<String> uris) {
+        try {
+            JSONArray array = RestUtils.getJsonObject(getRestApiClient(),
+                    getRestApiClient().newPostMethod(
+                            String.format("/gdc/md/%s/identifiers", testParams.getProjectId()),
+                            new JSONObject().put("uriToIdentifier", uris).toString()))
+                    .getJSONArray("identifiers");
+
+            List<String> foundIds = new ArrayList<>();
+            for (int i = 0; i < array.length(); i++) {
+                 foundIds.add(array.getJSONObject(i).getString("identifier"));
+            }
+
+            return foundIds;
+        } catch (IOException | JSONException e) {
+            throw new RuntimeException("there is an error while searching obj", e);
+        }
+    }
+    //------------------------- SUPPORT GET OBJECTS - END -------------------------
+
+    //------------------------- DASHBOARD MD OBJECTS - BEGIN -------------------------
+    protected FilterItemContent createSingleValueFilter(Attribute attribute) {
+        return Builder.of(FilterItemContent::new).with(item -> {
+            item.setObjUri(attribute.getDefaultDisplayForm().getUri());
+            item.setType(FilterType.LIST);
+        }).build();
+    }
+
+    protected FilterItemContent createMultipleValuesFilter(Attribute attribute) {
+        return Builder.of(FilterItemContent::new).with(item -> {
+            item.setObjUri(attribute.getDefaultDisplayForm().getUri());
+            item.setMultiple(true);
+            item.setType(FilterType.LIST);
+        }).build();
+    }
+
+    protected FilterItemContent createDateFilter(Attribute date, int from, int to) {
+        return Builder.of(FilterItemContent::new).with(item -> {
+            item.setObjUri(date.getDefaultDisplayForm().getUri());
+            item.setMultiple(true);
+            item.setType(FilterType.TIME);
+            item.setFilterConstraint(new FloatingFilterConstraint(from, to));
+        }).build();
+    }
+
+    protected ReportItem createReportItem(String reportUri) {
+        return createReportItem(reportUri, null);
+    }
+
+    protected ReportItem createReportItem(String reportUri, List<String> filterIds) {
+        return Builder.of(ReportItem::new).with(item -> {
+            item.setObjUri(reportUri);
+            if (!Objects.isNull(filterIds)) {
+                item.setAppliedFilterIds(filterIds);
+            }
+        }).build();
+    }
+
+    protected FilterItem createFilterItem(FilterItemContent item) {
+        return Builder.of(FilterItem::new).with(filterItem -> filterItem.setContentId(item.getId())).build();
+    }
+
+    protected FilterItem createFilterItem(FilterItemContent item, TabItem.ItemPosition itemPosition) {
+        return Builder.of(FilterItem::new).with(filterItem -> {
+            filterItem.setContentId(item.getId());
+            filterItem.setPosition(itemPosition);
+        }).build();
+    }
+    //------------------------- DASHBOARD MD OBJECTS - END ------------------------
+
+    //------------------------- REPORT, METRIC MD OBJECTS - BEGIN ------------------------
+
+    protected String createReport(ReportDefinition reportDefinition) {
+        ReportDefinition definition = getMdService().createObj(getProject(), reportDefinition);
+        return getMdService().createObj(getProject(), new Report(definition.getTitle(), definition)).getUri();
+    }
+
+    public static final String DEFAULT_METRIC_FORMAT = "#,##0";
+
+    protected Metric createMetric(String name, String expression) {
+        return createMetric(name, expression, DEFAULT_METRIC_FORMAT);
+    }
+
+    protected Metric createMetric(String name, String expression, String format) {
+        return createMetric(getGoodDataClient(), name, expression, format);
+    }
+
+    protected Metric createMetric(GoodData gooddata, String name, String expression, String format) {
+        return gooddata.getMetadataService().createObj(getProject(), new Metric(name, expression, format));
+    }
+
+    //------------------------- REPORT, METRIC MD OBJECTS - END ------------------------
 
     private String getWebDavServerUrl(final RestApiClient restApiClient, final String serverRootUrl)
             throws IOException, JSONException {
@@ -317,5 +505,41 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     private boolean isCurrentUserDomainUser() {
         return UserManagementRestUtils.isDomainUser(getRestApiClient(), testParams.getUserDomain());
+    }
+
+    private void adjustWindowSize(String windowSize) {
+        // this is now using for ui-tests-dashboards only
+        // if having wide use, we should consider dimension properties
+        // drone definition: http://arquillian.org/arquillian-extension-drone/#webdriver-configuration (see property named dimensions)
+        // e.g.: https://github.com/arquillian/arquillian-extension-drone/blob/master/drone-webdriver/src/test/resources/arquillian.xml#L31
+        if ("maximize".equals(windowSize)) {
+            maximizeWindow();
+        } else {
+            String[] dimensions = windowSize.split(",");
+            if (dimensions.length == 2) {
+                try {
+                    setWindowSize(Integer.valueOf(dimensions[0]), Integer.valueOf(dimensions[1]));
+                } catch (NumberFormatException e) {
+                    System.out.println("ERROR: Invalid window size given: " + windowSize
+                            + " (fallback to maximize)");
+                    maximizeWindow();
+                }
+            } else {
+                System.out.println("ERROR: Invalid window size given: " + windowSize
+                        + " (fallback to maximize)");
+                maximizeWindow();
+            }
+        }
+    }
+
+    private void setWindowSize(final int width, final int height) {
+        log.info("resizing window to " + width + "x" + height);
+        browser.manage().window().setSize(new Dimension(width, height));
+    }
+
+    private void maximizeWindow() {
+        log.info("maximizing window");
+        // browser.manage().window().maximize(); does not work
+        BrowserUtils.maximize(browser);
     }
 }

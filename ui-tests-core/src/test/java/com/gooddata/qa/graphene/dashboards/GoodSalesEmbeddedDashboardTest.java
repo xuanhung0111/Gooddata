@@ -30,7 +30,6 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -88,9 +87,17 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     private String htmlEmbedCode;
     private String additionalProjectId = "";
 
-    @BeforeClass(alwaysRun = true)
-    public void setUpData() {
+    @Override
+    protected void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-embedded-dashboard-test";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
+        createNumberOfActivitiesMetric();
+
         tabularReportDef = new UiReportDefinition().withName("tabular_report")
                 .withWhats(new WhatItem(METRIC_AMOUNT, ATTR_STATUS))
                 .withHows(ATTR_YEAR_CREATED);
@@ -169,7 +176,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = "createAdditionalProject", dataProvider = "embeddedDashboard")
     public void embedDashboard(boolean withIframe) throws IOException {
-        EmbeddedDashboard embeddedDashboard = null;
+        EmbeddedDashboard embeddedDashboard;
 
         if (withIframe) {
             embeddedDashboard = embedDashboardToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, 
@@ -226,7 +233,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = "createAdditionalProject", dataProvider = "embeddedDashboard")
     public void configReportTitleVisibility(boolean withIframe) {
         String dashboardName = "Config Report Title On Embedded Dashboard";
-        EmbeddedDashboard embeddedDashboard = null;
+        EmbeddedDashboard embeddedDashboard;
 
         if (withIframe) {
             embeddedDashboard = embedDashboardToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, dashboardName);
@@ -265,7 +272,8 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = "createAdditionalProject")
+    // this test is disabled until https://jira.intgdc.com/browse/QA-6823 is fixed
+    @Test(dependsOnMethods = "createAdditionalProject", enabled = false)
     public void drillingOnEmbeddedDashboard() {
         // check drill to attribute
         String attributeValueToDrill = "2009";

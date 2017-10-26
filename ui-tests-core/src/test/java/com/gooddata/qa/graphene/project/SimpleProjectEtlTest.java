@@ -6,7 +6,6 @@ import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.postEtlPullIntegra
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -58,8 +57,14 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
         };
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void loadProject() throws JSONException, URISyntaxException, IOException {
+    @Override
+    protected void initProperties() {
+        // use empty project
+        projectTitle = "SimpleProjectEtlTest";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
         URL maqlResource = getClass().getResource("/etl/maql-simple.txt");
         postMAQL(IOUtils.toString(maqlResource), statusPollingCheckIterations);
 
@@ -79,7 +84,7 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
                 webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()));
     }
 
-    @Test(dependsOnMethods = {"loadProject"})
+    @Test(dependsOnGroups = {"createProject"})
     public void sliManifestsCompare() throws JSONException, IOException {
         HashSet<Object> sliParts = new HashSet<Object>();
 
@@ -112,9 +117,8 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
         }
     }
 
-    @Test(dependsOnMethods = {"loadProject"}, dataProvider = "testExportCrossDataCenter")
-    public void exportImportProject(boolean crossDataCenter)
-            throws JSONException, IOException {
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "testExportCrossDataCenter")
+    public void exportImportProject(boolean crossDataCenter) throws Throwable {
         String exportToken = exportProject(exportUsers, exportData, crossDataCenter, statusPollingCheckIterations);
         String parentProjectId = testParams.getProjectId();
         boolean validationTimeoutOK = true;

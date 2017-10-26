@@ -8,15 +8,11 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.json.JSONException;
 import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Fact;
@@ -39,15 +35,14 @@ public class DashboardFiscalDateFilterTest extends AbstractDashboardWidgetTest {
     private static final String THIS = "this";
     private static final int STATUS_POLLING_CHECK_ITERATIONS = 60;
 
-    @BeforeClass(alwaysRun = true)
+    @Override
     public void initProperties() {
+        // use empty project
         projectTitle = "Fiscal-test";
-        projectTemplate = "";
-        expectedGoodSalesDashboardsAndTabs = null;
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"fiscalDateInit"})
-    public void loadProject() throws JSONException, URISyntaxException, IOException {
+    @Override
+    protected void customizeProject() throws Throwable {
         URL maqlResource = getClass().getResource("/fiscal-date/maql.txt");
         postMAQL(IOUtils.toString(maqlResource), STATUS_POLLING_CHECK_ITERATIONS);
 
@@ -57,16 +52,17 @@ public class DashboardFiscalDateFilterTest extends AbstractDashboardWidgetTest {
 
         postEtlPullIntegration(getRestApiClient(), testParams.getProjectId(),
                 webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()));
-    }
 
-    @Test(dependsOnMethods = {"loadProject"}, groups = {"fiscalDateInit"})
-    public void prepareFiscalDateFilterTest() throws Throwable {
         setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.FISCAL_CALENDAR_ENABLED, true);
-        prepareDashboardWithDateFilter();
+
+        initDashboardsPage().addNewDashboard(DASHBOARD_NAME)
+                .editDashboard()
+                .addTimeFilterToDashboard(TimeFilterPanel.DateGranularity.YEAR, "this")
+                .saveDashboard();
     }
 
-    @Test(dependsOnGroups = {"fiscalDateInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void shouldShowCustomLabels() {
         initDashboardsPage().selectDashboard(DASHBOARD_NAME).editDashboard();
         FilterWidget timeFilter = getFilter(FILTER_NAME);
@@ -78,7 +74,7 @@ public class DashboardFiscalDateFilterTest extends AbstractDashboardWidgetTest {
         assertTrue(isCustomYearLabels(selectedTimelineItemNames), "Display fiscal filter label on timeline incorrectly.");
     }
 
-    @Test(dependsOnGroups = {"fiscalDateInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void shouldShowCustomLabelsInViewMode() {
         initDashboardsPage().selectDashboard(DASHBOARD_NAME);
         FilterWidget timeFilter = getFilter(FILTER_NAME);
@@ -90,14 +86,14 @@ public class DashboardFiscalDateFilterTest extends AbstractDashboardWidgetTest {
         assertTrue(isCustomYearLabels(selectedTimelineItemNames), "Display fiscal filter label on timeline incorrectly.");
     }
 
-    @Test(dependsOnGroups = {"fiscalDateInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void shouldShowCustomLabelsForOtherTypes() {
         initDashboardsPage().selectDashboard(DASHBOARD_NAME).editDashboard();
         FilterWidget timeFilter = getFilter(FILTER_NAME);
 
         // Quarter
         timeFilter.editDefaultTimeFilterValue(TimeFilterPanel.DateGranularity.QUARTER, THIS);
-        int quarter = Integer.parseInt(timeFilter.getCurrentValue().split("/")[0].toString(), 10);
+        int quarter = Integer.parseInt(timeFilter.getCurrentValue().split("/")[0], 10);
         assertTrue((quarter >= 1) && (quarter <= 4), "Display fiscal filter label for quarter incorrectly.");
 
         // Month
@@ -109,7 +105,7 @@ public class DashboardFiscalDateFilterTest extends AbstractDashboardWidgetTest {
         assertTrue(timeFilter.getCurrentValue().startsWith("W"), "Display fiscal filter label for week incorrectly.");
     }
 
-    @Test(dependsOnGroups = {"fiscalDateInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void shouldLoadCorrectFromToFiscalDate() {
         initDashboardsPage().selectDashboard(DASHBOARD_NAME);
         FilterWidget timeFilter = getFilter(FILTER_NAME);
@@ -124,7 +120,7 @@ public class DashboardFiscalDateFilterTest extends AbstractDashboardWidgetTest {
         assertEquals(timeFilterPanel.getToValue(), "12/30/2007");
     }
 
-    @Test(dependsOnGroups = {"fiscalDateInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void shouldAppliedFiscalFilterForReport() {
         String reportName = "Sum Of Payments";
         String metricName = "Sum Of Payments";
@@ -159,7 +155,7 @@ public class DashboardFiscalDateFilterTest extends AbstractDashboardWidgetTest {
         assertFalse(report.getAttributeElements().toString().contains("FY2006"), "FY2006 shouldn't displayed in the report.");
     }
 
-    @Test(dependsOnGroups = {"fiscalDateInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void disableDatePicker() {
         initDashboardsPage().selectDashboard(DASHBOARD_NAME).editDashboard();
         FilterWidget timeFilter = getFilter(FILTER_NAME);
@@ -175,7 +171,7 @@ public class DashboardFiscalDateFilterTest extends AbstractDashboardWidgetTest {
         assertTrue(timeFilterPanel.isDatePickerNotPresent(), "Date picker shouldn't be displayed.");
     }
 
-    @Test(dependsOnGroups = {"fiscalDateInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void enableDatePicker() {
         initDashboardsPage().selectDashboard(DASHBOARD_NAME).editDashboard();
         FilterWidget timeFilter = getFilter(FILTER_NAME);
@@ -191,7 +187,7 @@ public class DashboardFiscalDateFilterTest extends AbstractDashboardWidgetTest {
         assertFalse(timeFilterPanel.isDatePickerNotPresent(), "Date picker isn't displayed.");
     }
 
-    @Test(dependsOnGroups = {"fiscalDateInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void hideFromTo() {
         initDashboardsPage().selectDashboard(DASHBOARD_NAME).editDashboard();
         FilterWidget timeFilter = getFilter(FILTER_NAME);
@@ -210,12 +206,5 @@ public class DashboardFiscalDateFilterTest extends AbstractDashboardWidgetTest {
 
     private boolean isCustomYearLabels(List<String> labels) {
         return labels.stream().allMatch(timelineItem -> timelineItem.startsWith("FY"));
-    }
-
-    private void prepareDashboardWithDateFilter() throws Throwable {
-        initDashboardsPage().addNewDashboard(DASHBOARD_NAME)
-                .editDashboard()
-                .addTimeFilterToDashboard(TimeFilterPanel.DateGranularity.YEAR, "this")
-                .saveDashboard();
     }
 }

@@ -15,7 +15,6 @@ import java.util.function.Supplier;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
@@ -23,17 +22,25 @@ import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
-public class GoodSalesShortcutRecommendationTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesShortcutRecommendationTest extends AbstractAnalyseTest {
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Shortcut-Recommendation-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+        createSnapshotBOPMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void testColumnChartShortcut() {
         WebElement metric = analysisPage.getCataloguePanel()
                 .searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC);
@@ -59,7 +66,7 @@ public class GoodSalesShortcutRecommendationTest extends GoodSalesAbstractAnalys
         checkingOpenAsReport("dragMetricToColumnChartShortcutPanel");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testTrendShortcut() {
         WebElement metric = analysisPage.getCataloguePanel()
                 .searchAndGet(METRIC_SNAPSHOT_BOP, FieldType.METRIC);
@@ -80,7 +87,7 @@ public class GoodSalesShortcutRecommendationTest extends GoodSalesAbstractAnalys
         checkingOpenAsReport("dragMetricToTrendShortcutPanel");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void displayWhenDraggingFirstMetric() {
         WebElement metric = analysisPage.getCataloguePanel()
                 .searchAndGet(METRIC_SNAPSHOT_BOP, FieldType.METRIC);
@@ -98,7 +105,7 @@ public class GoodSalesShortcutRecommendationTest extends GoodSalesAbstractAnalys
         checkingOpenAsReport("displayWhenDraggingFirstMetric");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createSimpleMetricFromFactUsingShortcut() {
         WebElement fact = analysisPage.getCataloguePanel()
                 .searchAndGet(FACT_AMOUNT, FieldType.FACT);

@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_OUTLOOK;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
@@ -28,22 +28,27 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.DateFilter;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.SplashScreen;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 
-public class SplashScreenTest extends GoodSalesAbstractDashboardTest {
+public class SplashScreenTest extends AbstractDashboardTest {
 
     private static final String SPLASH_SCREEN_MOBILE_MESSAGE = "To set up a KPI dashboard, head to your desktop and make your browser window wider.";
 
     private static final KpiConfiguration kpi = new KpiConfiguration.Builder()
         .metric(METRIC_AMOUNT)
-        .dataSet(DATE_CREATED)
+        .dataSet(DATE_DATASET_CREATED)
         .comparison(Kpi.ComparisonType.NO_COMPARISON.toString())
-        .drillTo(DASH_TAB_OUTLOOK)
         .build();
 
     private String dashboardOnlyUser;
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "empty-state"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createAmountMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop", "empty-state"})
     public void checkNewProjectWithoutKpisFallsToSplashScreen() {
         initIndigoDashboardsPage().getSplashScreen();
 
@@ -177,7 +182,7 @@ public class SplashScreenTest extends GoodSalesAbstractDashboardTest {
         takeScreenshot(browser, "checkDeleteDashboardButtonMissingOnUnsavedDashboard", getClass());
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"mobile"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void checkCreateNewKpiDashboardNotAvailableOnMobile() {
         SplashScreen splashScreen = initIndigoDashboardsPage().getSplashScreen();
         String mobileMessage = splashScreen.getMobileMessage();
@@ -188,7 +193,7 @@ public class SplashScreenTest extends GoodSalesAbstractDashboardTest {
         takeScreenshot(browser, "checkCreateNewKpiDashboardNotAvailableOnMobile", getClass());
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "mobile", "empty-state"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop", "mobile", "empty-state"})
     public void checkViewerCannotCreateDashboard() throws JSONException {
         try {
             signIn(canAccessGreyPage(browser), UserRoles.VIEWER);
@@ -206,7 +211,7 @@ public class SplashScreenTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "mobile"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop", "mobile"})
     public void checkDashboardOnlyUserCannotAccessDashboard() throws JSONException {
         logout();
         signInAtUI(dashboardOnlyUser, testParams.getPassword());
@@ -232,7 +237,7 @@ public class SplashScreenTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "empty-state"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop", "empty-state"})
     public void checkEditorCanCreateDashboard() throws JSONException {
         try {
             signIn(canAccessGreyPage(browser), UserRoles.EDITOR);
@@ -246,7 +251,7 @@ public class SplashScreenTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "empty-state"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop", "empty-state"})
     public void checkCannotSaveNewEmptyDashboard() throws JSONException {
         initIndigoDashboardsPage()
                 .getSplashScreen()

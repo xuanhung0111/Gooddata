@@ -10,7 +10,6 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.visualization.VisualizationMDConfiguration;
@@ -26,12 +25,12 @@ public class ReorderInsightTest extends AbstractDashboardTest {
     private static final String SECOND_INSIGHT = "Second-Insight";
     private static final String THIRD_INSIGHT = "Third-Insight";
 
-    @BeforeClass
-    public void setProjectTitle() {
+    @Override
+    public void initProperties() {
         projectTitle += "Reorder-Insight-Test";
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testAddingInsightsToDashboard() throws JSONException, IOException {
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), asList(
                 createBlankInsightWrapUsingRest(FIRST_INSIGHT),

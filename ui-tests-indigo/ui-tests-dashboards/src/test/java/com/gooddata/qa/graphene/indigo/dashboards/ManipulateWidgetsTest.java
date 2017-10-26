@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_ACTIVITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
@@ -19,9 +21,9 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.MetricSelect;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 
-public class ManipulateWidgetsTest extends GoodSalesAbstractDashboardTest {
+public class ManipulateWidgetsTest extends AbstractDashboardTest {
 
     private static final String TEST_HEADLINE = "Test headline";
     private static final String HINT_FOR_EDIT_NAME_BORDER_COLOR = "rgba\\(177, 193, 209, 0\\.(498\\d+|5)\\)";
@@ -29,17 +31,19 @@ public class ManipulateWidgetsTest extends GoodSalesAbstractDashboardTest {
     private static final String PATTERN_OF_METRIC_NAME = "is shortened";
 
     @Override
-    protected void prepareSetupProject() throws Throwable {
+    public void initProperties() {
+        super.initProperties();
+        validateAfterClass = true;
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
         final List<String> kpiUris = asList(createAmountKpi(), createLostKpi(), createNumOfActivitiesKpi());
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), kpiUris);
     }
 
-    @Override
-    public void turnOffProjectValidation() {
-        // turning off the validation is not necessary in this test
-    }
-
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkEditModeCancelNoChanges() {
         Kpi selectedKpi = initIndigoDashboardsPageWithWidgets()
             .selectDateFilterByName(DATE_FILTER_ALL_TIME)
@@ -57,7 +61,7 @@ public class ManipulateWidgetsTest extends GoodSalesAbstractDashboardTest {
         takeScreenshot(browser, "checkEditModeCancelNoChanges", getClass());
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiTitleChangeAndDiscard() {
         Kpi selectedKpi = initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
@@ -75,7 +79,7 @@ public class ManipulateWidgetsTest extends GoodSalesAbstractDashboardTest {
         assertEquals(selectedKpi.getHeadline(), kpiHeadline);
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiTitleChangeAndAbortCancel() {
         Kpi selectedKpi = initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
@@ -94,7 +98,7 @@ public class ManipulateWidgetsTest extends GoodSalesAbstractDashboardTest {
         assertNotEquals(selectedKpi.getHeadline(), kpiHeadline);
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiTitleChangeAndSave() {
         Kpi selectedKpi = initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
@@ -110,7 +114,7 @@ public class ManipulateWidgetsTest extends GoodSalesAbstractDashboardTest {
         takeScreenshot(browser, "checkKpiTitleChangeAndSave-" + uniqueHeadline, getClass());
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiTitleChangeWhenMetricChange() {
         Kpi selectedKpi = initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
@@ -120,7 +124,7 @@ public class ManipulateWidgetsTest extends GoodSalesAbstractDashboardTest {
 
         waitForFragmentVisible(indigoDashboardsPage).getConfigurationPanel()
             .selectMetricByName(METRIC_AMOUNT)
-            .selectDateDataSetByName(DATE_CREATED);
+            .selectDateDataSetByName(DATE_DATASET_CREATED);
 
         String metricHeadline = selectedKpi.getHeadline();
 
@@ -128,11 +132,11 @@ public class ManipulateWidgetsTest extends GoodSalesAbstractDashboardTest {
 
         indigoDashboardsPage.getConfigurationPanel()
             .selectMetricByName(METRIC_LOST)
-            .selectDateDataSetByName(DATE_CREATED);
+            .selectDateDataSetByName(DATE_DATASET_CREATED);
         assertNotEquals(selectedKpi.getHeadline(), metricHeadline);
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiTitlePersistenceWhenMetricChange() {
         Kpi selectedKpi = initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
@@ -140,7 +144,7 @@ public class ManipulateWidgetsTest extends GoodSalesAbstractDashboardTest {
 
         waitForFragmentVisible(indigoDashboardsPage).getConfigurationPanel()
             .selectMetricByName(METRIC_AMOUNT)
-            .selectDateDataSetByName(DATE_CREATED);
+            .selectDateDataSetByName(DATE_DATASET_CREATED);
 
         selectedKpi.setHeadline(TEST_HEADLINE);
         String metricHeadline = selectedKpi.getHeadline();
@@ -149,14 +153,14 @@ public class ManipulateWidgetsTest extends GoodSalesAbstractDashboardTest {
 
         indigoDashboardsPage.getConfigurationPanel()
             .selectMetricByName(METRIC_AMOUNT)
-            .selectDateDataSetByName(DATE_CREATED);
+            .selectDateDataSetByName(DATE_DATASET_CREATED);
 
         assertEquals(selectedKpi.getHeadline(), TEST_HEADLINE);
 
         takeScreenshot(browser, "checkKpiTitlePersistenceWhenMetricChange-" + TEST_HEADLINE, getClass());
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkDeleteKpiConfirmAndSave() {
         int kpisCount = initIndigoDashboardsPageWithWidgets().getKpisCount();
 
@@ -166,7 +170,7 @@ public class ManipulateWidgetsTest extends GoodSalesAbstractDashboardTest {
             .switchToEditMode()
             .addKpi(new KpiConfiguration.Builder()
                 .metric(METRIC_AMOUNT)
-                .dataSet(DATE_CREATED)
+                .dataSet(DATE_DATASET_CREATED)
                 .build())
             .saveEditModeWithWidgets();
 
@@ -179,7 +183,7 @@ public class ManipulateWidgetsTest extends GoodSalesAbstractDashboardTest {
         assertEquals(kpisCount, initIndigoDashboardsPageWithWidgets().getKpisCount());
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkDeleteKpiConfirmAndDiscard() {
         int kpisCount = initIndigoDashboardsPageWithWidgets().getKpisCount();
 
@@ -189,7 +193,7 @@ public class ManipulateWidgetsTest extends GoodSalesAbstractDashboardTest {
         assertEquals(kpisCount, initIndigoDashboardsPageWithWidgets().getKpisCount());
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void testCancelAddingWidget() {
         int kpisCount = initIndigoDashboardsPageWithWidgets().getKpisCount();
 
@@ -197,14 +201,14 @@ public class ManipulateWidgetsTest extends GoodSalesAbstractDashboardTest {
             .switchToEditMode()
             .addKpi(new KpiConfiguration.Builder()
                 .metric(METRIC_AMOUNT)
-                .dataSet(DATE_CREATED)
+                .dataSet(DATE_DATASET_CREATED)
                 .build())
             .cancelEditModeWithChanges();
 
         assertEquals(indigoDashboardsPage.getKpisCount(), kpisCount);
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiShowHintForEditableName() {
         Kpi kpi = initIndigoDashboardsPageWithWidgets()
                 .switchToEditMode()
@@ -219,7 +223,7 @@ public class ManipulateWidgetsTest extends GoodSalesAbstractDashboardTest {
                 "Hint color not matches! Expected: " + HINT_FOR_EDIT_NAME_BORDER_COLOR + " but actual: " + hintColor);
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkMetricWithLongerNameWillBeShortened() {
         createMetric(LONG_NAME_METRIC, "SELECT 1", "#,##0");
 
@@ -247,7 +251,7 @@ public class ManipulateWidgetsTest extends GoodSalesAbstractDashboardTest {
         assertEquals(metricTooltip, LONG_NAME_METRIC);
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void deleteMetricUsingInKpi() {
         final String deletedMetric = "DELETED_METRIC";
         createMetric(deletedMetric, "SELECT 1", "#,##0");
@@ -256,7 +260,7 @@ public class ManipulateWidgetsTest extends GoodSalesAbstractDashboardTest {
             .switchToEditMode()
             .addKpi(new KpiConfiguration.Builder()
                 .metric(deletedMetric)
-                .dataSet(DATE_ACTIVITY)
+                .dataSet(DATE_DATASET_ACTIVITY)
                 .build())
             .saveEditModeWithWidgets();
 

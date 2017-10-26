@@ -56,7 +56,7 @@ public final class ProjectRestUtils {
 
     /**
      * Create blank project
-     * 
+     *
      * @param goodData
      * @param title
      * @param authorizationToken
@@ -65,13 +65,13 @@ public final class ProjectRestUtils {
      * @return project id
      */
     public static String createBlankProject(final GoodData goodData, final String title,
-            final String authorizationToken, final ProjectDriver projectDriver, final Environment environment) {
+                                            final String authorizationToken, final ProjectDriver projectDriver, final Environment environment) {
         return createProject(goodData, title, null, authorizationToken, projectDriver, environment);
     }
 
     /**
      * Create project with specific template
-     * 
+     *
      * @param goodData
      * @param title
      * @param template
@@ -102,7 +102,7 @@ public final class ProjectRestUtils {
 
     /**
      * Delete project
-     * 
+     *
      * @param goodData
      * @param projectId
      */
@@ -113,7 +113,7 @@ public final class ProjectRestUtils {
 
     /**
      * Turn on/off project feature flag
-     * 
+     *
      * @param goodData
      * @param projectId
      * @param featureFlag
@@ -130,7 +130,7 @@ public final class ProjectRestUtils {
      * Turn on/off project feature flag and check the feature flag's status before exit
      * Because the cache in C3 is 10-20s so if checking the feature flag is not correct, we should wait for sometime
      * Waiting time is 10s++ for each loop
-     * 
+     *
      * @param goodData
      * @param projectId
      * @param featureFlag
@@ -146,11 +146,11 @@ public final class ProjectRestUtils {
         service.createProjectFeatureFlag(project, new ProjectFeatureFlag(featureFlag.getFlagName(), enabled));
 
         Awaitility.await()
-            .atMost(60, TimeUnit.SECONDS)
-            .pollInterval(IterativePollInterval.iterative(duration -> duration.plus(10, TimeUnit.SECONDS))
-                    .startDuration(Duration.TEN_SECONDS))
-            .conditionEvaluationListener(condition -> service.createProjectFeatureFlag(project, 
-                    new ProjectFeatureFlag(featureFlag.getFlagName(), enabled)))
-            .until(() -> service.getProjectFeatureFlag(project, featureFlag.getFlagName()).isEnabled() == enabled);
+                .atMost(60, TimeUnit.SECONDS)
+                .pollInterval(IterativePollInterval.iterative(duration -> duration.plus(10, TimeUnit.SECONDS))
+                        .startDuration(Duration.TEN_SECONDS))
+                .conditionEvaluationListener(condition -> service.createProjectFeatureFlag(project,
+                        new ProjectFeatureFlag(featureFlag.getFlagName(), enabled)))
+                .until(() -> service.getProjectFeatureFlag(project, featureFlag.getFlagName()).isEnabled() == enabled);
     }
 }

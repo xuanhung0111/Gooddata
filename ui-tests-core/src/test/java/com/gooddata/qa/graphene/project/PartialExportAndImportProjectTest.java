@@ -11,9 +11,9 @@ import static java.util.Collections.singletonList;
 import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertTrue;
 
+import com.gooddata.qa.graphene.TemplateAbstractTest;
 import org.json.JSONException;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Attribute;
@@ -24,14 +24,13 @@ import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
-import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
-public class PartialExportAndImportProjectTest extends AbstractProjectTest {
+public class PartialExportAndImportProjectTest extends TemplateAbstractTest {
 
     private final static String PROJECT_TEMPLATE = "/projectTemplates/OnboardingWalkMe/3";
 
@@ -53,20 +52,20 @@ public class PartialExportAndImportProjectTest extends AbstractProjectTest {
     private String sourceProjectId;
     private String targetProjectId;
 
-    @BeforeClass
-    public void initProjectTemplate() {
+    @Override
+    protected void initProperties() {
         projectTemplate = PROJECT_TEMPLATE;
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void setUpProject() {
+    public void createAnotherProject() {
         sourceProjectId = testParams.getProjectId();
         targetProjectId = ProjectRestUtils.createProject(getGoodDataClient(),
                 TARGET_PROJECT_TITLE, PROJECT_TEMPLATE, testParams.getAuthorizationToken(),
                 testParams.getProjectDriver(), testParams.getProjectEnvironment());
     }
 
-    @Test(dependsOnMethods = {"setUpProject"})
+    @Test(dependsOnMethods = {"createAnotherProject"})
     public void partialExportAndImportReport() throws JSONException {
         final String reportUri = createSimpleReport();
         final String exportToken = exportPartialProject(reportUri, DEFAULT_PROJECT_CHECK_LIMIT);
@@ -108,7 +107,7 @@ public class PartialExportAndImportProjectTest extends AbstractProjectTest {
         }
     }
 
-    @Test(dependsOnMethods = {"setUpProject"})
+    @Test(dependsOnMethods = {"createAnotherProject"})
     public void partialExportAndImportDashboard() throws JSONException {
         initDashboardsPage().selectDashboard(CONSUMER_INSIGHTS);
         final String existingDashobardUri = getObjdUri(browser.getCurrentUrl());
@@ -139,7 +138,7 @@ public class PartialExportAndImportProjectTest extends AbstractProjectTest {
         }
     }
 
-    @Test(dependsOnMethods = {"setUpProject"})
+    @Test(dependsOnMethods = {"createAnotherProject"})
     public void partialExportAndImportMetric() throws JSONException {
         final String simpleMetricUri = createSimpleMetric().getUri();
         final String spendMetricUri = getMdService().getObjUri(getProject(), Metric.class, title(SPEND));
@@ -161,7 +160,7 @@ public class PartialExportAndImportProjectTest extends AbstractProjectTest {
         }
     }
 
-    @Test(dependsOnMethods = {"setUpProject"})
+    @Test(dependsOnMethods = {"createAnotherProject"})
     public void partialExportAndImportVariable() throws JSONException {
         final AttributeVariable simpleVariable = new AttributeVariable(SIMPLE_FILTERED_VARIABLE)
                 .withAttribute(REGION)

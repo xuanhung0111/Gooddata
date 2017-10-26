@@ -1,23 +1,20 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import com.gooddata.md.Metric;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
+
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import com.gooddata.qa.browser.DragAndDropUtils;
 
-import org.apache.http.ParseException;
-import org.json.JSONException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -25,7 +22,7 @@ import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.*;
 import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
 
-public class DragWidgetsTest extends GoodSalesAbstractDashboardTest {
+public class DragWidgetsTest extends AbstractDashboardTest {
 
     private static final String WIDGET_SELECTOR_FORMATTER = ".dash-item-%1d";
     private static final String WIDGET_DROPZONE_FORMATTER = ".dropzone.%1s";
@@ -34,17 +31,18 @@ public class DragWidgetsTest extends GoodSalesAbstractDashboardTest {
     private static final String DROPZONE_PREV = "prev";
 
     @Override
-    protected void prepareSetupProject() throws ParseException, JSONException, IOException {
-        Metric metric = getMdService().getObj(getProject(), Metric.class, title(METRIC_AMOUNT));
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createAmountMetric();
 
-        String dateDimensionUri = getDateDatasetUri(DATE_CREATED);
+        String dateDimensionUri = getDateDatasetUri(DATE_DATASET_CREATED);
 
         List<String> kpiUris = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             kpiUris.add(createKpiWidget(getRestApiClient(), testParams.getProjectId(),
                     new KpiMDConfiguration.Builder()
                             .title("Drag-Drop-" + i)
-                            .metric(metric.getUri())
+                            .metric(getMetricByTitle(METRIC_AMOUNT).getUri())
                             .dateDataSet(dateDimensionUri)
                             .comparisonType(ComparisonType.PREVIOUS_PERIOD)
                             .comparisonDirection(ComparisonDirection.GOOD)
@@ -65,7 +63,7 @@ public class DragWidgetsTest extends GoodSalesAbstractDashboardTest {
         };
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, dataProvider = "dragKpiProvider", groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "dragKpiProvider", groups = {"desktop"})
     public void basicDragDropTest(int fromIndex, int toIndex, String dropzone, String screenshotName) {
         initIndigoDashboardsPageWithWidgets()
                 .switchToEditMode();

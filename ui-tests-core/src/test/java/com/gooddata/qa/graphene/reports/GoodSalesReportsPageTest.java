@@ -1,8 +1,13 @@
 package com.gooddata.qa.graphene.reports;
 
+import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPPORTUNITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_ACTIVITIES_BY_TYPE;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -10,6 +15,9 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
+import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.GridReportDefinitionContent;
+import com.gooddata.md.report.MetricElement;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 
@@ -19,28 +27,37 @@ public class GoodSalesReportsPageTest extends GoodSalesAbstractTest {
     private static final String TAG_NAME = "GDC";
     private static final String CURRENT_SALES_FOLDER = "Current Sales";
     private static final String FAVORITES_FOLDER = "Favorites";
-    private static final String ACTIVITY_REPORTS_FOLDER = "Activity Reports";
+    private static final String UNSORTED_FOLDER = "Unsorted";
     private static final String ALL_FOLDER = "All";
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void addTagToReport() {
-        initReportsPage().openReport(TAG_REPORT);
+    @Override
+    protected void customizeProject() throws Throwable {
+        createLostMetric();
+        createActivitiesByTypeReport();
+        createReport(GridReportDefinitionContent.create(TAG_REPORT,
+                singletonList(METRIC_GROUP),
+                singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_OPPORTUNITY))),
+                singletonList(new MetricElement(getMetricByTitle(METRIC_LOST)))));
+        ReportsPage reportsPage = initReportsPage();
+        reportsPage
+            .addNewFolder(CURRENT_SALES_FOLDER)
+            .openReport(TAG_REPORT);
         waitForAnalysisPageLoaded(browser);
         waitForFragmentVisible(reportPage).addTag(TAG_NAME);
+
+        initReportsPage().openFolder(ALL_FOLDER).moveReportsToFolder(CURRENT_SALES_FOLDER, REPORT_ACTIVITIES_BY_TYPE);
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void verifyReportsPage() {
         ReportsPage reportsPage = initReportsPage();
         assertTrue(isEqualCollection(reportsPage.getAllFolderNames(),
-                asList(ALL_FOLDER, FAVORITES_FOLDER, "My Reports", "Unsorted", ACTIVITY_REPORTS_FOLDER,
-                        CURRENT_SALES_FOLDER, "Leaderboards", "Opportunity Historicals", "Outlook Headlines",
-                        "Velocity Reports", "Waterfall Analysis", "What's Changed", "_Drill Reports")));
+                asList(ALL_FOLDER, FAVORITES_FOLDER, "My Reports", "Unsorted", CURRENT_SALES_FOLDER)));
         assertTrue(isEqualCollection(reportsPage.getGroupByVisibility(), asList("Time", "Author", "Report Name",
                 "Folders")));
     }
 
-    @Test(dependsOnMethods = {"addTagToReport"})
+    @Test(dependsOnGroups = {"createProject"})
     public void verifyTagReport() {
         ReportsPage reportsPage = initReportsPage();
         waitForFragmentVisible(reportsPage).openFolder(ALL_FOLDER);
@@ -50,7 +67,7 @@ public class GoodSalesReportsPageTest extends GoodSalesAbstractTest {
 
         reportsPage.openFolder(CURRENT_SALES_FOLDER);
         assertFalse(reportsPage.isTagCloudVisible());
-        assertEquals(reportsPage.getReportsCount(), 3);
+        assertEquals(reportsPage.getReportsCount(), 1);
 
         reportsPage.openFolder(ALL_FOLDER);
         assertTrue(reportsPage.deselectAllTags().getReportsCount() > 1);
@@ -60,7 +77,7 @@ public class GoodSalesReportsPageTest extends GoodSalesAbstractTest {
     public void moveReports() {
         ReportsPage reportsPage = initReportsPage();
         waitForFragmentVisible(reportsPage).openFolder(CURRENT_SALES_FOLDER);
-        assertEquals(reportsPage.getReportsCount(), 3);
+        assertEquals(reportsPage.getReportsCount(), 1);
 
         reportsPage.openFolder(ALL_FOLDER);
         reportsPage.moveReportsToFolder(CURRENT_SALES_FOLDER, TAG_REPORT);
@@ -70,15 +87,14 @@ public class GoodSalesReportsPageTest extends GoodSalesAbstractTest {
         //so we need to deselect all tags for sure
         reportsPage.deselectAllTags();
 
-        assertEquals(reportsPage.getReportsCount(), 4);
-
-        assertEquals(reportsPage.moveReportsToFolderByDragDrop(ACTIVITY_REPORTS_FOLDER, TAG_REPORT)
-                .getReportsCount(), 3);
-        reportsPage.openFolder(ACTIVITY_REPORTS_FOLDER);
-        assertEquals(reportsPage.getReportsCount(), 6);
+        assertEquals(reportsPage.getReportsCount(), 2);
+        assertEquals(reportsPage.moveReportsToFolderByDragDrop(UNSORTED_FOLDER, TAG_REPORT)
+                .getReportsCount(), 1);
+        reportsPage.openFolder(UNSORTED_FOLDER);
+        assertEquals(reportsPage.getReportsCount(), 1);
     }
 
-    @Test(dependsOnMethods = {"addTagToReport"})
+    @Test(dependsOnGroups = {"createProject"})
     public void favoriteReport() {
         ReportsPage reportsPage = initReportsPage();
         waitForFragmentVisible(reportsPage).openFolder(ALL_FOLDER);

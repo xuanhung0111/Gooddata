@@ -13,7 +13,6 @@ import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
@@ -22,12 +21,20 @@ import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
 public class StackedChartsTest extends AbstractAdE2ETest {
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "Stacked-Charts-E2E-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+        createNumberOfLostOppsMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void should_put_stack_by_attribute_into_color_series() {
         assertEquals(analysisPage.addStack(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
@@ -37,7 +44,7 @@ public class StackedChartsTest extends AbstractAdE2ETest {
             .getLegends(), asList("Email", "In Person Meeting", "Phone Call", "Web Meeting"));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_show_totals_for_stacked_columns() {
         analysisPage.addStack(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
@@ -47,7 +54,7 @@ public class StackedChartsTest extends AbstractAdE2ETest {
         assertEquals(browser.findElements(cssSelector(".highcharts-stack-labels text")).size(), 2);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_display_stack_warn_msg_when_there_is_something_in_stack_by_bucket() {
         assertFalse(analysisPage.addStack(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
@@ -57,7 +64,7 @@ public class StackedChartsTest extends AbstractAdE2ETest {
             .isEmpty());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_display_stack_warn_msg_if_there_is_more_than_1_metrics() {
         assertFalse(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addMetric(METRIC_NUMBER_OF_LOST_OPPS)
@@ -67,7 +74,7 @@ public class StackedChartsTest extends AbstractAdE2ETest {
             .isEmpty());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_disappear_when_visualization_is_switched_to_table_and_should_be_empty_when_going_back() {
         analysisPage.addStack(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
@@ -83,7 +90,7 @@ public class StackedChartsTest extends AbstractAdE2ETest {
     }
 
     // Unstable https://jira.intgdc.com/browse/CL-9774
-    // @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"}, enabled = false)
     public void should_disappear_when_switched_to_table_via_result_too_large_link() {
         analysisPage.addStack(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_ACCOUNT)

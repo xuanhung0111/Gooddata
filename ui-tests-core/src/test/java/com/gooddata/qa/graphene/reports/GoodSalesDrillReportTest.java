@@ -2,23 +2,23 @@ package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRIORITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_QUARTER_YEAR_ACTIVITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_ACTIVITY;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_QUARTER_YEAR_ACTIVITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CREATED;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static java.lang.String.format;
 import static java.util.Calendar.YEAR;
 import static org.testng.Assert.assertEquals;
@@ -31,28 +31,27 @@ import java.util.Calendar;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.HowItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.report.WhatItem;
+import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.ReportInfoViewPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
 import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
-import com.google.common.collect.Sets;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Sets;
 
 public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
 
@@ -65,9 +64,18 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     private static final int YEAR_2011 = 2011;
     private static final String YEAR_2012 = "2012";
 
-    @BeforeClass
-    public void setProjectTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-test-drill-report";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
+        createAvgAmountMetric();
+        createNumberOfActivitiesMetric();
+        createNumberOfOpportunitiesMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -347,7 +355,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             assertEquals(tableReportInDialog.getAttributesHeader(), Arrays.asList(ATTR_YEAR_ACTIVITY, ATTR_PRIORITY));
             assertSetEquals(tableReportInDialog.getMetricsHeader(), Sets.newHashSet(METRIC_NUMBER_OF_ACTIVITIES),
                     "Metric headers are not correct!");
-            assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(Arrays.asList(DRILL_ACTIVITY_REPORT, 
+            assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(Arrays.asList(DRILL_ACTIVITY_REPORT,
                     "Email with AirSplat on Apr-21-11"), ">>"));
             drillDialog.closeDialog();
 
@@ -365,7 +373,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             assertEquals(tableReportInDialog.getAttributesHeader(), Arrays.asList(ATTR_YEAR_SNAPSHOT, ATTR_STAGE_NAME));
             assertSetEquals(tableReportInDialog.getMetricsHeader(), Sets.newHashSet(METRIC_AMOUNT, METRIC_AVG_AMOUNT),
                     "Metric headers are not correct!");
-            assertEquals(drillDialog.getBreadcrumbsString(), 
+            assertEquals(drillDialog.getBreadcrumbsString(),
                     StringUtils.join(Arrays.asList(DRILL_ACTIVITY_REPORT, "2011"), ">>"));
             drillDialog.closeDialog();
         } finally {

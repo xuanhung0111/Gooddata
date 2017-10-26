@@ -4,6 +4,7 @@ import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_DROPS_BELOW;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_CREATED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
@@ -24,7 +25,6 @@ import java.util.UUID;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -35,24 +35,27 @@ import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 
-public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
+public class KpiAlertTest extends AbstractDashboardTest {
 
     private static final String METRIC_IN_PERCENT = "M" + UUID.randomUUID().toString().substring(0, 6);
 
     private static final String KPI_ALERT_DIALOG_HEADER = "Email me when this KPI is";
     private static final String KPI_ALERT_THRESHOLD = "100"; // TODO: consider parsing value from KPI to avoid immediate alert trigger
 
-    @BeforeClass(alwaysRun = true)
-    public void initImapUser() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         imapHost = testParams.loadProperty("imap.host");
         imapUser = testParams.loadProperty("imap.user");
         imapPassword = testParams.loadProperty("imap.password");
     }
 
     @Override
-    protected void prepareSetupProject() throws ParseException, JSONException, IOException {
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createAvgAmountMetric();
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
     }
 
@@ -61,11 +64,11 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
         addUserToProject(imapUser, UserRoles.ADMIN);
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkNewKpiDoesNotHaveAlertSet() throws JSONException, IOException {
         // creating kpi using REST is not recommended for this use case
         initIndigoDashboardsPageWithWidgets().switchToEditMode()
-                .addKpi(new KpiConfiguration.Builder().metric(METRIC_AVG_AMOUNT).dataSet(DATE_CREATED).build())
+                .addKpi(new KpiConfiguration.Builder().metric(METRIC_AVG_AMOUNT).dataSet(DATE_DATASET_CREATED).build())
                 .saveEditModeWithWidgets();
 
         try {
@@ -77,7 +80,7 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiAlertButtonVisibility() {
         Kpi kpi = initIndigoDashboardsPageWithWidgets().getFirstWidget(Kpi.class);
 
@@ -88,7 +91,7 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
         takeScreenshot(browser, "checkKpiAlertButtonVisibility-shouldBeVisible", getClass());
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiAlertDialog() {
         Kpi kpi = initIndigoDashboardsPageWithWidgets().getFirstWidget(Kpi.class);
 
@@ -98,7 +101,7 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
         assertTrue(kpi.hasAlertDialogOpen());
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiAlertDialogHeader() {
         KpiAlertDialog kpiAlertDialog =
                 initIndigoDashboardsPageWithWidgets().getFirstWidget(Kpi.class).openAlertDialog();
@@ -107,7 +110,7 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
         assertEquals(kpiAlertDialog.getDialogHeader(), KPI_ALERT_DIALOG_HEADER);
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkAddKpiAlert() throws JSONException, IOException {
         String kpiUri = addWidgetToWorkingDashboard(createAmountKpi());
 
@@ -122,7 +125,7 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiAlertUpdate() throws JSONException, IOException {
         String kpiUri = addWidgetToWorkingDashboard(createAmountKpi());
 
@@ -159,11 +162,11 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiAlertDialogWithPercentMetric() throws JSONException, IOException {
         Metric percentMetric = createMetric(METRIC_IN_PERCENT, "SELECT 1", "#,##0%");
         addWidgetToWorkingDashboard(
-                createKpiUsingRest(createDefaultKpiConfiguration(percentMetric, DATE_CREATED)));
+                createKpiUsingRest(createDefaultKpiConfiguration(percentMetric, DATE_DATASET_CREATED)));
 
         try {
             boolean hasPercentSymbol = initIndigoDashboardsPageWithWidgets()
@@ -178,7 +181,7 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiAlertWithDateFilter() throws JSONException, IOException {
         String kpiUri = addWidgetToWorkingDashboard(createAmountKpi());
 
@@ -207,7 +210,7 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiAlertResetFilters() throws JSONException, IOException {
         String kpiUri = addWidgetToWorkingDashboard(createAmountKpi());
 
@@ -250,7 +253,7 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
         };
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"}, dataProvider = "dateFilterProvider")
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"}, dataProvider = "dateFilterProvider")
     public void checkKpiAlertMessageWithDateFilter(String dateFilter, String alertDialogInfoText)
             throws JSONException, IOException {
         String kpiUri = addWidgetToWorkingDashboard(createAmountKpi());
@@ -285,7 +288,7 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiAlertDelete() throws JSONException, IOException {
         String kpiUri = addWidgetToWorkingDashboard(createAmountKpi());
 
@@ -306,7 +309,7 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiAlertValidationNumber() throws JSONException, IOException {
         String kpiUri = addWidgetToWorkingDashboard(createAmountKpi());
 
@@ -326,10 +329,10 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void triggerAlertImmediatelyWhenHitThreshold() throws JSONException, IOException {
         final Metric numberMetric = createMetric("Metric-" + generateHashString(), "SELECT 100", "#,##0");
-        final String numberKpiUri = createKpiUsingRest(createDefaultKpiConfiguration(numberMetric, DATE_CREATED));
+        final String numberKpiUri = createKpiUsingRest(createDefaultKpiConfiguration(numberMetric, DATE_DATASET_CREATED));
 
         addWidgetToWorkingDashboard(numberKpiUri);
         logout();
@@ -368,7 +371,7 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void updateAlertWhenKpiValueIsEmpty() throws JSONException, IOException {
         String amountMetricUri = getMdService().getObjUri(getProject(), Metric.class, title(METRIC_AMOUNT));
         Attribute createdYearAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_YEAR_CREATED));
@@ -384,7 +387,7 @@ public class KpiAlertTest extends GoodSalesAbstractDashboardTest {
                 amountMetricUri, createdYearAttribute.getUri(), createdYearValueUri);
 
         final Metric nullValueMetric = createMetric("Metric-" + generateHashString(), expression, "#,##0");
-        final String nullValueKpiUri = createKpiUsingRest(createDefaultKpiConfiguration(nullValueMetric, DATE_CREATED));
+        final String nullValueKpiUri = createKpiUsingRest(createDefaultKpiConfiguration(nullValueMetric, DATE_DATASET_CREATED));
 
         addWidgetToWorkingDashboard(nullValueKpiUri);
 

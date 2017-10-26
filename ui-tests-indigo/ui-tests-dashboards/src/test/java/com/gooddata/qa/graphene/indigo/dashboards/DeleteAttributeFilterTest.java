@@ -8,12 +8,11 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFilter;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.interactions.Actions;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -36,18 +35,22 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-public class DeleteAttributeFilterTest extends GoodSalesAbstractDashboardTest {
+public class DeleteAttributeFilterTest extends AbstractDashboardTest {
 
     private static final String TEST_INSIGHT = "Test-Insight";
     private static final String ALL_VALUE = "All";
 
-    @BeforeClass(alwaysRun = true)
-    public void setTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Delete-Attribute-Filter-Test";
     }
 
     @Override
-    protected void prepareSetupProject() throws Throwable {
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+        createAmountMetric();
         String insightWidget = createInsightWidget(new InsightMDConfiguration(TEST_INSIGHT, ReportType.COLUMN_CHART)
                 .setMeasureBucket(singletonList(MeasureBucket.getSimpleInstance(getMdService().getObj(getProject(),
                         Metric.class, title(METRIC_NUMBER_OF_ACTIVITIES))))));
@@ -67,7 +70,7 @@ public class DeleteAttributeFilterTest extends GoodSalesAbstractDashboardTest {
         createAndAddUserToProject(UserRoles.VIEWER);
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void displayTrashWhenPerformingFilterDrag() {
         initIndigoDashboardsPageWithWidgets().switchToEditMode();
 
@@ -84,7 +87,7 @@ public class DeleteAttributeFilterTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void deleteFilterWhenHavingMultipleAttributeFilters() {
         initIndigoDashboardsPageWithWidgets().switchToEditMode()
                 .deleteAttributeFilter(ATTR_DEPARTMENT).waitForWidgetsLoading();
@@ -113,7 +116,7 @@ public class DeleteAttributeFilterTest extends GoodSalesAbstractDashboardTest {
                 ALL_VALUE, "deleted attribute filter has not been added to dashboard");
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void applyFilterDeletingToOtherUserRoles() throws JSONException {
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put(ATTR_REGION, ALL_VALUE);
@@ -130,7 +133,7 @@ public class DeleteAttributeFilterTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void discardFilterDeletingAppliedToOtherUserRole() throws JSONException {
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put(ATTR_STAGE_NAME, ALL_VALUE);
@@ -147,7 +150,7 @@ public class DeleteAttributeFilterTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"},
+    @Test(dependsOnGroups = {"createProject"},
             description = "ONE-2028: Deleted filter does not reappear after discarding changes")
     public void discardChangesRelatingToDeleteFilter() throws IOException, JSONException {
         String filterValue = "East Coast";

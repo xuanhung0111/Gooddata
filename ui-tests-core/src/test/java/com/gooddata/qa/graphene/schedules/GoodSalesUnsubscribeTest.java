@@ -4,6 +4,7 @@
 package com.gooddata.qa.graphene.schedules;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_ACTIVITIES_BY_TYPE;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
@@ -66,10 +67,15 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
         signInAtGreyPages(imapUser, imapPassword);
     }
 
+    @Override
+    protected void customizeProject() throws Throwable {
+        createActivitiesByTypeReport();
+    }
+
     @Test(dependsOnMethods = {"signInImapUser"}, groups = {"schedules"})
     public void createReportSchedule() {
         initEmailSchedulesPage().scheduleNewReportEmail(imapUser, reportTitle,
-                "Unsubscribe bcc test - report.", "Activities by Type", ExportFormat.CSV, RepeatTime.DAILY);
+                "Unsubscribe bcc test - report.", REPORT_ACTIVITIES_BY_TYPE, ExportFormat.CSV, RepeatTime.DAILY);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-report", this.getClass());
     }

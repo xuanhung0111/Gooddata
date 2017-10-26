@@ -22,7 +22,6 @@ import javax.mail.MessagingException;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.jsoup.nodes.Document;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -45,14 +44,16 @@ public class KpiValueFormatInAlertEmailTest extends AbstractDashboardTest {
 
     private List<String> kpiNames = new ArrayList<>();
 
-    @BeforeClass(alwaysRun = true)
-    public void initImapUser() throws Exception {
+    @Override
+    public void initProperties() {
+        super.initProperties();
+        // init imap properties
         imapHost = testParams.loadProperty("imap.host");
         imapUser = testParams.loadProperty("imap.user");
         imapPassword = testParams.loadProperty("imap.password");
     }
 
-    @Test(dependsOnGroups = {"createProject", "dashboardsInit"}, groups = {"precondition"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
     public void initIndigoDashboardWithKpi() throws JSONException, IOException {
         String csvFilePath = new CsvFile(DATASET_NAME)
                 .columns(new CsvFile.Column("firstname"), new CsvFile.Column("number"), new CsvFile.Column("Date"))

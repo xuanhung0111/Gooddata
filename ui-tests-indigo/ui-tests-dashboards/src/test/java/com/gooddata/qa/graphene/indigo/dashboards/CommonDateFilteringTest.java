@@ -2,6 +2,8 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_ACTIVITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
@@ -18,7 +20,6 @@ import java.text.ParseException;
 import java.util.List;
 
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Attribute;
@@ -28,9 +29,9 @@ import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 
-public class CommonDateFilteringTest extends GoodSalesAbstractDashboardTest {
+public class CommonDateFilteringTest extends AbstractDashboardTest {
 
     private static String UNRELATED_DATE_INSIGHT = "Unrelated-Date-Insight";
     private static String TEST_INSIGHT = "Test-Insight";
@@ -39,20 +40,23 @@ public class CommonDateFilteringTest extends GoodSalesAbstractDashboardTest {
     private static String THIS_MONTH = "This month";
     private static String INSIGHT_USING_DATE_FILTER = "Insight-Using-Date-Filter";
 
-    @BeforeClass
-    public void setProjectTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Common-Date-Filter-Test";
     }
 
     @Override
-    protected void prepareSetupProject() throws Throwable {
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
         // create an insight without using date filter
         addWidgetToWorkingDashboard(createInsightWidget(new InsightMDConfiguration(TEST_INSIGHT,
                 ReportType.COLUMN_CHART).setMeasureBucket(singletonList(MeasureBucket.getSimpleInstance(
-                        getMdService().getObj(getProject(), Metric.class, title(METRIC_NUMBER_OF_ACTIVITIES)))))));
+                getMdService().getObj(getProject(), Metric.class, title(METRIC_NUMBER_OF_ACTIVITIES)))))));
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void makeNoChangeOnUnrelatedDateInsight() throws ParseException, JSONException, IOException {
         String insightUri = createUnrelatedDateInsight();
         addWidgetToWorkingDashboard(createVisualizationWidgetWrap(getRestApiClient(), testParams.getProjectId(),
@@ -71,7 +75,7 @@ public class CommonDateFilteringTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void makeNoChangeOnDisabledDateDatasetFilterInsight() {
         initIndigoDashboardsPageWithWidgets().switchToEditMode().selectDateFilterByName(ALL_TIME)
                 .waitForWidgetsLoading().selectWidgetByHeadline(Insight.class, TEST_INSIGHT);
@@ -89,13 +93,14 @@ public class CommonDateFilteringTest extends GoodSalesAbstractDashboardTest {
                 .getDataLabels(), expectedValues, "The insight is affected by common date filter");
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    // this test is disabled until https://jira.intgdc.com/browse/QA-6803 is fixed
+    @Test(dependsOnGroups = {"createProject"}, enabled = false)
     public void overrideFilterIfInsightUsingSameDateDataset() throws ParseException, JSONException, IOException {
         createInsightUsingDateFilter(INSIGHT_USING_DATE_FILTER);
 
         try {
             initIndigoDashboardsPageWithWidgets().switchToEditMode().addInsight(INSIGHT_USING_DATE_FILTER)
-                    .getConfigurationPanel().selectDateDataSetByName(DATE_CREATED);
+                    .getConfigurationPanel().selectDateDataSetByName(DATE_DATASET_CREATED);
 
             indigoDashboardsPage.selectDateFilterByName(ALL_TIME).waitForWidgetsLoading();
             takeScreenshot(browser, "Override-Date-Filter-If-Insight-Uses-Same-Date-Dataset", getClass());
@@ -107,14 +112,15 @@ public class CommonDateFilteringTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    // this test is disabled until https://jira.intgdc.com/browse/QA-6803 is fixed
+    @Test(dependsOnGroups = {"createProject"}, enabled = false)
     public void combineFiltersIfInsightUsingDifferentDateDataset()
             throws JSONException, IOException, ParseException {
         createInsightUsingDateFilter(INSIGHT_USING_DATE_FILTER);
 
         try {
             initIndigoDashboardsPageWithWidgets().switchToEditMode().addInsight(INSIGHT_USING_DATE_FILTER)
-                    .getConfigurationPanel().selectDateDataSetByName(DATE_ACTIVITY);
+                    .getConfigurationPanel().selectDateDataSetByName(DATE_DATASET_ACTIVITY);
 
             indigoDashboardsPage.selectDateFilterByName(ALL_TIME).waitForWidgetsLoading();
             takeScreenshot(browser, "Combine-Filters-If-Insight-Uses-Different-Date-Dataset", getClass());
@@ -126,14 +132,14 @@ public class CommonDateFilteringTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void keepDateFilterAfterEditingChartType() throws JSONException, IOException, ParseException {
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDateFilter()
                 .saveInsight(INSIGHT_USING_DATE_FILTER);
 
         try {
             initIndigoDashboardsPageWithWidgets().switchToEditMode().addInsight(INSIGHT_USING_DATE_FILTER);
-            indigoDashboardsPage.getConfigurationPanel().enableDateFilter().selectDateDataSetByName(DATE_ACTIVITY);
+            indigoDashboardsPage.getConfigurationPanel().enableDateFilter().selectDateDataSetByName(DATE_DATASET_ACTIVITY);
             indigoDashboardsPage.waitForWidgetsLoading().selectDateFilterByName(LAST_7_DAYS)
                     .waitForWidgetsLoading().saveEditModeWithWidgets();
             assertEquals(indigoDashboardsPage.getDateFilterSelection(), LAST_7_DAYS,
@@ -148,7 +154,7 @@ public class CommonDateFilteringTest extends GoodSalesAbstractDashboardTest {
                     LAST_7_DAYS, "Common date filter is changed");
 
             indigoDashboardsPage.selectLastWidget(Insight.class);
-            assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_ACTIVITY,
+            assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_DATASET_ACTIVITY,
                     "Date dataset is changed");
         } finally {
             deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(),
@@ -156,18 +162,18 @@ public class CommonDateFilteringTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void keepDateFilterAfterEditingPeriodFilterOnAD() throws JSONException, IOException, ParseException {
         AnalysisPage page =
                 initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDateFilter().waitForReportComputing();
         page.getFilterBuckets().configDateFilter(LAST_7_DAYS)
                 .getRoot().click(); // close panel
-        page.getFilterBuckets().changeDateDimension(DATE_ACTIVITY, DATE_CREATED);
+        page.getFilterBuckets().changeDateDimension(DATE_DATASET_ACTIVITY, DATE_DATASET_CREATED);
         page.saveInsight(INSIGHT_USING_DATE_FILTER);
 
         try {
             initIndigoDashboardsPageWithWidgets().switchToEditMode().addInsight(INSIGHT_USING_DATE_FILTER);
-            indigoDashboardsPage.getConfigurationPanel().selectDateDataSetByName(DATE_CREATED);
+            indigoDashboardsPage.getConfigurationPanel().selectDateDataSetByName(DATE_DATASET_CREATED);
             indigoDashboardsPage.waitForWidgetsLoading().selectDateFilterByName(THIS_MONTH).waitForWidgetsLoading()
                     .saveEditModeWithWidgets();
             assertEquals(indigoDashboardsPage.getDateFilterSelection(), THIS_MONTH,
@@ -187,7 +193,8 @@ public class CommonDateFilteringTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    // this test is disabled until https://jira.intgdc.com/browse/QA-6803 is fixed
+    @Test(dependsOnGroups = {"createProject"}, enabled = false)
     public void keepDateFilterAfterEditingDateDimensionOnAD() throws ParseException, JSONException, IOException {
         createInsightUsingDateFilter(INSIGHT_USING_DATE_FILTER);
 
@@ -195,14 +202,14 @@ public class CommonDateFilteringTest extends GoodSalesAbstractDashboardTest {
             assertEquals(
                     initIndigoDashboardsPageWithWidgets().switchToEditMode().addInsight(INSIGHT_USING_DATE_FILTER)
                             .getConfigurationPanel().getSelectedDataSet(),
-                    DATE_CREATED, "Date dataset on is not correct");
+                    DATE_DATASET_CREATED, "Date dataset on is not correct");
             indigoDashboardsPage.selectDateFilterByName(ALL_TIME).saveEditModeWithWidgets();
 
             AnalysisPage page = initAnalysePage().openInsight(INSIGHT_USING_DATE_FILTER).waitForReportComputing();
-            page.getFilterBuckets().changeDateDimension(DATE_CREATED, DATE_ACTIVITY);
+            page.getFilterBuckets().changeDateDimension(DATE_DATASET_CREATED, DATE_DATASET_ACTIVITY);
             page.waitForReportComputing().saveInsight();
 
-            assertTrue(page.getFilterBuckets().getDateFilterText().contains(DATE_ACTIVITY),
+            assertTrue(page.getFilterBuckets().getDateFilterText().contains(DATE_DATASET_ACTIVITY),
                     "Date dimension is not changed");
 
             assertEquals(
@@ -212,7 +219,7 @@ public class CommonDateFilteringTest extends GoodSalesAbstractDashboardTest {
                     "Changing date dimension on AD makes no impact to the insight on dashboard");
 
             indigoDashboardsPage.selectLastWidget(Insight.class);
-            assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_CREATED,
+            assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_DATASET_CREATED,
                     "Date dataset on dashboard is affected by changing date filter on AD");
 
         } finally {
@@ -234,7 +241,7 @@ public class CommonDateFilteringTest extends GoodSalesAbstractDashboardTest {
     private void createInsightUsingDateFilter(String insight) throws ParseException {
         AnalysisPage page = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDateFilter();
 
-        page.getFilterBuckets().changeDateDimension(DATE_ACTIVITY, DATE_CREATED);
+        page.getFilterBuckets().changeDateDimension(DATE_DATASET_ACTIVITY, DATE_DATASET_CREATED);
         page.waitForReportComputing().getFilterBuckets()
                 .getRoot().click(); // close panel
         page.getFilterBuckets().configDateFilter("01/01/2012", "12/31/2012");

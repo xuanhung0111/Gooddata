@@ -7,7 +7,6 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.stream.Stream;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
@@ -21,25 +20,32 @@ public class CatalogueFilterTest extends AbstractAdE2ETest {
     private String dates = ".type-date";
     private String header = ".adi-catalogue-header";
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "Catalogue-Filter-E2E-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void shows_all_items_for_all_data_filter() {
         analysisPage.getCataloguePanel().filterCatalog(CatalogFilterType.ALL);
         expectVisible(dates, attributes, metrics, facts, header);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void shows_only_metrics_and_facts_for_metrics_filter() {
         analysisPage.getCataloguePanel().filterCatalog(CatalogFilterType.MEASURES);
         expectVisible(metrics, facts, header);
         expectHidden(dates, attributes);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void shows_only_date_and_attributes_for_attributes_filter() {
         analysisPage.getCataloguePanel().filterCatalog(CatalogFilterType.ATTRIBUTES);
         expectVisible(dates, attributes, header);

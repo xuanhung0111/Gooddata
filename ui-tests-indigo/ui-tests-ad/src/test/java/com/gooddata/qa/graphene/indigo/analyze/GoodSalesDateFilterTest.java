@@ -24,14 +24,13 @@ import java.util.TimeZone;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
@@ -39,14 +38,21 @@ import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
-public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesDateFilterTest extends AbstractAnalyseTest {
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Date-Filter-Test";
     }
 
-    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void checkDefaultValueInDateRange() {
         analysisPage.addDateFilter()
             .getFilterBuckets()
@@ -63,7 +69,7 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
         assertEquals(panel.getFromDate(), getTimeString(date));
     }
 
-    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
+    @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void switchingDateRangeNotComputeReport() {
         final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
 
@@ -87,7 +93,7 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
         waitForFragmentNotVisible(panel);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void allowFilterByRange() throws ParseException {
         final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
 
@@ -123,7 +129,7 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
         BrowserUtils.switchToFirstTab(browser);
     }
 
-    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
+    @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void testDateInCategoryAndDateInFilter() {
         assertTrue(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addDate()
@@ -136,7 +142,7 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("testDateInCategoryAndDateInFilter");
     }
 
-    @Test(dependsOnGroups = {"init"}, description = "covered by TestCafe")
+    @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void switchBetweenPresetsAndDataRange() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().getFilterBuckets().configDateFilter("Last 90 days");
         analysisPage.waitForReportComputing();
@@ -158,7 +164,7 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("switchBetweenPresetsAndDataRange");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void showPercentAfterConfigDate() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                     .addDate()
@@ -187,7 +193,7 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("showPercentAfterConfigDate");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void popAfterConfigDate() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                     .addDate()
@@ -212,7 +218,7 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("popAfterConfigDate");
     }
 
-    @Test(dependsOnGroups = {"init"}, description = "CL-9807: Problems with export of date filters")
+    @Test(dependsOnGroups = {"createProject"}, description = "CL-9807: Problems with export of date filters")
     public void exportDateFilter() {
         final String dateFilterValue = "Last 4 quarters";
         analysisPage.addDateFilter()
@@ -232,7 +238,7 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
         }
     }
 
-    @Test(dependsOnGroups = {"init"},
+    @Test(dependsOnGroups = {"createProject"},
             description = "CL-9980: Date filter isn't remained when adding trending from recommendation panel, " +
                     "covered by TestCafe")
     public void keepDateDimensionAfterApplyingSeeTrendRecommendation() {
@@ -253,7 +259,7 @@ public class GoodSalesDateFilterTest extends GoodSalesAbstractAnalyseTest {
                 "Date dimension was changed after user applied see trend recommendation");
     }
 
-    @Test(dependsOnGroups = {"init"},
+    @Test(dependsOnGroups = {"createProject"},
             description = "CL-9955: Date is changed to unrelated when adding percent for viz."
                     + " After this CL-10156, the metric and attribute combination is changed "
                     + "into # of Activities and Activity Type")

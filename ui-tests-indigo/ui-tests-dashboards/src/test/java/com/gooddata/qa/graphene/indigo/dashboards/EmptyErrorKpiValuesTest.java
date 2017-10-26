@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -18,14 +19,20 @@ import com.gooddata.md.Metric;
 import com.gooddata.md.Restriction;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 
-public class EmptyErrorKpiValuesTest extends GoodSalesAbstractDashboardTest {
+public class EmptyErrorKpiValuesTest extends AbstractDashboardTest {
 
     private Metric errorMetric;
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createAmountMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void createEmptyMetric() {
         String amountUri = getMdService().getObjUri(getProject(), Metric.class, Restriction.title(METRIC_AMOUNT));
         errorMetric = getMdService().createObj(getProject(), new Metric("ERROR",
@@ -38,7 +45,7 @@ public class EmptyErrorKpiValuesTest extends GoodSalesAbstractDashboardTest {
             .startEditingWidgets()
             .addKpi(new KpiConfiguration.Builder()
                     .metric(errorMetric.getTitle())
-                    .dataSet(DATE_CREATED)
+                    .dataSet(DATE_DATASET_CREATED)
                     .build())
             .saveEditModeWithWidgets();
 

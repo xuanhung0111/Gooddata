@@ -1,21 +1,26 @@
 package com.gooddata.qa.graphene.reports;
 
+import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.GOODSALES_TEMPLATE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_ACTIVE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.GOODSALES_TEMPLATE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
+import static java.util.Collections.singletonList;
 import static java.util.Objects.isNull;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,11 +30,13 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.gooddata.GoodData;
+import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.GridReportDefinitionContent;
+import com.gooddata.md.report.MetricElement;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
@@ -64,15 +71,29 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
     private List<String> attributeValues;
     private List<Float> metricValues;
 
-    @BeforeClass(alwaysRun = true)
-    public void setProjectTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-embedded-report-test";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
+        createLostMetric();
+        createStatusVariable();
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void createReportToShare() {
-        createReport(new UiReportDefinition().withName(EMBEDDED_REPORT_TITLE)
-                .withHows(ATTR_STATUS).withWhats(METRIC_AMOUNT), "Report-To-Share");
+        createReport(GridReportDefinitionContent.create(EMBEDDED_REPORT_TITLE,
+                singletonList(METRIC_GROUP),
+                singletonList(new AttributeInGrid(getAttributeByIdentifier("attr.stage.status"))),
+                singletonList(new MetricElement(getMetricByTitle(METRIC_AMOUNT)))));
+        initReportsPage().openReport(EMBEDDED_REPORT_TITLE);
+
+        takeScreenshot(browser, "Report-To-Share" + "-" + EMBEDDED_REPORT_TITLE + "-" +
+                METRIC_GROUP, this.getClass());
         reportPage.setReportVisible();
         reportUrl = browser.getCurrentUrl();
 
@@ -240,16 +261,19 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createAdditionalProject"})
     public void shareUnsavedReport() {
         String reportTitle = "Embed unsaved report";
-
+        List<String> attributeElement;
+        List<Float> metricElement;
         initReportCreation();
         reportPage.initPage()
             .setReportName(reportTitle)
             .openWhatPanel()
             .selectMetric(METRIC_AMOUNT)
             .openHowPanel()
-            .selectAttribute(ATTR_STATUS)
+            .selectAttribute(ATTR_IS_ACTIVE)
             .doneSndPanel();
 
+        attributeElement = reportPage.getTableReport().getAttributeElements();
+        metricElement = reportPage.getTableReport().getMetricElements();
         WebElement unsavedReportWarning = reportPage.embedUnsavedReport();
         assertEquals(unsavedReportWarning.getText(), "Please first save the report before embeding. Close");
         reportPage.closeEmbedUnsavedWarning();
@@ -267,23 +291,30 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         assertEquals(embeddedReportContainer.getInfo(), reportTitle);
 
         TableReport tableReport = embeddedReportContainer.getTableReport();
-        assertThat(tableReport.getAttributeElements(), is(attributeValues));
-        assertThat(tableReport.getMetricElements(), is(metricValues));
+        assertThat(tableReport.getAttributeElements(), is(attributeElement));
+        assertThat(tableReport.getMetricElements(), is(metricElement));
 
         embeddedReportContainer = initEmbeddedReportWithUri(embedUri);
         assertEquals(embeddedReportContainer.getInfo(), reportTitle);
 
         tableReport = embeddedReportContainer.getTableReport();
-        assertThat(tableReport.getAttributeElements(), is(attributeValues));
-        assertThat(tableReport.getMetricElements(), is(metricValues));
+        assertThat(tableReport.getAttributeElements(), is(attributeElement));
+        assertThat(tableReport.getMetricElements(), is(metricElement));
     }
 
     @Test(dependsOnMethods = {"createAdditionalProject"})
     public void shareEmptyReport() {
         String reportTitle = "Empty report";
-        UiReportDefinition updateEmbeddedReport =
-                new UiReportDefinition().withName(reportTitle).withHows("Status").withWhats("Lost");
-        createReport(updateEmbeddedReport, "Update-Report-After-Sharing");
+
+        createReport(GridReportDefinitionContent.create(reportTitle,
+                singletonList(METRIC_GROUP),
+                singletonList(new AttributeInGrid(getAttributeByIdentifier("attr.stage.status"))),
+                singletonList(new MetricElement(getMetricByTitle(METRIC_LOST)))));
+
+        initReportsPage().openReport(reportTitle);
+        takeScreenshot(browser, "Update-Report-After-Sharing" + "-" + reportTitle + "-" +
+                METRIC_GROUP, this.getClass());
+
         reportPage.addFilter(FilterItem.Factory.createPromptFilter("Status"));
         reportPage.saveReport();
 
@@ -302,10 +333,16 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createAdditionalProject"})
     public void shareChartReport() {
-        UiReportDefinition reportDefinition =
-                new UiReportDefinition().withName("Embedded Chart Report").withHows("Status").withWhats("Amount")
-                        .withType(ReportTypes.BAR);
-        createReport(reportDefinition, "Embedded-chart-report");
+        String embeddedChartReport = "Embedded Chart Report";
+        createReport(GridReportDefinitionContent.create(embeddedChartReport,
+                singletonList(METRIC_GROUP),
+                singletonList(new AttributeInGrid(getAttributeByIdentifier("attr.stage.status"))),
+                singletonList(new MetricElement(getMetricByTitle(METRIC_AMOUNT)))));
+        initReportsPage().openReport(embeddedChartReport);
+        reportPage.selectReportVisualisation(ReportTypes.BAR).waitForReportExecutionProgress().saveReport();
+
+        takeScreenshot(browser, "Embedded-chart-report" + "-" + embeddedChartReport + "-" +
+                METRIC_GROUP, this.getClass());
 
         ReportEmbedDialog embedDialog = reportPage.openReportEmbedDialog();
         String htmlEmbedCode = embedDialog.getHtmlCode();
@@ -317,18 +354,18 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         checkRedBar(browser);
 
         embeddedReportContainer.openReportInfoViewPanel().downloadReportAsFormat(ExportFormat.CSV);
-        verifyReportExport(ExportFormat.CSV, reportDefinition.getName(), MINIMUM_EMBEDDED_CHART_REPORT_CSV_SIZE);
+        verifyReportExport(ExportFormat.CSV, embeddedChartReport, MINIMUM_EMBEDDED_CHART_REPORT_CSV_SIZE);
 
         embeddedReportContainer.openReportInfoViewPanel().downloadReportAsFormat(ExportFormat.PDF);
-        verifyReportExport(ExportFormat.PDF, reportDefinition.getName(), MINIMUM_EMBEDDED_CHART_REPORT_PDF_SIZE);
+        verifyReportExport(ExportFormat.PDF, embeddedChartReport, MINIMUM_EMBEDDED_CHART_REPORT_PDF_SIZE);
 
         embeddedReportContainer = initEmbeddedReportWithUri(embedUri);
 
         embeddedReportContainer.openReportInfoViewPanel().downloadReportAsFormat(ExportFormat.CSV);
-        verifyReportExport(ExportFormat.CSV, reportDefinition.getName(), MINIMUM_EMBEDDED_CHART_REPORT_CSV_SIZE);
+        verifyReportExport(ExportFormat.CSV, embeddedChartReport, MINIMUM_EMBEDDED_CHART_REPORT_CSV_SIZE);
 
         embeddedReportContainer.openReportInfoViewPanel().downloadReportAsFormat(ExportFormat.PDF);
-        verifyReportExport(ExportFormat.PDF, reportDefinition.getName(), MINIMUM_EMBEDDED_CHART_REPORT_PDF_SIZE);
+        verifyReportExport(ExportFormat.PDF, embeddedChartReport, MINIMUM_EMBEDDED_CHART_REPORT_PDF_SIZE);
     }
 
     @Test(dependsOnMethods = {"createAdditionalProject"})

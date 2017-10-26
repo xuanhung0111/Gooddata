@@ -31,22 +31,28 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
         projectTitle = "SimpleProject-test-geos-labels";
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void initialize() {
+    @Override
+    protected void initProperties() {
+        // use empty project
+        projectTitle = "SimpleProject-test-geos-labels";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
         attributesList =
                 asList("Geo Pushpin", "Aus State Name", "Aus State Iso", "Statename", "Stateid",
                         "Statecode", "Countyid", "Countryname", "Country Iso2", "Country Iso3",
                         "Cz District Name", "Cz District No Diacritics", "Cz District Nuts4",
                         "Cz District Knok");
-        Map<String, ColumnType> columnIndexAndType = new HashMap<String, ColumnType>();
+        Map<String, ColumnType> columnIndexAndType = new HashMap();
         columnIndexAndType.put("Cz District Knok", ColumnType.ATTRIBUTE);
         uploadCSV(getFilePathFromResource("/" + PAYROLL_CSV + "/attribute_geo_labels.csv"), columnIndexAndType);
-        createMetric("Sum of Amount", 
+        createMetric("Sum of Amount",
                 format("SELECT SUM([%s])", getMdService().getObjUri(getProject(), Fact.class, title("Amount"))),
                 "#,##0.00");
     }
 
-    @Test(dependsOnMethods = {"initialize"})
+    @Test(dependsOnGroups = {"createProject"})
     public void showInfoForNoAvailableLayer() {
         initDashboardsPage();
         DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
@@ -56,7 +62,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
         dashboardsPage.deleteDashboardTab(1);
     }
 
-    @Test(dependsOnMethods = {"initialize"}, priority = 1)
+    @Test(dependsOnGroups = {"createProject"}, priority = 1)
     public void changeAttributeToGeoStateTest() {
         int i = 0;
         for (AttributeLabelTypes type : getGeoLabels()) {
@@ -98,7 +104,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
     }
 
     private List<AttributeLabelTypes> getGeoLabels() {
-        List<AttributeLabelTypes> list = new ArrayList<AttributeLabelTypes>();
+        List<AttributeLabelTypes> list = new ArrayList();
         for (AttributeLabelTypes label : AttributeLabelTypes.values()) {
             if (label.isGeoLabel()) {
                 list.add(label);
@@ -311,7 +317,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
         private final List<String> metricValues;
         private final List<String> attrValues;
 
-        private GeoAttributeLabels(String name, String metricName, float startMetricValue,
+        GeoAttributeLabels(String name, String metricName, float startMetricValue,
                 float stopMetricValue, List<Integer> indexList, List<String> colorList,
                 List<String> svgDataList, List<String> metricValues, List<String> attrValues) {
             this.name = name;

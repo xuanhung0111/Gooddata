@@ -5,7 +5,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.Attribu
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.Test;
@@ -17,12 +17,19 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-public class GoodSalesPopComparisonTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesPopComparisonTest extends AbstractAnalyseTest {
 
     private static final String WEEK_GRANULARITY = "Week (Sun-Sat)";
     private static final String MONTH_GRANULARITY = "Month";
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+        createSnapshotBOPMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void applyWeekGranularityToHidePopComparison() {
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
 
@@ -47,7 +54,7 @@ public class GoodSalesPopComparisonTest extends GoodSalesAbstractAnalyseTest {
                 "Pop comparison state is not enabled after removing week granularity");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void applyWeekGranularityToHideCompareRecommendation() {
         initAnalysePage().addMetric(METRIC_SNAPSHOT_BOP);
 
@@ -74,7 +81,7 @@ public class GoodSalesPopComparisonTest extends GoodSalesAbstractAnalyseTest {
                 "Compare recommendation is not visible after changing to month granularity");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void enablePopToHideWeekGranularity() {
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().waitForReportComputing();
 

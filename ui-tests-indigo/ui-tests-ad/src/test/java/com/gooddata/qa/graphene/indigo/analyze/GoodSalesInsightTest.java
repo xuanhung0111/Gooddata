@@ -16,7 +16,6 @@ import java.util.UUID;
 import com.gooddata.qa.browser.BrowserUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -25,25 +24,28 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisInsightSelectionPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.FilterType;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
-public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesInsightTest extends AbstractAnalyseTest {
 
     private static final String INSIGHT_TEST = "Insight-Test";
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Insight-Test";
     }
 
     @Override
-    public void prepareSetupProject() throws Throwable {
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing().saveInsight(INSIGHT_TEST);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testRenameInsight() throws JSONException, IOException {
         final String copyOfInsightTest = "Copy-Of-Insight-Test";
         final String renamedInsight = "Renamed-Insight";
@@ -64,7 +66,7 @@ public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
         };
     }
 
-    @Test(dependsOnGroups = {"init"}, dataProvider = "renameInsightDataProvider")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "renameInsightDataProvider")
     public void renameInsightUsingSpecicalName(final String name) throws JSONException, IOException {
         final String insight = "Renaming-Saved-Insight-Test-Using-Special-Name"
                 + UUID.randomUUID().toString().substring(0, 3);
@@ -78,7 +80,7 @@ public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
         checkRenamedInsight(numberOfInsights, insight, name);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testOpenInsight() {
         final ChartReport chart = analysisPage
                 .openInsight(INSIGHT_TEST)
@@ -91,7 +93,7 @@ public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
         assertEquals(chart.getChartType(), ReportType.COLUMN_CHART.getLabel(), "Chart data type is not correct");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void deleteUnsavedChangesInsight() throws JSONException, IOException {
         final String insight = "Delete-Unsaved-Change-Insight";
         assertTrue(
@@ -112,7 +114,7 @@ public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
                 .contains(insight), insight + " has not been deleted");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void deleteCurrentlyOpenedInsight() throws JSONException, IOException {
         final String insight = "Delete-Currently-Opened-Insight";
         assertFalse(analysisPage.openInsight(INSIGHT_TEST).saveInsightAs(insight).isBlankState(),
@@ -126,7 +128,7 @@ public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
                 .contains(insight), insight + " has not been deleted");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void deleteNotCurrentlyOpenedInsight() throws JSONException, IOException {
         final String insight = "Delete-Currently-Opened-Insight";
         analysisPage.openInsight(INSIGHT_TEST).saveInsightAs(insight);
@@ -151,7 +153,7 @@ public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
         };
     }
 
-    @Test(dependsOnGroups = {"init"}, dataProvider = "chartTypeDataProvider")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "chartTypeDataProvider")
     public void openVariousChartTypes(ReportType type) {
         final String insight = "Open-Various-Chart-Types-" + type.toString();
         final int expectedTrackersCount = analysisPage
@@ -172,7 +174,7 @@ public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
                 "Chart content is not correct");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testOpenTableReport() {
         final String insight = "Open-Table-Report";
         final List<List<String>> expectedContent = analysisPage
@@ -197,13 +199,13 @@ public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
                 ATTR_ACTIVITY_TYPE + " is not sorted up");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testDefaultFilterOnInsightList() {
         assertTrue(analysisPage.getPageHeader().expandInsightSelection().isFilterActive(FilterType.BY_ME),
                 "Default filter is not created by me tab");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testNoInsightMessageOnInsightListForBlankProject() {
         final String blankProject = "Blank-Project-For-Insight-Test";
         final String blankProjectId = ProjectRestUtils.createBlankProject(getGoodDataClient(), blankProject,
@@ -220,7 +222,7 @@ public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
         }
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testInsightListWithCreatedByMeFilter() throws JSONException, IOException {
         final String insight = "Insight-List-Test-With-Filter-Created-By-Me";
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
@@ -234,7 +236,7 @@ public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
         assertEquals(insightSelectionPanel.getInsightItems().size(), 1, "The number of insights is not correct");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createInsightByEditor() throws JSONException {
         //using this name helps us remove redundant code in testInsightListWithAllFilter
         final String insight = "Insight-List-Test-With-Filter-All";
@@ -278,7 +280,7 @@ public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
         };
     }
 
-    @Test(dependsOnGroups = {"init"}, dataProvider = "chartIconDataProvider")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "chartIconDataProvider")
     public void testChartIconOnInsightList(ReportType type) {
         final String insight = "Chart-Icon-On-Insight-List-Test-" + type.getLabel();
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
@@ -294,13 +296,13 @@ public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
                 type.getLabel());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testDefaultInsightTitle() {
         assertEquals(analysisPage.getPageHeader().getInsightTitle(), "Untitled insight",
                 "The default title is not correct");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testBlankInsightAfterSwitchingToOtherPage() {
         assertFalse(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing().isBlankState(),
                 "Workspace is blank before switching page");
@@ -308,7 +310,7 @@ public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
         assertTrue(initAnalysePage().isBlankState(), "AD does not show blank state after switching page");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testBlankInsightAfterSwitchingProject() {
         final String blankProject = "Blank-Project-For-Insight-Test";
         final String blankProjectId = ProjectRestUtils.createBlankProject(getGoodDataClient(),
@@ -332,7 +334,7 @@ public class GoodSalesInsightTest extends GoodSalesAbstractAnalyseTest {
         }
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void openAsReportAfterSaveInsight() {
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)

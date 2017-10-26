@@ -19,24 +19,31 @@ import java.text.ParseException;
 import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
-public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Comparison-Recommendation-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+        createSnapshotBOPMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void testOverrideDateFilter() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -65,7 +72,7 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
         checkingOpenAsReport("testOverrideDateFilter");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testSimpleComparison() {
         ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing()
@@ -92,7 +99,7 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
         checkingOpenAsReport("testSimpleComparison");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testComparisonAndPoPAttribute() {
         final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
 
@@ -138,7 +145,7 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
         checkingOpenAsReport("testComparisonAndPoPAttribute");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testSimplePoP() throws ParseException {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addDate()
@@ -169,7 +176,7 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
         checkingOpenAsReport("testSimplePoP");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testAnotherApproachToShowPoP() {
         ChartReport report = analysisPage.addMetric(METRIC_SNAPSHOT_BOP)
                 .waitForReportComputing()
@@ -189,7 +196,7 @@ public class GoodSalesComparisonRecommendationTest extends GoodSalesAbstractAnal
         checkingOpenAsReport("testAnotherApproachToShowPoP");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testRecommendationDisplayingWithDateFilter() throws ParseException {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().waitForReportComputing();
         takeScreenshot(browser, "No-Recommendation-Displaying-With-All-Time-Filter", getClass());

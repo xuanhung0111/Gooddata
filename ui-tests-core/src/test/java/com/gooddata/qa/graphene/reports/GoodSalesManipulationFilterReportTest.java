@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -16,7 +16,6 @@ import static org.testng.Assert.assertTrue;
 import java.util.Collection;
 
 import org.openqa.selenium.By;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
@@ -37,13 +36,15 @@ public class GoodSalesManipulationFilterReportTest extends GoodSalesAbstractTest
 
     private String filterDescription;
 
-    @BeforeClass
-    public void setProjectTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-manipulation-filter-report-test";
     }
 
-    @Test(dependsOnGroups = "createProject")
-    public void createReport() {
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
         createReport(new UiReportDefinition()
                 .withName(REPORT_NAME)
                 .withWhats(METRIC_AMOUNT)
@@ -52,13 +53,9 @@ public class GoodSalesManipulationFilterReportTest extends GoodSalesAbstractTest
                 "Manipulation-filter-report");
     }
 
-    @Test(dependsOnGroups = "createProject")
-    public void addNumericVariable() {
-        initVariablePage().createVariable(new NumericVariable(VARIABLE_NAME).withDefaultNumber(500));
-    }
-
-    @Test(dependsOnMethods = {"createReport", "addNumericVariable"})
+    @Test(dependsOnGroups = {"createProject"})
     public void addNumericVariableFilter() {
+        initVariablePage().createVariable(new NumericVariable(VARIABLE_NAME).withDefaultNumber(500));
         Collection<String> variables = initReport().openFilterPanel()
                 .clickAddFilter()
                 .openPromptFilterFragment()
@@ -66,7 +63,7 @@ public class GoodSalesManipulationFilterReportTest extends GoodSalesAbstractTest
         assertThat(variables, not(hasItem(VARIABLE_NAME)));
     }
 
-    @Test(dependsOnMethods = "createReport")
+    @Test(dependsOnGroups = {"createProject"})
     public void editExistingFilter() {
         initReport().addFilter(FilterItem.Factory.createAttributeFilter(ATTR_YEAR_SNAPSHOT, "2010"));
         waitForReportLoaded();

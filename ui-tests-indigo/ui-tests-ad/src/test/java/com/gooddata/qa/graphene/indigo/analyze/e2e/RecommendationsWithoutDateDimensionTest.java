@@ -7,11 +7,6 @@ import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
-import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.model.LdmModel;
@@ -24,29 +19,20 @@ public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
     private static final String UPLOADINFO_PATH = "/customer/upload_info.json";
     private static final String CSV_PATH = "/customer/customer.csv";
 
-    @BeforeClass(alwaysRun = true)
+    @Override
     public void initProperties() {
-        super.initProperties();
-        projectTemplate = "";
-    }
-
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+        // create empty project and customized data
         projectTitle = "Recommendations-Without-Date-Dimension-E2E-Test";
     }
 
     @Override
-    public void prepareSetupProject() throws JSONException, IOException, URISyntaxException {
-        if (testParams.isReuseProject()) {
-            log.info("No need to setup data in reuse project.");
-            return;
-        }
-
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
         setupMaql(LdmModel.loadFromFile(MAQL_PATH));
         setupData(CSV_PATH, UPLOADINFO_PATH);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void trending_recommendation_should_not_be_visible() {
         assertFalse(analysisPage.getCataloguePanel().getFieldNamesInViewPort().contains(DATE));
         analysisPage.addMetric(METRIC_AMOUNT, FieldType.FACT)
@@ -56,7 +42,7 @@ public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
         assertFalse(isElementPresent(cssSelector(".s-recommendation-trending"), browser));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void metric_with_period_recommendation_should_not_be_visible() {
         analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT)
             .addAttribute("id")

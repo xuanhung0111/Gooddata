@@ -7,7 +7,6 @@ import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
@@ -15,12 +14,19 @@ import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
 public class VisualizationTypesTest extends AbstractAdE2ETest {
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "Visualization-Types-E2E-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void should_create_table_visualization() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -29,7 +35,7 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
         assertTrue(isElementPresent(cssSelector(".adi-report-visualization.s-visualization-table"), browser));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_create_line_chart_visualization() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -38,7 +44,7 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
         assertTrue(isElementPresent(cssSelector(".adi-report-visualization.s-visualization-line"), browser));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_create_bar_chart_visualization() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -47,7 +53,7 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
         assertTrue(isElementPresent(cssSelector(".adi-report-visualization.s-visualization-bar"), browser));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_create_column_chart_visualization() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -56,7 +62,7 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
         assertTrue(isElementPresent(cssSelector(".adi-report-visualization.s-visualization-column"), browser));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_apply_changing_the_visualization_type() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -81,7 +87,7 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
         assertTrue(isElementPresent(cssSelector(".adi-report-visualization.s-visualization-table"), browser));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_show_missing_metric_if_one_attribute_is_dragged_in() {
         analysisPage.changeReportType(ReportType.COLUMN_CHART)
             .addAttribute(ATTR_ACTIVITY_TYPE)

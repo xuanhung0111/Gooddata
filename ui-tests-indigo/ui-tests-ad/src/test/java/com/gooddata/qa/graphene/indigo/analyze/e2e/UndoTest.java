@@ -12,7 +12,6 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.stream.IntStream;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
@@ -22,12 +21,19 @@ import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
 public class UndoTest extends AbstractAdE2ETest {
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "Undo-E2E-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void should_create_one_version_per_user_action() {
         // 1st version
         MetricConfiguration configuration = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
@@ -49,7 +55,7 @@ public class UndoTest extends AbstractAdE2ETest {
         IntStream.rangeClosed(0, 3).forEach(i -> analysisPage.undo());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_undo_metric_over_time_shortcut_followed_by_filter_change() {
         // D&D the first metric to the metric overtime recommendation
         analysisPage.drag(analysisPage.getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC),
@@ -63,7 +69,7 @@ public class UndoTest extends AbstractAdE2ETest {
             .getDateFilterText(), "Activity: Last 4 quarters");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_redo_single_visualization_type_change() {
         assertTrue(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .changeReportType(ReportType.LINE_CHART)
@@ -74,7 +80,7 @@ public class UndoTest extends AbstractAdE2ETest {
             .isReportTypeSelected(ReportType.LINE_CHART));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_undo_visualization_type_change_for_complex_configuration() {
         assertEquals(analysisPage.changeReportType(ReportType.TABLE)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
@@ -86,7 +92,7 @@ public class UndoTest extends AbstractAdE2ETest {
             .getItemNames(), asList(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_properly_deserialize_auto_generated_filters() {
         assertTrue(analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
             .resetToBlankState()
@@ -96,7 +102,7 @@ public class UndoTest extends AbstractAdE2ETest {
             .isEmpty());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void should_properly_deserialize_modified_filters() {
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
             .getFilterBuckets()

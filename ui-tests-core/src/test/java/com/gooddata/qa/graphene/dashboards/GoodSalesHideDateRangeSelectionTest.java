@@ -1,5 +1,17 @@
 package com.gooddata.qa.graphene.dashboards;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_ACTIVITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CLOSED;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
+import java.io.IOException;
+
+import org.apache.http.ParseException;
+import org.json.JSONException;
+import org.testng.annotations.Test;
+
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
@@ -8,25 +20,14 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.SelectionConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
-import org.apache.http.ParseException;
-import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import java.io.IOException;
-
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_ACTIVITY;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CLOSED;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 public class GoodSalesHideDateRangeSelectionTest extends GoodSalesAbstractTest {
 
     private final static String TEST_DASHBOARD = "Test-Dashboard";
 
-    @BeforeClass
-    public void setTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Hide-Date-Range-Selection-Test";
     }
 
@@ -35,8 +36,8 @@ public class GoodSalesHideDateRangeSelectionTest extends GoodSalesAbstractTest {
         createAndAddUserToProject(UserRoles.VIEWER);
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void initDashboard() {
+    @Override
+    protected void customizeProject() throws Throwable {
         initDashboardsPage().addNewDashboard(TEST_DASHBOARD).publishDashboard(true);
 
         dashboardsPage.editDashboard()
@@ -44,7 +45,7 @@ public class GoodSalesHideDateRangeSelectionTest extends GoodSalesAbstractTest {
                 .saveDashboard();
     }
 
-    @Test(dependsOnMethods = {"initDashboard"}, groups = "need-fresh-env")
+    @Test(dependsOnGroups = "createProject", groups = "need-fresh-env")
     public void testHideDateRangeOptionDefaultState() {
         SelectionConfigPanel panel = initDashboardsPage().selectDashboard(TEST_DASHBOARD)
                 .editDashboard().getDashboardEditFilter()
@@ -56,7 +57,7 @@ public class GoodSalesHideDateRangeSelectionTest extends GoodSalesAbstractTest {
         assertFalse(panel.isHideDateRangeSelected(), "The default state is not unchecked");
     }
 
-    @Test(dependsOnMethods = {"initDashboard"}, groups = "need-fresh-env")
+    @Test(dependsOnGroups = "createProject", groups = "need-fresh-env")
     public void cancelDashboardApplyingHideDateRange() {
         DashboardEditBar editBar = initDashboardsPage().selectDashboard(TEST_DASHBOARD).editDashboard();
         hideDateRangeSelection(DATE_DIMENSION_ACTIVITY, true);
@@ -68,7 +69,7 @@ public class GoodSalesHideDateRangeSelectionTest extends GoodSalesAbstractTest {
 
     }
 
-    @Test(dependsOnMethods = {"initDashboard"}, groups = "need-fresh-env")
+    @Test(dependsOnGroups = "createProject", groups = "need-fresh-env")
     public void cancelCheckedHideDateRangeSelection() {
         initDashboardsPage().selectDashboard(TEST_DASHBOARD).editDashboard();
         WidgetConfigPanel configPanel = openFilterConfigPanel(DATE_DIMENSION_ACTIVITY);
@@ -79,7 +80,7 @@ public class GoodSalesHideDateRangeSelectionTest extends GoodSalesAbstractTest {
                 "Canceling filter configuration is not applied on hide date range selection");
     }
 
-    @Test(dependsOnMethods = {"initDashboard"}, groups = "need-fresh-env")
+    @Test(dependsOnGroups = "createProject", groups = "need-fresh-env")
     public void applyHideDateRange() {
         initDashboardsPage().selectDashboard(TEST_DASHBOARD).editDashboard();
         hideDateRangeSelection(DATE_DIMENSION_ACTIVITY, true);
@@ -91,7 +92,7 @@ public class GoodSalesHideDateRangeSelectionTest extends GoodSalesAbstractTest {
                 "Date Range Selection is displayed");
     }
 
-    @Test(dependsOnMethods = {"initDashboard"}, groups = "need-fresh-env")
+    @Test(dependsOnGroups = "createProject", groups = "need-fresh-env")
     public void hideDateRangeSelectionWhenHavingMultipleDateFilters() {
         DashboardEditBar editBar = initDashboardsPage().selectDashboard(TEST_DASHBOARD).editDashboard()
                 .addTimeFilterToDashboard(DATE_DIMENSION_CLOSED, TimeFilterPanel.DateGranularity.YEAR, "this");

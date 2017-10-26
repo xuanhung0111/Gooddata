@@ -7,6 +7,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
 import static com.gooddata.qa.graphene.utils.CheckUtils.logRedBarMessageInfo;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_WATERFALL_ANALYSIS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_WHATS_CHANGED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_ACTIVITIES_BY_TYPE;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -25,6 +26,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.gooddata.qa.mdObjects.dashboard.Dashboard;
+import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.java.Builder;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.joda.time.DateTimeZone;
@@ -34,7 +39,6 @@ import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.GoodData;
@@ -61,7 +65,6 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     private static final String SCHEDULE_WITH_INVALID_RECIPIENTS = "Schedule with invalid recipient";
     private static final String SCHEDULE_WITH_MORE_THAN_10_RECIPIENTS = "Schedule with more than 10 recipients";
     private static final String PUBLIC_SCHEDULE = "Public schedule test";
-    private static final String PIPELINE_ANALYSIS_DASHBOARD = "Pipeline Analysis";
     private static final String DELETE = "Delete";
 
     private final String CUSTOM_SUBJECT = "Extremely useful subject";
@@ -70,38 +73,42 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     private final List<String> SCHEDULED_TABS = asList(DASH_TAB_WATERFALL_ANALYSIS, DASH_TAB_WHATS_CHANGED);
     private final String SCHEDULE_INFO = "^This dashboard will be sent daily at 12:30 AM .* to %s "
             + "and 2 other recipients as a PDF attachment.$";
+    private final String DASHBOARD_HAVING_MANY_TABS = "Dashboard having many tabs";
     private DateTimeZone tz = DateTimeZone.getDefault();
 
     private String externalUser;
+    private List<String> tabNames = asList("Tab 1", "Tab 2", "Tab 3", "Tab 4", "Tab 5", "Tab 6", "Tab 7");
 
-    @BeforeClass(alwaysRun = true)
-    public void setProjectTitle() {
+    @Override
+    protected void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales schedule dashboard test";
     }
 
-    // login with defined user role, fail test on error
-    private void loginAs(UserRoles userRole) throws JSONException {
-        logout();
-        signIn(true, userRole); // login with gray pages to reload application and have feature flag set
-    }
-
-    @Test(dependsOnGroups = {"createProject"}, groups = {"prepareTests", "schedules"})
-    public void setFeatureFlags() throws JSONException, IOException {
+    @Override
+    protected void customizeProject() throws Throwable {
         disableHideDashboardScheduleFlag();
         enableDashboardScheduleRecipientsFlag();
 
         // need time for system apply feature flags setting
         sleepTightInSeconds(3);
-    }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"prepareTests", "schedules"})
-    public void publishDashboard() {
+
+        createActivitiesByTypeReport();
+
+        Dashboard dashboard = Builder.of(Dashboard::new).with(dash -> {
+            dash.setName(DASHBOARD_HAVING_MANY_TABS);
+            tabNames.forEach(name -> dash.addTab(Builder.of(Tab::new).with(tab -> tab.setTitle(name)).build()));
+        }).build();
+
+        DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(), dashboard.getMdObject());
+
         initDashboardsPage();
         dashboardsPage.publishDashboard(true);
     }
 
     // prepare viewer user and login
-    @Test(dependsOnGroups = {"prepareTests"}, groups = {"schedules"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"schedules"})
     public void createDashboardSchedule() throws JSONException {
         try {
             loginAs(UserRoles.VIEWER);
@@ -114,9 +121,8 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
             dashboardScheduleDialog.showCustomForm();
 
             dashboardScheduleDialog.selectTabs(new int[] { 1 });
-            String[] tabNames = expectedGoodSalesDashboardsAndTabs.get(PIPELINE_ANALYSIS_DASHBOARD);
             assertEquals(dashboardScheduleDialog.getCustomEmailSubject(), dashboardsPage.getDashboardName()
-                    + " Dashboard - " + tabNames[1], "Update of one Tab is reflected in subject.");
+                    + " Dashboard - " + tabNames.get(1), "Update of one Tab is reflected in subject.");
 
             dashboardScheduleDialog.selectTabs(new int[] { 1, 5, 6 });
             assertEquals(dashboardScheduleDialog.getCustomEmailSubject(), dashboardsPage.getDashboardName()
@@ -151,7 +157,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     @Test(dependsOnMethods = {"createDashboardSchedule"}, groups = {"schedules"})
     public void deleteDashboardUsedInSchedule() {
         initDashboardsPage();
-        dashboardsPage.selectDashboard(PIPELINE_ANALYSIS_DASHBOARD);
+        dashboardsPage.selectDashboard(DASHBOARD_HAVING_MANY_TABS);
         dashboardsPage.editDashboard();
         final DashboardEditBar editBar = dashboardsPage.getDashboardEditBar();
         editBar.tryToDeleteDashboard();
@@ -241,10 +247,10 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         }
     }
 
-    @Test(dependsOnGroups = {"prepareTests"})
+    @Test(dependsOnGroups = {"createProject"})
     public void preparePublicAndPrivateSchedules() {
         initDashboardsPage();
-        dashboardsPage.selectDashboard(PIPELINE_ANALYSIS_DASHBOARD);
+        dashboardsPage.selectDashboard(DASHBOARD_HAVING_MANY_TABS);
         createDashboardSchedule(SCHEDULE_WITHOUT_RECIPIENTS, Collections.<String>emptyList());
         createDashboardSchedule(SCHEDULE_WITH_INTERNAL_RECIPIENTS,
                 asList(testParams.getEditorUser(), testParams.getViewerUser()));
@@ -260,7 +266,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
 
         String schedule = "Public schedule test";
         initEmailSchedulesPage().scheduleNewDashboardEmail(testParams.getUser(), schedule,
-                "Scheduled email test - dashboard.", "Outlook");
+                "Scheduled email test - dashboard.", DASHBOARD_HAVING_MANY_TABS);
     }
 
     @Test(dependsOnMethods = {"preparePublicAndPrivateSchedules"})
@@ -302,7 +308,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         }
     }
 
-    @Test(dependsOnGroups = {"prepareTests"})
+    @Test(dependsOnGroups = {"createProject"})
     public void createScheduleEmailsForPublicAndPrivateDashboard() throws JSONException {
         String publicDashboard = "Public Dashboard Test";
         String privateDashboard = "Private Dashboard Test";
@@ -312,7 +318,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         dashboardsPage.publishDashboard(true);
         dashboardsPage.editDashboard();
         DashboardEditBar editDashboardBar =  dashboardsPage.getDashboardEditBar();
-        editDashboardBar.addReportToDashboard("Activities by Type");
+        editDashboardBar.addReportToDashboard(REPORT_ACTIVITIES_BY_TYPE);
         editDashboardBar.saveDashboard();
         createDefaultDashboardSchedule();
 
@@ -334,7 +340,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         }
     }
 
-    @Test(dependsOnGroups = {"prepareTests"})
+    @Test(dependsOnGroups = {"createProject"})
     public void deleteUserOnPrivateScheduledEmails() throws ParseException, JSONException, IOException {
         String scheduleEmail = testParams.getUser().replace("@", "+schedule@");
         String userA = createDynamicUserFrom(scheduleEmail);
@@ -349,7 +355,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
             UserManagementRestUtils.addUserToProject(restApiClient, testParams.getProjectId(), userB, UserRoles.ADMIN);
 
             initDashboardsPage();
-            dashboardsPage.selectDashboard(PIPELINE_ANALYSIS_DASHBOARD);
+            dashboardsPage.selectDashboard(DASHBOARD_HAVING_MANY_TABS);
             createDashboardSchedule(scheduleUserA, asList(userA));
             UserManagementRestUtils.deleteUserByEmail(restApiClient, testParams.getUserDomain(), userA);
 
@@ -476,5 +482,11 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         browser.navigate().refresh();
         waitForSchedulesPageLoaded(browser);
         return EmailSchedulePage.getInstance(browser);
+    }
+
+    // login with defined user role, fail test on error
+    private void loginAs(UserRoles userRole) throws JSONException {
+        logout();
+        signIn(true, userRole); // login with gray pages to reload application and have feature flag set
     }
 }

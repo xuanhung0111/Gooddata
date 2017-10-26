@@ -9,7 +9,6 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import org.jboss.arquillian.graphene.Graphene;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
@@ -18,17 +17,25 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.Filters
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.TrendingRecommendation;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
-public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesTrendingRecommendationTest extends AbstractAnalyseTest {
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Trending-Recommendation-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+        createSnapshotBOPMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void testOverrideDateFilter() {
         final FiltersBucket FiltersBucketReact = analysisPage.getFilterBuckets();
 
@@ -49,7 +56,7 @@ public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalys
         checkingOpenAsReport("testOverrideDateFilter");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void applyParameter() {
         ChartReport report = analysisPage.addMetric(METRIC_SNAPSHOT_BOP)
                 .waitForReportComputing().getChartReport();
@@ -79,7 +86,7 @@ public class GoodSalesTrendingRecommendationTest extends GoodSalesAbstractAnalys
         checkingOpenAsReport("applyParameter");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void displayInColumnChartWithOnlyMetric() {
         ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing().getChartReport();

@@ -7,7 +7,6 @@ import static org.testng.Assert.assertEquals;
 
 import java.util.stream.Stream;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
@@ -23,18 +22,20 @@ public class SpecialCasesTest extends AbstractAnalyseTest {
     private static final String ACCOUNT = "Account";
     private static final String DEPARTMENT = "Department";
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
-        projectTitle += "Special-Cases-Test";
+    @Override
+    public void initProperties() {
+        // create empty project and customized data
+        projectTitle = "Special-Cases-Test";
     }
 
     @Override
-    public void prepareSetupProject() {
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
         uploadCSV(getFilePathFromResource(MANY_COLUMNS_CSV_PATH));
         takeScreenshot(browser, "uploaded-" + MANY_CLOUMNS_DATASET +"-dataset", getClass());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testAttributeLimitationInTableReport() {
         analysisPage.getCataloguePanel().changeDataset(MANY_CLOUMNS_DATASET)
             .filterCatalog(CatalogFilterType.ATTRIBUTES);

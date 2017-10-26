@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_LOST_OPPS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_OPP_FIRST_SNAPSHOT ;
@@ -20,7 +21,6 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Metric;
@@ -32,18 +32,19 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.ConfigurationPanel;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.manage.DatasetDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import com.gooddata.qa.graphene.utils.Sleeper;
 
-public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
+public class DateFilteringOnInsightTest extends AbstractDashboardTest {
 
     private static String SNAPSHOT = "Snapshot";
     private static String DATE_SNAPSHOT = "Date (Snapshot)";
     private static String DATE_SNAPSHOT_RENAMED = "Date (Snapshot)_Renamed";
     private static String TEST_INSIGHT = "Test-Insight";
 
-    @BeforeClass
-    public void setProjectTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Date-Filtering-On-Insight-Test";
     }
 
@@ -53,7 +54,11 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
     }
 
     @Override
-    protected void prepareSetupProject() throws Throwable {
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+        createNumberOfLostOppsMetric();
+        createOppFirstSnapshotMetric();
         createInsight(getRestApiClient(), testParams.getProjectId(),
                 new InsightMDConfiguration(TEST_INSIGHT, ReportType.COLUMN_CHART).setMeasureBucket(
                         singletonList(MeasureBucket.getSimpleInstance(getMetric(METRIC_NUMBER_OF_ACTIVITIES)))));
@@ -63,7 +68,7 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
                 .waitForWidgetsLoading().saveEditModeWithWidgets();
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void rememberLastSettingAfterSelectingAnotherInsight()
             throws ParseException, JSONException, IOException {
         String anotherInsight = "Another-Insight";
@@ -77,22 +82,22 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
             initIndigoDashboardsPageWithWidgets().switchToEditMode().selectWidgetByHeadline(Insight.class,
                     TEST_INSIGHT);
 
-            indigoDashboardsPage.getConfigurationPanel().selectDateDataSetByName(DATE_CREATED);
+            indigoDashboardsPage.getConfigurationPanel().selectDateDataSetByName(DATE_DATASET_CREATED);
             assertEquals(indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().getSelectedDataSet(),
-                    DATE_CREATED);
+                    DATE_DATASET_CREATED);
 
             assertEquals(indigoDashboardsPage.selectWidgetByHeadline(Insight.class, anotherInsight).getHeadline(),
                     anotherInsight);
 
             indigoDashboardsPage.selectWidgetByHeadline(Insight.class, TEST_INSIGHT);
-            assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_CREATED);
+            assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_DATASET_CREATED);
 
         } finally {
             deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), anotherInsightUri);
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void disableDateFilter() {
         initIndigoDashboardsPageWithWidgets().switchToEditMode().selectWidgetByHeadline(Insight.class,
                 TEST_INSIGHT);
@@ -105,7 +110,7 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
                 "State of date filter is not disabled");
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testDateFilterStatusWithEditor() throws JSONException {
         logoutAndLoginAs(true, UserRoles.EDITOR);
 
@@ -128,7 +133,7 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void enableDateFilter() {
         initIndigoDashboardsPageWithWidgets().switchToEditMode().selectWidgetByHeadline(Insight.class,
                 TEST_INSIGHT);
@@ -142,13 +147,13 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
                 "Date filter is not enabled");
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void changeFilterOnAddedInsight() {
         initIndigoDashboardsPageWithWidgets().switchToEditMode().selectWidgetByHeadline(Insight.class,
                 TEST_INSIGHT);
-        indigoDashboardsPage.getConfigurationPanel().selectDateDataSetByName(DATE_CREATED);
+        indigoDashboardsPage.getConfigurationPanel().selectDateDataSetByName(DATE_DATASET_CREATED);
         takeScreenshot(browser, "Change-Filter-On-Added-Insight", getClass());
-        assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_CREATED,
+        assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_DATASET_CREATED,
                 "Date fillter is not applied");
 
         indigoDashboardsPage.selectDateFilterByName("All time").waitForWidgetsLoading();
@@ -156,7 +161,7 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
                 .getDataLabels(), singletonList("154,271"), "Chart renders incorrectly");
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void rememberDisabledDateFilterAfterSaving() throws JSONException, IOException {
         String insight = "Disabled-Date-Filter-Insight";
         String insightUri = createInsight(getRestApiClient(), testParams.getProjectId(),
@@ -178,7 +183,7 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void rememberEnabledDateFilterAfterSaving() throws JSONException, IOException {
         String insight = "Enabled-Date-Filter-Insight";
         String insightUri = createInsight(getRestApiClient(), testParams.getProjectId(),
@@ -200,7 +205,7 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void rememberModifiedDateFilterAfterSaving() throws JSONException, IOException {
         String widgetUri = createInsightWidget(new InsightMDConfiguration("Modified-Date-Filter-Insight",
                 ReportType.COLUMN_CHART).setMeasureBucket(
@@ -210,19 +215,19 @@ public class DateFilteringOnInsightTest extends GoodSalesAbstractDashboardTest {
 
         try {
             initIndigoDashboardsPageWithWidgets().switchToEditMode().selectLastWidget(Insight.class);
-            indigoDashboardsPage.getConfigurationPanel().enableDateFilter().selectDateDataSetByName(DATE_CREATED);
+            indigoDashboardsPage.getConfigurationPanel().enableDateFilter().selectDateDataSetByName(DATE_DATASET_CREATED);
 
             assertEquals(indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().getSelectedDataSet(),
-                    DATE_CREATED);
+                    DATE_DATASET_CREATED);
 
             indigoDashboardsPage.saveEditModeWithWidgets().switchToEditMode().selectLastWidget(Insight.class);
-            assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_CREATED);
+            assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_DATASET_CREATED);
         } finally {
             deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), widgetUri);
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"})
+    @Test(dependsOnGroups = {"createProject"})
     public void applyRenamedDateOnDateFilterInsight() throws JSONException, IOException {
         // currently, we can't create a new date value, so we will use 1 existing date for tests
         // which need to modify date in order to narrow affected area

@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFilter;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -11,14 +11,15 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-public class AttributeFilterMiscTest extends GoodSalesAbstractDashboardTest {
+public class AttributeFilterMiscTest extends AbstractDashboardTest {
 
-    @BeforeClass(alwaysRun = true)
-    public void setTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Attribute-Filter-Misc-Test";
     }
 
-    @Test(dependsOnGroups = "dashboardsInit", groups = {"desktop"})
+    @Test(dependsOnGroups = "createProject", groups = {"desktop"})
     public void addFilterToEmptyDashboard() {
         initIndigoDashboardsPage().getSplashScreen().startEditingWidgets().addAttributeFilter(ATTR_ACCOUNT)
                 .getAttributeFiltersPanel().getAttributeFilter(ATTR_ACCOUNT).selectAllValues();
@@ -36,7 +37,7 @@ public class AttributeFilterMiscTest extends GoodSalesAbstractDashboardTest {
         };
     }
 
-    @Test(dependsOnGroups = "dashboardsInit", groups = {"desktop"}, dataProvider = "searchValues")
+    @Test(dependsOnGroups = "createProject", groups = {"desktop"}, dataProvider = "searchValues")
     public void searchNonExistenceAttribute(String searchValue) {
         assertFalse(
                 initIndigoDashboardsPage().getSplashScreen().startEditingWidgets()
@@ -45,7 +46,7 @@ public class AttributeFilterMiscTest extends GoodSalesAbstractDashboardTest {
                 "Found attribute named " + searchValue);
     }
 
-    @Test(dependsOnGroups = "dashboardsInit", groups = {"desktop"})
+    @Test(dependsOnGroups = "createProject", groups = {"desktop"})
     public void searchOnListOfAttributes() {
         assertTrue(
                 initIndigoDashboardsPage().getSplashScreen().startEditingWidgets()
@@ -54,7 +55,7 @@ public class AttributeFilterMiscTest extends GoodSalesAbstractDashboardTest {
                 "Can't not find attribute named " + ATTR_STAGE_NAME);
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"},
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"},
             description = "ONE-2019: Arrow icon of attribute filter sometimes show wrong when open/close " +
                     "drop-down")
     public void expandAndCollapseFilter() {

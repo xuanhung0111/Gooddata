@@ -6,7 +6,6 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.Arrays;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
@@ -23,9 +22,15 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
     private static final String REPORT_NAME = "Test Filter";
     private static final String VARIABLE_NAME = "F Stage Name";
 
-    @BeforeClass
-    public void setProjectTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-test-filter";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"})

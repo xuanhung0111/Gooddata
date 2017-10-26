@@ -17,13 +17,9 @@ import org.jsoup.nodes.Document;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
-import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
-import com.gooddata.qa.graphene.utils.GoodSalesUtils;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;
 import com.google.common.collect.Iterables;
@@ -31,8 +27,6 @@ import com.google.common.collect.Iterables;
 public class NotificationTest extends AbstractCsvUploaderTest {
 
     private static final String GOODDATA_SUPPORT_URL = "https://support.gooddata.com";
-
-    private static final String MANAGE_DATASETS_PAGE_URL = "https://%s/#s=/gdc/projects/%s|dataPage|dataSets";
     private static final String PROJECT_PAGE_URL = "https://%s/#s=/gdc/projects/%s";
 
     @BeforeClass(alwaysRun = true)
@@ -59,41 +53,6 @@ public class NotificationTest extends AbstractCsvUploaderTest {
         takeScreenshot(browser, "Upload-csv-file-to-check-successful-notification" + PAYROLL.getFileName(), getClass());
 
         checkSuccessfulNotification(getSuccessfulNotification(1), datasetName);
-    }
-
-    //disable test due to MSF-12009
-    @Test(dependsOnGroups = "precondition", groups = "csv", enabled = false)
-    public void checkNotificationForFailedUpload() {
-        final String projectId = testParams.getProjectId();
-
-        GoodData goodDataClient = getGoodDataClient(imapUser, imapPassword);
-
-        String goodSalesProjectId = ProjectRestUtils.createProject(goodDataClient, projectTitle,
-                GoodSalesUtils.GOODSALES_TEMPLATE, testParams.getAuthorizationToken(), testParams.getProjectDriver(),
-                testParams.getProjectEnvironment());
-
-        try {
-            testParams.setProjectId(goodSalesProjectId);
-            uploadCsv(PAYROLL);
-
-        } catch (RuntimeException e) {
-            assertEquals(e.getMessage(), "Uploading csv file is FAILED!");
-
-            assertEquals(DatasetMessageBar.getInstance(browser).waitForErrorMessageBar().getText(),
-                    format("Failed to add data from \"%s\" due to internal error. Check your email for "
-                            + "instructions or contact support.", PAYROLL.getDatasetNameOfFirstUpload()));
-
-            takeScreenshot(browser, "Upload-csv-file-to-check-failed-notification-" + PAYROLL.getFileName(), getClass());
-
-            checkFailureNotification(getFailedNotification(1));
-
-        } finally {
-            testParams.setProjectId(projectId);
-
-            if (!goodSalesProjectId.isEmpty()) {
-                ProjectRestUtils.deleteProject(goodDataClient, goodSalesProjectId);
-            }
-        }
     }
 
     @Test(dependsOnMethods = {"checkNotificationForSuccessfulUpload"}, groups = "csv")
@@ -123,13 +82,6 @@ public class NotificationTest extends AbstractCsvUploaderTest {
                 analysisUrl);
     }
 
-    private void checkFailureNotification(Document message) {
-        checkGeneralNotification(message);
-        String datasetManageUrl = format(MANAGE_DATASETS_PAGE_URL, testParams.getHost(),
-                testParams.getProjectId());
-        assertEquals(message.getElementsContainingText("delete the loaded file").attr("href"), datasetManageUrl);
-    }
-
     private void checkGeneralNotification(Document message) {
         String projectUrl = format(PROJECT_PAGE_URL, testParams.getHost(), testParams.getProjectId());
         assertEquals(message.getElementsMatchingOwnText(projectTitle).attr("href"), projectUrl);
@@ -151,11 +103,6 @@ public class NotificationTest extends AbstractCsvUploaderTest {
 
     private Document getSuccessfulNotification(int expectedMessageCount) {
         String subject = format("New data is ready to use in the %s project", projectTitle);
-        return getNotification(subject, expectedMessageCount);
-    }
-
-    private Document getFailedNotification(int expectedMessageCount) {
-        String subject = format("Error adding new data to %s project", projectTitle);
         return getNotification(subject, expectedMessageCount);
     }
 }

@@ -13,24 +13,30 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
-public class GoodSalesMetricFilterTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesMetricFilterTest extends AbstractAnalyseTest {
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Metric-Filter-Test";
     }
 
-    @Test(dependsOnGroups = {"init"},
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createAmountMetric();
+        createNumberOfActivitiesMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"},
             description = "CL-10362 Attribute filter didn't connect with measure")
     public void makeSureAttributeFilterConnectWithMeasure() {
         assertTrue(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
@@ -42,13 +48,13 @@ public class GoodSalesMetricFilterTest extends GoodSalesAbstractAnalyseTest {
             .size() > 0);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testAddFilterToMetric() {
         addFilterToMetric();
         checkingOpenAsReport("testAddFilterToMetric");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void replaceAttributeFilterByNewOne() {
         addFilterToMetric();
         final MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
@@ -75,7 +81,7 @@ public class GoodSalesMetricFilterTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("replaceAttributeFilterByNewOne");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void addAttributeFilterForMultipleMetrics() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
@@ -99,7 +105,7 @@ public class GoodSalesMetricFilterTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("addAttributeFilterForMultipleMetrics");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void searchOnlyAttributeElement() {
         MetricConfiguration metricConfiguration = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
@@ -113,7 +119,7 @@ public class GoodSalesMetricFilterTest extends GoodSalesAbstractAnalyseTest {
         assertEquals(metricConfiguration.getFilterText(), format("%s: Email", ATTR_ACTIVITY_TYPE));
     }
 
-    @Test(dependsOnGroups = {"init"}, description = "Cover issue: https://jira.intgdc.com/browse/CL-7952")
+    @Test(dependsOnGroups = {"createProject"}, description = "Cover issue: https://jira.intgdc.com/browse/CL-7952")
     public void checkReportWhenFilterContainManyCharacters() {
         String unselectedValue = "14 West";
 

@@ -11,6 +11,7 @@ import static org.testng.Assert.assertEquals;
 
 import java.io.IOException;
 
+import com.gooddata.qa.graphene.TemplateAbstractTest;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
@@ -19,7 +20,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 
-public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
+public class GoodSalesDashboardTest extends TemplateAbstractTest {
 
     private static final long expectedDashboardExportSize = 65000L;
     private String exportedDashboardName;

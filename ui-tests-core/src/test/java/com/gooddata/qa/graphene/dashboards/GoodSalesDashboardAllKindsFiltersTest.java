@@ -22,7 +22,6 @@ import java.util.List;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.GoodData;
@@ -60,9 +59,15 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
 
     private static final int YEAR_OF_DATA = 2012;
 
-    @BeforeClass
-    public void setProjectTitle() {
+    @Override
+    protected void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-test-dashboard-all-kinds-filters";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -140,7 +145,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             addReportToDashboard(TESTING_REPORT, DashboardWidgetDirection.LEFT);
 
             dashboardsPage
-                    .addTimeFilterToDashboard(DATE_DIMENSION_SNAPSHOT, DateGranularity.YEAR, 
+                    .addTimeFilterToDashboard(DATE_DIMENSION_SNAPSHOT, DateGranularity.YEAR,
                             String.format("%s ago", Calendar.getInstance().get(Calendar.YEAR) - YEAR_OF_DATA))
                     .saveDashboard();
 
@@ -303,8 +308,8 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         GoodData goodDataClient = getGoodDataClient();
         Project project = goodDataClient.getProjectService().getProjectById(testParams.getProjectId());
         String metric = "GREATER-NVariable";
-        String expression = "SELECT [/gdc/md/${pid}/obj/1279] WHERE [/gdc/md/${pid}/obj/513] > [" +
-                nVariableUri + "]";
+        String expression = "SELECT [" + getMetricByTitle(METRIC_AMOUNT).getUri() + "]" +
+                " WHERE [" + getAttributeByTitle(ATTR_YEAR_SNAPSHOT).getUri() + "] > [" + nVariableUri + "]";
         goodDataClient.getMetadataService().createObj(project, new Metric(metric,
                 expression.replace("${pid}", testParams.getProjectId()), "#,##0"));
 

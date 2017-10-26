@@ -1,32 +1,38 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.md.Metric;
-import com.gooddata.md.Restriction;
-import com.gooddata.md.report.*;
-import com.gooddata.qa.graphene.AbstractDashboardWidgetTest;
-import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
-import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog;
-import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
-import org.apache.http.ParseException;
-import org.json.JSONException;
-import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRIORITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.testng.Assert.assertEquals;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.*;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static org.testng.Assert.assertEquals;
+import org.apache.http.ParseException;
+import org.json.JSONException;
+import org.openqa.selenium.WebElement;
+import org.testng.annotations.Test;
+
+import com.gooddata.md.Attribute;
+import com.gooddata.md.Metric;
+import com.gooddata.md.Restriction;
+import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.GridReportDefinitionContent;
+import com.gooddata.md.report.MetricElement;
+import com.gooddata.md.report.Report;
+import com.gooddata.md.report.ReportDefinition;
+import com.gooddata.qa.graphene.AbstractDashboardWidgetTest;
+import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
+import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog;
+import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
 
 public class GoodSalesSavedViewWithAllValuesTest extends AbstractDashboardWidgetTest {
     private final static String TEST_DASHBOARD = "Dashboard-Having-Report-And-Attribute-Filters";
@@ -38,20 +44,21 @@ public class GoodSalesSavedViewWithAllValuesTest extends AbstractDashboardWidget
     private final static String NORMAL = "NORMAL";
     private final static String HIGH = "HIGH";
 
-    @BeforeClass
-    public void setProjectTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "GoodSales-Attribute-Filter-On-View-Test";
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void createTestDashboard() {
-        Metric numberOfActivities = getMdService().getObj(getProject(), Metric.class, Restriction.title
-                (METRIC_NUMBER_OF_ACTIVITIES));
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
+        createNumberOfActivitiesMetric();
         List<Attribute> attributes = Stream.of("attr.activity.status", "attr.activity.priority")
                 .map(e -> getMdService().getObj(getProject(), Attribute.class, Restriction.identifier(e)))
                 .collect(Collectors.toList());
 
-        createReport(REPORT, attributes, singletonList(numberOfActivities));
+        createReport(REPORT, attributes, singletonList(getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES)));
 
         initDashboardsPage().addNewDashboard(TEST_DASHBOARD).editDashboard()
                 .addReportToDashboard(REPORT)
@@ -69,7 +76,7 @@ public class GoodSalesSavedViewWithAllValuesTest extends AbstractDashboardWidget
         takeScreenshot(browser, "test-dashboard", getClass());
     }
 
-    @Test(dependsOnMethods = {"createTestDashboard"})
+    @Test(dependsOnGroups = "createProject")
     public void testSavedViewAfterChangingFilterToAllValues() throws JSONException {
         logoutAndLoginAs(true, UserRoles.VIEWER);
         try {
@@ -91,7 +98,7 @@ public class GoodSalesSavedViewWithAllValuesTest extends AbstractDashboardWidget
         }
     }
 
-    @Test(dependsOnMethods = {"createTestDashboard"})
+    @Test(dependsOnGroups = "createProject")
     public void testSavedViewHavingNoChangeOnAllValuesFilter() throws JSONException {
         String dashboardHavingAllValuesFilter = "Dashboard having all values attribute filter";
         // clone existing dashboard

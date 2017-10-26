@@ -10,7 +10,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
@@ -33,13 +32,15 @@ public class GoodSalesAdvanceRangeFilterReportTest extends GoodSalesAbstractTest
     private static final String RANGE_FILTER_DESCRIPTION = "Opportunity where Amount is greater than or "
             + "equal to 19000";
 
-    @BeforeClass
-    public void setProjectTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "Advance-numeric-range-filter-report-test";
     }
 
-    @Test(dependsOnGroups = "createProject")
-    public void createReport() {
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
         createReport(new UiReportDefinition()
                 .withName(REPORT_NAME)
                 .withWhats(METRIC_AMOUNT)
@@ -55,7 +56,7 @@ public class GoodSalesAdvanceRangeFilterReportTest extends GoodSalesAbstractTest
                 .withAttributeValues("Interest", "Discovery", "Short List", "Negotiation"));
     }
 
-    @Test(dependsOnMethods = "createReport")
+    @Test(dependsOnGroups = {"createProject"})
     public void addRangeFilter() {
         initReport().addFilter(FilterItem.Factory.
                 createRangeFilter(RangeType.IS_GREATER_THAN_OR_EQUAL_TO, 19000, METRIC_AMOUNT, ATTR_OPPORTUNITY));

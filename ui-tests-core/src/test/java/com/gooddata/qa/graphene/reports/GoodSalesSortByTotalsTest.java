@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPPORTUNITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_QUARTER_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
@@ -29,8 +30,13 @@ public class GoodSalesSortByTotalsTest extends GoodSalesAbstractTest {
     private final static String OF_ALL_COLUMNS = "of All Columns";
     private final static String SUM = "Sum";
     private final static String REPORT_CONTAINING_ONE_METRIC = "Report-containing-one-metric";
-    private final static String AVG_AMOUNT = "Avg. Amount";
     private final static String BY_STAGE_NAME = "by Stage Name";
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
+        createAvgAmountMetric();
+    }
 
     @Test(dependsOnGroups = "createProject")
     public void sortByTotalsInOnTopAttributeReport() {
@@ -115,7 +121,7 @@ public class GoodSalesSortByTotalsTest extends GoodSalesAbstractTest {
         reportPage.waitForReportExecutionProgress();
 
         reportPage.openWhatPanel()
-                .selectMetric(AVG_AMOUNT)
+                .selectMetric(METRIC_AVG_AMOUNT)
                 .doneSndPanel()
                 .waitForReportExecutionProgress()
                 .addFilter(FilterItem.Factory.createAttributeFilter(ATTR_QUARTER_YEAR_SNAPSHOT, Q1_2011))

@@ -5,6 +5,7 @@ import static java.util.Objects.nonNull;
 
 import java.io.IOException;
 
+import com.gooddata.qa.graphene.TemplateAbstractTest;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -19,7 +20,7 @@ import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertTrue;
 
-public class PartialExportDashboardsTest extends AbstractDashboardTest {
+public class PartialExportDashboardsTest extends TemplateAbstractTest {
 
     @BeforeClass(alwaysRun = true)
     public void initProperties() {
@@ -27,7 +28,7 @@ public class PartialExportDashboardsTest extends AbstractDashboardTest {
         projectTemplate = "/projectTemplates/OnboardingWalkMe/3";
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void createKpiLinkToDashboardTab() {
         initIndigoDashboardsPage()
             .getSplashScreen()
@@ -42,7 +43,7 @@ public class PartialExportDashboardsTest extends AbstractDashboardTest {
             .saveEditModeWithWidgets();
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void exportDashboardsToAnotherProject() throws JSONException, IOException {
         final String oldPid = testParams.getProjectId();
 

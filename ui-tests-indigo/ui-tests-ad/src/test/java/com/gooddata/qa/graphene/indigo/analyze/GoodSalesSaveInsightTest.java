@@ -5,7 +5,7 @@ import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.dialog.SaveInsightDialog;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
@@ -29,7 +29,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-public class GoodSalesSaveInsightTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesSaveInsightTest extends AbstractAnalyseTest {
 
     private static final String INSIGHT_TEST = "Insight-Test";
     private static final String INSIGHT_TEST_LONG = "British scientists were crucial to the success of the Manhattan Project, "
@@ -45,9 +45,17 @@ public class GoodSalesSaveInsightTest extends GoodSalesAbstractAnalyseTest {
     private static final String DATE_CLOSED_DIMENSION_INSIGHT = "Save-Insight-Containing-Date-Closed-Dimension";
     private static final String DATE_CREATED_DIMENSION_INSIGHT = "Save-Insight-Containing-Date-Created-Dimension";
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Save-Insight-Test";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+        createStageVelocityMetric();
     }
 
     @DataProvider(name = "chartTypeDataProvider")
@@ -59,7 +67,7 @@ public class GoodSalesSaveInsightTest extends GoodSalesAbstractAnalyseTest {
                 {INSIGHT_TEST_DUPLICATE}
         };
     }
-    @Test(dependsOnGroups = {"init"}, dataProvider = "chartTypeDataProvider")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "chartTypeDataProvider")
     public void testSaveInsight(String insightName) throws JSONException, IOException {
         final int expectedTrackerCount = analysisPage
                 .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
@@ -81,7 +89,7 @@ public class GoodSalesSaveInsightTest extends GoodSalesAbstractAnalyseTest {
                 expectedTrackerCount);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testSaveInsightWithBlankName () throws JSONException, IOException {
         analysisPage.setInsightTitle(INSIGHT_TEST_NULL);
         assertFalse(analysisPage.isSaveInsightEnabled());
@@ -128,7 +136,7 @@ public class GoodSalesSaveInsightTest extends GoodSalesAbstractAnalyseTest {
                 .getTrackersCount(), 4);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testSaveUntitledInsight() throws JSONException, IOException {
         final String insight = "Untitled-Insight-Test";
         final List<String> expectedLabels = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
@@ -147,7 +155,7 @@ public class GoodSalesSaveInsightTest extends GoodSalesAbstractAnalyseTest {
                 expectedLabels);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testInsightNameInSaveDialog() throws JSONException, IOException {
         final String insight = "Untitled-Insight-Test-2";
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
@@ -160,7 +168,7 @@ public class GoodSalesSaveInsightTest extends GoodSalesAbstractAnalyseTest {
         assertEquals(SaveInsightDialog.getInstance(browser).getName(), "");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void trySavingUntitledInsightButCancel() throws JSONException, IOException {
         final String insight = "No-Saved-Insight-After-Canceling-Test";
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
@@ -175,7 +183,7 @@ public class GoodSalesSaveInsightTest extends GoodSalesAbstractAnalyseTest {
                 insight + " exists in Saved Insight list");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testEditSavedInsight() throws JSONException, IOException {
         final String insight = "Editing-Saved-Insight-Test";
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
@@ -198,20 +206,20 @@ public class GoodSalesSaveInsightTest extends GoodSalesAbstractAnalyseTest {
                 .getDataLabels(), expectedLabels);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testSaveAsButtonNotPresentInBlankState() {
         assertFalse(analysisPage.getPageHeader().isSaveAsPresent(),
                 "Save As button is displayed at start state");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void cannotSaveAsInsightCreatedFromBlankState() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
         assertFalse(analysisPage.getPageHeader().isSaveAsPresent(),
                 "Save As button is displayed after adding a few changes to blank state");
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {"save-insight-containing-date-dimension"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"save-insight-containing-date-dimension"})
     public void testSaveInsightContainingDateClosedDimension() {
         final int expectedTrackers = analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT)
                 .addDate()
@@ -234,7 +242,7 @@ public class GoodSalesSaveInsightTest extends GoodSalesAbstractAnalyseTest {
                 "The selected dimension was not displayed");
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {"save-insight-containing-date-dimension"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"save-insight-containing-date-dimension"})
     public void testSaveInsightContainingDateCreatedDimension() {
         final int expectedTrackers = analysisPage.addMetric(METRIC_STAGE_VELOCITY)
                 .addDate()
@@ -275,7 +283,7 @@ public class GoodSalesSaveInsightTest extends GoodSalesAbstractAnalyseTest {
                 "Selected date dimension of " + DATE_CREATED_DIMENSION_INSIGHT + "was not correct");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void saveInsightAfterOpenAsReport() {
         String insight = "Save-Insight-After-Open-As-Report";
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)

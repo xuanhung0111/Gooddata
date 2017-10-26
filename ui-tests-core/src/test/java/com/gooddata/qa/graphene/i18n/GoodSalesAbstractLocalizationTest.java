@@ -2,12 +2,13 @@ package com.gooddata.qa.graphene.i18n;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
+import com.gooddata.qa.graphene.TemplateAbstractTest;
 import org.jboss.arquillian.graphene.Graphene;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
 
-public abstract class GoodSalesAbstractLocalizationTest extends GoodSalesAbstractTest {
+public abstract class GoodSalesAbstractLocalizationTest extends TemplateAbstractTest {
 
     protected String embeddedUri;
 

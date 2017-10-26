@@ -1,7 +1,5 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import static com.gooddata.md.Restriction.identifier;
-import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
@@ -23,8 +21,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.gooddata.md.Dataset;
-import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.entity.model.LdmModel;
@@ -61,21 +57,22 @@ public class KpiAlertEvaluateTest extends AbstractDashboardTest {
     }
 
     @Override
-    protected void prepareSetupProject() throws JSONException, IOException, URISyntaxException {
-        setupMaql(LdmModel.loadFromFile(MAQL_PATH));
-
-        factUri = getMdService().getObjUri(getProject(), Fact.class, title("Fact"));
-        dateDatasetUri = getMdService().getObjUri(getProject(), Dataset.class, identifier(KPI_DATE_DIMENSION));
-
-        logout();
-        signInAtGreyPages(imapUser, imapPassword);
-    }
-
-    @BeforeClass(alwaysRun = true)
-    public void setUpImap() throws Exception {
+    public void initProperties() {
+        // create empty project and use customized data8
+        // init imap properties
         imapHost = testParams.loadProperty("imap.host");
         imapUser = testParams.loadProperty("imap.user");
         imapPassword = testParams.loadProperty("imap.password");
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        setupMaql(LdmModel.loadFromFile(MAQL_PATH));
+        factUri = getFactByTitle("Fact").getUri();
+        dateDatasetUri = getDatasetByIdentifier(KPI_DATE_DIMENSION).getUri();
+        logout();
+        signInAtGreyPages(imapUser, imapPassword);
     }
 
     @DataProvider(name = "alertsProvider")
@@ -91,7 +88,7 @@ public class KpiAlertEvaluateTest extends AbstractDashboardTest {
         };
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, dataProvider = "alertsProvider", groups = "desktop")
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "alertsProvider", groups = "desktop")
     public void checkKpiAlertEvaluation(Supplier<Metric> metricSupplier, String threshold)
             throws JSONException,IOException, URISyntaxException {
 
@@ -99,7 +96,7 @@ public class KpiAlertEvaluateTest extends AbstractDashboardTest {
             setupData(CSV_PATH, UPLOADINFO_PATH);
 
             Metric metric = metricSupplier.get();
-            String kpiUri = createKpiUsingRest(createDefaultKpiConfiguration(metric, dateDatasetUri));
+            String kpiUri = createKpiUsingRest(createDefaultKpiConfigure(metric, dateDatasetUri));
             createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(kpiUri));
 
             initIndigoDashboardsPageWithWidgets();
@@ -141,7 +138,7 @@ public class KpiAlertEvaluateTest extends AbstractDashboardTest {
         return IndigoDashboardsPage.getInstance(browser).waitForDashboardLoad();
     }
 
-    private KpiMDConfiguration createDefaultKpiConfiguration(Metric metric, String dateDatasetUri) {
+    private KpiMDConfiguration createDefaultKpiConfigure(Metric metric, String dateDatasetUri) {
         return new KpiMDConfiguration.Builder()
                 .title(metric.getTitle())
                 .metric(metric.getUri())

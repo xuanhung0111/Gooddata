@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.addWidgetToAnalyticalDashboard;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteWidgetsUsingCascade;
@@ -21,18 +22,19 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-public class MetricFormattingTest extends GoodSalesAbstractDashboardTest {
+public class MetricFormattingTest extends AbstractDashboardTest {
 
     private static final String PERCENT_OF_GOAL = "% of Goal";
 
     @Override
-    protected void prepareSetupProject() throws Throwable {
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
     }
 
@@ -48,7 +50,7 @@ public class MetricFormattingTest extends GoodSalesAbstractDashboardTest {
         };
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, dataProvider = "formattingProvider", groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "formattingProvider", groups = {"desktop"})
     public void testCustomMetricFormatting(Formatter format, String expectedValue, boolean compareFormat)
             throws ParseException, JSONException, IOException {
         String customFormatMetricName = "Custom format metric";
@@ -59,7 +61,7 @@ public class MetricFormattingTest extends GoodSalesAbstractDashboardTest {
         initIndigoDashboardsPageWithWidgets().switchToEditMode()
                 .addKpi(new KpiConfiguration.Builder()
                         .metric(customFormatMetricName)
-                        .dataSet(DATE_CREATED)
+                        .dataSet(DATE_DATASET_CREATED)
                         .build())
                 .saveEditModeWithWidgets();
 
@@ -81,7 +83,7 @@ public class MetricFormattingTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "mobile"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop", "mobile"})
     public void checkXssInMetricName(ITestContext context) throws JSONException, IOException {
         String xssHeadline = "<script>alert('Hi')</script>";
         String xssMetricName = "<button>" + PERCENT_OF_GOAL + "</button>";
@@ -94,7 +96,7 @@ public class MetricFormattingTest extends GoodSalesAbstractDashboardTest {
                 new KpiMDConfiguration.Builder()
                     .title(xssMetricName)
                     .metric(xssMetric.getUri())
-                    .dateDataSet(getDateDatasetUri(DATE_CREATED))
+                    .dateDataSet(getDateDatasetUri(DATE_DATASET_CREATED))
                     .comparisonType(ComparisonType.NO_COMPARISON)
                     .comparisonDirection(ComparisonDirection.NONE)
                     .build()
@@ -123,7 +125,7 @@ public class MetricFormattingTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "mobile"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop", "mobile"})
     public void checkXssInMetricFormat() throws ParseException, JSONException, IOException {
         String xssFormatMetricName = "<button>" + PERCENT_OF_GOAL + "</button>";
         String xssFormatMetricMaql = "SELECT 1";
@@ -136,7 +138,7 @@ public class MetricFormattingTest extends GoodSalesAbstractDashboardTest {
                 new KpiMDConfiguration.Builder()
                     .title(xssFormatMetricName)
                     .metric(xssFormatMetric.getUri())
-                    .dateDataSet(getDateDatasetUri(DATE_CREATED))
+                    .dateDataSet(getDateDatasetUri(DATE_DATASET_CREATED))
                     .comparisonType(ComparisonType.NO_COMPARISON)
                     .comparisonDirection(ComparisonDirection.NONE)
                     .build()
@@ -154,7 +156,7 @@ public class MetricFormattingTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "mobile"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop", "mobile"})
     public void checkKpiStateWithNoDataMetric() throws JSONException, IOException {
         String invalidMetricName = "No data metric";
         String invalidMetricMaql = "SELECT 1 where 2 = 3";
@@ -167,7 +169,7 @@ public class MetricFormattingTest extends GoodSalesAbstractDashboardTest {
                 new KpiMDConfiguration.Builder()
                     .title(invalidMetricName)
                     .metric(invalidMetric.getUri())
-                    .dateDataSet(getDateDatasetUri(DATE_CREATED))
+                    .dateDataSet(getDateDatasetUri(DATE_DATASET_CREATED))
                     .comparisonType(ComparisonType.NO_COMPARISON)
                     .comparisonDirection(ComparisonDirection.NONE)
                     .build()

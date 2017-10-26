@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
@@ -10,29 +11,36 @@ import static org.testng.Assert.assertTrue;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 
-public class GoodSalesDateDimensionTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
 
     private static final String ACTIVITY = "Activity";
     private static final String CREATED = "Created";
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Date-Dimension-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+        createSnapshotBOPMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void applyOnFilter() {
         final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-            .addMetric("_Snapshot [BOP]")
+            .addMetric(METRIC_SNAPSHOT_BOP)
             .addDateFilter()
             .waitForReportComputing();
         assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ": All time");
@@ -51,7 +59,7 @@ public class GoodSalesDateDimensionTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("applyOnFilter");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void applyOnBucket() {
         final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
 
@@ -71,7 +79,7 @@ public class GoodSalesDateDimensionTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("applyOnBucket");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void applyOnBothFilterAndBucket() {
         final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
 

@@ -26,7 +26,6 @@ import java.util.function.Supplier;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
@@ -37,21 +36,26 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.Filters
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 
-public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
+public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
-    private static final String EXPECTED = "Expected";
-    private static final String REMAINING_QUOTA = "Remaining Quota";
-
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "Indigo-GoodSales-Demo-Sanity-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+        createSnapshotBOPMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void testWithAttribute() {
         assertEquals(analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
                 .getExplorerMessage(), "NO MEASURE IN YOUR INSIGHT");
@@ -71,7 +75,7 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("testWithAttribute");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void dragMetricToColumnChartShortcutPanel() {
         WebElement metric = analysisPage.getCataloguePanel()
                 .searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC);
@@ -97,7 +101,7 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("dragMetricToColumnChartShortcutPanel");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testSimpleContribution() {
         ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -126,7 +130,7 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
         assertTrue(metricConfiguration.isShowPercentSelected());
         checkingOpenAsReport("testSimpleContribution");
     }
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testSimpleComparison() {
         ChartReport report = analysisPage
                 .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
@@ -155,7 +159,7 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("testSimpleComparison");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void displayWhenDraggingFirstMetric() {
         WebElement metric = analysisPage.getCataloguePanel()
                 .searchAndGet(METRIC_SNAPSHOT_BOP, FieldType.METRIC);
@@ -173,7 +177,7 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("displayWhenDraggingFirstMetric");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void exportCustomDiscovery() {
         assertTrue(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -222,7 +226,7 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
         browser.switchTo().window(currentWindowHandle);
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void filterOnDateAttribute() {
         final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
@@ -240,7 +244,7 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("filterOnDateAttribute");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testSimplePoP() throws ParseException {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate()
@@ -272,7 +276,7 @@ public class AnalyticalDesignerSanityTest extends GoodSalesAbstractAnalyseTest {
         checkingOpenAsReport("testSimplePoP");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void dropAttributeToReportHaveOneMetric() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE);
         assertEquals(analysisPage.waitForReportComputing().getChartReport().getTrackersCount(), 4);

@@ -24,7 +24,6 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -43,9 +42,17 @@ public class EmbeddedAdTest extends GoodSalesAbstractTest {
     private static final String PERMISSION_ERROR_MESSAGE = "SORRY, YOU DON'T HAVE ACCESS TO THIS PAGE.";
     private static final String IFRAME_WRAPPER_URL = "https://gdc.sitina.net/wrapper.html";
 
-    @BeforeClass(alwaysRun = true)
-    public void initializeProject() {
+    @Override
+    protected void initProperties() {
+        super.initProperties();
         projectTitle += "Embedded-Ad-Test";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+        createSnapshotBOPMetric();
     }
 
     @Test(dependsOnGroups = { "createProject" })

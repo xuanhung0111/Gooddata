@@ -11,12 +11,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.gooddata.qa.graphene.TemplateAbstractTest;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
@@ -25,7 +25,7 @@ import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
-public class GoodSalesReportsTest extends GoodSalesAbstractTest {
+public class GoodSalesReportsTest extends TemplateAbstractTest {
 
     private int createdReportsCount = 0;
     protected static final int expectedGoodSalesReportsCount = 103;

@@ -100,23 +100,23 @@ public final class DashboardsRestUtils {
     private static final Supplier<String> DASHBOARD_BODY = () -> {
         try {
             return new JSONObject() {{
-              put("projectDashboard", new JSONObject() {{
-                  put("content", new JSONObject() {{
-                      put("rememberFilters", 0);
-                      put("tabs", new JSONArray() {{
-                          put(new JSONObject() {{
-                              put("title", "First Tab");
-                              put("items", new JSONArray());
-                          }});
-                      }});
-                      put("filters", new JSONArray());
-                  }});
-                  put("meta", new JSONObject() {{
-                      put("title", "$title");
-                      put("locked", 0);
-                      put("unlisted", 1);
-                  }});
-              }});
+                put("projectDashboard", new JSONObject() {{
+                    put("content", new JSONObject() {{
+                        put("rememberFilters", 0);
+                        put("tabs", new JSONArray() {{
+                            put(new JSONObject() {{
+                                put("title", "First Tab");
+                                put("items", new JSONArray());
+                            }});
+                        }});
+                        put("filters", new JSONArray());
+                    }});
+                    put("meta", new JSONObject() {{
+                        put("title", "$title");
+                        put("locked", 0);
+                        put("unlisted", 1);
+                    }});
+                }});
             }}.toString();
         } catch (JSONException e) {
             throw new IllegalStateException("There is an exception during json object initialization! ", e);
@@ -138,8 +138,8 @@ public final class DashboardsRestUtils {
     };
 
     /**
-     * Create dashboard
-     * 
+     * Create an empty dashboard
+     *
      * @param restApiClient
      * @param projectId
      * @param title
@@ -151,14 +151,33 @@ public final class DashboardsRestUtils {
 
         return getJsonObject(restApiClient,
                 restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId), content))
-                    .getJSONObject("projectDashboard")
-                    .getJSONObject("meta")
-                    .getString("uri");
+                .getJSONObject("projectDashboard")
+                .getJSONObject("meta")
+                .getString("uri");
+    }
+
+    /**
+     * create a dashboard with given content
+     *
+     * @param restApiClient
+     * @param projectId
+     * @param content
+     * @return
+     * @throws JSONException
+     * @throws IOException
+     */
+    public static String createDashboard(final RestApiClient restApiClient, final String projectId,
+            final JSONObject content) throws JSONException, IOException {
+        return getJsonObject(restApiClient,
+                restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId), content.toString()))
+                .getJSONObject("projectDashboard")
+                .getJSONObject("meta")
+                .getString("uri");
     }
 
     /**
      * Delete dashboard tab
-     * 
+     *
      * @param restApiClient
      * @param dashboardUri
      * @param tabName
@@ -186,7 +205,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Add comment for object
-     * 
+     *
      * @param restApiClient
      * @param projectId
      * @param comment
@@ -204,38 +223,104 @@ public final class DashboardsRestUtils {
                 .replace("#{related}", objectUri);
         return getJsonObject(restApiClient,
                 restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId), content))
-                    .getJSONObject("comment")
-                    .getJSONObject("meta")
-                    .getString("uri");
+                .getJSONObject("comment")
+                .getJSONObject("meta")
+                .getString("uri");
+    }
+
+
+    /**
+     * Create filter variable
+     *
+     * @param restApiClient
+     * @param projectId
+     * @param name          variable name
+     * @return attributeUri
+     */
+    public static String createFilterVariable(final RestApiClient restApiClient, final String projectId,
+            final String name, final String attributeUri) {
+        return createFilterVariable(restApiClient, projectId, name, attributeUri, null);
     }
 
     /**
      * Create filter variable
-     * 
+     *
      * @param restApiClient
      * @param projectId
-     * @param name           variable name
+     * @param name          variable name
+     * @Param expression    expression for default values
      * @return attributeUri
      */
     public static String createFilterVariable(final RestApiClient restApiClient, final String projectId,
-            final String name, final String attributeUri) throws ParseException, JSONException, IOException {
-        final String content = new JSONObject() {{
-            put("prompt", new JSONObject() {{
-                put("content", new JSONObject() {{
-                    put("attribute", attributeUri);
-                    put("type", "filter");
+            final String name, final String attributeUri, final String expression) {
+        String objUri;
+        try {
+            final String content = new JSONObject() {{
+                put("prompt", new JSONObject() {{
+                    put("content", new JSONObject() {{
+                        put("attribute", attributeUri);
+                        put("type", "filter");
+                    }});
+                    put("meta", new JSONObject() {{
+                        put("tags", "");
+                        put("deprecated", 0);
+                        put("summary", "");
+                        put("isProduction", 1);
+                        put("title", name);
+                        put("category", "prompt");
+                    }});
                 }});
-                put("meta", new JSONObject() {{
-                    put("tags", "");
-                    put("deprecated", 0);
-                    put("summary", "");
-                    put("isProduction", 1);
-                    put("title", name);
-                    put("category", "prompt");
-                }});
-            }});
-        }}.toString();
+            }}.toString();
 
+            objUri = createVariable(restApiClient, projectId,
+                    content, "filter", expression == null ? "TRUE" : expression);
+        } catch (JSONException | IOException e) {
+            throw new RuntimeException("There is an error while creating filter variable", e);
+        }
+
+        return objUri;
+    }
+
+    /**
+     * Create filter variable
+     *
+     * @param restApiClient
+     * @param projectId
+     * @param name          variable name
+     * @param defaultValue  default numeric value
+     * @return attributeUri
+     */
+    public static String createNumericVariable(final RestApiClient restApiClient, final String projectId,
+                                               final String name, final String defaultValue) {
+        String objUri;
+        try {
+            final String content = new JSONObject() {{
+                put("prompt", new JSONObject() {{
+                    put("content", new JSONObject() {{
+                        put("type", "scalar");
+                    }});
+                    put("meta", new JSONObject() {{
+                        put("tags", "");
+                        put("deprecated", 0);
+                        put("summary", "");
+                        put("isProduction", 1);
+                        put("title", name);
+                        put("category", "prompt");
+                    }});
+                }});
+            }}.toString();
+
+            objUri = createVariable(restApiClient, projectId, content, "scalar", defaultValue);
+        } catch (JSONException | IOException e) {
+            throw new RuntimeException("There is an error while creating numeric variable", e);
+        }
+
+        return objUri;
+    }
+
+    private static String createVariable(final RestApiClient restApiClient, final String projectId,
+            final String content, final String variableType, final String expression)
+            throws ParseException, JSONException, IOException {
         String variableUri = getJsonObject(restApiClient,
                 restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId), content))
                 .getJSONObject("prompt")
@@ -245,30 +330,32 @@ public final class DashboardsRestUtils {
         getJsonObject(restApiClient, restApiClient.newPostMethod(format(VARIABLE_LINK, projectId),
                 new JSONObject() {{
                     put("variable", new JSONObject() {{
-                        put("expression", "TRUE");
+                        put("expression", expression);
                         put("level", "project");
                         put("prompt", variableUri);
                         put("related", format("/gdc/projects/%s", projectId));
-                        put("type", "filter");
+                        put("type", variableType);
                     }});
                 }}.toString()));
 
         return variableUri;
     }
 
-    public static String getVariableUri(RestApiClient restApiClient, String projectId, String title)
-            throws JSONException, IOException {
-        JSONArray variables = getJsonObject(restApiClient, format(GET_VARIABLE_LINK, projectId))
-                .getJSONObject("query")
-                .getJSONArray("entries");
+    public static String getVariableUri(RestApiClient restApiClient, String projectId, String title) {
+        try {
+            JSONArray variables = getJsonObject(restApiClient, format(GET_VARIABLE_LINK, projectId))
+                    .getJSONObject("query")
+                    .getJSONArray("entries");
 
-        for (int i = 0; i < variables.length(); i++) {
-            if (title.equals(variables.getJSONObject(i).getString("title"))) {
-                return variables.getJSONObject(i).getString("link");
+            for (int i = 0; i < variables.length(); i++) {
+                if (title.equals(variables.getJSONObject(i).getString("title"))) {
+                    return variables.getJSONObject(i).getString("link");
+                }
             }
+            throw new RuntimeException("No variable matches with title: " + title);
+        } catch (IOException | JSONException e) {
+            throw new RuntimeException("there is error while searching", e);
         }
-
-        throw new RuntimeException("No variable matches with title: " + title);
     }
 
     public static String getDashboardUri(RestApiClient restApiClient, String projectId, String title)
@@ -308,7 +395,7 @@ public final class DashboardsRestUtils {
      * @param restApiClient
      * @param projectID
      * @param dashboardName
-     * @throws tabName
+     * @param tabName
      * @throws JSONException
      * @throws IOException
      * @return default link
@@ -331,7 +418,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Change metric format
-     * 
+     *
      * @param restApiClient
      * @param metricUri
      * @param newFormat
@@ -346,7 +433,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Change metric expression
-     * 
+     *
      * @param restApiClient
      * @param metricUri
      * @param newExpression
@@ -361,7 +448,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Create mandatory user filter object with simple expression '%s IN (%s)'using uri
-     * 
+     *
      * @param restApiClient
      * @param projectID
      * @param mufTitle
@@ -370,7 +457,7 @@ public final class DashboardsRestUtils {
      */
     public static String createSimpleMufObjByUri(final RestApiClient restApiClient, final String projectID,
             final String mufTitle, final Map<String, Collection<String>> conditions)
-                    throws ParseException, JSONException, IOException {
+            throws ParseException, JSONException, IOException {
         final String expression = "(%s IN (%s))";
         final List<String> expressions = Lists.newArrayList();
 
@@ -385,7 +472,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Create mandatory user filter object with complex expression using uri
-     * 
+     *
      * @param restApiClient
      * @param projectID
      * @param mufTitle
@@ -404,7 +491,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Add mandatory user filter to specific user
-     * 
+     *
      * @param restApiClient
      * @param projectId
      * @param user
@@ -425,7 +512,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Set drill report as popup for specific dashboard
-     * 
+     *
      * @param restApiClient
      * @param projectID
      * @param dashboardID
@@ -437,7 +524,7 @@ public final class DashboardsRestUtils {
 
     /**
      * Set drill report as export for specific dashboard
-     * 
+     *
      * @param restApiClient
      * @param projectID
      * @param dashboardID
@@ -450,7 +537,7 @@ public final class DashboardsRestUtils {
 
     private static void setDrillReportTarget(final RestApiClient restApiClient, final String projectID,
             final String dashboardID, final String target, final String exportFormat)
-                    throws JSONException, IOException {
+            throws JSONException, IOException {
         final String dashboardEditModeURI = format(DASHBOARD_EDIT_MODE_LINK, projectID, dashboardID);
         final JSONObject json = getJsonObject(restApiClient, restApiClient.newGetMethod(dashboardEditModeURI));
         final JSONObject drills = json.getJSONObject("projectDashboard")

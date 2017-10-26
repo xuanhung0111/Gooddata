@@ -10,19 +10,25 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 
 import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
 public class NoncommonDateTest extends AbstractAdE2ETest {
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "Noncommon-Date-E2E-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void date_dimension_in_chart_should_reflect_currently_selected_dimension() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate()
@@ -40,7 +46,7 @@ public class NoncommonDateTest extends AbstractAdE2ETest {
                 containsString("Activity"));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void enable_date_dimension_selects_correctly() {
         WebElement dateFilter = analysisPage.addDateFilter()
             .getFilterBuckets()
@@ -58,7 +64,7 @@ public class NoncommonDateTest extends AbstractAdE2ETest {
         assertTrue(isElementPresent(cssSelector(".adi-date-dataset-select-dropdown button.disabled"), browser));
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"createProject"})
     public void keeps_date_dimensions_in_categories_in_sync_with_the_filter() {
         analysisPage.addDateFilter()
             .addDate()

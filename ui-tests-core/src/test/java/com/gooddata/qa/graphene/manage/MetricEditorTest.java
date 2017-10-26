@@ -6,7 +6,6 @@ import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
@@ -18,18 +17,19 @@ public class MetricEditorTest extends AbstractProjectTest {
     private static final String PAYROLL_DATASET = "Payroll";
     private static final String RECORD_OF_PAYROLL = "Records of Payroll";
 
-    @BeforeClass
-    public void setProjectTitle() {
-        projectTitle += "Metric-Editor-Improvement-Test";
+    @Override
+    protected void initProperties() {
+        // use empty project
+        projectTitle = "Metric-Editor-Improvement-Test";
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void uploadCsvFile() {
+    @Override
+    protected void customizeProject() throws Throwable {
         uploadCSV(getFilePathFromResource(PAYROLL_CSV_PATH));
         takeScreenshot(browser, "uploaded-" + PAYROLL_DATASET + "-dataset", getClass());
     }
 
-    @Test(dependsOnMethods = {"uploadCsvFile"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testRecordOfDatasetOnAttributeValues() {
         assertTrue(
                 initMetricPage().openMetricEditor().clickCustomMetricLink()
@@ -38,7 +38,7 @@ public class MetricEditorTest extends AbstractProjectTest {
                 "The empty message is not displayed");
     }
 
-    @Test(dependsOnMethods = {"uploadCsvFile"})
+    @Test(dependsOnGroups = {"createProject"})
     public void testRecordOfDatasetOnAttributeLabels() {
         assertEquals(
                 initMetricPage().openMetricEditor().clickCustomMetricLink()

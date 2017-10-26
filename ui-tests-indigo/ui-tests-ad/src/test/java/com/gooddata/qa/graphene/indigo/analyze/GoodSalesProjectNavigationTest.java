@@ -15,7 +15,6 @@ import java.util.UUID;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -23,10 +22,10 @@ import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
-public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesProjectNavigationTest extends AbstractAnalyseTest {
 
     private static final String UNIQUE_ID = UUID.randomUUID().toString().substring(0, 10);
     private static final String NEW_PROJECT_NAME = "New-project-navigation-" + UNIQUE_ID;
@@ -37,12 +36,19 @@ public class GoodSalesProjectNavigationTest extends GoodSalesAbstractAnalyseTest
     private String currentProjectId;
     private String newProjectId;
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Project-navigation-" + UNIQUE_ID;
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {"precondition"})
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createAmountMetric();
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
     public void getMoreProject() {
         currentProjectId = testParams.getProjectId();
 

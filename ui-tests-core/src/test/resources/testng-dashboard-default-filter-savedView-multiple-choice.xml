@@ -6,7 +6,6 @@
             <run>
                 <include name="df-multiple" />
                 <include name="initSavedView" />
-                <include name="precondition" />
                 <include name="createProject" />
                 <include name="arquillian" />
             </run>

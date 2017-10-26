@@ -34,23 +34,23 @@ import com.gooddata.qa.graphene.fragments.manage.DatasetDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFiltersPanel;
-import com.gooddata.qa.graphene.indigo.dashboards.common.GoodSalesAbstractDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
+public class AttributeFilteringTest extends AbstractDashboardTest {
 
     private static String TEST_INSIGHT = "Test-Insight";
     private static final String WITHOUT_DATE_CSV_PATH = "/" + UPLOAD_CSV + "/without.date.csv";
     private static final String WITHOUT_DATE_DATASET = "Without Date";
 
-    @BeforeClass(alwaysRun = true)
-    public void setTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Attribute-Filtering-Test";
     }
 
@@ -60,11 +60,15 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
     }
 
     @Override
-    protected void prepareSetupProject() throws ParseException, JSONException, IOException {
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+        createAmountMetric();
+        createNumberOfWonOppsMetric();
+
         String insightWidget = createInsightWidget(new InsightMDConfiguration(TEST_INSIGHT, ReportType.COLUMN_CHART)
                 .setMeasureBucket(singletonList(MeasureBucket.getSimpleInstance(getMdService().getObj(getProject(),
                         Metric.class, title(METRIC_NUMBER_OF_ACTIVITIES))))));
-
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
                 asList(createAmountKpi(), insightWidget));
     }
@@ -77,7 +81,7 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
         };
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"}, dataProvider = "widgetTypeProvider")
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"}, dataProvider = "widgetTypeProvider")
     public void checkStatusOfAttributeOnConfigurationPanelWithEditor(final String clazz, final String headLine)
             throws ClassNotFoundException, IOException, JSONException {
         logoutAndLoginAs(true, UserRoles.EDITOR);
@@ -110,7 +114,7 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop", "mobile"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop", "mobile"})
     public void checkDashboardWithNoAttributeFilters() {
         final AttributeFiltersPanel attributeFiltersPanel =
                 initIndigoDashboardsPageWithWidgets().getAttributeFiltersPanel();
@@ -120,7 +124,7 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
         assertEquals(attributeFiltersPanel.getAttributeFilters().size(), 0);
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void testMakingNoAffectOnWidgetsWhenUsingUnconnectedFilter() {
         initIndigoDashboardsPageWithWidgets().switchToEditMode()
                 .addAttributeFilter(ATTR_PRIORITY)
@@ -144,7 +148,7 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
                 singletonList("62,136"), "Unconnected filter make impact to insight");
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void keepFilterValuesAfterSave() throws IOException, JSONException {
         List<String> selectedItems = asList("236349", "236350", "236351");
 
@@ -173,7 +177,7 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void revertFilterValuesAfterCancelling() throws IOException, JSONException {
         addAttributeFilterToDashboard(ATTR_OPP_SNAPSHOT);
         try {
@@ -206,7 +210,7 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
         return new Object[][]{{true}, {false}};
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"}, dataProvider = "booleanProvider")
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"}, dataProvider = "booleanProvider")
     public void applyMultipleFiltersOnKpi(boolean isSaved) throws IOException, JSONException {
         Collection<String> filters = asList(ATTR_STAGE_NAME, ATTR_PRODUCT, ATTR_PRIORITY);
         initIndigoDashboardsPageWithWidgets().switchToEditMode();
@@ -240,7 +244,7 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"}, dataProvider = "booleanProvider")
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"}, dataProvider = "booleanProvider")
     public void applyMultipleFiltersOnInsight(boolean isSaved) throws IOException, JSONException {
         List<String> filters = asList(ATTR_DEPARTMENT, ATTR_PRODUCT, ATTR_PRIORITY);
         initIndigoDashboardsPageWithWidgets().switchToEditMode();
@@ -287,7 +291,7 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
         };
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"}, dataProvider = "testWidgets")
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"}, dataProvider = "testWidgets")
     public void testAddingIgnoredCheckboxesOnConfigurationPanel(String widgetHeadline, Class<? extends Widget> widgetClass) {
         initIndigoDashboardsPage().switchToEditMode()
                 .addAttributeFilter(ATTR_STAGE_NAME)
@@ -305,7 +309,7 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
                 "List of ignored checkboxes is not correct");
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkAttributeFilterDefaultState() {
         initIndigoDashboardsPageWithWidgets().switchToEditMode().
                 addAttributeFilter(ATTR_ACTIVITY_TYPE).waitForWidgetsLoading();
@@ -315,7 +319,7 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
                 .getSelection(), "All");
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"},
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"},
             description = "ONE-1981: Attribute filter have long name that is not shorten")
     public void shortenLongAttributeNameOnFilter() {
         String longNameAttribute = "Attribute-Having-Long-Name" + UUID.randomUUID().toString().substring(0, 10);
@@ -348,7 +352,7 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboardsInit"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void testEmptyStateWhenFilterOut() {
         initIndigoDashboardsPageWithWidgets().switchToEditMode()
                 .addAttributeFilter(ATTR_OPPORTUNITY)
@@ -371,7 +375,7 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
                 "The empty state on Insight is not correct");
     }
 
-    @Test(dependsOnGroups = "dashboardsInit", groups = {"desktop"},
+    @Test(dependsOnGroups = "createProject", groups = {"desktop"},
             description = "ONE-2044: Cannot delete dataset if there are filters in KPIs")
     public void deleteDatasetUsedByFilter() {
         String workingProject = testParams.getProjectId();
@@ -420,13 +424,13 @@ public class AttributeFilteringTest extends GoodSalesAbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnGroups = "dashboardsInit", groups = {"desktop"})
+    @Test(dependsOnGroups = "createProject", groups = {"desktop"})
     public void testAddAttributePlaceHolderExistence() {
         assertTrue(initIndigoDashboardsPageWithWidgets().switchToEditMode().hasAttributeFilterPlaceholder(),
                 "The attribute filter placeholder is not displayed");
     }
 
-    @Test(dependsOnGroups = "dashboardsInit", groups = {"desktop"})
+    @Test(dependsOnGroups = "createProject", groups = {"desktop"})
     public void testListOfAttributesAndValuesOnFilter() {
         AttributeSelect dropdown = initIndigoDashboardsPageWithWidgets().switchToEditMode()
                 .dragAddAttributeFilterPlaceholder().getAttributeSelect();

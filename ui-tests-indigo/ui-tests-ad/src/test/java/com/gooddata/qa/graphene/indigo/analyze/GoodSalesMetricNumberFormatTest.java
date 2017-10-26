@@ -20,7 +20,6 @@ import java.util.List;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -29,20 +28,23 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
-import com.gooddata.qa.graphene.indigo.analyze.common.GoodSalesAbstractAnalyseTest;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 
-public class GoodSalesMetricNumberFormatTest extends GoodSalesAbstractAnalyseTest {
+public class GoodSalesMetricNumberFormatTest extends AbstractAnalyseTest {
 
     private String percentOfGoalUri;
     private String oldPercentOfGoalMetricFormat;
 
-    @BeforeClass(alwaysRun = true)
-    public void initialize() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle += "Metric-Number-Format-Test";
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {"precondition"})
-    public void prepareData() {
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createPercentOfGoalMetric();
         percentOfGoalUri = getMdService().getObjUri(getProject(), Metric.class, title(METRIC_PERCENT_OF_GOAL));
         oldPercentOfGoalMetricFormat = getMetricFormat(METRIC_PERCENT_OF_GOAL);
     }
@@ -59,7 +61,7 @@ public class GoodSalesMetricNumberFormatTest extends GoodSalesAbstractAnalyseTes
         };
     }
 
-    @Test(dependsOnGroups = {"precondition"}, dataProvider = "formattingProvider", groups = {"metricFormat"})
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "formattingProvider", groups = {"metricFormat"})
     public void testMetricNumberFormat(Formatter format, String expectedValue, boolean compareFormat)
             throws ParseException, JSONException, IOException {
         changeMetricFormat(getRestApiClient(), percentOfGoalUri, format.toString());
@@ -93,7 +95,7 @@ public class GoodSalesMetricNumberFormatTest extends GoodSalesAbstractAnalyseTes
         }
     }
 
-    @Test(dependsOnGroups = {"precondition"}, dataProvider = "formattingProvider", groups = {"chartLabel"})
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "formattingProvider", groups = {"chartLabel"})
     public void checkDataLabelShowOnBarChart(Formatter format, String expectedValue, boolean compareFormat)
             throws ParseException, JSONException, IOException {
         changeMetricFormat(getRestApiClient(), percentOfGoalUri, format.toString());

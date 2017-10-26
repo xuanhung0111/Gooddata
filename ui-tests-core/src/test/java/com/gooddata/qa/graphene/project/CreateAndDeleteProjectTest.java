@@ -26,17 +26,18 @@ public class CreateAndDeleteProjectTest extends AbstractProjectTest {
     private static final String FIRST_EDITED_PROJECT_NAME = "Project rename first";
     private static final String SECOND_EDITED_PROJECT_NAME = "Project rename second";
 
-    private String fisrtProjectId;
+    private String firstProjectId;
     private String secondProjectId;
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void initData() {
-        fisrtProjectId = testParams.getProjectId();
+    @Override
+    protected void initProperties() {
         projectTitle = "Project-create-and-delete-test";
     }
 
-    @Test(dependsOnMethods = {"initData"})
-    public void createProjectByRestApi() throws ParseException, JSONException, IOException {
+    @Test(dependsOnGroups = {"createProject"})
+    public void createAnotherProject() {
+        firstProjectId = testParams.getProjectId();
+
         openUrl(PAGE_GDC_PROJECTS);
         assertEquals(waitForFragmentVisible(gpProject).getDwhDriverSelected(), ProjectDriver.POSTGRES.getValue());
 
@@ -44,9 +45,9 @@ public class CreateAndDeleteProjectTest extends AbstractProjectTest {
                 testParams.getAuthorizationToken(), testParams.getProjectDriver(), testParams.getProjectEnvironment());
     }
 
-    @Test(dependsOnMethods = {"createProjectByRestApi"})
+    @Test(dependsOnMethods = {"createAnotherProject"})
     public void renameProjectByOwner() {
-        ProjectsPage.getInstance(browser).goToProject(fisrtProjectId);
+        ProjectsPage.getInstance(browser).goToProject(firstProjectId);
         waitForDashboardPageLoaded(browser);
 
         assertEquals(initProjectsAndUsersPage().renameProject(FIRST_EDITED_PROJECT_NAME).getProjectName(),
@@ -64,7 +65,7 @@ public class CreateAndDeleteProjectTest extends AbstractProjectTest {
         logout();
         signInAtGreyPages(invitedAdminUser, testParams.getPassword());
 
-        initProjectsPage().goToProject(fisrtProjectId);
+        initProjectsPage().goToProject(firstProjectId);
         waitForDashboardPageLoaded(browser);
 
         assertEquals(initProjectsAndUsersPage().renameProject(SECOND_EDITED_PROJECT_NAME).getProjectName(),
@@ -81,10 +82,10 @@ public class CreateAndDeleteProjectTest extends AbstractProjectTest {
             assertTrue(initProjectsAndUsersPage().isDeleteButtonEnabled(), "Delete button is not enabled");
 
             ProjectAndUsersPage.getInstance(browser).tryDeleteProjectButDiscard();
-            assertTrue(initProjectsPage().isProjectDisplayed(fisrtProjectId),
+            assertTrue(initProjectsPage().isProjectDisplayed(firstProjectId),
                     "Project is still deleted after discard Delete project dialog");
 
-            assertFalse(initProjectsAndUsersPage().deteleProject().isProjectDisplayed(fisrtProjectId), "Project is still not deleted");
+            assertFalse(initProjectsAndUsersPage().deteleProject().isProjectDisplayed(firstProjectId), "Project is still not deleted");
 
         } catch(Exception e) {
             takeScreenshot(browser, "Fail to delete project", this.getClass());
