@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.connectors;
 
-import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.TemplateAbstractTest;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.enums.Connectors;
@@ -17,7 +16,6 @@ import org.testng.ITestContext;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.util.Map;
 
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
@@ -49,6 +47,14 @@ public abstract class AbstractConnectorsCheckTest extends TemplateAbstractTest {
     private ConnectorFragment connector;
 
     @Override
+    protected void initProperties() {
+        projectTemplate = connectorType.getTemplate();
+        projectTitle = connectorType.getName() + "Connector-test";
+        System.out.println(String.format("Template %s will be for project creation...", projectTemplate));
+        projectCreateCheckIterations = DEFAULT_PROJECT_CHECK_LIMIT;
+    }
+
+    @Override
     public void configureStartPage() {
         startPageContext = new StartPageContext() {
             
@@ -62,15 +68,6 @@ public abstract class AbstractConnectorsCheckTest extends TemplateAbstractTest {
                 return "gdc";
             }
         };
-        projectTitle = connectorType.getName() + "Connector-test";
-        String projectTemplateOverride = System.getProperty("projectTemplate");
-        if (projectTemplateOverride != null && !projectTemplateOverride.isEmpty()) {
-            projectTemplate = projectTemplateOverride;
-        } else {
-            projectTemplate = connectorType.getTemplate();
-        }
-        System.out.println(String.format("Template %s will be for project creation...", projectTemplate));
-        projectCreateCheckIterations = DEFAULT_PROJECT_CHECK_LIMIT;
     }
 
     /**
