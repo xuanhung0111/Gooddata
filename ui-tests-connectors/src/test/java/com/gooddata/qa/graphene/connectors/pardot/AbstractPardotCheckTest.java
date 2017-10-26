@@ -15,7 +15,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.connectors.AbstractConnectorsCheckTest;
@@ -30,8 +29,9 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
     protected String pardotUploadUserPassword;
     protected Map<String, String[]> expectedDashboardsAndTabs;
 
-    @BeforeClass
-    public void loadRequiredProperties() {
+    @Override
+    protected void initProperties() {
+        super.initProperties();
         pardotAccountId = testParams.loadProperty("connectors.pardot.accountId");
         pardotUploadUser = testParams.loadProperty("connectors.pardot.uploadUser");
         pardotUploadUserPassword = testParams.loadProperty("connectors.pardot.uploadUserPassword");

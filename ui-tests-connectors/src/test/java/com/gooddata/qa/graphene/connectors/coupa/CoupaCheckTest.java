@@ -16,7 +16,6 @@ import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.connectors.AbstractConnectorsCheckTest;
@@ -40,12 +39,12 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
     @FindBy(tagName = "form")
     private CoupaInstanceFragment coupaInstance;
 
-    @BeforeClass
-    public void loadRequiredProperties() {
+    @Override
+    protected void initProperties() {
+        connectorType = Connectors.COUPA;
+        super.initProperties();
         coupaInstanceApiUrl = testParams.loadProperty("connectors.coupa.instance.apiUrl");
         coupaInstanceApiKey = testParams.loadProperty("connectors.coupa.instance.apiKey");
-
-        connectorType = Connectors.COUPA;
 
         projectCreateCheckIterations = 120;
         integrationProcessCheckLimit = 720;
