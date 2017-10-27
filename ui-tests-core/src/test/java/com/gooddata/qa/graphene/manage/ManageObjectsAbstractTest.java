@@ -18,18 +18,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.gooddata.qa.graphene.TemplateAbstractTest;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.fragments.common.IpeEditor;
 import com.gooddata.qa.graphene.fragments.manage.DataPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectPropertiesPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 
-public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
+public abstract class ManageObjectsAbstractTest extends TemplateAbstractTest {
 
     protected static final List<String> attributesList = Arrays.asList("Account", "Activity",
             "Activity Type", "Date (Activity)", "Date (Closed)", "Date (Created)",

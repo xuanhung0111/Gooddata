@@ -5,17 +5,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.gooddata.qa.graphene.TemplateAbstractTest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.manage.DataPage;
 
-public class GoodSalesFolderTest extends GoodSalesAbstractTest {
+public class GoodSalesFolderTest extends TemplateAbstractTest {
     private String newName;
     private String oldEditName;
     private String newEditName;
