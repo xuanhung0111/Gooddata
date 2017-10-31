@@ -6,6 +6,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CLOSE
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.utils.asserts.AssertUtils.assertHeadersEqual;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Arrays.asList;
 import static org.joda.time.DateTime.now;
@@ -125,14 +126,14 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
 
         takeScreenshot(browser,
                 "checkReportRenderWithDateFilterBetweenDuplicatedTabs-Report-render-with-date-filter", getClass());
-        assertEquals(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
+        assertHeadersEqual(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
 
         dashboardsPage.openTab(1);
         getReport().waitForReportLoading();
 
         takeScreenshot(browser, "Report-render-with-date-filter-in-duplicated-tab", getClass());
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_OF_DATA);
-        assertEquals(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
+        assertHeadersEqual(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -157,14 +158,14 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
 
         takeScreenshot(browser,
                 "checkReportRenderWithDateFilterBetweenSameTabs-Report-render-with-date-filter", getClass());
-        assertEquals(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
+        assertHeadersEqual(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
 
         dashboardsPage.openTab(0);
         getReport().waitForReportLoading();
 
         takeScreenshot(browser, "Report-render-with-date-filter-in-same-tab", getClass());
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_OF_DATA);
-        assertEquals(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
+        assertHeadersEqual(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -224,7 +225,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
 
         takeScreenshot(browser,
                 "checkReportRenderWithDifferenceDateFilterBetweenTabs-Report-render-with-date-filter", getClass());
-        assertEquals(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
+        assertHeadersEqual(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
 
         dashboardsPage.openTab(0);
         getReport().waitForReportLoading();
@@ -257,7 +258,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
 
         takeScreenshot(browser,
                 "checkReportRenderWithDifferenceDateValuesBetweenTabs-Report-render-with-date-filter", getClass());
-        assertEquals(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
+        assertHeadersEqual(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
 
         dashboardsPage.openTab(0);
         getReport().waitForReportLoading();
@@ -297,7 +298,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
                 .changeTimeFilterValueByClickInTimeLine(YEAR_OF_DATA)
                 .getCurrentValue(),
                 YEAR_OF_DATA);
-        assertEquals(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
+        assertHeadersEqual(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
 
         dashboardsPage.openTab(1);
         getReport().waitForReportLoading();
@@ -305,7 +306,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         takeScreenshot(browser, "Multiple-date-filters-connected-between-duplicated-tabs", getClass());
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_OF_DATA);
         assertEquals(getDateClosedFilter().getCurrentValue(), YEAR_OF_DATA);
-        assertEquals(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
+        assertHeadersEqual(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -331,7 +332,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
 
         getDateCreatedFilter().changeTimeFilterValueByClickInTimeLine(YEAR_OF_DATA);
         getDateClosedFilter().changeTimeFilterValueByClickInTimeLine(YEAR_OF_DATA);
-        assertEquals(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
+        assertHeadersEqual(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
 
         dashboardsPage.openTab(0);
         getReport().waitForReportLoading();
@@ -339,7 +340,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         takeScreenshot(browser, "Multiple-date-filters-connected-between-same-tabs", getClass());
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_OF_DATA);
         assertEquals(getDateClosedFilter().getCurrentValue(), YEAR_OF_DATA);
-        assertEquals(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
+        assertHeadersEqual(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -367,7 +368,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
 
         getDateCreatedFilter().changeTimeFilterValueByClickInTimeLine(YEAR_OF_DATA);
         getDateSnapshotFilter().changeTimeFilterValueByClickInTimeLine(YEAR_OF_DATA);
-        assertEquals(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
+        assertHeadersEqual(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
 
         dashboardsPage.openTab(0);
         getReport().waitForReportLoading();
@@ -375,7 +376,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         takeScreenshot(browser, "Multiple-date-filters-do-not-connected-between-tabs", getClass());
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_OF_DATA);
         assertEquals(getDateClosedFilter().getCurrentValue(), CURRENT_YEAR);
-        assertEquals(getReport().getAttributeElements(), asList("Inside Sales", "CompuSci"));
+        assertHeadersEqual(getReport().getAttributeElements(), asList("Inside Sales", "CompuSci"));
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -401,7 +402,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
 
         getDateCreatedFilter().changeTimeFilterValueByClickInTimeLine(YEAR_OF_DATA);
         getDateClosedFilter().changeTimeFilterValueByClickInTimeLine(YEAR_OF_DATA);
-        assertEquals(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
+        assertHeadersEqual(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
 
         dashboardsPage.openTab(0);
         getReport().waitForReportLoading();
@@ -409,7 +410,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         takeScreenshot(browser, "Multiple-date-filters-with-difference-value-do-not-connect-between-tabs", getClass());
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_OF_DATA);
         assertEquals(getDateClosedFilter().getCurrentValue(), CURRENT_YEAR);
-        assertEquals(getReport().getAttributeElements(), asList("Inside Sales", "CompuSci"));
+        assertHeadersEqual(getReport().getAttributeElements(), asList("Inside Sales", "CompuSci"));
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -495,7 +496,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         dashboardsPage.openTab(0);
         getDateCreatedFilter().changeTimeFilterValueByClickInTimeLine(YEAR_OF_DATA);
         getProductFilter().changeAttributeFilterValues(PRODUCT_COMPUSCI);
-        assertEquals(getReport().getAttributeElements(), COMBINATION_ATTRIBUTE_FILTER_VALUES);
+        assertHeadersEqual(getReport().getAttributeElements(), COMBINATION_ATTRIBUTE_FILTER_VALUES);
 
         dashboardsPage.openTab(1);
         getReport().waitForReportLoading();
@@ -503,7 +504,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         takeScreenshot(browser, "Report-render-with-filter-combination-between-duplicated-tabs", getClass());
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_OF_DATA);
         assertEquals(getProductFilter().getCurrentValue(), PRODUCT_COMPUSCI);
-        assertEquals(getReport().getAttributeElements(), COMBINATION_ATTRIBUTE_FILTER_VALUES);
+        assertHeadersEqual(getReport().getAttributeElements(), COMBINATION_ATTRIBUTE_FILTER_VALUES);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -529,7 +530,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
 
         getDateCreatedFilter().changeTimeFilterValueByClickInTimeLine(YEAR_OF_DATA);
         getProductFilter().changeAttributeFilterValues(PRODUCT_COMPUSCI);
-        assertEquals(getReport().getAttributeElements(), COMBINATION_ATTRIBUTE_FILTER_VALUES);
+        assertHeadersEqual(getReport().getAttributeElements(), COMBINATION_ATTRIBUTE_FILTER_VALUES);
 
         dashboardsPage.openTab(0);
         getReport().waitForReportLoading();
@@ -537,7 +538,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         takeScreenshot(browser, "Report-render-with-filter-combination-between-same-tabs", getClass());
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_OF_DATA);
         assertEquals(getProductFilter().getCurrentValue(), PRODUCT_COMPUSCI);
-        assertEquals(getReport().getAttributeElements(), COMBINATION_ATTRIBUTE_FILTER_VALUES);
+        assertHeadersEqual(getReport().getAttributeElements(), COMBINATION_ATTRIBUTE_FILTER_VALUES);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -563,7 +564,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
 
         getDateCreatedFilter().changeTimeFilterValueByClickInTimeLine(YEAR_OF_DATA);
         getProductFilter().changeAttributeFilterValues(PRODUCT_COMPUSCI);
-        assertEquals(getReport().getAttributeElements(), COMBINATION_ATTRIBUTE_FILTER_VALUES);
+        assertHeadersEqual(getReport().getAttributeElements(), COMBINATION_ATTRIBUTE_FILTER_VALUES);
 
         dashboardsPage.openTab(1);
         getReport().waitForReportLoading();
@@ -571,7 +572,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         takeScreenshot(browser, "Report-render-with-difference-filter-combination-between-tabs", getClass());
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_OF_DATA);
         assertEquals(getDepartmentFilter().getCurrentValue(), ALL);
-        assertEquals(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
+        assertHeadersEqual(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -600,7 +601,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
 
         getDateCreatedFilter().changeTimeFilterValueByClickInTimeLine(YEAR_OF_DATA);
         getProductFilter().changeAttributeFilterValues("Educationly");
-        assertEquals(getReport().getAttributeElements(), asList("Direct Sales", "Inside Sales", "Educationly"));
+        assertHeadersEqual(getReport().getAttributeElements(), asList("Direct Sales", "Inside Sales", "Educationly"));
 
         dashboardsPage.openTab(0);
         getReport().waitForReportLoading();
@@ -608,7 +609,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         takeScreenshot(browser, "Report-render-with-difference-filter-values-combination-between-tabs", getClass());
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_OF_DATA);
         assertEquals(getProductFilter().getCurrentValue(), ALL);
-        assertEquals(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
+        assertHeadersEqual(getReport().getAttributeElements(), ATTRIBUTE_VALUES);
     }
 
     @Test(dependsOnGroups = {"createProject"})

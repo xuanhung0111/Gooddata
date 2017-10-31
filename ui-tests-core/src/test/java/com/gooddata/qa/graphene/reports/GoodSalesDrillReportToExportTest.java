@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.asserts.AssertUtils.assertHeadersEqual;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -14,7 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
@@ -23,6 +23,7 @@ import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.google.common.collect.Sets;
 
 public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
     
@@ -139,14 +140,14 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
             dashboardsPage.deleteDashboard();
         }
     }
-    
+
     private void setDrillReportTargetAsPopup() throws JSONException, IOException {
         DashboardsRestUtils.setDrillReportTargetAsPopup(getRestApiClient(), testParams.getProjectId(),
                 getDashboardID());
         browser.navigate().refresh();
         waitForDashboardPageLoaded(browser);
     }
-    
+
     private void setDrillReportTargetAsExport(String exportFormat) throws JSONException, IOException {
         DashboardsRestUtils.setDrillReportTargetAsExport(getRestApiClient(), testParams.getProjectId(),
                 getDashboardID(), exportFormat);
@@ -158,7 +159,7 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
         String currentURL = browser.getCurrentUrl();
         return currentURL.substring(currentURL.lastIndexOf("/obj/")+5 , currentURL.lastIndexOf("|"));
     }
-    
+
     private void drillReportToPopupDialog(String selectedAttributeName) {
         TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
         tableReport.drillOnAttributeValue(selectedAttributeName);
@@ -167,8 +168,9 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
                         waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
         tableReport = drillDialog.getReport(TableReport.class);
         assertTrue(tableReport.isRollupTotalVisible());
-        assertEquals(tableReport.getAttributesHeader(), Arrays.asList("Account"));
-        assertEquals(tableReport.getMetricsHeader(), Arrays.asList("Amount"));
+        assertHeadersEqual(tableReport.getAttributesHeader(), Arrays.asList("Account"));
+        assertHeadersEqual(tableReport.getMetricsHeader(), Sets.newHashSet("Amount"), 
+                "Metric headers are not correct!");
         assertEquals(drillDialog.getBreadcrumbsString(), 
                 StringUtils.join(Arrays.asList("Drill report to export", selectedAttributeName), ">>"));
         drillDialog.closeDialog();

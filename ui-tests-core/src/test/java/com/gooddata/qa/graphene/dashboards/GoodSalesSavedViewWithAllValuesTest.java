@@ -4,6 +4,7 @@ import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRIORITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.utils.asserts.AssertUtils.assertHeadersEqual;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -43,6 +44,11 @@ public class GoodSalesSavedViewWithAllValuesTest extends AbstractDashboardWidget
     private final static String LOW = "LOW";
     private final static String NORMAL = "NORMAL";
     private final static String HIGH = "HIGH";
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.VIEWER);
+    }
 
     @Override
     public void initProperties() {
@@ -90,8 +96,8 @@ public class GoodSalesSavedViewWithAllValuesTest extends AbstractDashboardWidget
                     asList(ATTR_STATUS, ATTR_PRIORITY), ATTR_PRIORITY + " and " + ATTR_STATUS + " are not displayed");
 
             dialog.saveCurrentView("View after changing filter to all values", true);
-            assertEquals(getReport(REPORT).getAttributeElements(), asList(COMPLETED, LOW, NORMAL, DEFERRED,
-                    HIGH, IN_PROGRESS, NORMAL), "List of attributes is not correct");
+            assertHeadersEqual(getReport(REPORT).getAttributeElements(), asList(COMPLETED, LOW, NORMAL, DEFERRED,
+                    HIGH, IN_PROGRESS, NORMAL));
             assertEquals(getReport(REPORT).getMetricElements(), asList(30510.0f, 31020.0f, 31109.0f, 31116.0f));
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
@@ -120,17 +126,13 @@ public class GoodSalesSavedViewWithAllValuesTest extends AbstractDashboardWidget
                     singletonList(ATTR_STATUS), ATTR_STATUS + "is not displayed");
 
             dialog.saveCurrentView("View having no change on all values filter", true);
-            assertEquals(getReport(REPORT).getAttributeElements(), asList(COMPLETED, LOW, NORMAL, DEFERRED,
-                    HIGH, IN_PROGRESS, NORMAL), "List of attributes is not correct");
+            assertHeadersEqual(getReport(REPORT).getAttributeElements(), asList(COMPLETED, LOW, NORMAL, DEFERRED,
+                    HIGH, IN_PROGRESS, NORMAL));
+
             assertEquals(getReport(REPORT).getMetricElements(), asList(30510.0f, 31020.0f, 31109.0f, 31116.0f));
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
         }
-    }
-
-    @Override
-    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
-        createAndAddUserToProject(UserRoles.VIEWER);
     }
 
     private void createReport(String reportName, List<Attribute> attributes, List<Metric> metrics) {

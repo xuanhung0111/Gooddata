@@ -5,6 +5,7 @@ import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.utils.asserts.AssertUtils.assertHeadersEqual;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.addMufToUser;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createMufObjectByUri;
@@ -124,7 +125,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             getFilter(MUF_DF_VARIABLE).editAttributeFilterValues(COMPUSCI, PHOENIXSOFT);
 
             dashboardsPage.saveDashboard();
-            assertEquals(getReport(REPORT_MUF).getAttributeElements(), asList(COMPUSCI, PHOENIXSOFT));
+            assertHeadersEqual(getReport(REPORT_MUF).getAttributeElements(), asList(COMPUSCI, PHOENIXSOFT));
 
             logoutAndLoginAs(canAccessGreyPage(browser), role);
             initDashboardsPage().selectDashboard(DASHBOARD_MUF);
@@ -132,7 +133,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             takeScreenshot(browser, "DF-is-updated-with-muf-value-in-default-view-with-" + role, getClass());
             assertEquals(getFilter(ATTR_PRODUCT).getCurrentValue(), String.join(", ", COMPUSCI, EDUCATIONLY));
             assertEquals(getFilter(MUF_DF_VARIABLE).getCurrentValue(), COMPUSCI);
-            assertEquals(getReport(REPORT_MUF).getAttributeElements(), singletonList(COMPUSCI));
+            assertHeadersEqual(getReport(REPORT_MUF).getAttributeElements(), singletonList(COMPUSCI));
 
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
             initDashboardsPage().selectDashboard(DASHBOARD_MUF).editDashboard();
@@ -140,7 +141,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             getFilter(MUF_DF_VARIABLE).editAttributeFilterValues(PHOENIXSOFT);
 
             dashboardsPage.saveDashboard();
-            assertEquals(getReport(REPORT_MUF).getAttributeElements(), singletonList(PHOENIXSOFT));
+            assertHeadersEqual(getReport(REPORT_MUF).getAttributeElements(), singletonList(PHOENIXSOFT));
 
             logoutAndLoginAs(canAccessGreyPage(browser), role);
             initDashboardsPage().selectDashboard(DASHBOARD_MUF);
@@ -148,7 +149,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             takeScreenshot(browser, "DF-shows-all-when-value-set-by-admin-out-of-range-with-" + role, getClass());
             assertEquals(getFilter(ATTR_PRODUCT).getCurrentValue(), ALL);
             assertEquals(getFilter(MUF_DF_VARIABLE).getCurrentValue(), ALL);
-            assertEquals(getReport(REPORT_MUF).getAttributeElements(), asList(COMPUSCI, EDUCATIONLY, EXPLORER));
+            assertHeadersEqual(getReport(REPORT_MUF).getAttributeElements(), asList(COMPUSCI, EDUCATIONLY, EXPLORER));
 
         } finally {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
@@ -168,7 +169,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             getFilter(MUF_DF_VARIABLE).editAttributeFilterValues(PHOENIXSOFT);
 
             dashboardsPage.saveDashboard();
-            assertEquals(getReport(REPORT_MUF).getAttributeElements(), singletonList(PHOENIXSOFT));
+            assertHeadersEqual(getReport(REPORT_MUF).getAttributeElements(), singletonList(PHOENIXSOFT));
 
             logoutAndLoginAs(canAccessGreyPage(browser), role);
             initDashboardsPage().selectDashboard(DASHBOARD_MUF);
@@ -176,7 +177,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             takeScreenshot(browser, "DF-shows-first-value-when-value-set-by-admin-out-of-range-with-" + role, getClass());
             assertEquals(getFilter(ATTR_PRODUCT).getCurrentValue(), COMPUSCI);
             assertEquals(getFilter(MUF_DF_VARIABLE).getCurrentValue(), COMPUSCI);
-            assertEquals(getReport(REPORT_MUF).getAttributeElements(), singletonList(COMPUSCI));
+            assertHeadersEqual(getReport(REPORT_MUF).getAttributeElements(), singletonList(COMPUSCI));
 
         } finally {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
@@ -215,13 +216,13 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             takeScreenshot(browser, "Saved-view-shows-all-when-value-out-of-range-muf-assigned-for-" + role, getClass());
             assertEquals(getFilter(ATTR_PRODUCT).getCurrentValue(), ALL);
             assertEquals(getFilter(MUF_DF_VARIABLE).getCurrentValue(), ALL);
-            assertEquals(getReport(REPORT_MUF).getAttributeElements(), asList(COMPUSCI, EDUCATIONLY, EXPLORER));
+            assertHeadersEqual(getReport(REPORT_MUF).getAttributeElements(), asList(COMPUSCI, EDUCATIONLY, EXPLORER));
 
             savedViewWidget.openSavedViewMenu().selectSavedView(savedView2);
             takeScreenshot(browser, "Saved-view-updated-with-muf-assigned-for-" + role, getClass());
             assertEquals(getFilter(ATTR_PRODUCT).getCurrentValue(), COMPUSCI);
             assertEquals(getFilter(MUF_DF_VARIABLE).getCurrentValue(), COMPUSCI);
-            assertEquals(getReport(REPORT_MUF).getAttributeElements(), singletonList(COMPUSCI));
+            assertHeadersEqual(getReport(REPORT_MUF).getAttributeElements(), singletonList(COMPUSCI));
 
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
@@ -256,7 +257,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             // Due to WA-6145, filter shows all instead of first value in available list
             assertEquals(getFilter(ATTR_PRODUCT).getCurrentValue(), ALL);
             assertEquals(getFilter(MUF_DF_VARIABLE).getCurrentValue(), ALL);
-            assertEquals(getReport(REPORT_MUF).getAttributeElements(), asList(COMPUSCI, EDUCATIONLY, EXPLORER));
+            assertHeadersEqual(getReport(REPORT_MUF).getAttributeElements(), asList(COMPUSCI, EDUCATIONLY, EXPLORER));
 
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);

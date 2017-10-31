@@ -4,24 +4,25 @@ import static com.gooddata.md.Restriction.title;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.browser.BrowserUtils.switchToMainWindow;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CLOSED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CREATED;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.asserts.AssertUtils.assertHeadersEqual;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -99,8 +100,8 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
         TableReport tableReport = embeddedDashboard.getReport(report, TableReport.class);
 
         takeScreenshot(browser, "create-report-" + report + "-in-embedded-dashboard-using-embedded-html-link", getClass());
-        assertThat(tableReport.getAttributeElements(),
-                hasItems("CompuSci", "Educationly", "Explorer", "Grammar Plus", "PhoenixSoft", "WonderKid"));
+        assertHeadersEqual(tableReport.getAttributeElements(),
+                Arrays.asList("CompuSci", "Educationly", "Explorer", "Grammar Plus", "PhoenixSoft", "WonderKid"));
 
         DashboardEditWidgetToolbarPanel.removeWidget(tableReport.getRoot(), browser);
 
@@ -140,8 +141,8 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
         TableReport tableReport = embeddedDashboard.getReport(report, TableReport.class);
 
         takeScreenshot(browser, "create-report-" + report + "-in-embedded-dashboard", getClass());
-        assertThat(tableReport.getAttributeElements(),
-                hasItems("CompuSci", "Educationly", "Explorer", "Grammar Plus", "PhoenixSoft", "WonderKid"));
+        assertHeadersEqual(tableReport.getAttributeElements(),
+                Arrays.asList("CompuSci", "Educationly", "Explorer", "Grammar Plus", "PhoenixSoft", "WonderKid"));
 
         openReportDetailFromEmbeddedDashboard(embeddedDashboard, report).deleteCurrentReport();
         EmbeddedDashboard.waitForDashboardLoaded(browser);
@@ -174,7 +175,7 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
         takeScreenshot(browser, "edit-report-in-embedded-dashboard", getClass());
         assertThat(attributeValues.size(), is(2));
-        assertThat(attributeValues, hasItems("CompuSci", "Educationly"));
+        assertHeadersEqual(attributeValues, Arrays.asList("CompuSci", "Educationly"));
 
         openReportDetailFromEmbeddedDashboard(embeddedDashboard, report.getTitle()).deleteCurrentReport();
         assertEquals(getRedBarMessage(), RED_BAR_MESSAGE);

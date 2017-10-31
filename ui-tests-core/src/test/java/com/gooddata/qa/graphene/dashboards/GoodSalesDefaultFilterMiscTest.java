@@ -5,13 +5,13 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_PIPELINE_ANALYSIS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_OUTLOOK;
+import static com.gooddata.qa.utils.asserts.AssertUtils.assertHeadersEqual;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.getVariableUri;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
-
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -80,21 +80,21 @@ public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest 
         dashboardsPage.saveDashboard();
 
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), String.join(", ", INTEREST, DISCOVERY));
-        assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), asList(INTEREST, DISCOVERY));
+        assertHeadersEqual(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), asList(INTEREST, DISCOVERY));
 
         dashboardsPage.editDashboard();
         getFilter(ATTR_STAGE_NAME).changeSelectionToOneValue();
         dashboardsPage.saveDashboard();
 
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), INTEREST);
-        assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(INTEREST));
+        assertHeadersEqual(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(INTEREST));
 
         dashboardsPage.editDashboard();
         getFilter(ATTR_STAGE_NAME).changeSelectionToMultipleValues();
         dashboardsPage.saveDashboard();
 
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), ALL);
-        assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(),
+        assertHeadersEqual(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(),
                 asList(INTEREST, DISCOVERY, SHORT_LIST, RISK_ASSESSMENT));
     }
 
@@ -135,7 +135,7 @@ public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest 
                 "Combination-of-single-and-multiple-filter-works-correctly-for-type-" + combinationType, getClass());
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), String.join(", ", INTEREST, DISCOVERY));
         assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), DISCOVERY);
-        assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(DISCOVERY));
+        assertHeadersEqual(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(DISCOVERY));
     }
 
     @Test(dependsOnGroups = {"createProject"})

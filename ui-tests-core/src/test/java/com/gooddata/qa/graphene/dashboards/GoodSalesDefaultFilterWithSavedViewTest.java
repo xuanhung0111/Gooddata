@@ -5,6 +5,7 @@ import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.utils.asserts.AssertUtils.assertHeadersEqual;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.getVariableUri;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileUri;
@@ -135,7 +136,7 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         assertThat(DEFAULT_VIEW, containsString(savedViewWidget.getCurrentSavedView()));
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), RISK_ASSESSMENT);
         assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), RISK_ASSESSMENT);
-        assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(RISK_ASSESSMENT));
+        assertHeadersEqual(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(RISK_ASSESSMENT));
 
         savedViewWidget.openSavedViewMenu().selectSavedView(SAVED_VIEW_WITH_STAGE_NAME_FILTER);
         takeScreenshot(browser, "Default-filter-does-not-affect-to-saved-view-with-stage-name-filter", getClass());
@@ -147,7 +148,7 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         takeScreenshot(browser, "Default-filter-does-not-affect-to-saved-view-with-all-filters", getClass());
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), SHORT_LIST);
         assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), SHORT_LIST);
-        assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(SHORT_LIST));
+        assertHeadersEqual(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(SHORT_LIST));
     }
 
     @Test(dependsOnGroups = {"initSavedView"}, groups = {"df-single", "df-multiple"})
@@ -240,7 +241,7 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         savedViewWidget.openSavedViewMenu().selectSavedView(DEFAULT_VIEW);
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), SHORT_LIST);
         assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), SHORT_LIST);
-        assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(SHORT_LIST));
+        assertHeadersEqual(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(SHORT_LIST));
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"df-single", "df-multiple"})
@@ -273,11 +274,11 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), SHORT_LIST);
         if (multipleChoice) {
             assertEquals(getFilter(ATTR_DEPARTMENT).getCurrentValue(), ALL);
-            assertEquals(getReport(REPORT_WITH_ADDITIONAL_ATTRIBUTE).getAttributeElements(),
+            assertHeadersEqual(getReport(REPORT_WITH_ADDITIONAL_ATTRIBUTE).getAttributeElements(),
                     asList(SHORT_LIST, DIRECT_SALES, INSIDE_SALES));
         } else {
             assertEquals(getFilter(ATTR_DEPARTMENT).getCurrentValue(), DIRECT_SALES);
-            assertEquals(getReport(REPORT_WITH_ADDITIONAL_ATTRIBUTE).getAttributeElements(),
+            assertHeadersEqual(getReport(REPORT_WITH_ADDITIONAL_ATTRIBUTE).getAttributeElements(),
                     asList(SHORT_LIST, DIRECT_SALES));
         }
 
@@ -285,11 +286,11 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), DISCOVERY);
         if (multipleChoice) {
             assertEquals(getFilter(ATTR_DEPARTMENT).getCurrentValue(), ALL);
-            assertEquals(getReport(REPORT_WITH_ADDITIONAL_ATTRIBUTE).getAttributeElements(),
+            assertHeadersEqual(getReport(REPORT_WITH_ADDITIONAL_ATTRIBUTE).getAttributeElements(),
                     asList(DISCOVERY, DIRECT_SALES, INSIDE_SALES));
         } else {
             assertEquals(getFilter(ATTR_DEPARTMENT).getCurrentValue(), DIRECT_SALES);
-            assertEquals(getReport(REPORT_WITH_ADDITIONAL_ATTRIBUTE).getAttributeElements(),
+            assertHeadersEqual(getReport(REPORT_WITH_ADDITIONAL_ATTRIBUTE).getAttributeElements(),
                     asList(DISCOVERY, DIRECT_SALES));
         }
     }
@@ -321,12 +322,14 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         assertEquals(savedViewWidget.getCurrentSavedView(), SAVED_VIEW_WITH_STAGE_NAME_FILTER);
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), SHORT_LIST);
         assertEquals(getFilter(ATTR_DEPARTMENT).getCurrentValue(), INSIDE_SALES);
-        assertEquals(getReport(REPORT_WITH_ADDITIONAL_ATTRIBUTE).getAttributeElements(), asList(SHORT_LIST, INSIDE_SALES));
+        assertHeadersEqual(getReport(REPORT_WITH_ADDITIONAL_ATTRIBUTE).getAttributeElements(), 
+                asList(SHORT_LIST, INSIDE_SALES));
 
         savedViewWidget.openSavedViewMenu().selectSavedView(DEFAULT_VIEW);
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), DISCOVERY);
         assertEquals(getFilter(ATTR_DEPARTMENT).getCurrentValue(), INSIDE_SALES);
-        assertEquals(getReport(REPORT_WITH_ADDITIONAL_ATTRIBUTE).getAttributeElements(), asList(DISCOVERY, INSIDE_SALES));
+        assertHeadersEqual(getReport(REPORT_WITH_ADDITIONAL_ATTRIBUTE).getAttributeElements(), 
+                asList(DISCOVERY, INSIDE_SALES));
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"df-multiple"}, description = "Verify default view of "
@@ -344,7 +347,8 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         DashboardWidgetDirection.LEFT.moveElementToRightPlace(getReport(REPORT_WITH_PROMPT_FILTER).getRoot());
         getFilter(DF_VARIABLE).editAttributeFilterValues(INTEREST, DISCOVERY, RISK_ASSESSMENT);
         dashboardsPage.saveDashboard().publishDashboard(true);
-        assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), asList(INTEREST, DISCOVERY, RISK_ASSESSMENT));
+        assertHeadersEqual(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), 
+                asList(INTEREST, DISCOVERY, RISK_ASSESSMENT));
 
         try {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.VIEWER);
@@ -352,7 +356,8 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
 
             takeScreenshot(browser, "Viewer-default-filter-is-updated-with-only-values-allowed-to-access", getClass());
             assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), String.join(", ", INTEREST, DISCOVERY));
-            assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), asList(INTEREST, DISCOVERY));
+            assertHeadersEqual(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), 
+                    asList(INTEREST, DISCOVERY));
 
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
             initDashboardsPage().selectDashboard(dashboard).editDashboard();
@@ -364,7 +369,8 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
 
             takeScreenshot(browser, "Viewer-default-filter-shows-all-when-the-value-set-by-admin-out-of-range", getClass());
             assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), ALL);
-            assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), asList(INTEREST, DISCOVERY, SHORT_LIST));
+            assertHeadersEqual(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), 
+                    asList(INTEREST, DISCOVERY, SHORT_LIST));
 
         } finally {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
@@ -390,7 +396,8 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
                 .editAttributeFilterValues(RISK_ASSESSMENT);
 
         dashboardsPage.saveDashboard().publishDashboard(true);
-        assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(RISK_ASSESSMENT));
+        assertHeadersEqual(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), 
+                singletonList(RISK_ASSESSMENT));
 
         try {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.VIEWER);
@@ -398,7 +405,7 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
 
             takeScreenshot(browser, "Viewer-default-filter-shows-first-value-when-out-of-range-in-single-choice-mode", getClass());
             assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), INTEREST);
-            assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(INTEREST));
+            assertHeadersEqual(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(INTEREST));
 
         } finally {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
@@ -443,12 +450,12 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
 
             takeScreenshot(browser, "Viewer-saved-view-shows-all-when-value-out-of-range-variable-filter", getClass());
             assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), ALL);
-            assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), asList(DISCOVERY, SHORT_LIST));
+            assertHeadersEqual(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), asList(DISCOVERY, SHORT_LIST));
     
             savedViewWidget.openSavedViewMenu().selectSavedView(savedView2);
             takeScreenshot(browser, "Viewer-saved-view-updated-upon-change-of-variable-filter", getClass());
             assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), DISCOVERY);
-            assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(DISCOVERY));
+            assertHeadersEqual(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(DISCOVERY));
 
         } finally {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
@@ -492,7 +499,7 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
             takeScreenshot(browser, "Viewer-saved-view-shows-first-value-when-out-of-range-in-single-choice-mode", getClass());
             // Due to WA-6145, filter shows all instead of first value in available list
             assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), ALL);
-            assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), asList(INTEREST, SHORT_LIST));
+            assertHeadersEqual(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), asList(INTEREST, SHORT_LIST));
 
         } finally {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
@@ -539,7 +546,7 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
             getReport(REPORT_WITH_PROMPT_FILTER).waitForReportLoading();
             takeScreenshot(browser, "Viewer-default-view-shows-all-when-out-of-permission", getClass());
             assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), ALL);
-            assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), asList(INTEREST, SHORT_LIST));
+            assertHeadersEqual(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), asList(INTEREST, SHORT_LIST));
 
         } finally {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);

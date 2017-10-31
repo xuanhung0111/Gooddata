@@ -5,6 +5,7 @@ import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.utils.asserts.AssertUtils.assertHeadersEqual;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.getVariableUri;
 import static java.lang.Boolean.parseBoolean;
@@ -105,12 +106,12 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
 
         takeScreenshot(browser, "Default-filter-is-applied-with-" + type + "-" + DISCOVERY, getClass());
         assertEquals(getFilter(name).getCurrentValue(), DISCOVERY);
-        assertEquals(getReport(report).getAttributeElements(), singletonList(DISCOVERY));
+        assertHeadersEqual(getReport(report).getAttributeElements(), singletonList(DISCOVERY));
 
         refreshDashboardsPage();
         takeScreenshot(browser, "Default-filter-is-kept-after-refresh-page", getClass());
         assertEquals(getFilter(name).getCurrentValue(), DISCOVERY);
-        assertEquals(getReport(report).getAttributeElements(), singletonList(DISCOVERY));
+        assertHeadersEqual(getReport(report).getAttributeElements(), singletonList(DISCOVERY));
 
         dashboardsPage.editDashboard();
         getFilter(name).editAttributeFilterValues(SHORT_LIST);
@@ -118,7 +119,7 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
 
         takeScreenshot(browser, "Default-filter-is-applied-with-" + type + "-" + SHORT_LIST, getClass());
         assertEquals(getFilter(name).getCurrentValue(), SHORT_LIST);
-        assertEquals(getReport(report).getAttributeElements(), singletonList(SHORT_LIST));
+        assertHeadersEqual(getReport(report).getAttributeElements(), singletonList(SHORT_LIST));
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"df-single", "df-multiple"})
@@ -146,7 +147,7 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
         takeScreenshot(browser, "Attribute-and-prompt-default-filter-combination-applied", getClass());
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), DISCOVERY);
         assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), DISCOVERY);
-        assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(DISCOVERY));
+        assertHeadersEqual(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(DISCOVERY));
 
         try {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.VIEWER);
@@ -155,7 +156,7 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
             takeScreenshot(browser, "Default-filter-for-viewer-is-applied-same-as-admin", getClass());
             assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), DISCOVERY);
             assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), DISCOVERY);
-            assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(DISCOVERY));
+            assertHeadersEqual(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(DISCOVERY));
 
         } finally {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
@@ -236,7 +237,7 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
 
         takeScreenshot(browser, "Default-view-displayed-after-turn-on-dashboard-saved-view", getClass());
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), DISCOVERY);
-        assertEquals(getReport(REPORT).getAttributeElements(), singletonList(DISCOVERY));
+        assertHeadersEqual(getReport(REPORT).getAttributeElements(), singletonList(DISCOVERY));
         assertThat(DEFAULT_VIEW, containsString(dashboardsPage.getSavedViewWidget().getCurrentSavedView()));
 
         try {
@@ -245,7 +246,7 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
 
             takeScreenshot(browser, "Default-view-applied-for-viewer-role", getClass());
             assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), DISCOVERY);
-            assertEquals(getReport(REPORT).getAttributeElements(), singletonList(DISCOVERY));
+            assertHeadersEqual(getReport(REPORT).getAttributeElements(), singletonList(DISCOVERY));
             assertThat(DEFAULT_VIEW, containsString(dashboardsPage.getSavedViewWidget().getCurrentSavedView()));
 
         } finally {
@@ -269,17 +270,17 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
 
         SavedViewWidget savedViewWidget = dashboardsPage.getSavedViewWidget();
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), DISCOVERY);
-        assertEquals(getReport(REPORT).getAttributeElements(), singletonList(DISCOVERY));
+        assertHeadersEqual(getReport(REPORT).getAttributeElements(), singletonList(DISCOVERY));
         assertThat(DEFAULT_VIEW, containsString(savedViewWidget.getCurrentSavedView()));
 
         getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(SHORT_LIST);
-        assertEquals(getReport(REPORT).getAttributeElements(), singletonList(SHORT_LIST));
+        assertHeadersEqual(getReport(REPORT).getAttributeElements(), singletonList(SHORT_LIST));
         assertEquals(savedViewWidget.getCurrentSavedView(), UNSAVED_VIEW);
 
         savedViewWidget.openSavedViewMenu().selectSavedView(DEFAULT_VIEW);
         takeScreenshot(browser, "Dashboard-render-with-default-filter", getClass());
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), DISCOVERY);
-        assertEquals(getReport(REPORT).getAttributeElements(), singletonList(DISCOVERY));
+        assertHeadersEqual(getReport(REPORT).getAttributeElements(), singletonList(DISCOVERY));
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"df-single", "df-multiple"})
@@ -309,13 +310,13 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
             takeScreenshot(browser, "DF-not-applied-for-filter-group", getClass());
             assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), ALL);
             assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), ALL);
-            assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(),
+            assertHeadersEqual(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(),
                     asList(INTEREST, DISCOVERY, SHORT_LIST, RISK_ASSESSMENT));
         } else {
             takeScreenshot(browser, "DF-not-applied-for-filter-group", getClass());
             assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), INTEREST);
             assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), INTEREST);
-            assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(INTEREST));
+            assertHeadersEqual(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(INTEREST));
         }
 
         dashboardsPage.editDashboard();
@@ -327,7 +328,7 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
         takeScreenshot(browser, "DF-applied-for-filter-group", getClass());
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), SHORT_LIST);
         assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), SHORT_LIST);
-        assertEquals(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(SHORT_LIST));
+        assertHeadersEqual(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(SHORT_LIST));
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"df-single", "df-multiple"})
