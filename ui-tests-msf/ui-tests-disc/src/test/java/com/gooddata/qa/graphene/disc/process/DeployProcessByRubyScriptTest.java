@@ -43,21 +43,6 @@ public class DeployProcessByRubyScriptTest extends AbstractProcessTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void redeployProcessWithDifferentProcessType() {
-        String processName = generateProcessName();
-
-        initDiscProjectDetailPage()
-                .deployProcessWithZipFile(processName, ProcessType.CLOUD_CONNECT, PackageFile.BASIC.loadFile());
-        assertTrue(projectDetailPage.hasProcess(processName), "Process is not deployed");
-
-        ProcessDetail process = projectDetailPage.getProcess(processName);
-        assertEquals(process.getTabTitle(Tab.EXECUTABLE), "4 graphs total");
-
-        process.redeployWithZipFile(processName, ProcessType.RUBY_SCRIPTS, PackageFile.RUBY.loadFile());
-        assertEquals(process.getTabTitle(Tab.EXECUTABLE), "3 scripts total");
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
     public void deployGraphFileWithRubyScriptTypeInProjectsPage() {
         initDiscProjectsPage().markProjectCheckbox(projectTitle)
                 .deployProcessWithZipFile(generateProcessName(), ProcessType.RUBY_SCRIPTS, PackageFile.BASIC.loadFile());
@@ -72,15 +57,4 @@ public class DeployProcessByRubyScriptTest extends AbstractProcessTest {
                 "Error message not show correctly");
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void redeployGraphFileWithRubyScriptType() {
-        String processName = generateProcessName();
-        initDiscProjectDetailPage()
-                .deployProcessWithZipFile(processName, ProcessType.CLOUD_CONNECT, PackageFile.BASIC.loadFile());
-
-        projectDetailPage.getProcess(processName)
-                .redeployWithZipFile(processName, ProcessType.RUBY_SCRIPTS, PackageFile.BASIC.loadFile());
-        assertTrue(ConfirmationDialog.getInstance(browser).getMessage().matches(FAILED_DEPLOY_MESSAGE),
-                "Error message not show correctly");
-    }
 }

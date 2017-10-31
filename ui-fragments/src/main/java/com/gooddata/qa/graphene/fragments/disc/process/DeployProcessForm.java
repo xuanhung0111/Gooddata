@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.ZIP_FILES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
 
 import java.io.File;
@@ -13,7 +14,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.Select;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
@@ -30,9 +30,6 @@ public class DeployProcessForm extends AbstractFragment {
     @FindBy(css = ".select-zip .fileInput")
     private WebElement packageInput;
 
-    @FindBy(tagName = "select")
-    private Select processType;
-
     @FindBy(xpath = ".//*[text()='FULL PATH TO INFO.JSON']/following::input[1]")
     private WebElement gitPathInput;
 
@@ -42,6 +39,9 @@ public class DeployProcessForm extends AbstractFragment {
     @FindBy(css = "button:first-child")
     private WebElement deployButton;
 
+    @FindBy(className = "ait-component-selection-dropdown-button")
+    private ProcessTypeDropdown processTypeDropdown;
+
     public static final DeployProcessForm getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(DeployProcessForm.class, waitForElementVisible(LOCATOR, searchContext));
     }
@@ -50,21 +50,33 @@ public class DeployProcessForm extends AbstractFragment {
         return Graphene.createPageFragment(DeployProcessForm.class, waitForElementVisible(locator, searchContext));
     }
 
-    public void deployProcessWithZipFile(String processName, ProcessType processType, File packageFile) {
-        selectZipFileOption()
+    public void selectZipAndDeploy(String processName, ProcessType processType, File packageFile) {
+        selectZipFileOption(processType)
                 .inputPackageFile(packageFile)
-                .selectProcessType(processType)
                 .enterProcessName(processName)
                 .submit();
         waitForFragmentNotVisible(this);
     }
 
+    public void deployProcessWithZipFile(String processName, ProcessType processType, File packageFile) {
+        selectProcessType(processType);
+        selectZipAndDeploy(processName, processType, packageFile);
+    }
+
     public void deployProcessWithGitStorePath(String processName, String gitStorePath) {
-        selectGitOption()
+        selectProcessType(ProcessType.RUBY_SCRIPTS)
+                .selectGitOption()
                 .enterGitPath(gitStorePath)
                 .enterProcessName(processName)
                 .submit();
         waitForFragmentNotVisible(this);
+    }
+
+    public DeployProcessForm selectProcessType(ProcessType processType) {
+        getProcessTypeDropdown()
+                .expand()
+                .selectProcessType(processType.getTitle());
+        return this;
     }
 
     public DeployProcessForm selectGitOption() {
@@ -106,13 +118,14 @@ public class DeployProcessForm extends AbstractFragment {
         waitForElementVisible(deployButton).click();
     }
 
-    private DeployProcessForm selectZipFileOption() {
-        waitForElementVisible(zipFileOption).click();
-        return this;
+    private ProcessTypeDropdown getProcessTypeDropdown() {
+        return waitForFragmentVisible(processTypeDropdown);
     }
 
-    private DeployProcessForm selectProcessType(ProcessType type) {
-        waitForElementVisible(processType).selectByValue(type.getValue());
+    private DeployProcessForm selectZipFileOption(ProcessType processType) {
+        if (processType == ProcessType.RUBY_SCRIPTS) {
+            waitForElementVisible(zipFileOption).click();
+        }
         return this;
     }
 
@@ -140,17 +153,23 @@ public class DeployProcessForm extends AbstractFragment {
     }
 
     public enum ProcessType {
-        CLOUD_CONNECT("GRAPH"),
-        RUBY_SCRIPTS("RUBY");
+        CLOUD_CONNECT("GRAPH", "Clover Graph Executor"),
+        RUBY_SCRIPTS("RUBY", "Generic Ruby Executor");
 
         private String value;
+        private String title;
 
-        private ProcessType(String value) {
+        private ProcessType(String value, String title) {
             this.value = value;
+            this.title = title;
         }
 
         public String getValue() {
             return value;
+        }
+
+        public String getTitle() {
+            return title;
         }
     }
 }
