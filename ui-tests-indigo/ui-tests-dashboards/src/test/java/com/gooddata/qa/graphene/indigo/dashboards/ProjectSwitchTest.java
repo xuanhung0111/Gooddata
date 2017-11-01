@@ -60,18 +60,20 @@ public class ProjectSwitchTest extends AbstractDashboardTest {
         ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), newProjectId,
                 ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, false);
 
-        initIndigoDashboardsPageWithWidgets().switchProject(NEW_PROJECT_NAME);
-        waitForDashboardPageLoaded(browser);
+        try {
+            initIndigoDashboardsPageWithWidgets().switchProject(NEW_PROJECT_NAME);
+            waitForDashboardPageLoaded(browser);
 
-        takeScreenshot(browser, "User-is-directed-to-dashboard-when-feature-flag-disabled", getClass());
-        assertThat(browser.getCurrentUrl(), containsString(newProjectId));
+            takeScreenshot(browser, "User-is-directed-to-dashboard-when-feature-flag-disabled", getClass());
+            assertThat(browser.getCurrentUrl(), containsString(newProjectId));
+        } finally {
+            ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), newProjectId,
+                    ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
+        }
     }
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"switchProject", "desktop", "mobile"})
     public void switchProjectsTest() throws JSONException {
-        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), newProjectId,
-                ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
-
         initIndigoDashboardsPageWithWidgets();
 
         takeScreenshot(browser, "switchProjectsTest-initial", getClass());
@@ -88,9 +90,6 @@ public class ProjectSwitchTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"switchProject"}, groups = {"desktop", "mobile"})
     public void checkLastVisitedProject() throws JSONException {
-        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), newProjectId,
-                ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
-
         initIndigoDashboardsPageWithWidgets()
                 .switchProject(NEW_PROJECT_NAME)
                 .getSplashScreen();
@@ -128,9 +127,6 @@ public class ProjectSwitchTest extends AbstractDashboardTest {
             newProjectId = ProjectRestUtils.createBlankProject(goodDataClient, NEW_PROJECT_NAME,
                     testParams.getAuthorizationToken(), testParams.getProjectDriver(),
                     testParams.getProjectEnvironment());
-
-            ProjectRestUtils.setFeatureFlagInProject(goodDataClient, newProjectId,
-                    ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
 
             logout();
             signInAtUI(embeddedDashboardUser, testParams.getPassword());

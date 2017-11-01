@@ -385,8 +385,6 @@ public class AttributeFilteringTest extends AbstractDashboardTest {
                 "Delete-Dataset-Having-KPI-Attribute-Filter", testParams.getAuthorizationToken(),
                 testParams.getProjectDriver(), testParams.getProjectEnvironment()));
         try {
-            setDashboardFeatureFlags();
-
             uploadCSV(getFilePathFromResource(WITHOUT_DATE_CSV_PATH));
             takeScreenshot(browser, "uploaded-" + WITHOUT_DATE_DATASET + "-dataset", getClass());
 

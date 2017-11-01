@@ -25,11 +25,6 @@ import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 public class HeaderTest extends AbstractDashboardTest {
 
     @Override
-    protected void setDashboardFeatureFlags() {
-        // do nothing because feature flag has been set inside tests
-    }
-
-    @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
         createAmountMetric();
@@ -58,9 +53,6 @@ public class HeaderTest extends AbstractDashboardTest {
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiLinkExistingAlthoughFeatureFlagOff() throws JSONException, IOException {
         try {
-            ProjectRestUtils.setFeatureFlagInProjectAndCheckResult(getGoodDataClient(), testParams.getProjectId(),
-                    ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
-
             // load old dashboards first to avoid redirect to projects.html
             initDashboardsPage();
             initIndigoDashboardsPage().getSplashScreen()
@@ -75,7 +67,7 @@ public class HeaderTest extends AbstractDashboardTest {
 
             // need another try finally block because not deleting kpi affects to other tests.
             try {
-                ProjectRestUtils.setFeatureFlagInProjectAndCheckResult(getGoodDataClient(), 
+                ProjectRestUtils.setFeatureFlagInProjectAndCheckResult(getGoodDataClient(),
                         testParams.getProjectId(), ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, false);
 
                 // ensure that feature flag is applied
