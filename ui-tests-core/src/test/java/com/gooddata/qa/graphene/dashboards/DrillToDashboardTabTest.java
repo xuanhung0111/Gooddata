@@ -1,6 +1,10 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
+import com.gooddata.qa.graphene.fragments.dashboards.SaveAndContinueDialog;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.DrillingConfigPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
@@ -13,29 +17,30 @@ import com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.gooddata.qa.utils.java.Builder;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.interactions.Actions;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_AMOUNT_BY_PRODUCT;
-import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.RIGHT;
-import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.TOP;
-import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.TOP_RIGHT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.*;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.*;
 import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
 
@@ -45,7 +50,10 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
     private final String DASHBOARD_HAVING_NO_FILTER_ON_TARGET_TAB = "Dashboard having no filter on target tab";
     private final String SOURCE_TAB = "Source Tab";
     private final String TARGET_TAB = "Target Tab";
+    private final String TAB_ANOTHER_DASHBOARD = "Tab Another Dashboard";
 
+    private final String DASHBOARD_DRILLING_GROUP = "Dashboards";
+    private final String REPORTS_DRILLING_GROUP = "Reports";
     private final String DISCOVERY = "Discovery";
     private final String CLOSED_WON = "Closed Won";
     private final String WEST_14 = "14 West";
@@ -54,6 +62,13 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
     private final String EXPLORER = "Explorer";
     private final String ALL = "All";
 
+    private final List<String> attributeValuesOfAmountReports =
+            asList("CompuSci", "Educationly", "Explorer", "Grammar Plus", "PhoenixSoft", "WonderKid");
+    private final List<String> attributeValuesOfSalesReports =
+            asList("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+    private final List<String> attributeValuesOfReportHavingFilter = asList("Excalibur Technology > CompuSci",
+            "LasX Industries > CompuSci", "Premier Integrity Solutions > CompuSci", "Turner Industries > CompuSci",
+            "VideoLink > Explorer");
 
     private FilterItemContent stageNameAsSingleFilter;
     private FilterItemContent accountAsMultipleFilter;
@@ -62,10 +77,13 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
     private FilterItemContent productAsSingleFilter;
 
     private String amountByProductReportUri;
+    private String salesSeasonalityReportUri;
 
     @Override
     protected void customizeProject() throws Throwable {
         amountByProductReportUri = createAmountByProductReport();
+        salesSeasonalityReportUri = createSalesSeasonalityReport();
+        createTop5OpenByCashReport();
 
         //init Dashboard Filter Objects
         stageNameAsSingleFilter = createSingleValueFilter(getAttributeByTitle(ATTR_STAGE_NAME));
@@ -151,11 +169,9 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
             }
 
             // att to drill to is CompuSci
-            reportOnSourceTab.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
-            reportOnSourceTab.waitForLoaded();
-
+            reportOnSourceTab.drillOnFirstValue(CellType.ATTRIBUTE_VALUE).waitForLoaded();
             assertTrue(dashboardsPage.getTabs().getTab(TARGET_TAB).isSelected(),
-                    TARGET_TAB + "is not selected after drill action");
+                    TARGET_TAB + " is not selected after drill action");
 
             TableReport reportOnTargetTab = dashboardsPage.getContent()
                     .getReport(REPORT_AMOUNT_BY_PRODUCT, TableReport.class).waitForLoaded();
@@ -174,6 +190,157 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
 
         } finally {
             deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashboardUri);
+        }
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void testDrillToCurrentTab() throws JSONException, IOException {
+        Dashboard dashboard = initDashboardHavingNoFilterInTabs();
+        String dashboardUri = DashboardsRestUtils.createDashboard(getRestApiClient(),
+                testParams.getProjectId(), dashboard.getMdObject());
+        try {
+            initDashboardsPage().selectDashboard(dashboard.getName());
+            dashboardsPage.getTabs().getTab(SOURCE_TAB).open();
+            dashboardsPage.editDashboard();
+
+            TableReport tableReport = dashboardsPage.getReport(REPORT_AMOUNT_BY_PRODUCT, TableReport.class);
+            tableReport.addDrilling(Pair.of(singletonList(ATTR_PRODUCT), SOURCE_TAB), DASHBOARD_DRILLING_GROUP);
+            tableReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE).waitForLoaded();
+
+            assertTrue(dashboardsPage.getTabs().getTab(SOURCE_TAB).isSelected(),
+                    SOURCE_TAB + " is not selected after drill action");
+
+            TableReport tableReportAfterDrilling = dashboardsPage.getContent().getLatestReport(TableReport.class);
+            assertEquals(tableReportAfterDrilling.getAttributeValues(), attributeValuesOfAmountReports,
+                    "Report aren't rendered correctly");
+            assertTrue(dashboardsPage.isEditDashboardVisible(), "Current mode isn't edit");
+        } finally {
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashboardUri);
+        }
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void testDrillToReportBeforeToTab() throws JSONException, IOException {
+        Dashboard dashboard = initDashboardHavingNoFilterInTabs();
+        String dashboardUri = DashboardsRestUtils.createDashboard(getRestApiClient(),
+                testParams.getProjectId(), dashboard.getMdObject());
+        try {
+            initDashboardsPage().selectDashboard(dashboard.getName());
+            dashboardsPage.getTabs().getTab(SOURCE_TAB).open();
+            dashboardsPage.editDashboard();
+
+            TableReport tableReport = dashboardsPage.getReport(REPORT_AMOUNT_BY_PRODUCT, TableReport.class);
+            addDrillingHavingInnerDrill(tableReport, TARGET_TAB);
+            tableReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
+            DashboardDrillDialog drillDialog = Graphene.createPageFragment(DashboardDrillDialog.class,
+                    waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
+            TableReport reportAfterDrillingToReport = drillDialog.getReport(TableReport.class);
+            assertEquals(reportAfterDrillingToReport.getAttributeValues(), attributeValuesOfReportHavingFilter,
+                    "Report aren't rendered correctly");
+            assertEquals(drillDialog.getBreadcrumbsString(), 
+                    StringUtils.join(Arrays.asList(REPORT_AMOUNT_BY_PRODUCT, "CompuSci"), ">>"));
+
+            reportAfterDrillingToReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE).waitForLoaded();
+            assertTrue(dashboardsPage.getTabs().getTab(TARGET_TAB).isSelected(),
+                    TARGET_TAB + " is not selected after drill action");
+
+            TableReport reportAfterDrillingToTab = dashboardsPage.getContent().getLatestReport(TableReport.class);
+            assertEquals(reportAfterDrillingToTab.getAttributeValues(), attributeValuesOfSalesReports,
+                    "Report aren't rendered correctly");
+            assertTrue(dashboardsPage.isEditDashboardVisible(), "Current mode isn't edit");
+        } finally {
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashboardUri);
+        }
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void testDrillToAnotherDashboardTab() throws JSONException, IOException {
+        Dashboard dashboard = initDashboardHavingNoFilterInSourceTab();
+        String dashboardUri = DashboardsRestUtils.createDashboard(getRestApiClient(),
+                testParams.getProjectId(), dashboard.getMdObject());
+
+        String anotherDashboardUri = DashboardsRestUtils.createDashboard(getRestApiClient(),
+                testParams.getProjectId(), initDashboardHavingOneTab().getMdObject());
+        try {
+            initDashboardsPage().selectDashboard(dashboard.getName());
+            dashboardsPage.getTabs().getTab(SOURCE_TAB).open();
+            dashboardsPage.editDashboard();
+
+            TableReport tableReport = dashboardsPage.getReport(REPORT_AMOUNT_BY_PRODUCT, TableReport.class);
+            tableReport.addDrilling(Pair.of(singletonList(ATTR_PRODUCT), TAB_ANOTHER_DASHBOARD), DASHBOARD_DRILLING_GROUP);
+            tableReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
+            SaveAndContinueDialog popupDialog = SaveAndContinueDialog.getInstance(browser);
+            assertTrue(popupDialog.getRoot().isDisplayed(), "Save and Continue dialog isn't displayed");
+
+            popupDialog.cancel();
+            assertTrue(dashboardsPage.getTabs().getTab(SOURCE_TAB).isSelected(), "Tab is changed");
+            assertTrue(dashboardsPage.isEditDashboardVisible(), "Current mode isn't edit mode");
+
+            tableReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
+            waitForFragmentVisible(popupDialog);
+            popupDialog.saveAndContinue();
+            dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
+            assertTrue(dashboardsPage.getTabs().getTab(TAB_ANOTHER_DASHBOARD).isSelected(),
+                    TAB_ANOTHER_DASHBOARD + " is not selected after drill action");
+            assertFalse(dashboardsPage.isEditDashboardVisible(), "Current mode isn't view mode");
+
+            browser.navigate().back();
+            dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
+            assertTrue(dashboardsPage.getTabs().getTab(SOURCE_TAB).isSelected(), "Back to incorrect tab");
+            assertTrue(dashboardsPage.isEditDashboardVisible(), "Current mode isn't edit mode");
+        } finally {
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashboardUri);
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), anotherDashboardUri);
+        }
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void testDrillToReportBeforeToAnotherDashboardTab() throws JSONException, IOException {
+        Dashboard dashboard = initDashboardHavingNoFilterInSourceTab();
+        String dashboardUri = DashboardsRestUtils.createDashboard(getRestApiClient(),
+                testParams.getProjectId(), dashboard.getMdObject());
+
+        String anotherDashboardUri = DashboardsRestUtils.createDashboard(getRestApiClient(),
+                testParams.getProjectId(), initDashboardHavingOneTab().getMdObject());
+        try {
+            initDashboardsPage().selectDashboard(dashboard.getName());
+            dashboardsPage.getTabs().getTab(SOURCE_TAB).open();
+            dashboardsPage.editDashboard();
+
+            TableReport tableReport = dashboardsPage.getReport(REPORT_AMOUNT_BY_PRODUCT, TableReport.class);
+            addDrillingHavingInnerDrill(tableReport, TAB_ANOTHER_DASHBOARD);
+            tableReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
+            DashboardDrillDialog drillDialog = Graphene.createPageFragment(DashboardDrillDialog.class,
+                    waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
+            TableReport reportAfterDrillingToReport = drillDialog.getReport(TableReport.class);
+            assertEquals(reportAfterDrillingToReport.getAttributeValues(), attributeValuesOfReportHavingFilter,
+                    "Report aren't rendered correctly");
+            assertEquals(drillDialog.getBreadcrumbsString(),
+                    StringUtils.join(Arrays.asList(REPORT_AMOUNT_BY_PRODUCT, "CompuSci"), ">>"));
+
+            reportAfterDrillingToReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
+            SaveAndContinueDialog popupDialog = SaveAndContinueDialog.getInstance(browser);
+            assertTrue(popupDialog.getRoot().isDisplayed(), "Save and Continue dialog isn't displayed");
+
+            popupDialog.cancel();
+            assertTrue(dashboardsPage.getTabs().getTab(SOURCE_TAB).isSelected(), "Tab is changed");
+            assertTrue(dashboardsPage.isEditDashboardVisible(), "Current mode isn't edit mode");
+
+            reportAfterDrillingToReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
+            waitForFragmentVisible(popupDialog);
+            popupDialog.saveAndContinue();
+            dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
+            assertTrue(dashboardsPage.getTabs().getTab(TAB_ANOTHER_DASHBOARD).isSelected(),
+                    TAB_ANOTHER_DASHBOARD + " is not selected after drill action");
+            assertFalse(dashboardsPage.isEditDashboardVisible(), "Current mode is not view mode");
+
+            browser.navigate().back();
+            dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
+            assertTrue(dashboardsPage.getTabs().getTab(SOURCE_TAB).isSelected(), "Back to incorrect tab");
+            assertTrue(dashboardsPage.isEditDashboardVisible(), "Current mode isn't edit mode");
+        } finally {
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashboardUri);
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), anotherDashboardUri);
         }
     }
 
@@ -294,4 +461,32 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
         }).build();
     }
 
+    private Dashboard initDashboardHavingNoFilterInTabs() {
+        Tab sourceTab = initDashboardTab(SOURCE_TAB, singletonList(createReportItem(amountByProductReportUri)));
+        Tab targetTab = initDashboardTab(TARGET_TAB, singletonList(createReportItem(salesSeasonalityReportUri)));
+
+        return Builder.of(Dashboard::new).with(dash -> {
+            dash.setName("Dashboard " + generateHashString());
+            dash.addTab(sourceTab);
+            dash.addTab(targetTab);
+        }).build();
+    }
+
+    private Dashboard initDashboardHavingOneTab() {
+        Tab sourceTab = initDashboardTab(TAB_ANOTHER_DASHBOARD, singletonList(createReportItem(amountByProductReportUri)));
+
+        return Builder.of(Dashboard::new).with(dash -> {
+            dash.setName("Dashboard " + generateHashString());
+            dash.addTab(sourceTab);
+        }).build();
+    }
+
+    private void addDrillingHavingInnerDrill(TableReport tableReport, String tabDrillTo) {
+        WidgetConfigPanel widgetConfigPanel = WidgetConfigPanel
+                .openConfigurationPanelFor(tableReport.getRoot(), browser);
+        widgetConfigPanel.getTab(WidgetConfigPanel.Tab.DRILLING, DrillingConfigPanel.class)
+                .addDrilling(Pair.of(singletonList(ATTR_PRODUCT), REPORT_TOP_5_OPEN_BY_CASH), REPORTS_DRILLING_GROUP)
+                .addInnerDrillToLastItemPanel(Pair.of(singletonList(ATTR_OPPORTUNITY), tabDrillTo));
+        widgetConfigPanel.saveConfiguration();
+    }
 }

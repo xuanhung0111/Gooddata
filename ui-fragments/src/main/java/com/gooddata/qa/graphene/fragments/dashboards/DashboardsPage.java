@@ -218,6 +218,10 @@ public class DashboardsPage extends AbstractFragment {
         return getDashboardEditBar();
     }
 
+    public boolean isEditDashboardVisible() {
+        return isElementVisible(BY_DASHBOARD_EDIT_BAR, browser);
+    }
+
     public DashboardEditBar getDashboardEditBar() {
         return Graphene.createPageFragment(DashboardEditBar.class, waitForElementVisible(BY_DASHBOARD_EDIT_BAR, browser));
     }
