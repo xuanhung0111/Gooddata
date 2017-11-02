@@ -52,16 +52,14 @@ public class EditModeTest extends AbstractDashboardTest {
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
+        disableAnalyticalDesignerFeatureFlag();
         createNumberOfActivitiesMetric();
         createAmountMetric();
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
     }
 
-    @Override
-    protected void setDashboardFeatureFlags() {
+    private void disableAnalyticalDesignerFeatureFlag() {
         //This test only works if insight flag is disabled
-        setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
         setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.ANALYTICAL_DESIGNER, false);
     }

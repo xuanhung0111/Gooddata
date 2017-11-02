@@ -68,12 +68,6 @@ public abstract class AbstractDashboardTest extends GoodSalesAbstractTest {
         // remove start page context configuration
     }
 
-    @Override
-    protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        setDashboardFeatureFlags();
-    }
-
     protected String addWidgetToWorkingDashboard(final String widgetUri) throws JSONException, IOException {
         final RestApiClient client = getRestApiClient();
         final String projectId = testParams.getProjectId();
@@ -101,11 +95,6 @@ public abstract class AbstractDashboardTest extends GoodSalesAbstractTest {
             .getLastWidget(Kpi.class)
             .openAlertDialog()
             .deleteAlert();
-    }
-
-    protected void setDashboardFeatureFlags() {
-        setFeatureFlagInProjectAndCheckResult(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
     }
 
     protected String getWorkingDashboardUri() throws JSONException, IOException {
