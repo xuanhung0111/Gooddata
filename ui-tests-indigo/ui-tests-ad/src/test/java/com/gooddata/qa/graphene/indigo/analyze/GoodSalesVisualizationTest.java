@@ -294,7 +294,7 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
         analysisPage.changeReportType(ReportType.COLUMN_CHART)
             .changeReportType(ReportType.TABLE);
         takeScreenshot(browser, "switchReportHasManyMetricsManyAttributes-backToTable", getClass());
-        assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE));
+        assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT));
     }
 
     @Test(dependsOnGroups = {"createProject"})
