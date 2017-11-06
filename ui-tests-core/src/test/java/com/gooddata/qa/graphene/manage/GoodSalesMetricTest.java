@@ -803,11 +803,9 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                 .withWhats(metricName).withHows(ATTR_STAGE_NAME);
         createReport(reportDefinition, "screenshot-" + "report_" + customMetricInfo.getName());
         reportPage.getTableReport().drillOn("Short List", CellType.ATTRIBUTE_VALUE);
-        Sleeper.sleepTight(1000); // Wait for drill report is present
 
         TableReport drillReport = reportPage.getTableReport();
-        drillReport.waitForLoaded();
-        List<Float> drillReportMetrics = asList(1.72400224E8f, 1.16374376E8f, 2.88774592E8f);
+        List<Float> drillReportMetrics = asList(1.72400224E8f, 1.16374376E8f);
         List<String> drillReportAttributes = asList("Direct Sales", "Inside Sales");
         System.out.println("Drill metrics: " + drillReport.getMetricValues());
         System.out.println("Drill attribues: " + drillReport.getAttributeValues());

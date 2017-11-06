@@ -303,7 +303,6 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
         getFilter(ATTR_STAGE_NAME).changeAttributeFilterValues(DISCOVERY);
         getFilter(DF_VARIABLE).changeAttributeFilterValues(DISCOVERY);
         dashboardsPage.saveDashboard();
-        getReport(REPORT_WITH_PROMPT_FILTER).waitForLoaded();
 
         if (multipleChoice) {
             takeScreenshot(browser, "DF-not-applied-for-filter-group", getClass());
@@ -322,7 +321,6 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
         getFilter(ATTR_STAGE_NAME).editAttributeFilterValues(SHORT_LIST);
         getFilter(DF_VARIABLE).editAttributeFilterValues(SHORT_LIST);
         dashboardsPage.saveDashboard();
-        getReport(REPORT_WITH_PROMPT_FILTER).waitForLoaded();
 
         takeScreenshot(browser, "DF-applied-for-filter-group", getClass());
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), SHORT_LIST);

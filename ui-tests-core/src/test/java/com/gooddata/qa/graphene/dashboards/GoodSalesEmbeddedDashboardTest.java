@@ -296,7 +296,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         DashboardDrillDialog drillDialog = Graphene.createPageFragment(DashboardDrillDialog.class,
                 waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
 
-        TableReport drilledTableReport = drillDialog.getReport(TableReport.class).waitForLoaded();
+        TableReport drilledTableReport = drillDialog.getReport(TableReport.class);
 
         assertThat(drilledTableReport.getAttributeValues(), is(drilledDownReportAttributeValues));
         assertThat(drilledTableReport.getMetricValues(), is(drilledDownReportMetricValues));
@@ -310,7 +310,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         drillDialog = Graphene
                 .createPageFragment(DashboardDrillDialog.class, waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
 
-        drilledTableReport = drillDialog.getReport(TableReport.class).waitForLoaded();
+        drilledTableReport = drillDialog.getReport(TableReport.class);
 
         assertThat(drilledTableReport.getAttributeValues(), is(drilledInReportAttributeValues));
         assertThat(drilledTableReport.getMetricValues(), is(drilledInReportMetricValues));
@@ -324,7 +324,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         drillDialog = Graphene.createPageFragment(DashboardDrillDialog.class,
                 waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
 
-        drilledTableReport = drillDialog.getReport(TableReport.class).waitForLoaded();
+        drilledTableReport = drillDialog.getReport(TableReport.class);
         assertThat(drilledTableReport.getAttributeValues(), is(Lists.newArrayList("2008", "2009", "2010", "2011",
                 "2012")));
         assertThat(drilledTableReport.getMetricValues(), is(Lists.newArrayList(2773426.95F, 8656468.20F,
@@ -414,7 +414,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
 
         embeddedDashboard.getFirstFilter().changeAttributeFilterValues(filteredAttributeValues);
-        tableReport = embeddedDashboard.getReport(tabularReportDef.getName(), TableReport.class).waitForLoaded();
+        tableReport = embeddedDashboard.getReport(tabularReportDef.getName(), TableReport.class);
 
         assertThat(tableReport.getAttributeValues(), is(newArrayList(filteredAttributeValues)));
         assertThat(tableReport.getMetricValues(), is(filteredMetricValues));

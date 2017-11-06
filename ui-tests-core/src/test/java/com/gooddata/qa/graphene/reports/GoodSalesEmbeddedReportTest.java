@@ -109,7 +109,6 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
     public void editorGetEmbedCode() throws JSONException {
         logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.EDITOR);
         openReportByUrl(reportUrl);
-        reportPage.getTableReport().waitForLoaded();
         ReportEmbedDialog embedDialog = reportPage.openReportEmbedDialog();
         htmlEmbedCode = embedDialog.getHtmlCode();
         embedUri = embedDialog.getEmbedUri();
@@ -173,7 +172,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         waitForFragmentVisible(reportPage);
         assertEquals(reportPage.getReportName(), EMBEDDED_REPORT_TITLE, "Incorrect report title!");
 
-        TableReport tableReport = reportPage.getTableReport().waitForLoaded();
+        TableReport tableReport = reportPage.getTableReport();
         assertThat(tableReport.getAttributeValues(), is(attributeValues));
         assertThat(tableReport.getMetricValues(), is(metricValues));
     }
@@ -460,7 +459,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
     private void openReportByUrl(String reportUrl) {
         browser.get(reportUrl);
-        waitForFragmentVisible(reportPage);
+        waitForFragmentVisible(reportPage).initPage();
     }
 
     private void switchToPopUpWindow(String reportTitle) {

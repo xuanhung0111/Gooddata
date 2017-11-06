@@ -128,7 +128,6 @@ public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest 
                 .editAttributeFilterValues(DISCOVERY);
 
         dashboardsPage.saveDashboard();
-        getReport(REPORT_WITH_PROMPT_FILTER).waitForLoaded();
 
         takeScreenshot(browser,
                 "Combination-of-single-and-multiple-filter-works-correctly-for-type-" + combinationType, getClass());
