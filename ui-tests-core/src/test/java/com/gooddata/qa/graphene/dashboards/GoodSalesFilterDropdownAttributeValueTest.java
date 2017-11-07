@@ -22,6 +22,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -177,7 +178,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
 
             filter.changeAttributeFilterValues("Conviction");
             sleepTightInSeconds(2);
-            assertTrue(isEqualCollection(singleton("Conviction"), getAttributeValuesInFirstRow(REPORT_1)),
+            assertHeadersEqual(getAttributeValuesInFirstRow(REPORT_1), asList("Conviction"),
                     "Report1 doesnt apply StageName filter correctly!");
 
             dashboardsPage.editDashboard();
@@ -201,8 +202,8 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
                     .getAttributeFilterPanel()
                     .getItems(),
                     singleton("Risk Assessment")));
-            assertTrue(isEqualCollection(asList("Discovery", "Risk Assessment"),
-                    getAttributeValuesInFirstRow(REPORT_2)));
+            assertHeadersEqual(getAttributeValuesInFirstRow(REPORT_2), asList("Risk Assessment", "Discovery"),
+                    "Report2 doesnt apply StageName filter correctly!");
 
             dashboardsPage
                     .editDashboard()
@@ -273,7 +274,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
             assertEquals(fStageNameFilter.getCurrentValue(), "Risk Assessment",
                     "Current value of FStageName filter is not correct!");
 
-            assertTrue(isEqualCollection(getAttributeValuesInFirstRow(REPORT_1), singleton("Short List")),
+            assertHeadersEqual(getAttributeValuesInFirstRow(REPORT_1), asList("Short List"),
                     "Report1 doesnt apply StageName filter correctly!");
             assertTrue(dashboardContent.getReport(REPORT_2, TableReport.class).isNoData(),
                     "Report2 still has data");
@@ -478,5 +479,12 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
         return Arrays.asList(buildAttributeElementUri(stageUri, RISK_ASSESSMENT_ID),
                 buildAttributeElementUri(stageUri, CONVICTION_ID),
                 buildAttributeElementUri(stageUri, NEGOTIATION_ID));
+    }
+
+    private void assertHeadersEqual(Collection<String> actual, List<String> expected, String message ) {
+        List<String> actuals = new ArrayList<String>(actual);
+        for(int i = 0; i < actuals.size(); i++) {
+            assertTrue(actuals.get(i).equalsIgnoreCase(expected.get(i)), message);
+        }
     }
 }

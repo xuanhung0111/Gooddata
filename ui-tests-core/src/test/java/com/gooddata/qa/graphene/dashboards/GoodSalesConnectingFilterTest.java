@@ -1,16 +1,15 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
+import static com.gooddata.qa.utils.asserts.AssertUtils.assertHeadersEqual;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createFilterVariable;
 import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
-import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
@@ -27,8 +26,8 @@ import com.gooddata.md.report.MetricElement;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
@@ -103,19 +102,19 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
             Sleeper.sleepTightInSeconds(3);
             assertNotEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(V_STAGE)).getCurrentValue(),
                     "Negotiation");
-            assertTrue(isEqualCollection(asList("2011", "Negotiation"),
-                    dashboardsPage.getContent().getReport("Report1", TableReport.class).getAttributeElements()));
-            assertTrue(isEqualCollection(singleton("Negotiation"),
-                    dashboardsPage.getContent().getReport("Report2", TableReport.class).getAttributeElements()));
+            assertHeadersEqual(asList("Negotiation","2011"),
+                    dashboardsPage.getContent().getReport("Report1", TableReport.class).getAttributeElements());
+            assertHeadersEqual(asList("Negotiation"),
+                    dashboardsPage.getContent().getReport("Report2", TableReport.class).getAttributeElements());
 
             dashboardsPage.getTabs().openTab(1);
             assertEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME)).getCurrentValue(),
                     "Negotiation");
             Sleeper.sleepTightInSeconds(3);
-            assertTrue(isEqualCollection(asList("2011", "Negotiation"),
-                    dashboardsPage.getContent().getReport("Report1", TableReport.class).getAttributeElements()));
-            assertTrue(isEqualCollection(singleton("Negotiation"),
-                    dashboardsPage.getContent().getReport("Report2", TableReport.class).getAttributeElements()));
+            assertHeadersEqual(asList("Negotiation", "2011"),
+                    dashboardsPage.getContent().getReport("Report1", TableReport.class).getAttributeElements());
+            assertHeadersEqual(asList("Negotiation"),
+                    dashboardsPage.getContent().getReport("Report2", TableReport.class).getAttributeElements());
 
             dashboardsPage.editDashboard();
             dashboardsPage.getTabs().openTab(0);
@@ -204,33 +203,33 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
                 .changeAttributeFilterValues("Negotiation");
 
             Sleeper.sleepTightInSeconds(3);
-            assertTrue(isEqualCollection(asList("2011", "Negotiation"),
-                    dashboardsPage.getContent().getReport("Report1", TableReport.class).getAttributeElements()));
-            assertTrue(isEqualCollection(singleton("Negotiation"),
-                    dashboardsPage.getContent().getReport("Report2", TableReport.class).getAttributeElements()));
+            assertHeadersEqual(asList("Negotiation", "2011"),
+                    dashboardsPage.getContent().getReport("Report1", TableReport.class).getAttributeElements());
+            assertHeadersEqual(asList("Negotiation"),
+                    dashboardsPage.getContent().getReport("Report2", TableReport.class).getAttributeElements());
 
             dashboardsPage.getTabs().openTab(1);
             assertEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME)).getCurrentValue(),
                     "Negotiation");
             Sleeper.sleepTightInSeconds(3);
-            assertTrue(isEqualCollection(asList("2011", "Negotiation"),
-                    dashboardsPage.getContent().getReport("Report1", TableReport.class).getAttributeElements()));
-            assertTrue(isEqualCollection(singleton("Negotiation"),
-                    dashboardsPage.getContent().getReport("Report2", TableReport.class).getAttributeElements()));
+            assertHeadersEqual(asList("Negotiation", "2011"),
+                    dashboardsPage.getContent().getReport("Report1", TableReport.class).getAttributeElements());
+            assertHeadersEqual(asList("Negotiation"),
+                    dashboardsPage.getContent().getReport("Report2", TableReport.class).getAttributeElements());
 
             dashboardsPage.getContent().getFilterWidget(simplifyText(V_STAGE))
                 .changeAttributeFilterValues("Conviction");
             Sleeper.sleepTightInSeconds(3);
-            assertTrue(isEqualCollection(asList("2011", "Negotiation"),
-                    dashboardsPage.getContent().getReport("Report1", TableReport.class).getAttributeElements()));
+            assertHeadersEqual(asList("Negotiation", "2011"),
+                    dashboardsPage.getContent().getReport("Report1", TableReport.class).getAttributeElements());
             assertTrue(dashboardsPage.getContent().getReport("Report2", TableReport.class).isNoData());
 
             dashboardsPage.getTabs().openTab(0);
             assertEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(V_STAGE)).getCurrentValue(),
                     "Conviction");
             Sleeper.sleepTightInSeconds(3);
-            assertTrue(isEqualCollection(asList("2011", "Negotiation"),
-                    dashboardsPage.getContent().getReport("Report1", TableReport.class).getAttributeElements()));
+            assertHeadersEqual(asList("Negotiation", "2011"),
+                    dashboardsPage.getContent().getReport("Report1", TableReport.class).getAttributeElements());
             assertTrue(dashboardsPage.getContent().getReport("Report2", TableReport.class).isNoData());
 
             dashboardsPage.getContent().getFilterWidget("filter-time")

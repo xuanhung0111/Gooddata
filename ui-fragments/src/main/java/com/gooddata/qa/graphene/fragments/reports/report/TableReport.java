@@ -282,8 +282,8 @@ public class TableReport extends AbstractDashboardReport {
         for (WebElement e : attributeElementInGrid) {
             if (!e.findElement(BY_PARENT).getAttribute("class").contains("rows"))
                 continue;
-
-            if (!value.equals(e.getText()))
+            //With new UI header Text be uppercase
+            if (!value.equalsIgnoreCase(e.getText()))
                 continue;
             return e;
         }
@@ -407,7 +407,7 @@ public class TableReport extends AbstractDashboardReport {
 
     private WebElement getHeaderElement(final String header) {
         return getAllHeaderElements().stream()
-                .filter(e -> header.equals(e.getText()))
+                .filter(e -> header.equalsIgnoreCase(e.getText()))      //With new UI header Text be uppercase
                 .map(e -> e.findElement(BY_PARENT))
                 .findFirst()
                 .orElseThrow(() -> new NoSuchElementException("Cannot find header named: " + header));
