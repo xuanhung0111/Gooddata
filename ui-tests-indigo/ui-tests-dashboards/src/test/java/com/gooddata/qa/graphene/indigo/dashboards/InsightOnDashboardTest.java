@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
+import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
@@ -7,7 +8,6 @@ import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidget;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidgetWrap;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteAnalyticalDashboard;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAllInsightNames;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAnalyticalDashboards;
@@ -27,7 +27,6 @@ import org.json.JSONException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.entity.visualization.VisualizationMDConfiguration;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
@@ -36,6 +35,7 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.FilterType;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.InsightItem;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createInsight;
 
 public class InsightOnDashboardTest extends AbstractDashboardTest {
 
@@ -166,7 +166,7 @@ public class InsightOnDashboardTest extends AbstractDashboardTest {
     public void testInsightRenderInViewModeAfterSwitchingPage() throws JSONException, IOException {
         final String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
                 singletonList(
-                        createVisualizationWidgetWrap(
+                        createVisualizationWidget(
                                 getRestApiClient(),
                                 testParams.getProjectId(),
                                 getInsightUri(TEST_INSIGHT, getRestApiClient(), testParams.getProjectId()),
@@ -187,7 +187,7 @@ public class InsightOnDashboardTest extends AbstractDashboardTest {
     public void testInsightTitleOnDashboardAfterRenamedInAD() throws JSONException, IOException {
         final String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
                 singletonList(
-                        createVisualizationWidgetWrap(
+                        createVisualizationWidget(
                                 getRestApiClient(),
                                 testParams.getProjectId(),
                                 getInsightUri(TEST_INSIGHT, getRestApiClient(), testParams.getProjectId()),
@@ -216,7 +216,7 @@ public class InsightOnDashboardTest extends AbstractDashboardTest {
     public void testInsightTitleOnDashboardAddedAfterRename() throws JSONException, IOException {
         final String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
                 singletonList(
-                        createVisualizationWidgetWrap(
+                        createVisualizationWidget(
                                 getRestApiClient(),
                                 testParams.getProjectId(),
                                 getInsightUri(TEST_INSIGHT, getRestApiClient(), testParams.getProjectId()),
@@ -244,7 +244,7 @@ public class InsightOnDashboardTest extends AbstractDashboardTest {
     public void testInsightTitleInADAfterRenamedOnDashboard() throws JSONException, IOException {
         final String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
                 singletonList(
-                        createVisualizationWidgetWrap(
+                        createVisualizationWidget(
                                 getRestApiClient(),
                                 testParams.getProjectId(),
                                 getInsightUri(TEST_INSIGHT, getRestApiClient(), testParams.getProjectId()),
@@ -277,19 +277,11 @@ public class InsightOnDashboardTest extends AbstractDashboardTest {
     public void testCreatingInsightsForFilterTest() throws ParseException, IOException, JSONException {
         initProjectsPage();
 
-        createVisualizationWidget(
-                getRestApiClient(testParams.getEditorUser(), testParams.getPassword()), testParams.getProjectId(),
-                new VisualizationMDConfiguration.Builder()
-                        .title(INSIGHT_CREATED_BY_EDITOR)
-                        .type(ReportType.BAR_CHART.getLabel())
-                        .build());
+        createInsight(getRestApiClient(testParams.getEditorUser(), testParams.getPassword()), testParams.getProjectId(),
+                new InsightMDConfiguration(INSIGHT_CREATED_BY_EDITOR, ReportType.BAR_CHART));
 
-        createVisualizationWidget(
-                getRestApiClient(), testParams.getProjectId(),
-                new VisualizationMDConfiguration.Builder()
-                        .title(INSIGHT_CREATED_BY_MAIN_USER)
-                        .type(ReportType.BAR_CHART.getLabel())
-                        .build());
+        createInsight(getRestApiClient(), testParams.getProjectId(),
+                new InsightMDConfiguration(INSIGHT_CREATED_BY_MAIN_USER, ReportType.BAR_CHART));
 
         // need refresh to make sure the insights are added to working project
         browser.navigate().refresh();

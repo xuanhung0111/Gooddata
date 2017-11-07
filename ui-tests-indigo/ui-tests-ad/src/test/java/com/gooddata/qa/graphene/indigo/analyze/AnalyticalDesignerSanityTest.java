@@ -81,7 +81,9 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
             waitForElementPresent(ShortcutPanel.AS_A_COLUMN_CHART.getLocator(), browser);
 
         ChartReport report = analysisPage.drag(metric, recommendation)
-                    .waitForReportComputing().getChartReport();
+                    .waitForNonEmptyBuckets()
+                    .waitForReportComputing()
+                    .getChartReport();
 
         assertThat(report.getTrackersCount(), equalTo(1));
         RecommendationContainer recommendationContainer =
@@ -165,6 +167,7 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
             waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
 
         analysisPage.drag(metric, trendRecommendation)
+            .waitForNonEmptyBuckets()
             .waitForReportComputing();
 
         assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));

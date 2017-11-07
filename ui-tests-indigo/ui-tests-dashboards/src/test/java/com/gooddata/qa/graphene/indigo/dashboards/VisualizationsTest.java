@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import com.gooddata.qa.graphene.entity.visualization.VisualizationMDConfiguration;
+import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
@@ -13,7 +14,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidget;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createInsight;
 import static java.util.Collections.singletonList;
 
 import java.io.IOException;
@@ -21,7 +22,6 @@ import java.io.IOException;
 public class VisualizationsTest extends AbstractDashboardTest {
 
     private final String VISUALIZATION_TITLE = "last_dummy_viz";
-    private final String VISUALIZATION_TYPE_BAR = "bar";
 
     @Override
     protected void customizeProject() throws Throwable {
@@ -31,11 +31,7 @@ public class VisualizationsTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void setupVisualizations() throws JSONException, IOException {
-        createVisualizationWidget(getRestApiClient(), testParams.getProjectId(),
-                new VisualizationMDConfiguration.Builder()
-                        .title(VISUALIZATION_TITLE)
-                        .type(VISUALIZATION_TYPE_BAR)
-                        .build());
+        createInsight(getRestApiClient(), testParams.getProjectId(), new InsightMDConfiguration(VISUALIZATION_TITLE, ReportType.BAR_CHART));
     }
 
     @Test(dependsOnMethods = {"setupVisualizations"}, groups = {"desktop"})

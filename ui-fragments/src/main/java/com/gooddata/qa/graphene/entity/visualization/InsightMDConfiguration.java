@@ -3,13 +3,14 @@ package com.gooddata.qa.graphene.entity.visualization;
 import java.util.List;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import java.util.ArrayList;
 
 public class InsightMDConfiguration {
 
     private String title;
     private ReportType type;
-    private List<MeasureBucket> measureBuckets;
-    private List<CategoryBucket> categoryBuckets;
+    private List<MeasureBucket> measureBuckets = new ArrayList<MeasureBucket>();
+    private List<CategoryBucket> categoryBuckets = new ArrayList<CategoryBucket>();
 
     public InsightMDConfiguration(String title, ReportType type) {
         this.title = title;

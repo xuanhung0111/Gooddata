@@ -8,7 +8,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACT
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createInsight;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidgetWrap;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidget;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getInsightUri;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
@@ -59,7 +59,7 @@ public class CommonDateFilteringTest extends AbstractDashboardTest {
     @Test(dependsOnGroups = {"createProject"})
     public void makeNoChangeOnUnrelatedDateInsight() throws ParseException, JSONException, IOException {
         String insightUri = createUnrelatedDateInsight();
-        addWidgetToWorkingDashboard(createVisualizationWidgetWrap(getRestApiClient(), testParams.getProjectId(),
+        addWidgetToWorkingDashboard(createVisualizationWidget(getRestApiClient(), testParams.getProjectId(),
                 insightUri, UNRELATED_DATE_INSIGHT));
 
         try {
@@ -83,7 +83,7 @@ public class CommonDateFilteringTest extends AbstractDashboardTest {
                 "The insight date dataset is not disabled");
 
         List<String> expectedValues = initIndigoDashboardsPageWithWidgets().switchToEditMode()
-                .selectLastWidget(Insight.class).getChartReport().getDataLabels(); 
+                .selectLastWidget(Insight.class).getChartReport().getDataLabels();
 
         indigoDashboardsPage.selectDateFilterByName(LAST_7_DAYS).waitForWidgetsLoading()
                 .selectWidgetByHeadline(Insight.class, TEST_INSIGHT);

@@ -8,7 +8,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_LOS
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPEN_OPPS;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
-import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -24,6 +23,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricC
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
+import static org.openqa.selenium.By.cssSelector;
 
 public class BucketsTest extends AbstractAdE2ETest {
 
@@ -35,6 +35,7 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Override
     protected void customizeProject() throws Throwable {
+        super.customizeProject();
         getMetricCreator().createNumberOfActivitiesMetric();
         getMetricCreator().createNumberOfLostOppsMetric();
         getMetricCreator().createNumberOfOpenOppsMetric();
@@ -62,19 +63,19 @@ public class BucketsTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void test_stack_bucket_is_visible_for_line_colunm_and_bar_charts() {
         analysisPage.changeReportType(ReportType.COLUMN_CHART);
-        assertTrue(isElementPresent(className(StacksBucket.CSS_CLASS), browser));
+        assertTrue(isElementPresent(cssSelector(StacksBucket.CSS_SELECTOR), browser));
 
         analysisPage.changeReportType(ReportType.BAR_CHART);
-        assertTrue(isElementPresent(className(StacksBucket.CSS_CLASS), browser));
+        assertTrue(isElementPresent(cssSelector(StacksBucket.CSS_SELECTOR), browser));
 
         analysisPage.changeReportType(ReportType.LINE_CHART);
-        assertTrue(isElementPresent(className(StacksBucket.CSS_CLASS), browser));
+        assertTrue(isElementPresent(cssSelector(StacksBucket.CSS_SELECTOR), browser));
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void test_stack_bucket_is_hidden_for_table_visualization() {
         analysisPage.changeReportType(ReportType.TABLE);
-        assertFalse(isElementPresent(className(StacksBucket.CSS_CLASS), browser));
+        assertFalse(isElementPresent(cssSelector(StacksBucket.CSS_SELECTOR), browser));
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
