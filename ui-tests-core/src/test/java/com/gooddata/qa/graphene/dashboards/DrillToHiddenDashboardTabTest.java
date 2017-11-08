@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.dashboards;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.DrillingConfigPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.DrillingConfigPanel.DrillingGroup;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
@@ -34,8 +35,6 @@ public class DrillToHiddenDashboardTabTest extends GoodSalesAbstractTest {
     private final String TAB_ON_PRIVATE_DASHBOARD = "Tab On Private Dashboard";
     private final String TAB_ON_PUBLIC_DASHBOARD = "Tab On Public Dashboard";
 
-    private final String DRILLING_GROUP = "Dashboards";
-
     @Override
     protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
         createAndAddUserToProject(UserRoles.EDITOR);
@@ -65,7 +64,7 @@ public class DrillToHiddenDashboardTabTest extends GoodSalesAbstractTest {
         initDashboardsPage().selectDashboard(PUBLIC_DASHBOARD).publishDashboard(true);
         dashboardsPage.editDashboard();
         dashboardsPage.getContent().getLatestReport(TableReport.class).addDrilling(
-                Pair.of(singletonList(ATTR_PRODUCT), TAB_ON_PRIVATE_DASHBOARD), DRILLING_GROUP);
+                Pair.of(singletonList(ATTR_PRODUCT), TAB_ON_PRIVATE_DASHBOARD), DrillingGroup.DASHBOARDS.getName());
         dashboardsPage.saveDashboard();
 
         dashboardsPage.selectDashboard(PRIVATE_DASHBOARD).publishDashboard(false);
@@ -100,7 +99,7 @@ public class DrillToHiddenDashboardTabTest extends GoodSalesAbstractTest {
                                     browser)
                             .getTab(WidgetConfigPanel.Tab.DRILLING, DrillingConfigPanel.class);
 
-            assertFalse(drillingConfigPanel.isValueOnRightButton(PRIVATE_DASHBOARD, DRILLING_GROUP),
+            assertFalse(drillingConfigPanel.isValueOnRightButton(PRIVATE_DASHBOARD, DrillingGroup.DASHBOARDS.getName()),
                     PRIVATE_DASHBOARD + " is on setting panel");
         } finally {
             logout();

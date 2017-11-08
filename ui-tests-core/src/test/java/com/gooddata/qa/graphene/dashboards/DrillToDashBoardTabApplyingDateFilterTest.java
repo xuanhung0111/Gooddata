@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.DrillingConfigPanel.DrillingGroup;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
@@ -45,11 +46,7 @@ public class DrillToDashBoardTabApplyingDateFilterTest extends GoodSalesAbstract
 
     private final String SOURCE_TAB = "Source Tab";
     private final String TARGET_TAB = "Target Tab";
-
-    private final String DASHBOARD_DRILLING_GROUP = "Dashboards";
-
     private final String DATA_FILTERED_BY_YEAR_2014 = "2014";
-
     private static final String DATE_DIMENSION_CLOSED = "Date dimension (Closed)";
     private static final String DATE_DIMENSION_SNAPSHOT = "Date dimension (Snapshot)";
 
@@ -113,7 +110,7 @@ public class DrillToDashBoardTabApplyingDateFilterTest extends GoodSalesAbstract
 
             TableReport reportOnSourceTab = dashboardsPage.getContent().getReport(REPORT_AMOUNT_BY_PRODUCT, TableReport.class);
 
-            reportOnSourceTab.addDrilling(Pair.of(singletonList(ATTR_PRODUCT), TARGET_TAB), DASHBOARD_DRILLING_GROUP);
+            reportOnSourceTab.addDrilling(Pair.of(singletonList(ATTR_PRODUCT), TARGET_TAB), DrillingGroup.DASHBOARDS.getName());
             dashboardsPage.saveDashboard();
 
             // wait for saving dashboard
@@ -175,7 +172,7 @@ public class DrillToDashBoardTabApplyingDateFilterTest extends GoodSalesAbstract
             TableReport reportOnFirstDash = dashboardsPage.getContent()
                     .getLatestReport(TableReport.class);
 
-            reportOnFirstDash.addDrilling(Pair.of(singletonList(ATTR_PRODUCT), TARGET_TAB), DASHBOARD_DRILLING_GROUP);
+            reportOnFirstDash.addDrilling(Pair.of(singletonList(ATTR_PRODUCT), TARGET_TAB), DrillingGroup.DASHBOARDS.getName());
             dashboardsPage.saveDashboard();
 
             // wait for saving dashboard

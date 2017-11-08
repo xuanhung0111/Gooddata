@@ -70,6 +70,13 @@ public class DrillingConfigPanel extends AbstractFragment {
         return result;
     }
 
+    public List<String> getRightItemValues() {
+        SelectItemPopupPanel rightPopupPanel = getLasItemPanel().openRightPopup();
+        List<String> listItems = rightPopupPanel.getItems();
+        rightPopupPanel.cancelPanel();
+        return listItems;
+    }
+
     public Pair<String, String> getSettingsOnLastItemPanel() {
         ItemPanel panel = getLasItemPanel();
         return Pair.of(panel.getLeftItemValue(), panel.getRightItemValue());
@@ -203,6 +210,22 @@ public class DrillingConfigPanel extends AbstractFragment {
             return innerDrillItemPanelList.stream()
                     .map(panel -> Pair.of(panel.getLeftItemValue(), panel.getRightItemValue()))
                     .collect(Collectors.toList());
+        }
+    }
+
+    public enum DrillingGroup {
+        ATTRIBUTES("Attributes"),
+        REPORTS("Reports"),
+        DASHBOARDS("Dashboards");
+
+        private String group;
+
+        DrillingGroup(String group) {
+            this.group = group;
+        }
+
+        public String getName() {
+            return this.group;
         }
     }
 }
