@@ -10,7 +10,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createFilterVariable;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Calendar.YEAR;
@@ -23,6 +22,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.Calendar;
 
+import com.gooddata.qa.utils.http.variable.VariableRestUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -66,7 +66,7 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
     protected void customizeProject() throws Throwable {
         createAmountMetric();
         String productUri = getMdService().getObjUri(getProject(), Attribute.class, title(ATTR_PRODUCT));
-        String variableUri = createFilterVariable(getRestApiClient(), testParams.getProjectId(), VARIABLE_NAME, productUri);
+        String variableUri = VariableRestUtils.createFilterVariable(getRestApiClient(), testParams.getProjectId(), VARIABLE_NAME, productUri);
 
         createMetric(COUNT_OF_PRODUCT, format("SELECT COUNT([%s])", productUri), "#,##0");
 

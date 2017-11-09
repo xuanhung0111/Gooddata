@@ -7,7 +7,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_SNAPS
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static com.gooddata.qa.utils.asserts.AssertUtils.assertHeadersEqual;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createFilterVariable;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
@@ -17,6 +16,7 @@ import static org.testng.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.Calendar;
 
+import com.gooddata.qa.utils.http.variable.VariableRestUtils;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
@@ -58,7 +58,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
     protected void customizeProject() throws Throwable {
         createAmountMetric();
 
-        createFilterVariable(getRestApiClient(), testParams.getProjectId(),
+        VariableRestUtils.createFilterVariable(getRestApiClient(), testParams.getProjectId(),
                 V_STAGE, getAttributeByTitle(ATTR_STAGE_NAME).getUri());
 
         createReport(GridReportDefinitionContent.create(REPORT_1,

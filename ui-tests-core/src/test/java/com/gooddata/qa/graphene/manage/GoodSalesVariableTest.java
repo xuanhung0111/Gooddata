@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.manage;
 
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.getVariableUri;
+import static com.gooddata.qa.utils.http.variable.VariableRestUtils.getVariableUri;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileUri;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;

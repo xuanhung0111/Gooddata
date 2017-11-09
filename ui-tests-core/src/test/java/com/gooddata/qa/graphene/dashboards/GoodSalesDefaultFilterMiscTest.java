@@ -7,7 +7,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_PIPELINE_ANALYS
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_OUTLOOK;
 import static com.gooddata.qa.utils.asserts.AssertUtils.assertHeadersEqual;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.getVariableUri;
+import static com.gooddata.qa.utils.http.variable.VariableRestUtils.getVariableUri;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
