@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.dashboards;
 
-
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.DrillingConfigPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.DrillingConfigPanel.DrillingGroup;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
@@ -27,8 +27,6 @@ import static org.testng.Assert.*;
 
 public class DrillToDashboardTabSettingTest extends GoodSalesAbstractTest {
 
-    private final String DASHBOARDS_DRILLING_GROUP = "Dashboards";
-    private final String REPORTS_DRILLING_GROUP = "Reports";
     private final String FIRST_TAB = "First Tab";
     private final String SECOND_TAB = "Second Tab";
     private final String THIRD_TAB = "Third Tab";
@@ -46,9 +44,10 @@ public class DrillToDashboardTabSettingTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void verifyDashboardDrillingTest() throws IOException, JSONException {
+        final List<String> tabs = asList(DrillingGroup.ATTRIBUTES.getName(), DrillingGroup.REPORTS.getName(),
+                DrillingGroup.DASHBOARDS.getName());
         final String toolTipIconHelp =
                 "By clicking on an attribute value or a metric value, the linked dashboard tab will open.";
-        final List<String> tabs = asList("Attributes", "Reports", "Dashboards");
         Dashboard dash = initDashboard();
         String dashUri = DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
                 dash.getMdObject());
@@ -63,9 +62,8 @@ public class DrillToDashboardTabSettingTest extends GoodSalesAbstractTest {
                     .openConfigurationPanelFor(reportOnFirstTab.getRoot(), browser);
             DrillingConfigPanel drillingConfigPanel = widgetConfigPanel
                     .getTab(WidgetConfigPanel.Tab.DRILLING, DrillingConfigPanel.class);
-            assertEquals(drillingConfigPanel.getTooltipFromHelpIcon(DASHBOARDS_DRILLING_GROUP), toolTipIconHelp);
-            assertEquals(drillingConfigPanel.getTabs(), tabs);
-
+            assertEquals(drillingConfigPanel.getTooltipFromHelpIcon(DrillingGroup.DASHBOARDS.getName()), toolTipIconHelp);
+            assertEquals(drillingConfigPanel.getRightItemGroups(DrillingGroup.DASHBOARDS.getName()), tabs);
         } finally {
             deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashUri);
         }
@@ -80,19 +78,17 @@ public class DrillToDashboardTabSettingTest extends GoodSalesAbstractTest {
             initDashboardsPage().selectDashboard(dash.getName());
             dashboardsPage.getTabs().getTab(FIRST_TAB).open();
             addDrillSettingsToLatestReport(
-                    new DrillSetting(singletonList(ATTR_PRODUCT), SECOND_TAB, DASHBOARDS_DRILLING_GROUP));
+                    new DrillSetting(singletonList(ATTR_PRODUCT), SECOND_TAB, DrillingGroup.DASHBOARDS.getName()));
 
             widgetConfigPanel.discardConfiguration();
-            assertFalse(report.isDrillable("CompuSci", CellType.ATTRIBUTE_VALUE),
-                    "Action discard configuration not work");
-
+            assertFalse(report.isDrillable("CompuSci", CellType.ATTRIBUTE_VALUE),"Action discard configuration not work");
         } finally {
             deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashUri);
         }
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void addMoreDrillingToDashboardTabTest() throws IOException, JSONException {
+    public void addMultiDrillingToDashboardTabTest() throws IOException, JSONException {
         Dashboard dash = initDashboard();
         String dashUri = DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
                 dash.getMdObject());
@@ -100,26 +96,34 @@ public class DrillToDashboardTabSettingTest extends GoodSalesAbstractTest {
             initDashboardsPage().selectDashboard(dash.getName());
             dashboardsPage.getTabs().getTab(FIRST_TAB).open();
             addDrillSettingsToLatestReport(
-                    new DrillSetting(singletonList(METRIC_AMOUNT), SECOND_TAB, DASHBOARDS_DRILLING_GROUP));
+                    new DrillSetting(singletonList(METRIC_AMOUNT), SECOND_TAB, DrillingGroup.DASHBOARDS.getName()));
 
-            drillingConfigPanel.addDrilling(Pair.of(singletonList(ATTR_PRODUCT), THIRD_TAB), DASHBOARDS_DRILLING_GROUP);
-            assertTrue(drillingConfigPanel.getAllValueLists(0).getRight()
-                    .containsAll(asList(FIRST_TAB, SECOND_TAB, THIRD_TAB)), "Some dashboard tabs is missing");
+            drillingConfigPanel.addDrilling(Pair.of(singletonList(ATTR_PRODUCT), THIRD_TAB), DrillingGroup.DASHBOARDS.getName());
+            assertTrue(drillingConfigPanel.getAllValueLists(0).getRight().containsAll(
+                    asList(FIRST_TAB, SECOND_TAB, THIRD_TAB)), "Some dashboard tabs is missing");
 
             widgetConfigPanel.saveConfiguration();
+            dashboardsPage.saveDashboard();
+
+            assertTrue(report.isDrillable("$27,222,899.64", CellType.METRIC_VALUE),
+                    "Drill setting for the report is not saved");
+            report.drillOnFirstValue(CellType.METRIC_VALUE);
+            report.waitForLoaded();
+            assertTrue(dashboardsPage.getTabs().getTab(SECOND_TAB).isSelected(),SECOND_TAB + " is not selected after drilling");
+
+            dashboardsPage.getTabs().getTab(FIRST_TAB).open();
             assertTrue(report.isDrillable("CompuSci", CellType.ATTRIBUTE_VALUE),
                     "Drill setting for the report is not saved");
             report.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
             report.waitForLoaded();
             assertTrue(dashboardsPage.getTabs().getTab(THIRD_TAB).isSelected(),THIRD_TAB + " is not selected after drilling");
-
         } finally {
             deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashUri);
         }
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void verifyAddInnerDrillingTest() throws IOException, JSONException {
+    public void addMultiInnerDrillingTest() throws IOException, JSONException {
         Dashboard dash = initDashboard();
         String dashUri = DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
                 dash.getMdObject());
@@ -127,19 +131,24 @@ public class DrillToDashboardTabSettingTest extends GoodSalesAbstractTest {
             initDashboardsPage().selectDashboard(dash.getName());
             dashboardsPage.getTabs().getTab(FIRST_TAB).open();
             addDrillSettingsToLatestReport(
-                    new DrillSetting(singletonList(ATTR_PRODUCT), REPORT_ACTIVITIES_BY_TYPE, REPORTS_DRILLING_GROUP));
-
+                    new DrillSetting(singletonList(METRIC_AMOUNT), REPORT_ACTIVITIES_BY_TYPE, DrillingGroup.REPORTS.getName()));
             assertTrue(drillingConfigPanel.canAddInnerDrill(), "+ Drill further in Activities by Type is not displayed");
 
-            List<Pair<String, String>> innerDrillSettings = drillingConfigPanel
-                    .openNewInnerDrillPanel().getAllInnerDrillSettingsOnLastPanel();
-            assertEquals(innerDrillSettings, singletonList(Pair.of("Select Metric / Attribute...", "Select Dashboard")));
-
             drillingConfigPanel
+                    .openNewInnerDrillPanel(0)   //Using to verify default setting
                     .addInnerDrillToLastItemPanel(Pair.of(singletonList(METRIC_NUMBER_OF_ACTIVITIES), SECOND_TAB))
                     .addInnerDrillToLastItemPanel(Pair.of(singletonList(ATTR_ACTIVITY_TYPE), THIRD_TAB));
-            assertFalse(drillingConfigPanel.canAddInnerDrill(), "+ Drill further in Activities by Type is not hidden");
+            assertFalse(drillingConfigPanel.canAddInnerDrill(),
+                    "Drill further in Activities by Type is not hidden after all metrics/atts are added drilling setting");
 
+            assertEquals(drillingConfigPanel.getSettingsOnLastItemPanel(), Pair.of(METRIC_AMOUNT, "Activities By Type"));
+            assertEquals(
+                    drillingConfigPanel.getAllInnerDrillSettingsOnLastPanel(),
+                    asList(Pair.of("Select Metric / Attribute...", "Select Dashboard"),
+                            Pair.of("# Of Activities", SECOND_TAB), Pair.of(ATTR_ACTIVITY_TYPE, THIRD_TAB)));
+
+            drillingConfigPanel.addDrilling(Pair.of(singletonList(ATTR_PRODUCT), SECOND_TAB), DrillingGroup.DASHBOARDS.getName());
+            assertEquals(drillingConfigPanel.getSettingsOnLastItemPanel(), Pair.of(ATTR_PRODUCT, SECOND_TAB));
         } finally {
             deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashUri);
         }

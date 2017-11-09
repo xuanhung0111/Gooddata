@@ -1,17 +1,8 @@
 package com.gooddata.qa.graphene.fragments.dashboards.widget.configuration;
 
-import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
-import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static java.util.Objects.isNull;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
+import com.google.common.base.Predicate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -19,9 +10,14 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
-import com.google.common.base.Predicate;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static java.util.Objects.isNull;
 
 public class DrillingConfigPanel extends AbstractFragment {
 
@@ -30,6 +26,12 @@ public class DrillingConfigPanel extends AbstractFragment {
 
     @FindBy(className = "yui3-drillitempanel")
     private List<WebElement> drillItemPanelList;
+
+    private static final By HELP_ICON = By.xpath("//div[contains(@class, 'yui3-c-container-content') and " +
+            "not(contains(@class,'gdc-hidden'))]//*[contains(@class, 'pickerHelp')]//*[contains(@class, 'inlineBubbleHelp')]");
+
+    private static final By TABS = By.xpath("//*[contains(@class, 'yui3-attributeorreportpickerpanel-content')]" +
+            "//*[contains(@class, 'button-primary')]");
 
     public DrillingConfigPanel addDrilling(Pair<List<String>, String> pairs, String group) {
         addNewDrillingPanel().selectLeftItem(pairs.getLeft()).selectRightItem(pairs.getRight(), group);
@@ -55,45 +57,29 @@ public class DrillingConfigPanel extends AbstractFragment {
     public boolean isValueOnRightButton(String value, String group) {
         boolean result;
 
-        ItemPanel itemPanel = addNewDrillingPanel();
-
+        SelectItemPopupPanel rightPopupPanel = openRightPopupPanel(group);
         try {
-            selectRandomLeftItem();
-            SelectItemPopupPanel rightPopupPanel = itemPanel.openRightPopup()
-                    .changeGroup(group)
-                    .searchItem(value);
-
-            result = rightPopupPanel.getItems().stream().anyMatch(value::equals);
+            result = rightPopupPanel.searchItem(value).getItems().stream().anyMatch(value::equals);
             rightPopupPanel.cancelPanel();
         } finally {
-            itemPanel.delete();
+            getLastItemPanel().delete();
         }
 
         return result;
     }
 
-//    public boolean isPrivateItemOnRightButton(String item, String group, Predicate<String> howToCheck) {
-//        boolean result;
-//        ItemPanel itemPanel = addNewDrillingPanel();
-//        try {
-//            selectRandomLeftItem();
-//            result = rightPopupPanel.getItems().stream().filter(item::equals).anyMatch(item::is);
-//            rightPopupPanel.cancelPanel();
-//        } finally {
-//            itemPanel.delete();
-//        }
-//        return result;
-//    }
-
     public Pair<List<String>, List<String>> getAllValueLists(int indexOfPanel) {
+        List<String> listRightItems = null;
         ItemPanel itemPanel = getItemPanelByIndex(indexOfPanel);
         SelectItemPopupPanel leftPopupPanel = itemPanel.openLeftPopup();
         List<String> listLeftItems = leftPopupPanel.getItems();
         leftPopupPanel.cancelPanel();
 
-        SelectItemPopupPanel rightPopupPanel = itemPanel.openRightPopup();
-        List<String> listRightItems = rightPopupPanel.getItems();
-        rightPopupPanel.cancelPanel();
+        if(itemPanel.getLeftItemValue() != "Select Metric / Attribute...") {
+            SelectItemPopupPanel rightPopupPanel = itemPanel.openRightPopup();
+            listRightItems = rightPopupPanel.getItems();
+            rightPopupPanel.cancelPanel();    
+        }
         return Pair.of(listLeftItems, listRightItems);
     }
 
@@ -102,9 +88,8 @@ public class DrillingConfigPanel extends AbstractFragment {
         return Pair.of(panel.getLeftItemValue(), panel.getRightItemValue());
     }
 
-
-    public DrillingConfigPanel openNewInnerDrillPanel() {
-        getLastItemPanel().openNewInnerDrillPanel();
+    public DrillingConfigPanel openNewInnerDrillPanel(int index) {
+        getItemPanelByIndex(index).openNewInnerDrillPanel();
         return this;
     }
 
@@ -118,40 +103,35 @@ public class DrillingConfigPanel extends AbstractFragment {
     }
 
     public String getTooltipFromHelpIcon(String group) {
-        String toolTip;
-        ItemPanel itemPanel = addNewDrillingPanel();
-
-        try {
-            selectRandomLeftItem();
-            toolTip = itemPanel.getToolTipHelpIcon(group);
-        } finally {
-            itemPanel.delete();
-        }
+        SelectItemPopupPanel rightPopupPanel = openRightPopupPanel(group);
+        String toolTip = rightPopupPanel.getRoot().findElement(HELP_ICON).getAttribute("title");
+        rightPopupPanel.cancelPanel();
+        getLastItemPanel().delete();
         return toolTip;
     }
 
     public boolean canAddInnerDrill() {
-        return getLastItemPanel().canAddInnerDrill();
+        return getLastItemPanel().addInnerDrillButton().isDisplayed();
     }
 
-    public List<String> getTabs() {
-        List<String> tabs;
-        ItemPanel itemPanel = addNewDrillingPanel();
-
-        try {
-            selectRandomLeftItem();
-            tabs = itemPanel.getTabs();
-        } finally {
-            itemPanel.delete();
-        }
+    public List<String> getRightItemGroups(String group) {
+        SelectItemPopupPanel rightPopupPanel = openRightPopupPanel(group);
+        List<String> tabs = getElementTexts(rightPopupPanel.getRoot().findElements(TABS));
+        rightPopupPanel.cancelPanel();
+        getLastItemPanel().delete();
         return tabs;
     }
 
-    // Using in cases which item on left does not affect to right item values
-    private DrillingConfigPanel selectRandomLeftItem() {
+    /**
+     * Adding a new item panel to  get information from right popup panel
+     * so that should delete it after using
+     */
+    private SelectItemPopupPanel openRightPopupPanel(String group) {
+        ItemPanel itemPanel = addNewDrillingPanel();
+        //item on left does not affect to right item values
         SelectItemPopupPanel leftPopupPanel = getLastItemPanel().openLeftPopup();
         leftPopupPanel.searchAndSelectItem(leftPopupPanel.getItemElements().get(0).getText()).submitPanel();
-        return this;
+        return itemPanel.openRightPopup().changeGroup(group);
     }
 
     private ItemPanel addInnerDrill(ItemPanel selectedPanel, Pair<List<String>, String> innerDrillSetting) {
@@ -215,10 +195,6 @@ public class DrillingConfigPanel extends AbstractFragment {
         @FindBy(className = "addMoreDetail")
         private WebElement addNewInnerDrill;
 
-        private final By helpIcon = By.cssSelector(".overlayPlugin-plugged:not(.gdc-hidden) " +
-                ".yui3-c-container-content:not(.gdc-hidden) .pickerHelp .inlineBubbleHelp)");
-        private final By tabs = By.cssSelector(".yui3-attributeorreportpickerpanel-content .button-primary");
-
         private ItemPanel selectLeftItem(List<String> names) {
             openLeftPopup().searchAndSelectItems(names).submitPanel();
 
@@ -273,40 +249,14 @@ public class DrillingConfigPanel extends AbstractFragment {
             return innerDrillItemPanelList.get(innerDrillItemPanelList.size() -1);
         }
 
-        private boolean canAddInnerDrill() {
-            return waitForElementPresent(addNewInnerDrill).isDisplayed();
+        private WebElement addInnerDrillButton() {
+            return waitForElementPresent(addNewInnerDrill);
         }
 
         private List<Pair<String, String>> getAllInnerDrillSettings() {
             return innerDrillItemPanelList.stream()
                     .map(panel -> Pair.of(panel.getLeftItemValue(), panel.getRightItemValue()))
                     .collect(Collectors.toList());
-        }
-
-        private String getToolTipHelpIcon(String group) {
-            String toolTip = openRightPopup().changeGroup(group).getRoot().findElement(helpIcon).getAttribute("title");
-            getPopupInstance().cancelPanel();
-            return toolTip;
-        }
-
-        private List<String> getTabs() {
-            List<String> listTab = getElementTexts(openRightPopup().getRoot().findElements(tabs));
-            getPopupInstance().cancelPanel();
-            return listTab;
-        }
-
-        private boolean isPrivateItem(String item, String group) {
-            boolean result = findItemFrom(item, openRightPopup().changeGroup(group).getItemElements())
-                    .get().getAttribute("class").contains("is-unlisted");
-            getPopupInstance().cancelPanel();
-            return result;
-        }
-
-        private Optional<WebElement> findItemFrom(final String item, final Collection<WebElement> collection) {
-            return waitForCollectionIsNotEmpty(collection)
-                    .stream()
-                    .filter(e -> item.equals(e.findElement(By.cssSelector("label,.label")).getText()))
-                    .findFirst();
         }
     }
 

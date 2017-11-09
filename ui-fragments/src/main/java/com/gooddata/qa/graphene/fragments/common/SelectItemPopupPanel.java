@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.fragments.common;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.clickElementByVisibleLocator;
-import static com.gooddata.qa.graphene.utils.ElementUtils.getTooltipFromElement;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsEmpty;
@@ -9,7 +8,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmp
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
 
-import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
