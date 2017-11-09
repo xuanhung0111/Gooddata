@@ -14,6 +14,7 @@ import com.gooddata.qa.graphene.dashboards.DashboardSavedFiltersTest;
 import com.gooddata.qa.graphene.dashboards.DeleteDashboardHavingDrillToTabTest;
 import com.gooddata.qa.graphene.dashboards.DrillToDashBoardTabApplyingDateFilterTest;
 import com.gooddata.qa.graphene.dashboards.DrillToDashboardTabTest;
+import com.gooddata.qa.graphene.dashboards.DrillToDashboardTabSettingTest;
 import com.gooddata.qa.graphene.dashboards.DrillToHiddenDashboardTabTest;
 import com.gooddata.qa.graphene.dashboards.DrillToUpdatedDashboardTabTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesCascadingFilterTest;
@@ -195,6 +196,7 @@ public class UITestsRegistry {
                     DrillToUpdatedDashboardTabTest.class,
                     DrillToDashBoardTabApplyingDateFilterTest.class,
                     DrillToDashboardFromDrilledReportTest.class,
+                    DrillToDashboardTabSettingTest.class,
                     DeleteDashboardHavingDrillToTabTest.class,
                     "testng-dashboard-default-filter-multiple-choice.xml",
                     "testng-dashboard-default-filter-single-choice.xml",

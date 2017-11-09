@@ -67,7 +67,8 @@ public class DrillToUpdatedDashboardTabTest extends GoodSalesAbstractTest {
                     "Show me is not reset");
 
             assertFalse(widgetConfigPanel.getTab(WidgetConfigPanel.Tab.DRILLING, DrillingConfigPanel.class)
-                    .getRightItemValues().contains(SECOND_TAB), SECOND_TAB + "is not removed out list tabs");
+                    .getAllValueLists(0).getRight().contains(SECOND_TAB),
+                    SECOND_TAB + "is not removed out list tabs");
             widgetConfigPanel.discardConfiguration();
 
             reportOnFirstTab.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
@@ -109,7 +110,8 @@ public class DrillToUpdatedDashboardTabTest extends GoodSalesAbstractTest {
                     "Show me is not updated");
 
             assertTrue(widgetConfigPanel.getTab(WidgetConfigPanel.Tab.DRILLING, DrillingConfigPanel.class)
-                    .getRightItemValues().contains(RENAME_TAB), RENAME_TAB + " is not added to list tabs");
+                    .getAllValueLists(0).getRight().contains(RENAME_TAB),
+                    RENAME_TAB + " is not added to list tabs");
 
             widgetConfigPanel.discardConfiguration();
 

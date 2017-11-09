@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.common;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.clickElementByVisibleLocator;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getTooltipFromElement;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsEmpty;
@@ -8,6 +9,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmp
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +35,8 @@ public class SelectItemPopupPanel extends AbstractFragment {
 
     private static final String WEIRD_STRING_TO_CLEAR_ALL_ITEMS = "!@#$%^";
 
-    private static final String BUTTON_GROUP_XPATH_LOCATOR = "//*[contains(@class,'gdc-buttonGroup')]//span[.='%s']";
+    private static final String BUTTON_GROUP_XPATH_LOCATOR = "//*[contains(@class,'overlayPlugin-plugged') " +
+            "and not(contains(@class,'gdc-hidden'))]//span[.='%s']";
 
     @FindBys({
         @FindBy(css = ".overlayPlugin-plugged>:not(.gdc-hidden),.sndPanelFilter,.filter,ul.c-AttributeFilterPicker"),

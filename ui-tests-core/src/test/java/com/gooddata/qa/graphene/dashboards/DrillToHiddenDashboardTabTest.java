@@ -27,8 +27,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOP_SALES_REPS_BY_WON_AND_LOST;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.*;
 
 public class DrillToHiddenDashboardTabTest extends GoodSalesAbstractTest {
 
@@ -42,8 +41,8 @@ public class DrillToHiddenDashboardTabTest extends GoodSalesAbstractTest {
     protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
         createAndAddUserToProject(UserRoles.EDITOR);
     }
-    
-    @Test(dependsOnMethods = {"createProject"})
+
+    @Test(dependsOnGroups = {"createProject"})
     public void initDashboardDrillingToHiddenTab() throws IOException, JSONException {
         String reportOnPublicDash = createAmountByProductReport();
         String reportOnPrivateDash = createTopSalesRepsByWonAndLostReport();
@@ -72,6 +71,25 @@ public class DrillToHiddenDashboardTabTest extends GoodSalesAbstractTest {
 
         dashboardsPage.selectDashboard(PRIVATE_DASHBOARD).publishDashboard(false);
     }
+
+//    @Test(dependsOnMethods = {"initDashboardDrillingToHiddenTab"})
+//    public void verifyDashboardTabsInDrilling() {
+//        initDashboardsPage().selectDashboard(PRIVATE_DASHBOARD);
+//        TableReport report = dashboardsPage.getContent()
+//                .getLatestReport(TableReport.class)
+//                .waitForLoaded();
+//        dashboardsPage.editDashboard();
+//
+//        WidgetConfigPanel widgetConfigPanel = WidgetConfigPanel
+//                .openConfigurationPanelFor(report.getRoot(), browser);
+//        DrillingConfigPanel drillingConfigPanel = widgetConfigPanel
+//                .getTab(WidgetConfigPanel.Tab.DRILLING, DrillingConfigPanel.class);
+//
+//        assertTrue(drillingConfigPanel.isPrivateItemOnRightButton(TAB_ON_PRIVATE_DASHBOARD, DrillingGroup.DASHBOARDS.getName()),
+//                "Private tab is not shown Eye icon");
+//        assertFalse(drillingConfigPanel.isPrivateItemOnRightButton(TAB_ON_PUBLIC_DASHBOARD, DrillingGroup.DASHBOARDS.getName()),
+//                "Public tab is shown Eye icon");
+//    }
 
     @Test(dependsOnMethods = {"initDashboardDrillingToHiddenTab"})
     public void testDrillReportToHiddenTab() throws JSONException {
