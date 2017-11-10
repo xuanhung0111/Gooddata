@@ -17,6 +17,7 @@
         <module>ui-tests-connectors</module>
         <module>ui-tests-msf</module>
         <module>ui-tests-indigo</module>
+        <module>ui-tests-lcmconsole</module>
     </modules>
 
     <properties>
