@@ -41,6 +41,9 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
@@ -353,6 +356,34 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             assertTrue(getRowElementsFrom(report).size() == 1);
             addAttributeFilterToDashboard(ATTR_STAGE_NAME, DashAttributeFilterTypes.ATTRIBUTE);
             assertTrue(getRowElementsFrom(report).size() > 1);
+        } finally {
+            dashboardsPage.deleteDashboard();
+        }
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void testDashboardFilterOverridesReportTimeFilter() {
+        createReport(
+                new UiReportDefinition()
+                        .withName("Report 5")
+                        .withWhats(METRIC_AMOUNT)
+                        .withHows(new HowItem(ATTR_STAGE_NAME, Position.LEFT),
+                                new HowItem(ATTR_YEAR_SNAPSHOT, Position.TOP))
+                        .withFilters(FilterItem.Factory.createAttributeFilter(ATTR_YEAR_SNAPSHOT, "2011")),
+                "Report 5"
+        );
+        checkRedBar(browser);
+
+        try {
+            addReportToDashboard("Report 5");
+            TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
+            assertThat(report.getAttributeValues(), hasItem("2011"));
+
+            dashboardsPage.addTimeFilterToDashboard(DATE_DIMENSION_SNAPSHOT, DateGranularity.YEAR,
+                    String.format("%s ago", Calendar.getInstance().get(Calendar.YEAR) - 2012))
+                    .saveDashboard();
+            assertThat(report.getAttributeValues(), not(hasItem("2011")));
+            assertThat(report.getAttributeValues(), hasItem("2012"));
         } finally {
             dashboardsPage.deleteDashboard();
         }
