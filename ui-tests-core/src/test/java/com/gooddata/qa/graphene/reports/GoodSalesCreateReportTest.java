@@ -15,6 +15,8 @@ import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
+import com.gooddata.qa.graphene.fragments.reports.report.AttributeSndPanel;
+import com.gooddata.qa.graphene.fragments.reports.report.MetricSndPanel;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import org.apache.http.ParseException;
@@ -29,7 +31,6 @@ import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static java.util.Arrays.asList;
@@ -77,22 +78,17 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
     public void createReportWithInapplicableAttribute() {
         initReportCreation();
 
-        reportPage.initPage()
-            .openWhatPanel()
-            .selectMetric(METRIC_NUMBER_OF_ACTIVITIES)
-            .openHowPanel();
-        sleepTightInSeconds(1);
-        reportPage.selectAttribute(ATTR_PRODUCT);
+        reportPage.initPage().openWhatPanel().selectItem(METRIC_NUMBER_OF_ACTIVITIES);
+
+        AttributeSndPanel attributePanel = reportPage.openHowPanel();
+        attributePanel.trySelectItem(ATTR_PRODUCT);
 
         assertThat(getErrorMessage(), startsWith(INAPPLICABLE_ATTR_MESSAGE));
-        assertThat(reportPage.getTooltipMessageOfAttribute(ATTR_PRODUCT), equalTo(
+        assertThat(attributePanel.getUnReachableAttributeDescription(ATTR_PRODUCT), equalTo(
                 "Product is unavailable due to the metric(s) in this report. Use Shift + click to override."));
 
-        String invalidDataReportMessage = reportPage.selectInapplicableAttribute(ATTR_PRODUCT)
-            .doneSndPanel()
-            .getInvalidDataReportMessage();
-
-        assertThat(invalidDataReportMessage, equalTo(INVALID_DATA_REPORT_MESSAGE));
+        attributePanel.selectInapplicableItem(ATTR_PRODUCT).done();
+        assertThat(reportPage.getInvalidDataReportMessage(), equalTo(INVALID_DATA_REPORT_MESSAGE));
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -101,7 +97,7 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
 
         reportPage.initPage()
             .openWhatPanel()
-            .selectMetric(METRIC_NUMBER_OF_ACTIVITIES);
+            .selectItem(METRIC_NUMBER_OF_ACTIVITIES);
         reportPage.tryOpenFilterPanelInDisabledState();
 
         String wrongStateFilterMessage = waitForElementVisible(cssSelector(".c-infoDialog .message"), browser)
@@ -113,13 +109,9 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
     public void cancelCreatingReport() {
         initReportCreation();
 
-        reportPage.initPage()
-            .openWhatPanel()
-            .selectMetric(METRIC_NUMBER_OF_ACTIVITIES)
-            .openHowPanel()
-            .selectAttribute(ATTR_ACTIVITY_TYPE)
-            .doneSndPanel()
-            .selectReportVisualisation(ReportTypes.TABLE)
+        reportPage.initPage().openWhatPanel().selectItem(METRIC_NUMBER_OF_ACTIVITIES);
+        reportPage.openHowPanel().selectItem(ATTR_ACTIVITY_TYPE).done();
+        reportPage.selectReportVisualisation(ReportTypes.TABLE)
             .clickSaveReport()
             .cancelCreateReportInDialog();
 
@@ -128,24 +120,16 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void switchBetweenFolderAndTagView() {
-        initReportCreation();
+        AttributeSndPanel attributePanel = initReportCreation().openHowPanel();
+        attributePanel.switchViewBy("Tags");
 
-        reportPage.initPage()
-            .openHowPanel()
-            .switchViewToTags();
-        sleepTightInSeconds(2);
-
-        assertThat(reportPage.loadAllViewGroups(),
-                equalTo(asList("date", "day", "eu", "month", "quarter", "week", "year")));
+        assertThat(attributePanel.getViewGroups(),
+                equalTo(asList("All Attributes", "date", "day", "eu", "month", "quarter", "week", "year")));
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void loadAllAttributesInFilterPanel() {
-        initReportCreation();
-
-        reportPage.initPage()
-            .openHowPanel()
-            .selectAttribute("Date (Snapshot)");
+        initReportCreation().openHowPanel().selectItem("Date (Snapshot)");
 
         waitForElementVisible(cssSelector(".s-btn-filter_this_attribute"), browser).sendKeys(Keys.ENTER);
         waitForElementVisible(cssSelector(".guidedNavigation .hyperlinkOn:not(.hidden) a"), browser).sendKeys(Keys.ENTER);
@@ -153,15 +137,12 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void createReportWithNonDefaultAttributeLabel() {
-        initReportCreation();
+        AttributeSndPanel attributePanel = initReportCreation().openHowPanel();
+        attributePanel.selectItem("Stage Name");
+        attributePanel.changeDisplayLabel("Order").done();
 
-        assertThat(reportPage.initPage()
-            .openHowPanel()
-            .selectAttribute("Stage Name")
-            .changeDisplayLabel("Order")
-            .doneSndPanel()
-            .getTableReport()
-            .getAttributeValues(), equalTo(asList("101", "102", "103", "104", "105", "106", "107", "108")));
+        assertThat(reportPage.getTableReport().getAttributeValues(),
+                equalTo(asList("101", "102", "103", "104", "105", "106", "107", "108")));
 
     }
 
@@ -172,25 +153,19 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
         reportPage.initPage()
             .addFilter(FilterItem.Factory.createAttributeFilter(ATTR_ACTIVITY_TYPE, "Email"))
             .openHowPanel()
-            .selectAttribute(ATTR_ACTIVITY_TYPE)
-            .doneSndPanel();
+            .selectItem(ATTR_ACTIVITY_TYPE)
+            .done();
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testFilterNotRemoveWhenAttributeRemovedFromHow() {
-        initReportCreation();
+        initReportCreation().openHowPanel().selectItem(ATTR_ACTIVITY_TYPE).done();
 
-        assertThat(reportPage.initPage()
-            .openHowPanel()
-            .selectAttribute(ATTR_ACTIVITY_TYPE)
-            .doneSndPanel()
-            .addFilter(FilterItem.Factory.createAttributeFilter(ATTR_ACTIVITY_TYPE, "Email"))
+        assertThat(reportPage.addFilter(FilterItem.Factory.createAttributeFilter(ATTR_ACTIVITY_TYPE, "Email"))
             .getFilters().size(), equalTo(1));
 
-        assertThat(reportPage.openHowPanel()
-            .deselectAttribute(ATTR_ACTIVITY_TYPE)
-            .doneSndPanel()
-            .getFilters().size(), equalTo(1));
+        reportPage.openHowPanel().deselectItem(ATTR_ACTIVITY_TYPE).done();
+        assertThat(reportPage.getFilters().size(), equalTo(1));
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -227,18 +202,13 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkLimitAttributes() {
-        initReportCreation();
-
-        reportPage.initPage()
-            .openHowPanel();
-        asList("Account", "Activity", "Activity Type", "Department", "Is Task?", "Opportunity",
+        AttributeSndPanel attributePanel = initReportCreation().openHowPanel();
+        attributePanel.selectItems("Account", "Activity", "Activity Type", "Department", "Is Task?", "Opportunity",
                 "Priority", "Region", "Sales Rep", "Date (Activity)", "Month (Activity)", "Month/Year (Activity)",
                 "Month of Quarter (Activity)", "Quarter/Year (Activity)", "Year (Activity)", "Date (Created)", 
-                "Month (Created)", "Month/Year (Created)", "Quarter/Year (Created)", "Year (Created)")
-            .stream()
-            .forEach(reportPage::selectAttribute);
+                "Month (Created)", "Month/Year (Created)", "Quarter/Year (Created)", "Year (Created)");
 
-        reportPage.selectAttribute("Month of Quarter (Created)");
+        attributePanel.trySelectItem("Month of Quarter (Created)");
         assertThat(getErrorMessage(), startsWith(ATTRIBUTE_LIMIT_MESSAGE));
     }
 
@@ -254,17 +224,16 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
                 createStageDurationMetric(), createStageVelocityMetric(),
                 createWinRateMetric(), createExpectedWonVsQuotaMetric());
 
-        initReportCreation();
-
         try {
-        reportPage.initPage().openWhatPanel();
-        asList("# of Activities", "# of Lost Opps.", "# of Open Opps.", "# of Opportunities",
-                "# of Opportunities [BOP]", "# of Won Opps.", "% of Goal", "Amount", "Avg. Amount", "Avg. Won",
-                "Best Case", "Days until Close", "Expected", "Lost", "Expected + Won", "Quota", "Stage Duration",
-                "Stage Velocity", "Win Rate", "Won").stream().forEach(reportPage::selectMetric);
+            MetricSndPanel metricPanel = initReportCreation().openWhatPanel();
+            metricPanel.selectItems("# of Activities", "# of Lost Opps.", "# of Open Opps.", "# of Opportunities",
+                    "# of Opportunities [BOP]", "# of Won Opps.", "% of Goal", "Amount", "Avg. Amount", "Avg. Won",
+                    "Best Case", "Days until Close", "Expected", "Lost", "Expected + Won", "Quota",
+                    "Stage Duration", "Stage Velocity", "Win Rate", "Won");
 
-        reportPage.selectMetric("Expected + Won vs. Quota");
-        assertThat(getErrorMessage(), startsWith(METRIC_LIMIT_MESSAGE));
+            metricPanel.trySelectItem("Expected + Won vs. Quota");
+            assertThat(getErrorMessage(), startsWith(METRIC_LIMIT_MESSAGE));
+
         } finally {
             for (Metric metric : metrics) {
                 RestUtils.deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), metric.getUri());

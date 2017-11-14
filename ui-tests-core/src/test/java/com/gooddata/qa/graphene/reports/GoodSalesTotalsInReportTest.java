@@ -356,11 +356,8 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
                 "Rollup values are not correct");
 
         //minimize number of metrics to 1 to avoid handling scroll bar
-        reportPage.openWhatPanel()
-                .selectInapplicableMetric(METRIC_PROBABILITY)
-                .doneSndPanel()
-                .waitForReportExecutionProgress()
-                .openFilterPanel()
+        reportPage.openWhatPanel().deselectItem(METRIC_PROBABILITY).done();
+        reportPage.openFilterPanel()
                 .addFilter(FilterItem.Factory.createAttributeFilter(ATTR_QUARTER_YEAR_SNAPSHOT, Q1_2011));
         reportPage.waitForReportExecutionProgress();
 
@@ -385,7 +382,7 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createReportForAddingMultipleTotals"})
-    public void addMultipleMedianTotals() throws FileNotFoundException, IOException {
+    public void addMultipleMedianTotals() throws IOException {
         final TableReport table = initReportsPage().openReport(MULTIPLE_TOTALS_REPORT).getTableReport();
         table.openContextMenuFrom(MAY_2011, CellType.ATTRIBUTE_VALUE)
                 .aggregateTableData(AggregationType.MEDIAN, BY_OPPORTUNITY);
@@ -429,9 +426,9 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
         //minimize number of metrics to 1 to avoid handling scroll bar
         reportPage.exchangeColAndRowHeaders()
                 .openWhatPanel()
-                .selectInapplicableMetric(METRIC_PROBABILITY)
-                .doneSndPanel()
-                .waitForReportExecutionProgress();
+                .deselectItem(METRIC_PROBABILITY)
+                .done();
+        reportPage.waitForReportExecutionProgress();
 
         reportPage.displayMetricsInDifferentRows();
         assertTrue(

@@ -52,10 +52,12 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
         reportPage.initPage()
                 .setReportName(TESTING_REPORT_CHART)
                 .openWhatPanel()
-                .selectMetric(METRIC_AMOUNT)
+                .selectItem(METRIC_AMOUNT);
+        reportPage
                 .openHowPanel()
-                .selectAttribute(ATTR_ACCOUNT)
-                .doneSndPanel()
+                .selectItem(ATTR_ACCOUNT)
+                .done();
+        reportPage
                 .selectReportVisualisation(ReportTypes.LINE)
                 .forceRenderChartReport()
                 .finishCreateReport();

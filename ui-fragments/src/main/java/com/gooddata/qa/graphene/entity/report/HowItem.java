@@ -53,18 +53,18 @@ public class HowItem {
         return this;
     }
 
-    public static enum Position {
+    public enum Position {
         LEFT("sndAttributePosition_rows"),
         TOP("sndAttributePosition_columns");
 
-        private String cssClass;
+        private String direction;
 
-        private Position(String cssClass) {
-            this.cssClass = cssClass;
+        Position(String direction) {
+            this.direction = direction;
         }
 
-        public String getCssClass() {
-            return cssClass;
+        public String getDirection() {
+            return direction;
         }
     }
 }

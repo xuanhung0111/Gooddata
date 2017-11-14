@@ -190,6 +190,7 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
             .startCreateReport()
             .initPage()
             .openWhatPanel()
+            .clickAddNewMetric()
             .createGlobalSimpleMetric(SimpleMetricTypes.SUM, "Amount", folderName);
         initDataPage("metrics").getObjectFolder().checkFolderVisible(folderName);
     }

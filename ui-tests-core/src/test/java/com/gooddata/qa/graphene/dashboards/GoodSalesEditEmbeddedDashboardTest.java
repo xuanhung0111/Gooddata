@@ -201,7 +201,7 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
         EmbeddedReportPage embeddedReportPage =
                 initEmbeddedDashboard(EMBEDDED_DASHBOARD).openEmbeddedReportPage();
 
-        embeddedReportPage.openWhatPanel().selectMetric(metric);
+        embeddedReportPage.openWhatPanel().selectItem(metric);
 
         assertTrue(embeddedReportPage.isSndEditMetricButtonVisible(), "Edit button in Snd Metric detail is not visible");
         assertTrue(embeddedReportPage.isSndDeleteMetricButtonVisible(), "Delete button in Snd Metric detail is not visible");
@@ -216,7 +216,7 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
         embeddedReportPage = initEmbeddedDashboard(EMBEDDED_DASHBOARD).openEmbeddedReportPage();
 
-        embeddedReportPage.openWhatPanel().selectMetric(editedMetricName);
+        embeddedReportPage.openWhatPanel().selectItem(editedMetricName);
         embeddedReportPage.clickDeleteInSndMetricDetail();
 
         takeScreenshot(browser, "delete-confirmation-message-for-metric" + metric, getClass());

@@ -6,6 +6,7 @@ import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.manage.MetricDetailsPage;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
+import com.gooddata.qa.graphene.fragments.reports.report.MetricSndPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import org.jboss.arquillian.graphene.Graphene;
@@ -48,18 +49,16 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
         assertEquals(MetricDetailsPage.getInstance(browser).getMetricFormat(), Formatter.BARS.toString());
 
         try {
-            initReportsPage()
-                .startCreateReport()
-                .initPage()
-                .openWhatPanel()
-                .selectMetric(METRIC_NUMBER_OF_ACTIVITIES);
+            MetricSndPanel metricPanel = initReportsPage().startCreateReport().initPage().openWhatPanel();
+
+            metricPanel.openMetricDetail(METRIC_NUMBER_OF_ACTIVITIES);
             assertEquals(waitForElementVisible(METRIC_DETAIL_FORMAT_LOCATOR, browser)
                     .getText(), Formatter.BARS.toString());
 
-            List<String> values = reportPage.doneSndPanel()
-                .selectReportVisualisation(ReportTypes.TABLE)
-                .getTableReport()
-                .getRawMetricValues();
+            metricPanel.done();
+
+            List<String> values = reportPage.selectReportVisualisation(ReportTypes.TABLE)
+                    .getTableReport().getRawMetricValues();
             assertEquals(values.size(), 1);
             assertTrue(Formatter.BARS.toString().contains(values.get(0)));
 
@@ -74,14 +73,10 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"})
     public void editFormatInReportPage() {
         try {
-            TableReport report = initReportsPage()
-                    .startCreateReport()
-                    .initPage()
-                    .openWhatPanel()
-                    .selectMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                    .doneSndPanel()
-                    .selectReportVisualisation(ReportTypes.TABLE)
-                    .getTableReport();
+            initReportsPage().startCreateReport().initPage().openWhatPanel()
+                    .selectItem(METRIC_NUMBER_OF_ACTIVITIES).done();
+
+            TableReport report = reportPage.selectReportVisualisation(ReportTypes.TABLE).getTableReport();
 
             List<String> values = report.getRawMetricValues();
             assertEquals(values.size(), 1);
@@ -106,11 +101,9 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void editFormatWhenCreatingNewMetric() {
-        initReportsPage()
-            .startCreateReport()
-            .initPage()
-            .openWhatPanel()
-            .createSimpleMetric(SimpleMetricTypes.SUM, "Duration");
+        initReportsPage().startCreateReport().openWhatPanel()
+                .clickAddNewMetric().createSimpleMetric(SimpleMetricTypes.SUM, "Duration");
+
         WebElement editFormat = waitForElementVisible(METRIC_DETAIL_FORMAT_LOCATOR, browser);
         editFormat.click();
 
@@ -131,9 +124,8 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
         try {
             initReportsPage()
                 .startCreateReport()
-                .initPage()
                 .openWhatPanel()
-                .selectMetric(METRIC_NUMBER_OF_ACTIVITIES);
+                .openMetricDetail(METRIC_NUMBER_OF_ACTIVITIES);
 
             WebElement editFormat = waitForElementVisible(METRIC_DETAIL_FORMAT_LOCATOR, browser);
             editFormat.click();

@@ -1,21 +1,5 @@
 package com.gooddata.qa.graphene.reports;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.io.IOUtils;
-import org.json.JSONException;
-import org.openqa.selenium.By;
-import org.testng.annotations.Test;
-
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
@@ -24,6 +8,21 @@ import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import org.apache.commons.io.IOUtils;
+import org.json.JSONException;
+import org.openqa.selenium.By;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 
 public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
@@ -69,11 +68,8 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
         URL maqlResource = getClass().getResource("/comp-attributes/ca-maql-simple.txt");
         postMAQL(IOUtils.toString(maqlResource), 60);
 
-        initReportsPage()
-            .startCreateReport()
-            .initPage()
-            .openWhatPanel()
-            .createGlobalSimpleMetric(SimpleMetricTypes.SUM, "Duration", FOLDER_UNSORTED);
+        initReportsPage().startCreateReport().openWhatPanel()
+                .clickAddNewMetric().createGlobalSimpleMetric(SimpleMetricTypes.SUM, "Duration", FOLDER_UNSORTED);
 
         List<String> what = new ArrayList<String>();
         what.add("Duration [Sum]");

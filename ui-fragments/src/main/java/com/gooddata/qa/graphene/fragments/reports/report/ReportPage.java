@@ -1,42 +1,21 @@
 package com.gooddata.qa.graphene.fragments.reports.report;
 
-import static com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter.REPORT_FILTER_LOCATOR;
-import static com.gooddata.qa.graphene.utils.CheckUtils.BY_BLUE_BAR;
-import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static com.gooddata.qa.utils.CssUtils.simplifyText;
-import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static java.util.Objects.isNull;
-import static java.util.stream.Collectors.toList;
-import static org.openqa.selenium.By.className;
-import static org.openqa.selenium.By.cssSelector;
-import static org.openqa.selenium.By.id;
-import static org.openqa.selenium.By.tagName;
-import static org.openqa.selenium.By.xpath;
-import static org.testng.Assert.assertEquals;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
+import com.gooddata.qa.graphene.entity.filter.FilterItem;
+import com.gooddata.qa.graphene.entity.filter.RangeFilterItem;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
+import com.gooddata.qa.graphene.enums.report.ReportTypes;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
+import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog;
+import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
+import com.gooddata.qa.graphene.fragments.reports.filter.AbstractFilterFragment;
+import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter;
+import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter.FilterFragment;
+import com.gooddata.qa.graphene.utils.WaitUtils;
+import com.google.common.base.Predicate;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TimeoutException;
@@ -44,27 +23,33 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
 
-import com.gooddata.qa.graphene.entity.filter.FilterItem;
-import com.gooddata.qa.graphene.entity.filter.RangeFilterItem;
-import com.gooddata.qa.graphene.entity.report.HowItem;
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.entity.report.WhatItem;
-import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
-import com.gooddata.qa.graphene.enums.report.ExportFormat;
-import com.gooddata.qa.graphene.enums.report.ReportTypes;
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
-import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
-import com.gooddata.qa.graphene.fragments.manage.MetricEditorDialog;
-import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog;
-import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
-import com.gooddata.qa.graphene.fragments.reports.filter.AbstractFilterFragment;
-import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter;
-import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter.FilterFragment;
-import com.google.common.base.Predicate;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter.REPORT_FILTER_LOCATOR;
+import static com.gooddata.qa.graphene.utils.CheckUtils.BY_BLUE_BAR;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementAttributeNotContainValue;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
+import static java.lang.String.format;
+import static java.util.Collections.emptyList;
+import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.cssSelector;
+import static org.openqa.selenium.By.id;
+import static org.openqa.selenium.By.tagName;
+import static org.openqa.selenium.By.xpath;
+import static org.testng.Assert.assertEquals;
 
 public class ReportPage extends AbstractFragment {
 
@@ -94,15 +79,6 @@ public class ReportPage extends AbstractFragment {
 
     public static final By LOCATOR = By.id("p-analysisPage");
 
-    private static final String WEIRD_STRING_TO_CLEAR_ALL_ITEMS = "!@#$%^";
-
-    private static final By METRIC_ATTRIBUTE_CONTAINER_LOCATOR =
-            cssSelector(".sndPanel1:not([style^='display: none']) .dataContainer .cell");
-
-    private static final By ATTRIBUTES_CONTAINER_LOCATOR = cssSelector(".s-snd-AttributesContainer .gridTile");
-
-    private static final By METRICS_CONTAINER_LOCATOR = cssSelector(".s-snd-MetricsContainer .gridTile");
-
     private static final By SHOW_CONFIGURATION_LOCATOR =
             cssSelector(".s-btn-__show_configuration:not(.gdc-hidden)");
 
@@ -126,21 +102,8 @@ public class ReportPage extends AbstractFragment {
 
     private static final By UNSAVED_WARNING_EMBED_LOCATOR = cssSelector(".unsavedWarning-share");
 
-    private static final By ADD_SIMPLE_METRIC_LOCATOR = xpath("//button[contains(@class,'s-sme-addButton')]");
-
-    private static final By ADD_TO_GLOBAL_METRICS_LOCATOR = xpath("//input[contains(@class,'s-sme-global')]");
-
-    private static final By NO_MATCHING_METRIC = By.cssSelector(".sndPanel .s-snd-MetricsContainer + .noMatch");
-
-    private static final By NO_MATCHING_ATTRIBUTE =
-            By.cssSelector(".sndPanel .s-snd-AttributesContainer + .noMatch");
-
     private static final By METRIC_AXIS_CONFIGURATION_CONTENT_LOCATOR = By
             .cssSelector("div.yui3-c-metricaxisconfiguration-content:not(.gdc-hidden)");
-
-    private static final By SND_DIALOG_LOADING = By.cssSelector("form.sndFooterForm > .progress.s-loading");
-
-    private static final By DONE_BUTTON_LOCATOR = By.cssSelector("form.sndFooterForm > button.s-btn-done:not([disabled])");
 
     public static final ReportPage getInstance(SearchContext context) {
         return Graphene.createPageFragment(ReportPage.class, waitForElementVisible(id("p-analysisPage"), context));
@@ -173,14 +136,21 @@ public class ReportPage extends AbstractFragment {
         return waitForElementVisible(reportName).getAttribute("title");
     }
 
-    public ReportPage openWhatPanel() {
+    public MetricSndPanel openWhatPanel() {
         waitForElementVisible(whatButton).click();
-        return this;
+        return getPanel(MetricSndPanel.class);
     }
 
-    public ReportPage openHowPanel() {
+    public AttributeSndPanel openHowPanel() {
         waitForElementVisible(howButton).click();
-        return this;
+        return getPanel(AttributeSndPanel.class);
+    }
+
+    public <T extends AbstractSndPanel> T getPanel(Class<T> clazz) {
+        WebElement panelRoot = waitForElementVisible(AbstractSndPanel.LOCATOR, getRoot());
+        panelRoot.findElements(By.className("sndWheel")).forEach(WaitUtils::waitForElementNotVisible);
+
+        return Graphene.createPageFragment(clazz, panelRoot);
     }
 
     public ReportFilter openFilterPanel() {
@@ -200,96 +170,6 @@ public class ReportPage extends AbstractFragment {
             throw new RuntimeException("Filter button is not disabled");
 
         filterButton.click();
-    }
-
-    public ReportPage selectFolderLocation(String folder) {
-        waitForCollectionIsNotEmpty(browser.findElements(METRIC_ATTRIBUTE_CONTAINER_LOCATOR))
-            .stream()
-
-            // date dimension has title like this: Date dimension (Activity)-Date dimension (Activity)
-            // so using startsWith() instead of equals() for general case
-            .filter(e -> e.getAttribute("title").startsWith(folder))
-
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("Cannot find folder: " + folder))
-            .click();
-        // wait for Folder location be highlighted
-        waitForElementHighLighted(folder);
-        return this;
-    }
-
-    public ReportPage selectMetric(String metric) {
-        return selectMetric(metric, e -> {
-            e.click();
-            waitForElementHighLighted(metric);
-            //wait for metric details displayed in third column of SND dialog
-            //or warning dialog of "You have reached the limit of metrics in report"
-            waitForSndMetricDetail();
-        });
-    }
-
-    public void waitForSndMetricDetail() {
-        Predicate<WebDriver> sndMetricDetailVisible = browser ->
-                isElementVisible(By.className("c-metricDetailViewButton"), browser)
-                || isElementVisible(By.className("t-reportEditorMessage"), browser);
-
-        Graphene.waitGui().until(sndMetricDetailVisible);
-    }
-
-    public ReportPage selectInapplicableMetric(String metric) {
-        return selectMetric(metric, e -> new Actions(browser).keyDown(Keys.SHIFT).click(e).keyUp(Keys.SHIFT).
-                perform());
-    }
-
-    public ReportPage selectInapplicableAttribute(String attribute) {
-        return selectAttribute(attribute, e -> new Actions(browser).keyDown(Keys.SHIFT).click(e).keyUp(Keys.SHIFT).
-                perform());
-    }
-
-    public ReportPage selectAttribute(String attribute) {
-        return selectAttribute(attribute, e -> {
-            e.click();
-            waitForElementHighLighted(attribute);
-        });
-    }
-
-    public ReportPage deselectAttribute(String attribute) {
-        searchAttribute(attribute);
-        findAttribute(attribute).findElement(tagName("input")).click();
-        return this;
-    }
-
-    public ReportPage searchAttribute(String attribute) {
-        WebElement filterInput = waitForElementVisible(xpath("//label[@class='sndAttributeFilterLabel']/../input"),
-                browser);
-
-        filterInput.clear();
-        filterInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
-        sleepTightInSeconds(1);
-        waitForElementVisible(NO_MATCHING_ATTRIBUTE, browser);
-
-        filterInput.clear();
-        filterInput.sendKeys(attribute);
-        sleepTightInSeconds(1);
-        waitForElementVisible(ATTRIBUTES_CONTAINER_LOCATOR, browser);
-
-        return this;
-    }
-
-    public ReportPage doneSndPanel() {
-        // When webapp do a lot of CRUD things, its rendering job will work slowly,
-        // so need a short time to wait in case like this
-        sleepTightInSeconds(2);
-
-        waitForElementNotPresent(SND_DIALOG_LOADING);
-        waitForElementVisible(DONE_BUTTON_LOCATOR, browser).click();
-        waitForElementNotVisible(DONE_BUTTON_LOCATOR);
-
-        Predicate<WebDriver> predicate = input -> !waitForElementVisible(filterButton)
-                .getAttribute("class")
-                .contains("disabled");
-        Graphene.waitGui().withTimeout(3, TimeUnit.MINUTES).until(predicate);
-        return this;
     }
 
     public ReportPage selectReportVisualisation(ReportTypes type) {
@@ -321,11 +201,6 @@ public class ReportPage extends AbstractFragment {
     public ReportPage showConfiguration() {
         waitForElementVisible(SHOW_CONFIGURATION_LOCATOR, getRoot()).click();
         waitForElementEnabled(waitForElementVisible(HIDE_CONFIGURATION_LOCATOR, getRoot()));
-        return this;
-    }
-
-    public ReportPage hideConfiguration() {
-        waitForElementVisible(HIDE_CONFIGURATION_LOCATOR, browser).click();
         return this;
     }
 
@@ -362,33 +237,6 @@ public class ReportPage extends AbstractFragment {
     public OneNumberReport getHeadlineReport() {
         return Graphene.createPageFragment(OneNumberReport.class,
                 waitForElementVisible(cssSelector(".c-oneNumberReport"), browser));
-    }
-
-    public ReportPage createSimpleMetric(SimpleMetricTypes metricOperation, String metricOnFact){
-        initSimpleMetric(metricOperation, metricOnFact);
-        waitForElementVisible(ADD_SIMPLE_METRIC_LOCATOR, browser).click();
-        return this;
-    }
-
-    public ReportPage createGlobalSimpleMetric(SimpleMetricTypes metricOperation, String metricOnFact) {
-        initSimpleMetric(metricOperation, metricOnFact);
-        waitForElementVisible(ADD_TO_GLOBAL_METRICS_LOCATOR, browser).click();
-        waitForElementVisible(ADD_SIMPLE_METRIC_LOCATOR, browser).click();
-        return this;
-    }
-
-    public ReportPage createGlobalSimpleMetric(SimpleMetricTypes metricOperation, String metricOnFact,
-            String folder) {
-        initSimpleMetric(metricOperation, metricOnFact);
-        waitForElementVisible(ADD_TO_GLOBAL_METRICS_LOCATOR, browser).click();
-        new Select(waitForElementVisible(xpath("//select[contains(@class,'s-sme-folder')]"), browser))
-            .selectByVisibleText("Create New Folder");
-        waitForElementVisible(xpath("//input[contains(@class,'newFolder')]"), browser).sendKeys(folder);
-
-        waitForElementVisible(ADD_SIMPLE_METRIC_LOCATOR, browser).click();
-        By snDFolder = By.xpath("//div[@title='${SnDFolderName}']".replace("${SnDFolderName}", folder));
-        waitForElementVisible(snDFolder, browser);
-        return this;
     }
 
     public String exportReport(ExportFormat format) {
@@ -458,9 +306,7 @@ public class ReportPage extends AbstractFragment {
     }
 
     public ReportPage clickSaveReport() {
-        Predicate<WebDriver> createReportButtonEnabled =
-                input -> waitForElementVisible(createReportButton).isEnabled();
-        Graphene.waitGui().until(createReportButtonEnabled);
+        waitForElementAttributeNotContainValue(createReportButton, "class", "disabled");
         createReportButton.click();
         return this;
     }
@@ -507,11 +353,6 @@ public class ReportPage extends AbstractFragment {
 
     public ReportPage setReportVisible() {
         setReportVisibleSettings(true);
-        return this;
-    }
-
-    public ReportPage setReportInvisible() {
-        setReportVisibleSettings(false);
         return this;
     }
 
@@ -609,35 +450,15 @@ public class ReportPage extends AbstractFragment {
         return this;
     }
 
-    public ReportPage addDrillStep(String attribute) {
-        if (isNull(attribute)) {
-            return this;
-        }
-
-        waitForElementVisible(cssSelector(".c-metricDetailDrillStep button"), browser).click();
-        WebElement popupElement = waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser);
-        SelectItemPopupPanel popupPanel = Graphene.createPageFragment(SelectItemPopupPanel.class, popupElement);
-        popupPanel.searchAndSelectItem(attribute).submitPanel();
-        return this;
-    }
-
     public void createReport(UiReportDefinition reportDefinition) {
-        initPage()
-        .setReportName(reportDefinition.getName())
-        .openWhatPanel()
-        .selectMetrics(reportDefinition.getWhats())
-        .openHowPanel()
-        .selectAttributes(reportDefinition.getHows())
-        .doneSndPanel()
-        .addFilters(reportDefinition.getFilters())
-        .selectReportVisualisation(reportDefinition.getType());
+        setReportName(reportDefinition.getName());
+
+        openWhatPanel().selectMetrics(reportDefinition.getWhats());
+        openHowPanel().selectAttribtues(reportDefinition.getHows()).done();
+
+        addFilters(reportDefinition.getFilters()).selectReportVisualisation(reportDefinition.getType());
         waitForAnalysisPageLoaded(browser);
         finishCreateReport();
-    }
-
-    public boolean isGreyedOutAttribute(String attribute) {
-        return findAttribute(attribute).findElement(BY_PARENT)
-                .getAttribute("class").contains("sndUnReachable");
     }
 
     public String getDataReportHelpMessage() {
@@ -658,30 +479,6 @@ public class ReportPage extends AbstractFragment {
 
     public boolean isInvalidDataReportMessageVisible() {
         return isElementPresent(cssSelector("#invalidDataReportHelp:not([style*='display: none'])"), browser);
-    }
-
-    public ReportPage switchViewToTags() {
-        new Select(waitForElementVisible(cssSelector(".sndPanelTitle[style='display: inline;'] .sndViewSelector"),
-                browser)).selectByValue("tags");
-        return this;
-    }
-
-    public ReportPage changeDisplayLabel(String label) {
-        new Select(waitForElementVisible(cssSelector(".sndAttributeDetailDisplayLabelChangerContainer .selection"),
-                browser)).selectByVisibleText(label);
-        return this;
-    }
-
-    public List<String> loadAllViewGroups() {
-        return browser.findElements(cssSelector(".sndPanel1[style='display: block;'] .element > span")).stream()
-            .skip(1)
-            .map(WebElement::getText)
-            .collect(toList());
-    }
-
-    public String getTooltipMessageOfAttribute(String attribute) {
-        searchAttribute(attribute);
-        return findAttribute(attribute).findElement(BY_PARENT).getAttribute("title");
     }
 
     public static float getNumber(String text) {
@@ -769,12 +566,6 @@ public class ReportPage extends AbstractFragment {
         waitForSaveButtonEnabled();
     }
 
-    public ReportPage deleteFilterInSndDialog() {
-        waitForElementVisible(By.className("deleteFilter"), browser).click();
-        waitForElementNotVisible(By.className("deleteFilter"));
-        return this;
-    }
-
     public ReportPage exchangeColAndRowHeaders() {
         waitForElementVisible(By.className("iconBtnSwapheaders"), browser).click();
         waitForReportExecutionProgress();
@@ -805,12 +596,6 @@ public class ReportPage extends AbstractFragment {
         return getElementTexts(getCustomFormatElements(), e -> e.findElement(className("metricTitle")));
     }
 
-    public ReportPage deselectMetric(final String metric) {
-        searchMetric(metric);
-        findMetric(metric).findElement(tagName("input")).click();
-        return this;
-    }
-
     public ReportPage showMoreReportInfo() {
         waitForElementVisible(className("s-btn-more_report_info"), browser).click();
         return this;
@@ -830,112 +615,14 @@ public class ReportPage extends AbstractFragment {
                 .findElements(cssSelector(".content a"));
     }
 
-    private ReportPage selectAttribute(String attribute, Consumer<WebElement> howToSelect) {
-        searchAttribute(attribute);
-        howToSelect.accept(findAttribute(attribute));
-        return this;
-    }
-
-    private ReportPage addFilters(Collection<FilterItem> filters) {
-        filters.stream().forEach(this::addFilter);
-        return this;
-    }
-
-    private ReportPage selectMetrics(Collection<WhatItem> metrics) {
-        if (metrics.isEmpty()) {
-            return this;
-        }
-
-        metrics.stream().forEach(what -> {
-            selectMetric(what.getMetric()).addDrillStep(what.getDrillStep());
-        });
-        return this;
-    }
-
-    public ReportPage selectAttributes(Collection<HowItem> attributes) {
-        if (attributes.isEmpty()) {
-            return this;
-        }
-
-        attributes.stream().forEach(how -> {
-            selectAttribute(how.getAttribute().getName())
-            .selectAttributePosition(how)
-            .filterAttribute(how.getFilterValues());
-        });
-        return this;
-    }
-
-    public ReportPage selectAttributePosition(HowItem attribute) {
-        sleepTight(500);
-        WebElement attributeElement = findAttribute(attribute.getAttribute().getName());
-        sleepTightInSeconds(2);
-
-        WebElement attributePositionElement = waitForElementVisible(
-                attributeElement.findElement(cssSelector("div")));
-        String attributeClass =  attributePositionElement.getAttribute("class");
-
-        if (!attributeClass.contains(attribute.getPosition().getCssClass())) {
-            attributePositionElement.click();
-        }
-        return this;
-    }
-
-    private WebElement findAttribute(String attribute) {
-        WebElement attributesContainer = waitForElementVisible(ATTRIBUTES_CONTAINER_LOCATOR, browser);
-        return waitForElementVisible(cssSelector(".s-grid-" + simplifyText(attribute) + " .metricName"),
-                attributesContainer);
-    }
-
-    private ReportPage filterAttribute(Collection<String> values) {
-        if (values.isEmpty()) {
-            return this;
-        }
-        //sleep here to wait for busyMask loading
-        sleepTightInSeconds(1);
-        waitForElementNotPresent(cssSelector(".busyMask[style='display: block;']"));
-        Graphene.waitGui()
-                .until(ExpectedConditions.elementToBeClickable(cssSelector(".s-btn-filter_this_attribute"))).click();
-        SelectItemPopupPanel panel = Graphene.createPageFragment(SelectItemPopupPanel.class,
-                waitForElementVisible(cssSelector(".c-attributeElementsFilterEditor"), browser));
-        values.stream().forEach(panel::searchAndSelectItem);
-        return this;
-    }
-
-    public void clickAddNewSimpleMetric() {
-        waitForElementVisible(xpath("//button[contains(@class,'sndCreateMetric')]"), browser).click();
-    }
-
-    public MetricEditorDialog clickAddAdvanceMetric() {
-        waitForElementVisible(className("sndCreateAdvancedMetric"), browser).click();
-
-        return MetricEditorDialog.getInstance(browser);
-    }
-
-    private void initSimpleMetric(SimpleMetricTypes metricOperation, String metricOnFact) {
-        clickAddNewSimpleMetric();
-        new Select(waitForElementVisible(xpath("//select[contains(@class,'s-sme-fnSelect')]"), browser))
-            .selectByVisibleText(metricOperation.name());
-
-        Select operation = new Select(
-                waitForElementVisible(xpath("//select[contains(@class,'s-sme-objSelect')]"), browser));
-        Predicate<WebDriver> isSelectable = browser ->
-                operation.getFirstSelectedOption().getText().contains("select a fact");
-        Graphene.waitGui().until(isSelectable);
-
-        operation.selectByVisibleText(metricOnFact);
-    }
-
     public SimpleMenu openOptionsMenu() {
         waitForElementVisible(optionsButton).click();
         return SimpleMenu.getInstance(browser);
     }
 
-    public MetricEditorDialog editMetric(String metric) {
-        // waitForSndMetricDetail() does not work on local metric
-        selectMetric(metric, WebElement::click);
-        waitForElementVisible(By.className("c-metricDetailEditButton"), getRoot()).click();
-
-        return MetricEditorDialog.getInstance(browser);
+    private ReportPage addFilters(Collection<FilterItem> filters) {
+        filters.stream().forEach(this::addFilter);
+        return this;
     }
 
     private void setReportVisibleSettings(boolean isVisible) {
@@ -977,40 +664,5 @@ public class ReportPage extends AbstractFragment {
     private List<WebElement> getCustomFormatElements() {
         return waitForElementVisible(className("customMetricFormatContainer"), browser)
                 .findElements(By.className("customMetricFormatItem"));
-    }
-
-    private ReportPage searchMetric(final String metric) {
-        final WebElement filterInput = waitForElementVisible(By.cssSelector(".gdc-input.metFilter"), browser);
-
-        filterInput.clear();
-        filterInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
-        sleepTightInSeconds(1);
-        waitForElementVisible(NO_MATCHING_METRIC, browser);
-        sleepTightInSeconds(1);
-        filterInput.clear();
-        filterInput.sendKeys(metric);
-        sleepTightInSeconds(1);
-        waitForElementNotVisible(NO_MATCHING_METRIC);
-        return this;
-    }
-
-    private ReportPage selectMetric(String metric, Consumer<WebElement> howToSelect) {
-        searchMetric(metric);
-        howToSelect.accept(findMetric(metric));
-
-        return this;
-    }
-
-    private WebElement findMetric(final String metric) {
-        final WebElement metricContainer = waitForElementVisible(METRICS_CONTAINER_LOCATOR, browser);
-        return waitForElementVisible(cssSelector(".s-grid-" + simplifyText(metric) + " .metricName"),
-                metricContainer);
-    }
-
-    private void waitForElementHighLighted(String element) {
-        Predicate<WebDriver> highlightedElement = browser ->
-                isElementVisible(By.cssSelector(".s-grid-" + simplifyText(element) + ".highlight"), getRoot())
-                || isElementVisible(By.className("t-reportEditorMessage"), browser);
-        Graphene.waitGui().until(highlightedElement);
     }
 }

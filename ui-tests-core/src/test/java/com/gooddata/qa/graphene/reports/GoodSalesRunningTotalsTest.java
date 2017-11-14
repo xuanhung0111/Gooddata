@@ -121,10 +121,9 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
 
         reportPage.waitForReportExecutionProgress()
                 .openWhatPanel()
-                .selectMetric(METRIC_AVG_AMOUNT)
-                .deselectMetric(METRIC_PROBABILITY) //minimize number of metrics to avoid handling scroll bar
-                .doneSndPanel()
-                .waitForReportExecutionProgress();
+                .selectItem(METRIC_AVG_AMOUNT)
+                .deselectItem(METRIC_PROBABILITY) //minimize number of metrics to avoid handling scroll bar
+                .done();
 
         assertTrue(table.getMetricHeaders().stream().filter(e -> e.equals(RUNNING_SUM)).count() == 1,
                 "Running sum header is calculated for new metric");
@@ -134,9 +133,9 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
                 "Running sum values are calculated for new metric");
 
         reportPage.openHowPanel()
-                .selectAttributes(singletonList(new HowItem(ATTR_QUARTER_YEAR_SNAPSHOT, Position.TOP, Q1_2011, Q2_2011)))
-                .doneSndPanel()
-                .waitForReportExecutionProgress();
+                .selectAttribtues(singletonList(new HowItem(ATTR_QUARTER_YEAR_SNAPSHOT, Position.TOP,
+                        Q1_2011, Q2_2011)))
+                .done();
 
         //use List.equal() to check value's order
         assertTrue(
@@ -265,10 +264,9 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
         browser.navigate().back();
         reportPage.waitForReportExecutionProgress()
                 .openWhatPanel()
-                .selectMetric(METRIC_AMOUNT)
+                .openMetricDetail(METRIC_AMOUNT)
                 .addDrillStep(ATTR_IS_ACTIVE)
-                .doneSndPanel()
-                .waitForReportExecutionProgress();
+                .done();
 
         //click on any metric value to drill in
         table.drillOnFirstValue(CellType.METRIC_VALUE);

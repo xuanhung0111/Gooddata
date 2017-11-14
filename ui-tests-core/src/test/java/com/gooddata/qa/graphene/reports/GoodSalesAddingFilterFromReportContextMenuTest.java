@@ -48,9 +48,9 @@ public class GoodSalesAddingFilterFromReportContextMenuTest extends GoodSalesAbs
         assertThat(reportPage.getFilters(), hasItem("Year (Snapshot) is 2010"));
 
         reportPage.openHowPanel()
-                .selectAttribute(ATTR_YEAR_SNAPSHOT)
-                .deleteFilterInSndDialog()
-                .doneSndPanel();
+                .openAttributeDetail(ATTR_YEAR_SNAPSHOT)
+                .deleteFilter()
+                .done();
 
         reportPage.saveReport();
         checkRedBar(browser);

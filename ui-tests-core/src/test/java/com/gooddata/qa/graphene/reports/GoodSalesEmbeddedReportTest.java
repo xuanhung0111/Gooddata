@@ -262,14 +262,9 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         String reportTitle = "Embed unsaved report";
         List<String> attributeElement;
         List<Float> metricElement;
-        initReportCreation();
-        reportPage.initPage()
-            .setReportName(reportTitle)
-            .openWhatPanel()
-            .selectMetric(METRIC_AMOUNT)
-            .openHowPanel()
-            .selectAttribute(ATTR_IS_ACTIVE)
-            .doneSndPanel();
+
+        initReportCreation().setReportName(reportTitle).openWhatPanel().selectItem(METRIC_AMOUNT);
+        reportPage.openHowPanel().selectItem(ATTR_IS_ACTIVE).done();
 
         attributeElement = reportPage.getTableReport().getAttributeValues();
         metricElement = reportPage.getTableReport().getMetricValues();
