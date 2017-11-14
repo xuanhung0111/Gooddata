@@ -5,81 +5,70 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.gooddata.qa.graphene.TemplateAbstractTest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.manage.DataPage;
 
-public class GoodSalesFolderTest extends TemplateAbstractTest {
-    private String newName;
+public class GoodSalesFolderTest extends GoodSalesAbstractTest {
+
+    private static final List<String> PAGES = Arrays.asList("attributes", "facts", "metrics");
+    private static final List<String> ATTRIBUTE_FOLDER_LIST = new ArrayList<String>(Arrays.asList("Unsorted",
+            "Account", "Activity", "Date dimension (Activity)",
+            "Date dimension (Closed)", "Date dimension (Created)",
+            "Date dimension (Snapshot)", "Date dimension (Timeline)",
+            "Opp. Snapshot", "Opportunity", "Product", "Sales Rep",
+            "Stage", "Stage History"));
+    private static final List<String> FACT_FOLDER_LIST = new ArrayList<String>(Arrays.asList("Unsorted",
+            "Opp. Snapshot", "Stage History"));
+    private static final List<String> METRICFOLDERLIST = new ArrayList<String>(Arrays.asList("Unsorted"));
+
     private String oldEditName;
     private String newEditName;
     private String deleteName;
     private String uniqueName;
-    private String unicodeName;
-    private String description;
-    private String sndFolder;
-    private List<String> attributeFolderList;
-    private List<String> factFolderList;
-    private List<String> metricFolderList;
-    private List<String> pages;
 
-    @BeforeClass(alwaysRun = true)
-    public void setProjectTitle() {
+    @Override
+    public void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-test-folder";
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void initialize() throws JSONException {
-        newName = "New Folder";
-        unicodeName = "ພາສາລາວ résumé اللغة";
-        description = "This is a description of folder";
-        sndFolder = "Slide-n-Dice Folder";
-        pages = Arrays.asList("attributes", "facts", "metrics");
-        attributeFolderList = new ArrayList<String>(Arrays.asList("Unsorted",
-                "Account", "Activity", "Date dimension (Activity)",
-                "Date dimension (Closed)", "Date dimension (Created)",
-                "Date dimension (Snapshot)", "Date dimension (Timeline)",
-                "Opp. Snapshot", "Opportunity", "Product", "Sales Rep",
-                "Stage", "Stage History"));
-        factFolderList = new ArrayList<String>(Arrays.asList("Unsorted",
-                "Opp. Snapshot", "Stage History"));
-        metricFolderList = new ArrayList<String>(Arrays.asList("Unsorted",
-                "Activities", "Opportunity Counts", "Quota Attainment",
-                "Sales Cycles", "Sales Figures", "Sales Rep", "_System"));
+    @Override
+    protected void customizeProject() throws Throwable {
+        createAmountMetric();
     }
 
-    @Test(dependsOnMethods = {"initialize"}, groups = {"admin-tests"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests"})
     public void verifyFolderListTest() {
-        for (String page : pages) {
+        for (String page : PAGES) {
             initDataPage(page).getObjectFolder().verifyFolderList(page, getFolderList(page));
         }
     }
 
     @Test(dependsOnMethods = {"verifyFolderListTest"}, groups = {"admin-tests"})
     public void addFolderTest() {
-        for (String page : pages) {
+        for (String page : PAGES) {
             initVariables(page);
-            initDataPage(page).getObjectFolder().addFolder(page, newName, null);
+            initDataPage(page).getObjectFolder().addFolder(page, "New Folder", null);
         }
     }
 
     @Test(dependsOnMethods = {"addFolderTest"}, groups = {"admin-tests"})
     public void checkUnicodeNameTest() {
-        for (String page : pages) {
+        for (String page : PAGES) {
             initVariables(page);
-            initDataPage(page).getObjectFolder().addFolder(page, unicodeName, null);
+            initDataPage(page).getObjectFolder().addFolder(page, "ພາສາລາວ résumé اللغة", null);
         }
     }
 
     @Test(dependsOnMethods = {"addFolderTest"}, groups = {"admin-tests"})
     public void checkUniqueNameTest() {
-        for (String page : pages) {
+        for (String page : PAGES) {
             initVariables(page);
             initDataPage(page).getObjectFolder().addFolder(page, uniqueName,
                     "Folder with that name already exists.");
@@ -88,7 +77,8 @@ public class GoodSalesFolderTest extends TemplateAbstractTest {
 
     @Test(dependsOnMethods = {"addFolderTest"}, groups = {"admin-tests"})
     public void editFolderTest() {
-        for (String page : pages) {
+    	final String description = "This is a description of folder";
+        for (String page : PAGES) {
             initVariables(page);
             initDataPage(page).getObjectFolder().editFolder(oldEditName, newEditName, description);
             removeFolderFromList(page, oldEditName);
@@ -97,7 +87,7 @@ public class GoodSalesFolderTest extends TemplateAbstractTest {
 
     @Test(dependsOnMethods = {"editFolderTest"}, groups = {"admin-tests"})
     public void deleteFolderTest() {
-        for (String page : pages) {
+        for (String page : PAGES) {
             initVariables(page);
             initDataPage(page).getObjectFolder().deleteFolder(deleteName);
             removeFolderFromList(page, deleteName);
@@ -106,6 +96,7 @@ public class GoodSalesFolderTest extends TemplateAbstractTest {
 
     @Test(dependsOnMethods = {"verifyFolderListTest"}, groups = {"admin-tests"})
     public void createSnDFolderTest() {
+    	final String sndFolder = "Slide-n-Dice Folder";
         createSnDFolder(sndFolder);
     }
 
@@ -113,7 +104,7 @@ public class GoodSalesFolderTest extends TemplateAbstractTest {
     public void editorVerifyFolderListTest() throws ParseException, IOException, JSONException {
         logout();
         signIn(false, UserRoles.EDITOR);
-        for (String page : pages) {
+        for (String page : PAGES) {
             initDataPage(page).getObjectFolder().checkEditorViewFolderList(page, getFolderList(page));
         }
     }
@@ -123,15 +114,15 @@ public class GoodSalesFolderTest extends TemplateAbstractTest {
         initDataPage("metrics").getObjectFolder().addFolder("metrics", "New Folder 1", null);
     }
 
-    @Test(dependsOnMethods = {"editorVerifyFolderListTest"}, groups = {"editor-tests"})
+    @Test(dependsOnMethods = {"editorCreateMetricFolderTest"}, groups = {"editor-tests"})
     public void editorEditMetricFolderTest() {
-        initDataPage("metrics").getObjectFolder().editFolder("Sales Figures",
-                "Sales Figures Renamed", "This is a description of folder");
+        initDataPage("metrics").getObjectFolder().editFolder("New Folder 1",
+                "Renamed", "This is a description of folder");
     }
 
-    @Test(dependsOnMethods = {"editorVerifyFolderListTest"}, groups = {"editor-tests"})
+    @Test(dependsOnMethods = {"editorEditMetricFolderTest"}, groups = {"editor-tests"})
     public void editorDeleteMetricFolderTest() {
-        initDataPage("metrics").getObjectFolder().deleteFolder("Sales Rep");
+        initDataPage("metrics").getObjectFolder().deleteFolder("Renamed");
     }
 
     @Test(dependsOnMethods = {"editorVerifyFolderListTest"}, groups = {"editor-tests"})
@@ -174,10 +165,10 @@ public class GoodSalesFolderTest extends TemplateAbstractTest {
             deleteName = "New Folder";
             uniqueName = "Opp. Snapshot";
         } else {
-            oldEditName = "Activities";
-            newEditName = "Activities Renamed";
-            deleteName = "Sales Cycles";
-            uniqueName = "Quota Attainment";
+            oldEditName = "New Folder";
+            newEditName = "Renamed";
+            deleteName = "Renamed";
+            uniqueName = "New Folder";
         }
     }
 
@@ -205,21 +196,21 @@ public class GoodSalesFolderTest extends TemplateAbstractTest {
 
     private void removeFolderFromList(String page, String folderName) {
         if (page.equalsIgnoreCase("attributes")) {
-            attributeFolderList.remove(folderName);
+        	ATTRIBUTE_FOLDER_LIST.remove(folderName);
         } else if (page.equalsIgnoreCase("facts")) {
-            factFolderList.remove(folderName);
+        	FACT_FOLDER_LIST.remove(folderName);
         } else {
-            metricFolderList.remove(folderName);
+        	METRICFOLDERLIST.remove(folderName);
         }
     }
 
     private List<String> getFolderList(String page) {
         if (page.equalsIgnoreCase("attributes")) {
-            return attributeFolderList;
+            return ATTRIBUTE_FOLDER_LIST;
         } else if (page.equalsIgnoreCase("facts")) {
-            return factFolderList;
+            return FACT_FOLDER_LIST;
         } else {
-            return metricFolderList;
+            return METRICFOLDERLIST;
         }
     }
 }

@@ -18,18 +18,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.gooddata.qa.graphene.TemplateAbstractTest;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.fragments.common.IpeEditor;
 import com.gooddata.qa.graphene.fragments.manage.DataPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectPropertiesPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 
-public abstract class ManageObjectsAbstractTest extends TemplateAbstractTest {
+public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
 
     protected static final List<String> attributesList = Arrays.asList("Account", "Activity",
             "Activity Type", "Date (Activity)", "Date (Closed)", "Date (Created)",
@@ -74,19 +74,6 @@ public abstract class ManageObjectsAbstractTest extends TemplateAbstractTest {
     protected static final List<String> factsList = Arrays.asList("Activity (Date)", "Amount",
             "Days to Close", "Duration", "Opp. Close (Date)", "Opp. Created (Date)",
             "Opp. Snapshot (Date)", "Probability", "Timeline (Date)", "Velocity");
-
-    protected static final List<String> metricsList = Arrays.asList("# of Activities",
-            "# of Lost Opps.", "# of Open Opps.", "# of Opportunities", "# of Opportunities [BOP]",
-            "# of Won Opps.", "% of Goal", "Amount", "Amount [BOP]", "Avg. Amount", "Avg. Won",
-            "Best Case", "Best Case + Won", "Best Case + Won above Quota", "Best Case [BOP]",
-            "Days until Close", "Expected", "Expected % of Goal", "Expected + Won",
-            "Expected + Won vs. Quota", "Lost", "Probability", "Probability [BOP]",
-            "Productive Reps", "Quota", "Remaining Quota", "Stage Duration", "Stage Velocity",
-            "Win Rate", "Won", "_Close [BOP]", "_Close [EOP]", "_Opp. First Snapshot",
-            "_Snapshot [BOP]", "_Snapshot [EOP-1]", "_Snapshot [EOP-2]", "_Snapshot [EOP]",
-            "_Timeline [BOP]", "_Timeline [EOP]");
-
-    protected static final List<String> variablesList = Arrays.asList("Quota", "Status");
 
     protected void createNewFolder(ObjectTypes objectType, String newFolderName) {
         DataPage.getInstance(browser).createNewFolder(newFolderName);
@@ -217,8 +204,7 @@ public abstract class ManageObjectsAbstractTest extends TemplateAbstractTest {
                 selectedObjectName);
     }
 
-    protected void assertRowTitles(ObjectTypes objectType, List<String> rowTitles)
-            {
+    protected void assertRowTitles(ObjectTypes objectType, List<String> rowTitles) {
         int index = 0;
         for (WebElement row : ObjectsTable.getInstance(id(objectType.getObjectsTableID()), browser).getRows()) {
             assertTrue(row.getText().contains(rowTitles.get(index)));
