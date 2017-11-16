@@ -1,9 +1,11 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 
 import java.util.List;
@@ -40,6 +42,9 @@ public class DashboardEditBar extends AbstractFragment {
     @FindBy(css = ".s-delete")
     private WebElement deleteButton;
 
+    @FindBy(css = ".s-save_as___")
+    private WebElement saveAsButton;
+
     @FindBy(css = ".s-settings___")
     private WebElement settingsButton;
 
@@ -72,6 +77,9 @@ public class DashboardEditBar extends AbstractFragment {
 
     @FindBy(xpath = "//div[contains(@class,'gdc-menu-simple') and not(contains(@class,'yui3-overlay-hidden'))]")
     private DashboardLineObject dashboardLineObject;
+
+    @FindBy(xpath = "//div[contains(@class,'c-confirmDeleteDialog')]//button[contains(@class,'s-btn-cancel')]")
+    private WebElement cancelDeleteDashboardDialogButton;
 
     @FindBy(xpath = "//div[contains(@class,'c-confirmDeleteDialog')]//button[contains(@class,'s-btn-delete')]")
     private WebElement deleteDashboardDialogButton;
@@ -234,6 +242,41 @@ public class DashboardEditBar extends AbstractFragment {
         tryToDeleteDashboard();
         waitForElementNotPresent(this.getRoot());
         sleepTightInSeconds(3); // take sometime for saving current dashboard into user profile settings
+    }
+
+    public DashboardEditBar deleteDashboardWithConfirm() {
+        waitForElementVisible(actionsMenu).click();
+        waitForElementVisible(deleteButton).click();
+        return this;
+    }
+
+    public DashboardEditBar confirmDeleteDashboard(boolean isOk) {
+        if (isOk) {
+            waitForElementVisible(deleteDashboardDialogButton).click();
+        } else {
+            waitForElementVisible(cancelDeleteDashboardDialogButton).click();
+        }
+        return this;
+    }
+
+
+    private SaveAsDialog openSaveAsDialog() {
+        waitForElementVisible(actionsMenu).click();
+        waitForElementVisible(saveAsButton).click();
+
+        return Graphene.createPageFragment(SaveAsDialog.class,
+                waitForElementVisible(By.className("dashboardSettingsDialogView"), browser));
+
+    }
+
+    public void saveAsDashboard(String dashboardName, boolean isSavedViews, SaveAsDialog.PermissionType permissionType) {
+        SaveAsDialog saveAsDialog = openSaveAsDialog();
+
+        saveAsDialog.saveAs(dashboardName, isSavedViews, permissionType);
+        waitForFragmentNotVisible(saveAsDialog);
+
+        saveDashboard();
+        waitForDashboardPageLoaded(browser);
     }
 
     public void tryToDeleteDashboard() {

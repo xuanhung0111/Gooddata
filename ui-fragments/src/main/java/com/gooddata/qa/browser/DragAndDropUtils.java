@@ -57,4 +57,18 @@ public class DragAndDropUtils {
             driverActions.release().perform();
         }
     }
+
+    public static void dragAndDropWithCustomBackend(WebDriver driver, WebElement from, WebElement dropZone) {
+        waitForElementVisible(from);
+        Actions driverActions = new Actions(driver);
+        driverActions.clickAndHold(from).perform();
+
+        try {
+
+            waitForElementVisible(dropZone);
+            driverActions.moveToElement(dropZone).perform();
+        } finally {
+            driverActions.release().perform();
+        }
+    }
 }

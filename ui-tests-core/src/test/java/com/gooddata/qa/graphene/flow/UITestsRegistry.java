@@ -163,6 +163,7 @@ public class UITestsRegistry {
 
         suites.put("dashboards", new HashMap<String, Object[]>() {{
             put("phaseDashboardMainFunctions", new Object[] {
+                    DashboardAndTabManipulationTest.class,
                     GoodSalesDrillReportTest.class,
                     GoodSalesDrillReportToExportTest.class,
                     GoodSalesDrillDownToExportSpecialTest.class,
