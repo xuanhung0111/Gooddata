@@ -9,7 +9,7 @@ import static com.gooddata.qa.utils.asserts.AssertUtils.assertHeadersEqual;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.addMufToUser;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createMufObjectByUri;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.getVariableUri;
+import static com.gooddata.qa.utils.http.variable.VariableRestUtils.getVariableUri;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.removeAllMufFromUser;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
