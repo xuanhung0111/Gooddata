@@ -306,7 +306,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
     public void shareEmptyReport() {
         String reportTitle = "Empty report";
 
-        createReport(GridReportDefinitionContent.create(reportTitle,
+        createReportViaRest(getEditorGoodDataClient(), GridReportDefinitionContent.create(reportTitle,
                 singletonList(METRIC_GROUP),
                 singletonList(new AttributeInGrid(getAttributeByIdentifier("attr.stage.status"))),
                 singletonList(new MetricElement(getMetricByTitle(METRIC_LOST)))));
@@ -334,7 +334,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createAdditionalProject"})
     public void shareChartReport() {
         String embeddedChartReport = "Embedded Chart Report";
-        createReport(GridReportDefinitionContent.create(embeddedChartReport,
+        createReportViaRest(getEditorGoodDataClient(), GridReportDefinitionContent.create(embeddedChartReport,
                 singletonList(METRIC_GROUP),
                 singletonList(new AttributeInGrid(getAttributeByIdentifier("attr.stage.status"))),
                 singletonList(new MetricElement(getMetricByTitle(METRIC_AMOUNT)))));
