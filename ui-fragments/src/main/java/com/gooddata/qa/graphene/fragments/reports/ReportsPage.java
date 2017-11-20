@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.fragments.reports;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkGreenBar;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
@@ -23,7 +22,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -34,7 +32,6 @@ import com.gooddata.qa.graphene.fragments.account.AccountCard;
 import com.gooddata.qa.graphene.fragments.common.IpeEditor;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
-import com.google.common.base.Predicate;
 
 public class ReportsPage extends AbstractFragment {
 
@@ -73,6 +70,7 @@ public class ReportsPage extends AbstractFragment {
     private Select groupBy;
 
     public static final ReportsPage getInstance(SearchContext context) {
+        waitForReportsPageLoaded(context);
         return Graphene.createPageFragment(ReportsPage.class, waitForElementVisible(id("p-domainPage"), context));
     }
 
