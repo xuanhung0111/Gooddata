@@ -1,37 +1,31 @@
 package com.gooddata.qa.graphene.fragments.reports.report;
 
-import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.utils.CssUtils.simplifyText;
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
-import static org.openqa.selenium.By.className;
-import static org.openqa.selenium.By.cssSelector;
-import static org.openqa.selenium.By.id;
-import static org.openqa.selenium.By.tagName;
-import static org.testng.Assert.assertTrue;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Stream;
-
-import org.apache.commons.lang3.tuple.Pair;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
+import com.gooddata.qa.graphene.fragments.reports.filter.ContextMenu;
+import com.gooddata.qa.utils.browser.BrowserUtils;
+import com.google.common.base.Predicate;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.fragments.reports.filter.ContextMenu;
-import com.gooddata.qa.utils.browser.BrowserUtils;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.google.common.collect.Iterables.getLast;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Fragment represents table report in
@@ -41,391 +35,300 @@ import com.google.common.collect.Lists;
  */
 public class TableReport extends AbstractDashboardReport {
 
-    @FindBy(css = ".containerBody .gridTabPlate .gridTile .element span.captionWrapper")
-    private List<WebElement> attributeElementInGrid;
+    public TableReport sortBy(String value, CellType type, Sort howToSort) {
+        WebElement cell = getCellElement(value, type);
 
-    @FindBy(css = ".containerBody .gridTabPlate .gridTile .metric span")
-    private List<WebElement> metricElementInGrid;
-
-    @FindBy(css = ".containerBody .gridTabPlate .gridTile .data")
-    private List<WebElement> metricValuesInGrid;
-
-    @FindBy(css = ".drillable")
-    private List<WebElement> drillableElements;
-
-    @FindBy(css = ".gridTab.mainHeaderTab .captionWrapper")
-    private List<WebElement> attributesHeader;
-
-    @FindBy(css = ".containerBody .gridTabPlate .gridTile .metric span")
-    private List<WebElement> metricsHeader;
-
-    private static final String NO_DATA = "No data";
-
-    private static final By BY_SORT_LOCATOR = className("sort");
-    private static final By REPORT_MESSAGE_LOCATOR = className("c-report-message");
-    private static final By REPORT_TITLE = cssSelector(".yui3-c-reportdashboardwidget-reportTitle > a");
-
-    public TableReport sortByHeader(final String header, final Sort howToSort) {
-        getActions().moveToElement(getHeaderElement(header)).perform();
-
-        //graphene finds wrong sort arrows in some cases, so we need to find parent node again 
-        List<WebElement> sortElements = browser.findElement(cssSelector("div.hover"))
-                .findElements(By.className("sortArrow"));
-        for(WebElement e : sortElements) {
-            if(e.getAttribute("class").contains(howToSort.toString())) {
-                //have tried to use WebElement.click() but it's unstable
-                getActions().moveToElement(e).click().perform();
-                break;
-            }
-        }
-
-        waitForReportLoading();
+        getActions().moveToElement(cell).perform();
+        waitForElementVisible(howToSort.getLocator(), cell).click();
         return this;
     }
 
-    public boolean isSortAvailable(final String header) {
-        final WebElement headerElement = waitForElementVisible(getHeaderElement(header));
-        getActions().moveToElement(headerElement).perform();
-        return !headerElement.findElements(BY_SORT_LOCATOR).isEmpty();
+    public boolean isSortableAt(String value, CellType type) {
+        WebElement cellElement = getCellElement(value, type);
+
+        getActions().moveToElement(cellElement).perform();
+        return isElementPresent(By.className("sort"), cellElement);
     }
 
-    public List<String> getAttributesHeader() {
-        waitForReportLoading();
-        return getElementTexts(attributesHeader);
+    public List<String> getAttributeHeaders() {
+        return getCellValues(CellType.ATTRIBUTE_HEADER);
     }
 
-    public Set<String> getMetricsHeader() {
-        waitForReportLoading();
-        return new HashSet<>(getElementTexts(metricsHeader));
+    public Set<String> getMetricHeaders() {
+        return new HashSet<>(getCellValues(CellType.METRIC_HEADER));
     }
 
     public List<String> getTotalHeaders() {
-        waitForReportLoading();
-        return getElementTexts(
-            cssSelector(".containerBody .gridTabPlate .gridTile .totalHeader span.captionWrapper"), browser);
+        return getCellValues(CellType.TOTAL_HEADER);
     }
 
     public List<Float> getTotalValues() {
-        waitForReportLoading();
-        return browser
-                .findElements(cssSelector(".containerBody .gridTabPlate .gridTile div.total:not(.totalHeader)"))
-                .stream().map(e -> e.getAttribute("title"))
+        return getCellValuesAsNumber(CellType.TOTAL_VALUE);
+    }
+
+    public List<String> getAttributeValues() {
+        return getCellValues(CellType.ATTRIBUTE_VALUE);
+    }
+
+    public List<List<String>> getDataContent() {
+        List<List<String>> dataContent = new ArrayList<>();
+        Collection<Integer> rowPositions = getDataRowPositions();
+
+        List<WebElement> dataCellElements =
+                Stream.of(getCellElements(CellType.ATTRIBUTE_VALUE), getCellElements(CellType.METRIC_VALUE))
+                        .flatMap(Collection::stream)
+                        .collect(toList());
+
+        for (int rowPosition : rowPositions) {
+            dataContent.add(dataCellElements.stream()
+                    .filter(cell -> getCellRowPositions(cell).contains(rowPosition))
+                    .sorted((cell1, cell2) -> getCellColumnPosition(cell1) - getCellColumnPosition(cell2))
+                    .map(WebElement::getText)
+                    .collect(toList()));
+        }
+        return dataContent;
+    }
+
+    public List<Float> getMetricValues() {
+        return getCellValuesAsNumber(CellType.METRIC_VALUE);
+    }
+
+    public List<String> getRawMetricValues() {
+        return getCellValues(CellType.METRIC_VALUE);
+    }
+
+    public TableReport drillOn(String value, CellType type) {
+        return drillOn(getCellElement(value, type));
+    }
+
+    public TableReport drillOnFirstValue(CellType type) {
+        return drillOn(getCellElements(type).get(0));
+    }
+
+    public DashboardDrillDialog openDrillDialogFrom(String value, CellType type) {
+        drillOn(value, type);
+        return DashboardDrillDialog.getInstance(browser);
+    }
+
+    public boolean isDrillable(String value, CellType type) {
+        return isDrillable(getCellElement(value, type));
+    }
+
+    public boolean isDrillableToExternalPage(CellType type) {
+        return getCellElements(type).stream().allMatch(this::isDrillableToExternalPage);
+    }
+
+    public boolean isImageDisplayed(String imageSource, CellType type) {
+        return isImageDisplayed(getCellElement(imageSource, type).findElement(By.tagName("img")));
+    }
+
+    public boolean isErrorImageDisplayed(String imageSource, CellType type) {
+        WebElement image = getCellElement(imageSource, type);
+        return isImageDisplayed(image.findElement(By.tagName("img"))) &&
+                isElementPresent(By.className("imageError"), image);
+    }
+
+    public boolean hasValue(String value, CellType type) {
+        return findCellElement(value, type).isPresent();
+    }
+
+    public boolean hasNoData() {
+        return !isElementPresent(By.className("containerBody"), getRoot());
+    }
+
+    public ContextMenu openContextMenuFrom(String value, CellType type) {
+        getActions().contextClick(getCellElement(value, type)).perform();
+        return ContextMenu.getInstance(browser);
+    }
+
+    public void copyMetricValue(String value) {
+        WebElement metricValue = getCellElement(value, CellType.METRIC_VALUE);
+        metricValue.click();
+
+        Predicate<WebDriver> isSelected = browser -> metricValue.getAttribute("class").contains("highlight");
+        Graphene.waitGui().until(isSelected);
+
+        getActions().sendKeys(Keys.chord(Keys.CONTROL, "c")).perform();
+    }
+
+    public TableReport waitForLoaded() {
+        WebElement loadingElement = findLoadingElement();
+
+        try {
+            waitForElementVisible(loadingElement, 1);
+            waitForElementNotVisible(loadingElement);
+
+        } catch (TimeoutException e) {
+            // Report already loaded so WebDriver unable to catch the loading indicator
+        }
+        return this;
+    }
+
+    private WebElement findLoadingElement() {
+        return Stream.of(By.className("c-report-overlay"), By.id("progressOverlay"))
+                .filter(by -> isElementPresent(by, browser))
+                .map(by -> getLast(browser.findElements(by)))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Cannot find report loading element"));
+    }
+
+    private WebElement getCellElement(String value, CellType type) {
+        return findCellElement(value, type)
+                .orElseThrow(() -> new NoSuchElementException("Not found cell type: " + type + " with value: " + value));
+    }
+
+    private List<WebElement> getCellElements(CellType type) {
+        waitForLoaded();
+        return getRoot().findElements(type.getLocator());
+    }
+
+    private Optional<WebElement> findCellElement(String value, CellType type) {
+        return getCellElements(type).stream()
+                .filter(e -> {
+                    if (isDrillableToExternalPage(e)) {
+                        return value.equals(e.getText());
+                    }
+                    return value.equals(e.getAttribute("title").trim());
+                })
+                .findFirst();
+    }
+
+    private List<String> getCellValues(CellType type) {
+        return getCellElements(type).stream()
+                .map(e -> {
+                    if (isDrillableToExternalPage(e)) {
+                        return e.getText();
+                    }
+                    return e.getAttribute("title").trim();
+                })
+                .collect(toList());
+    }
+
+    private List<Float> getCellValuesAsNumber(CellType type) {
+        return getCellValues(type).stream()
                 .map(ReportPage::getNumber)
                 .collect(toList());
     }
 
-    public List<String> getAttributeElements() {
-        waitForReportLoading();
-        waitForTableReportExecutionProgress();
-        return getElementTexts(attributeElementInGrid);
+    private List<Integer> getCellRowPositions(WebElement cell) {
+        List<Integer> positions = Stream.of(cell.getAttribute("gdc:region").split(","))
+                .map(Integer::valueOf).collect(toList());
+        return IntStream.rangeClosed(positions.get(0), positions.get(2))
+                .mapToObj(Integer::new).collect(toList());
     }
 
-    public TableReport showOnly(String attributeValue) {
-        waitForReportLoading();
-        WebElement cell = attributeElementInGrid.stream()
-            .filter(e -> attributeValue.equals(e.getText().trim()))
-            .findFirst()
-            .orElseThrow(() -> new NoSuchElementException("Cannot find attribute value: " + attributeValue));
-        getActions().contextClick(cell).perform();
-        waitForElementVisible(className(format("s-show_only__%s_", simplifyText(attributeValue))), browser).click();
-        waitForReportLoading();
-        return this;
+    private int getCellColumnPosition(WebElement cell) {
+        return Integer.valueOf(cell.getAttribute("gdc:region").split(",")[1]);
     }
 
-    public List<List<String>> getAttributeElementsByRow() {
-        waitForReportLoading();
-        List<List<String>> result = Lists.newArrayList();
-        List<String> row = null;
-        List<String> lastRow = null;
-        Pair<Integer, Integer> possition = null;
-        int lastRowIndex = 0;
-
-        for (WebElement element: attributeElementInGrid) {
-            possition = getPossitionFromRegion(element.findElement(BY_PARENT).getAttribute("gdc:region"));
-            if (possition.getLeft() == lastRowIndex + 1) {
-                if (row != null) {
-                    result.add(row);
-                    lastRow = row;
-                }
-                lastRowIndex++;
-                row = Lists.newArrayList();
-                if (possition.getRight() > 0) {
-                    for (int i = 0; i < possition.getRight(); i++) {
-                        row.add(lastRow.get(i));
-                    }
-                }
-            }
-            row.add(element.getText().trim());
-        }
-        if (row != null) {
-            result.add(row);
-        }
-
-        return result;
-    }
-
-    public List<Float> getMetricElements() {
-        waitForReportLoading();
-        return metricValuesInGrid.stream()
-            .map(e -> e.getAttribute("title"))
-            .map(ReportPage::getNumber)
-            .collect(toList());
-    }
-
-    public List<String> getRawMetricElements() {
-        waitForReportLoading();
-        //wait for display metric value
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-            @Override
-            public boolean apply(WebDriver input) {
-                return !metricValuesInGrid.isEmpty();
-            }
-        });
-        return metricValuesInGrid.stream()
-            .map(e -> e.getAttribute("title"))
-            .collect(toList());
-    }
-
-    public void verifyAttributeIsHyperlinkInReport() {
-        String drillToHyperLinkElement = "Open external link in a new window";
-        assertTrue(drillableElements.size() > 0, "Attribute is NOT drillable");
-        for (WebElement element : drillableElements) {
-            assertTrue(waitForElementVisible(element).getAttribute("title").indexOf(drillToHyperLinkElement) > -1,
-                       "Some of elements are NOT drillable to external link!");
-        }
-    }
-
-    public void clickOnAttributeToOpenDrillReport(String attributeName) {
-        waitForReportLoading();
-        for (WebElement e : attributeElementInGrid) {
-            if (!attributeName.equals(e.getText().trim()))
-                continue;
-            e.click();
-            break;
-        }
-    }
-
-    public boolean isRollupTotalVisible() {
-        waitForReportLoading();
-
-        try {
-            return browser.findElement(cssSelector(".totalHeader")).isDisplayed();
-        } catch(NoSuchElementException e) {
-            return false;
-        }
-    }
-
-    public void drillOnMetricValue() {
-        waitForReportLoading();
-        String cssClass = null;
-        for (WebElement e : drillableElements) {
-            cssClass = e.getAttribute("class");
-
-            if (!cssClass.contains("even") && !cssClass.contains("odd"))
-                continue;
-
-            e.findElement(cssSelector("span")).click();
-            waitForReportLoading();
-            return;
-        }
-        throw new IllegalArgumentException("No metric value to drill on");
-    }
-
-    public TableReport drillOnMetricValue(String value) {
-        getMetricElement(value).click();
-        waitForReportLoading();
-        return this;
-    }
-
-    public WebElement getMetricElement(String value) {
-        waitForReportLoading();
-        String cssClass = null;
-        WebElement spanElement = null;
-        for (WebElement e : metricValuesInGrid) {
-            cssClass = e.getAttribute("class");
-
-            if (!cssClass.contains("even") && !cssClass.contains("odd"))
-                continue;
-
-            spanElement = e.findElement(cssSelector("span"));
-            if (!value.equals(spanElement.getText()))
-                continue;
-            return spanElement;
-        }
-        throw new IllegalArgumentException("Cannot find metric value " + value);
-    }
-
-    public TableReport drillOnAttributeValue() {
-        waitForReportLoading();
-
-        attributeElementInGrid.stream()
-                .filter(e -> e.findElement(BY_PARENT).getAttribute("class").contains("rows"))
-                .findFirst()
-                //if attribute value is longer than the table cell, click on the table cell element (div)
-                //otherwise, click on the attribute value (span)
-                .map(e -> (e.getSize().width > e.findElement(BY_PARENT).getSize().width)? e.findElement(BY_PARENT) : e)
-                .orElseThrow(() -> new IllegalArgumentException("No attribute value to drill on"))
-                .click();
-        return this;
-    }
-
-    public TableReport drillOnAttributeValue(String value) {
-        //if attribute value is longer than the table cell, click on the table cell element (div)
-        //otherwise, click on the attribute value (span)
-        WebElement e = getAttributeValueElement(value);
-        ((e.getSize().width > e.findElement(BY_PARENT).getSize().width)? e.findElement(BY_PARENT) : e).click();;
-        return this;
-    }
-
-    public WebElement getAttributeValueElement(String value) {
-        waitForReportLoading();
-        for (WebElement e : attributeElementInGrid) {
-            if (!e.findElement(BY_PARENT).getAttribute("class").contains("rows"))
-                continue;
-            //With new UI header Text be uppercase
-            if (!value.equalsIgnoreCase(e.getText()))
-                continue;
-            return e;
-        }
-        throw new IllegalArgumentException("Cannot find attribute value " + value);
-    }
-
-    public TableReport waitForReportLoading() {
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-            @Override
-            public boolean apply(WebDriver input) {
-                // wait for report idle when drill on metric values
-                sleepTightInSeconds(1);
-
-                try {
-                    return !TableReport.this.getRoot().findElement(cssSelector(".c-report"))
-                            .getAttribute("class").contains("reloading");
-                } catch(NoSuchElementException e) {
-                    // in Report Page
-                    return !metricElementInGrid.isEmpty() || !attributeElementInGrid.isEmpty();
-                }
-            }
-        });
-        return this;
-    }
-
-    public TableReport waitForTableReportExecutionProgress() {
-        Stream.of(By.className("c-report-overlay"), By.id("executionProgress"))
-                .filter(by -> isElementPresent(by, browser))
-                .findFirst().ifPresent(by -> waitForElementNotVisible(by));
-        return this;
-    }
-
-    public boolean isNoData() {
-        return waitForElementVisible(REPORT_MESSAGE_LOCATOR, getRoot()).getText().contains(NO_DATA);
-    }
-
-    public void changeAttributeDisplayLabelByRightClick(final String attribute, String label) {
-        WebElement header = attributesHeader.stream()
-            .filter(e -> attribute.equals(e.getText()))
-            .findFirst()
-            .orElseThrow(() -> new NoSuchElementException("Cannot find attribute header: " + attribute));
-
-        BrowserUtils.contextClick(browser, header);
-        waitForElementVisible(cssSelector("#ctxMenu .s-" + simplifyText(label) +" > a"), browser).click();
-    }
-
-    public String getReportTiTle() {
-        return waitForElementVisible(getRoot().findElement(REPORT_TITLE)).getText();
-    }
-
-    public boolean isReportTitleVisible() {
-        if (!isElementPresent(REPORT_TITLE, getRoot())) {
-            return false;
-        }
-
-        return !getRoot().findElement(REPORT_TITLE).getCssValue("display").startsWith("none");
-    }
-
-    public ContextMenu openContextMenuFromCellValue(final String cellValue) {
-        BrowserUtils.contextClick(browser,
-                browser.findElements(cssSelector(".containerBody .gridTabPlate .gridTile div.cell"))
-                    .stream()
-                    .filter(e -> e.getText().equals(cellValue)).findFirst().get());
-
-        return Graphene.createPageFragment(ContextMenu.class, waitForElementVisible(id("ctxMenu"), browser));
-    }
-
-    public List<WebElement> getImageElements() {
-        waitForReportLoading();
-        final List<WebElement> images = attributeElementInGrid.stream()
-                .map(e -> e.findElement(BY_PARENT))
-                .filter(e -> 
-                        Stream.of(e.getAttribute("class").split("\\s+"))
-                                .anyMatch(input -> input.equals("image")))
-                .map(e -> e.findElement(tagName("img")))
+    private List<Integer> getDataRowPositions() {
+        return getCellElements(CellType.ATTRIBUTE_VALUE).stream()
+                .map(this::getCellRowPositions)
+                .flatMap(Collection::stream)
+                .distinct()
                 .collect(toList());
-
-        if(images.isEmpty())
-            throw new RuntimeException("Cannot find any image element");
-
-        return images;
     }
 
-    public WebElement getImageElement(String imageSource) {
-        waitForReportLoading();
-
-        return waitForElementVisible(attributeElementInGrid.stream()
-                .map(e -> e.findElement(BY_PARENT))
-                .filter(e -> e.getAttribute("class").contains("s-grid-" + simplifyText(imageSource)))
-                .findAny()
-                .get()
-                .findElement(tagName("img")));
+    private boolean isDrillable(WebElement element) {
+        return element.getAttribute("class").contains("drillable");
     }
 
-    public void copyMetricCell(final String cell) {
-        WebElement target = getMetricElement(cell).findElement(BY_PARENT);
-        target.click();
+    private boolean isDrillableToExternalPage(WebElement element) {
+        return isDrillable(element) && element.getAttribute("title").contains("Open external link in a new window");
+    }
 
-        //wait until the cell is actually selected
-        Predicate<WebDriver> predicate = browser -> target.getAttribute("class").contains("highlight");
-        Graphene.waitGui().until(predicate);
-
-        //use keyDown and single calling to make test more stable
-        try {
-            getActions().keyDown(Keys.CONTROL).perform();
-            getActions().sendKeys("c").perform();
-        } finally {
-            getActions().keyUp(Keys.CONTROL).perform();
+    private TableReport drillOn(WebElement element) {
+        if (!isDrillable(element)) {
+            throw new RuntimeException("Could not drill on undrillable element");
         }
+        getActions().moveToElement(element.findElement(By.tagName("span")), 5, 5).click().perform();
+        return this;
     }
 
-    private Pair<Integer, Integer> getPossitionFromRegion(String region) {
-        String[] parts = region.split(",");
-        return Pair.of(Integer.parseInt(parts[0].trim()), Integer.parseInt(parts[1].trim()));
+    private boolean isImageDisplayed(WebElement image) {
+        //have 3 scenarios when loading image
+        //1.Image is loaded successfully
+        //      src attribute = https://api.monosnap.com/image/download?id=987dH7kckbVcKcv8UFK5jdoKXCJ8wk
+        //2.An alternative img is loaded when browser encounters error
+        //      src attribute =
+        //                  /gdc/app/projects/s03a3h7ru03dli7iq3o4xk4fl2xlgqmn/images?source=http:
+        //                  //samsuria.com/wp-content/uploads/2014/10/wallpaper-nature-3d.jpg
+        //                  &errorPage=/images/2011/il-no-image.png
+        //3.A broken image symbol is displayed
+        //      src attribute = /gdc/app/projects/s03a3h7ru03dli7iq3o4xk4fl2xlgqmn/images?source=web&url
+        //                  =http://hdwallweb.com/wp-content/uploads/2014/10/01/nature-home-drawing.jpg&errorPage=/images
+        //                  /2011/il-no-image.png
+        //
+        //Generally, calling restAPI with src attribute only handles case 2&3 by checking body response
+        //due to src attribute differences.
+        //Using JS to cover 3 above cases. To check an image is displayed completely, JS code works as below
+        //1.wait for image is loaded
+        //2.image's width must be defined and > 0
+
+        final String js = "return arguments[0].complete && "
+                + "typeof arguments[0].naturalWidth != \"undefined\" && "
+                + "arguments[0].naturalWidth > 0";
+
+        return (Boolean) BrowserUtils.runScript(browser, js, image);
     }
 
-    private List<WebElement> getAllHeaderElements() {
-        return browser.findElements(cssSelector(
-                ".containerBody .gridTabPlate .gridTile .cell:not(.element):not(.data) span.captionWrapper"));
-    }
-
-    private WebElement getHeaderElement(final String header) {
-        return getAllHeaderElements().stream()
-                .filter(e -> header.equalsIgnoreCase(e.getText()))      //With new UI header Text be uppercase
-                .map(e -> e.findElement(BY_PARENT))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("Cannot find header named: " + header));
-    }
-
-    public static enum Sort {
+    public enum Sort {
         ASC("ascendingArrow"),
         DESC("descendingArrow");
 
-        private String cssClass;
+        private String locator;
 
-        private Sort(String css) {
-            cssClass = css;
+        Sort(String locator) {
+            this.locator = locator;
         }
 
-        @Override
-        public String toString() {
-            return cssClass;
+        public By getLocator() {
+            return By.className(locator);
         }
+    }
+
+    public enum CellType {
+        ATTRIBUTE_HEADER {
+            @Override
+            public By getLocator() {
+                return isElementPresent(By.id("analysisAttributesContainer"), BrowserUtils.getBrowserContext())
+                        ? By.cssSelector("#analysisAttributesContainer .attribute")
+                        : By.className("attribute");
+            }
+        },
+        ATTRIBUTE_VALUE {
+            @Override
+            public By getLocator() {
+                return By.cssSelector(".gridTile .element");
+            }
+        },
+        METRIC_HEADER {
+            @Override
+            public By getLocator() {
+                return isElementPresent(By.id("analysisMetricsContainer"), BrowserUtils.getBrowserContext())
+                        ? By.cssSelector("#analysisMetricsContainer .metric")
+                        : By.className("metric");
+            }
+        },
+        METRIC_VALUE {
+            @Override
+            public By getLocator() {
+                return By.cssSelector(".data:not(.total)");
+            }
+        },
+        TOTAL_HEADER {
+            @Override
+            public By getLocator() {
+                return By.className("totalHeader");
+            }
+        },
+        TOTAL_VALUE {
+            @Override
+            public By getLocator() {
+                return By.cssSelector(".data.total");
+            }
+        };
+
+        public abstract By getLocator();
     }
 }

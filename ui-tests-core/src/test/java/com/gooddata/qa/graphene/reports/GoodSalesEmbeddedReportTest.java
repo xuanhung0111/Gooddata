@@ -1,5 +1,36 @@
 package com.gooddata.qa.graphene.reports;
 
+import com.gooddata.GoodData;
+import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.GridReportDefinitionContent;
+import com.gooddata.md.report.MetricElement;
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.entity.filter.FilterItem;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.entity.report.WhatItem;
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
+import com.gooddata.qa.graphene.enums.report.ReportTypes;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.EmbeddedWidget;
+import com.gooddata.qa.graphene.fragments.reports.report.EmbeddedReportContainer;
+import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
+import com.gooddata.qa.graphene.fragments.reports.report.ReportEmbedDialog;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
+import com.google.common.collect.Lists;
+import org.apache.http.ParseException;
+import org.jboss.arquillian.graphene.Graphene;
+import org.json.JSONException;
+import org.openqa.selenium.WebElement;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.util.List;
+
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
@@ -21,37 +52,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-
-import java.io.IOException;
-import java.util.List;
-
-import org.apache.http.ParseException;
-import org.jboss.arquillian.graphene.Graphene;
-import org.json.JSONException;
-import org.openqa.selenium.WebElement;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
-import com.gooddata.GoodData;
-import com.gooddata.md.report.AttributeInGrid;
-import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.entity.filter.FilterItem;
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.entity.report.WhatItem;
-import com.gooddata.qa.graphene.enums.report.ExportFormat;
-import com.gooddata.qa.graphene.enums.report.ReportTypes;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.EmbeddedWidget;
-import com.gooddata.qa.graphene.fragments.reports.report.EmbeddedReportContainer;
-import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
-import com.gooddata.qa.graphene.fragments.reports.report.ReportEmbedDialog;
-import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
-import com.google.common.collect.Lists;
 
 public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
@@ -98,8 +98,8 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         reportUrl = browser.getCurrentUrl();
 
         TableReport tableReport = reportPage.getTableReport();
-        attributeValues = tableReport.getAttributeElements();
-        metricValues = tableReport.getMetricElements();
+        attributeValues = tableReport.getAttributeValues();
+        metricValues = tableReport.getMetricValues();
 
         System.out.println("attributeValues: " + attributeValues);
         System.out.println("metricValues: " + metricValues);
@@ -109,7 +109,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
     public void editorGetEmbedCode() throws JSONException {
         logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.EDITOR);
         openReportByUrl(reportUrl);
-        reportPage.getTableReport().waitForReportLoading();
+        reportPage.getTableReport().waitForLoaded();
         ReportEmbedDialog embedDialog = reportPage.openReportEmbedDialog();
         htmlEmbedCode = embedDialog.getHtmlCode();
         embedUri = embedDialog.getEmbedUri();
@@ -149,11 +149,11 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
         TableReport tableReport = embeddedReportContainer.getTableReport();
 
-        assertThat(tableReport.getAttributesHeader(), is(newArrayList(ATTR_STATUS)));
-        assertThat(tableReport.getAttributeElements(), is(attributeValues));
+        assertThat(tableReport.getAttributeHeaders(), is(newArrayList(ATTR_STATUS)));
+        assertThat(tableReport.getAttributeValues(), is(attributeValues));
 
-        assertThat(tableReport.getMetricsHeader(), is(newHashSet(METRIC_AMOUNT)));
-        assertThat(tableReport.getMetricElements(), is(metricValues));
+        assertThat(tableReport.getMetricHeaders(), is(newHashSet(METRIC_AMOUNT)));
+        assertThat(tableReport.getMetricValues(), is(metricValues));
     }
 
     @Test(dependsOnMethods = {"createAdditionalProject"}, dataProvider = "embeddedReport")
@@ -173,9 +173,9 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         waitForFragmentVisible(reportPage);
         assertEquals(reportPage.getReportName(), EMBEDDED_REPORT_TITLE, "Incorrect report title!");
 
-        TableReport tableReport = reportPage.getTableReport().waitForReportLoading();
-        assertThat(tableReport.getAttributeElements(), is(attributeValues));
-        assertThat(tableReport.getMetricElements(), is(metricValues));
+        TableReport tableReport = reportPage.getTableReport().waitForLoaded();
+        assertThat(tableReport.getAttributeValues(), is(attributeValues));
+        assertThat(tableReport.getMetricValues(), is(metricValues));
     }
 
     @Test(dependsOnMethods = {"createAdditionalProject"}, dataProvider = "embeddedReport")
@@ -252,10 +252,10 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
                 .getLastEmbeddedWidget()
                 .getEmbeddedReportContainer()
                 .getTableReport();
-        assertThat(embeddedTableReport.getAttributeElements(), is(newArrayList(filteredValues)));
+        assertThat(embeddedTableReport.getAttributeValues(), is(newArrayList(filteredValues)));
 
         embeddedTableReport = initEmbeddedReportWithUri(embedUri).getTableReport();
-        assertThat(embeddedTableReport.getAttributeElements(), is(newArrayList(filteredValues)));
+        assertThat(embeddedTableReport.getAttributeValues(), is(newArrayList(filteredValues)));
     }
 
     @Test(dependsOnMethods = {"createAdditionalProject"})
@@ -272,8 +272,8 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
             .selectAttribute(ATTR_IS_ACTIVE)
             .doneSndPanel();
 
-        attributeElement = reportPage.getTableReport().getAttributeElements();
-        metricElement = reportPage.getTableReport().getMetricElements();
+        attributeElement = reportPage.getTableReport().getAttributeValues();
+        metricElement = reportPage.getTableReport().getMetricValues();
         WebElement unsavedReportWarning = reportPage.embedUnsavedReport();
         assertEquals(unsavedReportWarning.getText(), "Please first save the report before embeding. Close");
         reportPage.closeEmbedUnsavedWarning();
@@ -291,15 +291,15 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         assertEquals(embeddedReportContainer.getInfo(), reportTitle);
 
         TableReport tableReport = embeddedReportContainer.getTableReport();
-        assertThat(tableReport.getAttributeElements(), is(attributeElement));
-        assertThat(tableReport.getMetricElements(), is(metricElement));
+        assertThat(tableReport.getAttributeValues(), is(attributeElement));
+        assertThat(tableReport.getMetricValues(), is(metricElement));
 
         embeddedReportContainer = initEmbeddedReportWithUri(embedUri);
         assertEquals(embeddedReportContainer.getInfo(), reportTitle);
 
         tableReport = embeddedReportContainer.getTableReport();
-        assertThat(tableReport.getAttributeElements(), is(attributeElement));
-        assertThat(tableReport.getMetricElements(), is(metricElement));
+        assertThat(tableReport.getAttributeValues(), is(attributeElement));
+        assertThat(tableReport.getMetricValues(), is(metricElement));
     }
 
     @Test(dependsOnMethods = {"createAdditionalProject"})
@@ -325,10 +325,10 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
         EmbeddedReportContainer embeddedReportContainer =
                 embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Embed empty report");
-        assertTrue(embeddedReportContainer.getTableReport().isNoData(), "Embedded Empty Report is not empty!");
+        assertTrue(embeddedReportContainer.getTableReport().hasNoData(), "Embedded Empty Report is not empty!");
 
         embeddedReportContainer = initEmbeddedReportWithUri(embedUri);
-        assertTrue(embeddedReportContainer.getTableReport().isNoData(), "Embedded Empty Report is not empty!");
+        assertTrue(embeddedReportContainer.getTableReport().hasNoData(), "Embedded Empty Report is not empty!");
     }
 
     @Test(dependsOnMethods = {"createAdditionalProject"})
@@ -383,11 +383,11 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
         EmbeddedReportContainer embeddedReportContainer =
                 embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Share report with url parameter");
-        assertThat(embeddedReportContainer.getTableReport().getAttributeElements(),
+        assertThat(embeddedReportContainer.getTableReport().getAttributeValues(),
                 is(newArrayList(filteredAttributeValues)));
 
         embeddedReportContainer = initEmbeddedReportWithUri(embedUri);
-        assertThat(embeddedReportContainer.getTableReport().getAttributeElements(),
+        assertThat(embeddedReportContainer.getTableReport().getAttributeValues(),
                 is(newArrayList(filteredAttributeValues)));
     }
 
@@ -407,44 +407,45 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         List<String> drilledDownReportAttributeValues =
                 Lists.newArrayList("Q1/2009", "Q2/2009", "Q3/2009", "Q4/2009");
         List<Float> drilledDownReportMetricValues =
-                Lists.newArrayList(1279125.6F, 1881130.8F, 2381755.0F, 3114457.0F, 8656468.0F);
+                Lists.newArrayList(1279125.6F, 1881130.8F, 2381755.0F, 3114457.0F);
 
         String metricValueToDrill = "$2,773,426.95";
         List<String> drilledInReportAttributeValues = Lists.newArrayList("Lost", "Open", "Won");
         List<Float> drilledInReportMetricValues =
-                Lists.newArrayList(1980676.1F, 326592.22F, 466158.62F, 2773427.0F);
+                Lists.newArrayList(1980676.1F, 326592.22F, 466158.62F);
 
         EmbeddedReportContainer embeddedReportContainer =
                 embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Drill embedded report with iframe");
 
-        TableReport tableReport = embeddedReportContainer.getTableReport().drillOnAttributeValue(attributeValueToDrill);
+        TableReport tableReport = embeddedReportContainer.getTableReport()
+                .drillOn(attributeValueToDrill, CellType.ATTRIBUTE_VALUE);
 
-        assertThat(tableReport.getAttributeElements(), is(drilledDownReportAttributeValues));
-        assertThat(tableReport.getMetricElements(), is(drilledDownReportMetricValues));
+        assertThat(tableReport.getAttributeValues(), is(drilledDownReportAttributeValues));
+        assertThat(tableReport.getMetricValues(), is(drilledDownReportMetricValues));
 
         tableReport = refreshDashboardPage()
                 .getLastEmbeddedWidget()
                 .getEmbeddedReportContainer()
                 .getTableReport()
-                .drillOnMetricValue(metricValueToDrill);
+                .drillOn(metricValueToDrill, CellType.METRIC_VALUE);
 
-        assertThat(tableReport.getAttributeElements(), is(drilledInReportAttributeValues));
-        assertThat(tableReport.getMetricElements(), is(drilledInReportMetricValues));
+        assertThat(tableReport.getAttributeValues(), is(drilledInReportAttributeValues));
+        assertThat(tableReport.getMetricValues(), is(drilledInReportMetricValues));
 
         embeddedReportContainer = initEmbeddedReportWithUri(embedUri);
 
-        tableReport = embeddedReportContainer.getTableReport().drillOnAttributeValue(attributeValueToDrill);
+        tableReport = embeddedReportContainer.getTableReport().drillOn(attributeValueToDrill, CellType.ATTRIBUTE_VALUE);
 
-        assertThat(tableReport.getAttributeElements(), is(drilledDownReportAttributeValues));
-        assertThat(tableReport.getMetricElements(), is(drilledDownReportMetricValues));
+        assertThat(tableReport.getAttributeValues(), is(drilledDownReportAttributeValues));
+        assertThat(tableReport.getMetricValues(), is(drilledDownReportMetricValues));
 
         browser.navigate().refresh();
         tableReport = waitForFragmentVisible(embeddedReportContainer)
                 .getTableReport()
-                .drillOnMetricValue(metricValueToDrill);
+                .drillOn(metricValueToDrill, CellType.METRIC_VALUE);
 
-        assertThat(tableReport.getAttributeElements(), is(drilledInReportAttributeValues));
-        assertThat(tableReport.getMetricElements(), is(drilledInReportMetricValues));
+        assertThat(tableReport.getAttributeValues(), is(drilledInReportAttributeValues));
+        assertThat(tableReport.getMetricValues(), is(drilledInReportMetricValues));
     }
 
     @AfterClass(alwaysRun = true)

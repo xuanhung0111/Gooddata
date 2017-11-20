@@ -20,15 +20,4 @@ public class BrowserUtils {
             throw new IllegalStateException("This driver does not support JavaScript!");
         }
     }
-
-    public static void contextClick(WebDriver driver, WebElement onElement) {
-        new Actions(driver).moveToElement(onElement).perform();
-        StringBuilder script = new StringBuilder()
-            .append("var evt = arguments[0].ownerDocument.createEvent('MouseEvents');")
-            .append("evt.initMouseEvent('contextmenu', true, true,")
-            .append("window, 1, 100, 200, 100, 200, false,")
-            .append("false, false, false, 2, null);")
-            .append("!arguments[0].dispatchEvent(evt); // dispatch for firefox + others");
-        runScript(driver, script.toString(), onElement);
-    }
 }

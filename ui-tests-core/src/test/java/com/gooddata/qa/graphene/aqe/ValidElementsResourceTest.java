@@ -1,39 +1,5 @@
 package com.gooddata.qa.graphene.aqe;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CLOSED;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_TIMELINE;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_MONTH_YEAR_CREATED;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_PIPELINE_ANALYSIS;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOP_5_LOST_BY_CASH;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOP_5_OPEN_BY_CASH;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOP_5_WON_BY_CASH;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.utils.CssUtils.simplifyText;
-import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
-import static java.util.Arrays.asList;
-import static org.testng.Assert.assertTrue;
-
-import java.io.IOException;
-import java.util.List;
-
-import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
-import com.gooddata.qa.mdObjects.dashboard.Dashboard;
-import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
-import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
-import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
-import com.gooddata.qa.utils.java.Builder;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.http.ParseException;
-import org.json.JSONException;
-import org.testng.annotations.Test;
-
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.report.HowItem;
@@ -42,11 +8,41 @@ import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.mdObjects.dashboard.Dashboard;
+import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
+import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
+import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.java.Builder;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.http.ParseException;
+import org.json.JSONException;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.util.List;
+
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_MONTH_YEAR_CREATED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CLOSED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_TIMELINE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOP_5_OPEN_BY_CASH;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
+import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
+import static java.util.Arrays.asList;
+import static org.testng.Assert.assertTrue;
 
 public class ValidElementsResourceTest extends GoodSalesAbstractTest {
 
@@ -150,16 +146,16 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
             checkRedBar(browser);
 
             TableReport dashboardTableReport = getDashboardTableReport(REPORT_TOP_5_OPEN_BY_CASH);
-            assertTrue(CollectionUtils.isEqualCollection(dashboardTableReport.getAttributeElements(),
+            assertTrue(CollectionUtils.isEqualCollection(dashboardTableReport.getAttributeValues(),
                     reportAttributeValues),
                     "Attribute values in report 'Top 5 Open (by $)' are not properly");
-            assertTrue(CollectionUtils.isEqualCollection(dashboardTableReport.getMetricElements(),
+            assertTrue(CollectionUtils.isEqualCollection(dashboardTableReport.getMetricValues(),
                     reportMetricValues),
                     "Metric values in report 'Top 5 Open (by $)' are not properly");
 
-            assertTrue(getDashboardTableReport(REPORT_TOP_5_WON_BY_CASH).isNoData(),
+            assertTrue(getDashboardTableReport(REPORT_TOP_5_OPEN_BY_CASH).hasNoData(),
                     "The message in report is not properly.");
-            assertTrue(getDashboardTableReport(REPORT_TOP_5_LOST_BY_CASH).isNoData());
+            assertTrue(getDashboardTableReport(REPORT_TOP_5_OPEN_BY_CASH).hasNoData());
         } finally {
             deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), workingDashboard);
         }
@@ -195,10 +191,10 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
                 checkRedBar(browser);
                 Screenshots.takeScreenshot(browser, "AQE-Check variable filter at dashboard", this.getClass());
                 assertTrue(CollectionUtils.isEqualCollection(getDashboardTableReport(REPORT_TOP_5_OPEN_BY_CASH)
-                                .getAttributeElements(), asList("Brighton Cromwell > WonderKid")),
+                                .getAttributeValues(), asList("Brighton Cromwell > WonderKid")),
                         "Attribute values in report 'Top 5 Open (by $)' are not properly");
                 assertTrue(CollectionUtils.isEqualCollection(getDashboardTableReport(REPORT_TOP_5_OPEN_BY_CASH)
-                                .getMetricElements(), asList(8.6f, 100.0f)),
+                                .getMetricValues(), asList(8.6f, 100.0f)),
                         "Metric values in report 'Top 5 Open (by $)' are not properly");
             } finally {
                 logoutAndLoginAs(true, UserRoles.ADMIN);
@@ -228,10 +224,10 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
         checkRedBar(browser);
 
         TableReport report = reportPage.getTableReport();
-        assertTrue(CollectionUtils.isEqualCollection(report.getAttributeElements(),
+        assertTrue(CollectionUtils.isEqualCollection(report.getAttributeValues(),
                 asList("Direct Sales", "CompuSci", "Educationly", "Explorer", "WonderKid")),
                 "Attribute values in report are not properly.");
-        assertTrue(CollectionUtils.isEqualCollection(report.getMetricElements(),
+        assertTrue(CollectionUtils.isEqualCollection(report.getMetricValues(),
                 asList(15582695.69f, 16188138.24f, 30029658.14f, 6978618.41f)),
                 "Metric values in report are not properly.");
     }
@@ -264,13 +260,6 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
             return filter;
         }
         return null;
-    }
-
-    private void openDashboardTab(int tabindex) {
-        initDashboardsPage();
-        browser.navigate().refresh();
-        dashboardsPage.selectDashboard(DASH_PIPELINE_ANALYSIS);
-        dashboardsPage.getTabs().openTab(tabindex);
     }
 
     private TableReport getDashboardTableReport(String reportName) {

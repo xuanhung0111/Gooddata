@@ -1,21 +1,5 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_PIPELINE_ANALYSIS;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_OUTLOOK;
-import static com.gooddata.qa.utils.asserts.AssertUtils.assertHeadersEqual;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.variable.VariableRestUtils.getVariableUri;
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static org.testng.Assert.assertEquals;
-
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
 import com.gooddata.md.report.AttributeInGrid;
 import com.gooddata.md.report.Filter;
 import com.gooddata.md.report.GridReportDefinitionContent;
@@ -26,8 +10,23 @@ import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
+import com.gooddata.qa.utils.asserts.AssertUtils;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.gooddata.qa.utils.java.Builder;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_PIPELINE_ANALYSIS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_OUTLOOK;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.utils.http.variable.VariableRestUtils.getVariableUri;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.testng.Assert.assertEquals;
 
 public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest {
 
@@ -80,21 +79,21 @@ public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest 
         dashboardsPage.saveDashboard();
 
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), String.join(", ", INTEREST, DISCOVERY));
-        assertHeadersEqual(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), asList(INTEREST, DISCOVERY));
+        AssertUtils.assertIgnoreCase(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeValues(), asList(INTEREST, DISCOVERY));
 
         dashboardsPage.editDashboard();
         getFilter(ATTR_STAGE_NAME).changeSelectionToOneValue();
         dashboardsPage.saveDashboard();
 
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), INTEREST);
-        assertHeadersEqual(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(INTEREST));
+        AssertUtils.assertIgnoreCase(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeValues(), singletonList(INTEREST));
 
         dashboardsPage.editDashboard();
         getFilter(ATTR_STAGE_NAME).changeSelectionToMultipleValues();
         dashboardsPage.saveDashboard();
 
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), ALL);
-        assertHeadersEqual(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(),
+        AssertUtils.assertIgnoreCase(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeValues(),
                 asList(INTEREST, DISCOVERY, SHORT_LIST, RISK_ASSESSMENT));
     }
 
@@ -129,13 +128,13 @@ public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest 
                 .editAttributeFilterValues(DISCOVERY);
 
         dashboardsPage.saveDashboard();
-        getReport(REPORT_WITH_PROMPT_FILTER).waitForReportLoading();
+        getReport(REPORT_WITH_PROMPT_FILTER).waitForLoaded();
 
         takeScreenshot(browser,
                 "Combination-of-single-and-multiple-filter-works-correctly-for-type-" + combinationType, getClass());
         assertEquals(getFilter(ATTR_STAGE_NAME).getCurrentValue(), String.join(", ", INTEREST, DISCOVERY));
         assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), DISCOVERY);
-        assertHeadersEqual(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeElements(), singletonList(DISCOVERY));
+        AssertUtils.assertIgnoreCase(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeValues(), singletonList(DISCOVERY));
     }
 
     @Test(dependsOnGroups = {"createProject"})

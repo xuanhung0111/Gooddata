@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.dashboards;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
 import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
@@ -19,8 +20,9 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.*;
-import java.util.stream.*;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
@@ -30,8 +32,8 @@ import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.RIGHT
 import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.TOP;
 import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.TOP_RIGHT;
 import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
-import static java.util.Arrays.*;
-import static java.util.Collections.*;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -130,8 +132,7 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
             dashboardsPage.getTabs().getTab(TARGET_TAB).open();
             int reportRowCountBeforeDrilling = dashboardsPage.getContent()
                     .getLatestReport(TableReport.class)
-                    .waitForTableReportExecutionProgress()
-                    .getAttributeElements()
+                    .getAttributeValues()
                     .size();
 
             dashboardsPage.getTabs().getTab(SOURCE_TAB).open();
@@ -150,14 +151,14 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
             }
 
             // att to drill to is CompuSci
-            reportOnSourceTab.drillOnAttributeValue();
-            reportOnSourceTab.waitForTableReportExecutionProgress();
+            reportOnSourceTab.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
+            reportOnSourceTab.waitForLoaded();
 
             assertTrue(dashboardsPage.getTabs().getTab(TARGET_TAB).isSelected(),
                     TARGET_TAB + "is not selected after drill action");
 
             TableReport reportOnTargetTab = dashboardsPage.getContent()
-                    .getReport(REPORT_AMOUNT_BY_PRODUCT, TableReport.class).waitForTableReportExecutionProgress();
+                    .getReport(REPORT_AMOUNT_BY_PRODUCT, TableReport.class).waitForLoaded();
             Screenshots.takeScreenshot(browser, "testDrillToDashboardTab-" + dashboard, getClass());
             if (!expectedFilterValues.isEmpty()) {
                 for (Pair<String, List<String>> expectedFilterValue : expectedFilterValues) {
@@ -165,10 +166,10 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
                 }
             }
 
-            assertEquals(reportOnTargetTab.getAttributeElements().size(), expectedReportSize);
+            assertEquals(reportOnTargetTab.getAttributeValues().size(), expectedReportSize);
 
             browser.navigate().refresh();
-            assertEquals(dashboardsPage.getContent().getLatestReport(TableReport.class).getAttributeElements().size(),
+            assertEquals(dashboardsPage.getContent().getLatestReport(TableReport.class).getAttributeValues().size(),
                     reportRowCountBeforeDrilling, "Target tab items are not back to original values");
 
         } finally {

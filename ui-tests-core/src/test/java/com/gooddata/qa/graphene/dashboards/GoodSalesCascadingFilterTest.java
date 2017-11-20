@@ -1,33 +1,5 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_MONTH_YEAR_SNAPSHOT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPP_SNAPSHOT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_QUARTER_YEAR_SNAPSHOT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.utils.CssUtils.simplifyText;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
-import static java.util.Collections.singletonList;
-import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.testng.annotations.Test;
-
 import com.gooddata.GoodData;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.MetadataService;
@@ -54,6 +26,33 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.Parent
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.utils.Sleeper;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.testng.annotations.Test;
+
+import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_MONTH_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPP_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_QUARTER_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
+import static java.util.Collections.singletonList;
+import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
 
@@ -302,24 +301,24 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
             groupButton.click();
             Sleeper.sleepTightInSeconds(2);
             assertEquals(dashboardContent.getReport("Report1", TableReport.class)
-                    .getAttributeElementsByRow().size(), 1);
+                    .getDataContent().size(), 1);
             assertEquals(dashboardContent.getReport("Report2", TableReport.class)
-                    .getAttributeElementsByRow().size(), 1);
+                    .getDataContent().size(), 1);
 
             accountFilter.changeAttributeFilterValues("101 Financial");
             assertEquals(productFilter.getCurrentValue(), "All");
             assertEquals(stageNameFilter.getCurrentValue(), "All");
             assertEquals(dashboardContent.getReport("Report1", TableReport.class)
-                    .getAttributeElementsByRow().size(), 1);
+                    .getDataContent().size(), 1);
             assertEquals(dashboardContent.getReport("Report2", TableReport.class)
-                    .getAttributeElementsByRow().size(), 1);
+                    .getDataContent().size(), 1);
 
             groupButton.click();
             Sleeper.sleepTightInSeconds(2);
             assertEquals(dashboardContent.getReport("Report1", TableReport.class)
-                    .getAttributeElementsByRow().size(), 2);
+                    .getDataContent().size(), 2);
             assertEquals(dashboardContent.getReport("Report2", TableReport.class)
-                    .getAttributeElementsByRow().size(), 2);
+                    .getDataContent().size(), 2);
 
         } finally {
             dashboardsPage.deleteDashboard();

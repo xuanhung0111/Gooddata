@@ -1,5 +1,15 @@
 package com.gooddata.qa.graphene.reports;
 
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.entity.report.WhatItem;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
+import org.jboss.arquillian.graphene.Graphene;
+import org.testng.annotations.Test;
+
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
@@ -13,18 +23,6 @@ import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-
-import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
-import org.testng.annotations.Test;
-
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.entity.report.WhatItem;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
-import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 
 public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest {
 
@@ -56,15 +54,15 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
         checkRedBar(browser);
 
         TableReport report = openTableReport(ATTRIBUTE_REPORT_NAME);
-        assertEquals(report.getAttributesHeader(), asList(ATTR_ACCOUNT));
+        assertEquals(report.getAttributeHeaders(), asList(ATTR_ACCOUNT));
         assertTrue(reportPage.getFilters().isEmpty());
 
         report = drillOnAttributeFromReport(report, ATTRIBUTE_VALUE_TO_DRILL);
-        assertEquals(report.getAttributesHeader(), asList(ATTR_PRODUCT));
+        assertEquals(report.getAttributeHeaders(), asList(ATTR_PRODUCT));
         assertEquals(reportPage.getFilters(), asList(ATTR_ACCOUNT + " is " + ATTRIBUTE_VALUE_TO_DRILL));
 
         report = backToPreviousReport();
-        assertEquals(report.getAttributesHeader(), asList(ATTR_ACCOUNT));
+        assertEquals(report.getAttributeHeaders(), asList(ATTR_ACCOUNT));
         assertTrue(reportPage.getFilters().isEmpty());
     }
 
@@ -74,23 +72,23 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
 
         TableReport report = drillOnAttributeFromReport(openTableReport(ATTRIBUTE_REPORT_NAME),
                 ATTRIBUTE_VALUE_TO_DRILL);
-        assertEquals(report.getAttributesHeader(), asList(ATTR_DEPARTMENT));
+        assertEquals(report.getAttributeHeaders(), asList(ATTR_DEPARTMENT));
         assertEquals(reportPage.getFilters(), asList(ATTR_ACCOUNT + " is " + ATTRIBUTE_VALUE_TO_DRILL));
 
         report = backToPreviousReport();
-        assertEquals(report.getAttributesHeader(), asList(ATTR_ACCOUNT));
+        assertEquals(report.getAttributeHeaders(), asList(ATTR_ACCOUNT));
         assertTrue(reportPage.getFilters().isEmpty());
     }
 
     @Test(dependsOnMethods = {"updateDrillDownInReport"})
     public void removeDrillDownForAttribute() {
-        openTableReport(ATTRIBUTE_REPORT_NAME);
-        assertTrue(isLinkAppearedWhenHoveringOn(getAttributeValueElement(ATTRIBUTE_VALUE_TO_DRILL)));
+        TableReport report = openTableReport(ATTRIBUTE_REPORT_NAME);
+        assertTrue(report.isDrillable(ATTRIBUTE_VALUE_TO_DRILL, CellType.ATTRIBUTE_VALUE));
 
         clearDrillAttribute(ATTR_ACCOUNT);
 
-        openTableReport(ATTRIBUTE_REPORT_NAME);
-        assertFalse(isLinkAppearedWhenHoveringOn(getAttributeValueElement(ATTRIBUTE_VALUE_TO_DRILL)));
+        report = openTableReport(ATTRIBUTE_REPORT_NAME);
+        assertFalse(report.isDrillable(ATTRIBUTE_VALUE_TO_DRILL, CellType.ATTRIBUTE_VALUE));
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -103,27 +101,27 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
         checkRedBar(browser);
 
         TableReport report = openTableReport(METRIC_REPORT_NAME);
-        assertEquals(report.getAttributesHeader(), asList(ATTR_STAGE_NAME));
+        assertEquals(report.getAttributeHeaders(), asList(ATTR_STAGE_NAME));
         assertTrue(reportPage.getFilters().isEmpty());
 
         report = drillOnMetricFromReport(report, METRIC_VALUE_TO_DRILL);
-        assertEquals(report.getAttributesHeader(), asList(ATTR_ACCOUNT));
+        assertEquals(report.getAttributeHeaders(), asList(ATTR_ACCOUNT));
         assertEquals(reportPage.getFilters(), asList(ATTR_STAGE_NAME + " is Interest"));
 
         report = backToPreviousReport();
-        assertEquals(report.getAttributesHeader(), asList(ATTR_STAGE_NAME));
+        assertEquals(report.getAttributeHeaders(), asList(ATTR_STAGE_NAME));
         assertTrue(reportPage.getFilters().isEmpty());
     }
 
     @Test(dependsOnMethods = {"drillDownMetric"})
     public void removeDrillDownForMetric() {
-        openTableReport(METRIC_REPORT_NAME);
-        assertTrue(isLinkAppearedWhenHoveringOn(getMetricElement(METRIC_VALUE_TO_DRILL)));
+        TableReport report = openTableReport(METRIC_REPORT_NAME);
+        assertTrue(report.isDrillable(METRIC_VALUE_TO_DRILL, CellType.METRIC_VALUE));
 
         reportPage.showConfiguration()
             .removeDrillStepInConfigPanel(METRIC_AMOUNT, ATTR_ACCOUNT)
             .waitForReportExecutionProgress();
-        assertFalse(isLinkAppearedWhenHoveringOn(getMetricElement(METRIC_VALUE_TO_DRILL)));
+        assertFalse(report.isDrillable(METRIC_VALUE_TO_DRILL, CellType.METRIC_VALUE));
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -139,7 +137,8 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
         checkRedBar(browser);
 
         openTableReport(reportName)
-            .changeAttributeDisplayLabelByRightClick(ATTR_MONTH_YEAR_SNAPSHOT, "Number (1/2010) (Snapshot)");
+                .openContextMenuFrom(ATTR_MONTH_YEAR_SNAPSHOT, CellType.ATTRIBUTE_HEADER)
+                .selectItem("Number (1/2010) (Snapshot)");
         reportPage.waitForReportExecutionProgress()
             .clickSaveReport()
             .waitForReportSaved();
@@ -148,7 +147,7 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
         dashboardsPage.addNewDashboard(reportName);
 
         try {
-            addTableReportToDashboard(reportName).drillOnAttributeValue(attributeValue);
+            addTableReportToDashboard(reportName).drillOn(attributeValue, CellType.ATTRIBUTE_VALUE);
             DashboardDrillDialog drillDialog = Graphene.createPageFragment(DashboardDrillDialog.class,
                     waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
             assertEquals(drillDialog.getBreadcrumbsString(), reportName + ">>" + attributeValue);
@@ -176,19 +175,19 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
         deleteAttribute(ATTR_PRODUCT);
 
         TableReport report = openTableReport(reportName);
-        assertEquals(report.getAttributesHeader(), asList(ATTR_ACCOUNT));
+        assertEquals(report.getAttributeHeaders(), asList(ATTR_ACCOUNT));
         assertTrue(reportPage.getFilters().isEmpty());
 
         report = drillOnAttributeFromReport(report, ATTRIBUTE_VALUE_TO_DRILL);
-        assertEquals(report.getAttributesHeader(), asList(ATTR_PRODUCT));
+        assertEquals(report.getAttributeHeaders(), asList(ATTR_PRODUCT));
         assertEquals(reportPage.getFilters(), asList(ATTR_ACCOUNT + " is " + ATTRIBUTE_VALUE_TO_DRILL));
 
         report = backToPreviousReport();
-        assertEquals(report.getAttributesHeader(), asList(ATTR_ACCOUNT));
+        assertEquals(report.getAttributeHeaders(), asList(ATTR_ACCOUNT));
         assertTrue(reportPage.getFilters().isEmpty());
 
         report = drillOnMetricFromReport(report, metricValueToDrill);
-        assertEquals(report.getAttributesHeader(), asList(ATTR_DEPARTMENT));
+        assertEquals(report.getAttributeHeaders(), asList(ATTR_DEPARTMENT));
         assertEquals(reportPage.getFilters(), asList(ATTR_ACCOUNT + " is " + attributeValueToDrill));
         backToPreviousReport();
 
@@ -196,32 +195,19 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
         dashboardsPage.addNewDashboard(reportName);
 
         try {
-            addTableReportToDashboard(reportName).drillOnAttributeValue(attributeValueToDrill);
+            addTableReportToDashboard(reportName).drillOn(attributeValueToDrill, CellType.ATTRIBUTE_VALUE);
             DashboardDrillDialog drillDialog = Graphene.createPageFragment(DashboardDrillDialog.class,
                     waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
             assertEquals(drillDialog.getBreadcrumbsString(), reportName + ">>" + attributeValueToDrill);
             drillDialog.closeDialog();
 
-            dashboardsPage.getContent().getLatestReport(TableReport.class).drillOnMetricValue(metricValueToDrill);
+            dashboardsPage.getContent().getLatestReport(TableReport.class).drillOn(metricValueToDrill, CellType.METRIC_VALUE);
             waitForFragmentVisible(drillDialog);
             assertEquals(drillDialog.getBreadcrumbsString(), reportName + ">>" + attributeValueToDrill);
             drillDialog.closeDialog();
         } finally {
             dashboardsPage.deleteDashboard();
         }
-    }
-
-    private boolean isLinkAppearedWhenHoveringOn(WebElement element) {
-        new Actions(browser).moveToElement(element).perform();
-        return element.getCssValue("text-decoration").equals("underline");
-    }
-
-    private WebElement getAttributeValueElement(String value) {
-        return waitForFragmentVisible(reportPage).getTableReport().getAttributeValueElement(value);
-    }
-
-    private WebElement getMetricElement(String value) {
-        return waitForFragmentVisible(reportPage).getTableReport().getMetricElement(value);
     }
 
     private void setDrillAttribute(String source, String target) {
@@ -246,12 +232,12 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
     }
 
     private TableReport drillOnAttributeFromReport(TableReport report, String value) {
-        report.drillOnAttributeValue(value);
+        report.drillOn(value, CellType.ATTRIBUTE_VALUE);
         return waitForFragmentVisible(reportPage).waitForReportExecutionProgress().getTableReport();
     }
 
     private TableReport drillOnMetricFromReport(TableReport report, String value) {
-        report.drillOnMetricValue(value);
+        report.drillOn(value, CellType.METRIC_VALUE);
         return waitForFragmentVisible(reportPage).waitForReportExecutionProgress().getTableReport();
     }
 

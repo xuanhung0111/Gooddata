@@ -1,16 +1,5 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_WON;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.utils.CssUtils.simplifyText;
-import static org.testng.Assert.assertEquals;
-
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.testng.annotations.Test;
-
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
@@ -21,6 +10,16 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.GroupC
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.utils.Sleeper;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.testng.annotations.Test;
+
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_WON;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
+import static org.testng.Assert.assertEquals;
 
 public class GoodSalesFilterGroupTest extends GoodSalesAbstractTest {
 
@@ -97,20 +96,20 @@ public class GoodSalesFilterGroupTest extends GoodSalesAbstractTest {
 
         Sleeper.sleepTightInSeconds(2);
         assertEquals(dashboardsPage.getContent().getLatestReport(TableReport.class)
-                .getAttributeElementsByRow().size(), 7);
+                .getDataContent().size(), 7);
 
         isWonFilter.changeAttributeFilterValues("true");
         assertEquals(dashboardsPage.getContent().getLatestReport(TableReport.class)
-                .getAttributeElementsByRow().size(), 7);
+                .getDataContent().size(), 7);
 
         FilterWidget stageNameFilter = dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME));
         stageNameFilter.changeAttributeFilterValues("Closed Won");
         assertEquals(dashboardsPage.getContent().getLatestReport(TableReport.class)
-                .getAttributeElementsByRow().size(), 7);
+                .getDataContent().size(), 7);
 
         waitForElementVisible(By.cssSelector(".s-btn-apply"), browser).click();
         Sleeper.sleepTightInSeconds(2);
         assertEquals(dashboardsPage.getContent().getLatestReport(TableReport.class)
-                .getAttributeElementsByRow().size(), 1);
+                .getDataContent().size(), 1);
     }
 }

@@ -1,5 +1,40 @@
 package com.gooddata.qa.graphene.reports;
 
+import com.gooddata.md.Attribute;
+import com.gooddata.md.Metric;
+import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.GridReportDefinitionContent;
+import com.gooddata.md.report.MetricElement;
+import com.gooddata.md.report.Report;
+import com.gooddata.md.report.ReportDefinition;
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.entity.filter.FilterItem;
+import com.gooddata.qa.graphene.entity.report.HowItem;
+import com.gooddata.qa.graphene.entity.report.HowItem.Position;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
+import com.gooddata.qa.graphene.utils.UrlParserUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.google.common.base.Predicate;
+import org.apache.commons.lang3.tuple.Pair;
+import org.jboss.arquillian.graphene.Graphene;
+import org.json.JSONException;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
+import org.supercsv.io.CsvListReader;
+import org.supercsv.prefs.CsvPreference;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
@@ -24,42 +59,6 @@ import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang3.tuple.Pair;
-import org.jboss.arquillian.graphene.Graphene;
-import org.json.JSONException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
-import org.supercsv.io.CsvListReader;
-import org.supercsv.prefs.CsvPreference;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
-import com.gooddata.md.Attribute;
-import com.gooddata.md.Metric;
-import com.gooddata.md.report.AttributeInGrid;
-import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
-import com.gooddata.md.report.Report;
-import com.gooddata.md.report.ReportDefinition;
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.entity.filter.FilterItem;
-import com.gooddata.qa.graphene.entity.report.HowItem;
-import com.gooddata.qa.graphene.entity.report.HowItem.Position;
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.enums.report.ExportFormat;
-import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
-import com.gooddata.qa.graphene.utils.UrlParserUtils;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
-import com.google.common.base.Predicate;
 
 public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest {
 
@@ -143,7 +142,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
         createDashboardForExportTest(dashboard, REPORT_SALES_SEASONALITY, METRIC_NUMBER_OF_WON_OPPS, TOO_LARGE_REPORT);
         try {
             setDrillReportTargetAsExport(format.getName());
-            dashboardsPage.getContent().getLatestReport(TableReport.class).drillOnMetricValue(DRILL_DOWN_VALUE);
+            dashboardsPage.getContent().getLatestReport(TableReport.class).drillOn(DRILL_DOWN_VALUE, CellType.METRIC_VALUE);
             checkRebBarVisible();
         } finally {
             dashboardsPage.deleteDashboard();
@@ -156,7 +155,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
         createDashboardForExportTest(dashboard, REPORT_SALES_SEASONALITY, METRIC_NUMBER_OF_WON_OPPS, INCOMPUTABLE_REPORT);
         try {
             setDrillReportTargetAsExport(format.getName());
-            dashboardsPage.getContent().getLatestReport(TableReport.class).drillOnMetricValue(DRILL_DOWN_VALUE);
+            dashboardsPage.getContent().getLatestReport(TableReport.class).drillOn(DRILL_DOWN_VALUE, CellType.METRIC_VALUE);
             checkRebBarVisible();
         } finally {
             dashboardsPage.deleteDashboard();
@@ -169,7 +168,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
         createDashboardForExportTest(dashboard, REPORT_SALES_SEASONALITY, METRIC_NUMBER_OF_WON_OPPS, EMPTY_REPORT);
         try {
             setDrillReportTargetAsExport(format.getName());
-            dashboardsPage.getContent().getLatestReport(TableReport.class).drillOnMetricValue(DRILL_DOWN_VALUE);
+            dashboardsPage.getContent().getLatestReport(TableReport.class).drillOn(DRILL_DOWN_VALUE, CellType.METRIC_VALUE);
             checkRedBar(browser);
         } finally {
             dashboardsPage.deleteDashboard();
@@ -186,7 +185,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
         createDashboardForExportTest(dashboard, report, METRIC_NUMBER_OF_ACTIVITIES, drillDownReport);
         try {
             setDrillReportTargetAsExport(RAW_FORMAT);
-            dashboardsPage.getContent().getLatestReport(TableReport.class).drillOnMetricValue();
+            dashboardsPage.getContent().getLatestReport(TableReport.class).drillOnFirstValue(CellType.METRIC_VALUE);
             final File exportFile = new File(testParams.getDownloadFolder(), "Email.csv");
             waitForExportReport(exportFile, 69);
             assertEquals(readCsvFile(exportFile), asList(asList("East Coast", "1060"), asList("West Coast", "2251")),
@@ -205,7 +204,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
         createDashboardForExportTest(dashboard, report, METRIC_PRODUCTIVE_REPS, TOO_LARGE_REPORT);
         try {
             setDrillReportTargetAsExport(RAW_FORMAT);
-            dashboardsPage.getContent().getLatestReport(TableReport.class).drillOnMetricValue();
+            dashboardsPage.getContent().getLatestReport(TableReport.class).drillOnFirstValue(CellType.METRIC_VALUE);
             final File exportFile = new File(testParams.getDownloadFolder(), "CompuSci.csv");
             waitForExportReport(exportFile, 2042960);
             assertEquals(readCsvFile(exportFile).size(), 69923, "The number of lines in export file is not correct");
@@ -215,7 +214,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
         }
     }
 
-    private List<List<String>> readCsvFile(final File file) throws FileNotFoundException, IOException {
+    private List<List<String>> readCsvFile(final File file) throws IOException {
         List<List<String>> actualResult = new ArrayList<>();
         try (CsvListReader reader = new CsvListReader(new FileReader(file), CsvPreference.STANDARD_PREFERENCE)) {
             reader.getHeader(true);
@@ -236,7 +235,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
                 .getLatestReport(TableReport.class)
         //wait for report loading finish before adding drilling. Otherwise, the select item popup panel on 
         //drilling setting is disappeared when report finishes loading (might be due to lost focus)
-                .waitForReportLoading()
+                .waitForLoaded()
                 .addDrilling(Pair.of(singletonList(drillDownValue), drillDownReport), "Reports");
         dashboardsPage.getDashboardEditBar().saveDashboard();
     }

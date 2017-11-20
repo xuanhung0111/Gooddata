@@ -1,5 +1,39 @@
 package com.gooddata.qa.graphene.dashboards;
 
+import com.gooddata.md.Attribute;
+import com.gooddata.md.Metric;
+import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.GridReportDefinitionContent;
+import com.gooddata.md.report.MetricElement;
+import com.gooddata.md.report.Report;
+import com.gooddata.md.report.ReportDefinition;
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.entity.filter.FilterItem;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
+import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardContent;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
+import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.google.common.base.Function;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.openqa.selenium.WebElement;
+import org.springframework.http.HttpStatus;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
@@ -20,41 +54,6 @@ import static java.util.Collections.singletonList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.openqa.selenium.WebElement;
-import org.springframework.http.HttpStatus;
-import org.testng.annotations.Test;
-
-import com.gooddata.md.Attribute;
-import com.gooddata.md.Metric;
-import com.gooddata.md.report.AttributeInGrid;
-import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
-import com.gooddata.md.report.Report;
-import com.gooddata.md.report.ReportDefinition;
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.entity.filter.FilterItem;
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
-import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
-import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardContent;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
-import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
-import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
-import com.google.common.base.Function;
 
 public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstractTest {
 
@@ -276,7 +275,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
 
             assertHeadersEqual(getAttributeValuesInFirstRow(REPORT_1), asList("Short List"),
                     "Report1 doesnt apply StageName filter correctly!");
-            assertTrue(dashboardContent.getReport(REPORT_2, TableReport.class).isNoData(),
+            assertTrue(dashboardContent.getReport(REPORT_2, TableReport.class).hasNoData(),
                     "Report2 still has data");
         } finally {
             dashboardsPage.deleteDashboard();
@@ -374,7 +373,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
 
     private Collection<String> getAttributeValuesInFirstRow(String reportName) {
         List<List<String>> attributesByRow =
-                dashboardsPage.getContent().getReport(reportName, TableReport.class).getAttributeElementsByRow();
+                dashboardsPage.getContent().getReport(reportName, TableReport.class).getDataContent();
         return newHashSet(transform(attributesByRow, new Function<List<String>, String>() {
             @Override
             public String apply(List<String> input) {

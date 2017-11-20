@@ -1,20 +1,19 @@
 package com.gooddata.qa.graphene.reports;
 
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_MONTH_YEAR_SNAPSHOT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPPORTUNITY;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PROBABILITY;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_QUARTER_YEAR_SNAPSHOT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static java.util.Arrays.asList;
-import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.entity.filter.FilterItem;
+import com.gooddata.qa.graphene.entity.report.HowItem;
+import com.gooddata.qa.graphene.entity.report.HowItem.Position;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
+import com.gooddata.qa.graphene.fragments.reports.filter.ContextMenu.AggregationType;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
+import org.openqa.selenium.By;
+import org.supercsv.io.CsvListReader;
+import org.supercsv.prefs.CsvPreference;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,20 +24,21 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.openqa.selenium.By;
-import org.supercsv.io.CsvListReader;
-import org.supercsv.prefs.CsvPreference;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.entity.filter.FilterItem;
-import com.gooddata.qa.graphene.entity.report.HowItem;
-import com.gooddata.qa.graphene.entity.report.HowItem.Position;
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.enums.report.ExportFormat;
-import com.gooddata.qa.graphene.fragments.reports.filter.ContextMenu.AggregationType;
-import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_MONTH_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPPORTUNITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_QUARTER_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PROBABILITY;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.util.Arrays.asList;
+import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
 
@@ -106,13 +106,13 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
             final List<Float> totalValuesOfAllRows, final List<Float> totalValuesOfEachStage) {
         final TableReport table = initReportsPage().openReport(SIMPLE_REPORT).getTableReport();
 
-        table.openContextMenuFromCellValue(YEAR_2011).aggregateTableData(type, OF_ALL_ROWS);
+        table.openContextMenuFrom(YEAR_2011, CellType.ATTRIBUTE_VALUE).aggregateTableData(type, OF_ALL_ROWS);
         checkNumberOfTotalHeaders(type, 1);
 
         //use List.equal() due to checking value order
         assertTrue(table.getTotalValues().equals(totalValuesOfAllRows), type.getType() + " values are not correct");
 
-        table.openContextMenuFromCellValue(YEAR_2011).aggregateTableData(type, BY_STAGE_NAME);
+        table.openContextMenuFrom(YEAR_2011, CellType.ATTRIBUTE_VALUE).aggregateTableData(type, BY_STAGE_NAME);
 
         takeScreenshot(browser, "Row-" + type.getType() + "-total-values", getClass());
         checkNumberOfTotalHeaders(type, 4);
@@ -123,14 +123,14 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
                                 .collect(Collectors.toList())),
                 type.getType() + " values are not correct");
 
-        table.openContextMenuFromCellValue(YEAR_2011).nonAggregateTableData(type, OF_ALL_ROWS);
+        table.openContextMenuFrom(YEAR_2011, CellType.ATTRIBUTE_VALUE).nonAggregateTableData(type, OF_ALL_ROWS);
         checkNumberOfTotalHeaders(type, 3);
 
         //use List.equals() to check total value order
         assertTrue(table.getTotalValues().equals(totalValuesOfEachStage),
                 type.getType() + " header & values of all rows have not been removed");
 
-        table.openContextMenuFromCellValue(YEAR_2011).nonAggregateTableData(type, BY_STAGE_NAME);
+        table.openContextMenuFrom(YEAR_2011, CellType.ATTRIBUTE_VALUE).nonAggregateTableData(type, BY_STAGE_NAME);
         assertTrue(table.getTotalHeaders().isEmpty() && table.getTotalValues().isEmpty(),
                 type.getType() + " headers & values have not been removed");
     }
@@ -167,13 +167,13 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
         //because we only show data for 1 quarter
         final List<Float> totalValuesOfEachYear = totalValuesOfAllColumns;
 
-        table.openContextMenuFromCellValue(SHORT_LIST).aggregateTableData(type, OF_ALL_COLUMNS);
+        table.openContextMenuFrom(SHORT_LIST, CellType.ATTRIBUTE_VALUE).aggregateTableData(type, OF_ALL_COLUMNS);
         checkNumberOfTotalHeaders(type, 1);
 
         //use List.equal() due to checking value order
         assertTrue(table.getTotalValues().equals(totalValuesOfAllColumns), type.getType() + " values are not correct");
 
-        table.openContextMenuFromCellValue(SHORT_LIST).aggregateTableData(type, BY_YEAR_SNAPSHOT);
+        table.openContextMenuFrom(SHORT_LIST, CellType.ATTRIBUTE_VALUE).aggregateTableData(type, BY_YEAR_SNAPSHOT);
 
         takeScreenshot(browser, "Column-" + type.getType() + "-total-values", getClass());
         checkNumberOfTotalHeaders(type, 2);
@@ -184,14 +184,14 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
                             .collect(Collectors.toList())),
                 type.getType() + " values are not correct");
 
-        table.openContextMenuFromCellValue(SHORT_LIST).nonAggregateTableData(type, OF_ALL_COLUMNS);
+        table.openContextMenuFrom(SHORT_LIST, CellType.ATTRIBUTE_VALUE).nonAggregateTableData(type, OF_ALL_COLUMNS);
         checkNumberOfTotalHeaders(type, 1);
 
         //use List.equals() to check total value order
         assertTrue(table.getTotalValues().equals(totalValuesOfEachYear),
                 type.getType() + " headers & values of all columns have not been removed");
 
-        table.openContextMenuFromCellValue(SHORT_LIST).nonAggregateTableData(type, BY_YEAR_SNAPSHOT);
+        table.openContextMenuFrom(SHORT_LIST, CellType.ATTRIBUTE_VALUE).nonAggregateTableData(type, BY_YEAR_SNAPSHOT);
         assertTrue(table.getTotalHeaders().isEmpty() && table.getTotalValues().isEmpty(),
                 type.getType() + " headers & values have not been removed");
     }
@@ -218,29 +218,31 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
 
         final TableReport table = initReportsPage().openReport(SIMPLE_REPORT).getTableReport();
 
-        table.openContextMenuFromCellValue(METRIC_AMOUNT).aggregateTableData(AggregationType.SUM, OF_ALL_ROWS);
+        table.openContextMenuFrom(METRIC_AMOUNT, CellType.METRIC_HEADER)
+                .aggregateTableData(AggregationType.SUM, OF_ALL_ROWS);
         //use List.equal() due to checking value order
         assertTrue(table.getTotalValues().equals(asList(66519.20f, 0.0f, 117164.00f, 0.0f)), "The total values are not correct");
 
-        table.openContextMenuFromCellValue(METRIC_PROBABILITY).aggregateTableData(type, OF_ALL_ROWS);
+        table.openContextMenuFrom(METRIC_PROBABILITY, CellType.METRIC_HEADER).aggregateTableData(type, OF_ALL_ROWS);
         takeScreenshot(browser, type.getType() + "-values-for-other-metric", getClass());
         //use List.equal() due to checking value order
         assertTrue(table.getTotalValues().equals(otherMetricTotalValues), type.getType() + " values are not correct");
 
-        table.openContextMenuFromCellValue(METRIC_PROBABILITY).nonAggregateTableData(type, OF_ALL_ROWS);
+        table.openContextMenuFrom(METRIC_PROBABILITY, CellType.METRIC_HEADER).nonAggregateTableData(type, OF_ALL_ROWS);
         assertTrue(isEqualCollection(table.getTotalValues(), asList(66519.20f, 0.0f, 117164.00f, 0.0f)),
                 type.getType() + " values have not been removed");
 
-        table.openContextMenuFromCellValue(METRIC_AMOUNT).nonAggregateTableData(AggregationType.SUM, OF_ALL_ROWS);
+        table.openContextMenuFrom(METRIC_AMOUNT, CellType.METRIC_HEADER)
+                .nonAggregateTableData(AggregationType.SUM, OF_ALL_ROWS);
         assertTrue(table.getTotalHeaders().isEmpty() && table.getTotalValues().isEmpty(),
                 "Total headers & values have not been removed");
 
-        table.openContextMenuFromCellValue(METRIC_AMOUNT).aggregateTableData(type, OF_ALL_ROWS);
+        table.openContextMenuFrom(METRIC_AMOUNT, CellType.METRIC_HEADER).aggregateTableData(type, OF_ALL_ROWS);
         takeScreenshot(browser, type.getType() + "-values-for-single-metric", getClass());
         //use List.equal() due to checking value order
         assertTrue(table.getTotalValues().equals(totalValues), type.getType() + " values are not correct");
 
-        table.openContextMenuFromCellValue(METRIC_AMOUNT).nonAggregateTableData(type, OF_ALL_ROWS);
+        table.openContextMenuFrom(METRIC_AMOUNT, CellType.METRIC_HEADER).nonAggregateTableData(type, OF_ALL_ROWS);
         assertTrue(table.getTotalHeaders().isEmpty() && table.getTotalValues().isEmpty(),
                 "Total headers & values have not been removed");
     }
@@ -249,17 +251,19 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
     public void removeTotalsFromMetric() {
         final TableReport table = initReportsPage().openReport(SIMPLE_REPORT).getTableReport();
 
-        table.openContextMenuFromCellValue(YEAR_2011).aggregateTableData(AggregationType.SUM, OF_ALL_ROWS);
+        table.openContextMenuFrom(YEAR_2011, CellType.ATTRIBUTE_VALUE)
+                .aggregateTableData(AggregationType.SUM, OF_ALL_ROWS);
 
-        table.openContextMenuFromCellValue(YEAR_2011).aggregateTableData(AggregationType.SUM, BY_STAGE_NAME);
+        table.openContextMenuFrom(YEAR_2011, CellType.ATTRIBUTE_VALUE)
+                .aggregateTableData(AggregationType.SUM, BY_STAGE_NAME);
         checkNumberOfTotalHeaders(AggregationType.SUM, 4);
         
-        table.openContextMenuFromCellValue("90.0%").selectItem("Remove from Probability");
+        table.openContextMenuFrom("90.0%", CellType.TOTAL_VALUE).selectItem("Remove from Probability");
         assertTrue(table.getTotalValues().equals(asList(5998.00f, 40000.00f, 20521.20f, 30.0f,
                 60.0f, 0.0f, 5998.00f, 40000.00f, 71166.00f, 30.0f, 60.0f, 0.0f, 66519.20f, 0.0f, 117164.00f, 0.0f)),
                 "Totals of probability have not been removed");
 
-        table.openContextMenuFromCellValue(table.getTotalHeaders().get(0))
+        table.openContextMenuFrom(table.getTotalHeaders().get(0), CellType.TOTAL_HEADER)
                 .selectItem("Remove from all metrics");
 
         assertTrue(table.getTotalValues().equals(asList(66519.20f, 0.0f, 117164.00f, 0.0f)),
@@ -268,7 +272,8 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void cancelAddingTotals() {
-        initReportsPage().openReport(SIMPLE_REPORT).getTableReport().openContextMenuFromCellValue(YEAR_2011);
+        initReportsPage().openReport(SIMPLE_REPORT).getTableReport()
+                .openContextMenuFrom(YEAR_2011, CellType.ATTRIBUTE_VALUE);
 
         final By contextMenuLocator = By.id("ctxMenu");
         assertTrue(isElementVisible(contextMenuLocator, browser), "The context menu is not displayed");
@@ -306,9 +311,9 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
     public void addTotalsOfTotals(final AggregationType type, final List<Float> totalValues) {
         final TableReport table = initReportsPage().openReport(SIMPLE_REPORT).getTableReport();
 
-        table.openContextMenuFromCellValue(Q1_2011).aggregateTableData(type, OF_ALL_ROWS);
+        table.openContextMenuFrom(Q1_2011, CellType.ATTRIBUTE_VALUE).aggregateTableData(type, OF_ALL_ROWS);
 
-        table.openContextMenuFromCellValue(SHORT_LIST)
+        table.openContextMenuFrom(SHORT_LIST, CellType.ATTRIBUTE_VALUE)
                 .aggregateTableData(type, OF_ALL_COLUMNS);
 
         assertTrue(table.getTotalValues().equals(totalValues), type.getType() + " values are not correct");
@@ -332,13 +337,16 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createReportForAddingMultipleTotals"})
     public void addMultipleRollupTotals() {
         final TableReport table = initReportsPage().openReport(MULTIPLE_TOTALS_REPORT).getTableReport();
-        table.openContextMenuFromCellValue(MAY_2011).aggregateTableData(AggregationType.ROLLUP, BY_OPPORTUNITY);
+        table.openContextMenuFrom(MAY_2011, CellType.ATTRIBUTE_VALUE)
+                .aggregateTableData(AggregationType.ROLLUP, BY_OPPORTUNITY);
         checkNumberOfTotalHeaders(AggregationType.ROLLUP, 3);
 
-        table.openContextMenuFromCellValue(YEAR_2011).aggregateTableData(AggregationType.ROLLUP, BY_STAGE_NAME);
+        table.openContextMenuFrom(YEAR_2011, CellType.ATTRIBUTE_VALUE)
+                .aggregateTableData(AggregationType.ROLLUP, BY_STAGE_NAME);
         checkNumberOfTotalHeaders(AggregationType.ROLLUP, 4);
 
-        table.openContextMenuFromCellValue(Q1_2011).aggregateTableData(AggregationType.ROLLUP, OF_ALL_ROWS);
+        table.openContextMenuFrom(Q1_2011, CellType.ATTRIBUTE_VALUE)
+                .aggregateTableData(AggregationType.ROLLUP, OF_ALL_ROWS);
         checkNumberOfTotalHeaders(AggregationType.ROLLUP, 5);
         assertTrue(
                 table.getTotalValues()
@@ -356,11 +364,14 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
                 .addFilter(FilterItem.Factory.createAttributeFilter(ATTR_QUARTER_YEAR_SNAPSHOT, Q1_2011));
         reportPage.waitForReportExecutionProgress();
 
-        table.openContextMenuFromCellValue(CLOSED_LOST).aggregateTableData(AggregationType.ROLLUP, OF_ALL_COLUMNS);
+        table.openContextMenuFrom(CLOSED_LOST, CellType.ATTRIBUTE_VALUE)
+                .aggregateTableData(AggregationType.ROLLUP, OF_ALL_COLUMNS);
 
-        table.openContextMenuFromCellValue(CLOSED_LOST).aggregateTableData(AggregationType.ROLLUP, BY_YEAR_SNAPSHOT);
+        table.openContextMenuFrom(CLOSED_LOST, CellType.ATTRIBUTE_VALUE)
+                .aggregateTableData(AggregationType.ROLLUP, BY_YEAR_SNAPSHOT);
 
-        table.openContextMenuFromCellValue(CLOSED_LOST).aggregateTableData(AggregationType.ROLLUP, BY_QUARTER_YEAR_SNAPSHOT);
+        table.openContextMenuFrom(CLOSED_LOST, CellType.ATTRIBUTE_VALUE)
+                .aggregateTableData(AggregationType.ROLLUP, BY_QUARTER_YEAR_SNAPSHOT);
 
         checkNumberOfTotalHeaders(AggregationType.ROLLUP, 8);
         assertTrue(
@@ -376,11 +387,14 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createReportForAddingMultipleTotals"})
     public void addMultipleMedianTotals() throws FileNotFoundException, IOException {
         final TableReport table = initReportsPage().openReport(MULTIPLE_TOTALS_REPORT).getTableReport();
-        table.openContextMenuFromCellValue(MAY_2011).aggregateTableData(AggregationType.MEDIAN, BY_OPPORTUNITY);
+        table.openContextMenuFrom(MAY_2011, CellType.ATTRIBUTE_VALUE)
+                .aggregateTableData(AggregationType.MEDIAN, BY_OPPORTUNITY);
 
-        table.openContextMenuFromCellValue(YEAR_2011).aggregateTableData(AggregationType.MEDIAN, BY_STAGE_NAME);
+        table.openContextMenuFrom(YEAR_2011, CellType.ATTRIBUTE_VALUE)
+                .aggregateTableData(AggregationType.MEDIAN, BY_STAGE_NAME);
 
-        table.openContextMenuFromCellValue(Q1_2011).aggregateTableData(AggregationType.MEDIAN, OF_ALL_ROWS);
+        table.openContextMenuFrom(Q1_2011, CellType.ATTRIBUTE_VALUE)
+                .aggregateTableData(AggregationType.MEDIAN, OF_ALL_ROWS);
 
         checkNumberOfTotalHeaders(AggregationType.MEDIAN, 5);
 

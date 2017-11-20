@@ -1,18 +1,5 @@
 package com.gooddata.qa.graphene.manage;
 
-import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
-import static java.lang.String.format;
-
-import org.jboss.arquillian.graphene.Graphene;
-import org.json.JSONException;
-import org.openqa.selenium.By;
-import org.openqa.selenium.support.FindBy;
-import org.testng.annotations.Test;
-
 import com.gooddata.md.Fact;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
@@ -20,6 +7,20 @@ import com.gooddata.qa.graphene.enums.AttributeLabelTypes;
 import com.gooddata.qa.graphene.fragments.greypages.sfdc.ConfigureSFDCCredentials;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportWithImage;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
+import org.jboss.arquillian.graphene.Graphene;
+import org.json.JSONException;
+import org.openqa.selenium.By;
+import org.openqa.selenium.support.FindBy;
+import org.testng.annotations.Test;
+
+import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
+import static java.lang.String.format;
+import static org.testng.Assert.assertTrue;
 
 public class AttributeLabelsTest extends AbstractProjectTest {
 
@@ -123,10 +124,8 @@ public class AttributeLabelsTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"createReportWithHyperlinkTest"})
     public void verifyReportWithHyperlinkTest() {
-        initReportsPage().openReport(HYPERLINK_REPORT);
-        TableReport report = Graphene.createPageFragment(TableReport.class,
-                browser.findElement(By.id("gridContainerTab")));
-        report.verifyAttributeIsHyperlinkInReport();
+        TableReport report = initReportsPage().openReport(HYPERLINK_REPORT).getTableReport();
+        assertTrue(report.isDrillableToExternalPage(CellType.ATTRIBUTE_VALUE), "cannot drill report to external page");
     }
 
     private void changeAttributeLabel(String attribute, AttributeLabelTypes label) {

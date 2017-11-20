@@ -1,5 +1,34 @@
 package com.gooddata.qa.graphene.reports;
 
+import com.gooddata.md.Attribute;
+import com.gooddata.md.Fact;
+import com.gooddata.md.Metric;
+import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.GridReportDefinitionContent;
+import com.gooddata.md.report.MetricElement;
+import com.gooddata.md.report.Report;
+import com.gooddata.md.report.ReportDefinition;
+import com.gooddata.qa.browser.BrowserUtils;
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.entity.filter.FilterItem;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.entity.report.WhatItem;
+import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
+import com.gooddata.qa.graphene.enums.report.ReportTypes;
+import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
+import com.gooddata.qa.graphene.utils.WaitUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.google.common.base.Predicate;
+import org.apache.http.ParseException;
+import org.jboss.arquillian.graphene.Graphene;
+import org.json.JSONException;
+import org.openqa.selenium.WebDriver;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
@@ -20,35 +49,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
-
-import java.io.IOException;
-
-import org.apache.http.ParseException;
-import org.jboss.arquillian.graphene.Graphene;
-import org.json.JSONException;
-import org.openqa.selenium.WebDriver;
-import org.testng.annotations.Test;
-
-import com.gooddata.md.Attribute;
-import com.gooddata.md.Fact;
-import com.gooddata.md.Metric;
-import com.gooddata.md.report.AttributeInGrid;
-import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
-import com.gooddata.md.report.Report;
-import com.gooddata.md.report.ReportDefinition;
-import com.gooddata.qa.browser.BrowserUtils;
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.entity.filter.FilterItem;
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.entity.report.WhatItem;
-import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
-import com.gooddata.qa.graphene.enums.report.ReportTypes;
-import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
-import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
-import com.gooddata.qa.graphene.utils.WaitUtils;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
-import com.google.common.base.Predicate;
 
 public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
     
@@ -101,17 +101,17 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"})
     public void breakDownMetricValue() {
         initReportsPage().openReport(SIMPLE_REPORT).getTableReport()
-                .openContextMenuFromCellValue("770,636,605.83")
+                .openContextMenuFrom("770,636,605.83", CellType.METRIC_VALUE)
                 .selectItem("Break Down This Number");
 
         reportPage.selectAttribute("Year (Snapshot)").doneSndPanel().waitForReportExecutionProgress();
 
         takeScreenshot(browser, "break-down-metric-value", getClass());
-        assertTrue(isEqualCollection(reportPage.getTableReport().getAttributeElements(),
+        assertTrue(isEqualCollection(reportPage.getTableReport().getAttributeValues(),
                 asList("2010", "2011", "2012", INTEREST)), "The expected attribute elements are not displayed");
 
         //use List.equals() to test that metric elements are computed correctly and have correct order
-        assertTrue(reportPage.getTableReport().getMetricElements()
+        assertTrue(reportPage.getTableReport().getMetricValues()
                 .equals(asList(8094721.67f, 43.30f, 366082936.76f, 459.60f, 396458947.40f, 483.90f)),
                 "The expected metric elements are not displayed");
     }
@@ -120,13 +120,13 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
     public void drillOnGridMenu() {
         initReportsPage().openReport(SIMPLE_REPORT)
                 .getTableReport()
-                .openContextMenuFromCellValue(INTEREST)
+                .openContextMenuFrom(INTEREST, CellType.ATTRIBUTE_VALUE)
                 .selectItem("Break Down \"" + INTEREST + "\"");
 
         reportPage.selectAttribute(ATTR_STATUS).doneSndPanel();
 
         takeScreenshot(browser, "drill-on-grid-menu", getClass());
-        assertTrue(reportPage.getTableReport().getAttributesHeader().contains(ATTR_STATUS),
+        assertTrue(reportPage.getTableReport().getAttributeHeaders().contains(ATTR_STATUS),
                 "Status attribute has not been added");
         assertTrue(reportPage.openFilterPanel().getFilterElement(ATTR_STAGE_NAME + " is " + INTEREST).isDisplayed(),
                 "The filter has not been added");
@@ -134,29 +134,30 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void filterOnGridMenu() {
-        assertTrue(
-                initReportsPage().openReport(SIMPLE_REPORT).getTableReport()
-                        .showOnly(INTEREST)
-                        .getAttributeElements().equals(singletonList(INTEREST)),
+        TableReport report = initReportsPage().openReport(SIMPLE_REPORT).getTableReport();
+
+        report.openContextMenuFrom(INTEREST, CellType.ATTRIBUTE_VALUE)
+                .selectItem(format("Show only \"%s\"", INTEREST));
+        assertTrue(report.getAttributeValues().equals(singletonList(INTEREST)),
                 INTEREST + "is not the only attribute or not displayed");
 
         takeScreenshot(browser, "filter-on-grid-menu", getClass());
         //use List.equals() to test that metric elements are computed correctly and have correct order
-        assertTrue(reportPage.getTableReport().getMetricElements().equals(asList(770636605.83f, 986.80f)),
+        assertTrue(report.getMetricValues().equals(asList(770636605.83f, 986.80f)),
                 "The metrics elements are not as expected");
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void addAttributeUsingGridMenu() {
         initReportsPage().openReport(SIMPLE_REPORT).getTableReport()
-                .openContextMenuFromCellValue(INTEREST)
+                .openContextMenuFrom(INTEREST, CellType.ATTRIBUTE_VALUE)
                 .selectItem(ADD_NEW_ATTRIBUTE);
 
         takeScreenshot(browser, "adding-attribute", getClass());
         reportPage.selectFolderLocation(STAGE).selectAttribute(ATTR_STATUS).doneSndPanel().waitForReportExecutionProgress();
-        assertTrue(reportPage.getTableReport().getAttributesHeader().contains(ATTR_STATUS),
+        assertTrue(reportPage.getTableReport().getAttributeHeaders().contains(ATTR_STATUS),
                 "Status attribute has not been added");
-        
+
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -167,7 +168,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
 
         assertFalse(
                 initReportsPage().openReport(REPORT_WITHOUT_METRIC).getTableReport()
-                        .openContextMenuFromCellValue(ATTR_STAGE_NAME)
+                        .openContextMenuFrom(ATTR_STAGE_NAME, CellType.ATTRIBUTE_HEADER)
                         .getGroupNames().contains("Totals"),
                 "Totals group is displayed");
     }
@@ -190,11 +191,11 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
 
         final TableReport table = reportPage.waitForReportExecutionProgress().getTableReport();
 
-        table.verifyAttributeIsHyperlinkInReport();
+        assertTrue(table.isDrillableToExternalPage(CellType.ATTRIBUTE_VALUE), "cannot drill report to external page");
 
         final String currentWindow = browser.getWindowHandle();
 
-        table.drillOnMetricValue();
+        table.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
         checkExternalPageUrl(currentWindow);
 
         reportPage.openHowPanel()
@@ -203,20 +204,20 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
                 .doneSndPanel()
                 .waitForReportExecutionProgress();
 
-        assertTrue(isEqualCollection(table.getAttributeElements(), asList(DISPLAY_LABEL, DISPLAY_LABEL, DISPLAY_LABEL)),
+        assertTrue(isEqualCollection(table.getAttributeValues(), asList(DISPLAY_LABEL, DISPLAY_LABEL, DISPLAY_LABEL)),
                 "The label has not been applied");
 
-        table.drillOnMetricValue();
+        table.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
         checkExternalPageUrl(currentWindow);
         reportPage.saveReport();
 
         initAttributePage().initAttribute(ATTR_OPPORTUNITY).clearDrillingSetting().setDrillToAttribute(ATTR_ACCOUNT);
 
         initReportsPage().openReport(hyperlinkReport);
-        table.drillOnAttributeValue();
+        table.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
         reportPage.waitForReportExecutionProgress();
 
-        assertTrue(table.getAttributesHeader().contains(ATTR_ACCOUNT), "The expected attribute is not displayed");
+        assertTrue(table.getAttributeHeaders().contains(ATTR_ACCOUNT), "The expected attribute is not displayed");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -240,7 +241,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
                 isEqualCollection(
                         reportPage.waitForReportExecutionProgress()
                                 .getTableReport()
-                                .getAttributesHeader(),
+                                .getAttributeHeaders(),
                         singletonList(ATTR_REGION)),
                 "The expected attribute is not displayed");
         browser.navigate().back();

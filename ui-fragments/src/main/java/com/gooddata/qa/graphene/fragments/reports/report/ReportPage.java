@@ -732,14 +732,14 @@ public class ReportPage extends AbstractFragment {
     }
 
     public boolean isRangeFilterApplied(RangeFilterItem filterItem) {
-        return getTableReport().getMetricElements()
+        return getTableReport().getMetricValues()
                     .stream()
                     .allMatch(metricValue -> isMetricValueInRange(metricValue, filterItem));
     }
 
     public boolean isRankingFilterApplied(List<Float> expectedMetricList) {
         List<Float> listOfMetrics = getTableReport()
-                .getMetricElements()
+                .getMetricValues()
                 .stream()
                 .filter(metricValue -> !metricValue.equals(0f))
                 .sorted()
@@ -750,7 +750,7 @@ public class ReportPage extends AbstractFragment {
     }
 
     public boolean isReportContains(List<String> expectedAttributeList) {
-        final List<String> attributeValuesList = getTableReport().getAttributeElements();
+        final List<String> attributeValuesList = getTableReport().getAttributeValues();
 
         return expectedAttributeList.stream()
                 .allMatch(attributeValue -> attributeValuesList.contains(attributeValue));

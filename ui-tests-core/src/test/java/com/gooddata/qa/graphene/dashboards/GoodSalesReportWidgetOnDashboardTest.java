@@ -1,5 +1,29 @@
 package com.gooddata.qa.graphene.dashboards;
 
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.entity.variable.NumericVariable;
+import com.gooddata.qa.graphene.enums.report.ReportTypes;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.StyleConfigPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel.Tab;
+import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport.Sort;
+import com.gooddata.qa.utils.http.RestApiClient;
+import org.apache.http.ParseException;
+import org.json.JSONException;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOP_5_OPEN_BY_CASH;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
@@ -14,30 +38,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-
-import java.io.IOException;
-
-import org.apache.http.ParseException;
-import org.json.JSONException;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
-import org.testng.annotations.Test;
-
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.entity.variable.NumericVariable;
-import com.gooddata.qa.graphene.enums.report.ReportTypes;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.StyleConfigPanel;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel.Tab;
-import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
-import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
-import com.gooddata.qa.graphene.fragments.reports.report.TableReport.Sort;
-import com.gooddata.qa.utils.http.RestApiClient;
 
 public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest {
 
@@ -158,14 +158,14 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
             takeScreenshot(browser, "sortTableReport - before sorting", getClass());
 
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            assertEquals(report.getRawMetricElements(), asList("101,054", "53,217"));
+            assertEquals(report.getRawMetricValues(), asList("101,054", "53,217"));
 
-            report.sortByHeader("# of Activities", Sort.ASC);
+            report.sortBy("# of Activities", CellType.METRIC_HEADER, Sort.ASC);
             takeScreenshot(browser, "sortTableReport - after sorting", getClass());
-            assertEquals(report.getRawMetricElements(), asList("53,217", "101,054"));
+            assertEquals(report.getRawMetricValues(), asList("53,217", "101,054"));
 
             refreshDashboardsPage();
-            assertEquals(report.getRawMetricElements(), asList("101,054", "53,217"));
+            assertEquals(report.getRawMetricValues(), asList("101,054", "53,217"));
         } finally {
             dashboardsPage.deleteDashboard();
         }

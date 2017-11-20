@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.reports.report;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import java.util.List;
@@ -20,11 +21,9 @@ public class AbstractDashboardReport extends AbstractReport {
     @FindBy(css = "button.s-btn-show_anyway")
     protected WebElement showAnywayBtn;
 
-    public static final By DRILL_REPORT_LOCATOR = By.cssSelector(".c-drillDialog-report");
-
     private static final String CELL_LIMIT = "Report too large to display.";
-    
     private static final String SHOW_ANYWAY = "Show anyway";
+    private static final By REPORT_TITLE = By.cssSelector(".yui3-c-reportdashboardwidget-reportTitle > a");
 
     public void addDrilling(Pair<List<String>, String> pairs, String group) {
         WidgetConfigPanel configPanel = WidgetConfigPanel.openConfigurationPanelFor(getRoot(), browser);
@@ -73,5 +72,19 @@ public class AbstractDashboardReport extends AbstractReport {
 
     public void showAnyway() {
         waitForElementVisible(showAnywayBtn).click();
+    }
+
+    public boolean isReportTitleVisible() {
+        final By reportLabelLocator = By.cssSelector(".yui3-c-reportdashboardwidget-reportTitle > a");
+
+        if (!isElementPresent(reportLabelLocator, getRoot())) {
+            return false;
+        }
+
+        return !getRoot().findElement(reportLabelLocator).getCssValue("display").startsWith("none");
+    }
+
+    public String getReportTiTle() {
+        return waitForElementVisible(getRoot().findElement(REPORT_TITLE)).getText();
     }
 }

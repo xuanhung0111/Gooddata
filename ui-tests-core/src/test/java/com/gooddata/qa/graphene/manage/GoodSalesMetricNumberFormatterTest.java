@@ -1,17 +1,5 @@
 package com.gooddata.qa.graphene.manage;
 
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-
-import java.util.List;
-
-import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.testng.annotations.Test;
-
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
@@ -20,6 +8,17 @@ import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.testng.annotations.Test;
+
+import java.util.List;
+
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
 
@@ -60,7 +59,7 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
             List<String> values = reportPage.doneSndPanel()
                 .selectReportVisualisation(ReportTypes.TABLE)
                 .getTableReport()
-                .getRawMetricElements();
+                .getRawMetricValues();
             assertEquals(values.size(), 1);
             assertTrue(Formatter.BARS.toString().contains(values.get(0)));
 
@@ -84,23 +83,23 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
                     .selectReportVisualisation(ReportTypes.TABLE)
                     .getTableReport();
 
-            List<String> values = report.getRawMetricElements();
+            List<String> values = report.getRawMetricValues();
             assertEquals(values.size(), 1);
             assertEquals(values.get(0), "154,271.00");
 
             reportPage.showConfiguration()
                 .showCustomNumberFormat()
                 .changeNumberFormatButDiscard(Formatter.BARS);
-            report.waitForReportLoading();
-            values = report.getRawMetricElements();
+            report.waitForLoaded();
+            values = report.getRawMetricValues();
             assertEquals(values.size(), 1);
             assertEquals(values.get(0), "154,271.00");
 
             Screenshots.takeScreenshot(browser, "editFormatInReportPage-beforeChangeFormat", getClass());
             reportPage.changeNumberFormat(Formatter.BARS);
-            report.waitForReportLoading();
+            report.waitForLoaded();
             Screenshots.takeScreenshot(browser, "editFormatInReportPage-afterChangeFormat", getClass());
-            values = report.getRawMetricElements();
+            values = report.getRawMetricValues();
             assertEquals(values.size(), 1);
             assertTrue(Formatter.BARS.toString().contains(values.get(0)));
         } finally {

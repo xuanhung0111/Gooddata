@@ -1,29 +1,5 @@
 package com.gooddata.qa.graphene.reports;
 
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PROBABILITY;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_QUARTER_YEAR_SNAPSHOT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_ACTIVE;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
-import java.util.List;
-
-import org.jboss.arquillian.graphene.Graphene;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
 import com.gooddata.md.Metric;
 import com.gooddata.md.report.AttributeInGrid;
 import com.gooddata.md.report.GridReportDefinitionContent;
@@ -40,7 +16,31 @@ import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 import com.gooddata.qa.graphene.fragments.reports.filter.ContextMenu.AggregationType;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.Sort;
+import org.jboss.arquillian.graphene.Graphene;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+import java.util.List;
+
+import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_ACTIVE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_QUARTER_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PROBABILITY;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
 
@@ -90,30 +90,33 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
             final String runningTotalHeader, final List<Float> runningTotalValues) {
 
         final TableReport table = initReportsPage().openReport(RUNNING_TOTAL).getTableReport();
-        table.openContextMenuFromCellValue(YEAR_2011)
+        table.openContextMenuFrom(YEAR_2011, CellType.ATTRIBUTE_VALUE)
                 .aggregateTableData(AggregationType.RUNNING, type);
-        assertTrue(table.getMetricsHeader().contains(runningTotalHeader), type + " headers have not been added");
-        assertTrue(table.getMetricElements().equals(runningTotalValues), type + " values are not correct");
+        assertTrue(table.getMetricHeaders().contains(runningTotalHeader), type + " headers have not been added");
+        assertTrue(table.getMetricValues().equals(runningTotalValues), type + " values are not correct");
 
         final List<Float> metricValues = asList(10.0f, 20.0f, 30.0f, 16427388.57f, 3436167.70f, 3903521.33f);
-        table.openContextMenuFromCellValue(YEAR_2011).nonAggregateTableData(AggregationType.RUNNING, type);
-        assertFalse(table.getMetricsHeader().contains(runningTotalHeader), type + " headers has not been removed");
-        assertEquals(table.getMetricElements(), metricValues, type + " values has not been removed");
+        table.openContextMenuFrom(YEAR_2011, CellType.ATTRIBUTE_VALUE)
+                .nonAggregateTableData(AggregationType.RUNNING, type);
+        assertFalse(table.getMetricHeaders().contains(runningTotalHeader), type + " headers has not been removed");
+        assertEquals(table.getMetricValues(), metricValues, type + " values has not been removed");
 
-        table.openContextMenuFromCellValue(INTEREST).aggregateTableData(AggregationType.RUNNING, type);
-        assertTrue(table.getMetricsHeader().contains(runningTotalHeader), type + " headers have not been added");
-        assertEquals(table.getMetricElements(), runningTotalValues, type + " values are not correct");
+        table.openContextMenuFrom(INTEREST, CellType.ATTRIBUTE_VALUE)
+                .aggregateTableData(AggregationType.RUNNING, type);
+        assertTrue(table.getMetricHeaders().contains(runningTotalHeader), type + " headers have not been added");
+        assertEquals(table.getMetricValues(), runningTotalValues, type + " values are not correct");
 
-        table.openContextMenuFromCellValue(INTEREST).nonAggregateTableData(AggregationType.RUNNING, type);
-        assertFalse(table.getMetricsHeader().contains(runningTotalHeader), type + " headers has not been removed");
-        assertEquals(table.getMetricElements(), metricValues, type + " values has not been removed");
+        table.openContextMenuFrom(INTEREST, CellType.ATTRIBUTE_VALUE)
+                .nonAggregateTableData(AggregationType.RUNNING, type);
+        assertFalse(table.getMetricHeaders().contains(runningTotalHeader), type + " headers has not been removed");
+        assertEquals(table.getMetricValues(), metricValues, type + " values has not been removed");
     }
 
     @Test(dependsOnGroups = "createProject")
     public void customizeMetricAndAttributeInRunningSumReport() {
         final TableReport table = initReportsPage().openReport(RUNNING_TOTAL).getTableReport();
 
-        table.openContextMenuFromCellValue(YEAR_2011)
+        table.openContextMenuFrom(YEAR_2011, CellType.ATTRIBUTE_VALUE)
                 .aggregateTableData(AggregationType.RUNNING, RUNNING_SUM);
 
         reportPage.waitForReportExecutionProgress()
@@ -123,10 +126,10 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
                 .doneSndPanel()
                 .waitForReportExecutionProgress();
 
-        assertTrue(table.getMetricsHeader().stream().filter(e -> e.equals(RUNNING_SUM)).count() == 1,
+        assertTrue(table.getMetricHeaders().stream().filter(e -> e.equals(RUNNING_SUM)).count() == 1,
                 "Running sum header is calculated for new metric");
         assertEquals(
-                table.getMetricElements(), asList(16427388.57f, 3436167.70f, 3903521.33f, 16427388.57f, 19863556.27f,
+                table.getMetricValues(), asList(16427388.57f, 3436167.70f, 3903521.33f, 16427388.57f, 19863556.27f,
                         23767077.60f, 130376.10f, 25265.94f, 29797.87f),
                 "Running sum values are calculated for new metric");
 
@@ -137,7 +140,7 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
 
         //use List.equal() to check value's order
         assertTrue(
-                table.getMetricElements()
+                table.getMetricValues()
                         .equals(asList(1719072.21f, 1456305.27f, 1772094.56f, 1719072.21f, 3175377.48f, 4947472.04f,
                                 34381.44f, 21105.87f, 24959.08f, 1663660.67f, 2350525.55f, 3121266.12f, 1663660.67f,
                                 4014186.22f, 7135452.34f, 25206.98f, 27653.24f, 32855.43f)),
@@ -162,7 +165,8 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
         final TableReport table = initReportsPage().openReport(reportName).getTableReport();
-        table.openContextMenuFromCellValue(metricAlias).aggregateTableData(AggregationType.RUNNING, RUNNING_SUM);
+        table.openContextMenuFrom(metricAlias, CellType.METRIC_HEADER)
+                .aggregateTableData(AggregationType.RUNNING, RUNNING_SUM);
 
         reportPage.waitForReportExecutionProgress()
                 .showConfiguration()
@@ -193,7 +197,7 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
                 .getReportStatistic().contains("1 Metrics"), "There is more than 1 metric");
 
         assertTrue(
-                table.openContextMenuFromCellValue(INTEREST)
+                table.openContextMenuFrom(INTEREST, CellType.ATTRIBUTE_VALUE)
                         .getItemNames()
                         .stream().filter(e -> e.contains(metricAlias)).count() == 1,
                 "There is more than 1 item which relates to metric");
@@ -211,19 +215,23 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
                 .withHows(new HowItem(ATTR_YEAR_SNAPSHOT, Position.TOP, YEAR_2011)));
 
         final TableReport table = initReportsPage().openReport(reportName).getTableReport();
-        table.openContextMenuFromCellValue(YEAR_2011).aggregateTableData(AggregationType.SUM, "of All Rows");
+        table.openContextMenuFrom(YEAR_2011, CellType.ATTRIBUTE_VALUE)
+                .aggregateTableData(AggregationType.SUM, "of All Rows");
         reportPage.waitForReportExecutionProgress();
 
-        table.openContextMenuFromCellValue(YEAR_2011).aggregateTableData(AggregationType.RUNNING, RUNNING_SUM);
+        table.openContextMenuFrom(YEAR_2011, CellType.ATTRIBUTE_VALUE)
+                .aggregateTableData(AggregationType.RUNNING, RUNNING_SUM);
         assertEquals(table.getTotalValues(), asList(23767077.60f, 0.0f),
                 "Running sum of sum is not empty");
 
-        table.openContextMenuFromCellValue(YEAR_2011).aggregateTableData(AggregationType.SUM, "by Stage Name");
-        assertEquals(table.getMetricElements(), asList(16427388.57f, 16427388.57f, 3436167.70f, 3436167.70f,
-                3903521.33f, 3903521.33f, 16427388.57f, 0.0f, 3436167.70f, 0.0f, 3903521.33f, 0.0f, 23767077.60f, 0.0f),
-                "The total values are computed incorrectly");
+        table.openContextMenuFrom(YEAR_2011, CellType.ATTRIBUTE_VALUE)
+                .aggregateTableData(AggregationType.SUM, "by Stage Name");
+        assertEquals(table.getMetricValues(), asList(16427388.57f, 3436167.70f, 3903521.33f,
+                16427388.57f, 3436167.70f, 3903521.33f));
+        assertEquals(table.getTotalValues(), asList(16427388.57f, 3436167.70f, 3903521.33f, 0.0f ,0.0f, 0.0f,
+                23767077.60f, 0.0f));
 
-        table.sortByHeader(METRIC_AMOUNT, Sort.DESC);
+        table.sortBy(METRIC_AMOUNT, CellType.METRIC_HEADER, Sort.DESC);
         takeScreenshot(browser, "not-calculate-running-totals-for-total-columns", getClass());
         assertEquals(table.getTotalValues(), asList(23767077.60f, 0.0f));
     }
@@ -239,20 +247,20 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
                 .withHows(new HowItem(ATTR_YEAR_SNAPSHOT, Position.TOP)));
 
         final TableReport table = initReportsPage().openReport(reportName).getTableReport();
-        table.openContextMenuFromCellValue(YEAR_2011).aggregateTableData(AggregationType.RUNNING, RUNNING_SUM);
-        table.clickOnAttributeToOpenDrillReport(YEAR_2011);
+        table.openContextMenuFrom(YEAR_2011, CellType.ATTRIBUTE_VALUE)
+                .aggregateTableData(AggregationType.RUNNING, RUNNING_SUM);
+        table.drillOn(YEAR_2011, CellType.ATTRIBUTE_VALUE);
 
         reportPage.waitForReportExecutionProgress().openFilterPanel()
                 .addFilter(FilterItem.Factory.createAttributeFilter(ATTR_QUARTER_YEAR_SNAPSHOT, Q1_2011, Q2_2011));
 
         takeScreenshot(browser, "drill-on-report-containing-running-totals", getClass());
-        assertTrue(table.getAttributesHeader().contains(ATTR_QUARTER_YEAR_SNAPSHOT) && table.getAttributeElements()
+        assertTrue(table.getAttributeHeaders().contains(ATTR_QUARTER_YEAR_SNAPSHOT) && table.getAttributeValues()
                 .containsAll(asList(Q1_2011, Q2_2011)), "The drill values are not displayed");
 
-        assertEquals(table.getMetricElements(),
+        assertEquals(table.getMetricValues(),
                 asList(1719072.21f, 1456305.27f, 1772094.56f, 1719072.21f, 3175377.48f, 4947472.04f, 1663660.67f,
-                        2350525.55f, 3121266.12f, 1663660.67f, 4014186.22f, 7135452.34f, 1663660.67f, 2350525.55f,
-                        3121266.12f));
+                        2350525.55f, 3121266.12f, 1663660.67f, 4014186.22f, 7135452.34f));
 
         browser.navigate().back();
         reportPage.waitForReportExecutionProgress()
@@ -262,9 +270,9 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
                 .doneSndPanel()
                 .waitForReportExecutionProgress();
 
-        //click on any metric value to drill in 
-        table.drillOnMetricValue();
+        //click on any metric value to drill in
+        table.drillOnFirstValue(CellType.METRIC_VALUE);
         reportPage.waitForReportExecutionProgress();
-        assertEquals(table.getMetricElements(), asList(1719072.21f, 1719072.21f, 1719072.21f, 0.0f));
+        assertEquals(table.getMetricValues(), asList(1719072.21f, 1719072.21f));
     }
 }

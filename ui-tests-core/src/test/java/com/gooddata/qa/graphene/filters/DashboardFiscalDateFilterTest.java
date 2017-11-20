@@ -1,20 +1,5 @@
 package com.gooddata.qa.graphene.filters;
 
-import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
-import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.postEtlPullIntegration;
-import static java.lang.String.format;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
-import java.net.URL;
-import java.util.List;
-
-import org.apache.commons.io.IOUtils;
-import org.openqa.selenium.WebElement;
-import org.testng.annotations.Test;
-
 import com.gooddata.md.Fact;
 import com.gooddata.qa.graphene.AbstractDashboardWidgetTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
@@ -26,6 +11,20 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.Widget
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel.Tab;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import org.apache.commons.io.IOUtils;
+import org.openqa.selenium.WebElement;
+import org.testng.annotations.Test;
+
+import java.net.URL;
+import java.util.List;
+
+import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
+import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.postEtlPullIntegration;
+import static java.lang.String.format;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 public class DashboardFiscalDateFilterTest extends AbstractDashboardWidgetTest {
 
@@ -149,10 +148,10 @@ public class DashboardFiscalDateFilterTest extends AbstractDashboardWidgetTest {
                 .getTimeFilterPanel()
                 .selectTimeLine(INPUT_YEAR)
                 .submit();
-        report.waitForReportLoading();
+        report.waitForLoaded();
 
-        assertTrue(report.getAttributeElements().toString().contains(INPUT_YEAR), INPUT_YEAR + " should be displayed in the report.");
-        assertFalse(report.getAttributeElements().toString().contains("FY2006"), "FY2006 shouldn't displayed in the report.");
+        assertTrue(report.getAttributeValues().toString().contains(INPUT_YEAR), INPUT_YEAR + " should be displayed in the report.");
+        assertFalse(report.getAttributeValues().toString().contains("FY2006"), "FY2006 shouldn't displayed in the report.");
     }
 
     @Test(dependsOnGroups = {"createProject"})

@@ -1,34 +1,5 @@
 package com.gooddata.qa.graphene.manage;
 
-import static com.gooddata.qa.utils.http.variable.VariableRestUtils.getVariableUri;
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileUri;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertEquals;
-import static com.gooddata.md.Restriction.title;
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-
-import java.io.IOException;
-import java.util.Collection;
-import java.util.UUID;
-
-import org.apache.http.ParseException;
-import org.json.JSONException;
-import org.openqa.selenium.By;
-import org.openqa.selenium.support.ui.Select;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
 import com.gooddata.md.Attribute;
 import com.gooddata.md.Metric;
 import com.gooddata.md.report.AttributeInGrid;
@@ -42,9 +13,37 @@ import com.gooddata.qa.graphene.entity.variable.NumericVariable;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 import com.gooddata.qa.graphene.fragments.manage.VariableDetailPage;
-import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 import com.gooddata.qa.graphene.fragments.manage.VariablesPage;
+import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 import com.gooddata.qa.utils.http.RestApiClient;
+import org.apache.http.ParseException;
+import org.json.JSONException;
+import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.Select;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.UUID;
+
+import static com.gooddata.md.Restriction.title;
+import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileUri;
+import static com.gooddata.qa.utils.http.variable.VariableRestUtils.getVariableUri;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 public class GoodSalesVariableTest extends GoodSalesAbstractTest {
 
@@ -245,7 +244,7 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
         waitForAnalysisPageLoaded(browser);
 
         takeScreenshot(browser, "Variable-filter-is-kept-in-report", getClass());
-        assertEquals(reportPage.getTableReport().getAttributeElements(), ATTRIBUTE_VALUES);
+        assertEquals(reportPage.getTableReport().getAttributeValues(), ATTRIBUTE_VALUES);
         assertThat(reportPage.getFilters(), hasItem(variable));
     }
 

@@ -224,7 +224,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         takeScreenshot(browser, "report-with-negative-number", this.getClass());
 
         log.info("Check the negative number in report!");
-        final List<Float> metricValues = reportPage.getTableReport().getMetricElements();
+        final List<Float> metricValues = reportPage.getTableReport().getMetricValues();
         final List<Integer> metricIndexes = asList(0, 1, 2, 3, 4);
         final List<Double> expectedMetricValues = asList(-6080.0, -10230.0, -3330.0, -6630.0, -4670.0);
         assertMetricValuesInReport(metricIndexes, metricValues, expectedMetricValues);
@@ -257,7 +257,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         takeScreenshot(browser, "report-with-null-number", this.getClass());
 
         log.info("Check the null number in report!");
-        final List<Float> metricValues = reportPage.getTableReport().getMetricElements();
+        final List<Float> metricValues = reportPage.getTableReport().getMetricValues();
         final List<Integer> metricIndexes = asList(1, 2);
         assertEmptyMetricInReport(metricIndexes, metricValues);
 

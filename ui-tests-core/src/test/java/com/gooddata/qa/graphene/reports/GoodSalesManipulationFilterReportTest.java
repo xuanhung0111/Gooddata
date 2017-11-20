@@ -1,5 +1,19 @@
 package com.gooddata.qa.graphene.reports;
 
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.entity.filter.FilterItem;
+import com.gooddata.qa.graphene.entity.report.HowItem;
+import com.gooddata.qa.graphene.entity.report.HowItem.Position;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.entity.variable.NumericVariable;
+import com.gooddata.qa.graphene.fragments.reports.filter.AttributeFilterFragment;
+import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter.FilterFragment;
+import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
+import org.openqa.selenium.By;
+import org.testng.annotations.Test;
+
+import java.util.Collection;
+
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
@@ -12,21 +26,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 import static org.testng.Assert.assertTrue;
-
-import java.util.Collection;
-
-import org.openqa.selenium.By;
-import org.testng.annotations.Test;
-
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.entity.filter.FilterItem;
-import com.gooddata.qa.graphene.entity.report.HowItem;
-import com.gooddata.qa.graphene.entity.report.HowItem.Position;
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.entity.variable.NumericVariable;
-import com.gooddata.qa.graphene.fragments.reports.filter.AttributeFilterFragment;
-import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter.FilterFragment;
-import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 
 public class GoodSalesManipulationFilterReportTest extends GoodSalesAbstractTest {
     private static final By FILTER_PICKER_LOCATOR = By.className("newFilterPicker");
@@ -131,7 +130,6 @@ public class GoodSalesManipulationFilterReportTest extends GoodSalesAbstractTest
     }
 
     private void waitForReportLoaded() {
-        reportPage.getTableReport()
-                .waitForReportLoading();
+        reportPage.getTableReport().waitForLoaded();
     }
 }

@@ -1,5 +1,19 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import com.gooddata.md.Metric;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.enums.report.ReportTypes;
+import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
+import org.apache.http.ParseException;
+import org.json.JSONException;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.util.List;
+
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_WON;
@@ -14,21 +28,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-
-import java.io.IOException;
-import java.util.List;
-
-import org.apache.http.ParseException;
-import org.json.JSONException;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
-import com.gooddata.md.Metric;
-import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.enums.report.ReportTypes;
-import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
-import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
-import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 
 public class GoodSalesMetricNumberFormatTest extends AbstractAnalyseTest {
 
@@ -146,7 +145,7 @@ public class GoodSalesMetricNumberFormatTest extends AbstractAnalyseTest {
     private void verifyFormatInReportPage(Formatter format, String expectedValue, boolean compareFormat) {
         reportPage.selectReportVisualisation(ReportTypes.TABLE);
         waitForAnalysisPageLoaded(browser);
-        String actualValue = reportPage.getTableReport().getRawMetricElements().get(0);
+        String actualValue = reportPage.getTableReport().getRawMetricValues().get(0);
         if (compareFormat) {
             assertTrue(format.toString().contains(actualValue));
         } else {
@@ -167,7 +166,7 @@ public class GoodSalesMetricNumberFormatTest extends AbstractAnalyseTest {
                 dashboardsPage.getDashboardEditBar().addReportToDashboard(reportName);
                 dashboardsPage.getDashboardEditBar().saveDashboard();
                 String actualValue = dashboardsPage.getContent()
-                        .getLatestReport(TableReport.class).getRawMetricElements().get(0);
+                        .getLatestReport(TableReport.class).getRawMetricValues().get(0);
                 if (compareFormat) {
                     assertTrue(format.toString().contains(actualValue));
                 } else {

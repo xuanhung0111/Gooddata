@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.dashboards;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
 import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
@@ -18,15 +19,16 @@ import org.testng.annotations.Test;
 import org.threeten.extra.YearQuarter;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.gooddata.qa.graphene.enums.DateRange.ZONE_ID;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_AMOUNT_BY_PRODUCT;
 import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.TOP_RIGHT;
 import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
-import static java.util.Arrays.*;
-import static java.util.Collections.*;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -115,21 +117,19 @@ public class DrillToDashBoardTabApplyingDateFilterTest extends GoodSalesAbstract
             dashboardsPage.saveDashboard();
 
             // wait for saving dashboard
-            reportOnSourceTab.waitForTableReportExecutionProgress();
             changeFilterValues(filterValuesToChange.getLeft(), filterValuesToChange.getRight());
 
             // att to drill to is CompuSci
-            reportOnSourceTab.drillOnAttributeValue();
-            reportOnSourceTab.waitForTableReportExecutionProgress();
+            reportOnSourceTab.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
 
             assertTrue(dashboardsPage.getTabs().getTab(TARGET_TAB).isSelected(),
                     TARGET_TAB + "is not selected after drill action");
 
             TableReport reportOnTargetTab = dashboardsPage.getContent()
-                    .getReport(REPORT_AMOUNT_BY_PRODUCT, TableReport.class).waitForTableReportExecutionProgress();
+                    .getReport(REPORT_AMOUNT_BY_PRODUCT, TableReport.class);
             Screenshots.takeScreenshot(browser, "testDrillToDashboardTab-" + dashboard, getClass());
             checkSelectedFilterValues(expectedFilterValue.getLeft(), expectedFilterValue.getRight());
-            assertEquals(reportOnTargetTab.getAttributeElements().size(), expectedReportRowCount,
+            assertEquals(reportOnTargetTab.getAttributeValues().size(), expectedReportRowCount,
                     "Report is not applied date filter");
         } finally {
             deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashboardUri);
@@ -179,14 +179,13 @@ public class DrillToDashBoardTabApplyingDateFilterTest extends GoodSalesAbstract
             dashboardsPage.saveDashboard();
 
             // wait for saving dashboard
-            reportOnFirstDash.waitForTableReportExecutionProgress();
             changeFilterValues(DATE_DIMENSION_CLOSED, DATA_FILTERED_BY_YEAR_2014);
-            reportOnFirstDash.waitForTableReportExecutionProgress().drillOnAttributeValue();
+            reportOnFirstDash.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
 
             TableReport reportOnSecondDash = dashboardsPage.getContent()
-                    .getLatestReport(TableReport.class).waitForTableReportExecutionProgress();
+                    .getLatestReport(TableReport.class);
 
-            assertEquals(reportOnSecondDash.getAttributeElements().size(), 3);
+            assertEquals(reportOnSecondDash.getAttributeValues().size(), 3);
             checkSelectedFilterValues(DATE_DIMENSION_CLOSED, DATA_FILTERED_BY_YEAR_2014);
         } finally {
             for (String dashboardUri : dashboardUris) {
