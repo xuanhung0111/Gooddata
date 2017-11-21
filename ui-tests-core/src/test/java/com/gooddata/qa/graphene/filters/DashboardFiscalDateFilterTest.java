@@ -148,7 +148,6 @@ public class DashboardFiscalDateFilterTest extends AbstractDashboardWidgetTest {
                 .getTimeFilterPanel()
                 .selectTimeLine(INPUT_YEAR)
                 .submit();
-        report.waitForLoaded();
 
         assertTrue(report.getAttributeValues().toString().contains(INPUT_YEAR), INPUT_YEAR + " should be displayed in the report.");
         assertFalse(report.getAttributeValues().toString().contains("FY2006"), "FY2006 shouldn't displayed in the report.");

@@ -122,8 +122,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             getFilterWidget(STAGE_NAME_FILTER).changeAttributeFilterValues("Short List");
 
             // reload table report unless will get ArrayIndexOutOfBoundException: Index 1: Size 1
-            report = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            report.waitForLoaded();
+            report = dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
             assertTrue(getRowElementsFrom(report).size() == 1);
 
             dashboardsPage.editDashboard();
@@ -161,8 +160,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             FilterWidget filter = getFilterWidget("filter-time");
             filter.changeTimeFilterValueByClickInTimeLine("2011");
 
-            report = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            report.waitForLoaded();
+            report = dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
             assertTrue(report.getRoot().findElements(By.cssSelector("div[title='2012']")).isEmpty());
             assertTrue(report.getRoot().findElement(By.cssSelector("div[title='2011']")).isDisplayed());
 
@@ -171,8 +169,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             report.removeFilters(DATE_DIMENSION_SNAPSHOT);
             dashboardsPage.saveDashboard();
 
-            report = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            report.waitForLoaded();
+            report = dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
             assertTrue(report.getRoot().findElement(By.cssSelector("div[title='2010']")).isDisplayed());
             getFilterWidget("filter-time").changeTimeFilterValueByClickInTimeLine("2011");
             assertTrue(report.getRoot().findElement(By.cssSelector("div[title='2010']")).isDisplayed());

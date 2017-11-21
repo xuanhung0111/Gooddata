@@ -229,7 +229,6 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         getFilter(ATTR_STAGE_NAME).editAttributeFilterValues(SHORT_LIST);
         getFilter(DF_VARIABLE).editAttributeFilterValues(SHORT_LIST);
         dashboardsPage.saveDashboard();
-        getReport(REPORT_WITH_PROMPT_FILTER).waitForLoaded();
 
         takeScreenshot(browser, "DF-applied-for-filter-group-on-saved-view", getClass());
         assertEquals(savedViewWidget.getCurrentSavedView(), SAVED_VIEW_WITH_STAGE_NAME_FILTER);
@@ -542,8 +541,6 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
                     .openSavedViewMenu()
                     .selectSavedView(DEFAULT_VIEW);
 
-            getReport(REPORT_WITH_PROMPT_FILTER).waitForLoaded();
-            takeScreenshot(browser, "Viewer-default-view-shows-all-when-out-of-permission", getClass());
             assertEquals(getFilter(DF_VARIABLE).getCurrentValue(), ALL);
             AssertUtils.assertIgnoreCase(getReport(REPORT_WITH_PROMPT_FILTER).getAttributeValues(), asList(INTEREST, SHORT_LIST));
 

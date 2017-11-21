@@ -213,9 +213,6 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
                     .getFilterWidgetByName(ATTR_PRODUCT)
                     .changeAttributeFilterValues(EDUCATIONLY);
 
-            getReport(report.getTitle()).waitForLoaded();
-            takeScreenshot(browser, "Selection-type:" + filterSelectionType + 
-                    "-works-correctly-after-change-attribute-label-type", getClass());
             assertEquals(getFilter(ATTR_PRODUCT).getCurrentValue(), EDUCATIONLY);
             assertEquals(getReport(report.getTitle()).getAttributeValues(), singletonList(EDUCATIONLY));
 
@@ -264,9 +261,6 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
                 applyValuesForGroupFilter();
             }
 
-            getReport(report.getTitle()).waitForLoaded();
-            takeScreenshot(browser,
-                    "Multiple-filter:" + filterType + "-works-correctly-after-change-attribute-label-type", getClass());
             assertEquals(getFilter(ATTR_PRODUCT).getCurrentValue(), EDUCATIONLY);
             assertEquals(getFilter(ATTR_DEPARTMENT).getCurrentValue(), DIRECT_SALES);
             assertEquals(getReport(report.getTitle()).getAttributeValues(), asList(EDUCATIONLY, DIRECT_SALES));
@@ -322,9 +316,6 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
 
             initDashboardsPage();
             getFilter(ATTR_FIRSTNAME).changeAttributeFilterValues(FIRSTNAME_VALUE_UPDATE);
-            getReport(report.getTitle()).waitForLoaded();
-
-            takeScreenshot(browser, "Data-updated-correctly-after-changing-attribute-label", getClass());
             assertEquals(getFilter(ATTR_FIRSTNAME).getCurrentValue(), FIRSTNAME_VALUE_UPDATE);
             assertEquals(getReport(report.getTitle()).getAttributeValues(), singletonList(FIRSTNAME_VALUE_UPDATE));
 

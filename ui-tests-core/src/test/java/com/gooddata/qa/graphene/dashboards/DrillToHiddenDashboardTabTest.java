@@ -77,8 +77,7 @@ public class DrillToHiddenDashboardTabTest extends GoodSalesAbstractTest {
         try {
             initDashboardsPage().selectDashboard(PUBLIC_DASHBOARD).getContent()
                     .getLatestReport(TableReport.class)
-                    .drillOnFirstValue(CellType.ATTRIBUTE_VALUE)
-                    .waitForLoaded();
+                    .drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
 
             assertEquals(dashboardsPage.getContent().getLatestReport(TableReport.class).getReportTiTle(),
                     REPORT_TOP_SALES_REPS_BY_WON_AND_LOST);

@@ -85,7 +85,6 @@ public class CopyReportTableTest extends AbstractProjectTest {
                 .addReportToDashboard(SIMPLE_REPORT)
                 .saveDashboard();
         final TableReport table = dashboardsPage.getContent().getReport(SIMPLE_REPORT, TableReport.class);
-        table.waitForLoaded();
         table.copyMetricValue(DEFAULT_FORMAT_VALUE);
         takeScreenshot(browser, "copy-single-cell-on-dahboard-page", getClass());
         assertEquals(getClipboardContent(), DEFAULT_FORMAT_VALUE);

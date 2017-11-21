@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.reports;
 
+import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.HowItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
@@ -119,8 +120,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             assertIgnoreCaseAndIndex(tableReport.getMetricHeaders(), Sets.newHashSet("Amount", "Avg. Amount"));
 
             tableReport.drillOnFirstValue(CellType.METRIC_VALUE);
-            tableReport.waitForLoaded();
-            AssertUtils.assertIgnoreCase(tableReport.getAttributeHeaders(), Arrays.asList("Account"));
+            assertIgnoreCase(tableReport.getAttributeHeaders(), Arrays.asList("Account"));
             assertIgnoreCaseAndIndex(tableReport.getMetricHeaders(), Sets.newHashSet("Amount"));
             assertTrue(tableReport.hasValue(ROLL_UP, CellType.TOTAL_HEADER));
 
@@ -246,22 +246,20 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
         try {
             addReportToNewDashboard("Drill-Opportunity", TEST_DASHBOAD_NAME);
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            tableReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
-            tableReport.waitForLoaded();
 
-            String currentWindowHandle = browser.getWindowHandle();
-            // wait for google window
-            sleepTight(1500);
-            // switch to newest window handle
-            for (String s : browser.getWindowHandles()) {
-                if (!s.equals(currentWindowHandle)) {
-                    browser.switchTo().window(s);
-                    break;
-                }
+            int windowHandles = browser.getWindowHandles().size();
+            tableReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
+
+            Predicate<WebDriver> newTabOpened = browser -> browser.getWindowHandles().size() > windowHandles;
+            Graphene.waitGui().until(newTabOpened);
+
+            try {
+                BrowserUtils.switchToLastTab(browser);
+                assertTrue(browser.getCurrentUrl().contains("www.google.com"));
+            } finally {
+                BrowserUtils.closeCurrentTab(browser);
+                BrowserUtils.switchToFirstTab(browser);
             }
-            assertTrue(browser.getCurrentUrl().contains("www.google.com"));
-            browser.close();
-            browser.switchTo().window(currentWindowHandle);
 
             initAttributePage().initAttribute("Opportunity")
                 .setDrillToAttribute("Account");
@@ -269,7 +267,6 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             initDashboardsPage().selectDashboard(TEST_DASHBOAD_NAME);
             tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
-            tableReport.waitForLoaded();
 
             DashboardDrillDialog drillDialog = Graphene.createPageFragment(DashboardDrillDialog.class,
                     waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));

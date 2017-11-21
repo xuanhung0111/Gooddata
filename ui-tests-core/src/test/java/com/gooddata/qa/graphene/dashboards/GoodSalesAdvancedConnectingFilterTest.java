@@ -23,6 +23,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CLOSE
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.utils.asserts.AssertUtils.assertIgnoreCase;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Arrays.asList;
 import static org.joda.time.DateTime.now;
@@ -121,16 +122,9 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
 
         dashboardsPage.openTab(0);
         getDateCreatedFilter().changeTimeFilterValueByClickInTimeLine(YEAR_OF_DATA);
-        getReport().waitForLoaded();
-
-        takeScreenshot(browser,
-                "checkReportRenderWithDateFilterBetweenDuplicatedTabs-Report-render-with-date-filter", getClass());
-        AssertUtils.assertIgnoreCase(getReport().getAttributeValues(), ATTRIBUTE_VALUES);
+        assertIgnoreCase(getReport().getAttributeValues(), ATTRIBUTE_VALUES);
 
         dashboardsPage.openTab(1);
-        getReport().waitForLoaded();
-
-        takeScreenshot(browser, "Report-render-with-date-filter-in-duplicated-tab", getClass());
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_OF_DATA);
         AssertUtils.assertIgnoreCase(getReport().getAttributeValues(), ATTRIBUTE_VALUES);
     }
@@ -153,16 +147,9 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         dashboardsPage.saveDashboard();
 
         getDateCreatedFilter().changeTimeFilterValueByClickInTimeLine(YEAR_OF_DATA);
-        getReport().waitForLoaded();
-
-        takeScreenshot(browser,
-                "checkReportRenderWithDateFilterBetweenSameTabs-Report-render-with-date-filter", getClass());
-        AssertUtils.assertIgnoreCase(getReport().getAttributeValues(), ATTRIBUTE_VALUES);
+        assertIgnoreCase(getReport().getAttributeValues(), ATTRIBUTE_VALUES);
 
         dashboardsPage.openTab(0);
-        getReport().waitForLoaded();
-
-        takeScreenshot(browser, "Report-render-with-date-filter-in-same-tab", getClass());
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_OF_DATA);
         AssertUtils.assertIgnoreCase(getReport().getAttributeValues(), ATTRIBUTE_VALUES);
     }
@@ -220,16 +207,9 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         assertTrue(getReport().hasNoData(), "Report data is not rendered correctly");
 
         getDateSnapshotFilter().changeTimeFilterValueByClickInTimeLine(YEAR_OF_DATA);
-        getReport().waitForLoaded();
-
-        takeScreenshot(browser,
-                "checkReportRenderWithDifferenceDateFilterBetweenTabs-Report-render-with-date-filter", getClass());
-        AssertUtils.assertIgnoreCase(getReport().getAttributeValues(), ATTRIBUTE_VALUES);
+        assertIgnoreCase(getReport().getAttributeValues(), ATTRIBUTE_VALUES);
 
         dashboardsPage.openTab(0);
-        getReport().waitForLoaded();
-
-        takeScreenshot(browser, "Report-render-with-difference-date-filter", getClass());
         assertEquals(getDateCreatedFilter().getCurrentValue(), CURRENT_YEAR);
         assertTrue(getReport().hasNoData(), "Report is not render correctly");
     }
@@ -253,16 +233,9 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         assertTrue(getReport().hasNoData(), "Report data is not rendered correctly");
 
         getDateCreatedFilter().changeTimeFilterValueByClickInTimeLine(YEAR_OF_DATA);
-        getReport().waitForLoaded();
-
-        takeScreenshot(browser,
-                "checkReportRenderWithDifferenceDateValuesBetweenTabs-Report-render-with-date-filter", getClass());
-        AssertUtils.assertIgnoreCase(getReport().getAttributeValues(), ATTRIBUTE_VALUES);
+        assertIgnoreCase(getReport().getAttributeValues(), ATTRIBUTE_VALUES);
 
         dashboardsPage.openTab(0);
-        getReport().waitForLoaded();
-
-        takeScreenshot(browser, "Report-render-with-difference-date-filter-value", getClass());
         assertEquals(getDateCreatedFilter().getCurrentValue(), CURRENT_YEAR);
         assertTrue(getReport().hasNoData(), "Report is not render correctly");
     }
@@ -300,9 +273,6 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         AssertUtils.assertIgnoreCase(getReport().getAttributeValues(), ATTRIBUTE_VALUES);
 
         dashboardsPage.openTab(1);
-        getReport().waitForLoaded();
-
-        takeScreenshot(browser, "Multiple-date-filters-connected-between-duplicated-tabs", getClass());
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_OF_DATA);
         assertEquals(getDateClosedFilter().getCurrentValue(), YEAR_OF_DATA);
         AssertUtils.assertIgnoreCase(getReport().getAttributeValues(), ATTRIBUTE_VALUES);
@@ -334,9 +304,6 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         AssertUtils.assertIgnoreCase(getReport().getAttributeValues(), ATTRIBUTE_VALUES);
 
         dashboardsPage.openTab(0);
-        getReport().waitForLoaded();
-
-        takeScreenshot(browser, "Multiple-date-filters-connected-between-same-tabs", getClass());
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_OF_DATA);
         assertEquals(getDateClosedFilter().getCurrentValue(), YEAR_OF_DATA);
         AssertUtils.assertIgnoreCase(getReport().getAttributeValues(), ATTRIBUTE_VALUES);
@@ -370,9 +337,6 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         AssertUtils.assertIgnoreCase(getReport().getAttributeValues(), ATTRIBUTE_VALUES);
 
         dashboardsPage.openTab(0);
-        getReport().waitForLoaded();
-
-        takeScreenshot(browser, "Multiple-date-filters-do-not-connected-between-tabs", getClass());
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_OF_DATA);
         assertEquals(getDateClosedFilter().getCurrentValue(), CURRENT_YEAR);
         AssertUtils.assertIgnoreCase(getReport().getAttributeValues(), asList("Inside Sales", "CompuSci"));
@@ -404,9 +368,6 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         AssertUtils.assertIgnoreCase(getReport().getAttributeValues(), ATTRIBUTE_VALUES);
 
         dashboardsPage.openTab(0);
-        getReport().waitForLoaded();
-
-        takeScreenshot(browser, "Multiple-date-filters-with-difference-value-do-not-connect-between-tabs", getClass());
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_OF_DATA);
         assertEquals(getDateClosedFilter().getCurrentValue(), CURRENT_YEAR);
         AssertUtils.assertIgnoreCase(getReport().getAttributeValues(), asList("Inside Sales", "CompuSci"));
@@ -498,9 +459,6 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         AssertUtils.assertIgnoreCase(getReport().getAttributeValues(), COMBINATION_ATTRIBUTE_FILTER_VALUES);
 
         dashboardsPage.openTab(1);
-        getReport().waitForLoaded();
-
-        takeScreenshot(browser, "Report-render-with-filter-combination-between-duplicated-tabs", getClass());
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_OF_DATA);
         assertEquals(getProductFilter().getCurrentValue(), PRODUCT_COMPUSCI);
         AssertUtils.assertIgnoreCase(getReport().getAttributeValues(), COMBINATION_ATTRIBUTE_FILTER_VALUES);
@@ -532,9 +490,6 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         AssertUtils.assertIgnoreCase(getReport().getAttributeValues(), COMBINATION_ATTRIBUTE_FILTER_VALUES);
 
         dashboardsPage.openTab(0);
-        getReport().waitForLoaded();
-
-        takeScreenshot(browser, "Report-render-with-filter-combination-between-same-tabs", getClass());
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_OF_DATA);
         assertEquals(getProductFilter().getCurrentValue(), PRODUCT_COMPUSCI);
         AssertUtils.assertIgnoreCase(getReport().getAttributeValues(), COMBINATION_ATTRIBUTE_FILTER_VALUES);
@@ -566,9 +521,6 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         AssertUtils.assertIgnoreCase(getReport().getAttributeValues(), COMBINATION_ATTRIBUTE_FILTER_VALUES);
 
         dashboardsPage.openTab(1);
-        getReport().waitForLoaded();
-
-        takeScreenshot(browser, "Report-render-with-difference-filter-combination-between-tabs", getClass());
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_OF_DATA);
         assertEquals(getDepartmentFilter().getCurrentValue(), ALL);
         AssertUtils.assertIgnoreCase(getReport().getAttributeValues(), ATTRIBUTE_VALUES);
@@ -603,9 +555,6 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         AssertUtils.assertIgnoreCase(getReport().getAttributeValues(), asList("Direct Sales", "Inside Sales", "Educationly"));
 
         dashboardsPage.openTab(0);
-        getReport().waitForLoaded();
-
-        takeScreenshot(browser, "Report-render-with-difference-filter-values-combination-between-tabs", getClass());
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_OF_DATA);
         assertEquals(getProductFilter().getCurrentValue(), ALL);
         AssertUtils.assertIgnoreCase(getReport().getAttributeValues(), ATTRIBUTE_VALUES);
@@ -728,7 +677,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
     }
 
     private TableReport getReport() {
-        return dashboardsPage.getReport(REPORT, TableReport.class).waitForLoaded();
+        return dashboardsPage.getReport(REPORT, TableReport.class);
     }
 
     private FilterWidget getDateCreatedFilter() {
