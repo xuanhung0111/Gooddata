@@ -5,9 +5,5 @@ public final class NamingConstants {
     public static final String DOMAIN_ID_2 = "data-admin-test2";
     public static final String DOMAIN_ID_3 = "data-admin-test3";
 
-    public static final String ADMIN_LOGIN_SUFFIX = "admin@gooddata.com";
-
-    public static String getAdminLogin(String domainId) {
-        return domainId + ADMIN_LOGIN_SUFFIX;
-    }
+    public static final String USER_1_LOGIN = "user1@gooddata.com";
 }
