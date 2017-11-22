@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_TOP_5_OF_BEST_CASE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOP_5_OPEN_BY_CASH;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
@@ -132,7 +133,7 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
             dashboardsPage.selectDashboard(REPORT_TOP_5_OPEN_BY_CASH);
             takeScreenshot(browser, "editReportFromDashboard - headline report in dashboard", getClass());
             OneNumberReport headlineReport = dashboardsPage.getContent().getLatestReport(OneNumberReport.class);
-            assertThat(headlineReport.getDescription(), equalTo("Top 5"));
+            assertThat(headlineReport.getDescription(), equalTo(METRIC_TOP_5_OF_BEST_CASE));
         } finally {
             dashboardsPage.deleteDashboard();
         }
