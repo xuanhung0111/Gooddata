@@ -5,28 +5,17 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
 import static com.gooddata.qa.utils.CssUtils.convertCSSClassTojQuerySelector;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.id;
-
-import java.util.List;
-
-import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
@@ -35,6 +24,16 @@ import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Widget.DropZone;
 import com.gooddata.qa.graphene.utils.Sleeper;
 import com.google.common.base.Predicate;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 
 @SuppressWarnings("unchecked")
 public class IndigoDashboardsPage extends AbstractFragment {
@@ -74,6 +73,12 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     @FindBy(className = ATTRIBUTE_FITERS_PANEL_CLASS_NAME)
     private AttributeFiltersPanel attributeFiltersPanel;
+
+    @FindBy(className = "dash-title")
+    private WebElement dashboardTitle;
+
+    @FindBy(className = "navigation-list")
+    private WebElement dashboardsList;
 
     private static final String EDIT_BUTTON_CLASS_NAME = "s-edit_button";
     private static final String SAVE_BUTTON_CLASS_NAME = "s-save_button";
@@ -273,6 +278,22 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public String getCurrentProjectName() {
         return waitForFragmentVisible(header).getCurrentProjectName();
+    }
+
+    public String getDashboardTitle() {
+        return waitForElementVisible(dashboardTitle).getText();
+    }
+
+    public IndigoDashboardsPage changeDashboardTitle(String newTitle) {
+        waitForElementVisible(dashboardTitle).click();
+        dashboardTitle.findElement(By.tagName("textarea")).sendKeys(newTitle);
+        return this;
+    }
+
+    public List<String> getDashboardTitles() {
+        return waitForElementVisible(dashboardsList)
+                .findElements(By.className("navigation-list-item")).stream()
+                .map(WebElement::getText).collect(Collectors.toList());
     }
 
     public IndigoDashboardsPage deleteDashboard(boolean confirm) {
