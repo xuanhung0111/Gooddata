@@ -30,8 +30,6 @@ public final class GoodSalesUtils {
     public static final String METRIC_NUMBER_OF_OPPORTUNITIES_BOP = "# of Opportunities [BOP]";
     public static final String METRIC_NUMBER_OF_WON_OPPS = "# of Won Opps.";
     public static final String METRIC_NUMBER_OF_WON = "# of Won"; //metric name in report, originally METRIC_NUMBER_OF_WON_OPPS
-    public static final String METRIC_NUMBER_OF_OPPS_WON_IN_PERIOD = "# Opps. [won] in Period";
-    public static final String METRIC_NUMBER_OF_OPPS_LOST_IN_PERIOD = "# Opps. [lost] in Period";
     public static final String METRIC_SNAPSHOT_BOP = "_Snapshot [BOP]";
     public static final String METRIC_SNAPSHOT_EOP = "_Snapshot [EOP]";
     public static final String METRIC_SNAPSHOT_EOP1 = "_Snapshot [EOP-1]";
@@ -60,9 +58,17 @@ public final class GoodSalesUtils {
     public static final String METRIC_EXPECTED_WON = "Expected + Won";
     public static final String METRIC_EXPECTED_WON_VS_QUOTA = "Expected + Won vs. Quota";
     public static final String METRIC_AMOUNT_BOP = "Amount [BOP]";
-    public static final String METRIC_PERCENT_OF_PIPLINE = "% of Pipeline";
-    public static final String METRIC_TOP_5 = "Top 5";
     public static final String METRIC_CLOSE_EOP = "_Close [EOP]";
+
+    // private metrics
+    public static final String METRIC_NUMBER_OF_OPPS_WON_IN_PERIOD = "# Opps. [won] in Period";
+    public static final String METRIC_NUMBER_OF_OPPS_LOST_IN_PERIOD = "# Opps. [lost] in Period";
+    public static final String METRIC_PERCENT_OF_PIPELINE_BEST_CASE = "% of Pipeline - Best Case";
+    public static final String METRIC_PERCENT_OF_PIPELINE_WON = "% of Pipeline - Won";
+    public static final String METRIC_PERCENT_OF_PIPELINE_LOST = "% of Pipeline - Lost";
+    public static final String METRIC_TOP_5_OF_BEST_CASE = "Top 5 - Best Case";
+    public static final String METRIC_TOP_5_OF_WON = "Top 5 - Won";
+    public static final String METRIC_TOP_5_OF_LOST = "Top 5 - Lost";
 
     // attributes
     public static final String ATTR_PRODUCT = "Product";
