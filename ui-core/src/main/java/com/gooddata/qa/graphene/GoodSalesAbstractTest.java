@@ -25,8 +25,8 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
 
     //------------------------- REPORT MD OBJECTS - BEGIN  ------------------------
     protected String createTop5OpenByCashReport() {
-        Metric pipelineMetric = createPercentOfPipelineMetric(createBestCaseMetric());
-        Metric top5Metric = createTop5Metric(getMetricByTitle(METRIC_BEST_CASE));
+        Metric pipelineMetric = createPercentOfPipelineMetric(METRIC_PERCENT_OF_PIPELINE_BEST_CASE, createBestCaseMetric());
+        Metric top5Metric = createTop5Metric(METRIC_TOP_5_OF_BEST_CASE, getMetricByTitle(METRIC_BEST_CASE));
 
         return createReport(
                 GridReportDefinitionContent.create(
@@ -39,8 +39,8 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
     }
 
     protected String createTop5WonByCashReport() {
-        Metric pipelineMetric = createPercentOfPipelineMetric(createWonMetric());
-        Metric top5Metric = createTop5Metric(getMetricByTitle(METRIC_WON));
+        Metric pipelineMetric = createPercentOfPipelineMetric(METRIC_PERCENT_OF_PIPELINE_WON, createWonMetric());
+        Metric top5Metric = createTop5Metric(METRIC_TOP_5_OF_WON, getMetricByTitle(METRIC_WON));
         Metric numberOfOppsMetric = createNumberOfOppsInPeriodMetric(
                 METRIC_NUMBER_OF_OPPS_WON_IN_PERIOD, getMetricByTitle(METRIC_WON));
 
@@ -59,8 +59,8 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
     }
 
     protected String createTop5LostByCashReport() {
-        Metric pipelineMetric = createPercentOfPipelineMetric(createLostMetric());
-        Metric top5Metric = createTop5Metric(getMetricByTitle(METRIC_LOST));
+        Metric pipelineMetric = createPercentOfPipelineMetric(METRIC_PERCENT_OF_PIPELINE_LOST, createLostMetric());
+        Metric top5Metric = createTop5Metric(METRIC_TOP_5_OF_LOST, getMetricByTitle(METRIC_LOST));
         Metric numberOfOppsMetric = createNumberOfOppsInPeriodMetric(
                 METRIC_NUMBER_OF_OPPS_LOST_IN_PERIOD, getMetricByTitle(METRIC_LOST));
 
@@ -599,7 +599,10 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
                 DEFAULT_CURRENCY_METRIC_FORMAT);
     }
 
-    private Metric createNumberOfOppsInPeriodMetric(String name, Metric metric) {
+    /**
+     * This is private metric and should be used internally in report
+     */
+    private Metric createNumberOfOppsInPeriodMetric(String name, Metric appliedMetric) {
         return createMetricIfNotExist(getGoodDataClient(), name,
                 new String("SELECT [# of Won Opps.]" +
                         "WHERE (" +
@@ -607,7 +610,7 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
                         "WHERE [Opp. Snapshot (Date)] = [_Snapshot [EOP]]) >= [_Timeline [BOP]]" +
                         "AND (SELECT MAX([Opp. Close (Date)]) BY [Opportunity]" +
                         "WHERE [Opp. Snapshot (Date)] = [_Snapshot [EOP]]) <= [_Timeline [EOP]]")
-                        .replaceAll("# of Won Opps\\.", metric.getUri())
+                        .replaceAll("# of Won Opps\\.", appliedMetric.getUri())
                         .replaceAll("Opp\\. Close \\(Date\\)", getFactByTitle(FACT_OPP_CLOSE_DATE).getUri())
                         .replaceAll("Opportunity", getAttributeByTitle(ATTR_OPPORTUNITY).getUri())
                         .replaceAll("Opp\\. Snapshot \\(Date\\)", getFactByTitle(FACT_OPP_SNAPSHOT_DATE).getUri())
@@ -617,21 +620,27 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
                 DEFAULT_METRIC_FORMAT);
     }
 
-    private Metric createPercentOfPipelineMetric(Metric metric) {
-        return createMetricIfNotExist(getGoodDataClient(), METRIC_PERCENT_OF_PIPLINE,
+    /**
+     * This is private metric and should be used internally in report
+     */
+    private Metric createPercentOfPipelineMetric(String name, Metric appliedMetric) {
+        return createMetricIfNotExist(getGoodDataClient(), name,
                 format("SELECT (SELECT [%s] WHERE TOP (5) IN (SELECT [%s] BY [%s]) ) /( SELECT [%s]BY ALL OTHER)",
-                        metric.getUri(),
-                        metric.getUri(),
+                        appliedMetric.getUri(),
+                        appliedMetric.getUri(),
                         getAttributeByTitle(ATTR_OPPORTUNITY).getUri(),
-                        metric.getUri()),
+                        appliedMetric.getUri()),
                 "#,##0.0%");
     }
 
-    private Metric createTop5Metric(Metric metric) {
-        return createMetricIfNotExist(getGoodDataClient(), METRIC_TOP_5,
+    /**
+     * This is private metric and should be used internally in report
+     */
+    private Metric createTop5Metric(String name, Metric appliedMetric) {
+        return createMetricIfNotExist(getGoodDataClient(), name,
                 format("SELECT [%s] WHERE TOP (5) IN (SELECT [%s] BY [%s])",
-                        metric.getUri(),
-                        metric.getUri(),
+                        appliedMetric.getUri(),
+                        appliedMetric.getUri(),
                         getAttributeByTitle(ATTR_OPPORTUNITY).getUri()),
                 "[=null]--;\r\n" +
                         "[>=1000000000]$#,,,.0 B;\r\n" +
