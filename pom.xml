@@ -32,7 +32,7 @@
         <!-- (seconds) -->
         <timeout>90</timeout>
         <!-- can be used to multiply the timeout on a specific test places (currently the only place is the validation on vertica DM) -->
-        <extendedTimeoutMultiple>10</extendedTimeoutMultiple>
+        <extendedTimeoutMultiple>20</extendedTimeoutMultiple>
         <file.separator>/</file.separator>
         <test.module>.</test.module>
         <targetFolder>${user.dir}${file.separator}${test.module}${file.separator}target</targetFolder>
