@@ -4,11 +4,14 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static java.lang.Integer.parseInt;
 
+import com.gooddata.qa.graphene.utils.ElementUtils;
+import com.gooddata.qa.graphene.utils.WaitUtils;
 import java.util.concurrent.TimeUnit;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
@@ -22,6 +25,9 @@ public class OverviewPage extends AbstractFragment {
     @FindBy(className = "overview-projects")
     private OverviewProjects overviewProjects;
 
+    @FindBy(className = "overview")
+    private WebElement overviewSection;
+
     public OverviewPage selectState(OverviewState state) {
         waitForElementVisible(state.getLocator(), getRoot()).click();
         waitForPageLoaded();
@@ -30,6 +36,10 @@ public class OverviewPage extends AbstractFragment {
 
     public boolean isStateActive(OverviewState state) {
         return waitForElementVisible(state.getLocator(), getRoot()).getAttribute("class").contains("active");
+    }
+
+    public boolean containsAnyOverviewState() {
+        return ElementUtils.isElementPresent(By.className("overview-state"), overviewSection);
     }
 
     public int getStateNumber(OverviewState state) {
@@ -84,11 +94,18 @@ public class OverviewPage extends AbstractFragment {
     }
 
     public OverviewPage waitForPageLoaded() {
-        Predicate<WebDriver> pageLoaded = browser -> !waitForFragmentVisible(overviewProjects)
-                .getRoot().getAttribute("class").contains("loading");
+        Predicate<WebDriver> pageLoaded = browser -> getRoot().findElements(By.cssSelector("[class*='loading']")).size() == 0;
 
         Graphene.waitGui().until(pageLoaded);
         return this;
+    }
+
+    public String getOverviewEmptyStateTitle() {
+        return waitForElementVisible(overviewSection).findElement(By.className("title")).getText();
+    }
+
+    public String getOverviewEmptyStateMessage() {
+        return waitForElementVisible(overviewSection).findElement(By.className("message")).getText();
     }
 
     private int refreshStateNumber(OverviewState state) {

@@ -6,6 +6,8 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -37,13 +39,15 @@ public class OverviewPageTest extends AbstractProcessTest {
     private static final String RUNNING_EMPTY_STATE_MESSAGE = "No data loading processes are running right now.";
     private static final String SCHEDULED_EMPTY_STATE_MESSAGE = "No data loading processes are scheduled to run.";
     private static final String SUCCESSFUL_EMPTY_STATE_MESSAGE = "No data loading processes have successfully finished.";
+    private static final String NO_PROJECTS_TITLE = "You do not have any projects.";
+    private static final String NO_PROJECTS_MESSAGE = "Do you want to build your own project with your own data? Let us know!";
 
     @Override
     protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
         createAndAddUserToProject(UserRoles.EDITOR);
         createAndAddUserToProject(UserRoles.VIEWER);
     }
-
+    
     @Test(dependsOnGroups = {"createProject"})
     public void checkOverviewPageShowAfterLogoutAndSignIn() throws ParseException, JSONException, IOException {
         initDiscOverviewPage();
@@ -334,6 +338,24 @@ public class OverviewPageTest extends AbstractProcessTest {
         } finally {
             getProcessService().removeProcess(process);
         }
+    }
+
+    @Test
+    public void messageIsShownForUserWithoutProjects() throws IOException, JSONException {
+        String username = createDynamicUserFrom(testParams.getUser());
+        logout();
+        signInAtUI(username, testParams.getPassword());
+
+        initDiscOverviewPage();
+        takeScreenshot(browser, "overview-page-without-projects", this.getClass());
+        assertThat(overviewPage.getOverviewEmptyStateTitle(), equalTo(NO_PROJECTS_TITLE));
+        assertThat(overviewPage.getOverviewEmptyStateMessage(), equalTo(NO_PROJECTS_MESSAGE));
+        assertThat(overviewPage.containsAnyOverviewState(), is(false));
+
+        initDiscProjectsPage();
+        takeScreenshot(browser, "projects-page-without-projects", this.getClass());
+        assertThat(projectsPage.getEmptyStateTitle(), equalTo(NO_PROJECTS_TITLE));
+        assertThat(projectsPage.getEmptyStateMessage(), equalTo(NO_PROJECTS_MESSAGE));
     }
 
     private void logoutInDiscPage() {

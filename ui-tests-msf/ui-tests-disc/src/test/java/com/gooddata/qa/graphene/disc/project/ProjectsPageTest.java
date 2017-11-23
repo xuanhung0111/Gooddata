@@ -241,10 +241,10 @@ public class ProjectsPageTest extends AbstractProcessTest {
         initDiscProjectsPage()
                 .selectFilterOption(filterOption)
                 .searchProject(searchKey);
-        assertEquals(projectsPage.getEmptyStateMessage(), format(EMPTY_STATE_MESSAGE, filterOption + " ", searchKey));
+        assertEquals(projectsPage.getEmptyStateTitle(), format(EMPTY_STATE_MESSAGE, filterOption + " ", searchKey));
 
         projectsPage.clickSearchInAllProjectsLink();
-        assertEquals(projectsPage.getEmptyStateMessage(), format(EMPTY_STATE_MESSAGE, "", searchKey));
+        assertEquals(projectsPage.getEmptyStateTitle(), format(EMPTY_STATE_MESSAGE, "", searchKey));
         assertEquals(projectsPage.getSelectedFilterOption(), FilterOption.ALL.toString());
     }
 
