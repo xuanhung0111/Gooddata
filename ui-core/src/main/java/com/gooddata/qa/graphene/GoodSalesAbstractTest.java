@@ -6,7 +6,6 @@ import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.Metric;
-
 import java.util.Arrays;
 
 import static com.gooddata.fixture.ResourceManagement.ResourceTemplate.GOODSALES;
@@ -164,6 +163,16 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
                 singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_OPPORTUNITY))),
                 singletonList(new MetricElement(createWonMetric()))));
     }
+
+    protected String createAmountByStageNameReport() {
+        return createReport(GridReportDefinitionContent.create(REPORT_AMOUNT_BY_STAGE_NAME,
+                singletonList(METRIC_GROUP),
+                Arrays.asList(
+                        new AttributeInGrid(getAttributeByTitle(ATTR_YEAR_SNAPSHOT)),
+                        new AttributeInGrid(getAttributeByTitle(ATTR_STAGE_NAME))),
+                singletonList(new MetricElement(createAmountMetric()))));
+    }
+
     //------------------------- REPORT MD OBJECTS - END  ------------------------
 
     //------------------------- VARIABLE MD OBJECTS - BEGIN  ------------------------

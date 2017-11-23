@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.entity.dashboard.drilling.DrillSetting;
 import com.gooddata.qa.graphene.fragments.common.StatusBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.DrillingConfigPanel;
@@ -19,7 +20,6 @@ import org.json.JSONException;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
@@ -210,29 +210,6 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
         }
     }
 
-    private void deleteDashboardTab(String name) {
-        DashboardTabs tabs = dashboardsPage.getTabs();
-        tabs.getTab(name).open();
-        dashboardsPage.deleteDashboardTab(tabs.getSelectedTabIndex());
-    }
-
-    private Tab initTabHavingReport(String name) {
-        return Builder.of(Tab::new).with(tab -> {
-            tab.setTitle(name);
-            tab.addItem(Builder.of(ReportItem::new)
-                    .with(item -> item.setObjUri(reportHavingOneMetric))
-                    .build());
-        }).build();
-    }
-
-    private Dashboard initDashboardHavingDrillSetting(String name) {
-        return Builder.of(Dashboard::new).with(dash -> {
-            dash.setName(name);
-            dash.addTab(initTabHavingReport(SOURCE_TAB));
-            dash.addTab(initTabHavingReport(TARGET_TAB));
-        }).build();
-    }
-
     private void addDrillSettingsToLatestReport(DrillSetting setting) {
         TableReport report = dashboardsPage.getContent()
                 .getLatestReport(TableReport.class);
@@ -254,44 +231,26 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
         dashboardsPage.saveDashboard();
     }
 
-    private class DrillSetting {
-        List<String> leftValues;
-        String rightValue;
-        String group;
-        List<DrillSetting> innerDrillSetting;
+    private void deleteDashboardTab(String name) {
+        DashboardTabs tabs = dashboardsPage.getTabs();
+        tabs.getTab(name).open();
+        dashboardsPage.deleteDashboardTab(tabs.getSelectedTabIndex());
+    }
 
-        public DrillSetting(List<String> leftValues, String rightValue, String group) {
-            this.leftValues = leftValues;
-            this.rightValue = rightValue;
-            this.group = group;
+    private Tab initTabHavingReport(String name) {
+        return Builder.of(Tab::new).with(tab -> {
+            tab.setTitle(name);
+            tab.addItem(Builder.of(ReportItem::new)
+                    .with(item -> item.setObjUri(reportHavingOneMetric))
+                    .build());
+        }).build();
+    }
 
-            innerDrillSetting = new ArrayList<>();
-        }
-
-        public DrillSetting addInnerDrillSetting(DrillSetting innerDrillSetting) {
-            this.innerDrillSetting.add(innerDrillSetting);
-
-            return this;
-        }
-
-        public List<String> getLeftValues() {
-            return leftValues;
-        }
-
-        public String getRightValue() {
-            return rightValue;
-        }
-
-        public String getGroup() {
-            return group;
-        }
-
-        public List<DrillSetting> getInnerDrillSetting() {
-            return innerDrillSetting;
-        }
-
-        public Pair<List<String>, String> getValuesAsPair() {
-            return Pair.of(leftValues, rightValue);
-        }
+    private Dashboard initDashboardHavingDrillSetting(String name) {
+        return Builder.of(Dashboard::new).with(dash -> {
+            dash.setName(name);
+            dash.addTab(initTabHavingReport(SOURCE_TAB));
+            dash.addTab(initTabHavingReport(TARGET_TAB));
+        }).build();
     }
 }
