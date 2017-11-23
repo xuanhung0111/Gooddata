@@ -4,6 +4,7 @@ import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.fragments.common.StatusBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.DrillingConfigPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.DrillingConfigPanel.DrillingGroup;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
@@ -33,9 +34,6 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
 
     private final String SOURCE_TAB = "source tab";
     private final String TARGET_TAB = "target tab";
-
-    private final String DASHBOARD_DRILLING_GROUP = "Dashboards";
-
     private final String DASHBOARD_HAS_DRILL_SETTINGS = "Dashboard has drill settings";
     private final String ERROR_MSG = "The target dashboard tab has been deleted.";
     private final String SHOW_ME_DEFAULT_VALUE = "Select Attribute / Report / Dashboard";
@@ -59,7 +57,7 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
                     .getTabs().getTab(SOURCE_TAB).open();
 
             addDrillSettingsToLatestReport(
-                    new DrillSetting(singletonList(ATTR_PRODUCT), TARGET_TAB, DASHBOARD_DRILLING_GROUP));
+                    new DrillSetting(singletonList(ATTR_PRODUCT), TARGET_TAB, DrillingGroup.DASHBOARDS.getName()));
 
             dashboardsPage.editDashboard().deleteDashboard();
 
@@ -79,7 +77,7 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
                     .getTabs().getTab(SOURCE_TAB).open();
 
             addDrillSettingsToLatestReport(
-                    new DrillSetting(singletonList(ATTR_PRODUCT), TARGET_TAB, DASHBOARD_DRILLING_GROUP));
+                    new DrillSetting(singletonList(ATTR_PRODUCT), TARGET_TAB, DrillingGroup.DASHBOARDS.getName()));
 
             dashboardsPage.getTabs().getTab(TARGET_TAB).open();
             deleteDashboardTab(TARGET_TAB);
@@ -101,7 +99,7 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
 
             tabs.getTab(SOURCE_TAB).open();
             addDrillSettingsToLatestReport(
-                    new DrillSetting(singletonList(ATTR_PRODUCT), TARGET_TAB, DASHBOARD_DRILLING_GROUP));
+                    new DrillSetting(singletonList(ATTR_PRODUCT), TARGET_TAB, DrillingGroup.DASHBOARDS.getName()));
 
             tabs.getTab(TARGET_TAB).open();
             deleteDashboardTab(TARGET_TAB);
@@ -131,7 +129,7 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
 
             tabs.getTab(SOURCE_TAB).open();
             addDrillSettingsToLatestReport(
-                    new DrillSetting(singletonList(ATTR_PRODUCT), TARGET_TAB, DASHBOARD_DRILLING_GROUP));
+                    new DrillSetting(singletonList(ATTR_PRODUCT), TARGET_TAB, DrillingGroup.DASHBOARDS.getName()));
 
             deleteDashboardTab(TARGET_TAB);
             tabs.getTab(SOURCE_TAB).open();
@@ -184,7 +182,7 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
             addDrillSettingsToLatestReport(
                     new DrillSetting(singletonList(ATTR_SALES_REP), REPORT_AMOUNT_BY_PRODUCT, "Reports")
                             .addInnerDrillSetting(new DrillSetting(singletonList(ATTR_PRODUCT), TARGET_TAB,
-                                    DASHBOARD_DRILLING_GROUP)));
+                                    DrillingGroup.DASHBOARDS.getName())));
 
             tabs.getTab(TARGET_TAB).open();
             deleteDashboardTab(TARGET_TAB);
