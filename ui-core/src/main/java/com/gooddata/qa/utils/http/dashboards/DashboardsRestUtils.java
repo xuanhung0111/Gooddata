@@ -66,7 +66,7 @@ public final class DashboardsRestUtils {
                 put("userFilters", new JSONObject() {{
                     put("items", new JSONArray() {{
                         put(new JSONObject() {{
-                            put("user", "/gdc/account/profile/${email}");
+                            put("user", "${profileUri}");
                             put("userFilters", new JSONArray() {{
                                 put("$MUFExpression");
                             }});
@@ -494,20 +494,20 @@ public final class DashboardsRestUtils {
      *
      * @param restApiClient
      * @param projectId
-     * @param user
+     * @param profileUri
      * @param mufURI
      */
-    public static void addMufToUser(final RestApiClient restApiClient, final String projectId, final String user,
+    public static void addMufToUser(final RestApiClient restApiClient, final String projectId, final String profileUri,
             final String mufURI) throws ParseException, IOException {
-        final String urserFilter = format(MUF_LINK, projectId);
-        final String contentBody = USER_FILTER.get().replace("${email}", user).replace("$MUFExpression", mufURI);
+        final String userFilter = format(MUF_LINK, projectId);
+        final String contentBody = USER_FILTER.get().replace("${profileUri}", profileUri).replace("$MUFExpression", mufURI);
 
-        executeRequest(restApiClient, restApiClient.newPostMethod(urserFilter, contentBody), HttpStatus.OK);
+        executeRequest(restApiClient, restApiClient.newPostMethod(userFilter, contentBody), HttpStatus.OK);
     }
 
-    public static void removeAllMufFromUser(RestApiClient restApiClient, String projectId, String user)
+    public static void removeAllMufFromUser(RestApiClient restApiClient, String projectId, String profileUri)
             throws ParseException, IOException {
-        addMufToUser(restApiClient, projectId, user, "");
+        addMufToUser(restApiClient, projectId, profileUri, "");
     }
 
     /**
