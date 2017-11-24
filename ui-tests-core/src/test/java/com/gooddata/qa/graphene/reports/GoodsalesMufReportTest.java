@@ -28,6 +28,8 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.joda.time.DateTime.now;
 import static org.testng.Assert.assertEquals;
 
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
+
 public class GoodsalesMufReportTest extends GoodSalesAbstractTest {
     private Attribute stageNameAttribute;
     private AttributeElement stageNameValue;
@@ -76,7 +78,8 @@ public class GoodsalesMufReportTest extends GoodSalesAbstractTest {
         final String mufUri =
                 createMufObjectByUri(getRestApiClient(), testParams.getProjectId(), mufName, expression);
 
-        addMufToUser(getRestApiClient(), testParams.getProjectId(), testParams.getUser(), mufUri);
+        addMufToUser(getRestApiClient(), testParams.getProjectId(),
+                UserManagementRestUtils.getCurrentUserProfileUri(getRestApiClient()), mufUri);
 
         final String uniqueString = UUID.randomUUID().toString().substring(0, 6);
         final String reportName = "Report" + uniqueString;
@@ -122,7 +125,8 @@ public class GoodsalesMufReportTest extends GoodSalesAbstractTest {
         final String combinedMufUri =
                 createMufObjectByUri(getRestApiClient(), testParams.getProjectId(), "combinedMuf", combinedMufExpression);
 
-        addMufToUser(getRestApiClient(), testParams.getProjectId(), testParams.getUser(), combinedMufUri);
+        addMufToUser(getRestApiClient(), testParams.getProjectId(),
+                UserManagementRestUtils.getCurrentUserProfileUri(getRestApiClient()), combinedMufUri);
 
         final String uniqueString = UUID.randomUUID().toString().substring(0, 6);
         final String reportName = "Report" + uniqueString;

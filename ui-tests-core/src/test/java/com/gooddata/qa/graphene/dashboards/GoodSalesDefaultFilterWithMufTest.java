@@ -38,6 +38,8 @@ import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.joining;
 import static org.testng.Assert.assertEquals;
 
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
+
 public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTest {
 
     private static final String DASHBOARD_MUF = "Muf-Dashboard";
@@ -116,7 +118,10 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             description = "Verify muf user default view shows correctly after assigned muf in multiple choice mode")
     public void checkMufUserDefaultViewInMultipleChoiceMode(String user, UserRoles role, String mufObjectUri)
             throws ParseException, IOException, JSONException {
-        addMufToUser(getRestApiClient(), testParams.getProjectId(), user, mufObjectUri);
+        String assignedMufUserId = UserManagementRestUtils
+                .getUserProfileUri(getDomainUserRestApiClient(), testParams.getUserDomain(), user);
+
+        addMufToUser(getRestApiClient(), testParams.getProjectId(), assignedMufUserId, mufObjectUri);
 
         try {
             initDashboardsPage().selectDashboard(DASHBOARD_MUF).editDashboard();
@@ -152,7 +157,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
 
         } finally {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
-            removeAllMufFromUser(getRestApiClient(), testParams.getProjectId(), user);
+            removeAllMufFromUser(getRestApiClient(), testParams.getProjectId(), assignedMufUserId);
         }
     }
 
@@ -160,7 +165,10 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             description = "Verify muf user default view shows correctly after assigned muf in single choice mode")
     public void checkMufUserDefaultViewInSingleChoiceMode(String user, UserRoles role, String mufObjectUri)
             throws ParseException, IOException, JSONException {
-        addMufToUser(getRestApiClient(), testParams.getProjectId(), user, mufObjectUri);
+        String assignedMufUserId = UserManagementRestUtils
+                .getUserProfileUri(getDomainUserRestApiClient(), testParams.getUserDomain(), user);
+
+        addMufToUser(getRestApiClient(), testParams.getProjectId(), assignedMufUserId, mufObjectUri);
 
         try {
             initDashboardsPage().selectDashboard(DASHBOARD_MUF).editDashboard();
@@ -180,7 +188,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
 
         } finally {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
-            removeAllMufFromUser(getRestApiClient(), testParams.getProjectId(), user);
+            removeAllMufFromUser(getRestApiClient(), testParams.getProjectId(), assignedMufUserId);
         }
     }
 
@@ -190,6 +198,9 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             throws JSONException, ParseException, IOException {
         final String savedView1 = "SavedView1";
         final String savedView2 = "SavedView2";
+
+        String assignedMufUserId = UserManagementRestUtils
+                .getUserProfileUri(getDomainUserRestApiClient(), testParams.getUserDomain(), user);
 
         try {
             logoutAndLoginAs(canAccessGreyPage(browser), role);
@@ -205,7 +216,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             getFilter(MUF_DF_VARIABLE).changeAttributeFilterValues(COMPUSCI, WONDERKID);
             savedViewWidget.openSavedViewMenu().saveCurrentView(savedView2);
 
-            addMufToUser(getRestApiClient(), testParams.getProjectId(), user, mufObjectUri);
+            addMufToUser(getRestApiClient(), testParams.getProjectId(), assignedMufUserId, mufObjectUri);
 
             savedViewWidget = refreshDashboardsPage()
                     .getSavedViewWidget()
@@ -225,7 +236,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
 
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
-            removeAllMufFromUser(getRestApiClient(), testParams.getProjectId(), user);
+            removeAllMufFromUser(getRestApiClient(), testParams.getProjectId(), assignedMufUserId);
         }
     }
 
@@ -234,6 +245,8 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
     public void checkMufUserSavedViewInSingleChoiceMode(String user, UserRoles role, String mufObjectUri)
             throws JSONException, ParseException, IOException {
         final String savedView = "SavedView";
+        String assignedMufUserId = UserManagementRestUtils
+                .getUserProfileUri(getDomainUserRestApiClient(), testParams.getUserDomain(), user);
 
         try {
             logoutAndLoginAs(canAccessGreyPage(browser), role);
@@ -245,7 +258,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             getFilter(MUF_DF_VARIABLE).changeAttributeFilterValues(WONDERKID);
             savedViewWidget.openSavedViewMenu().saveCurrentView(savedView);
 
-            addMufToUser(getRestApiClient(), testParams.getProjectId(), user, mufObjectUri);
+            addMufToUser(getRestApiClient(), testParams.getProjectId(), assignedMufUserId, mufObjectUri);
 
             refreshDashboardsPage()
                     .getSavedViewWidget()
@@ -260,7 +273,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
 
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
-            removeAllMufFromUser(getRestApiClient(), testParams.getProjectId(), user);
+            removeAllMufFromUser(getRestApiClient(), testParams.getProjectId(), assignedMufUserId);
         }
     }
 

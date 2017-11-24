@@ -1,5 +1,46 @@
 package com.gooddata.qa.graphene.manage;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
+import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.changeMetricExpression;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForObjectPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getBubbleMessage;
+import static org.openqa.selenium.By.id;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_MONTH_YEAR_CREATED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_SALES_REP;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_EXPECTED_PERCENT_OF_GOAL;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON_OPPS;
+import static com.gooddata.md.Restriction.title;
+import static java.lang.String.format;
+import static java.util.stream.Collectors.joining;
+import static java.util.Arrays.asList;
+import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
+import org.apache.http.ParseException;
+import org.json.JSONException;
+import org.openqa.selenium.By;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
 import com.gooddata.md.Attribute;
 import com.gooddata.md.AttributeElement;
 import com.gooddata.md.Fact;
@@ -25,46 +66,6 @@ import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
-import org.apache.http.ParseException;
-import org.json.JSONException;
-import org.openqa.selenium.By;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
-import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.ElementUtils.getBubbleMessage;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_MONTH_YEAR_CREATED;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_SALES_REP;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_EXPECTED_PERCENT_OF_GOAL;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON_OPPS;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForObjectPageLoaded;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.changeMetricExpression;
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.joining;
-import static org.openqa.selenium.By.id;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
 
 public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
@@ -448,7 +449,9 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             restApiClient = getRestApiClient();
 
             String mufUri = createStageMuf(Arrays.asList("Won", "Lost"), "Status User Filters");
-            DashboardsRestUtils.addMufToUser(restApiClient, testParams.getProjectId(), testParams.getEditorUser(),
+            DashboardsRestUtils.addMufToUser(restApiClient, testParams.getProjectId(),
+                    UserManagementRestUtils.getUserProfileUri(
+                            getDomainUserRestApiClient(), testParams.getUserDomain(), testParams.getEditorUser()),
                     mufUri);
             logout();
 
