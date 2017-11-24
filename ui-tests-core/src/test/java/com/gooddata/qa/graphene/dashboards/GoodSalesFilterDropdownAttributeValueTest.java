@@ -55,6 +55,8 @@ import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
+
 public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstractTest {
 
     private static final String SHORT_LIST_ID = "168751";
@@ -322,7 +324,8 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
 
         String mufUri = createSimpleMufObjByUri(getRestApiClient(),
                 getProject().getId(), "Stage Name user filter", conditions);
-        addMufToUser(getRestApiClient(), getProject().getId(), testParams.getUser(), mufUri);
+        addMufToUser(getRestApiClient(), getProject().getId(),
+                UserManagementRestUtils.getCurrentUserProfileUri(getRestApiClient()), mufUri);
 
         makeCopyFromDashboard(USE_AVAILABLE_DASHBOARD_2);
 
@@ -350,7 +353,8 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
         } finally {
             dashboardsPage.deleteDashboard();
             editMetricExpression(buildFirstMetricExpression(amountMetric.getUri(), stageNameUri));
-            addMufToUser(getRestApiClient(), getProject().getId(), testParams.getUser(), "");
+            addMufToUser(getRestApiClient(), getProject().getId(),
+                    UserManagementRestUtils.getCurrentUserProfileUri(getRestApiClient()), "");
         }
     }
 

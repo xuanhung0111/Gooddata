@@ -262,6 +262,16 @@ public final class UserManagementRestUtils {
     }
 
     /**
+     * Get current user profile uri
+     *
+     * @param restApiClient
+     * @return current user profile uri
+     */
+    public static String getCurrentUserProfileUri(final RestApiClient restApiClient) throws JSONException, IOException {
+        return getCurrentUserProfile(restApiClient).getJSONObject("links").getString("self");
+    }
+
+    /**
      * Update password of an user
      * 
      * @param restApiClient

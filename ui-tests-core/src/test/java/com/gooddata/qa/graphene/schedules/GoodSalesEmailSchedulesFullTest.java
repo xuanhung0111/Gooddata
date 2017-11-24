@@ -50,6 +50,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.java.Builder;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -268,7 +269,10 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         conditions.put(product.getUri(), singletonList(explorerUri));
         String mufUri =
                 createSimpleMufObjByUri(getRestApiClient(), getProject().getId(), "Product user filter", conditions);
-        addMufToUser(getRestApiClient(), getProject().getId(), imapUser, mufUri);
+        addMufToUser(getRestApiClient(), getProject().getId(),
+                UserManagementRestUtils.getUserProfileUri(
+                        getDomainUserRestApiClient(), testParams.getUserDomain(), imapUser),
+                mufUri);
 
         ReportDefinition definition = GridReportDefinitionContent.create(report, singletonList(METRIC_GROUP),
                 singletonList(new AttributeInGrid(product.getDefaultDisplayForm().getUri(), product.getTitle())),

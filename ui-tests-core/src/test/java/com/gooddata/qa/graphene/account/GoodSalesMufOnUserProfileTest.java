@@ -52,7 +52,11 @@ public class GoodSalesMufOnUserProfileTest extends GoodSalesAbstractTest {
         final String expression = format(EXPRESSION, stageNameAttribute.getUri(), stageNameValue.getUri());
         final String mufUri = createMufObjectByUri(getRestApiClient(), testParams.getProjectId(), MUF_NAME, expression);
 
-        addMufToUser(getRestApiClient(), testParams.getProjectId(), testParams.getEditorUser(), mufUri);
+        addMufToUser(getRestApiClient(), testParams.getProjectId(),
+                getUserProfileUri(getDomainUserRestApiClient(),
+                        testParams.getUserDomain(),
+                        testParams.getEditorUser()),
+                mufUri);
     }
 
     @DataProvider(name = "userProvider")
