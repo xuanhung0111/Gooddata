@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.DataProvider;
@@ -77,7 +78,8 @@ public class GoodsalesMufReportTest extends GoodSalesAbstractTest {
         final String mufUri =
                 createMufObjectByUri(getRestApiClient(), testParams.getProjectId(), mufName, expression);
 
-        addMufToUser(getRestApiClient(), testParams.getProjectId(), testParams.getUser(), mufUri);
+        addMufToUser(getRestApiClient(), testParams.getProjectId(),
+                UserManagementRestUtils.getCurrentUserProfileUri(getRestApiClient()), mufUri);
 
         final String uniqueString = UUID.randomUUID().toString().substring(0, 6);
         final String reportName = "Report" + uniqueString;
@@ -123,7 +125,8 @@ public class GoodsalesMufReportTest extends GoodSalesAbstractTest {
         final String combinedMufUri =
                 createMufObjectByUri(getRestApiClient(), testParams.getProjectId(), "combinedMuf", combinedMufExpression);
 
-        addMufToUser(getRestApiClient(), testParams.getProjectId(), testParams.getUser(), combinedMufUri);
+        addMufToUser(getRestApiClient(), testParams.getProjectId(),
+                UserManagementRestUtils.getCurrentUserProfileUri(getRestApiClient()), combinedMufUri);
 
         final String uniqueString = UUID.randomUUID().toString().substring(0, 6);
         final String reportName = "Report" + uniqueString;

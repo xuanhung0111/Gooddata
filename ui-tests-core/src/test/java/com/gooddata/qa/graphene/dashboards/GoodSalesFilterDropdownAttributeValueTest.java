@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -322,7 +323,8 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
 
         String mufUri = createSimpleMufObjByUri(getRestApiClient(),
                 getProject().getId(), "Stage Name user filter", conditions);
-        addMufToUser(getRestApiClient(), getProject().getId(), testParams.getUser(), mufUri);
+        addMufToUser(getRestApiClient(), getProject().getId(),
+                UserManagementRestUtils.getCurrentUserProfileUri(getRestApiClient()), mufUri);
 
         makeCopyFromDashboard(USE_AVAILABLE_DASHBOARD_2);
 
@@ -350,7 +352,8 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
         } finally {
             dashboardsPage.deleteDashboard();
             editMetricExpression(buildFirstMetricExpression(amountMetric.getUri(), stageNameUri));
-            addMufToUser(getRestApiClient(), getProject().getId(), testParams.getUser(), "");
+            addMufToUser(getRestApiClient(), getProject().getId(),
+                    UserManagementRestUtils.getCurrentUserProfileUri(getRestApiClient()), "");
         }
     }
 

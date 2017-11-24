@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
@@ -448,7 +449,9 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             restApiClient = getRestApiClient();
 
             String mufUri = createStageMuf(Arrays.asList("Won", "Lost"), "Status User Filters");
-            DashboardsRestUtils.addMufToUser(restApiClient, testParams.getProjectId(), testParams.getEditorUser(),
+            DashboardsRestUtils.addMufToUser(restApiClient, testParams.getProjectId(),
+                    UserManagementRestUtils.getUserProfileUri(
+                            getDomainUserRestApiClient(), testParams.getUserDomain(), testParams.getEditorUser()),
                     mufUri);
             logout();
 
