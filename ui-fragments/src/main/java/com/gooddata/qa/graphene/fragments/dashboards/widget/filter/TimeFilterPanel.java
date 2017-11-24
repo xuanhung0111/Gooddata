@@ -166,6 +166,18 @@ public class TimeFilterPanel extends AbstractFragment {
         return this;
     }
 
+    public TimeFilterPanel moveLeftOnTimelines() {
+        if (!canMoveLeftOnTimeline()) throw new RuntimeException("Reached to limit range");
+        leftArrow.click();
+        return this;
+    }
+
+    public TimeFilterPanel moveRightOnTimelines() {
+        if (!canMoveRightOnTimeline()) throw new RuntimeException("Reached to limit range");
+        rightArrow.click();
+        return this;
+    }
+
     public boolean isFromToNotVisible() {
         return (!isElementVisible(INTERVAL, getRoot()));
     }
@@ -189,6 +201,14 @@ public class TimeFilterPanel extends AbstractFragment {
 
         return ElementUtils.isElementVisible(filterTimeFromInput)
                 && ElementUtils.isElementVisible(filterTimeToInput);
+    }
+
+    public boolean canMoveLeftOnTimeline() {
+        return isElementVisible(leftArrow);
+    }
+
+    public boolean canMoveRightOnTimeline() {
+        return isElementVisible(rightArrow);
     }
 
     public String getPreviewValue() {

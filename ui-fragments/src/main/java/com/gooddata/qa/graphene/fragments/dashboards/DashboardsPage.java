@@ -519,6 +519,11 @@ public class DashboardsPage extends AbstractFragment {
         return this;
     }
 
+    public DashboardsPage cancelDashboard() {
+        getDashboardEditBar().cancelDashboard();
+        return this;
+    }
+
     public DashboardsPage addWebContentToDashboard(String content) {
         editDashboard().addWebContentToDashboard(content);
         return this;

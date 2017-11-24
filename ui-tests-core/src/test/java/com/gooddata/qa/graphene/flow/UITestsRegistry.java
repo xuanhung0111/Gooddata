@@ -36,6 +36,7 @@ import com.gooddata.qa.graphene.dashboards.GoodSalesReportWidgetOnDashboardTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesSavedViewWithAllValuesTest;
 import com.gooddata.qa.graphene.filters.DashboardDateFilterSelectRangeTest;
 import com.gooddata.qa.graphene.filters.DashboardFilterVisualTest;
+import com.gooddata.qa.graphene.filters.DashboardFiscalDateFilterConfigurationTest;
 import com.gooddata.qa.graphene.filters.DashboardFiscalDateFilterTest;
 import com.gooddata.qa.graphene.filters.FiscalDateFilterNameTest;
 import com.gooddata.qa.graphene.filters.GroupFiltersOnDashboardTest;
@@ -127,6 +128,7 @@ public class UITestsRegistry {
             GoodSalesFilterGroupTest.class,
             DashboardFilterVisualTest.class,
             DashboardFiscalDateFilterTest.class,
+            DashboardFiscalDateFilterConfigurationTest.class,
             MetricAvailableFilterTest.class,
             DashboardSavedFiltersTest.class,
             GoodSalesAdvancedConnectingFilterTest.class,
@@ -182,6 +184,7 @@ public class UITestsRegistry {
                     GoodSalesFilterGroupTest.class,
                     DashboardFilterVisualTest.class,
                     DashboardFiscalDateFilterTest.class,
+                    DashboardFiscalDateFilterConfigurationTest.class,
                     MetricAvailableFilterTest.class,
                     GoodSalesDashboardWidgetManipulationTest.class,
                     DashboardSavedFiltersTest.class,
