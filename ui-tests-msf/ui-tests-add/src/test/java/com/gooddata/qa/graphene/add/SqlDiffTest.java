@@ -90,6 +90,7 @@ public class SqlDiffTest extends AbstractDataloadProcessTest {
                 .append("-- Uncomment only if you really know the consequences of your decision\n")
                 .append("-- ,    \"x__client_id\" VARCHAR(128) ENCODING RLE\n")
                 .append("-- ,    \"x__timestamp\" TIMESTAMP ENCODING RLE\n")
+                .append("-- ,    \"x__deleted\" BOOLEAN DEFAULT false ENCODING RLE\n")
                 .append(");\n")
                 .append("--if Vertica optimization is required, then: 1) replace \");\" with \"\"; 2) "
                         + "replace \"--verticaOpt \" with \"\".\n")
@@ -97,7 +98,7 @@ public class SqlDiffTest extends AbstractDataloadProcessTest {
                         + "with their real presence in the table.\n")
                 .append("--verticaOpt )\n")
                 .append("--verticaOpt order by \"x__client_id\", \"x__timestamp\"\n")
-                .append("--verticaOpt segmented by hash(\"a__opportunity\",\"f__price\",\"x__client_id\","
+                .append("--verticaOpt segmented by hash(\"a__opportunity\",\"f__price\",\"x__client_id\",\"x__deleted\","
                         + "\"x__timestamp\") all nodes;")
                 .toString();
     }
