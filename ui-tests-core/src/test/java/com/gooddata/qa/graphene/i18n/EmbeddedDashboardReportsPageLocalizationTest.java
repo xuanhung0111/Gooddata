@@ -5,7 +5,6 @@ import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog;
 import com.gooddata.qa.graphene.fragments.reports.report.EmbeddedReportPage;
 import com.gooddata.qa.graphene.fragments.reports.report.MetricSndPanel;
 import org.jboss.arquillian.graphene.Graphene;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkLocalization;
@@ -14,11 +13,19 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_ACTIVITIES_BY
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.cssSelector;
 
-public class EmbeddedDashboardReportsPageLocalizationTest extends GoodSalesAbstractLocalizationTest {
+public class EmbeddedDashboardReportsPageLocalizationTest extends AbstractEmbeddedDashboardTest {
 
-    @BeforeClass(alwaysRun = true)
-    public void setProjectTitle() {
+    @Override
+    protected void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-embeded-dashboard-reports-page-localization-test";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createNumberOfActivitiesMetric();
+        createActivitiesByTypeReport();
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})

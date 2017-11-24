@@ -22,6 +22,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_WHATS_CHANG
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.GOODSALES_TEMPLATE;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
+@Deprecated
 public class TemplateAbstractTest extends AbstractProjectTest{
 
     protected String projectTemplate;

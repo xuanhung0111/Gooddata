@@ -1,84 +1,63 @@
 package com.gooddata.qa.graphene.project;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.md.Fact;
-import com.gooddata.md.Metric;
-import com.gooddata.md.report.AttributeInGrid;
-import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.MetricElement;
-import com.gooddata.md.report.Report;
-import com.gooddata.md.report.ReportDefinition;
-import com.gooddata.qa.graphene.TemplateAbstractTest;
-import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
-import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
+import com.gooddata.fixture.ResourceManagement.*;
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
-import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.mdObjects.dashboard.Dashboard;
+import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
+import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
+import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
+import com.gooddata.qa.utils.java.Builder;
 import org.json.JSONException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
-import static com.gooddata.md.Restriction.title;
-import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
-import static com.gooddata.qa.graphene.utils.UrlParserUtils.getObjdUri;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_ACTIVITIES_BY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOP_5_LOST_BY_CASH;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOP_5_OPEN_BY_CASH;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.VARIABLE_STATUS;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static org.openqa.selenium.By.id;
+import static org.openqa.selenium.By.className;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-public class PartialExportAndImportProjectTest extends TemplateAbstractTest {
+public class PartialExportAndImportProjectTest extends GoodSalesAbstractTest {
 
-    private final static String PROJECT_TEMPLATE = "/projectTemplates/OnboardingWalkMe/3";
-
-    private final static String TARGET_PROJECT_TITLE = "Target-Project";
-    private final static String SIMPLE_REPORT = "Simple-Report";
-    private final static String SIMPLE_METRIC = "Simple-Metric";
-    private final static String NEW_DASHBOARD = "New-Dashboard";
-    private final static String CONSUMER_INSIGHTS = "Consumer Insights";
-    private static final String SIMPLE_FILTERED_VARIABLE = "Simple-filtered-variable";
-    private static final String REGION = "Region";
-    private static final String SOUTH = "South";
-    private static final String WEST = "West";
-    private static final String MIDWEST = "Midwest";
-    private static final String NORTHEAST = "Northeast";
-    private static final String SALES = "Sales";
-    private static final String SPEND = "Spend";
-    private static final String BAR_CHART_REPORT = "Bar Chart: Email Open Rate by Month";
+    private final String FIRST_TAB = "First Tab";
+    private final String SECOND_TAB = "Second Tab";
 
     private String sourceProjectId;
     private String targetProjectId;
 
-    @Override
-    protected void initProperties() {
-        projectTemplate = PROJECT_TEMPLATE;
-    }
-
     @Test(dependsOnGroups = {"createProject"})
     public void createAnotherProject() {
         sourceProjectId = testParams.getProjectId();
-        targetProjectId = ProjectRestUtils.createProject(getGoodDataClient(),
-                TARGET_PROJECT_TITLE, PROJECT_TEMPLATE, testParams.getAuthorizationToken(),
-                testParams.getProjectDriver(), testParams.getProjectEnvironment());
+        targetProjectId = createProjectUsingFixture("Target-Project", ResourceTemplate.GOODSALES);
     }
 
     @Test(dependsOnMethods = {"createAnotherProject"})
     public void partialExportAndImportReport() throws JSONException {
-        final String reportUri = createSimpleReport();
-        final String exportToken = exportPartialProject(reportUri, DEFAULT_PROJECT_CHECK_LIMIT);
-
+        String exportToken = exportPartialProject(createActivitiesByTypeReport(), DEFAULT_PROJECT_CHECK_LIMIT);
+        testParams.setProjectId(targetProjectId);
         try {
-            testParams.setProjectId(targetProjectId);
             importPartialProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
-
-            initReportsPage().openReport(SIMPLE_REPORT);
-            //use List.equals due to checking attribute & metric order
-            assertTrue(reportPage.getTableReport().getAttributeValues().equals(asList(MIDWEST, NORTHEAST, SOUTH, WEST)),
+            TableReport report = initReportsPage().openReport(REPORT_ACTIVITIES_BY_TYPE).getTableReport();
+            assertEquals(report.getAttributeValues(), asList("Email", "In Person Meeting", "Phone Call", "Web Meeting"),
                     "There is difference between actual and expected attributes");
-            assertTrue(reportPage.getTableReport().getMetricValues().equals(asList(3.8f, 2.8f, 7.3f, 3.7f)),
-                    "There is difference between actual and expected metric elelemts");
+            assertEquals(report.getRawMetricValues(), asList("33,920", "35,975", "50,780", "33,596"),
+                    "There is difference between actual and expected metric elements");
         } finally {
             testParams.setProjectId(sourceProjectId);
         }
@@ -86,51 +65,53 @@ public class PartialExportAndImportProjectTest extends TemplateAbstractTest {
 
     @Test(dependsOnMethods = {"partialExportAndImportReport"})
     public void partialExportAndImportChartReport() throws JSONException {
-        initReportsPage().openReport(SIMPLE_REPORT);
-        reportPage.waitForReportExecutionProgress();
-        final String simpleReportUri = getObjdUri(browser.getCurrentUrl());
-        reportPage.selectReportVisualisation(ReportTypes.BAR).waitForReportExecutionProgress().saveReport();
+        // using report will be changed from table to bar chart
+        String top5OpenByCashReportUri = createTop5OpenByCashReport();
+        initReportsPage().openReport(REPORT_TOP_5_OPEN_BY_CASH)
+                .selectReportVisualisation(ReportTypes.BAR)
+                .waitForReportExecutionProgress()
+                .saveReport();
 
-        final String exportToken = exportPartialProject(simpleReportUri, DEFAULT_PROJECT_CHECK_LIMIT);
-
+        String exportToken = exportPartialProject(top5OpenByCashReportUri, DEFAULT_PROJECT_CHECK_LIMIT);
+        testParams.setProjectId(targetProjectId);
         try {
-            testParams.setProjectId(targetProjectId);
             importPartialProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
-
-            initReportsPage().openReport(SIMPLE_REPORT);
-            reportPage.waitForReportExecutionProgress();
-            assertTrue(isElementVisible(id("chartContainer"), browser), "The bar chart is not displayed");
-            takeScreenshot(browser, "Simple-report-in-bar-chart-type", getClass());
+            initReportsPage().openReport(REPORT_TOP_5_OPEN_BY_CASH);
+            takeScreenshot(browser, "Report-in-bar-chart-type", getClass());
+            assertTrue(isElementVisible(className("yui3-c-chart"), browser), "The bar chart is not rendered");
+            assertEquals(reportPage.getSelectedChartType(), ReportTypes.BAR.getName(), "Displayed chart is not Bar type");
         } finally {
             testParams.setProjectId(sourceProjectId);
         }
     }
 
     @Test(dependsOnMethods = {"createAnotherProject"})
-    public void partialExportAndImportDashboard() throws JSONException {
-        initDashboardsPage().selectDashboard(CONSUMER_INSIGHTS);
-        final String existingDashobardUri = getObjdUri(browser.getCurrentUrl());
+    public void partialExportAndImportDashboard() throws JSONException, IOException {
+        String dashboard1 = "Dashboard contains Top 5 Won";
+        String dashboard2 = "Dashboard contains Top 5 Lost";
 
-        dashboardsPage.addNewDashboard(NEW_DASHBOARD).editDashboard().addReportToDashboard(BAR_CHART_REPORT).saveDashboard();
-        takeScreenshot(browser, "HL-Sales-report-on-dashboard", getClass());
+        List<String> dashUris = new ArrayList<>();
+        dashUris.add(DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
+                initDashboard(dashboard1, createTop5WonByCashReport()).getMdObject()));
+        dashUris.add(DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
+                initDashboard(dashboard2, createTop5LostByCashReport()).getMdObject()));
 
-        dashboardsPage.selectDashboard(NEW_DASHBOARD);
-        final String newDashobardUri = getObjdUri(browser.getCurrentUrl());
-        final String exportToken = exportPartialProject(existingDashobardUri + "\n" + newDashobardUri,
-                DEFAULT_PROJECT_CHECK_LIMIT);
-
+        String exportToken = exportPartialProject(
+                dashUris.stream().collect(Collectors.joining("\n")), DEFAULT_PROJECT_CHECK_LIMIT);
+        testParams.setProjectId(targetProjectId);
         try {
-            testParams.setProjectId(targetProjectId);
             importPartialProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
-
-            initDashboardsPage().selectDashboard(CONSUMER_INSIGHTS);
-
+            initDashboardsPage().selectDashboard(dashboard1);
             //use List.equals due to checking tab order
-            assertTrue(asList("Executive Overview", "Marketing Contribution", "Sales Forecast", "Create Insights")
-                    .equals(dashboardsPage.getTabs().getAllTabNames()), "The imported dashboard is incorrect ");
+            assertTrue(asList(FIRST_TAB, SECOND_TAB).equals(dashboardsPage.getTabs().getAllTabNames()),
+                    "The imported dashboard is not correct ");
 
-            dashboardsPage.selectDashboard(NEW_DASHBOARD);
-            assertTrue(dashboardsPage.getContent().getReport(BAR_CHART_REPORT, OneNumberReport.class).getRoot().isDisplayed(),
+            dashboardsPage.selectDashboard(dashboard2);
+            assertTrue(dashboardsPage.getContent()
+                            .getReport(REPORT_TOP_5_LOST_BY_CASH, TableReport.class)
+                            .getAttributeValues()
+                            .equals(asList("Boston Health Economics > CompuSci", "Hinshaw & Culbertson > CompuSci",
+                                    "Mediatavern > Explorer", "R2integrated > PhoenixSoft", "TechSource > CompuSci")),
                     "The imported dashboard is not correct");
         } finally {
             testParams.setProjectId(sourceProjectId);
@@ -139,21 +120,17 @@ public class PartialExportAndImportProjectTest extends TemplateAbstractTest {
 
     @Test(dependsOnMethods = {"createAnotherProject"})
     public void partialExportAndImportMetric() throws JSONException {
-        final String simpleMetricUri = createSimpleMetric().getUri();
-        final String spendMetricUri = getMdService().getObjUri(getProject(), Metric.class, title(SPEND));
-
-        final String exportToken = exportPartialProject(simpleMetricUri + "\n" + spendMetricUri,
-                DEFAULT_PROJECT_CHECK_LIMIT);
-
+        String amountMetricUri = createAvgAmountMetric().getUri();
+        String numberOfActUri = createNumberOfActivitiesMetric().getUri();
+        String exportToken = exportPartialProject(
+                amountMetricUri + "\n" + numberOfActUri, DEFAULT_PROJECT_CHECK_LIMIT);
+        testParams.setProjectId(targetProjectId);
         try {
-            testParams.setProjectId(targetProjectId);
             importPartialProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
-
-            assertTrue(initMetricPage().openMetricDetailPage(SPEND).getMAQL()
-                    .equals("SELECT SUM(ifnull(Spend,0))"), "The imported metric is not correct");
-
-            assertTrue(initMetricPage().openMetricDetailPage(SIMPLE_METRIC).getMAQL()
-                    .equals("SELECT SUM(Sales)"), "The imported metric is not correct");
+            assertEquals(initMetricPage().openMetricDetailPage(METRIC_AMOUNT).getMAQL(),
+                    "SELECT SUM(Amount) where Opp. Snapshot (Date)= _Snapshot [EOP]", "The imported metric is not correct");
+            assertEquals(initMetricPage().openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES).getMAQL(),
+                    "SELECT COUNT(Activity)", "The imported metric is not correct");
         } finally {
             testParams.setProjectId(sourceProjectId);
         }
@@ -161,47 +138,36 @@ public class PartialExportAndImportProjectTest extends TemplateAbstractTest {
 
     @Test(dependsOnMethods = {"createAnotherProject"})
     public void partialExportAndImportVariable() throws JSONException {
-        final AttributeVariable simpleVariable = new AttributeVariable(SIMPLE_FILTERED_VARIABLE)
-                .withAttribute(REGION)
-                .withAttributeValues(asList(SOUTH, WEST));
-
-        final String simpleVariableUri = initVariablePage().createVariable(simpleVariable);
-        final String exportToken = exportPartialProject(simpleVariableUri, DEFAULT_PROJECT_CHECK_LIMIT);
-
+        String exportToken = exportPartialProject(createStatusVariable(), DEFAULT_PROJECT_CHECK_LIMIT);
+        testParams.setProjectId(targetProjectId);
         try {
-            testParams.setProjectId(targetProjectId);
             importPartialProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
-
-            assertTrue(initVariablePage().hasVariable(SIMPLE_FILTERED_VARIABLE),
-                    "There has an issue after import partial project");
+            assertTrue(initVariablePage().hasVariable(VARIABLE_STATUS), "Variable is not imported");
         } finally {
             testParams.setProjectId(sourceProjectId);
         }
     }
 
+    private Dashboard initDashboard(String name, String reportUri) {
+        return Builder.of(Dashboard::new).with(dashboard -> {
+            dashboard.setName(name);
+            dashboard.addTab(Builder.of(Tab::new)
+                    .with(tab -> {
+                        tab.setTitle(FIRST_TAB);
+                        tab.addItem(Builder.of(ReportItem::new)
+                                .with(reportItem -> {
+                                    reportItem.setObjUri(reportUri);
+                                    reportItem.setPosition(TabItem.ItemPosition.LEFT);
+                                }).build());
+                    }).build());
+
+            dashboard.addTab(Builder.of(Tab::new).with(tab -> tab.setTitle(SECOND_TAB)).build()); // empty tab
+        }).build();
+    }
+
     @AfterClass
     public void tearDown() {
-        ProjectRestUtils.deleteProject(getGoodDataClient(), sourceProjectId);
-        testParams.setProjectId(targetProjectId);
+        ProjectRestUtils.deleteProject(getGoodDataClient(), targetProjectId);
+        testParams.setProjectId(sourceProjectId);
     }
-
-    private String createSimpleReport() {
-        final Metric salesMetric = getMdService().getObj(getProject(), Metric.class, title(SALES));
-        final Attribute region = getMdService().getObj(getProject(), Attribute.class, title(REGION));
-
-        ReportDefinition definition = GridReportDefinitionContent.create(SIMPLE_REPORT,
-                singletonList(METRIC_GROUP),
-                singletonList(new AttributeInGrid(region.getDefaultDisplayForm().getUri(), region.getTitle())),
-                singletonList(new MetricElement(salesMetric)));
-
-        definition = getMdService().createObj(getProject(), definition);
-        return getMdService().createObj(getProject(), new Report(definition.getTitle(), definition)).getUri();
-    }
-
-    private Metric createSimpleMetric() {
-        final String salesFactUri = getMdService().getObjUri(getProject(), Fact.class, title(SALES));
-        return getMdService().createObj(getProject(), new Metric(SIMPLE_METRIC, MetricTypes.SUM.getMaql()
-                .replaceFirst("__fact__", format("[%s]", salesFactUri)), "#,##0.00"));
-    }
-
 }

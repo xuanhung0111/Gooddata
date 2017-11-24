@@ -2,26 +2,25 @@ package com.gooddata.qa.graphene.i18n;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkLocalization;
 
-import com.gooddata.qa.graphene.TemplateAbstractTest;
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import org.json.JSONException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.graphene.utils.WaitUtils;
 
-public class LocalizationTest extends TemplateAbstractTest {
+public class LocalizationTest extends GoodSalesAbstractTest {
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
-    public void changeLanguage() throws JSONException {
+    @Override
+    protected void customizeProject() throws Throwable {
         initLocalizationPage().selectLanguge(testParams.getLanguageCode());
     }
 
-    @Test(dependsOnMethods = {"changeLanguage"}, groups = {"precondition"})
-    public void initStartPage() {
+    @Override
+    public void assignStartPage() {
         logout();
 
         startPageContext = new StartPageContext() {
@@ -38,18 +37,18 @@ public class LocalizationTest extends TemplateAbstractTest {
         };
     }
 
-    @Test(dependsOnGroups = {"precondition"}, groups = {"entry-point"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"entry-point"})
     public void verifyLoginPage() {
         checkLocalization(browser);
     }
 
-    @Test(dependsOnGroups = {"precondition"}, groups = {"entry-point"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"entry-point"})
     public void verifyRegistrationPage() {
         LoginFragment.getInstance(browser).openRegistrationPage();
         checkLocalization(browser);
     }
 
-    @Test(dependsOnGroups = {"precondition"}, groups = {"entry-point"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"entry-point"})
     public void verifyResetPasswordPage() {
         LoginFragment.getInstance(browser).openLostPasswordPage();
         checkLocalization(browser);
