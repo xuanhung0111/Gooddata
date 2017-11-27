@@ -8,8 +8,10 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import java.util.List;
+
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static java.lang.String.*;
+import static java.lang.String.format;
 
 public class DataproductsPage extends AbstractFragment {
 
@@ -32,7 +34,16 @@ public class DataproductsPage extends AbstractFragment {
         return ElementUtils.isElementPresent(getCssSelectorDataproduct(dataproductId), browser);
     }
 
+    public boolean isSegmentsPresent(String dataproductId, List<String> segmentIds) {
+        if ( !isDataproductPresent(dataproductId)) {
+            return false;
+        }
+
+        WebElement dataproduct = waitForElementVisible(browser.findElement(getCssSelectorDataproduct(dataproductId)));
+        return segmentIds.stream().allMatch(segmentId -> dataproduct.getText().contains(segmentId));
+    }
+
     private By getCssSelectorDataproduct(String dataproductId) {
-        return By.cssSelector(format("[href = '#/dataproducts/%s']", dataproductId));
+        return By.cssSelector(format("[id = 'data-products-item-%s']", dataproductId));
     }
 }
