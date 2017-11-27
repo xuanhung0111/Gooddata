@@ -153,8 +153,8 @@ public class DeployProcessForm extends AbstractFragment {
     }
 
     public enum ProcessType {
-        CLOUD_CONNECT("GRAPH", "CloudConnect Graph"),
-        RUBY_SCRIPTS("RUBY", "Generic Ruby");
+        CLOUD_CONNECT("GRAPH", "Clover Graph Executor"),
+        RUBY_SCRIPTS("RUBY", "Generic Ruby Executor");
 
         private String value;
         private String title;
