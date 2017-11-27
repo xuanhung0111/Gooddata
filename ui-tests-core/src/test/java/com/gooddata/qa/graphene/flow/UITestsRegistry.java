@@ -194,6 +194,7 @@ public class UITestsRegistry {
                     DrillToHiddenDashboardTabTest.class,
                     DrillToUpdatedDashboardTabTest.class,
                     DrillToDashBoardTabApplyingDateFilterTest.class,
+                    DrillToDashboardFromDrilledReportTest.class,
                     DeleteDashboardHavingDrillToTabTest.class,
                     "testng-dashboard-default-filter-multiple-choice.xml",
                     "testng-dashboard-default-filter-single-choice.xml",
