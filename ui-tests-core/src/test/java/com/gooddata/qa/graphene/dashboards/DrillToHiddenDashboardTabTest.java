@@ -11,9 +11,12 @@ import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.gooddata.qa.utils.java.Builder;
+import com.google.common.base.Predicate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
+import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
+import org.openqa.selenium.WebDriver;
 import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 
@@ -78,6 +81,11 @@ public class DrillToHiddenDashboardTabTest extends GoodSalesAbstractTest {
                     .getLatestReport(TableReport.class)
                     .drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
 
+            final Predicate<WebDriver> targetTabIsLoaded =
+                    browser -> dashboardsPage.getDashboardName().equals(PRIVATE_DASHBOARD) &&
+                            dashboardsPage.getTabs().getSelectedTab().getLabel().equals(TAB_ON_PRIVATE_DASHBOARD);
+            Graphene.waitGui().until(targetTabIsLoaded);
+            
             assertEquals(dashboardsPage.getContent().getLatestReport(TableReport.class).getReportTiTle(),
                     REPORT_TOP_SALES_REPS_BY_WON_AND_LOST);
         } finally {
