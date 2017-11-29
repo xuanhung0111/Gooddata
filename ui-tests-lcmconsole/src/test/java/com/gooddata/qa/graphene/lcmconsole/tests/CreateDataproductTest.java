@@ -9,6 +9,7 @@ import org.testng.annotations.Test;
 import java.util.Random;
 
 import static com.gooddata.qa.graphene.lcmconsole.NamingConstants.DOMAIN_ID_1;
+import static java.util.Arrays.asList;
 import static org.testng.AssertJUnit.assertTrue;
 
 
@@ -30,6 +31,13 @@ public class CreateDataproductTest extends AbstractLcmConsoleTest {
         dataproductDialog.submitDialog(dataproductId, DOMAIN_ID_1);
 
         assertTrue(dataproductsPage.isDataproductPresent(dataproductId));
+    }
+
+    @Test(dependsOnMethods = {"initTest"})
+    public void testDataProductPresent() throws  JSONException {
+        assertTrue("Dataproduct BranchConnect should be present", dataproductsPage.isDataproductPresent("BranchConnect"));
+        assertTrue("Dataproduct BranchConnect should have segments Region, State" ,
+                dataproductsPage.isSegmentsPresent("BranchConnect", asList("Region", "State")));
     }
 
     private String generateRandomDataproductId() {
