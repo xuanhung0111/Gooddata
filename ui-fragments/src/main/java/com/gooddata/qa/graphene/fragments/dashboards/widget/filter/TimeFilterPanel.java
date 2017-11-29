@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -43,6 +44,9 @@ public class TimeFilterPanel extends AbstractFragment {
 
     @FindBy(css = ".timeline .arrow-left")
     private WebElement leftArrow;
+
+    @FindBy(css = ".timeline .arrow-right")
+    private WebElement rightArrow;
 
     @FindBy(css = ".fromInput:not(.loading) input")
     private WebElement filterTimeFromInput;
@@ -78,6 +82,47 @@ public class TimeFilterPanel extends AbstractFragment {
         return selectTimeFilter(dateGranularitys, dateGranularity.toString());
     }
 
+    public TimeFilterPanel selectRange(final String startTime, final String endTime) {
+        waitForElementVisible(timelineContent);
+
+        while (!isExistingTimeline(startTime)) {
+            if (!moveLeftOnTimeline()) {
+                break;
+            }
+        }
+
+        WebElement startTimeElement = getTimeLineElement(startTime);
+
+        startTimeElement.click();
+        WebElement moveButton;
+        while ((moveButton = getMoveButton(endTime)) != null) {
+            moveButton.click();
+        }
+        WebElement endTimeElement = getTimeLineElement(endTime);
+        try {
+            getActions().keyDown(Keys.SHIFT).perform();
+            endTimeElement.click();
+        } finally {
+            getActions().keyUp(Keys.SHIFT).perform();
+            return this;
+        }
+    }
+
+    private WebElement getMoveButton(final String timeLine) {
+        if (isExistingTimeline(timeLine)) {
+            return null;
+        }
+
+        WebElement firstElement = timeLineItems.get(0);
+        if (timeLine.compareTo(firstElement.getText()) < 0) {
+            //move left
+            return leftArrow.isDisplayed() ? leftArrow : null;
+        } else {
+            //move right
+            return rightArrow.isDisplayed() ? rightArrow : null;
+        }
+    }
+
     public TimeFilterPanel selectTimeLine(final String timeLine) {
         waitForElementVisible(timelineContent);
         while (!isExistingTimeline(timeLine)) {
@@ -91,6 +136,14 @@ public class TimeFilterPanel extends AbstractFragment {
             throw new NoSuchElementException("No value present");
         }
         return this;
+    }
+
+    private WebElement getTimeLineElement(final String timeValue) {
+        waitForCollectionIsNotEmpty(timeLineItems);
+        return timeLineItems.stream()
+                .filter(e -> timeValue.equalsIgnoreCase(e.getText()))
+                .findFirst()
+                .get();
     }
 
     public void changeValueByEnterFromDateAndToDate(String startTime, String endTime) {
