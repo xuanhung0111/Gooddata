@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.dashboards.widget.filter;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
@@ -7,10 +8,10 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
-
+import com.gooddata.qa.graphene.entity.filter.TimeRange;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.common.SelectTimeRangePanel;
+import com.gooddata.qa.graphene.utils.ElementUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -18,8 +19,9 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.utils.ElementUtils;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 public class TimeFilterPanel extends AbstractFragment {
 
@@ -57,6 +59,9 @@ public class TimeFilterPanel extends AbstractFragment {
     @FindBy(css = ".s-btn-apply,.s-btn-add")
     private WebElement applyButton;
 
+    @FindBy(className = "example")
+    private WebElement preview;
+
     public static TimeFilterPanel getInstance(SearchContext searchContext) {
         //wait for loading progress finished
         waitForElementNotPresent(BY_FISCAL_MESSAGE_LOADING);
@@ -68,6 +73,11 @@ public class TimeFilterPanel extends AbstractFragment {
         return selectedTimelineItems.stream()
                 .map(WebElement::getText)
                 .collect(Collectors.toList());
+    }
+
+    public List<String> getVisibleTimelines() {
+        waitForElementVisible(timelineContent);
+        return getElementTexts(timeLineItems);
     }
 
     public String getFromValue() {
@@ -108,19 +118,9 @@ public class TimeFilterPanel extends AbstractFragment {
         }
     }
 
-    private WebElement getMoveButton(final String timeLine) {
-        if (isExistingTimeline(timeLine)) {
-            return null;
-        }
-
-        WebElement firstElement = timeLineItems.get(0);
-        if (timeLine.compareTo(firstElement.getText()) < 0) {
-            //move left
-            return leftArrow.isDisplayed() ? leftArrow : null;
-        } else {
-            //move right
-            return rightArrow.isDisplayed() ? rightArrow : null;
-        }
+    public TimeFilterPanel setValueFromDateAndToDateByAdvance(TimeRange timeFrom, TimeRange timeTo) {
+        getTimeRangePanel().setTimeRange(timeFrom, timeTo);
+        return this;
     }
 
     public TimeFilterPanel selectTimeLine(final String timeLine) {
@@ -136,14 +136,6 @@ public class TimeFilterPanel extends AbstractFragment {
             throw new NoSuchElementException("No value present");
         }
         return this;
-    }
-
-    private WebElement getTimeLineElement(final String timeValue) {
-        waitForCollectionIsNotEmpty(timeLineItems);
-        return timeLineItems.stream()
-                .filter(e -> timeValue.equalsIgnoreCase(e.getText()))
-                .findFirst()
-                .get();
     }
 
     public void changeValueByEnterFromDateAndToDate(String startTime, String endTime) {
@@ -199,6 +191,14 @@ public class TimeFilterPanel extends AbstractFragment {
                 && ElementUtils.isElementVisible(filterTimeToInput);
     }
 
+    public String getPreviewValue() {
+        return waitForElementVisible(preview).getText().substring(9);
+    }
+
+    private SelectTimeRangePanel getTimeRangePanel() {
+        return SelectTimeRangePanel.getInstance(By.className("advanced"), browser);
+    }
+
     private TimeFilterPanel selectTimeFilter(final List<WebElement> timeFilters, final String time) {
         waitForCollectionIsNotEmpty(timeFilters)
                 .stream()
@@ -222,6 +222,29 @@ public class TimeFilterPanel extends AbstractFragment {
 
     private boolean isExistingTimeline(String timeline) {
         return timeLineItems.stream().filter(item -> item.getText().contains(timeline)).findFirst().isPresent();
+    }
+
+    private WebElement getMoveButton(final String timeLine) {
+        if (isExistingTimeline(timeLine)) {
+            return null;
+        }
+
+        WebElement firstElement = timeLineItems.get(0);
+        if (timeLine.compareTo(firstElement.getText()) < 0) {
+            //move left
+            return leftArrow.isDisplayed() ? leftArrow : null;
+        } else {
+            //move right
+            return rightArrow.isDisplayed() ? rightArrow : null;
+        }
+    }
+
+    private WebElement getTimeLineElement(final String timeValue) {
+        waitForCollectionIsNotEmpty(timeLineItems);
+        return timeLineItems.stream()
+                .filter(e -> timeValue.equalsIgnoreCase(e.getText()))
+                .findFirst()
+                .get();
     }
 
     public enum DateGranularity {
