@@ -9,7 +9,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static java.lang.String.*;
+import static java.lang.String.format;
 
 public class DomainUsersDialog extends AbstractFragment {
 

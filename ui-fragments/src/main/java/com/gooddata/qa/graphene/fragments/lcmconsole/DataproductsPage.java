@@ -21,6 +21,9 @@ public class DataproductsPage extends AbstractFragment {
     @FindBy(className = "s-dialog-submit-button")
     private WebElement createDataproductButton;
 
+    @FindBy( css = "[href='#/domains']")
+    private WebElement domainsLink;
+
     public static final DataproductsPage getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(DataproductsPage.class, waitForElementVisible(DATA_PRODUCTS_ID, searchContext));
     }
@@ -30,17 +33,27 @@ public class DataproductsPage extends AbstractFragment {
         return CreateDataproductDialog.getInstance(browser);
     }
 
+    public DomainsPage openDomainsPage() {
+        waitForElementVisible(domainsLink).click();
+        return DomainsPage.getInstance(browser);
+    }
+
     public boolean isDataproductPresent(String dataproductId) {
         return ElementUtils.isElementPresent(getCssSelectorDataproduct(dataproductId), browser);
     }
 
     public boolean isSegmentsPresent(String dataproductId, List<String> segmentIds) {
-        if ( !isDataproductPresent(dataproductId)) {
+        if (!isDataproductPresent(dataproductId)) {
             return false;
         }
 
         WebElement dataproduct = waitForElementVisible(browser.findElement(getCssSelectorDataproduct(dataproductId)));
         return segmentIds.stream().allMatch(segmentId -> dataproduct.getText().contains(segmentId));
+    }
+
+    public DataproductDetailPage openDataproductDetailPage(String dataproductId) {
+        waitForElementVisible(browser.findElement(getCssSelectorDataproduct(dataproductId))).click();
+        return DataproductDetailPage.getInstance(browser);
     }
 
     private By getCssSelectorDataproduct(String dataproductId) {

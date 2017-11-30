@@ -18,8 +18,7 @@ public class DomainsTest extends AbstractLcmConsoleTest {
 
     @Test(dependsOnMethods = {"signIn"})
     public void initTest() throws JSONException {
-        openUrl(DomainsPage.URI);
-        domainsPage = DomainsPage.getInstance(browser);
+        domainsPage = initDataproductPage().openDomainsPage();
     }
 
     @Test(dependsOnMethods = {"initTest"})

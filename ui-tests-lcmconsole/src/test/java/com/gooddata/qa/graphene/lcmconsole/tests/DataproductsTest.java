@@ -13,14 +13,13 @@ import static java.util.Arrays.asList;
 import static org.testng.AssertJUnit.assertTrue;
 
 
-public class CreateDataproductTest extends AbstractLcmConsoleTest {
+public class DataproductsTest extends AbstractLcmConsoleTest {
 
     private DataproductsPage dataproductsPage;
 
     @Test(dependsOnMethods = {"signIn"})
     public void initTest() throws JSONException {
-        openUrl(DataproductsPage.URI);
-        dataproductsPage = DataproductsPage.getInstance(browser);
+        dataproductsPage = initDataproductPage();
     }
 
     @Test(dependsOnMethods = {"initTest"})

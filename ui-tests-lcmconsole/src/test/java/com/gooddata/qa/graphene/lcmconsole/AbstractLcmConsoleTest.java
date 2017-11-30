@@ -15,4 +15,9 @@ public class AbstractLcmConsoleTest extends AbstractUITest {
     protected void signIn() throws JSONException {
         signIn(true, UserRoles.ADMIN);
     }
+
+    protected DataproductsPage initDataproductPage() {
+        openUrl(DataproductsPage.URI);
+        return DataproductsPage.getInstance(browser);
+    }
 }
