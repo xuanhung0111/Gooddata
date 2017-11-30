@@ -27,6 +27,11 @@ public class DataproductDetailPage extends AbstractFragment {
         return DomainSegmentFragment.getInstance(domainSegment);
     }
 
+    public SegmentDetailPage openDomainSegment(String domainId, String segmentId) {
+        waitForElementVisible(segmentList.findElement(getIdSelectorForDomainSegment(domainId, segmentId))).click();
+        return SegmentDetailPage.getInstance(browser);
+    }
+
     public boolean isDomainPresent(String domainId) {
         return ElementUtils.isElementPresent(getXpathSelectorForDomainColumn(domainId), segmentList);
     }
