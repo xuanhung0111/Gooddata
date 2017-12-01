@@ -7,6 +7,7 @@
     <!-- possible options are listed at https://docs.jboss.org/author/display/ARQ/Drone -->
     <extension qualifier="webdriver">
         <property name="browser">chrome</property>
+        <property name="dimensions">${screenResolution}</property>
         <property name="chromeDriverBinary">${chromeDriverBinaryPath}</property>
         <property name="chromeArguments">${chromeDriverArguments}</property>
         <property name="chromePrintOptions">true</property>
