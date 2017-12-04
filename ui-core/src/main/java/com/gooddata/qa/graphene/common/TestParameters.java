@@ -22,7 +22,6 @@ public class TestParameters {
     private String editorUser;
     private String viewerUser;
     private String authorizationToken;
-    private String authorizationToken2;
     private ProjectDriver projectDriver = ProjectDriver.POSTGRES;
     private DeleteMode deleteMode = DeleteMode.DELETE_NEVER;
     private Environment projectEnvironment = Environment.TESTING;
@@ -46,7 +45,6 @@ public class TestParameters {
         password = loadProperty("password");
         projectDriver = lookup(loadProperty("project.dwhDriver"), ProjectDriver.class, ProjectDriver.POSTGRES, "getValue");
         authorizationToken = loadProperty("project.authorizationToken");
-        authorizationToken2 = loadProperty("project.authorizationToken2");
         deleteMode = lookup(loadProperty("deleteMode"), DeleteMode.class, DeleteMode.DELETE_NEVER);
         projectEnvironment = lookup(loadProperty("project.environment"), Environment.class, Environment.TESTING);
         downloadFolder = loadProperty("browserDownloadFolder");
@@ -135,10 +133,6 @@ public class TestParameters {
 
     public String getAuthorizationToken() {
         return authorizationToken;
-    }
-
-    public String getAuthorizationToken2() {
-        return authorizationToken2;
     }
 
     public ProjectDriver getProjectDriver() {
