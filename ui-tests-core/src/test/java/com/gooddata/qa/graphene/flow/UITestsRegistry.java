@@ -111,9 +111,7 @@ public class UITestsRegistry {
         }});
 
         suites.put("basic-vertica", new Object[] {
-            new PredefineParameterTest(SimpleProjectEtlTest.class)
-                .param("PROJECT_AUTHORIZATION_TOKEN", "$PROJECT_AUTHORIZATION_TOKEN2"),
-
+            SimpleProjectEtlTest.class,
             GoodSalesDashboardTest.class,
             GoodSalesReportsTest.class
         });
