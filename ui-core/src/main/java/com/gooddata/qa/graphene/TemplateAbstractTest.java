@@ -65,18 +65,6 @@ public class TemplateAbstractTest extends AbstractProjectTest{
                 testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, projectTemplate,
                         testParams.getAuthorizationToken(), ProjectDriver.POSTGRES, testParams.getProjectEnvironment(),
                         projectCreateCheckIterations));
-
-                if (testParams.getProjectDriver().equals(ProjectDriver.VERTICA)) {
-                    String exportToken = exportProject(true, true, false, projectCreateCheckIterations * 5);
-                    deleteProject(testParams.getProjectId());
-
-                    openUrl(PAGE_GDC_PROJECTS);
-                    waitForElementVisible(gpProject.getRoot());
-                    testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, null,
-                            testParams.getAuthorizationToken2(), testParams.getProjectDriver(),
-                            testParams.getProjectEnvironment(), projectCreateCheckIterations));
-                    importProject(exportToken, projectCreateCheckIterations * 5);
-                }
             }
             Screenshots.takeScreenshot(browser, projectTitle + "-created", this.getClass());
         }

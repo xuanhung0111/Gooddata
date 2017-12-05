@@ -2,28 +2,54 @@ package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_PIPELINE_ANALYSIS;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_WHATS_CHANGED;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import com.gooddata.qa.graphene.TemplateAbstractTest;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.mdObjects.dashboard.Dashboard;
+import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
+import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.java.Builder;
 
-public class GoodSalesDashboardTest extends TemplateAbstractTest {
+public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 
-    private static final long expectedDashboardExportSize = 65000L;
+    private static final long expectedDashboardExportSize = 55200L;
+    private final String SOURCE_TAB = "Source Tab";
+    private final String TARGET_TAB = "Target Tab";
     private String exportedDashboardName;
+    private Map<String, String[]> expectedGoodSalesDashboardsAndTabs;
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        String reportUri = createAmountByProductReport();
+        Tab sourceTab = initDashboardTab(SOURCE_TAB, singletonList(createReportItem(reportUri)));
+        Tab targetTab = initDashboardTab(TARGET_TAB, singletonList(createReportItem(reportUri)));
+        Dashboard dashboard = Builder.of(Dashboard::new).with(dash -> {
+            dash.setName(DASH_PIPELINE_ANALYSIS);
+            dash.addTab(sourceTab);
+            dash.addTab(targetTab);
+        }).build();
+
+        DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(), dashboard.getMdObject());
+
+        expectedGoodSalesDashboardsAndTabs = new HashMap<>();
+        expectedGoodSalesDashboardsAndTabs.put(DASH_PIPELINE_ANALYSIS, new String[] {SOURCE_TAB, TARGET_TAB});
+    }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"dashboards-verification"})
     public void verifyDashboardTabs() {
@@ -43,7 +69,7 @@ public class GoodSalesDashboardTest extends TemplateAbstractTest {
     @Test(dependsOnMethods = {"exportFirstDashboard"}, groups = {"dashboards-verification"})
     public void verifyExportedDashboardPDF() {
         if (testParams.isClientDemoEnvironment()) return;
-        verifyDashboardExport(exportedDashboardName, "Outlook", expectedDashboardExportSize);
+        verifyDashboardExport(exportedDashboardName, SOURCE_TAB, expectedDashboardExportSize);
     }
 
     @Test(dependsOnMethods = {"verifyDashboardTabs"}, groups = {"dashboards-verification"})
@@ -109,7 +135,7 @@ public class GoodSalesDashboardTest extends TemplateAbstractTest {
     public void openDefaultDashboardWithoutPID() throws JSONException, IOException {
         String domainUser = testParams.getDomainUser() == null ? testParams.getUser() : testParams.getDomainUser();
         DashboardsRestUtils.setDefaultDashboardForDomainUser(getDomainUserRestApiClient(), testParams.getProjectId(),
-                DASH_PIPELINE_ANALYSIS, DASH_TAB_WHATS_CHANGED);
+                DASH_PIPELINE_ANALYSIS, TARGET_TAB);
         logout();
         signInAtGreyPages(domainUser, testParams.getPassword());
         try {
@@ -117,7 +143,7 @@ public class GoodSalesDashboardTest extends TemplateAbstractTest {
             String dashboardUri = DashboardsRestUtils.getDashboardUri(getRestApiClient(), testParams.getProjectId(), 
                     DASH_PIPELINE_ANALYSIS);
             String tabID = DashboardsRestUtils.getTabId(getRestApiClient(), testParams.getProjectId(), 
-                    DASH_PIPELINE_ANALYSIS, DASH_TAB_WHATS_CHANGED);
+                    DASH_PIPELINE_ANALYSIS, TARGET_TAB);
             assertThat(browser.getCurrentUrl(), containsString(dashboardUri));
             assertThat(browser.getCurrentUrl(), containsString(tabID));
         } finally {
@@ -139,5 +165,12 @@ public class GoodSalesDashboardTest extends TemplateAbstractTest {
     private void openDefaultDashboardOfDomainUser() {
         openUrl("/dashboard.html");
         waitForDashboardPageLoaded(browser);
+    }
+
+    private Tab initDashboardTab(String name, List<TabItem> items) {
+        return Builder.of(Tab::new)
+                .with(tab -> tab.setTitle(name))
+                .with(tab -> tab.addItems(items))
+                .build();
     }
 }
