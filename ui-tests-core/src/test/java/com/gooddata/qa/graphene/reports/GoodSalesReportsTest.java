@@ -11,12 +11,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.gooddata.qa.graphene.TemplateAbstractTest;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
@@ -25,11 +25,11 @@ import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
-public class GoodSalesReportsTest extends TemplateAbstractTest {
+public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     private int createdReportsCount = 0;
-    protected static final int expectedGoodSalesReportsCount = 103;
-    protected static final int expectedGoodSalesReportsFoldersCount = 13;
+    protected static final int expectedGoodSalesReportsCount = 0;
+    protected static final int expectedGoodSalesReportsFoldersCount = 4;
 
     private static final long expectedLineChartExportPDFSize = 110000L;
     private static final long expectedAreaChartReportExportPNGSize = 43000L;
@@ -39,9 +39,15 @@ public class GoodSalesReportsTest extends TemplateAbstractTest {
     private static final long expectedTabularReportExportCSVSize = 1650L;
 
     private static final String SIMPLE_CA_REPORT = "Simple CA report";
-
+    private static final String FOLDER_UNSORTED = "Unsorted";
     private String regionLocator = "//div[@*[local-name() = 'gdc:region']='0,0,0,0']/span";
 
+    @Override
+    protected void customizeProject() throws Throwable {
+        createNumberOfActivitiesMetric();
+        createNumberOfWonOppsMetric();
+        createNumberOfLostOppsMetric();
+    }
 
     @Test(dependsOnGroups = {"createProject"})
     public void verifyReportsPage() {
@@ -67,7 +73,7 @@ public class GoodSalesReportsTest extends TemplateAbstractTest {
             .startCreateReport()
             .initPage()
             .openWhatPanel()
-            .createGlobalSimpleMetric(SimpleMetricTypes.SUM, "Duration");
+            .createGlobalSimpleMetric(SimpleMetricTypes.SUM, "Duration", FOLDER_UNSORTED);
 
         List<String> what = new ArrayList<String>();
         what.add("Duration [Sum]");
