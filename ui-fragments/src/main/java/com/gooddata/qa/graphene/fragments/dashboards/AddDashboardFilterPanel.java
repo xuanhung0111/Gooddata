@@ -1,19 +1,19 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static java.util.Objects.nonNull;
-
-import java.util.List;
-
+import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.DayTimeFilterPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.DayTimeFilterPanel.DayAgo;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.ui.Select;
 
-import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
+import java.util.List;
+
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static java.util.Objects.nonNull;
 
 public class AddDashboardFilterPanel extends SelectItemPopupPanel {
 
@@ -47,6 +47,15 @@ public class AddDashboardFilterPanel extends SelectItemPopupPanel {
                 .selectDateGranularity(dateGranularity)
                 .selectTimeLine(timeLine)
                 .submit();
+    }
+
+    public void addDayTimeFilter(String dateDimension, DayAgo day) {
+        if (nonNull(dateDimension)) {
+            searchAndSelectItem(dateDimension);
+            waitForElementVisible(By.className("s-btn-next"), getRoot()).click();
+        }
+
+        DayTimeFilterPanel.getInstance(browser).selectLast(day).submit();
     }
 
     @Override

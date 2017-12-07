@@ -38,6 +38,7 @@ import com.gooddata.qa.graphene.filters.DashboardDateFilterSelectRangeTest;
 import com.gooddata.qa.graphene.filters.DashboardFilterVisualTest;
 import com.gooddata.qa.graphene.filters.DashboardFiscalDateFilterConfigurationTest;
 import com.gooddata.qa.graphene.filters.DashboardFiscalDateFilterTest;
+import com.gooddata.qa.graphene.filters.FiscalDateFilterFromAndToTest;
 import com.gooddata.qa.graphene.filters.FiscalDateFilterNameTest;
 import com.gooddata.qa.graphene.filters.GroupFiltersOnDashboardTest;
 import com.gooddata.qa.graphene.filters.MetricAvailableFilterTest;
@@ -136,6 +137,7 @@ public class UITestsRegistry {
             GoodSalesSavedViewWithAllValuesTest.class,
             GoodSalesHideDateRangeSelectionTest.class,
             DashboardDateFilterSelectRangeTest.class,
+            FiscalDateFilterFromAndToTest.class,
             GroupFiltersOnDashboardTest.class,
             FiscalDateFilterNameTest.class,
             "testng-dashboard-default-filter-multiple-choice.xml",

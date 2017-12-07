@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -42,7 +43,6 @@ public class DashboardContent extends AbstractFragment {
 
     @FindBy(css = ".c-collectionWidget:not(.gdc-hidden) .yui3-c-dashboardcollectionwidget-content .yui3-c-dashboardwidget")
     private List<WebElement> widgets;
-
     private static final By REPORT_TITLE_LOCATOR = By.cssSelector(".yui3-c-reportdashboardwidget-reportTitle");
     private static final By REPORT_LOCATOR =
             By.cssSelector(".c-collectionWidget:not(.gdc-hidden) .yui3-c-reportdashboardwidget");
@@ -50,6 +50,8 @@ public class DashboardContent extends AbstractFragment {
     private static final By BY_EMBEDDED_WIDGET = 
             By.cssSelector(".c-collectionWidget:not(.gdc-hidden) .yui3-c-iframedashboardwidget");
     private static final By HEADLINE_WIDGET_LOCATOR = className("yui3-c-headlinedashboardwidget");
+
+    private static final By TEXT_WIDGET_LOCATOR = className("yui3-c-textdashboardwidget");
 
     private static String REPORT_IMAGE_LOCATOR = "div.s-${reportName} img";
     private static String REPORT_IMAGE_LOADED_LOCATOR =
@@ -159,6 +161,10 @@ public class DashboardContent extends AbstractFragment {
 
     public EmbeddedWidget getLastEmbeddedWidget() {
         return Iterables.getLast(getEmbeddedWidgets());
+    }
+
+    public String getLastTextWidgetValue() {
+        return Iterables.getLast(browser.findElements(TEXT_WIDGET_LOCATOR)).getText();
     }
 
     public DashboardContent applyValuesForGroupFilter() {

@@ -4,6 +4,7 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.SelectionConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.AttributeFilterPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.DayTimeFilterPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 import org.openqa.selenium.By;
@@ -164,6 +165,10 @@ public class FilterWidget extends AbstractFragment {
 
     public TimeFilterPanel getTimeFilterPanel() {
         return TimeFilterPanel.getInstance(browser);
+    }
+
+    public DayTimeFilterPanel getDayTimeFilterPanel() {
+        return DayTimeFilterPanel.getInstance(browser);
     }
 
     private FilterWidget switchToOneOrMultipleValuesMode(boolean isMultiple) {
