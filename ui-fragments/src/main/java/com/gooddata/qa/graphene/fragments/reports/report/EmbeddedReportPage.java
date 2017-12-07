@@ -50,9 +50,4 @@ public class EmbeddedReportPage extends ReportPage {
         clickSaveReport().confirmCreateReportInDialog();
         return this;
     }
-
-    @Override
-    public void waitForSndMetricDetail() {
-        waitForElementVisible(BY_SND_EDIT_METRIC_BUTTON, browser);
-    }
 }

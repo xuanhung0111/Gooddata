@@ -68,9 +68,9 @@ public class DynamicImageTest extends AbstractProjectTest {
         browser.navigate().back();
         reportPage.waitForReportExecutionProgress()
                 .openHowPanel()
-                .selectAttributePosition(howItem)
-                .doneSndPanel()
-                .waitForReportExecutionProgress();
+                .selectAttributePosition(howItem.getAttribute().getName(), howItem.getPosition())
+                .done();
+        reportPage.waitForReportExecutionProgress();
 
         takeScreenshot(browser, "images-having-top-position", getClass());
         checkAllImagesInReport();

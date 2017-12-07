@@ -1,18 +1,18 @@
 package com.gooddata.qa.graphene.i18n;
 
+import com.gooddata.qa.graphene.fragments.manage.MetricEditorDialog;
+import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog;
+import com.gooddata.qa.graphene.fragments.reports.report.EmbeddedReportPage;
+import com.gooddata.qa.graphene.fragments.reports.report.MetricSndPanel;
+import org.jboss.arquillian.graphene.Graphene;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkLocalization;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_ACTIVITIES_BY_TYPE;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.cssSelector;
-
-import org.jboss.arquillian.graphene.Graphene;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import com.gooddata.qa.graphene.fragments.manage.MetricEditorDialog;
-import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog;
-import com.gooddata.qa.graphene.fragments.reports.report.EmbeddedReportPage;
 
 public class EmbeddedDashboardReportsPageLocalizationTest extends GoodSalesAbstractLocalizationTest {
 
@@ -102,10 +102,7 @@ public class EmbeddedDashboardReportsPageLocalizationTest extends GoodSalesAbstr
         EmbeddedReportPage reportPage = initEmbeddedDashboard()
             .openEmbeddedReportPage();
 
-        reportPage.openWhatPanel()
-            .selectMetric(METRIC_NUMBER_OF_ACTIVITIES)
-            .doneSndPanel()
-            .waitForReportExecutionProgress();
+        reportPage.openWhatPanel().selectItem(METRIC_NUMBER_OF_ACTIVITIES).done();
         reportPage.cancel();
         checkLocalization(browser);
     }
@@ -116,8 +113,7 @@ public class EmbeddedDashboardReportsPageLocalizationTest extends GoodSalesAbstr
             .openEmbeddedReportPage();
         checkLocalization(browser);
 
-        reportPage.openWhatPanel()
-            .selectMetric(METRIC_NUMBER_OF_ACTIVITIES);
+        reportPage.openWhatPanel().selectItem(METRIC_NUMBER_OF_ACTIVITIES);
         reportPage.clickDeleteInSndMetricDetail();
         checkLocalization(browser);
 
@@ -127,10 +123,10 @@ public class EmbeddedDashboardReportsPageLocalizationTest extends GoodSalesAbstr
         metricEditorDialog.back();
         browser.switchTo().defaultContent();
 
-        reportPage.clickAddNewSimpleMetric();
+        reportPage.getPanel(MetricSndPanel.class).clickAddNewMetric();
         checkLocalization(browser);
 
-        metricEditorDialog = reportPage.clickAddAdvanceMetric();
+        metricEditorDialog = reportPage.getPanel(MetricSndPanel.class).clickAddAdvanceMetric();
 
         metricEditorDialog.clickShareMetricLink();
         checkLocalization(browser);

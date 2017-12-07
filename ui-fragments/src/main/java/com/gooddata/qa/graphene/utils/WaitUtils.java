@@ -137,6 +137,10 @@ public final class WaitUtils {
         Graphene.waitGui().until().element(byElement).is().not().visible();
     }
 
+    public static void waitForElementNotVisible(By byElement, SearchContext searchContext) {
+        Graphene.waitGui().until().element(searchContext, byElement).is().not().visible();
+    }
+
     public static void waitForElementNotVisible(Select select) {
         Graphene.waitGui().until().element(select.getFirstSelectedOption()).is().not().visible();
     }
@@ -199,6 +203,14 @@ public final class WaitUtils {
     public static void waitForCollectionIsEmpty(final Collection<?> items) {
         Predicate<WebDriver> collectionEmpty = browser -> items.isEmpty();
         Graphene.waitGui().until(collectionEmpty);
+    }
+
+    public static void waitForElementAttributeContainValue(WebElement element, String attribute, String value) {
+        Graphene.waitGui().until().element(element).attribute(attribute).contains(value);
+    }
+
+    public static void waitForElementAttributeNotContainValue(WebElement element, String attribute, String value) {
+        Graphene.waitGui().until().element(element).attribute(attribute).not().contains(value);
     }
 
     public static <T extends Collection<?>> T waitForCollectionIsNotEmpty(final T items) {

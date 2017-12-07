@@ -16,6 +16,7 @@ import com.gooddata.qa.graphene.entity.report.WhatItem;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
+import com.gooddata.qa.graphene.fragments.reports.report.AttributeSndPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import com.gooddata.qa.graphene.utils.WaitUtils;
@@ -104,7 +105,8 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
                 .openContextMenuFrom("770,636,605.83", CellType.METRIC_VALUE)
                 .selectItem("Break Down This Number");
 
-        reportPage.selectAttribute("Year (Snapshot)").doneSndPanel().waitForReportExecutionProgress();
+        reportPage.getPanel(AttributeSndPanel.class).selectItem("Year (Snapshot)").done();
+        reportPage.waitForReportExecutionProgress();
 
         takeScreenshot(browser, "break-down-metric-value", getClass());
         assertTrue(isEqualCollection(reportPage.getTableReport().getAttributeValues(),
@@ -123,7 +125,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
                 .openContextMenuFrom(INTEREST, CellType.ATTRIBUTE_VALUE)
                 .selectItem("Break Down \"" + INTEREST + "\"");
 
-        reportPage.selectAttribute(ATTR_STATUS).doneSndPanel();
+        reportPage.getPanel(AttributeSndPanel.class).selectItem(ATTR_STATUS).done();
 
         takeScreenshot(browser, "drill-on-grid-menu", getClass());
         assertTrue(reportPage.getTableReport().getAttributeHeaders().contains(ATTR_STATUS),
@@ -153,11 +155,9 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
                 .openContextMenuFrom(INTEREST, CellType.ATTRIBUTE_VALUE)
                 .selectItem(ADD_NEW_ATTRIBUTE);
 
-        takeScreenshot(browser, "adding-attribute", getClass());
-        reportPage.selectFolderLocation(STAGE).selectAttribute(ATTR_STATUS).doneSndPanel().waitForReportExecutionProgress();
+        reportPage.getPanel(AttributeSndPanel.class).selectViewGroup(STAGE).selectItem(ATTR_STATUS).done();
         assertTrue(reportPage.getTableReport().getAttributeHeaders().contains(ATTR_STATUS),
                 "Status attribute has not been added");
-
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -198,12 +198,8 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
         table.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
         checkExternalPageUrl(currentWindow);
 
-        reportPage.openHowPanel()
-                .selectAttribute(ATTR_OPPORTUNITY)
-                .changeDisplayLabel(SFDC_URL)
-                .doneSndPanel()
-                .waitForReportExecutionProgress();
-
+        reportPage.openHowPanel().openAttributeDetail(ATTR_OPPORTUNITY).changeDisplayLabel(SFDC_URL).done();
+        reportPage.waitForReportExecutionProgress();
         assertTrue(isEqualCollection(table.getAttributeValues(), asList(DISPLAY_LABEL, DISPLAY_LABEL, DISPLAY_LABEL)),
                 "The label has not been applied");
 
@@ -247,12 +243,10 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
         browser.navigate().back();
         reportPage.waitForReportExecutionProgress();
 
-        assertNotNull(
-                initReportsPage().openReport(headlineReport).openHowPanel()
-                        .selectAttribute(ATTR_REGION)
-                        .doneSndPanel()
-                        .waitForReportExecutionProgress()
-                        .getTableReport(),
+        initReportsPage().openReport(headlineReport).openHowPanel()
+                .selectItem(ATTR_REGION).done();
+
+        assertNotNull(reportPage.waitForReportExecutionProgress().getTableReport(),
                 "The grid report is not displayed");
         browser.navigate().back();
         reportPage.waitForReportExecutionProgress();

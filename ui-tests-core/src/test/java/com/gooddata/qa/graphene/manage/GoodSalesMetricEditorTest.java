@@ -19,6 +19,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 
 import java.util.List;
 
+import com.gooddata.qa.graphene.fragments.reports.report.MetricSndPanel;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -96,8 +97,12 @@ public class GoodSalesMetricEditorTest extends GoodSalesAbstractTest {
         BrowserUtils.runScript(browser, "window.scrollTo(0, 0)");
 
         assertEquals(
-                reportPage.clickAddAdvanceMetric().clickCustomMetricLink().selectElementType(ElementType.METRICS)
-                        .search(metricName).getElementValues(),
+                reportPage.getPanel(MetricSndPanel.class)
+                        .clickAddAdvanceMetric()
+                        .clickCustomMetricLink()
+                        .selectElementType(ElementType.METRICS)
+                        .search(metricName)
+                        .getElementValues(),
                 singletonList(metricName), "The global metric is displayed");
     }
 
@@ -132,7 +137,11 @@ public class GoodSalesMetricEditorTest extends GoodSalesAbstractTest {
 
         switchToMainWindow(browser);
         waitForElementNotPresent(MetricEditorDialog.IFRAME, browser);
-        assertTrue(reportPage.editMetric(metricName).waitForElementsLoading().search(metricName)
+        assertTrue(reportPage.getPanel(MetricSndPanel.class)
+                .openMetricDetail(metricName)
+                .editAdvanceMetric()
+                .waitForElementsLoading()
+                .search(metricName)
                 .isEmptyMessagePresent(), "The empty message is not displayed");
     }
 

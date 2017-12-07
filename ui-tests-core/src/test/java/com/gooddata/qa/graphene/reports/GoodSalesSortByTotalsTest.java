@@ -125,11 +125,8 @@ public class GoodSalesSortByTotalsTest extends GoodSalesAbstractTest {
                 .aggregateTableData(AggregationType.SUM, BY_STAGE_NAME);
         reportPage.waitForReportExecutionProgress();
 
-        reportPage.openWhatPanel()
-                .selectMetric(METRIC_AVG_AMOUNT)
-                .doneSndPanel()
-                .waitForReportExecutionProgress()
-                .addFilter(FilterItem.Factory.createAttributeFilter(ATTR_QUARTER_YEAR_SNAPSHOT, Q1_2011))
+        reportPage.openWhatPanel().selectItem(METRIC_AVG_AMOUNT).done();
+        reportPage.addFilter(FilterItem.Factory.createAttributeFilter(ATTR_QUARTER_YEAR_SNAPSHOT, Q1_2011))
                 .waitForReportExecutionProgress();
 
         takeScreenshot(browser, "sort-by-totals-in-report-containing-two-metrics", getClass());

@@ -1,15 +1,32 @@
 package com.gooddata.qa.graphene.reports;
 
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
+import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
+import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
+import com.gooddata.qa.mdObjects.dashboard.Dashboard;
+import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.java.Builder;
+import com.google.common.base.Predicate;
+import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.testng.annotations.Test;
+
+import java.util.Arrays;
+
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkBlueBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_CLOSED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_WON;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_ACTIVITIES_BY_TYPE;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_AMOUNT_BY_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_AMOUNT_BY_DATE_CLOSED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_AMOUNT_BY_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOP_SALES_REPS_BY_WON_AND_LOST;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
@@ -22,24 +39,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertTrue;
-
-import java.util.Arrays;
-
-import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.testng.annotations.Test;
-
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
-import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
-import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
-import com.gooddata.qa.mdObjects.dashboard.Dashboard;
-import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
-import com.gooddata.qa.utils.java.Builder;
-import com.google.common.base.Predicate;
 
 public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
 
@@ -90,8 +89,8 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
             .openReport(VERSION_REPORT)
             .initPage()
             .openHowPanel()
-            .selectAttribute(ATTR_ACTIVITY_TYPE)
-            .doneSndPanel();
+            .selectItem(ATTR_ACTIVITY_TYPE)
+            .done();
         int versionsCount = waitForReportLoading().saveReport().getVersionsCount();
         takeScreenshot(browser, "workWithOldVersion - get versions", getClass());
         assertThat(versionsCount, equalTo(2));
@@ -124,8 +123,8 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
             .startCreateReport()
             .initPage()
             .openWhatPanel()
-            .selectMetric(METRIC_NUMBER_OF_ACTIVITIES)
-            .doneSndPanel();
+            .selectItem(METRIC_NUMBER_OF_ACTIVITIES)
+            .done();
         waitForReportLoading();
 
         moveToAnotherPage();
@@ -142,8 +141,8 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
             .startCreateReport()
             .initPage()
             .openWhatPanel()
-            .selectMetric(METRIC_NUMBER_OF_ACTIVITIES)
-            .doneSndPanel();
+            .selectItem(METRIC_NUMBER_OF_ACTIVITIES)
+            .done();
         waitForReportLoading();
 
         moveToAnotherPage();
@@ -157,8 +156,8 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         waitForAnalysisPageLoaded(browser);
         int versionCount = waitForFragmentVisible(reportPage).getVersionsCount();
         reportPage.openHowPanel()
-            .selectAttribute(ATTR_ACCOUNT)
-            .doneSndPanel();
+            .selectItem(ATTR_ACCOUNT)
+            .done();
         waitForReportLoading();
 
         moveToAnotherPage();
@@ -179,8 +178,8 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
             .initPage()
             .setReportName(reportName)
             .openWhatPanel()
-            .selectMetric(METRIC_NUMBER_OF_ACTIVITIES)
-            .doneSndPanel();
+            .selectItem(METRIC_NUMBER_OF_ACTIVITIES)
+            .done();
         waitForReportLoading();
 
         moveToAnotherPage();
@@ -200,8 +199,8 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
             .getVersionsCount();
 
         reportPage.openHowPanel()
-            .selectAttribute(ATTR_ACCOUNT)
-            .doneSndPanel();
+            .selectItem(ATTR_ACCOUNT)
+            .done();
         waitForReportLoading();
 
         moveToAnotherPage();
@@ -220,8 +219,8 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
             .initPage()
             .setReportName("R1")
             .openWhatPanel()
-            .selectMetric(METRIC_NUMBER_OF_ACTIVITIES)
-            .doneSndPanel();
+            .selectItem(METRIC_NUMBER_OF_ACTIVITIES)
+            .done();
 
         if (tryCancelReportComputing()) {
             assertThat(reportPage.getExecuteProgressStatus(), equalTo("Report computation canceled."));
@@ -272,8 +271,8 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
             .openFolder(ALL)
             .openReport(REPORT_ACTIVITIES_BY_TYPE)
             .openHowPanel()
-            .selectAttribute(ATTR_IS_CLOSED)
-            .doneSndPanel();
+            .selectItem(ATTR_IS_CLOSED)
+            .done();
         waitForReportLoading();
         reportPage.clickSaveReport().confirmSaveReport().waitForReportSaved();
     }
@@ -284,8 +283,8 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
             .openFolder(ALL)
             .openReport(REPORT_TOP_SALES_REPS_BY_WON_AND_LOST)
             .openHowPanel()
-            .selectAttribute(ATTR_IS_WON)
-            .doneSndPanel();
+            .selectItem(ATTR_IS_WON)
+            .done();
         waitForReportLoading();
         reportPage.saveAsReport();
         sleepTightInSeconds(3);
@@ -299,8 +298,8 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
             .openFolder(ALL)
             .openReport(REPORT_AMOUNT_BY_DATE_CLOSED)
             .openHowPanel()
-            .selectAttribute(ATTR_DATE_CREATED)
-            .doneSndPanel();
+            .selectItem(ATTR_DATE_CREATED)
+            .done();
         waitForReportLoading();
         reportPage.clickSaveReport().cancelSaveReport();
     }

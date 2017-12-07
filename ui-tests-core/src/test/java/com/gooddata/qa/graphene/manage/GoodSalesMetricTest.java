@@ -15,6 +15,7 @@ import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.manage.MetricPage;
+import com.gooddata.qa.graphene.fragments.reports.report.AttributeSndPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import com.gooddata.qa.graphene.utils.Sleeper;
@@ -766,27 +767,16 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         createCustomMetric(customMetricInfo, MetricTypes.SUM, AGGREGATION);
 
         initReportCreation();
-        reportPage.initPage()
-            .openWhatPanel()
-            .selectMetric(customMetricInfo.getName())
-            .openHowPanel();
+        reportPage.initPage().openWhatPanel().selectItem(customMetricInfo.getName());
 
-        asList("Activity Type", "Date (Activity)", "Date (Timeline)", ATTR_STAGE_HISTORY).stream()
-            .forEach(attribute -> {
-                assertTrue(reportPage.searchAttribute(attribute)
-                    .isGreyedOutAttribute(attribute),
-                    format("Attribue %s is not unreachable", attribute));
-            });
+        AttributeSndPanel attributePanel = reportPage.openHowPanel();
+        assertTrue(attributePanel.isUnReachable("Activity Type", "Date (Activity)",
+                "Date (Timeline)", ATTR_STAGE_HISTORY),
+                "One or more of given attributes is reachable");
 
-        asList("Account", "Date (Created)", "Opp. Snapshot", "Opportunity", ATTR_DEPARTMENT, ATTR_PRODUCT, ATTR_STAGE_NAME,
-                ATTR_YEAR_CLOSE, ATTR_MONTH_YEAR_SNAPSHOT).stream()
-                .forEach(attribute -> {
-                    assertFalse(reportPage.searchAttribute(attribute)
-                            .isGreyedOutAttribute(attribute),
-                            format("Attribue %s is unreachable", attribute));
-                });
-
-        reportPage.doneSndPanel();
+        assertFalse(attributePanel.isUnReachable("Account", "Date (Created)", "Opp. Snapshot", "Opportunity",
+                ATTR_DEPARTMENT, ATTR_PRODUCT, ATTR_STAGE_NAME, ATTR_YEAR_CLOSE, ATTR_MONTH_YEAR_SNAPSHOT),
+                "One or more of given attributes is unreachable");
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"aggregation-metric"})
@@ -831,7 +821,6 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         checkRedBar(browser);
         assertEquals(reportPage.getDataReportHelpMessage(), NO_DATA_MATCH_REPORT_MESSAGE,
                 "Report help message is incorrect!");
-        reportPage.saveReport();
     }
 
     private ByteArrayOutputStream exportReport(ReportDefinition rd) {
@@ -893,7 +882,6 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
             List<String> attributeValuesinGrid = reportPage.getTableReport().getAttributeValues();
             assertEquals(attributeValuesinGrid, attributeValues);
         }
-        reportPage.saveReport();
     }
 
     private Metric createMetricByGoodDataClient(MetricTypes metricType) {
