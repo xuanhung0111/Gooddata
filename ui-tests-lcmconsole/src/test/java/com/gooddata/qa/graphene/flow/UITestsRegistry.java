@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.flow;
 
-import com.gooddata.qa.graphene.lcmconsole.tests.CreateDataproductTest;
+import com.gooddata.qa.graphene.lcmconsole.tests.DataproductDetailTest;
+import com.gooddata.qa.graphene.lcmconsole.tests.DataproductsTest;
 import com.gooddata.qa.graphene.lcmconsole.tests.DomainsTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
@@ -13,8 +14,9 @@ public class UITestsRegistry {
         Map<String, Object> suites = new HashMap<>();
 
         suites.put("all", new Object[] {
-                CreateDataproductTest.class,
-                DomainsTest.class
+                DataproductsTest.class,
+                DomainsTest.class,
+                DataproductDetailTest.class
         });
 
         TestsRegistry.getInstance()
