@@ -2,8 +2,8 @@ package com.gooddata.qa.graphene.i18n;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkLocalization;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_ACTIVITIES_BY_TYPE;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.VARIABLE_STATUS;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.className;
@@ -12,7 +12,6 @@ import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
@@ -22,13 +21,21 @@ import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.ChartReport;
 
-public class EmbeddedDashboardWidgetSettingLocalizationTest extends GoodSalesAbstractLocalizationTest {
+public class EmbeddedDashboardWidgetSettingLocalizationTest extends AbstractEmbeddedDashboardTest {
 
     private static final String DASHBOARD_NAME = "Widget setting";
 
-    @BeforeClass(alwaysRun = true)
-    public void setProjectTitle() {
+    @Override
+    protected void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-embeded-dashboard-widget-setting-localization-test";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createActivitiesByTypeReport();
+        createStatusVariable();
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
@@ -106,7 +113,7 @@ public class EmbeddedDashboardWidgetSettingLocalizationTest extends GoodSalesAbs
     public void checkDashboardVariableFilterSetting() {
         EmbeddedDashboard dashboard = initEmbeddedDashboard();
         dashboard.editDashboard()
-            .addAttributeFilterToDashboard(DashAttributeFilterTypes.PROMPT, ATTR_STATUS);
+            .addAttributeFilterToDashboard(DashAttributeFilterTypes.PROMPT, VARIABLE_STATUS);
 
         WebElement elem = dashboard.getContent().getFirstFilter().getRoot();
         checkLocalizationThroughTabs(WidgetConfigPanel.openConfigurationPanelFor(elem, browser).getTabs());

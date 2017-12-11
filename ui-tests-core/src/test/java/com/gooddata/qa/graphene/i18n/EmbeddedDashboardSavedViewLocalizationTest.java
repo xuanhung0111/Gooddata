@@ -3,19 +3,19 @@ package com.gooddata.qa.graphene.i18n;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkLocalization;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
 
-public class EmbeddedDashboardSavedViewLocalizationTest extends GoodSalesAbstractLocalizationTest {
+public class EmbeddedDashboardSavedViewLocalizationTest extends AbstractEmbeddedDashboardTest {
 
     private static final String DASHBOARD_NAME = "Saved view";
 
-    @BeforeClass(alwaysRun = true)
-    public void setProjectTitle() {
+    @Override
+    protected void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-embeded-dashboard-saved-view-localization-test";
     }
 

@@ -2,13 +2,13 @@ package com.gooddata.qa.graphene.i18n;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkLocalization;
 
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class EmbeddedDashboardLocalizationTest extends GoodSalesAbstractLocalizationTest {
+public class EmbeddedDashboardLocalizationTest extends AbstractEmbeddedDashboardTest {
 
-    @BeforeClass(alwaysRun = true)
-    public void setProjectTitle() {
+    @Override
+    protected void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-embeded-dashboard-localization-test";
     }
 

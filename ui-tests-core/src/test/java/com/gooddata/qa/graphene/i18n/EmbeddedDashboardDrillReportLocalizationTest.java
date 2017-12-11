@@ -7,7 +7,6 @@ import com.gooddata.qa.graphene.fragments.reports.report.EmbeddedReportPage;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import org.jboss.arquillian.graphene.Graphene;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkLocalization;
@@ -17,13 +16,20 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
-public class EmbeddedDashboardDrillReportLocalizationTest extends GoodSalesAbstractLocalizationTest {
+public class EmbeddedDashboardDrillReportLocalizationTest extends AbstractEmbeddedDashboardTest {
 
     private static final String REPORT_NAME = "Drill report";
 
-    @BeforeClass(alwaysRun = true)
-    public void setProjectTitle() {
+    @Override
+    protected void initProperties() {
+        super.initProperties();
         projectTitle = "GoodSales-embeded-dashboard-saved-view-localization-test";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        createAmountMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})

@@ -180,6 +180,12 @@ public class ReportPage extends AbstractFragment {
         return this;
     }
 
+    public String getSelectedChartType() {
+        WebElement selectedElement = waitForElementVisible(
+                cssSelector(".yui3-c-charttype-selected .c-chartType"), browser);
+        return selectedElement.findElement(cssSelector("span.label")).getAttribute("title");
+    }
+
     public ReportPage confirmCreateReportInDialog() {
         WebElement confirmDialogCreateButton = waitForElementVisible(cssSelector(
                 ".s-saveReportDialog.s-is-loaded .s-btn-create"), browser);
