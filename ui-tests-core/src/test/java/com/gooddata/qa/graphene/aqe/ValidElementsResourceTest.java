@@ -36,7 +36,9 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CLOSED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_TIMELINE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOP_5_LOST_BY_CASH;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOP_5_OPEN_BY_CASH;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOP_5_WON_BY_CASH;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
@@ -153,9 +155,9 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
                     reportMetricValues),
                     "Metric values in report 'Top 5 Open (by $)' are not properly");
 
-            assertTrue(getDashboardTableReport(REPORT_TOP_5_OPEN_BY_CASH).hasNoData(),
+            assertTrue(getDashboardTableReport(REPORT_TOP_5_WON_BY_CASH).hasNoData(),
                     "The message in report is not properly.");
-            assertTrue(getDashboardTableReport(REPORT_TOP_5_OPEN_BY_CASH).hasNoData());
+            assertTrue(getDashboardTableReport(REPORT_TOP_5_LOST_BY_CASH).hasNoData());
         } finally {
             deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), workingDashboard);
         }
