@@ -3,10 +3,8 @@ package com.gooddata.qa.graphene.lcmconsole;
 import com.gooddata.qa.graphene.AbstractUITest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.lcmconsole.DataproductsPage;
-import com.gooddata.qa.graphene.fragments.lcmconsole.DomainsPage;
+import com.gooddata.qa.graphene.fragments.lcmconsole.SegmentDetailPage;
 import org.json.JSONException;
-import org.openqa.selenium.support.FindBy;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class AbstractLcmConsoleTest extends AbstractUITest {
@@ -19,5 +17,10 @@ public class AbstractLcmConsoleTest extends AbstractUITest {
     protected DataproductsPage initDataproductPage() {
         openUrl(DataproductsPage.URI);
         return DataproductsPage.getInstance(browser);
+    }
+
+    protected SegmentDetailPage initSegmentDetailPage(String dataProductId, String segmentId, String domainId) {
+        openUrl(SegmentDetailPage.getUri(dataProductId, segmentId, domainId));
+        return SegmentDetailPage.getInstance(browser);
     }
 }
