@@ -53,8 +53,8 @@ public class GoodSalesHideDateRangeSelectionTest extends GoodSalesAbstractTest {
                 .getTab(WidgetConfigPanel.Tab.SELECTION, SelectionConfigPanel.class);
 
         takeScreenshot(browser, "testHideDateRangeOptionDefaultState", getClass());
-        assertTrue(panel.isHideDateRangeSelectionVisible(), "Hide date range selection does not exist");
-        assertFalse(panel.isHideDateRangeSelected(), "The default state is not unchecked");
+        assertTrue(panel.isHideFromToOptionVisible(), "Hide date range selection does not exist");
+        assertFalse(panel.isHideFromToOptionSelected(), "The default state is not unchecked");
     }
 
     @Test(dependsOnGroups = "createProject", groups = "need-fresh-env")
@@ -73,7 +73,7 @@ public class GoodSalesHideDateRangeSelectionTest extends GoodSalesAbstractTest {
     public void cancelCheckedHideDateRangeSelection() {
         initDashboardsPage().selectDashboard(TEST_DASHBOARD).editDashboard();
         WidgetConfigPanel configPanel = openFilterConfigPanel(DATE_DIMENSION_ACTIVITY);
-        configPanel.getTab(WidgetConfigPanel.Tab.SELECTION, SelectionConfigPanel.class).setHideDateRange(true);
+        configPanel.getTab(WidgetConfigPanel.Tab.SELECTION, SelectionConfigPanel.class).setHideFromToOption(true);
         configPanel.discardConfiguration();
 
         assertTrue(dashboardsPage.getContent().getFirstFilter().openPanel().getTimeFilterPanel().isDateRangeVisible(),
@@ -170,7 +170,7 @@ public class GoodSalesHideDateRangeSelectionTest extends GoodSalesAbstractTest {
 
     private void hideDateRangeSelection(String filterName, boolean hideDate) {
         WidgetConfigPanel configPanel = openFilterConfigPanel(filterName);
-        configPanel.getTab(WidgetConfigPanel.Tab.SELECTION, SelectionConfigPanel.class).setHideDateRange(hideDate);
+        configPanel.getTab(WidgetConfigPanel.Tab.SELECTION, SelectionConfigPanel.class).setHideFromToOption(hideDate);
         configPanel.saveConfiguration();
     }
 }

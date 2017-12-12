@@ -156,12 +156,12 @@ public class TimeFilterPanel extends AbstractFragment {
         submit();
     }
 
-    public boolean isDatePickerIconNotPresent() {
-        return (!isElementPresent(FROM_DATE_PICKER_ICON, getRoot()) && !isElementPresent(TO_DATE_PICKER_ICON, getRoot()));
+    public boolean isDatePickerIconPresent() {
+        return (isElementPresent(FROM_DATE_PICKER_ICON, getRoot()) && isElementPresent(TO_DATE_PICKER_ICON, getRoot()));
     }
 
-    public boolean isDatePickerNotPresent() {
-        return !isElementPresent(DATE_PICKER, browser);
+    public boolean isDatePickerPresent() {
+        return isElementPresent(DATE_PICKER, browser);
     }
 
     public TimeFilterPanel clickOnFromInput() {

@@ -160,13 +160,13 @@ public class DashboardFiscalDateFilterTest extends AbstractDashboardWidgetTest {
         configureSelectionDateFilter(timeFilter.getRoot(), false, true);
 
         TimeFilterPanel timeFilterPanel = timeFilter.openPanel().getTimeFilterPanel();
-        assertTrue(timeFilterPanel.isDatePickerIconNotPresent(), "Calendar icon shouldn't be displayed.");
+        assertFalse(timeFilterPanel.isDatePickerIconPresent(), "Calendar icon shouldn't be displayed.");
 
         timeFilterPanel.clickOnFromInput();
-        assertTrue(timeFilterPanel.isDatePickerNotPresent(), "Date picker shouldn't be displayed.");
+        assertFalse(timeFilterPanel.isDatePickerPresent(), "Date picker shouldn't be displayed.");
 
         timeFilterPanel.clickOnToInput();
-        assertTrue(timeFilterPanel.isDatePickerNotPresent(), "Date picker shouldn't be displayed.");
+        assertFalse(timeFilterPanel.isDatePickerPresent(), "Date picker shouldn't be displayed.");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -176,13 +176,13 @@ public class DashboardFiscalDateFilterTest extends AbstractDashboardWidgetTest {
         configureSelectionDateFilter(timeFilter.getRoot(), false, false);
 
         TimeFilterPanel timeFilterPanel = timeFilter.openPanel().getTimeFilterPanel();
-        assertFalse(timeFilterPanel.isDatePickerIconNotPresent(), "Calendar icon isn't displayed.");
+        assertTrue(timeFilterPanel.isDatePickerIconPresent(), "Calendar icon isn't displayed.");
 
         timeFilterPanel.clickOnFromInput();
-        assertFalse(timeFilterPanel.isDatePickerNotPresent(), "Date picker isn't displayed.");
+        assertTrue(timeFilterPanel.isDatePickerPresent(), "Date picker isn't displayed.");
 
         timeFilterPanel.clickOnToInput();
-        assertFalse(timeFilterPanel.isDatePickerNotPresent(), "Date picker isn't displayed.");
+        assertTrue(timeFilterPanel.isDatePickerPresent(), "Date picker isn't displayed.");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -194,11 +194,51 @@ public class DashboardFiscalDateFilterTest extends AbstractDashboardWidgetTest {
         assertTrue(timeFilter.openPanel().getTimeFilterPanel().isFromToNotVisible(), "From/To inputs still be displayed.");
     }
 
+    @Test(dependsOnGroups = {"createProject"})
+    public void checkDateConfigurationOnSelectionTab() {
+        initDashboardsPage().selectDashboard(DASHBOARD_NAME).editDashboard();
+        WidgetConfigPanel widgetConfigPanel = WidgetConfigPanel.openConfigurationPanelFor(getFilter(FILTER_NAME).getRoot(), browser);
+
+        SelectionConfigPanel selectionConfigPanel = widgetConfigPanel.getTab(Tab.SELECTION, SelectionConfigPanel.class);
+        assertTrue(selectionConfigPanel.isHideFromToOptionEnabled(), "Wrong default configuration");
+        assertTrue(selectionConfigPanel.isHideCalendarOptionEnabled(), "Wrong default configuration");
+
+        selectionConfigPanel.setHideFromToOption(true);
+        assertFalse(selectionConfigPanel.isHideCalendarOptionEnabled(), "Hidden date picker should be disable");
+
+        selectionConfigPanel.setHideFromToOption(false);
+        selectionConfigPanel.setHideCalendarOption(true);
+        assertTrue(selectionConfigPanel.isHideFromToOptionEnabled(), "Hidden date range should be enable");
+
+        selectionConfigPanel.setHideFromToOption(true);
+        assertFalse(selectionConfigPanel.isHideCalendarOptionEnabled(), "Hidden date picker should be disable");
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void defaultDateConfigurationOnSelectionTab() {
+        initDashboardsPage().selectDashboard(DASHBOARD_NAME).editDashboard();
+        WidgetConfigPanel widgetConfigPanel = WidgetConfigPanel.openConfigurationPanelFor(getFilter(FILTER_NAME).getRoot(), browser);
+
+        SelectionConfigPanel selectionConfigPanel = widgetConfigPanel.getTab(Tab.SELECTION, SelectionConfigPanel.class);
+        assertFalse(selectionConfigPanel.isHideFromToOptionSelected(), "Should be uncheck");
+        assertFalse(selectionConfigPanel.isHideCalendarOptionSelected(), "Should be uncheck");
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void defaultSettingOnTimeFilterPanel() {
+        initDashboardsPage().selectDashboard(DASHBOARD_NAME).editDashboard();
+
+        TimeFilterPanel timeFilterPanel = getFilter(FILTER_NAME).openPanel().getTimeFilterPanel();
+        assertTrue(timeFilterPanel.isDatePickerIconPresent(), "Date picker should be displayed");
+        assertTrue(timeFilterPanel.clickOnFromInput().isDatePickerPresent(), "Calender should be displayed");
+        assertTrue(timeFilterPanel.clickOnToInput().isDatePickerPresent(), "Calender should be displayed");
+    }
+
     private void configureSelectionDateFilter(WebElement timeFilter, boolean isHideDateRange, boolean isHideDatePicker) {
         WidgetConfigPanel widgetConfigPanel = WidgetConfigPanel.openConfigurationPanelFor(timeFilter, browser);
         widgetConfigPanel.getTab(Tab.SELECTION, SelectionConfigPanel.class)
-                .setHideDateRange(isHideDateRange)
-                .setHideDatePicker(isHideDatePicker);
+                .setHideFromToOption(isHideDateRange)
+                .setHideCalendarOption(isHideDatePicker);
         widgetConfigPanel.saveConfiguration();
     }
 
