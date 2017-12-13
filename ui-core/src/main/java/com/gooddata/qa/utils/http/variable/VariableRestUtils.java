@@ -10,10 +10,12 @@ import com.gooddata.qa.utils.http.RestApiClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 
 import static com.gooddata.qa.utils.http.RestUtils.CREATE_AND_GET_OBJ_LINK;
+import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static java.lang.String.format;
 
@@ -112,7 +114,7 @@ public final class VariableRestUtils {
                     .getString("uri");
 
             //create variable obj
-            getJsonObject(restApiClient, restApiClient.newPostMethod(format(VARIABLE_LINK, projectId),
+            executeRequest(restApiClient, restApiClient.newPostMethod(format(VARIABLE_LINK, projectId),
                     new JSONObject() {{
                         put("variable", new JSONObject() {{
                             put("expression", expression);
@@ -121,7 +123,7 @@ public final class VariableRestUtils {
                             put("related", format("/gdc/projects/%s", projectId));
                             put("type", type.getType());
                         }});
-                    }}.toString()));
+                    }}.toString()), HttpStatus.OK);
 
             return variableUri;
         } catch (JSONException | IOException e) {
