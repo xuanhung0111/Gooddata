@@ -37,6 +37,7 @@ import com.gooddata.qa.graphene.dashboards.GoodSalesSavedViewWithAllValuesTest;
 import com.gooddata.qa.graphene.filters.DashboardDateFilterSelectRangeTest;
 import com.gooddata.qa.graphene.filters.DashboardFilterVisualTest;
 import com.gooddata.qa.graphene.filters.DashboardFiscalDateFilterTest;
+import com.gooddata.qa.graphene.filters.GroupFiltersOnDashboardTest;
 import com.gooddata.qa.graphene.filters.MetricAvailableFilterTest;
 import com.gooddata.qa.graphene.i18n.LocalizationTest;
 import com.gooddata.qa.graphene.manage.AttributeLabelsTest;
@@ -132,6 +133,7 @@ public class UITestsRegistry {
             GoodSalesSavedViewWithAllValuesTest.class,
             GoodSalesHideDateRangeSelectionTest.class,
             DashboardDateFilterSelectRangeTest.class,
+            GroupFiltersOnDashboardTest.class,
             "testng-dashboard-default-filter-multiple-choice.xml",
             "testng-dashboard-default-filter-single-choice.xml",
             "testng-dashboard-default-filter-savedView-multiple-choice.xml",
@@ -199,6 +201,7 @@ public class UITestsRegistry {
                     DrillToDashboardTabSettingTest.class,
                     DeleteDashboardHavingDrillToTabTest.class,
                     DrillFromCopiedDashboardTest.class,
+                    GroupFiltersOnDashboardTest.class,
                     "testng-dashboard-default-filter-multiple-choice.xml",
                     "testng-dashboard-default-filter-single-choice.xml",
                     "testng-dashboard-default-filter-savedView-multiple-choice.xml",
