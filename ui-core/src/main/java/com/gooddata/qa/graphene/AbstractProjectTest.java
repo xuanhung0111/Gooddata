@@ -17,7 +17,6 @@ import com.gooddata.md.Dataset;
 import com.gooddata.md.Fact;
 import com.gooddata.md.ObjNotFoundException;
 import com.gooddata.project.ProjectValidationResults;
-import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.fixture.FixtureException;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterType;
@@ -99,7 +98,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         initProperties();
 
         // adjust window size to run on mobile mode
-        adjustWindowSize(windowSize);
+        if (!windowSize.equals("maximize")) adjustWindowSize(windowSize);
 
         // sign in with admin user
         signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
@@ -554,34 +553,20 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         // if having wide use, we should consider dimension properties
         // drone definition: http://arquillian.org/arquillian-extension-drone/#webdriver-configuration (see property named dimensions)
         // e.g.: https://github.com/arquillian/arquillian-extension-drone/blob/master/drone-webdriver/src/test/resources/arquillian.xml#L31
-        if ("maximize".equals(windowSize)) {
-            maximizeWindow();
-        } else {
-            String[] dimensions = windowSize.split(",");
-            if (dimensions.length == 2) {
-                try {
-                    setWindowSize(Integer.valueOf(dimensions[0]), Integer.valueOf(dimensions[1]));
-                } catch (NumberFormatException e) {
-                    System.out.println("ERROR: Invalid window size given: " + windowSize
-                            + " (fallback to maximize)");
-                    maximizeWindow();
-                }
-            } else {
-                System.out.println("ERROR: Invalid window size given: " + windowSize
-                        + " (fallback to maximize)");
-                maximizeWindow();
+        String[] dimensions = windowSize.split(",");
+        if (dimensions.length == 2) {
+            try {
+                setWindowSize(Integer.valueOf(dimensions[0]), Integer.valueOf(dimensions[1]));
+            } catch (NumberFormatException e) {
+                throw new IllegalStateException("ERROR: Invalid window size given: " + windowSize);
             }
+        } else {
+            throw new IllegalStateException("ERROR: Invalid window size given: " + windowSize);
         }
     }
 
     private void setWindowSize(final int width, final int height) {
         log.info("resizing window to " + width + "x" + height);
         browser.manage().window().setSize(new Dimension(width, height));
-    }
-
-    private void maximizeWindow() {
-        log.info("maximizing window");
-        // browser.manage().window().maximize(); does not work
-        BrowserUtils.maximize(browser);
     }
 }

@@ -56,15 +56,6 @@ public class BrowserUtils {
         return true;
     }
 
-    public static void maximize(WebDriver browser) {
-        browser.manage().window().setPosition(new Point(0, 0));
-
-        Toolkit toolkit = Toolkit.getDefaultToolkit();
-        int width = (int) toolkit.getScreenSize().getWidth();
-        int height = (int) toolkit.getScreenSize().getHeight();
-        browser.manage().window().setSize(new Dimension(width, height));
-    }
-
     public static void switchToMainWindow(WebDriver browser) {
         browser.switchTo().defaultContent();
     }

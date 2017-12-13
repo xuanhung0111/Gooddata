@@ -26,6 +26,13 @@
         <targetJdk>1.8</targetJdk>
 
         <browser>firefox</browser>
+
+        <!--The key fullscreen does not work with xvfb so it should be overridden by a specific
+        resolution (width x height) when running inside docker-->
+        <!--Related issue: https://bugs.chromium.org/p/chromedriver/issues/detail?id=1901,
+        https://github.com/seleniumhq/selenium-google-code-issue-archive/issues/6775-->
+        <screenResolution>fullscreen</screenResolution>
+
         <chromeDriverBinaryPath>/usr/bin/chromium-browser</chromeDriverBinaryPath>
         <!-- Add option 'no-sandbox' in case running chromium inside docker -->
         <chromeDriverArguments></chromeDriverArguments>
@@ -310,6 +317,10 @@
                                             <property>
                                                 <name>browser</name>
                                                 <value>${browser}</value>
+                                            </property>
+                                            <property>
+                                                <name>screenResolution</name>
+                                                <value>${screenResolution}</value>
                                             </property>
                                             <property>
                                                 <name>chromeDriverBinaryPath</name>

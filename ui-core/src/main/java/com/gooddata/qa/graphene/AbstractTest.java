@@ -1,7 +1,5 @@
 package com.gooddata.qa.graphene;
 
-import static com.gooddata.qa.browser.BrowserUtils.getCurrentBrowserAgent;
-import static com.gooddata.qa.browser.BrowserUtils.maximize;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.deleteUserByEmail;
 
 import java.io.FileInputStream;
@@ -62,8 +60,6 @@ public abstract class AbstractTest extends Arquillian {
 
     protected StartPageContext startPageContext = null;
 
-    private boolean maximizeBrowser = true;
-
     protected static final Logger log = Logger.getLogger(AbstractTest.class.getName());
 
     // Store extra dynamic users in tests and will be deleted after test
@@ -85,18 +81,6 @@ public abstract class AbstractTest extends Arquillian {
         }
 
         testParams = new TestParameters(testVariables);
-    }
-
-    @BeforeMethod(alwaysRun = true)
-    public void maximizeBrowser() {
-        if (maximizeBrowser) {
-            System.out.println("Current browser agent is: " + getCurrentBrowserAgent(browser).toUpperCase());
-
-            // Use this utility to maximize browser in chrome - MAC
-            // browser.manage().window().maximize(); do not work
-            maximize(browser);
-            maximizeBrowser = false;
-        }
     }
 
     @BeforeMethod(alwaysRun = true)
