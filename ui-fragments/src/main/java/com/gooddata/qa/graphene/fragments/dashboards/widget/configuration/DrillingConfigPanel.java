@@ -1,12 +1,7 @@
 package com.gooddata.qa.graphene.fragments.dashboards.widget.configuration;
 
-import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static java.util.Objects.isNull;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 import com.google.common.base.Predicate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
@@ -15,8 +10,14 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static java.util.Objects.isNull;
 
 public class DrillingConfigPanel extends AbstractFragment {
 
@@ -25,6 +26,12 @@ public class DrillingConfigPanel extends AbstractFragment {
 
     @FindBy(className = "yui3-drillitempanel")
     private List<WebElement> drillItemPanelList;
+
+    private static final By HELP_ICON = By.xpath("//div[contains(@class, 'yui3-c-container-content') and " +
+            "not(contains(@class,'gdc-hidden'))]//*[contains(@class, 'pickerHelp')]//*[contains(@class, 'inlineBubbleHelp')]");
+
+    private static final By TABS = By.xpath("//*[contains(@class, 'yui3-attributeorreportpickerpanel-content')]" +
+            "//*[contains(@class, 'button-primary')]");
 
     public DrillingConfigPanel addDrilling(Pair<List<String>, String> pairs, String group) {
         addNewDrillingPanel().selectLeftItem(pairs.getLeft()).selectRightItem(pairs.getRight(), group);
@@ -50,45 +57,81 @@ public class DrillingConfigPanel extends AbstractFragment {
     public boolean isValueOnRightButton(String value, String group) {
         boolean result;
 
-        ItemPanel itemPanel = addNewDrillingPanel();
-
+        SelectItemPopupPanel rightPopupPanel = openRightPopupPanel(group);
         try {
-            // choosing #1 item on left item does not affect to right item values
-            SelectItemPopupPanel leftPopupPanel = itemPanel.openLeftPopup();
-            leftPopupPanel.searchAndSelectItem(leftPopupPanel.getItemElements().get(0).getText()).submitPanel();
-
-            SelectItemPopupPanel rightPopupPanel = itemPanel.openRightPopup()
-                    .changeGroup(group)
-                    .searchItem(value);
-
-            result = rightPopupPanel.getItems().stream().anyMatch(value::equals);
+            result = rightPopupPanel.searchItem(value).getItems().stream().anyMatch(value::equals);
             rightPopupPanel.cancelPanel();
         } finally {
-            itemPanel.delete();
+            getLastItemPanel().delete();
         }
 
         return result;
     }
 
-    public List<String> getRightItemValues() {
-        SelectItemPopupPanel rightPopupPanel = getLasItemPanel().openRightPopup();
-        List<String> listItems = rightPopupPanel.getItems();
-        rightPopupPanel.cancelPanel();
-        return listItems;
+    public Pair<List<String>, List<String>> getAllValueLists(int indexOfPanel) {
+        List<String> listRightItems = null;
+        ItemPanel itemPanel = getItemPanelByIndex(indexOfPanel);
+        SelectItemPopupPanel leftPopupPanel = itemPanel.openLeftPopup();
+        List<String> listLeftItems = leftPopupPanel.getItems();
+        leftPopupPanel.cancelPanel();
+
+        if(itemPanel.getLeftItemValue() != "Select Metric / Attribute...") {
+            SelectItemPopupPanel rightPopupPanel = itemPanel.openRightPopup();
+            listRightItems = rightPopupPanel.getItems();
+            rightPopupPanel.cancelPanel();    
+        }
+        return Pair.of(listLeftItems, listRightItems);
     }
 
     public Pair<String, String> getSettingsOnLastItemPanel() {
-        ItemPanel panel = getLasItemPanel();
+        ItemPanel panel = getLastItemPanel();
         return Pair.of(panel.getLeftItemValue(), panel.getRightItemValue());
     }
 
+    public DrillingConfigPanel openNewInnerDrillPanel(int index) {
+        getItemPanelByIndex(index).openNewInnerDrillPanel();
+        return this;
+    }
+
     public List<Pair<String, String>> getAllInnerDrillSettingsOnLastPanel() {
-        return getLasItemPanel().getAllInnerDrillSettings();
+        return getLastItemPanel().getAllInnerDrillSettings();
     }
 
     public DrillingConfigPanel addInnerDrillToLastItemPanel(Pair<List<String>, String> innerDrillSetting) {
-        addInnerDrill(getLasItemPanel(), innerDrillSetting);
+        addInnerDrill(getLastItemPanel(), innerDrillSetting);
         return this;
+    }
+
+    public String getTooltipFromHelpIcon(String group) {
+        SelectItemPopupPanel rightPopupPanel = openRightPopupPanel(group);
+        String toolTip = rightPopupPanel.getRoot().findElement(HELP_ICON).getAttribute("title");
+        rightPopupPanel.cancelPanel();
+        getLastItemPanel().delete();
+        return toolTip;
+    }
+
+    public boolean canAddInnerDrill() {
+        return getLastItemPanel().addInnerDrillButton().isDisplayed();
+    }
+
+    public List<String> getRightItemGroups(String group) {
+        SelectItemPopupPanel rightPopupPanel = openRightPopupPanel(group);
+        List<String> tabs = getElementTexts(rightPopupPanel.getRoot().findElements(TABS));
+        rightPopupPanel.cancelPanel();
+        getLastItemPanel().delete();
+        return tabs;
+    }
+
+    /**
+     * Adding a new item panel to  get information from right popup panel
+     * so that should delete it after using
+     */
+    private SelectItemPopupPanel openRightPopupPanel(String group) {
+        ItemPanel itemPanel = addNewDrillingPanel();
+        //item on left does not affect to right item values
+        SelectItemPopupPanel leftPopupPanel = getLastItemPanel().openLeftPopup();
+        leftPopupPanel.searchAndSelectItem(leftPopupPanel.getItemElements().get(0).getText()).submitPanel();
+        return itemPanel.openRightPopup().changeGroup(group);
     }
 
     private ItemPanel addInnerDrill(ItemPanel selectedPanel, Pair<List<String>, String> innerDrillSetting) {
@@ -104,14 +147,14 @@ public class DrillingConfigPanel extends AbstractFragment {
         scrollElementIntoView(
                 waitForElementVisible(By.className("s-btn-select_metric___attribute___"), getRoot()), browser);
 
-        return getLasItemPanel();
+        return getLastItemPanel();
     }
 
     private ItemPanel getItemPanelByIndex(int index) {
         return Graphene.createPageFragment(ItemPanel.class, drillItemPanelList.get(index));
     }
 
-    private ItemPanel getLasItemPanel() {
+    private ItemPanel getLastItemPanel() {
         return getItemPanelByIndex(drillItemPanelList.size() - 1);
     }
 
@@ -204,6 +247,10 @@ public class DrillingConfigPanel extends AbstractFragment {
         private ItemPanel openNewInnerDrillPanel() {
             waitForElementVisible(addNewInnerDrill).click();
             return innerDrillItemPanelList.get(innerDrillItemPanelList.size() -1);
+        }
+
+        private WebElement addInnerDrillButton() {
+            return waitForElementPresent(addNewInnerDrill);
         }
 
         private List<Pair<String, String>> getAllInnerDrillSettings() {

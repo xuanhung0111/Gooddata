@@ -42,7 +42,7 @@ public class DrillToHiddenDashboardTabTest extends GoodSalesAbstractTest {
     protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
         createAndAddUserToProject(UserRoles.EDITOR);
     }
-    
+
     @Test(dependsOnMethods = {"createProject"})
     public void initDashboardDrillingToHiddenTab() throws IOException, JSONException {
         String reportOnPublicDash = createAmountByProductReport();

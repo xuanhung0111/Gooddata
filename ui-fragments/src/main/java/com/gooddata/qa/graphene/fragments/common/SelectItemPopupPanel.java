@@ -33,7 +33,8 @@ public class SelectItemPopupPanel extends AbstractFragment {
 
     private static final String WEIRD_STRING_TO_CLEAR_ALL_ITEMS = "!@#$%^";
 
-    private static final String BUTTON_GROUP_XPATH_LOCATOR = "//*[contains(@class,'gdc-buttonGroup')]//span[.='%s']";
+    private static final String BUTTON_GROUP_XPATH_LOCATOR = "//*[contains(@class,'overlayPlugin-plugged') " +
+            "and not(contains(@class,'gdc-hidden'))]//span[.='%s']";
 
     @FindBys({
         @FindBy(css = ".overlayPlugin-plugged>:not(.gdc-hidden),.sndPanelFilter,.filter,ul.c-AttributeFilterPicker"),
