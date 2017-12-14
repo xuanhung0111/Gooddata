@@ -9,6 +9,7 @@ import static org.openqa.selenium.By.className;
 import static java.util.stream.Collectors.toList;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -132,6 +133,12 @@ public class DashboardContent extends AbstractFragment {
                 .filter(e -> name.equalsIgnoreCase(e.getTitle()))
                 .findFirst()
                 .get();
+    }
+
+    public boolean hasFilterWidget(final String name) {
+        return getFilters()
+                .stream()
+                .filter(e -> Objects.equals(name, e.getTitle())).anyMatch(e -> true);
     }
 
     public boolean isEmpty() {

@@ -173,6 +173,11 @@ public class DashboardEditBar extends AbstractFragment {
         return this;
     }
 
+    public List<String> getAllDateFilterValues(){
+        openFilterMenu().select("Date");
+        return waitForFragmentVisible(dashboardFilter).getItems();
+    }
+
     public DashboardEditBar addTimeFilterToDashboard(DateGranularity dateGranularity, String timeLine) {
         return addTimeFilterToDashboard(null, dateGranularity, timeLine);
     }
