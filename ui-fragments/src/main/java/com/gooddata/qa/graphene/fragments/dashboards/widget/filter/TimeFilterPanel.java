@@ -181,8 +181,8 @@ public class TimeFilterPanel extends AbstractFragment {
     public void submit() {
         // submit changes on grouped time filter
         if(isElementPresent(By.className("s-btn-default"), getRoot())) {
-            if(isElementPresent(By.className("s-btn-apply"), getRoot())
-                    && isElementPresent(By.className("s-btn-cancel"), getRoot())) {
+            if(!isElementVisible(By.className("s-btn-apply"), getRoot())
+                    && !isElementVisible((By.className("s-btn-cancel")), getRoot())) {
                 waitForElementVisible(By.cssSelector(".inline.dateExample"), getRoot()).sendKeys(Keys.ESCAPE);
                 return;
             }
