@@ -13,7 +13,7 @@ import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
-import com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition;
+import com.gooddata.qa.mdObjects.dashboard.tab.TabItem.*;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.gooddata.qa.utils.java.Builder;
@@ -21,8 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.interactions.Actions;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -48,8 +46,11 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
     private final String DASHBOARD_HAVING_DIFF_FILTER_MODE = "Dashboard having different filter mode";
     private final String DASHBOARD_HAVING_NO_FILTER_ON_SOURCE_TAB = "Dashboard having no filter on source tab";
     private final String DASHBOARD_HAVING_NO_FILTER_ON_TARGET_TAB = "Dashboard having no filter on target tab";
+    private final String DASHBOARD_FOR_DRILL_FURTHER_TEST = "Report for drill further test";
     private final String SOURCE_TAB = "Source Tab";
     private final String TARGET_TAB = "Target Tab";
+    private final String FIRST_TAB = "First Tab";
+    private final String SECOND_TAB = "Second Tab";
     private final String TAB_ANOTHER_DASHBOARD = "Tab Another Dashboard";
 
     private final String DASHBOARD_DRILLING_GROUP = "Dashboards";
@@ -237,7 +238,7 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
             TableReport reportAfterDrillingToReport = drillDialog.getReport(TableReport.class);
             assertEquals(reportAfterDrillingToReport.getAttributeValues(), attributeValuesOfReportHavingFilter,
                     "Report aren't rendered correctly");
-            assertEquals(drillDialog.getBreadcrumbsString(), 
+            assertEquals(drillDialog.getBreadcrumbsString(),
                     StringUtils.join(Arrays.asList(REPORT_AMOUNT_BY_PRODUCT, "CompuSci"), ">>"));
 
             reportAfterDrillingToReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE).waitForLoaded();
@@ -341,6 +342,39 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
         } finally {
             deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashboardUri);
             deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), anotherDashboardUri);
+        }
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void testSecondDrillFurtherToTab() throws IOException, JSONException {
+        String dashUri = DashboardsRestUtils.createDashboard(
+                getRestApiClient(), testParams.getProjectId(), initDashForDrillFurtherTest().getMdObject());
+
+        try {
+            initDashboardsPage().selectDashboard(DASHBOARD_FOR_DRILL_FURTHER_TEST).editDashboard();
+            dashboardsPage.getTabs().openTab(0);
+            TableReport tableOnFirstTab = dashboardsPage.getContent().getLatestReport(TableReport.class);
+
+            WidgetConfigPanel widgetConfigPanel = WidgetConfigPanel
+                    .openConfigurationPanelFor(tableOnFirstTab.getRoot(), browser);
+            widgetConfigPanel.getTab(WidgetConfigPanel.Tab.DRILLING, DrillingConfigPanel.class)
+                    .addDrilling(Pair.of(singletonList(METRIC_AMOUNT), REPORT_TOP_5_OPEN_BY_CASH), REPORTS_DRILLING_GROUP)
+                    .addInnerDrillToLastItemPanel(Pair.of(singletonList(ATTR_OPPORTUNITY), FIRST_TAB))
+                    .addDrilling(Pair.of(singletonList(ATTR_PRODUCT), REPORT_TOP_5_OPEN_BY_CASH), REPORTS_DRILLING_GROUP)
+                    .addInnerDrillToLastItemPanel(Pair.of(singletonList(METRIC_TOP_5_OF_BEST_CASE), SECOND_TAB));
+            widgetConfigPanel.saveConfiguration();
+            dashboardsPage.saveDashboard();
+            tableOnFirstTab.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
+            TableReport reportAfterDrillAction = DashboardDrillDialog.getInstance(browser)
+                    .getReport(TableReport.class).waitForLoaded();
+
+            assertEquals(reportAfterDrillAction.getAttributeHeaders(), singletonList(ATTR_OPPORTUNITY),
+                    REPORT_TOP_5_OPEN_BY_CASH + "report is not displayed after drill action");
+            reportAfterDrillAction.drillOnFirstValue(CellType.METRIC_VALUE);
+            assertEquals(dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded().getReportTiTle(),
+                    REPORT_TOP_5_OPEN_BY_CASH, REPORT_TOP_5_OPEN_BY_CASH + " and " + SECOND_TAB + " are not displayed");
+        } finally {
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashUri);
         }
     }
 
@@ -488,5 +522,26 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
                 .addDrilling(Pair.of(singletonList(ATTR_PRODUCT), REPORT_TOP_5_OPEN_BY_CASH), REPORTS_DRILLING_GROUP)
                 .addInnerDrillToLastItemPanel(Pair.of(singletonList(ATTR_OPPORTUNITY), tabDrillTo));
         widgetConfigPanel.saveConfiguration();
+    }
+
+    private Dashboard initDashForDrillFurtherTest() {
+        return Builder.of(Dashboard::new).with(dashboard -> {
+            dashboard.setName(DASHBOARD_FOR_DRILL_FURTHER_TEST);
+            dashboard.addTab(Builder.of(Tab::new).with(tab -> {
+                tab.setTitle(FIRST_TAB);
+                tab.addItem(Builder.of(ReportItem::new).with(reportItem -> {
+                    reportItem.setObjUri(getReportByTitle(REPORT_AMOUNT_BY_PRODUCT).getUri());
+                    reportItem.setPosition(ItemPosition.LEFT);
+                }).build());
+            }).build());
+
+            dashboard.addTab(Builder.of(Tab::new).with(tab -> {
+                tab.setTitle(SECOND_TAB);
+                tab.addItem(Builder.of(ReportItem::new).with(reportItem -> {
+                    reportItem.setObjUri(getReportByTitle(REPORT_TOP_5_OPEN_BY_CASH).getUri());
+                    reportItem.setPosition(ItemPosition.RIGHT);
+                }).build());
+            }).build());
+        }).build();
     }
 }
