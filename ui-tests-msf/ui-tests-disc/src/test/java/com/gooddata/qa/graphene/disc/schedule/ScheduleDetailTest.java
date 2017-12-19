@@ -208,7 +208,7 @@ public class ScheduleDetailTest extends AbstractProcessTest {
 
             ScheduleDetail scheduleDetail = processDetail.openSchedule(schedule2.getName());
             assertEquals(scheduleDetail.getTriggeringScheduleErrorMessage(), TRIGGERING_SCHEDULE_ERROR_MESSAGE);
-            assertEquals(scheduleDetail.getCronEditor().getCronExpression(), "0 * * * *");
+            assertTrue(scheduleDetail.getCronEditor().isSelectedManually());
 
         } finally {
             getProcessService().removeProcess(process);

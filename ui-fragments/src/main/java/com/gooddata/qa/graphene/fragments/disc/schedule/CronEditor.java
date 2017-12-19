@@ -113,6 +113,10 @@ public class CronEditor extends AbstractFragment {
         return waitForElementVisible(By.cssSelector(".whenSchedule span"), getRoot()).getText();
     }
 
+    public boolean isSelectedManually() {
+        return waitForElementVisible(cronTypeSelect).getFirstSelectedOption().getText().equals("manually");
+    }
+
     private CronEditor selectHourOfDay(int hourOfDay) {
         waitForElementVisible(cronHourSelect).selectByVisibleText(format("%02d", hourOfDay));
         return this;
