@@ -217,6 +217,18 @@ public class UITestsRegistry {
             });
         }});
 
+        suites.put("drilling", new Object[] {
+            GoodSalesDrillReportTest.class,
+            GoodSalesDrillReportToExportTest.class,
+            GoodSalesDrillDownToExportSpecialTest.class,
+            DrillToDashboardTabTest.class,
+            DrillToHiddenDashboardTabTest.class,
+            DrillToUpdatedDashboardTabTest.class,
+            DrillToDashBoardTabApplyingDateFilterTest.class,
+            DrillToDashboardFromDrilledReportTest.class,
+            DeleteDashboardHavingDrillToTabTest.class
+        });
+
         suites.put("manage", new Object[] {
             GoodSalesManageObjectsTest.class,
             GoodSalesFactTest.class,
