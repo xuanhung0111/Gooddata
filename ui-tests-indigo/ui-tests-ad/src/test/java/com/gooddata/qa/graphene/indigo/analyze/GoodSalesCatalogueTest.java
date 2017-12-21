@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
@@ -16,9 +17,13 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
+import com.google.common.base.Predicate;
+import org.jboss.arquillian.graphene.Graphene;
 import org.jboss.arquillian.graphene.findby.ByJQuery;
+import org.openqa.selenium.WebDriver;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Attribute;
@@ -115,6 +120,13 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
             .openMetricDetailPage(METRIC_PERCENT_OF_GOAL)
             .changeName(xssMetric);
 
+        // It takes 3s to complete updated requests after saving
+        // but next steps is initAnalysePage which load all attributes/metrics/facts immediately
+        // so sometimes, the new name is not updated in Analyse page (see bug QA-6981).
+        // Using the following wait to handle this bug
+        Predicate<WebDriver> renameSuccess = browser -> !getMdService()
+                .findUris(getProject(), Metric.class, title(xssMetric)).isEmpty();
+        Graphene.waitGui().withTimeout(3, TimeUnit.SECONDS).until(renameSuccess);
         try {
             initAnalysePage();
             final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
