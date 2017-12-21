@@ -202,7 +202,7 @@ public class AbstractScheduleDetail extends AbstractScheduleFragment {
                     !executionStatus.equals(ScheduleStatus.RUNNING.toString());
         };
 
-        Graphene.waitGui().withTimeout(5, TimeUnit.MINUTES)
+        Graphene.waitGui().withTimeout(15, TimeUnit.MINUTES)
                 .pollingEvery(2, TimeUnit.SECONDS).until(executionFinished);
         return this;
     }
