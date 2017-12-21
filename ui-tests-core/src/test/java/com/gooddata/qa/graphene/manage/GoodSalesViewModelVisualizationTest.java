@@ -1,29 +1,26 @@
 package com.gooddata.qa.graphene.manage;
 
-import static com.gooddata.qa.graphene.enums.ResourceDirectory.IMAGES;
-import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
-import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
-import static java.lang.String.format;
-import static org.testng.Assert.assertTrue;
-import static com.gooddata.md.Restriction.title;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.URL;
-
+import com.gooddata.md.Attribute;
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.models.GraphModel;
+import com.google.common.base.Predicate;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.Test;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.google.common.base.Predicate;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+
+import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.IMAGES;
+import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
+import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
+import static java.lang.String.format;
+import static org.testng.Assert.assertEquals;
 
 public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
 
@@ -35,10 +32,13 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"})
     public void checkLDMImageTest() throws IOException, JSONException {
         File tmpImage = getLDMImageFromGrayPage();
-        String hostname = testParams.isHostProxy()? testParams.getHostProxy(): testParams.getHost();
-        replaceContentInSVGFile(tmpImage, Pair.of(hostname, HOST_NAME), 
-                Pair.of(testParams.getProjectId(), PROJECT_ID));
-        assertTrue(compareTwoFile(getResourceAsFile("/" + IMAGES + "/" + MODEL_IMAGE_FILE), tmpImage));
+        GraphModel expectedGraph = GraphModel.readGraphXPath(getResourceAsFile("/" + IMAGES + "/" + MODEL_IMAGE_FILE));
+        GraphModel actualGraph = GraphModel.readGraphXPath(tmpImage);
+
+        assertEquals(actualGraph.getNodes(), expectedGraph.getNodes(),
+                "actual nodes in graph do not match expected nodes");
+        assertEquals(actualGraph.getEdges(), expectedGraph.getEdges(),
+                "actual edges in graph do not match expected edges");
     }
 
     @SuppressWarnings("unchecked")
@@ -46,12 +46,14 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
     public void checkLDMImageAfterChangeAttributeNameTest() throws ParseException, IOException, JSONException {
         changeAttributeName("Account", "Acsount");
         File tmpImage = getLDMImageFromGrayPage();
-        String hostname = testParams.isHostProxy()? testParams.getHostProxy(): testParams.getHost();
-        replaceContentInSVGFile(tmpImage, Pair.of(hostname, HOST_NAME), 
-                Pair.of(testParams.getProjectId(), PROJECT_ID));
         try {
-            assertTrue(compareTwoFile(getResourceAsFile("/" + IMAGES + "/"
-                    + MODEL_IMAGE_WITH_ATTRIBUTE_ACCOUNT_CHANGED_FILE), tmpImage));
+
+            GraphModel expectedGraph = GraphModel.readGraphXPath(getResourceAsFile("/" + IMAGES + "/"
+                    + MODEL_IMAGE_WITH_ATTRIBUTE_ACCOUNT_CHANGED_FILE));
+            GraphModel actualGraph = GraphModel.readGraphXPath(tmpImage);
+
+            assertEquals(actualGraph.getNodes(), expectedGraph.getNodes());
+            assertEquals(actualGraph.getEdges(), expectedGraph.getEdges());
         } finally {
             changeAttributeName("Acsount", "Account");
         }
@@ -71,27 +73,5 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
         final File image = new File(testParams.loadProperty("user.home"), MODEL_IMAGE_FILE);
         FileUtils.copyURLToFile(url, image);
         return image;
-    }
-
-    private boolean compareTwoFile(File file1, File file2) throws IOException {
-        System.out.println("Length of the first image is " + file1.length());
-        System.out.println("Length of the second image is " + file2.length());
-        if (file1.length() != file2.length())
-            return false;
-        BufferedReader reader1 = new BufferedReader(new FileReader(file1));
-        BufferedReader reader2 = new BufferedReader(new FileReader(file2));
-        String line1 = null;
-        String line2 = null;
-        try {
-            while (((line1 = reader1.readLine()) != null)
-                    && ((line2 = reader2.readLine()) != null)) {
-                if (!line1.equals(line2))
-                    return false;
-            }
-        } finally {
-            reader1.close();
-            reader2.close();
-        }
-        return true;
     }
 }
