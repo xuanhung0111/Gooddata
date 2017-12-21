@@ -25,6 +25,7 @@ import com.gooddata.qa.graphene.indigo.dashboards.RoutingTest;
 import com.gooddata.qa.graphene.indigo.dashboards.VisualizationsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.AttributeFilterManipulationTest;
 import com.gooddata.qa.graphene.indigo.dashboards.AttributeFilterMiscTest;
+import com.gooddata.qa.graphene.indigo.dashboards.KpiPermissionsTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 public class UITestsRegistry {
@@ -62,6 +63,7 @@ public class UITestsRegistry {
             AttributeFilterManipulationTest.class,
             AttributeFilterMiscTest.class,
             DeleteAttributeFilterTest.class,
+            KpiPermissionsTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-EditMode.xml",
@@ -110,6 +112,7 @@ public class UITestsRegistry {
             AttributeFilterManipulationTest.class,
             AttributeFilterMiscTest.class,
             DeleteAttributeFilterTest.class,
+            KpiPermissionsTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-EditMode.xml",

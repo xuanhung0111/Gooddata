@@ -114,6 +114,22 @@ public class IndigoRestUtils {
     };
 
     /**
+     * Get uri for specific analytical dashboard
+     *
+     * @param dashboardTitle dashboard title / name
+     * @param restApiClient rest client
+     * @param projectId project ID
+     * @return Uri of analytical dashboard
+     * @throws JSONException
+     * @throws IOException
+     */
+    public static String getAnalyticalDashboardUri(final String dashboardTitle, final RestApiClient restApiClient,
+            final String projectId) throws JSONException, IOException {
+        return getMdObjectValue(restApiClient, projectId, "analyticaldashboard",
+                jsonObj -> dashboardTitle.equals(jsonObj.getString("title")), jsonObj -> jsonObj.getString("link"));
+    }
+
+    /**
      * Get analytical dashboards of a project
      *
      * @param restApiClient
@@ -125,6 +141,22 @@ public class IndigoRestUtils {
     public static List<String> getAnalyticalDashboards(final RestApiClient restApiClient, final String projectId)
             throws JSONException, IOException {
         return getMdObjectValues(restApiClient, projectId, "analyticaldashboard", jsonObj -> jsonObj.getString("link"));
+    }
+
+    /**
+     * Get identifier of analytical dashboard
+     *
+     * @param dashboardTitle dashboard title / name
+     * @param restApiClient rest client
+     * @param projectId project ID
+     * @return identifier of analytical dashboard
+     * @throws JSONException
+     * @throws IOException
+     */
+    public static String getAnalyticalDashboardIdentifier(final String dashboardTitle, final RestApiClient restApiClient,
+            final String projectId) throws JSONException, IOException {
+        return getMdObjectValue(restApiClient, projectId, "analyticaldashboard",
+                jsonObj -> dashboardTitle.equals(jsonObj.getString("title")), jsonObj -> jsonObj.getString("identifier"));
     }
 
     /**
