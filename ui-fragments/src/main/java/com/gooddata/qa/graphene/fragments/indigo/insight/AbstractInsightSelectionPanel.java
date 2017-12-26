@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
@@ -13,6 +14,7 @@ import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -29,7 +31,6 @@ public abstract class AbstractInsightSelectionPanel extends AbstractFragment {
 
     protected static final By NO_DATA_LOCATOR = className("gd-no-data");
     protected static final By CLEAR_ICON_LOCATOR = className("icon-clear");
-    protected static final By SEARCH_TEXTBOX_LOCATOR = className("gd-input-search input");
 
     public List<InsightItem> getInsightItems() {
         waitForLoading();
@@ -160,6 +161,9 @@ public abstract class AbstractInsightSelectionPanel extends AbstractFragment {
         @FindBy(className = "gd-vis-type")
         private WebElement vizTypeIcon;
 
+        private static final By SUCCESS_MESSAGE_LOCATOR = cssSelector("gd-message.success");
+        private static final By ERROR_MESSAGE_LOCATOR = cssSelector("gd-message.error");
+
         public String getName() {
             return waitForElementVisible(nameLabel).getText();
         }
@@ -178,6 +182,7 @@ public abstract class AbstractInsightSelectionPanel extends AbstractFragment {
             getActions().moveToElement(vizTypeIcon).perform();
             waitForElementVisible(deleteIcon).click();
             SaveInsightDialog.getInstance(browser).clickSubmitButton();
+            waitForDeleteFinished();
         }
 
         public void open() {
@@ -189,6 +194,19 @@ public abstract class AbstractInsightSelectionPanel extends AbstractFragment {
                     .getAttribute("class")
                     .replaceAll("(gd-vis-type|-)", "")
                     .trim();
+        }
+
+        private void waitForDeleteFinished() {
+            int timeoutInSeconds = 10;
+            try {
+                waitForElementVisible(SUCCESS_MESSAGE_LOCATOR, browser, timeoutInSeconds);
+                waitForElementNotPresent(SUCCESS_MESSAGE_LOCATOR);
+            } catch (TimeoutException e) {
+                if (isElementVisible(ERROR_MESSAGE_LOCATOR, browser)) {
+                    throw new RuntimeException("Indigo delete failed");
+                }
+                //do nothing, exception could be thrown because the success message flashes so quickly that we missed it.
+            }
         }
     }
 }
