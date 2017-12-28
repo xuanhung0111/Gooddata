@@ -1,8 +1,10 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementAttributeNotContainValue;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static org.jboss.arquillian.graphene.Graphene.createPageFragment;
 import static org.openqa.selenium.By.className;
@@ -47,6 +49,7 @@ public class DashboardContent extends AbstractFragment {
 
     private static final By BY_EMBEDDED_WIDGET = 
             By.cssSelector(".c-collectionWidget:not(.gdc-hidden) .yui3-c-iframedashboardwidget");
+    private static final By HEADLINE_WIDGET_LOCATOR = className("yui3-c-headlinedashboardwidget");
 
     private static String REPORT_IMAGE_LOCATOR = "div.s-${reportName} img";
     private static String REPORT_IMAGE_LOADED_LOCATOR =
@@ -165,6 +168,19 @@ public class DashboardContent extends AbstractFragment {
         Predicate<WebDriver> filterApplied = browser -> applyButton.getAttribute("class").contains("disabled");
         Graphene.waitGui().until(filterApplied);
         return this;
+    }
+
+    public String getLastKeyMetricValue() {
+        return getLastKeyMetricElement().findElement(By.cssSelector(".indicatorValue span")).getText();
+    }
+
+    public void waitForLastKeyMetricUpdated() {
+        sleepTightInSeconds(1); // need buffer time to make sure css class 'reloading' appear in DOM
+        waitForElementAttributeNotContainValue(getLastKeyMetricElement(), "class", "reloading");
+    }
+
+    private WebElement getLastKeyMetricElement() {
+        return Iterables.getLast(browser.findElements(HEADLINE_WIDGET_LOCATOR));
     }
 
     private List<EmbeddedWidget> getEmbeddedWidgets() {
