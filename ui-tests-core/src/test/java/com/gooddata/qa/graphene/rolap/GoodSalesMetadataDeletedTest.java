@@ -81,12 +81,12 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createQuoteVariable();
-        createStatusVariable();
-        createNewLostDrillInReport();
-        createNewWonDrillInReport();
-        createActivitiesByTypeReport();
-        createWinRateMetric();
+        getVariableCreator().createQuoteVariable();
+        getVariableCreator().createStatusVariable();
+        getReportCreator().createNewLostDrillInReport();
+        getReportCreator().createNewWonDrillInReport();
+        getReportCreator().createActivitiesByTypeReport();
+        getMetricCreator().createWinRateMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
@@ -202,7 +202,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     public void deletePrompt() throws JSONException, IOException {
         final String ReportUsingQuotaVariable = "Quote Report";
         //Create metric and report using Quote variable
-        createQuotaMetric();
+        getMetricCreator().createQuotaMetric();
         createReport(GridReportDefinitionContent.create(ReportUsingQuotaVariable,
                 singletonList(METRIC_GROUP),
                 singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_OPPORTUNITY))),
@@ -230,7 +230,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
     public void deleteMetric() throws JSONException, IOException {
         //create report using won opp. metric
-        createSalesSeasonalityReport();
+        getReportCreator().createSalesSeasonalityReport();
 
         String metricNumberOfWonOppsUri = getMetricByTitle(METRIC_NUMBER_OF_WON_OPPS).getUri();
         String reportTop5WonByCashUri = getReportByTitle(REPORT_SALES_SEASONALITY).getUri();
@@ -245,7 +245,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
 
         } finally {
             tryDeleteDashboard();
-            createNumberOfOpportunitiesMetric();
+            getMetricCreator().createNumberOfOpportunitiesMetric();
         }
     }
 
@@ -294,8 +294,8 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"resetLDM"}, groups = {"group2"})
     public void deleteDomainWithNoReportUsageUsingCascadeStrategy() throws IOException, JSONException {
-        createActivitiesByTypeReport();
-        createAmountByDateClosedReport();
+        getReportCreator().createActivitiesByTypeReport();
+        getReportCreator().createAmountByDateClosedReport();
         deleteDomainHelper(DropStrategy.CASCADE, REPORT_ACTIVITIES_BY_TYPE, REPORT_AMOUNT_BY_DATE_CLOSED);
     }
 
@@ -309,7 +309,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"resetLDM"}, groups = {"group2"})
     public void deleteDomainWithReportUsageUsingCascadeStrategy() throws IOException, JSONException {
-        createActiveLevelReport();
+        getReportCreator().createActiveLevelReport();
         Pair<String, String> folderIdAndName = createNewReportFolder();
         String folderId = folderIdAndName.getLeft();
         String folderName = folderIdAndName.getRight();
@@ -330,7 +330,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"deleteDomainWithReportUsageUsingCascadeStrategy"}, groups = {"group2"})
     public void deleteDomainWithReportUsageUsingAllInStrategy() throws IOException, JSONException {
-        createActivitiesByTypeReport();
+        getReportCreator().createActivitiesByTypeReport();
         Pair<String, String> folderIdAndName = createNewReportFolder();
         String folderId = folderIdAndName.getLeft();
         String folderName = folderIdAndName.getRight();

@@ -34,8 +34,8 @@ public class GoodSalesSortByTotalsTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountMetric();
-        createAvgAmountMetric();
+        getMetricCreator().createAmountMetric();
+        getMetricCreator().createAvgAmountMetric();
     }
 
     @Test(dependsOnGroups = "createProject")

@@ -81,8 +81,8 @@ public class DrillToDashboardFromDrilledReportTest extends GoodSalesAbstractTest
     protected void customizeProject() throws Throwable {
         super.customizeProject();
 
-        amountByProductReportUri = createAmountByProductReport();
-        amountByStageNameReportUri = createAmountByStageNameReport();
+        amountByProductReportUri = getReportCreator().createAmountByProductReport();
+        amountByStageNameReportUri = getReportCreator().createAmountByStageNameReport();
 
         //init Dashboard Filter Objects
         stageNameAsMultipleFilter = createMultipleValuesFilter(getAttributeByTitle(ATTR_STAGE_NAME));

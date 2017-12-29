@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -28,14 +29,16 @@ public class GoodSalesManageObjectsTest extends ManageObjectsAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountBOPMetric();
-        createBestCaseBOPMetric();
-        createProbabilityBOPMetric();
-        createCloseEOPMetric();
-        createExpectedPercentOfGoalMetric();
-        createNumberOfOpenOppsMetric();
-        createQuoteVariable();
-        createStatusVariable();
+        Metrics metricCreator = getMetricCreator();
+        metricCreator.createAmountBOPMetric();
+        metricCreator.createBestCaseBOPMetric();
+        metricCreator.createProbabilityBOPMetric();
+        metricCreator.createCloseEOPMetric();
+        metricCreator.createExpectedPercentOfGoalMetric();
+        metricCreator.createNumberOfOpenOppsMetric();
+
+        getVariableCreator().createQuoteVariable();
+        getVariableCreator().createStatusVariable();
         initMetricPage().getObjectFolder().addFolder("metrics", "_System", null);
     }
     @Test(dependsOnGroups = {"createProject"}, priority = 1, groups = {"viewObjetcs", "fact"})

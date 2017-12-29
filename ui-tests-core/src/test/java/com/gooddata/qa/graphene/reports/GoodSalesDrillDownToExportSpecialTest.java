@@ -7,6 +7,7 @@ import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
+import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.report.HowItem;
@@ -78,16 +79,17 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
 
     @Override
     protected void customizeProject() throws Throwable {
-        createNumberOfActivitiesMetric();
-        createWonMetric();
-        createNumberOfWonOppsMetric();
-        createProductiveRepsMetric();
-        createLostMetric();
-        createAvgAmountMetric();
-        createAvgWonMetric();
-        createStatusVariable();
+        Metrics metricCreator = getMetricCreator();
+        metricCreator.createNumberOfActivitiesMetric();
+        metricCreator.createWonMetric();
+        metricCreator.createNumberOfWonOppsMetric();
+        metricCreator.createProductiveRepsMetric();
+        metricCreator.createLostMetric();
+        metricCreator.createAvgAmountMetric();
+        metricCreator.createAvgWonMetric();
+        getVariableCreator().createStatusVariable();
 
-        createSalesSeasonalityReport();
+        getReportCreator().createSalesSeasonalityReport();
     }
 
     @Test(dependsOnGroups = { "createProject" })

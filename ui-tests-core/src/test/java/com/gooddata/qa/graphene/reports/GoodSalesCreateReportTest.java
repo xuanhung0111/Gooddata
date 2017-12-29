@@ -12,6 +12,7 @@ import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.project.Project;
+import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
@@ -71,7 +72,7 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createNumberOfActivitiesMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -214,15 +215,16 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkLimitMetrics() throws IOException, JSONException {
+        Metrics metricCreator = getMetricCreator();
         List<Metric> metrics = asList(
-                createNumberOfLostOppsMetric(), createNumberOfOpenOppsMetric(),
-                 createNumberOfOpportunitiesBOPMetric(),createNumberOfWonOppsMetric(),
-                createPercentOfGoalMetric(), createAvgAmountMetric(),
-                createAvgWonMetric(), createBestCaseMetric(),
-                createDaysUntilCloseMetric(), createLostMetric(),
-                createExpectedWonMetric(), createQuotaMetric(),
-                createStageDurationMetric(), createStageVelocityMetric(),
-                createWinRateMetric(), createExpectedWonVsQuotaMetric());
+                metricCreator.createNumberOfLostOppsMetric(), metricCreator.createNumberOfOpenOppsMetric(),
+                metricCreator.createNumberOfOpportunitiesBOPMetric(), metricCreator.createNumberOfWonOppsMetric(),
+                metricCreator.createPercentOfGoalMetric(), metricCreator.createAvgAmountMetric(),
+                metricCreator.createAvgWonMetric(), metricCreator.createBestCaseMetric(),
+                metricCreator.createDaysUntilCloseMetric(), metricCreator.createLostMetric(),
+                metricCreator.createExpectedWonMetric(), metricCreator.createQuotaMetric(),
+                metricCreator.createStageDurationMetric(), metricCreator.createStageVelocityMetric(),
+                metricCreator.createWinRateMetric(), metricCreator.createExpectedWonVsQuotaMetric());
 
         try {
             MetricSndPanel metricPanel = initReportCreation().openWhatPanel();

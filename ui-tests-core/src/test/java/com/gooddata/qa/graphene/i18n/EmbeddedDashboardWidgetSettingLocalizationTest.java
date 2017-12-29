@@ -34,8 +34,8 @@ public class EmbeddedDashboardWidgetSettingLocalizationTest extends AbstractEmbe
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
-        createActivitiesByTypeReport();
-        createStatusVariable();
+        getReportCreator().createActivitiesByTypeReport();
+        getVariableCreator().createStatusVariable();
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})

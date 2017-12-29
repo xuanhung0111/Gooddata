@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
@@ -64,16 +65,16 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createAmountMetric();
-        createNumberOfActivitiesMetric();
-        createNumberOfLostOppsMetric();
-        createNumberOfOpenOppsMetric();
-        createNumberOfOpportunitiesBOPMetric();
-        createNumberOfWonOppsMetric();
-        createPercentOfGoalMetric();
-        createQuotaMetric();
-        createBestCaseMetric();
+        Metrics metricCreator = getMetricCreator();
+        metricCreator.createAmountMetric();
+        metricCreator.createNumberOfActivitiesMetric();
+        metricCreator.createNumberOfLostOppsMetric();
+        metricCreator.createNumberOfOpenOppsMetric();
+        metricCreator.createNumberOfOpportunitiesBOPMetric();
+        metricCreator.createNumberOfWonOppsMetric();
+        metricCreator.createPercentOfGoalMetric();
+        metricCreator.createQuotaMetric();
+        metricCreator.createBestCaseMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"})

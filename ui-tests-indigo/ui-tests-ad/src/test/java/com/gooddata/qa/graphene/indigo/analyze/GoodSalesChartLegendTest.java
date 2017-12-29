@@ -15,6 +15,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.List;
 
+import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
@@ -32,11 +33,11 @@ public class GoodSalesChartLegendTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createNumberOfActivitiesMetric();
-        createNumberOfWonOppsMetric();
-        createQuotaMetric();
-        createAmountMetric();
+        Metrics metricCreator = getMetricCreator();
+        metricCreator.createNumberOfActivitiesMetric();
+        metricCreator.createNumberOfWonOppsMetric();
+        metricCreator.createQuotaMetric();
+        metricCreator.createAmountMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"})

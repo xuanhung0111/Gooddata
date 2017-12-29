@@ -16,6 +16,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.Arrays;
 
+import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
@@ -33,11 +34,11 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createAmountMetric();
-        createNumberOfActivitiesMetric();
-        createQuotaMetric();
-        createSnapshotBOPMetric();
+        Metrics metricCreator = getMetricCreator();
+        metricCreator.createAmountMetric();
+        metricCreator.createNumberOfActivitiesMetric();
+        metricCreator.createQuotaMetric();
+        metricCreator.createSnapshotBOPMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"})

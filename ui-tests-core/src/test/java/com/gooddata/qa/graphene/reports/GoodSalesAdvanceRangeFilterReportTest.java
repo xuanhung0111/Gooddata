@@ -39,7 +39,7 @@ public class GoodSalesAdvanceRangeFilterReportTest extends GoodSalesAbstractTest
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountMetric();
+        getMetricCreator().createAmountMetric();
         createReport(new UiReportDefinition()
                 .withName(REPORT_NAME)
                 .withWhats(METRIC_AMOUNT)

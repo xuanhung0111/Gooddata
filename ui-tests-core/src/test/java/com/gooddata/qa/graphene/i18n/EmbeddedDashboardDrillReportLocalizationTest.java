@@ -28,8 +28,7 @@ public class EmbeddedDashboardDrillReportLocalizationTest extends AbstractEmbedd
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createAmountMetric();
+        getMetricCreator().createAmountMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})

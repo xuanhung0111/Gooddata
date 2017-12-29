@@ -32,9 +32,8 @@ public class GoodSalesAttributeFilterTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createNumberOfActivitiesMetric();
-        createAmountMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
+        getMetricCreator().createAmountMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"})

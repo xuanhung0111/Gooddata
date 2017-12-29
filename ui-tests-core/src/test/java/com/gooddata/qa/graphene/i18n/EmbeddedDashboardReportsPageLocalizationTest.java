@@ -24,8 +24,8 @@ public class EmbeddedDashboardReportsPageLocalizationTest extends AbstractEmbedd
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
-        createNumberOfActivitiesMetric();
-        createActivitiesByTypeReport();
+        getMetricCreator().createNumberOfActivitiesMetric();
+        getReportCreator().createActivitiesByTypeReport();
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})

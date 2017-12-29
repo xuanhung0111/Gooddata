@@ -25,10 +25,9 @@ public class AvailableItemsTest extends AbstractAdE2ETest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createAmountMetric();
-        createNumberOfActivitiesMetric();
-        createNumberOfLostOppsMetric();
+        getMetricCreator().createAmountMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
+        getMetricCreator().createNumberOfLostOppsMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"})

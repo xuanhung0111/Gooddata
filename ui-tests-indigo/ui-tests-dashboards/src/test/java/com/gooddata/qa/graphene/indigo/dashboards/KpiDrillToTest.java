@@ -79,11 +79,10 @@ public class KpiDrillToTest extends AbstractDashboardTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createAmountMetric();
-        createLostMetric();
-        createWonMetric();
-        createAvgAmountMetric();
+        getMetricCreator().createAmountMetric();
+        getMetricCreator().createLostMetric();
+        getMetricCreator().createWonMetric();
+        getMetricCreator().createAvgAmountMetric();
         addNewDashboard(DASH_PIPELINE_ANALYSIS);
     }
 

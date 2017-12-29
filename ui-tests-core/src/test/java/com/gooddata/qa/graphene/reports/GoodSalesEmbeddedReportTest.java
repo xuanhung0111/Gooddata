@@ -79,9 +79,9 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountMetric();
-        createLostMetric();
-        createStatusVariable();
+        getMetricCreator().createAmountMetric();
+        getMetricCreator().createLostMetric();
+        getVariableCreator().createStatusVariable();
     }
 
     @Test(dependsOnGroups = {"createProject"})

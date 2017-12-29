@@ -72,7 +72,7 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
                 .withAttribute(ATTR_STAGE_NAME)
                 .withAttributeValues(asList(INTEREST, DISCOVERY, SHORT_LIST, RISK_ASSESSMENT)));
 
-        Metric amountMetric = createAmountMetric();
+        Metric amountMetric = getMetricCreator().createAmountMetric();
 
         Attribute stageNameAttribute = getAttributeByTitle(ATTR_STAGE_NAME);
         Attribute departmentAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_DEPARTMENT));

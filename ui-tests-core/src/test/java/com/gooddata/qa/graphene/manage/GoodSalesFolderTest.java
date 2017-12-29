@@ -40,7 +40,7 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountMetric();
+        getMetricCreator().createAmountMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests"})

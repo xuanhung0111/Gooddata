@@ -36,7 +36,7 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        String reportUri = createAmountByProductReport();
+        String reportUri = getReportCreator().createAmountByProductReport();
         Tab sourceTab = initDashboardTab(SOURCE_TAB, singletonList(createReportItem(reportUri)));
         Tab targetTab = initDashboardTab(TARGET_TAB, singletonList(createReportItem(reportUri)));
         Dashboard dashboard = Builder.of(Dashboard::new).with(dash -> {

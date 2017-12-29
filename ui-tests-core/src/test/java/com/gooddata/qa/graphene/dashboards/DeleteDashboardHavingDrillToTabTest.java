@@ -44,8 +44,8 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        reportHavingOneMetric = createAmountByProductReport();
-        reportHavingTwoMetrics = createTopSalesRepsByWonAndLostReport();
+        reportHavingOneMetric = getReportCreator().createAmountByProductReport();
+        reportHavingTwoMetrics = getReportCreator().createTopSalesRepsByWonAndLostReport();
     }
 
     @Test(dependsOnGroups = {"createProject"})

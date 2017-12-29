@@ -91,7 +91,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountMetric();
+        getMetricCreator().createAmountMetric();
         stageName = getMdService().getObj(getProject(), Attribute.class, identifier("attr.stage.name"));
         amountMetric = getMetricByTitle(METRIC_AMOUNT);
 

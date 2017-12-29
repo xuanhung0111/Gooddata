@@ -40,7 +40,7 @@ public class PartialExportDashboardsTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountMetric();
+        getMetricCreator().createAmountMetric();
 
         Dashboard testDashboard = Builder.of(Dashboard::new).with(dashboard -> {
             dashboard.setName(TEST_DASHBOARD);
@@ -49,7 +49,7 @@ public class PartialExportDashboardsTest extends GoodSalesAbstractTest {
                         tab.setTitle(SECOND_TAB);
                         tab.addItem(Builder.of(ReportItem::new)
                                 .with(item -> {
-                                    item.setObjUri(createTop5OpenByCashReport());
+                                    item.setObjUri(getReportCreator().createTop5OpenByCashReport());
                                     item.setPosition(TabItem.ItemPosition.LEFT);
                                 }).build());
                     }

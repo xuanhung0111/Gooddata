@@ -54,7 +54,7 @@ public class DrillToDashBoardTabApplyingDateFilterTest extends GoodSalesAbstract
 
     @Override
     protected void customizeProject() throws Throwable {
-        testReportUri = createAmountByProductReport();
+        testReportUri = getReportCreator().createAmountByProductReport();
     }
 
     @DataProvider
@@ -182,7 +182,7 @@ public class DrillToDashBoardTabApplyingDateFilterTest extends GoodSalesAbstract
             TableReport reportOnSecondDash = dashboardsPage.getContent()
                     .getLatestReport(TableReport.class);
 
-            assertEquals(reportOnSecondDash.getAttributeValues().size(), 3);
+            assertEquals(reportOnSecondDash.waitForLoaded().getAttributeValues().size(), 3);
             checkSelectedFilterValues(DATE_DIMENSION_CLOSED, DATA_FILTERED_BY_YEAR_2014);
         } finally {
             for (String dashboardUri : dashboardUris) {

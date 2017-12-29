@@ -35,7 +35,7 @@ public class GoodSalesFilterGroupTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountMetric();
+        getMetricCreator().createAmountMetric();
         initReportsPage();
         UiReportDefinition rd = new UiReportDefinition().withName(REPORT).withWhats(METRIC_AMOUNT)
                 .withHows(ATTR_STAGE_NAME, ATTR_IS_WON);

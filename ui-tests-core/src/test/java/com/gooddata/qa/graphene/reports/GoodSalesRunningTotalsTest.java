@@ -58,9 +58,9 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountMetric();
-        createProbabilityMetric();
-        createAvgAmountMetric();
+        getMetricCreator().createAmountMetric();
+        getMetricCreator().createProbabilityMetric();
+        getMetricCreator().createAvgAmountMetric();
 
         //create report using UI due to attribute position
         initReportCreation().createReport(new UiReportDefinition()

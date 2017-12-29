@@ -8,6 +8,7 @@ import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
+import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.metric.CustomMetricUI;
@@ -128,20 +129,21 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountMetric();
-        createAvgAmountMetric();
-        createBestCaseMetric();
-        createLostMetric();
-        createNumberOfOpportunitiesMetric();
-        createNumberOfOpenOppsMetric();
-        createNumberOfWonOppsMetric();
-        createProbabilityMetric();
-        createSnapshotBOPMetric();
-        createWinRateMetric();
-        createWonMetric();
-        createNumberOfActivitiesMetric();
-        createSnapshotEOP1Metric();
-        createSnapshotEOP2Metric();
+        Metrics metricCreator = getMetricCreator();
+        metricCreator.createAmountMetric();
+        metricCreator.createAvgAmountMetric();
+        metricCreator.createBestCaseMetric();
+        metricCreator.createLostMetric();
+        metricCreator.createNumberOfOpportunitiesMetric();
+        metricCreator.createNumberOfOpenOppsMetric();
+        metricCreator.createNumberOfWonOppsMetric();
+        metricCreator.createProbabilityMetric();
+        metricCreator.createSnapshotBOPMetric();
+        metricCreator.createWinRateMetric();
+        metricCreator.createWonMetric();
+        metricCreator.createNumberOfActivitiesMetric();
+        metricCreator.createSnapshotEOP1Metric();
+        metricCreator.createSnapshotEOP2Metric();
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"filter-share-ratio-metric"})

@@ -15,6 +15,7 @@ import com.gooddata.project.Project;
 import com.gooddata.project.ProjectDriver;
 import com.gooddata.project.ProjectService;
 import com.gooddata.project.ProjectValidationResults;
+import com.gooddata.qa.utils.http.RestClient.RestProfile;
 import org.apache.http.HttpHost;
 import org.apache.http.ParseException;
 import org.apache.http.NoHttpResponseException;
@@ -223,5 +224,30 @@ public abstract class AbstractTest extends Arquillian {
                         return false;
                     }
                 });
+    }
+
+    protected RestProfile getProfile(Profile profile) {
+        String username;
+        String password;
+
+        switch (profile) {
+            case DOMAIN:
+                username = testParams.getDomainUser();
+                password = testParams.getPassword();
+                break;
+            default:
+                username = testParams.getUser();
+                password = testParams.getPassword();
+                break;
+        }
+
+        return new RestProfile(testParams.getHost(), username, password, true);
+    }
+
+    public enum Profile {
+        DOMAIN,
+        ADMIN,
+        EDITOR,
+        VIEWER
     }
 }

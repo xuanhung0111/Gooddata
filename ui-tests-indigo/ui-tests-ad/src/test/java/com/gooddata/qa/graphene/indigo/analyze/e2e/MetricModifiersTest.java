@@ -25,9 +25,8 @@ public class MetricModifiersTest extends AbstractAdE2ETest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createNumberOfActivitiesMetric();
-        createQuotaMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
+        getMetricCreator().createQuotaMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"})

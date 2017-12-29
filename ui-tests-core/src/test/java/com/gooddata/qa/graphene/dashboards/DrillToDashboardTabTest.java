@@ -82,9 +82,9 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        amountByProductReportUri = createAmountByProductReport();
-        salesSeasonalityReportUri = createSalesSeasonalityReport();
-        createTop5OpenByCashReport();
+        amountByProductReportUri = getReportCreator().createAmountByProductReport();
+        salesSeasonalityReportUri = getReportCreator().createSalesSeasonalityReport();
+        getReportCreator().createTop5OpenByCashReport();
 
         //init Dashboard Filter Objects
         stageNameAsSingleFilter = createSingleValueFilter(getAttributeByTitle(ATTR_STAGE_NAME));
@@ -186,9 +186,10 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
             assertEquals(reportOnTargetTab.getAttributeValues().size(), expectedReportSize);
 
             browser.navigate().refresh();
-            assertEquals(dashboardsPage.getContent().getLatestReport(TableReport.class).getAttributeValues().size(),
+            assertEquals(
+                    dashboardsPage.getContent().getLatestReport(TableReport.class)
+                            .waitForLoaded().getAttributeValues().size(),
                     reportRowCountBeforeDrilling, "Target tab items are not back to original values");
-
         } finally {
             deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashboardUri);
         }

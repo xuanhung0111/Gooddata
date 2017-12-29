@@ -64,9 +64,9 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountMetric();
-        createActivitiesByTypeReport();
-        createActiveLevelReport();
+        getMetricCreator().createAmountMetric();
+        getReportCreator().createActivitiesByTypeReport();
+        getReportCreator().createActiveLevelReport();
         EmbedDashboardDialog embeddedDialog = initDashboardsPage()
                 .addNewDashboard("New Dashboard")
                 .addNewTab("1st_filter_report")

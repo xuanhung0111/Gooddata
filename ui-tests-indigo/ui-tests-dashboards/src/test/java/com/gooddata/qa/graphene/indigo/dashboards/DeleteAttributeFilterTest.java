@@ -49,8 +49,8 @@ public class DeleteAttributeFilterTest extends AbstractDashboardTest {
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
-        createNumberOfActivitiesMetric();
-        createAmountMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
+        getMetricCreator().createAmountMetric();
         String insightWidget = createInsightWidget(new InsightMDConfiguration(TEST_INSIGHT, ReportType.COLUMN_CHART)
                 .setMeasureBucket(singletonList(MeasureBucket.getSimpleInstance(getMdService().getObj(getProject(),
                         Metric.class, title(METRIC_NUMBER_OF_ACTIVITIES))))));

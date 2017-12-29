@@ -57,8 +57,8 @@ public class GoodSalesSavedViewWithAllValuesTest extends AbstractDashboardWidget
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountMetric();
-        createNumberOfActivitiesMetric();
+        getMetricCreator().createAmountMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
         List<Attribute> attributes = Stream.of("attr.activity.status", "attr.activity.priority")
                 .map(e -> getMdService().getObj(getProject(), Attribute.class, Restriction.identifier(e)))
                 .collect(Collectors.toList());

@@ -74,7 +74,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountMetric();
+        getMetricCreator().createAmountMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"init"})

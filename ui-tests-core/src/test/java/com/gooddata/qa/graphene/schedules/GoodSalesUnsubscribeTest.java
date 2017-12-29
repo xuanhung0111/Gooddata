@@ -69,7 +69,7 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
 
     @Override
     protected void customizeProject() throws Throwable {
-        createActivitiesByTypeReport();
+        getReportCreator().createActivitiesByTypeReport();
     }
 
     @Test(dependsOnMethods = {"signInImapUser"}, groups = {"schedules"})

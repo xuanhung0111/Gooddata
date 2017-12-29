@@ -62,9 +62,9 @@ public class AttributeFilteringTest extends AbstractDashboardTest {
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
-        createNumberOfActivitiesMetric();
-        createAmountMetric();
-        createNumberOfWonOppsMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
+        getMetricCreator().createAmountMetric();
+        getMetricCreator().createNumberOfWonOppsMetric();
 
         String insightWidget = createInsightWidget(new InsightMDConfiguration(TEST_INSIGHT, ReportType.COLUMN_CHART)
                 .setMeasureBucket(singletonList(MeasureBucket.getSimpleInstance(getMdService().getObj(getProject(),

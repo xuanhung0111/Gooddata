@@ -61,11 +61,11 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountMetric();
-        createStatusVariable();
-        top5WonReportUri = createTop5WonByCashReport();
-        top5OpenReportUri = createTop5OpenByCashReport();
-        top5LostReportUri = createTop5LostByCashReport();
+        getMetricCreator().createAmountMetric();
+        getVariableCreator().createStatusVariable();
+        top5WonReportUri = getReportCreator().createTop5WonByCashReport();
+        top5OpenReportUri = getReportCreator().createTop5OpenByCashReport();
+        top5LostReportUri = getReportCreator().createTop5LostByCashReport();
     }
 
     /*

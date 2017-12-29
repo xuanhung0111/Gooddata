@@ -68,8 +68,8 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountMetric();
-        createProbabilityMetric();
+        getMetricCreator().createAmountMetric();
+        getMetricCreator().createProbabilityMetric();
         final Attribute stageName = getMdService().getObj(getProject(), Attribute.class, title(ATTR_STAGE_NAME));
 
         final String amountUri = getMdService()

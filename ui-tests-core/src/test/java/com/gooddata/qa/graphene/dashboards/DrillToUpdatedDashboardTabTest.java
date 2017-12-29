@@ -36,7 +36,7 @@ public class DrillToUpdatedDashboardTabTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        reportUri = createAmountByProductReport();
+        reportUri = getReportCreator().createAmountByProductReport();
     }
 
     @Test(dependsOnGroups = {"createProject"})

@@ -27,8 +27,7 @@ public class DateFilterOnCategoryBucketTest extends AbstractDashboardTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createNumberOfActivitiesMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
     }
 
     @DataProvider

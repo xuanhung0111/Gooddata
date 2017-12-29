@@ -54,7 +54,7 @@ public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest 
                 singletonList(METRIC_GROUP),
                 singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_STAGE_NAME).getDefaultDisplayForm().getUri(), 
                         ATTR_STAGE_NAME)),
-                singletonList(new MetricElement(createAmountMetric())),
+                singletonList(new MetricElement(getMetricCreator().createAmountMetric())),
                 singletonList(new Filter(format("[%s]", promptFilterUri)))));
 
         Dashboard dashboard = Builder.of(Dashboard::new).with(dash -> {

@@ -38,8 +38,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createNumberOfActivitiesMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing().saveInsight(INSIGHT_TEST);
     }

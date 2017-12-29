@@ -35,10 +35,9 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createNumberOfActivitiesMetric();
-        createNumberOfLostOppsMetric(); 
-        createNumberOfOpenOppsMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
+        getMetricCreator().createNumberOfLostOppsMetric();
+        getMetricCreator().createNumberOfOpenOppsMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")

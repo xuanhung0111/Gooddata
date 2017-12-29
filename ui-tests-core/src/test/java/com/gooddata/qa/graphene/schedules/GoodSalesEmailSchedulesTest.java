@@ -58,7 +58,7 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
 
     @Override
     protected void customizeProject() throws Throwable {
-        String reportUri = createActivitiesByTypeReport();
+        String reportUri = getReportCreator().createActivitiesByTypeReport();
 
         Dashboard dashboard = Builder.of(Dashboard::new).with(dash -> {
             dash.setName(DASHBOARD_HAVING_TAB);

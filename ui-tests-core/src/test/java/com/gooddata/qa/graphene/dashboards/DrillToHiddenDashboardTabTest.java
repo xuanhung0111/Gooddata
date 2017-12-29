@@ -45,8 +45,8 @@ public class DrillToHiddenDashboardTabTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void initDashboardDrillingToHiddenTab() throws IOException, JSONException {
-        String reportOnPublicDash = createAmountByProductReport();
-        String reportOnPrivateDash = createTopSalesRepsByWonAndLostReport();
+        String reportOnPublicDash = getReportCreator().createAmountByProductReport();
+        String reportOnPrivateDash = getReportCreator().createTopSalesRepsByWonAndLostReport();
 
         Dashboard privateDash = Builder.of(Dashboard::new).with(dashboard -> {
             dashboard.setName(PRIVATE_DASHBOARD);

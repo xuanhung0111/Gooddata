@@ -49,7 +49,7 @@ public class CommonDateFilteringTest extends AbstractDashboardTest {
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
-        createNumberOfActivitiesMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
         // create an insight without using date filter
         addWidgetToWorkingDashboard(createInsightWidget(new InsightMDConfiguration(TEST_INSIGHT,
                 ReportType.COLUMN_CHART).setMeasureBucket(singletonList(MeasureBucket.getSimpleInstance(

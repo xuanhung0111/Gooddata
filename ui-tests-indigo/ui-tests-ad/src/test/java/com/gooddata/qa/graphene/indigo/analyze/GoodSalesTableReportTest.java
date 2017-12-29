@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
 import com.gooddata.qa.browser.BrowserUtils;
+import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
@@ -49,14 +50,14 @@ public class GoodSalesTableReportTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createNumberOfOpportunitiesMetric();
-        createNumberOfActivitiesMetric();
-        createNumberOfLostOppsMetric();
-        createNumberOfOpenOppsMetric();
-        createNumberOfWonOppsMetric();
-        createQuotaMetric();
-        createSnapshotBOPMetric();
+        Metrics metricCreator = getMetricCreator();
+        metricCreator.createNumberOfOpportunitiesMetric();
+        metricCreator.createNumberOfActivitiesMetric();
+        metricCreator.createNumberOfLostOppsMetric();
+        metricCreator.createNumberOfOpenOppsMetric();
+        metricCreator.createNumberOfWonOppsMetric();
+        metricCreator.createQuotaMetric();
+        metricCreator.createSnapshotBOPMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"})

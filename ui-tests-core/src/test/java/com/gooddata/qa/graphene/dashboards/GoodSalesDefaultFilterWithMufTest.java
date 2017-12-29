@@ -91,7 +91,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
                 singletonList(METRIC_GROUP),
                 singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_PRODUCT).getDefaultDisplayForm().getUri(), 
                         ATTR_PRODUCT)),
-                singletonList(new MetricElement(createAmountMetric())),
+                singletonList(new MetricElement(getMetricCreator().createAmountMetric())),
                 singletonList(new Filter(format("[%s]", promptFilterUri)))));
 
         initDashboardsPage()

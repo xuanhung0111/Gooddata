@@ -61,8 +61,8 @@ public class DrillFromCopiedDashboardTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        amountByProductReportUri = createAmountByProductReport();
-        amountByStageNameReportUri = createAmountByStageNameReport();
+        amountByProductReportUri = getReportCreator().createAmountByProductReport();
+        amountByStageNameReportUri = getReportCreator().createAmountByStageNameReport();
 
         prepareDashboards();
     }

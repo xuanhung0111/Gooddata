@@ -39,10 +39,10 @@ public class GoodSalesDescriptionTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createNumberOfActivitiesMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
 
-        List<String> ids = getObjIdentifiers(asList(createAmountMetric().getUri(), createStatusVariable()));
+        List<String> ids = getObjIdentifiers(asList(getMetricCreator().createAmountMetric().getUri(),
+                getVariableCreator().createStatusVariable()));
 
         identifiersMap.put(ATTR_ACCOUNT, "attr.account.id");
         identifiersMap.put(FACT_AMOUNT, "attr.account.id");

@@ -119,12 +119,12 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
 
     @Override
     protected void customizeProject() throws Throwable {
-        createNumberOfActivitiesMetric();
-        createAmountMetric();
-        createEmptyReport();
-        createIncomputableReport();
-        createTooLargeReport();
-        createActivitiesByTypeReport();
+        getMetricCreator().createNumberOfActivitiesMetric();
+        getMetricCreator().createAmountMetric();
+        getReportCreator().createEmptyReport();
+        getReportCreator().createIncomputableReport();
+        getReportCreator().createTooLargeReport();
+        getReportCreator().createActivitiesByTypeReport();
 
         Dashboard dashboard = Builder.of(Dashboard::new).with(dash -> {
             dash.setName(DASHBOARD_HAVING_TAB);

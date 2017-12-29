@@ -67,7 +67,7 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
                 .withAttribute(ATTR_STAGE_NAME)
                 .withAttributeValues(asList(INTEREST, DISCOVERY, SHORT_LIST, RISK_ASSESSMENT)));
 
-        Metric amountMetric = createAmountMetric();
+        Metric amountMetric = getMetricCreator().createAmountMetric();
         String promptFilterUri = getVariableUri(getRestApiClient(), testParams.getProjectId(), DF_VARIABLE);
 
         createReportViaRest(GridReportDefinitionContent.create(REPORT,
