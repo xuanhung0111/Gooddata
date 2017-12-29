@@ -1,32 +1,5 @@
 package com.gooddata.qa.graphene;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
-import static org.testng.Assert.assertTrue;
-import static java.util.Objects.isNull;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.http.ParseException;
-import org.jboss.arquillian.graphene.Graphene;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.FindBy;
-
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.greypages.account.AccountLoginFragment;
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceFragment;
@@ -42,12 +15,42 @@ import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectElementsFragmen
 import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.query.attributes.QueryAttributesFragment;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
+import com.gooddata.qa.models.GraphModel;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.model.ModelRestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.webdav.WebDavClient;
 import com.google.common.base.Predicate;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.http.ParseException;
+import org.jboss.arquillian.graphene.Graphene;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.FindBy;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static java.util.Objects.isNull;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 public class AbstractGreyPageTest extends AbstractTest {
 
@@ -220,22 +223,6 @@ public class AbstractGreyPageTest extends AbstractTest {
         return objectElementsFragment.getObjectElements();
     }
 
-    @SuppressWarnings("unchecked")
-    public void verifyLDMModelProject(long expectedSize) throws ParseException, IOException, JSONException {
-        //download folder is not created automatically
-        new File(testParams.getDownloadFolder()).mkdir();
-        File imageFileName = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator() + 
-                getLDMImageFile());
-        String hostname = testParams.isHostProxy()? testParams.getHostProxy(): testParams.getHost();
-        replaceContentInSVGFile(imageFileName, Pair.of(hostname, HOST_NAME), 
-                Pair.of(testParams.getProjectId(), PROJECT_ID));
-        System.out.println("imageFileName = " + imageFileName);
-        long fileSize = imageFileName.length();
-        System.out.println("File size: " + fileSize);
-        assertTrue(fileSize == expectedSize, "LDM is probably invalid, check the LDM image manually! "
-                + "Current size is " + fileSize + ", but " + expectedSize + " in size was expected");
-    }
-
     /**
      * A hook for inviting users from other roles to project.
      * @throws ParseException
@@ -308,51 +295,6 @@ public class AbstractGreyPageTest extends AbstractTest {
         extraUsers.add(dynamicUser);
 
         return dynamicUser;
-    }
-
-    private String getLDMImageFile() throws ParseException, IOException, JSONException {
-        String imageURI = ModelRestUtils.getLDMImageURI(getRestApiClient(), testParams.getProjectId(),
-                testParams.getHost());
-        int indexSVG = imageURI.indexOf(".svg");
-        String imageFileName = imageURI.substring(0, indexSVG + 4);
-        imageFileName = imageFileName.substring(imageFileName.lastIndexOf("/") + 1);
-        downloadFile(imageURI, imageFileName);
-        return imageFileName;
-    }
-
-    private void downloadFile(String href, String filename) throws IOException {
-        URL url = new URL(href);
-        InputStream in = new BufferedInputStream(url.openStream());
-        OutputStream out = new BufferedOutputStream(new FileOutputStream(testParams.getDownloadFolder() +
-                testParams.getFolderSeparator() + filename));
-        for ( int i; (i = in.read()) != -1; ) {
-            out.write(i);
-        }
-        out.close();
-        in.close();
-    }
-
-    protected void replaceContentInSVGFile(File file,
-            @SuppressWarnings("unchecked") Pair<String,String>... replaceStrings) throws IOException {
-        FileInputStream input = new FileInputStream(file);
-        FileOutputStream output = null;
-        try {
-            String content = IOUtils.toString(input);
-            for (Pair<String,String> replaceString : replaceStrings) {
-                // process the hostname in svg file if it has some prefix (na1 or ea)
-                if (HOST_NAME.equals(replaceString.getRight())) {
-                    String pattern = "https://(\\w+.)*" + replaceString.getLeft();
-                    content = content.replaceAll(pattern,"https://" + replaceString.getRight());
-                    continue;
-                }
-                content = content.replaceAll(replaceString.getLeft(), replaceString.getRight());
-            }
-            output = new FileOutputStream(file);
-            IOUtils.write(content, output);
-        } finally {
-            input.close();
-            if (output!= null) output.close();
-        }
     }
 
     private void refreshToken() {

@@ -26,14 +26,25 @@ import static java.util.stream.Collectors.joining;
 import static java.util.Arrays.asList;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.gooddata.qa.models.GraphModel;
+import com.gooddata.qa.utils.http.model.ModelRestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -195,7 +206,10 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
         Screenshots.takeScreenshot(browser, "project-model", this.getClass());
 
-        verifyLDMModelProject(33304);
+        Set<String> expectedNodes = new HashSet<>(Arrays.asList(COMPUTED_ATTRIBUTE_NAME));
+        Set<String> expectedEdges = new HashSet<>(Arrays.asList(String.format("%s->%s",
+                COMPUTED_ATTRIBUTE_NAME, ATTR_SALES_REP)));
+        verifyLDMModelProject(expectedNodes, expectedEdges);
     }
 
     @Test(dependsOnMethods = {"createComputedAttributeTest"}, priority = 1)
@@ -615,5 +629,41 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
         return DashboardsRestUtils
                 .createSimpleMufObjByUri(getRestApiClient(), testParams.getProjectId(), mufTitle, conditions);
+    }
+
+    private void verifyLDMModelProject(Set<String> expectedNodes, Set<String> expectedEdges)
+            throws ParseException, IOException, JSONException {
+        new File(testParams.getDownloadFolder()).mkdir();
+        File imageFileName = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator() +
+                getLDMImageFile());
+        GraphModel graph = GraphModel.readGraphXPath(imageFileName);
+
+        Set<String> nodeTexts = graph.getNodes().stream().map(e -> e.getText()).collect(Collectors.toSet());
+        Set<String> edgeTexts = graph.getEdges().stream().map(e -> e.getText()).collect(Collectors.toSet());
+
+        assertTrue(nodeTexts.containsAll(expectedNodes), "expected nodes does not in ldm nodes");
+        assertTrue(edgeTexts.containsAll(expectedEdges), "expected edges does not in ldm edges");
+    }
+
+    private String getLDMImageFile() throws ParseException, IOException, JSONException {
+        String imageURI = ModelRestUtils.getLDMImageURI(getRestApiClient(), testParams.getProjectId(),
+                testParams.getHost());
+        int indexSVG = imageURI.indexOf(".svg");
+        String imageFileName = imageURI.substring(0, indexSVG + 4);
+        imageFileName = imageFileName.substring(imageFileName.lastIndexOf("/") + 1);
+        downloadFile(imageURI, imageFileName);
+        return imageFileName;
+    }
+
+    private void downloadFile(String href, String filename) throws IOException {
+        URL url = new URL(href);
+        InputStream in = new BufferedInputStream(url.openStream());
+        OutputStream out = new BufferedOutputStream(new FileOutputStream(testParams.getDownloadFolder() +
+                testParams.getFolderSeparator() + filename));
+        for (int i; (i = in.read()) != -1; ) {
+            out.write(i);
+        }
+        out.close();
+        in.close();
     }
 }
