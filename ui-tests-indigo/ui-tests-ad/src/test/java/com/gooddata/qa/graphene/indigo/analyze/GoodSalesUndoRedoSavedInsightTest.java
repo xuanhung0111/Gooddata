@@ -40,15 +40,6 @@ public class GoodSalesUndoRedoSavedInsightTest extends AbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = { "createProject" })
-    public void newCreatedInsightNotAppliedUndo() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                .addAttribute(ATTR_ACTIVITY_TYPE)
-                .waitForReportComputing()
-                .saveInsight("Newly created insight");
-        assertFalse(analysisPage.getPageHeader().isUndoButtonEnabled(), "The undo button is still enabled");
-    }
-
-    @Test(dependsOnGroups = { "createProject" })
     public void prepareSavedInsightsForUndoRedoTest() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
