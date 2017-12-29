@@ -72,7 +72,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     private final List<String> CUSTOM_RECIPIENTS = asList("bear+1@gooddata.com", "bear+2@gooddata.com");
     private final List<String> SCHEDULED_TABS = asList(DASH_TAB_WATERFALL_ANALYSIS, DASH_TAB_WHATS_CHANGED);
     private final String SCHEDULE_INFO = "^This dashboard will be sent daily at 12:30 AM .* to %s "
-            + "and 2 other recipients as a PDF attachment.$";
+            + "and 2 other recipients as a PDF attachment. It will include all currently active filters.$";
     private final String DASHBOARD_HAVING_MANY_TABS = "Dashboard having many tabs";
     private DateTimeZone tz = DateTimeZone.getDefault();
 
