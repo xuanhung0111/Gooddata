@@ -24,7 +24,8 @@ import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmailSchedulesTest {
     private final String DASHBOARD_HAVING_TAB = "Dashboard having tab";
-    private final String SCHEDULE_INFO = "^This dashboard will be sent %s .* to %s as a PDF attachment.$";
+    private final String SCHEDULE_INFO = "^This dashboard will be sent %s .* to %s as a PDF attachment. "
+                                         + "It will include all currently active filters.$";
     private DashboardScheduleDialog dashboardScheduleDialog;
     private AbstractRecurrenceTestCase[] CASES = new AbstractRecurrenceTestCase[]{
             new WeeklyTestCase(
