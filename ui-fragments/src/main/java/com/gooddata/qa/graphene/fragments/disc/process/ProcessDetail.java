@@ -48,14 +48,23 @@ public class ProcessDetail extends AbstractProcessDetail {
     }
 
     public ProcessDetail redeployWithZipFile(String processName, ProcessType processType, File packageFile) {
-        waitForElementVisible(redeployButton).click();
-        DeployProcessForm.getInstance(browser).selectZipAndDeploy(processName, processType, packageFile);
+        clickRedeployButton().selectZipAndDeploy(processName, processType, packageFile);
+        return this;
+    }
+
+    public ProcessDetail redeploySqlExecutorProcess(String newProcessName) {
+        clickRedeployButton().enterEtlProcessNameAndDeploy(newProcessName);
         return this;
     }
 
     public ConfirmationDialog clickDeleteButton() {
         waitForElementVisible(deleteButton).click();
         return ConfirmationDialog.getInstance(browser);
+    }
+
+    public DeployProcessForm clickRedeployButton() {
+        waitForElementVisible(redeployButton).click();
+        return DeployProcessForm.getInstance(browser);
     }
 
     public void deleteProcess() {

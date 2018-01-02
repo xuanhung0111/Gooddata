@@ -1,21 +1,26 @@
 package com.gooddata.qa.graphene.flow;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.gooddata.qa.graphene.disc.LongRunTimeTest;
 import com.gooddata.qa.graphene.disc.OverviewPageTest;
 import com.gooddata.qa.graphene.disc.SanityTest;
 import com.gooddata.qa.graphene.disc.notification.NotificationsTest;
+import com.gooddata.qa.graphene.disc.process.DeployEtlProcessTest;
 import com.gooddata.qa.graphene.disc.process.DeployProcessByGitStoreTest;
 import com.gooddata.qa.graphene.disc.process.DeployProcessByGraphTest;
 import com.gooddata.qa.graphene.disc.process.DeployProcessByRubyScriptTest;
+import com.gooddata.qa.graphene.disc.process.DeploySqlExecutorProcessTest;
 import com.gooddata.qa.graphene.disc.project.ProjectsDetailTest;
 import com.gooddata.qa.graphene.disc.project.ProjectsPageTest;
+import com.gooddata.qa.graphene.disc.schedule.CreateEtlProcessScheduleTest;
 import com.gooddata.qa.graphene.disc.schedule.CreateScheduleTest;
+import com.gooddata.qa.graphene.disc.schedule.EditEtlProcessScheduleTest;
 import com.gooddata.qa.graphene.disc.schedule.EditScheduleTest;
+import com.gooddata.qa.graphene.disc.schedule.EtlProcessScheduleDetailTest;
 import com.gooddata.qa.graphene.disc.schedule.ScheduleDetailTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class UITestsRegistry {
 
@@ -30,9 +35,14 @@ public class UITestsRegistry {
             DeployProcessByGitStoreTest.class,
             DeployProcessByGraphTest.class,
             DeployProcessByRubyScriptTest.class,
+            DeployEtlProcessTest.class,
+            DeploySqlExecutorProcessTest.class,
             CreateScheduleTest.class,
+            CreateEtlProcessScheduleTest.class,
             EditScheduleTest.class,
+            EditEtlProcessScheduleTest.class,
             ScheduleDetailTest.class,
+            EtlProcessScheduleDetailTest.class,
             NotificationsTest.class,
             "testng-imap-notification.xml"
         });
@@ -44,9 +54,14 @@ public class UITestsRegistry {
             DeployProcessByGitStoreTest.class,
             DeployProcessByGraphTest.class,
             DeployProcessByRubyScriptTest.class,
+            DeployEtlProcessTest.class,
+            DeploySqlExecutorProcessTest.class,
             CreateScheduleTest.class,
+            CreateEtlProcessScheduleTest.class,
             EditScheduleTest.class,
+            EditEtlProcessScheduleTest.class,
             ScheduleDetailTest.class,
+            EtlProcessScheduleDetailTest.class,
             NotificationsTest.class
         });
 

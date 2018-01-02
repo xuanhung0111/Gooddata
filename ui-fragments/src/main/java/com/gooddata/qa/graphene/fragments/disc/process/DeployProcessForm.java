@@ -42,6 +42,21 @@ public class DeployProcessForm extends AbstractFragment {
     @FindBy(className = "ait-component-selection-dropdown-button")
     private ProcessTypeDropdown processTypeDropdown;
 
+    @FindBy(xpath = ".//*[text()='PATH TO CONFIGURATION.JSON']/following::input[1]")
+    private WebElement s3ConfigurationPathInput;
+
+    @FindBy(xpath = ".//*[text()='ACCESS KEY FOR S3']/following::input[1]")
+    private WebElement s3AccessKeyInput;
+
+    @FindBy(xpath = ".//*[text()='SECRET KEY FOR S3']/following::input[1]")
+    private WebElement s3SecretKeyInput;
+
+    @FindBy(xpath = ".//*[text()='Region']/following::input")
+    private WebElement s3RegionInput;
+
+    @FindBy(css = ".form-title .input-checkbox")
+    private WebElement s3ServerSideEncryptionInput;
+
     public static final DeployProcessForm getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(DeployProcessForm.class, waitForElementVisible(LOCATOR, searchContext));
     }
@@ -58,6 +73,12 @@ public class DeployProcessForm extends AbstractFragment {
         waitForFragmentNotVisible(this);
     }
 
+    public void enterEtlProcessNameAndDeploy(String processName) {
+        enterProcessName(processName)
+                .submit();
+        waitForFragmentNotVisible(this);
+    }
+
     public void deployProcessWithZipFile(String processName, ProcessType processType, File packageFile) {
         selectProcessType(processType);
         selectZipAndDeploy(processName, processType, packageFile);
@@ -70,6 +91,35 @@ public class DeployProcessForm extends AbstractFragment {
                 .enterProcessName(processName)
                 .submit();
         waitForFragmentNotVisible(this);
+    }
+
+    public DeployProcessForm deployEtlProcess(String processName,
+                                 ProcessType processType,
+                                 String s3ConfigurationPath,
+                                 String s3AccessKey,
+                                 String s3SecretKey,
+                                 String s3Region,
+                                 boolean serverSideEncryption) {
+        selectProcessType(processType)
+                .enterProcessName(processName)
+                .enterS3ConfigurationPath(s3ConfigurationPath)
+                .enterS3AccessKey(s3AccessKey)
+                .enterS3SecretKey(s3SecretKey)
+                .enterS3Region(s3Region);
+        if (serverSideEncryption) {
+            selectServerSideEncryption();
+        }
+        submit();
+        waitForFragmentNotVisible(this);
+        return this;
+    }
+
+    public DeployProcessForm deploySqlExecutorProcess(String processName) {
+        selectProcessType(ProcessType.SQL_EXECUTOR)
+                .enterProcessName(processName)
+                .submit();
+        waitForFragmentNotVisible(this);
+        return this;
     }
 
     public DeployProcessForm selectProcessType(ProcessType processType) {
@@ -101,6 +151,47 @@ public class DeployProcessForm extends AbstractFragment {
         return this;
     }
 
+    public DeployProcessForm enterS3ConfigurationPath(String s3ConfigurationPath) {
+        waitForElementVisible(s3ConfigurationPathInput).clear();
+        s3ConfigurationPathInput.sendKeys(s3ConfigurationPath);
+        return this;
+    }
+
+    public DeployProcessForm enterS3AccessKey(String s3AccessKey) {
+        waitForElementVisible(s3AccessKeyInput).clear();
+        s3AccessKeyInput.sendKeys(s3AccessKey);
+        return this;
+    }
+
+    public DeployProcessForm enterS3SecretKey(String s3SecretKey) {
+        waitForElementVisible(s3SecretKeyInput).clear();
+        s3SecretKeyInput.sendKeys(s3SecretKey);
+        return this;
+    }
+
+    public DeployProcessForm enterS3Region(String s3Region) {
+        waitForElementVisible(s3RegionInput).clear();
+        s3RegionInput.sendKeys(s3Region);
+        return this;
+    }
+
+    public DeployProcessForm selectServerSideEncryption() {
+        waitForElementVisible(s3ServerSideEncryptionInput).click();
+        return this;
+    }
+
+    public String getS3ConfigurationPath() {
+        return waitForElementVisible(s3ConfigurationPathInput).getAttribute("value");
+    }
+
+    public String getS3AccessKey() {
+        return waitForElementVisible(s3AccessKeyInput).getAttribute("value");
+    }
+
+    public String getS3Region() {
+        return waitForElementVisible(s3RegionInput).getAttribute("value");
+    }
+
     public boolean isPackageInputError() {
         return waitForElementVisible(By.cssSelector(".select-zip .input-text"), getRoot())
                 .getAttribute("class").contains("has-error");
@@ -112,6 +203,18 @@ public class DeployProcessForm extends AbstractFragment {
 
     public boolean isGitPathInputError() {
         return waitForElementVisible(gitPathInput).getAttribute("class").contains("has-error");
+    }
+
+    public boolean isS3ConfigurationPathError() {
+        return waitForElementVisible(s3ConfigurationPathInput).getAttribute("class").contains("has-error");
+    }
+
+    public boolean isS3AccessKeyError() {
+        return waitForElementVisible(s3AccessKeyInput).getAttribute("class").contains("has-error");
+    }
+
+    public boolean isS3SecretKeyError() {
+        return waitForElementVisible(s3SecretKeyInput).getAttribute("class").contains("has-error");
     }
 
     public void submit() {
@@ -154,7 +257,11 @@ public class DeployProcessForm extends AbstractFragment {
 
     public enum ProcessType {
         CLOUD_CONNECT("GRAPH", "CloudConnect Graph"),
-        RUBY_SCRIPTS("RUBY", "Generic Ruby");
+        RUBY_SCRIPTS("RUBY", "Generic Ruby"),
+        CSV_DOWNLOADER("gdc-etl-csv-downloader", "CSV Downloader"),
+        SQL_DOWNLOADER("gdc-etl-sql-downloader", "SQL Downloader"),
+        ADS_INTEGRATOR("gdc-etl-ads-integrator", "ADS Integrator"),
+        SQL_EXECUTOR("gdc-etl-sql-executor", "SQL Executor");
 
         private String value;
         private String title;

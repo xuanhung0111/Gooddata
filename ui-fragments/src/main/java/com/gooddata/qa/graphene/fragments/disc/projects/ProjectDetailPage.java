@@ -114,6 +114,21 @@ public class ProjectDetailPage extends AbstractFragment {
         return this;
     }
 
+    public DeployProcessForm deployEtlProcess(String processName,
+                                        ProcessType processType,
+                                        String s3ConfigurationPath,
+                                        String s3AccessKey,
+                                        String s3SecretKey,
+                                        String s3Region,
+                                        boolean serverSideEncryption) {
+        return clickDeployButton().deployEtlProcess(processName, processType, s3ConfigurationPath, s3AccessKey,
+                s3SecretKey, s3Region, serverSideEncryption);
+    }
+
+    public DeployProcessForm deploySqlExecutorProcess(String processName) {
+        return clickDeployButton().deploySqlExecutorProcess(processName);
+    }
+
     public void downloadProcess(String processName) {
         getProcess(processName).downloadProcess();
     }
