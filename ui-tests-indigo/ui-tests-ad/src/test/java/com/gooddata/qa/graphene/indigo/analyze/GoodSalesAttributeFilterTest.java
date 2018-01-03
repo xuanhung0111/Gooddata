@@ -81,25 +81,6 @@ public class GoodSalesAttributeFilterTest extends AbstractAnalyseTest {
         checkingOpenAsReport("addFilterNotHideRecommendation");
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void filterOnDateAndAttribute() {
-        final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
-
-        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                .addAttribute(ATTR_ACTIVITY_TYPE)
-                .addDateFilter()
-                .waitForReportComputing()
-                .getChartReport();
-        assertEquals(report.getTrackersCount(), 4);
-        assertEquals(filtersBucketReact.getFilterText("Activity"), "Activity: All time");
-
-        assertEquals(filtersBucketReact.configDateFilter("Last year")
-                .getFilterText("Activity"), "Activity: Last year");
-        analysisPage.waitForReportComputing();
-        assertTrue(report.getTrackersCount() >= 1);
-        checkingOpenAsReport("filterOnDateAndAttribute");
-    }
-
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void addAttributeToFilterBucket() {
         final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
