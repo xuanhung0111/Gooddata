@@ -225,7 +225,7 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void filterOnDateAttribute() {
+    public void filterOnDateAttribute() throws ParseException {
         final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
@@ -235,9 +235,9 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
         assertEquals(analysisPage.getChartReport().getTrackersCount(), 4);
         assertEquals(filtersBucket.getDateFilterText(), "Activity: All time");
 
-        filtersBucket.configDateFilter("Last year");
+        filtersBucket.configDateFilter("01/01/2016", "01/01/2017");
         analysisPage.waitForReportComputing();
-        assertEquals(filtersBucket.getFilterText("Activity"), "Activity: Last year");
+        assertEquals(filtersBucket.getFilterText("Activity"), "Activity: Jan 1, 2016 - Jan 1, 2017");
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
         checkingOpenAsReport("filterOnDateAttribute");
     }
