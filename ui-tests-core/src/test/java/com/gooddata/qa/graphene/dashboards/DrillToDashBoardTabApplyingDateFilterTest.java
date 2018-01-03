@@ -77,7 +77,7 @@ public class DrillToDashBoardTabApplyingDateFilterTest extends GoodSalesAbstract
                 DATA_FILTERED_BY_YEAR_2014);
 
         Pair<String, String> expectedValuesOnDiffDateDimensionAndSameRangeDash = Pair.of
-                (DATE_DIMENSION_SNAPSHOT, "2017");
+                (DATE_DIMENSION_SNAPSHOT, String.valueOf(now.getYear()));
 
         Pair<String, String> changeValuesOnDiffDateDimensionAndDiffRangeDash = Pair.of(DATE_DIMENSION_CLOSED,
                 DATA_FILTERED_BY_YEAR_2014);
