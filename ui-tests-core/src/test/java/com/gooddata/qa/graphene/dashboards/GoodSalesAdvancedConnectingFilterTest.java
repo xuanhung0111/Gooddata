@@ -39,7 +39,9 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
     private static final String YEAR_2013 = "2013";
     private static final String YEAR_2014 = "2014";
     private static final String CURRENT_YEAR = String.valueOf(now().getYear());
-
+    private static final String YEAR_2016 = (Integer.valueOf(CURRENT_YEAR) - 2016) + " ago";
+    private static final String YEAR_2017 =
+            (Integer.valueOf(CURRENT_YEAR) - 2017) == 1 ? "last" : (Integer.valueOf(CURRENT_YEAR) - 2017) + " ago";
     private static final String THIS = "this";
     private static final String LAST = "last";
     private static final String ALL = "All";
@@ -314,8 +316,8 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         initDashboardsPage()
                 .addNewDashboard(generateDashboard())
                 .addReportToDashboard(REPORT)
-                .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR, THIS)
-                .addTimeFilterToDashboard(DATE_DIMENSION_CLOSED, DateGranularity.YEAR, THIS);
+                .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR, YEAR_2017)
+                .addTimeFilterToDashboard(DATE_DIMENSION_CLOSED, DateGranularity.YEAR, YEAR_2017);
 
         moveElementToRightPlace(getReport().getRoot(), DashboardWidgetDirection.LEFT);
         moveElementToRightPlace(getDateCreatedFilter().getRoot(), DashboardWidgetDirection.RIGHT);
@@ -323,8 +325,8 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         dashboardsPage
                 .addNewTab(DASHBOARD_TAB)
                 .addReportToDashboard(REPORT)
-                .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR, THIS)
-                .addTimeFilterToDashboard(DATE_DIMENSION_SNAPSHOT, DateGranularity.YEAR, THIS);
+                .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR, YEAR_2017)
+                .addTimeFilterToDashboard(DATE_DIMENSION_SNAPSHOT, DateGranularity.YEAR, YEAR_2017);
 
         moveElementToRightPlace(getReport().getRoot(), DashboardWidgetDirection.LEFT);
         moveElementToRightPlace(getDateCreatedFilter().getRoot(), DashboardWidgetDirection.RIGHT);
@@ -338,7 +340,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
 
         dashboardsPage.openTab(0);
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_OF_DATA);
-        assertEquals(getDateClosedFilter().getCurrentValue(), CURRENT_YEAR);
+        assertEquals(getDateClosedFilter().getCurrentValue(), "2017");
         AssertUtils.assertIgnoreCase(getReport().getAttributeValues(), asList("Inside Sales", "CompuSci"));
     }
 
@@ -347,8 +349,8 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         initDashboardsPage()
                 .addNewDashboard(generateDashboard())
                 .addReportToDashboard(REPORT)
-                .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR, THIS)
-                .addTimeFilterToDashboard(DATE_DIMENSION_CLOSED, DateGranularity.YEAR, THIS);
+                .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR, YEAR_2017)
+                .addTimeFilterToDashboard(DATE_DIMENSION_CLOSED, DateGranularity.YEAR, YEAR_2017);
 
         moveElementToRightPlace(getReport().getRoot(), DashboardWidgetDirection.LEFT);
         moveElementToRightPlace(getDateCreatedFilter().getRoot(), DashboardWidgetDirection.RIGHT);
@@ -356,8 +358,8 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
         dashboardsPage
                 .addNewTab(DASHBOARD_TAB)
                 .addReportToDashboard(REPORT)
-                .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR, THIS)
-                .addTimeFilterToDashboard(DATE_DIMENSION_CLOSED, DateGranularity.YEAR, LAST);
+                .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR, YEAR_2017)
+                .addTimeFilterToDashboard(DATE_DIMENSION_CLOSED, DateGranularity.YEAR, YEAR_2016);
 
         moveElementToRightPlace(getReport().getRoot(), DashboardWidgetDirection.LEFT);
         moveElementToRightPlace(getDateCreatedFilter().getRoot(), DashboardWidgetDirection.RIGHT);
@@ -369,7 +371,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
 
         dashboardsPage.openTab(0);
         assertEquals(getDateCreatedFilter().getCurrentValue(), YEAR_OF_DATA);
-        assertEquals(getDateClosedFilter().getCurrentValue(), CURRENT_YEAR);
+        assertEquals(getDateClosedFilter().getCurrentValue(), "2017");
         AssertUtils.assertIgnoreCase(getReport().getAttributeValues(), asList("Inside Sales", "CompuSci"));
     }
 
