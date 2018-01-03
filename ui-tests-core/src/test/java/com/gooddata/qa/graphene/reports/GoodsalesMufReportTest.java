@@ -31,6 +31,7 @@ import static org.testng.Assert.assertEquals;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 public class GoodsalesMufReportTest extends GoodSalesAbstractTest {
+    private final static int PERIOD_UNTIL_2012 = now().getYear() - 2012;
     private Attribute stageNameAttribute;
     private AttributeElement stageNameValue;
 
@@ -53,7 +54,7 @@ public class GoodsalesMufReportTest extends GoodSalesAbstractTest {
         yearCreatedValue = getMdService()
                 .getAttributeElements(yearCreatedAttribute)
                 .stream()
-                .filter(element -> element.getTitle().equals(valueOf(now().getYear() - 5)))
+                .filter(element -> element.getTitle().equals(valueOf(now().getYear() - PERIOD_UNTIL_2012)))
                 .findFirst()
                 .get();
     }
@@ -61,7 +62,8 @@ public class GoodsalesMufReportTest extends GoodSalesAbstractTest {
     @DataProvider(name = "mufProvider")
     public Object [][] getMufProvider() {
         final String simpleMufExpression = format("[%s] = [%s]", stageNameAttribute.getUri(), stageNameValue.getUri());
-        final String mufWithTimeMacroExpression = format("[%s] = THIS - 5", yearCreatedAttribute.getUri());
+        final String mufWithTimeMacroExpression = format("[%s] = THIS - " + String.valueOf(PERIOD_UNTIL_2012),
+                yearCreatedAttribute.getUri());
 
         combinedMufExpression = simpleMufExpression + " AND " + mufWithTimeMacroExpression;
 

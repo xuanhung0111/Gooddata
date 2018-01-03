@@ -67,7 +67,7 @@ public class UITestsRegistry {
             ResetButtonTest.class,
             "testng-ad-e2e-metrics-test.xml",
             "testng-ad-e2e-visualization-test.xml",
-            "testng-ad-e2e-recommendation-test.xml",
+//            "testng-ad-e2e-recommendation-test.xml", Will be reverted after finishing QA-7229
             "testng-ad-e2e-catalogue-test.xml",
             "testng-ad-e2e-date-test.xml"
         });
@@ -84,9 +84,9 @@ public class UITestsRegistry {
             GoodSalesChartLegendTest.class,
             GoodSalesComparisonRecommendationTest.class,
             GoodSalesContributionRecommendationTest.class,
-            CustomDateDimensionsTest.class,
+//            CustomDateDimensionsTest.class, Will be reverted after finishing CL-11645
             GoodSalesDateDimensionTest.class,
-            GoodSalesDateFilterTest.class,
+//            GoodSalesDateFilterTest.class, Will be reverted after finishing QA-7229
             GoodSalesDescriptionTest.class,
             GoodSalesDropAttributeTest.class,
             GoodSalesVisualizationTest.class,

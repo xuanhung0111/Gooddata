@@ -44,12 +44,12 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void testOverrideDateFilter() {
+    public void testOverrideDateFilter() throws ParseException {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addDateFilter()
             .getFilterBuckets()
-            .configDateFilter("Last year");
+            .configDateFilter("01/01/2016", "01/01/2017");
         ChartReport report = analysisPage.waitForReportComputing().getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
         RecommendationContainer recommendationContainer =
