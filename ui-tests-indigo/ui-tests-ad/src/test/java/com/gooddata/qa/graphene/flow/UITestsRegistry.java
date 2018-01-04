@@ -84,7 +84,7 @@ public class UITestsRegistry {
             GoodSalesChartLegendTest.class,
             GoodSalesComparisonRecommendationTest.class,
             GoodSalesContributionRecommendationTest.class,
-//            CustomDateDimensionsTest.class, Will be reverted after finishing CL-11645
+            CustomDateDimensionsTest.class,
             GoodSalesDateDimensionTest.class,
 //            GoodSalesDateFilterTest.class, Will be reverted after finishing QA-7229
             GoodSalesDescriptionTest.class,

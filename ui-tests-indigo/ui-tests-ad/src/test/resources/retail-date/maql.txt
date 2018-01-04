@@ -1,0 +1,9 @@
+CREATE DATASET {dataset.customer} VISUAL(TITLE "Customer");
+INCLUDE TEMPLATE "urn:retail454:date" MODIFY (IDENTIFIER "retaildate", TITLE "Retaildate");
+CREATE ATTRIBUTE {attr.customer.date} VISUAL(TITLE "Date") AS KEYS {f_customer.date} FULLSET;
+ALTER DATASET {dataset.customer} ADD {attr.customer.date};
+ALTER ATTRIBUTE {attr.customer.date} ADD LABELS {label.customer.date} VISUAL(TITLE "Date") AS {f_customer.nm_date};
+CREATE FACT {fact.customer.number} VISUAL(TITLE "Number") AS {f_customer.f_number};
+ALTER DATASET {dataset.customer} ADD {fact.customer.number};
+ALTER ATTRIBUTE {retaildate.retail454_date} ADD KEYS {f_customer.dt_date};
+SYNCHRONIZE {dataset.customer};
