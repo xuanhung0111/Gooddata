@@ -9,11 +9,13 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.testng.Assert;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -214,12 +216,20 @@ public class DrillingConfigPanel extends AbstractFragment {
         }
 
         private SelectItemPopupPanel getPopupInstance() {
-            Predicate<WebDriver> isPanelDisplayed = driver -> driver.findElements(SelectItemPopupPanel.LOCATOR).size() > 1;
-            Graphene.waitGui().until(isPanelDisplayed);
+            WebElement root = browser.findElements(SelectItemPopupPanel.LOCATOR).get(1);
+            List<WebElement> elements = root.findElements(By.cssSelector(".gdc-overlay-simple:not(.hidden)" +
+                    ":not(.yui3-overlay-hidden):not(.ember-view) div.yui3-c-container-content:not(.m9):not" +
+                    "(footer)"));
 
-            // always get #2 found element
-            return Graphene.createPageFragment(SelectItemPopupPanel.class,
-                    browser.findElements(SelectItemPopupPanel.LOCATOR).get(1));
+            for (WebElement element : elements) {
+                if (isElementVisible(element)) {
+                    waitForElementVisible(By.cssSelector(".yui3-c-simpleColumn-window.loaded"), element);
+                    break;
+                }
+            }
+
+            // SelectItemPopupPanel.getInstance does not work in this case
+            return Graphene.createPageFragment(SelectItemPopupPanel.class, root);
         }
 
         private SelectItemPopupPanel openLeftPopup() {
@@ -229,6 +239,7 @@ public class DrillingConfigPanel extends AbstractFragment {
 
         private SelectItemPopupPanel openRightPopup() {
             waitForElementVisible(rightButton).click();
+
             return getPopupInstance();
         }
 
