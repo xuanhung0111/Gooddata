@@ -53,6 +53,12 @@ public class TimeFilterPanel extends AbstractFragment {
     @FindBy(css = ".fromInput:not(.loading) input")
     private WebElement filterTimeFromInput;
 
+    @FindBy(css = ".dateExample:not(.loading)")
+    private WebElement fromDateDescription;
+
+    @FindBy(css = ".dateExample2:not(.loading)")
+    private WebElement toDateDescription;
+
     @FindBy(css = ".toInput:not(.loading) input")
     private WebElement filterTimeToInput;
 
@@ -84,8 +90,16 @@ public class TimeFilterPanel extends AbstractFragment {
         return waitForElementVisible(filterTimeFromInput).getAttribute("value");
     }
 
+    public String getFromDateDescription() {
+        return waitForElementVisible(fromDateDescription).getText();
+    }
+
     public String getToValue() {
         return waitForElementVisible(filterTimeToInput).getAttribute("value");
+    }
+
+    public String getToDateDescription() {
+        return waitForElementVisible(toDateDescription).getText();
     }
 
     public TimeFilterPanel selectDateGranularity(final DateGranularity dateGranularity) {

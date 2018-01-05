@@ -10,6 +10,8 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 
 import java.util.List;
 
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.DayTimeFilterPanel.DayAgo;
+import com.google.common.collect.Iterables;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -170,6 +172,12 @@ public class DashboardEditBar extends AbstractFragment {
         openFilterMenu().select("Date");
         waitForFragmentVisible(dashboardFilter).addTimeFilter(dateDimension, dateGranularity, timeLine);
 
+        return this;
+    }
+
+    public DashboardEditBar addDayTimeFilterToDashboard(String dateDimension, DayAgo day) {
+        openFilterMenu().select("Date");
+        waitForFragmentVisible(dashboardFilter).addDayTimeFilter(dateDimension, day);
         return this;
     }
 
