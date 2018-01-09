@@ -1,15 +1,14 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.fixture.ResourceManagement.ResourceTemplate.SINGLE_INVOICE;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
@@ -17,11 +16,10 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.text.ParseException;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
-import java.util.TimeZone;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
+import com.gooddata.qa.graphene.enums.DateRange;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
@@ -38,50 +36,55 @@ import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
-public class GoodSalesDateFilterTest extends AbstractAnalyseTest {
+public class DateFilterTest extends AbstractAnalyseTest {
+
+    public static final String DATE_INVOICE = "templ:DateInvoice";
+    public static final String METRIC_NUMBER_OF_PERSONS = "# Of attr:Persons";
+    public static final String ATTR_PERSON = "attr:Person";
+    public static final String ATTR_INVOICE_ITEM = "attr:Invoice Item";
 
     @Override
     public void initProperties() {
-        super.initProperties();
         projectTitle += "Date-Filter-Test";
+        appliedFixture = SINGLE_INVOICE;
     }
 
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
-        createNumberOfActivitiesMetric();
+        createMetricIfNotExist(getGoodDataClient(), METRIC_NUMBER_OF_PERSONS,
+                format("SELECT COUNT([%s], [%s])",
+                        getAttributeByTitle(ATTR_PERSON).getUri(),
+                        getAttributeByTitle(ATTR_INVOICE_ITEM).getUri()), DEFAULT_METRIC_FORMAT);
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void checkDefaultValueInDateRange() {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
         analysisPage.addDateFilter()
-            .getFilterBuckets()
-            .getFilter("Activity").click();
+                .getFilterBuckets()
+                .getFilter(DATE_INVOICE).click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
 
         panel.changeToDateRangeSection();
-
-        Calendar date = Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles"));
-        assertEquals(panel.getToDate(), getTimeString(date));
-
-        date.add(Calendar.DAY_OF_MONTH, -29);
-        assertEquals(panel.getFromDate(), getTimeString(date));
+        assertEquals(panel.getToDate(), DateRange.now().format(dateTimeFormatter));
+        assertEquals(panel.getFromDate(), DateRange.LAST_30_DAYS.getFrom().format(dateTimeFormatter));
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void switchingDateRangeNotComputeReport() {
         final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
 
-        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                .addAttribute(ATTR_ACTIVITY_TYPE)
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_PERSONS)
+                .addAttribute(ATTR_PERSON)
                 .addDateFilter()
                 .waitForReportComputing()
                 .getChartReport();
-        assertEquals(report.getTrackersCount(), 4);
-        assertEquals(filtersBucketReact.getFilterText("Activity"), "Activity: All time");
+        assertEquals(report.getTrackersCount(), 15);
+        assertEquals(filtersBucketReact.getFilterText(DATE_INVOICE), "templ:DateInvoice: All time");
 
-        WebElement dateFilter = filtersBucketReact.getFilter("Activity");
+        WebElement dateFilter = filtersBucketReact.getFilter(DATE_INVOICE);
         dateFilter.click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
@@ -97,15 +100,13 @@ public class GoodSalesDateFilterTest extends AbstractAnalyseTest {
     public void allowFilterByRange() throws ParseException {
         final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
 
-        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                .addAttribute(ATTR_ACTIVITY_TYPE)
+        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_PERSONS)
+                .addAttribute(ATTR_PERSON)
                 .addDateFilter()
                 .waitForReportComputing()
                 .getChartReport();
-        assertEquals(report.getTrackersCount(), 4);
-        assertEquals(filtersBucketReact.getFilterText("Activity"), "Activity: All time");
 
-        filtersBucketReact.configDateFilterByRangeButNotApply("01/12/2014", "01/12/2015");
+        filtersBucketReact.configDateFilterByRangeButNotApply("12/12/2016", "01/12/2017");
         analysisPage.exportReport();
         BrowserUtils.switchToLastTab(browser);
         waitForFragmentVisible(reportPage);
@@ -114,16 +115,16 @@ public class GoodSalesDateFilterTest extends AbstractAnalyseTest {
         browser.close();
         BrowserUtils.switchToFirstTab(browser);
 
-        filtersBucketReact.configDateFilter("01/12/2014", "01/12/2015");
+        filtersBucketReact.configDateFilter("12/12/2016", "01/12/2017");
         analysisPage.waitForReportComputing();
-        assertEquals(report.getTrackersCount(), 4);
+        assertEquals(report.getTrackersCount(), 13);
         analysisPage.exportReport();
         BrowserUtils.switchToLastTab(browser);
         waitForFragmentVisible(reportPage);
         List<String> filters = reportPage.getFilters();
         takeScreenshot(browser, "allowDateFilterByRange-dateFilters", getClass());
         assertEquals(filters.size(), 1);
-        assertEquals(filters.get(0), "Date (Activity) is between 01/12/2014 and 01/12/2015");
+        assertEquals(filters.get(0), "Date (templ:DateInvoice) is between 12/12/2016 and 01/12/2017");
         checkRedBar(browser);
         browser.close();
         BrowserUtils.switchToFirstTab(browser);
@@ -131,12 +132,12 @@ public class GoodSalesDateFilterTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void testDateInCategoryAndDateInFilter() {
-        assertTrue(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        assertTrue(analysisPage.addMetric(METRIC_NUMBER_OF_PERSONS)
                 .addDate()
                 .waitForReportComputing()
                 .getChartReport()
                 .getTrackersCount() >= 1);
-        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity: All time");
+        assertEquals(analysisPage.getFilterBuckets().getFilterText(DATE_INVOICE), "templ:DateInvoice: All time");
         assertEquals(analysisPage.getAttributesBucket().getAllGranularities(),
                 Arrays.asList("Day", "Week (Sun-Sat)", "Month", "Quarter", "Year"));
         checkingOpenAsReport("testDateInCategoryAndDateInFilter");
@@ -144,36 +145,37 @@ public class GoodSalesDateFilterTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void switchBetweenPresetsAndDataRange() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().getFilterBuckets().configDateFilter("Last 90 days");
+        analysisPage.addMetric(METRIC_NUMBER_OF_PERSONS).addDate().getFilterBuckets()
+                .configDateFilter(DateRange.LAST_90_DAYS.toString());
         analysisPage.waitForReportComputing();
 
-        WebElement dateFilter = analysisPage.getFilterBuckets().getFilter("Activity");
+        WebElement dateFilter = analysisPage.getFilterBuckets().getFilter(DATE_INVOICE);
         dateFilter.click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
         panel.changeToDateRangeSection();
         assertFalse(analysisPage.isReportComputing());
-        panel.configTimeFilter("01/14/2015", "04/13/2015");
+        panel.configTimeFilter("01/14/2016", "04/13/2019");
         analysisPage.waitForReportComputing();
 
         dateFilter.click();
         panel.changeToPresetsSection();
         assertFalse(analysisPage.isReportComputing());
-        panel.select("This month");
+        panel.select(DateRange.THIS_MONTH.toString());
         analysisPage.waitForReportComputing();
         checkingOpenAsReport("switchBetweenPresetsAndDataRange");
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void showPercentAfterConfigDate() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                    .addDate()
-                    .getFilterBuckets()
-                    .configDateFilter("Last 90 days");
+        analysisPage.addMetric(METRIC_NUMBER_OF_PERSONS)
+                .addDate()
+                .getFilterBuckets()
+                .configDateFilter(DateRange.LAST_90_DAYS.toString());
         analysisPage.getMetricsBucket()
-                    .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
-                    .expandConfiguration()
-                    .showPercents();
+                .getMetricConfiguration(METRIC_NUMBER_OF_PERSONS)
+                .expandConfiguration()
+                .showPercents();
         analysisPage.waitForReportComputing();
         // wait for data labels rendered
         sleepTight(2000);
@@ -195,15 +197,15 @@ public class GoodSalesDateFilterTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void popAfterConfigDate() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                    .addDate()
-                    .getFilterBuckets()
-                    .configDateFilter("Last 90 days");
+        analysisPage.addMetric(METRIC_NUMBER_OF_PERSONS)
+                .addDate()
+                .getFilterBuckets()
+                .configDateFilter(DateRange.LAST_90_DAYS.toString());
 
         analysisPage.getMetricsBucket()
-            .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
-            .expandConfiguration()
-            .showPop();
+                .getMetricConfiguration(METRIC_NUMBER_OF_PERSONS)
+                .expandConfiguration()
+                .showPop();
 
         analysisPage.waitForReportComputing();
         if (analysisPage.isExplorerMessageVisible()) {
@@ -214,13 +216,13 @@ public class GoodSalesDateFilterTest extends AbstractAnalyseTest {
         ChartReport report = analysisPage.getChartReport();
 
         assertTrue(isEqualCollection(report.getLegends(),
-                asList(METRIC_NUMBER_OF_ACTIVITIES + " - previous year", METRIC_NUMBER_OF_ACTIVITIES)));
+                asList(METRIC_NUMBER_OF_PERSONS + " - previous year", METRIC_NUMBER_OF_PERSONS)));
         checkingOpenAsReport("popAfterConfigDate");
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "CL-9807: Problems with export of date filters")
     public void exportDateFilter() {
-        final String dateFilterValue = "Last 4 quarters";
+        final String dateFilterValue = DateRange.LAST_4_QUARTERS.toString();
         analysisPage.addDateFilter()
                 .getFilterBuckets()
                 .configDateFilter(dateFilterValue);
@@ -230,7 +232,7 @@ public class GoodSalesDateFilterTest extends AbstractAnalyseTest {
             waitForAnalysisPageLoaded(browser);
             final ReportFilter reportFilter = reportPage.openFilterPanel();
             takeScreenshot(browser, "export-date-filter", getClass());
-            assertTrue(reportFilter.getFilterElement("Quarter/Year (Activity) is the last 4 quarters").isDisplayed(),
+            assertTrue(reportFilter.getFilterElement("Quarter/Year (templ:DateInvoice) is the last 4 quarters").isDisplayed(),
                     dateFilterValue + " filter is not displayed");
             browser.close();
         } finally {
@@ -239,33 +241,12 @@ public class GoodSalesDateFilterTest extends AbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"createProject"},
-            description = "CL-9980: Date filter isn't remained when adding trending from recommendation panel, " +
-                    "covered by TestCafe")
-    public void keepDateDimensionAfterApplyingSeeTrendRecommendation() {
-        final String newDateDimension = "Created";
-        analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT).addDateFilter().getFilterBuckets()
-                .changeDateDimension("Closed", newDateDimension);
-
-        assertTrue(analysisPage.waitForReportComputing().getFilterBuckets().getDateFilterText()
-                .startsWith(newDateDimension), "Date dimension was not changed to " + newDateDimension);
-
-        Graphene.createPageFragment(RecommendationContainer.class,
-                waitForElementVisible(RecommendationContainer.LOCATOR, browser))
-                .getRecommendation(RecommendationStep.SEE_TREND).apply();
-
-        analysisPage.waitForReportComputing();
-        takeScreenshot(browser, "keep-date-dimension-after-applying-seetrend-recommendation", getClass());
-        assertTrue(analysisPage.getFilterBuckets().getDateFilterText().startsWith(newDateDimension),
-                "Date dimension was changed after user applied see trend recommendation");
-    }
-
-    @Test(dependsOnGroups = {"createProject"},
             description = "CL-9955: Date is changed to unrelated when adding percent for viz."
                     + " After this CL-10156, the metric and attribute combination is changed "
-                    + "into # of Activities and Activity Type")
+                    + "into # of Persons and attr:Person")
     public void keepDateRelationAfterAddingPercent() {
-        final String expectedDate = "Activity: This quarter";
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC).addAttribute(ATTR_ACTIVITY_TYPE)
+        final String expectedDate = "templ:DateInvoice: This quarter";
+        analysisPage.addMetric(METRIC_NUMBER_OF_PERSONS, FieldType.METRIC).addAttribute(ATTR_PERSON)
                 .waitForReportComputing();
 
         RecommendationContainer recommendationContainer =
@@ -280,20 +261,12 @@ public class GoodSalesDateFilterTest extends AbstractAnalyseTest {
         analysisPage.waitForReportComputing();
 
         assertTrue(
-                analysisPage.getMetricsBucket().getMetricConfiguration("% " + METRIC_NUMBER_OF_ACTIVITIES)
+                analysisPage.getMetricsBucket().getMetricConfiguration("% " + METRIC_NUMBER_OF_PERSONS)
                         .expandConfiguration().isShowPercentSelected(),
                 "Percent was not added after using see percent recommendation");
 
         takeScreenshot(browser, "keep-date-relation-after-adding-percent", getClass());
         assertEquals(analysisPage.getFilterBuckets().getDateFilterText(), expectedDate,
                 "Date has been changed after adding percent");
-    }
-
-    private String getTimeString(Calendar date) {
-        StringBuilder timeBuilder = new StringBuilder();
-        timeBuilder.append(String.format("%02d", date.get(Calendar.MONTH) + 1)).append("/");
-        timeBuilder.append(String.format("%02d", date.get(Calendar.DAY_OF_MONTH))).append("/");
-        timeBuilder.append(date.get(Calendar.YEAR));
-        return timeBuilder.toString();
     }
 }
