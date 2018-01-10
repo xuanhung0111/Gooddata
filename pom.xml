@@ -199,7 +199,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20171018</version>
+            <version>20080701</version>
         </dependency>
 
         <dependency>
@@ -249,7 +249,7 @@
         <dependency>
             <groupId>com.gooddata</groupId>
             <artifactId>gdc-test-fixtures</artifactId>
-            <version>1.0.6</version>
+            <version>1.0.5</version>
         </dependency>
     </dependencies>
 
