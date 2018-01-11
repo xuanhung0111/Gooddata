@@ -80,6 +80,10 @@ public class ProjectsPage extends AbstractFragment {
         return waitForElementVisible(searchField).getAttribute("placeholder");
     }
 
+    public String getEmptyStateMessage() {
+        return waitForElementVisible(By.cssSelector(".empty-state .message"), getRoot()).getText();
+    }
+
     public ProjectsPage searchProject(String nameOrId) {
         inputSearchField(nameOrId);
 
@@ -100,7 +104,7 @@ public class ProjectsPage extends AbstractFragment {
         return this;
     }
 
-    public String getEmptyStateMessage() {
+    public String getEmptyStateTitle() {
         return waitForElementVisible(By.cssSelector(".empty-state .title"), getRoot()).getText();
     }
 
