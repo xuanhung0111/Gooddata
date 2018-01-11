@@ -16,6 +16,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementAttributeContainValue;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementAttributeNotContainValue;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
@@ -132,7 +133,7 @@ public abstract class AbstractSndPanel extends AbstractFragment {
     }
 
     public void done() {
-        doneButton.click();
+        waitForElementEnabled(doneButton).click();
         waitForFragmentNotVisible(this);
     }
 
