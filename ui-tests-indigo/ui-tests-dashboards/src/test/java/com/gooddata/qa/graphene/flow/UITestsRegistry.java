@@ -77,6 +77,7 @@ public class UITestsRegistry {
             "testng-desktop-ProjectSwitch.xml",
             "testng-desktop-EmptyErrorKpiValue.xml",
             "testng-desktop-imap-KpiAlert.xml",
+            "testng-desktop-KpiDashboards.xml",
             "testng-mobile-AttributeFiltering.xml",
             "testng-mobile-DateFiltering.xml",
             "testng-mobile-EditMode.xml",
@@ -86,7 +87,8 @@ public class UITestsRegistry {
             "testng-mobile-ResponsiveNavigation.xml",
             "testng-mobile-SplashScreen.xml",
             "testng-mobile-KpiPopChangeValueExceedLimit.xml",
-            "testng-mobile-ProjectSwitch.xml"
+            "testng-mobile-ProjectSwitch.xml",
+            "testng-mobile-KpiDashboards.xml"
         });
 
         suites.put("all", new Object[] {
@@ -130,6 +132,7 @@ public class UITestsRegistry {
             "testng-desktop-imap-KpiAlertSpecialCaseTest.xml",
             "testng-desktop-EmptyErrorKpiValue.xml",
             "testng-desktop-imap-KpiAlert.xml",
+            "testng-desktop-KpiDashboards.xml",
             "testng-mobile-AttributeFiltering.xml",
             "testng-mobile-DateFiltering.xml",
             "testng-mobile-EditMode.xml",
@@ -139,7 +142,8 @@ public class UITestsRegistry {
             "testng-mobile-ResponsiveNavigation.xml",
             "testng-mobile-SplashScreen.xml",
             "testng-mobile-KpiPopChangeValueExceedLimit.xml",
-            "testng-mobile-ProjectSwitch.xml"
+            "testng-mobile-ProjectSwitch.xml",
+            "testng-mobile-KpiDashboards.xml"
         });
 
         TestsRegistry.getInstance()

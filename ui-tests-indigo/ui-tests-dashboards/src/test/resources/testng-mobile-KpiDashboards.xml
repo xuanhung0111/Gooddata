@@ -1,0 +1,19 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="GD_UI_Selenium_Tests">
+    <test name="kpi-Dashboards">
+        <groups>
+            <run>
+                <include name="mobile" />
+                <include name="dashboardsInit" />
+                <include name="createProject" />
+                <include name="arquillian" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.dashboards.KpiDashboardsTest" />
+        </classes>
+    </test>
+
+    <parameter name="windowSize" value="600,800" />
+    <parameter name="isMobileRunning" value="true" />
+</suite>
