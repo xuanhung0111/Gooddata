@@ -38,6 +38,9 @@ import org.openqa.selenium.support.FindBy;
 @SuppressWarnings("unchecked")
 public class IndigoDashboardsPage extends AbstractFragment {
 
+    @FindBy(className = "mobile-navigation-button")
+    private WebElement mobileNavigationButton;
+
     @FindBy(className = "dash-item")
     private List<Widget> widgets;
 
@@ -77,8 +80,14 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(className = "dash-title")
     private WebElement dashboardTitle;
 
+    @FindBy(className = "mobile-navigation-button")
+    private WebElement dashboardTitleOnMobile;
+
     @FindBy(className = "navigation-list")
     private WebElement dashboardsList;
+
+    @FindBy(className = "navigation")
+    private WebElement navigationBar;
 
     private static final String EDIT_BUTTON_CLASS_NAME = "s-edit_button";
     private static final String SAVE_BUTTON_CLASS_NAME = "s-save_button";
@@ -110,6 +119,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public boolean isSplashScreenPresent() {
         return isElementPresent(className(SPLASH_SCREEN_CLASS_NAME), browser);
+    }
+
+    public boolean isNavigationBarVisible() {
+        return isElementVisible(navigationBar);
     }
 
     public ConfigurationPanel getConfigurationPanel() {
@@ -183,7 +196,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
         }
 
         waitForElementVisible(cancelButton).click();
-        if(ConfirmDialog.isPresent(browser))
+        if (ConfirmDialog.isPresent(browser))
             ConfirmDialog.getInstance(browser).submitClick();
 
         waitForElementNotVisible(cancelButton);
@@ -281,7 +294,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     }
 
     public String getDashboardTitle() {
-        return waitForElementVisible(dashboardTitle).getText();
+        return waitForElementVisible(isMobileMode() ? dashboardTitleOnMobile : dashboardTitle).getText();
     }
 
     public IndigoDashboardsPage changeDashboardTitle(String newTitle) {
@@ -294,6 +307,27 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return waitForElementVisible(dashboardsList)
                 .findElements(By.className("navigation-list-item")).stream()
                 .map(WebElement::getText).collect(Collectors.toList());
+    }
+
+    public IndigoDashboardsPage selectKpiDashboard(String title) {
+        if (isMobileMode()) {
+            waitForElementVisible(mobileNavigationButton).click();
+
+            MobileKpiDashboardSelection dashboardsListOnMobile = Graphene.createPageFragment(
+                    MobileKpiDashboardSelection.class,
+                    waitForElementVisible(className("gd-mobile-dropdown-overlay"), browser));
+
+            selectDashboard(title, dashboardsListOnMobile.dropdownList);
+            waitForFragmentVisible(this);
+        } else {
+            selectDashboard(title, dashboardsList);
+        }
+        return this;
+    }
+
+    public String getSelectedKpiDashboard() {
+        return waitForElementVisible(dashboardsList)
+                .findElement(By.className("navigation-list-item-selected")).getText();
     }
 
     public IndigoDashboardsPage deleteDashboard(boolean confirm) {
@@ -514,5 +548,23 @@ public class IndigoDashboardsPage extends AbstractFragment {
         }
 
         return false;
+    }
+
+    private boolean isMobileMode() {
+        return isElementPresent(By.className("mobile-navigation-button"), browser);
+    }
+
+    private class MobileKpiDashboardSelection extends AbstractFragment{
+        @FindBy(className = "gd-mobile-dropdown-content")
+        public WebElement dropdownList;
+    }
+
+    private void selectDashboard(String title, WebElement element) {
+        waitForElementVisible(element)
+            .findElements(By.className(isMobileMode() ? "gd-list-item" : "navigation-list-item")).stream()
+            .filter(items -> items.getText().equals(title))
+            .findFirst()
+            .get()
+            .click();
     }
 }
