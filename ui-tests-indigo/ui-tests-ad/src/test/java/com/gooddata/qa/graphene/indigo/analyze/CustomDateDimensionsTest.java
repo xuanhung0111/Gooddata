@@ -1,28 +1,26 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
-import static com.gooddata.qa.graphene.enums.ResourceDirectory.UPLOAD_CSV;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
+import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
+import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.postEtlPullIntegration;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.net.URL;
 import java.text.ParseException;
 import java.util.List;
 
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import org.apache.commons.io.IOUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
@@ -37,9 +35,6 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
     private static final String NUMBER = "Number";
     private static final String RETAIL_DATE = "Retaildate";
 
-    private static final String FISCAL_CSV_PATH = "/" + UPLOAD_CSV + "/fiscal_dimension_sample_test.csv";
-    private static final String FISCAL_DATASET = "Fiscal Dimension Sample Test";
-
     @Override
     public void initProperties() {
         // create empty project
@@ -48,26 +43,18 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        uploadCSV(getFilePathFromResource(FISCAL_CSV_PATH));
-        takeScreenshot(browser, "uploaded-" + FISCAL_DATASET +"-dataset", getClass());
-    }
+        URL maqlResource = getClass().getResource("/retail-date/maql.txt");
+        setupMaql(IOUtils.toString(maqlResource));
 
-    @Override
-    protected void configureStartPage() {
-        // set analyse page using FISCAL_DATASET as startPageContext
-        startPageContext = new StartPageContext() {
+        URL retailDateResouce = getClass().getResource("/retail-date/upload.zip");
+        String webdavURL = uploadFileToWebDav(retailDateResouce, null);
+        getFileFromWebDav(webdavURL, retailDateResouce);
 
-            @Override
-            public void waitForStartPageLoaded() {
-                // load the Fiscal dataset
-                waitForFragmentVisible(analysisPage).getCataloguePanel().changeDataset(FISCAL_DATASET);
-            }
+        postEtlPullIntegration(getRestApiClient(), testParams.getProjectId(),
+                webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()));
 
-            @Override
-            public String getStartPage() {
-                return PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/reportId/edit";
-            }
-        };
+        setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.FISCAL_CALENDAR_ENABLED, true);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -94,9 +81,9 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"})
     public void dateRangeAppliedInReport() throws ParseException {
         analysisPage.addMetric(NUMBER, FieldType.FACT)
-            .addDate()
-            .getFilterBuckets()
-            .configDateFilter("07/13/2014", "08/11/2014");
+                .addDate()
+                .getFilterBuckets()
+                .configDateFilter("07/13/2014", "08/11/2014");
         analysisPage.waitForReportComputing();
         checkingOpenAsReport("dateRangeAppliedInReport");
     }
@@ -113,7 +100,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
 
         assertEquals(analysisPage.getFilterBuckets().getDateFilterText(), RETAIL_DATE + ": Last 4 quarters");
         assertThat(analysisPage.getAttributesBucket().getItemNames(), contains(DATE));
-        assertThat(analysisPage.waitForReportComputing().getChartReport().getTrackersCount(), equalTo(4));
+        assertThat(analysisPage.waitForReportComputing().getChartReport().getTrackersCount(), lessThanOrEqualTo(4));
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         checkingOpenAsReport("applyRecommendation");
     }
@@ -121,33 +108,33 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"})
     public void testGranularityOfDate() {
         analysisPage.addMetric(NUMBER, FieldType.FACT)
-            .addDate()
-            .getAttributesBucket()
-            .changeGranularity("Month");
+                .addDate()
+                .getAttributesBucket()
+                .changeGranularity("Month");
         assertThat(analysisPage.waitForReportComputing().getChartReport().getTrackersCount(), greaterThanOrEqualTo(1));
 
         List<String> headers = analysisPage.changeReportType(ReportType.TABLE)
-            .waitForReportComputing()
-            .getTableReport()
-            .getHeaders()
-            .stream()
-            .map(String::toLowerCase)
-            .collect(toList());
+                .waitForReportComputing()
+                .getTableReport()
+                .getHeaders()
+                .stream()
+                .map(String::toLowerCase)
+                .collect(toList());
         assertThat(headers, equalTo(asList("month/year (retaildate)", "sum of number")));
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testPopAndPercentOnCustomDate() {
         ChartReport report = analysisPage.addMetric(NUMBER, FieldType.FACT)
-            .addDate()
-            .waitForReportComputing()
-            .getChartReport();
+                .addDate()
+                .waitForReportComputing()
+                .getChartReport();
 
         analysisPage.getMetricsBucket()
-            .getMetricConfiguration("Sum of " + NUMBER)
-            .expandConfiguration()
-            .showPercents()
-            .showPop();
+                .getMetricConfiguration("Sum of " + NUMBER)
+                .expandConfiguration()
+                .showPercents()
+                .showPop();
 
         analysisPage.waitForReportComputing();
         assertThat(report.getLegends(), equalTo(asList("% Sum of Number - previous year", "% Sum of Number")));
