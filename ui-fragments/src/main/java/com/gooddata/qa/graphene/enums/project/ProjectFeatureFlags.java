@@ -13,7 +13,8 @@ public enum ProjectFeatureFlags {
     ENABLE_CHANGE_LANGUAGE("enableChangeLanguage"),
     HIDE_KPI_ALERT_LINK("hideKPIAlertLinks"),
     FISCAL_CALENDAR_ENABLED("fiscalCalendarEnabled"),
-    USE_AVAILABLE_ENABLED("useAvailableEnabled");
+    USE_AVAILABLE_ENABLED("useAvailableEnabled"),
+    ENABLE_ETL_COMPONENT("enableEtlComponent");
 
     private final String featureFlag;
 
