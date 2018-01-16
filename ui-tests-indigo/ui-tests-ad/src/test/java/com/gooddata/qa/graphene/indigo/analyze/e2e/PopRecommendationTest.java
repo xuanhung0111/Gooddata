@@ -54,9 +54,6 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
 
         analysisPage.waitForReportComputing();
 
-        assertThat(waitForElementVisible(cssSelector(LEGEND_ITEM_NAME), browser).getText(),
-                containsString("# of Activities - previous year"));
-
         assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
     }
 

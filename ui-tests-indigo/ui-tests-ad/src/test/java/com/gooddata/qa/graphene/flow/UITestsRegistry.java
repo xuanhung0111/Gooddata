@@ -14,7 +14,7 @@ import com.gooddata.qa.graphene.indigo.analyze.GoodSalesChartLegendTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesComparisonRecommendationTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesContributionRecommendationTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesDateDimensionTest;
-import com.gooddata.qa.graphene.indigo.analyze.GoodSalesDateFilterTest;
+import com.gooddata.qa.graphene.indigo.analyze.DateFilterTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesDescriptionTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesDropAttributeTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesFactBasedMetricTest;
@@ -67,7 +67,7 @@ public class UITestsRegistry {
             ResetButtonTest.class,
             "testng-ad-e2e-metrics-test.xml",
             "testng-ad-e2e-visualization-test.xml",
-//            "testng-ad-e2e-recommendation-test.xml", Will be reverted after finishing QA-7229
+            "testng-ad-e2e-recommendation-test.xml",
             "testng-ad-e2e-catalogue-test.xml",
             "testng-ad-e2e-date-test.xml"
         });
@@ -86,7 +86,7 @@ public class UITestsRegistry {
             GoodSalesContributionRecommendationTest.class,
             CustomDateDimensionsTest.class,
             GoodSalesDateDimensionTest.class,
-//            GoodSalesDateFilterTest.class, Will be reverted after finishing QA-7229
+            DateFilterTest.class,
             GoodSalesDescriptionTest.class,
             GoodSalesDropAttributeTest.class,
             GoodSalesVisualizationTest.class,

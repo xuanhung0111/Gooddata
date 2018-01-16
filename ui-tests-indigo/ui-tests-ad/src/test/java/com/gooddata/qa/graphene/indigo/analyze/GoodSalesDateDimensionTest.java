@@ -1,14 +1,19 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
@@ -40,9 +45,9 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
         final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-            .addMetric(METRIC_SNAPSHOT_BOP)
-            .addDateFilter()
-            .waitForReportComputing();
+                .addMetric(METRIC_SNAPSHOT_BOP)
+                .addDateFilter()
+                .waitForReportComputing();
         assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ": All time");
         assertEquals(analysisPage.getChartReport().getTrackersCount(), 2);
 
@@ -93,11 +98,32 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
         WebElement filter = filtersBucketReact.getFilter(CREATED);
         filter.click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
-              waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
         assertFalse(panel.isDimensionSwitcherEnabled());
 
         analysisPage.getAttributesBucket().changeDateDimension(ACTIVITY);
         assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ": All time");
         checkingOpenAsReport("applyOnBothFilterAndBucket");
+    }
+
+    @Test(dependsOnGroups = {"createProject"},
+            description = "CL-9980: Date filter isn't remained when adding trending from recommendation panel, " +
+                    "covered by TestCafe")
+    public void keepDateDimensionAfterApplyingSeeTrendRecommendation() {
+        final String newDateDimension = CREATED;
+        analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT).addDateFilter().getFilterBuckets()
+                .changeDateDimension("Closed", newDateDimension);
+
+        assertTrue(analysisPage.waitForReportComputing().getFilterBuckets().getDateFilterText()
+                .startsWith(newDateDimension), "Date dimension was not changed to " + newDateDimension);
+
+        Graphene.createPageFragment(RecommendationContainer.class,
+                waitForElementVisible(RecommendationContainer.LOCATOR, browser))
+                .getRecommendation(RecommendationStep.SEE_TREND).apply();
+
+        analysisPage.waitForReportComputing();
+        takeScreenshot(browser, "keep-date-dimension-after-applying-seetrend-recommendation", getClass());
+        assertTrue(analysisPage.getFilterBuckets().getDateFilterText().startsWith(newDateDimension),
+                "Date dimension was changed after user applied see trend recommendation");
     }
 }
