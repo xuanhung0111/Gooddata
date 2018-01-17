@@ -3,7 +3,7 @@ package com.gooddata.qa.utils.http.user.mgmt;
 import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static java.lang.String.format;
-import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -407,9 +407,8 @@ public final class UserManagementRestUtils {
         log.info("content of json: " + contentBody);
 
         final JSONObject result = getJsonObject(restApiClient, restApiClient.newPostMethod(usersUri, contentBody));
-        assertFalse(result.getJSONObject("projectUsersUpdateResult")
-                .getString("successful")
-                .equals("[]"), "User isn't assigned properly into the project");
+        assertTrue(result.getJSONObject("projectUsersUpdateResult")
+                .getJSONArray("successful").length() > 0, "User isn't assigned properly into the project");
         log.info(format("Successfully assigned user %s to project %s", email, projectId));
     }
 
