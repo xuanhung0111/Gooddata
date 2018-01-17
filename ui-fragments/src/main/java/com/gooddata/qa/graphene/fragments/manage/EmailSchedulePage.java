@@ -111,7 +111,13 @@ public class EmailSchedulePage extends AbstractFragment {
     private List<WebElement> emailScheduleItems;
 
     @FindBy(css = ".pickers > :not([style*='display: none']) input.gdc-input")
-    private WebElement searchInput;
+    private WebElement searchReportInput;
+
+    @FindBy(css = ".pickers > :not([style*='display: none']) .tabsPicker input.gdc-input")
+    private WebElement searchDashboardTabInput;
+
+    @FindBy(css = ".pickers > :not([style*='display: none']) .dashboardsPicker input.gdc-input")
+    private WebElement searchDashboardInput;
 
     public static final EmailSchedulePage getInstance(SearchContext context) {
         return Graphene.createPageFragment(EmailSchedulePage.class, waitForElementVisible(id("p-emailSchedulePage"), context));
@@ -400,14 +406,22 @@ public class EmailSchedulePage extends AbstractFragment {
         checkbox.click();
     }
 
-    private void searchItem(String item) {
-        waitForElementVisible(searchInput).clear();
-        searchInput.sendKeys(item);
+    private void searchReportItem(String item) {
+        searchItem(searchReportInput, item);
+    }
+
+    private void searchDashboardItem(String item) {
+        searchItem(searchDashboardTabInput, item);
+    }
+
+    private void searchItem(WebElement input, String item) {
+        waitForElementVisible(input).clear();
+        input.sendKeys(item);
         sleepTightInSeconds(2);
     }
 
     private void selectDashboard(String dashboardName) {
-        searchItem(dashboardName);
+        searchDashboardItem(dashboardName);
         waitForCollectionIsNotEmpty(dashboardsList);
         if (dashboardsList != null && dashboardsList.size() > 0) {
             for (WebElement elem : dashboardsList) {
@@ -423,7 +437,7 @@ public class EmailSchedulePage extends AbstractFragment {
     }
 
     private void selectReport(String reportName) {
-        searchItem(reportName);
+        searchReportItem(reportName);
         waitForCollectionIsNotEmpty(reportsList);
         if (reportsList != null && reportsList.size() > 0) {
             for (WebElement elem : reportsList) {
