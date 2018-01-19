@@ -1,8 +1,5 @@
 package com.gooddata.qa.graphene.flow;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.gooddata.qa.graphene.indigo.dashboards.CommonDateFilteringTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DataSetTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DateDatasetRecommendationTest;
@@ -16,6 +13,7 @@ import com.gooddata.qa.graphene.indigo.dashboards.EmbeddingSingleDashboardTest;
 import com.gooddata.qa.graphene.indigo.dashboards.HeaderTest;
 import com.gooddata.qa.graphene.indigo.dashboards.InsightOnDashboardTest;
 import com.gooddata.qa.graphene.indigo.dashboards.InvalidDateDataSetTest;
+import com.gooddata.qa.graphene.indigo.dashboards.KpiDashboardCreationTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ManipulateWidgetsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.MetricsDropdownTest;
 import com.gooddata.qa.graphene.indigo.dashboards.NonProductionDatasetTest;
@@ -27,6 +25,9 @@ import com.gooddata.qa.graphene.indigo.dashboards.AttributeFilterManipulationTes
 import com.gooddata.qa.graphene.indigo.dashboards.AttributeFilterMiscTest;
 import com.gooddata.qa.graphene.indigo.dashboards.KpiPermissionsTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class UITestsRegistry {
 
@@ -64,6 +65,7 @@ public class UITestsRegistry {
             AttributeFilterMiscTest.class,
             DeleteAttributeFilterTest.class,
             KpiPermissionsTest.class,
+            KpiDashboardCreationTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-EditMode.xml",
@@ -115,6 +117,7 @@ public class UITestsRegistry {
             AttributeFilterMiscTest.class,
             DeleteAttributeFilterTest.class,
             KpiPermissionsTest.class,
+            KpiDashboardCreationTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-EditMode.xml",

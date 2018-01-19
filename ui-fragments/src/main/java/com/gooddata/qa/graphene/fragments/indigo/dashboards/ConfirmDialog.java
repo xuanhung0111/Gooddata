@@ -20,12 +20,16 @@ public class ConfirmDialog extends AbstractFragment {
     @FindBy(className = "s-dialog-submit-button")
     private WebElement submitButton;
 
+    @FindBy(className = "s-dialog-close-button")
+    private WebElement closeButton;
+
     private static By ROOT = xpath("//*[contains(concat(' ', normalize-space(@class), ' '), ' s-dialog ')]");
 
     public static ConfirmDialog getInstance(final SearchContext searchContext) {
         return Graphene.createPageFragment(ConfirmDialog.class,
                 waitForElementVisible(ROOT, searchContext));
     }
+
     public void cancelClick() {
         waitForElementVisible(cancelButton).click();
         waitForFragmentNotVisible(this);
@@ -35,6 +39,11 @@ public class ConfirmDialog extends AbstractFragment {
         waitForElementVisible(submitButton).click();
 
         return this;
+    }
+
+    public void closeClick() {
+        waitForElementVisible(closeButton).click();
+        waitForFragmentNotVisible(this);
     }
 
     public static boolean isPresent(final SearchContext searchContext) {

@@ -24,8 +24,6 @@ import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Widget.DropZone;
 import com.gooddata.qa.graphene.utils.Sleeper;
 import com.google.common.base.Predicate;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -34,6 +32,9 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 public class IndigoDashboardsPage extends AbstractFragment {
@@ -89,6 +90,9 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(className = "navigation")
     private WebElement navigationBar;
 
+    @FindBy(className = "navigation-add-dashboard")
+    private WebElement addDashboard;
+
     private static final String EDIT_BUTTON_CLASS_NAME = "s-edit_button";
     private static final String SAVE_BUTTON_CLASS_NAME = "s-save_button";
     private static final String DELETE_BUTTON_CLASS_NAME = "s-delete_dashboard";
@@ -111,6 +115,16 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public static final IndigoDashboardsPage getInstance(SearchContext context) {
         return Graphene.createPageFragment(IndigoDashboardsPage.class, waitForElementVisible(id(MAIN_ID), context));
+    }
+
+    public IndigoDashboardsPage addDashboard() {
+        waitForElementVisible(addDashboard).click();
+        waitForElementVisible(cancelButton);
+        return this;
+    }
+
+    public boolean isAddDashboardVisible() {
+        return isElementVisible(By.className("navigation-add-dashboard"), browser);
     }
 
     public SplashScreen getSplashScreen() {
@@ -165,6 +179,13 @@ public class IndigoDashboardsPage extends AbstractFragment {
     public IndigoDashboardsPage tryCancelingEditModeWithoutApplying() {
         waitForElementVisible(cancelButton).click();
         ConfirmDialog.getInstance(browser).cancelClick();
+
+        return this;
+    }
+
+    public IndigoDashboardsPage tryCancelingEditModeByClickCloseButton() {
+        waitForElementVisible(cancelButton).click();
+        ConfirmDialog.getInstance(browser).closeClick();
 
         return this;
     }
@@ -336,7 +357,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
         if (confirm) {
             deleteConfirmDialog.submitClick();
-            waitForElementNotPresent(deleteButton);
+            waitForFragmentNotVisible(deleteConfirmDialog);
         } else {
             deleteConfirmDialog.cancelClick();
         }
@@ -430,6 +451,16 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public int getInsightsCount() {
         return (int) getWidgets().stream().filter(Insight::isInsight).count();
+    }
+
+    public List<String> getInsightTitles() {
+        return getWidgets().stream().filter(Insight::isInsight)
+                .map(Widget::getHeadline).collect(Collectors.toList());
+    }
+
+    public List<String> getKpiTitles() {
+        return getWidgets().stream().filter(Kpi::isKpi)
+                .map(Widget::getHeadline).collect(Collectors.toList());
     }
 
     public IndigoDashboardsPage dragAddKpiPlaceholder() {
@@ -554,7 +585,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return isElementPresent(By.className("mobile-navigation-button"), browser);
     }
 
-    private class MobileKpiDashboardSelection extends AbstractFragment{
+    private class MobileKpiDashboardSelection extends AbstractFragment {
         @FindBy(className = "gd-mobile-dropdown-content")
         public WebElement dropdownList;
     }

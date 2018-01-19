@@ -11,6 +11,7 @@ import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalytical
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createInsight;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidgetWrap;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAnalyticalDashboards;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAnalyticalDashboardIdentifier;
 import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProjectAndCheckResult;
 import static com.gooddata.qa.utils.mail.ImapUtils.getEmailBody;
 import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
@@ -206,5 +207,9 @@ public abstract class AbstractDashboardTest extends GoodSalesAbstractTest {
             throw new RuntimeException("There is error while create Kpi Widget");
         }
         return kpiWidget;
+    }
+
+    protected String getKpiDashboardIdentifierByTitle(String title) throws IOException, JSONException {
+        return getAnalyticalDashboardIdentifier(title, getRestApiClient(), testParams.getProjectId());
     }
 }
