@@ -130,7 +130,7 @@ public class DeployEtlProcessTest extends AbstractEtlProcessTest {
             assertTrue(processDetail.isTabActive(AbstractProcessDetail.Tab.METADATA),
                     "Process metadata tab is not active");
             assertTrue(processDetail.getMetadata("Author").equals(testParams.getUser()));
-            assertTrue(processDetail.getMetadata("Name").equals(processType.getValue()));
+            assertTrue(processDetail.getMetadata("Name").equals(processType.getTitle()));
             assertTrue(processDetail.getMetadata("Configuration Path").equals(s3ConfigurationPath));
             assertTrue(EtlProcessRestUtils.ETL_PROCESS_TYPE_LABEL.equals(processDetail.getMetadata("Type")));
             validateProcessMetadata(processName, processType, s3ConfigurationPath, s3AccessKey, s3Region,
