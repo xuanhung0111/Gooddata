@@ -40,7 +40,7 @@ public class IndigoRestUtils {
             return new JSONObject() {{
                 put("analyticalDashboard", new JSONObject() {{
                     put("meta", new JSONObject() {{
-                        put("title", "title");
+                        put("title", "${title}");
                     }});
                     put("content", new JSONObject() {{
                         put("widgets", new JSONArray());
@@ -306,13 +306,16 @@ public class IndigoRestUtils {
      * @param restApiClient
      * @param projectId
      * @param widgetUris
+     * @param title
      * @return new analytical dashboard uri
      */
     public static String createAnalyticalDashboard(final RestApiClient restApiClient, final String projectId,
-                                                   final Collection<String> widgetUris) {
+                                                   final Collection<String> widgetUris, final String title) {
         // TODO: consider better with .put() and have clever template
         final String widgets = new JSONArray(widgetUris).toString();
-        final String content = ANALYTICAL_DASHBOARD_BODY.get().replace("\"widgets\":[]", "\"widgets\":" + widgets);
+        final String content = ANALYTICAL_DASHBOARD_BODY.get()
+                .replace("\"widgets\":[]", "\"widgets\":" + widgets)
+                .replace("${title}", title);
         String uri;
         try {
             uri = getJsonObject(restApiClient,
@@ -324,6 +327,18 @@ public class IndigoRestUtils {
             throw new RuntimeException("There is error while getting JSON object", e);
         }
         return uri;
+    }
+
+    /**
+     * Create new analytical dashboard with default title
+     * @param restApiClient
+     * @param projectId
+     * @param widgetUris
+     * @return
+     */
+    public static String createAnalyticalDashboard(final RestApiClient restApiClient, final String projectId,
+                                                   final Collection<String> widgetUris) {
+        return createAnalyticalDashboard(restApiClient, projectId, widgetUris, "title");
     }
 
     /**
