@@ -40,6 +40,7 @@ public final class UserManagementRestUtils {
     private static final String ROLE_LINK = "/gdc/projects/%s/roles/%s";
     private static final String INVITATION_LINK = "/gdc/projects/%s/invitations";
     private static final String USER_FILTER_LINK = "/gdc/md/%s/userfilters";
+    private static final String LIST_USERS_USING_FILTER_LINK = USER_FILTER_LINK + "?userFilters=%s";
 
     private static final Supplier<String> CREATE_USER_CONTENT_BODY = () -> {
         try {
@@ -357,14 +358,12 @@ public final class UserManagementRestUtils {
      */
     public static List<String> getUsersUsingMuf(final RestApiClient restApiClient, final String projectId,
             final String mufUri) throws JSONException, IOException {
-        final JSONArray items = getJsonObject(restApiClient, format(USER_FILTER_LINK, projectId))
+        final JSONArray items = getJsonObject(restApiClient, format(LIST_USERS_USING_FILTER_LINK, projectId, mufUri))
                 .getJSONObject("userFilters").getJSONArray("items");
 
         final List<String> users = new ArrayList<String>();
         for (int i = 0, n = items.length(); i < n; i++) {
-            final String json = items.getString(i);
-            if (json.contains(mufUri))
-                users.add(new JSONObject(json).getString("user"));
+            users.add( items.getJSONObject(i).getString("user"));
         }
         return users;
     }
@@ -384,7 +383,7 @@ public final class UserManagementRestUtils {
                 .replace("${status}", status.toString())
                 .replace("${email}", email);
         final JSONObject result = getJsonObject(restApiClient, restApiClient.newPostMethod(usersUri, contentBody));
-        if (result.getJSONObject("projectUsersUpdateResult").getString("successful").equals("[]")) {
+        if (result.getJSONObject("projectUsersUpdateResult").getJSONArray("successful").length() == 0) {
                 throw new RuntimeException("Update user status failed");
         }
     }
