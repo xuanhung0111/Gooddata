@@ -42,7 +42,7 @@ public class ScheduleDetailTest extends AbstractProcessTest {
             + " because there is no graph to execute.";
 
     private static final String TRIGGERING_SCHEDULE_ERROR_MESSAGE = "The schedule that triggers this schedule"
-            + " is missing. To run this schedule, set a new trigger or select a cron frequency.";
+            + " is missing. To run this schedule, set it to be run manually, or set a new trigger, or set a cron frequency.";
 
     private static final String SCHEDULE_IN_LOOP_MESSAGE = "Schedules cannot be scheduled in a loop";
 
