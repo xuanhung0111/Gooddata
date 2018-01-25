@@ -4,7 +4,6 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import com.google.common.collect.Ordering;
-
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.DataProvider;
@@ -12,15 +11,18 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.*;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.*;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteAnalyticalDashboard;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.assertEquals;
 
 public class KpiDashboardsTest extends AbstractDashboardTest {
 
@@ -117,9 +119,5 @@ public class KpiDashboardsTest extends AbstractDashboardTest {
         } finally {
         	logoutAndLoginAs(true, UserRoles.ADMIN);
         }
-    }
-
-    private String getKpiDashboardIdentifierByTitle(String title) throws IOException, JSONException {
-        return getAnalyticalDashboardIdentifier(title, getRestApiClient(), testParams.getProjectId());
     }
 }
