@@ -28,6 +28,7 @@ import com.google.common.base.Predicate;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -121,6 +122,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     public IndigoDashboardsPage addDashboard() {
         waitForElementVisible(addDashboard).click();
         waitForElementVisible(cancelButton);
+        getInsightSelectionPanel().waitForLoading();
         return this;
     }
 
@@ -158,9 +160,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
         waitForElementVisible(cancelButton);
 
-        // There's an animation switching to edit mode,
-        // so wait until the css transition is finished
-        Sleeper.sleepTight(500);
+        getInsightSelectionPanel().waitForLoading();
 
         // wait until editing is allowed
         return waitForWidgetsEditable();
@@ -329,7 +329,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public IndigoDashboardsPage changeDashboardTitle(String newTitle) {
         waitForElementVisible(dashboardTitle).click();
-        dashboardTitle.findElement(By.tagName("textarea")).sendKeys(newTitle);
+        dashboardTitle.findElement(By.tagName("textarea")).sendKeys(newTitle, Keys.ENTER);
         return this;
     }
 
@@ -352,6 +352,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
         } else {
             selectDashboard(title, dashboardsList);
         }
+        waitForDashboardLoad();
         return this;
     }
 
