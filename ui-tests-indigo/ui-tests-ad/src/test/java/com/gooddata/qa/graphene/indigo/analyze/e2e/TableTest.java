@@ -40,8 +40,7 @@ public class TableTest extends AbstractAdE2ETest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createNumberOfActivitiesMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
         Metric metric;
         if (testParams.isReuseProject()) {
             metric = getMdService().getObj(getProject(), Metric.class, title("__EMPTY__"));

@@ -54,9 +54,9 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountMetric();
-        createNumberOfActivitiesMetric();
-        createTop5OpenByCashReport();
+        getMetricCreator().createAmountMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
+        getReportCreator().createTop5OpenByCashReport();
     }
 
     @Test(dependsOnGroups = {"createProject"})

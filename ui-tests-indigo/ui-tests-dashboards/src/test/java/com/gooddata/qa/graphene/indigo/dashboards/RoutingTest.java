@@ -17,8 +17,7 @@ public class RoutingTest extends AbstractDashboardTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createAmountMetric();
+        getMetricCreator().createAmountMetric();
         kpi = new KpiConfiguration.Builder()
             .metric(METRIC_AMOUNT)
             .dataSet(DATE_DATASET_CREATED)

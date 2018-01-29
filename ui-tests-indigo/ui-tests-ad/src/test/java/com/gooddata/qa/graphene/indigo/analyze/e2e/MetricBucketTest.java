@@ -30,10 +30,9 @@ public class MetricBucketTest extends AbstractAdE2ETest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createNumberOfActivitiesMetric(); 
-        createNumberOfLostOppsMetric();
-        createQuotaMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
+        getMetricCreator().createNumberOfLostOppsMetric();
+        getMetricCreator().createQuotaMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"})

@@ -57,7 +57,7 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
 
     @Override
     protected void customizeProject() throws Throwable {
-        String reportUri = createAmountByProductReport();
+        String reportUri = getReportCreator().createAmountByProductReport();
         FilterItemContent regionFilter = createSingleValueFilter(getAttributeByTitle(ATTR_REGION));
         Dashboard dashboard = Builder.of(Dashboard::new).with(dash -> {
             dash.setName(DASHBOARD_HAVING_FILTER);

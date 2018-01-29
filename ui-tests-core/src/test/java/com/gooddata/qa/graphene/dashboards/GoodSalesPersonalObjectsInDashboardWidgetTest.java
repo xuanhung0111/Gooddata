@@ -43,7 +43,7 @@ public class GoodSalesPersonalObjectsInDashboardWidgetTest extends GoodSalesAbst
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountMetric();
+        getMetricCreator().createAmountMetric();
         waitForFragmentVisible(initMetricPage()).createShareMetric(PERSONAL_METRIC, METRIC_AMOUNT, ATTR_YEAR_SNAPSHOT);
 
         initReportsPage();
@@ -54,7 +54,7 @@ public class GoodSalesPersonalObjectsInDashboardWidgetTest extends GoodSalesAbst
         checkRedBar(browser);
 
         //Add more a report to check search report 
-        createAmountByProductReport();
+        getReportCreator().createAmountByProductReport();
     }
 
     @Test(dependsOnGroups = "createProject")

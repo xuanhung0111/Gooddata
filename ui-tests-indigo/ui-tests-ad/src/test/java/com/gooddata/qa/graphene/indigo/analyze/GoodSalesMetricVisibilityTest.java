@@ -29,9 +29,8 @@ public class GoodSalesMetricVisibilityTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createNumberOfOpenOppsMetric();
-        createNumberOfWonOppsMetric();
+        getMetricCreator().createNumberOfOpenOppsMetric();
+        getMetricCreator().createNumberOfWonOppsMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})

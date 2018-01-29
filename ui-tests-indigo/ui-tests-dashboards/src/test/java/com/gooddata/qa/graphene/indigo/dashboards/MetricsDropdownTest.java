@@ -8,6 +8,7 @@ import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
+import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
@@ -18,20 +19,20 @@ public class MetricsDropdownTest extends AbstractDashboardTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
         //add more metrics to display search metric
-        createAmountMetric();
-        createAmountBOPMetric();
-        createAvgAmountMetric();
-        createNumberOfActivitiesMetric();
-        createNumberOfLostOppsMetric();
-        createNumberOfOpportunitiesMetric();
-        createNumberOfOpportunitiesBOPMetric();
-        createTimelineBOPMetric();
-        createTimelineEOPMetric();
-        createPercentOfGoalMetric();
-        createProbabilityMetric();
-        createQuotaMetric();
+        Metrics metricCreator = getMetricCreator();
+        metricCreator.createAmountMetric();
+        metricCreator.createAmountBOPMetric();
+        metricCreator.createAvgAmountMetric();
+        metricCreator.createNumberOfActivitiesMetric();
+        metricCreator.createNumberOfLostOppsMetric();
+        metricCreator.createNumberOfOpportunitiesMetric();
+        metricCreator.createNumberOfOpportunitiesBOPMetric();
+        metricCreator.createTimelineBOPMetric();
+        metricCreator.createTimelineEOPMetric();
+        metricCreator.createPercentOfGoalMetric();
+        metricCreator.createProbabilityMetric();
+        metricCreator.createQuotaMetric();
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
     }
 

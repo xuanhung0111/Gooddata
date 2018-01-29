@@ -33,8 +33,7 @@ public class GoodSalesDropAttributeTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createNumberOfActivitiesMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"})

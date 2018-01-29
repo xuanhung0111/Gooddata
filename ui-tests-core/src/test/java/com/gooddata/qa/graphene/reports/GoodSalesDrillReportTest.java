@@ -74,10 +74,10 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountMetric();
-        createAvgAmountMetric();
-        createNumberOfActivitiesMetric();
-        createNumberOfOpportunitiesMetric();
+        getMetricCreator().createAmountMetric();
+        getMetricCreator().createAvgAmountMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
+        getMetricCreator().createNumberOfOpportunitiesMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"})

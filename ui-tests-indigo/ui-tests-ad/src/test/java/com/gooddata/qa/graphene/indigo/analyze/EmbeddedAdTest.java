@@ -50,9 +50,8 @@ public class EmbeddedAdTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createNumberOfActivitiesMetric();
-        createSnapshotBOPMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
+        getMetricCreator().createSnapshotBOPMetric();
     }
 
     @Test(dependsOnGroups = { "createProject" })

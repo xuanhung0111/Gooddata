@@ -6,6 +6,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
+import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
@@ -30,20 +31,20 @@ public class MetricsAccessibilityTest extends AbstractDashboardTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
         //add more metrics to display search metric
-        createNumberOfActivitiesMetric();
-        createAmountMetric();
-        createTimelineEOPMetric();
-        createLostMetric();
-        createNumberOfLostOppsMetric();
-        createNumberOfOpportunitiesMetric();
-        createTimelineBOPMetric();
-        createNumberOfOpportunitiesBOPMetric();
-        createWonMetric();
-        createPercentOfGoalMetric();
-        createQuotaMetric();
-        createProbabilityMetric();
+        Metrics metricCreator = getMetricCreator();
+        metricCreator.createNumberOfActivitiesMetric();
+        metricCreator.createAmountMetric();
+        metricCreator.createTimelineEOPMetric();
+        metricCreator.createLostMetric();
+        metricCreator.createNumberOfLostOppsMetric();
+        metricCreator.createNumberOfOpportunitiesMetric();
+        metricCreator.createTimelineBOPMetric();
+        metricCreator.createNumberOfOpportunitiesBOPMetric();
+        metricCreator.createWonMetric();
+        metricCreator.createPercentOfGoalMetric();
+        metricCreator.createQuotaMetric();
+        metricCreator.createProbabilityMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})

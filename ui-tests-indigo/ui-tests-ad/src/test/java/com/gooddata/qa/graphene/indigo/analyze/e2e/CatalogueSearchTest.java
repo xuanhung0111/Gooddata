@@ -8,6 +8,7 @@ import static java.util.Arrays.asList;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
@@ -23,12 +24,12 @@ public class CatalogueSearchTest extends AbstractAdE2ETest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createNumberOfLostOppsMetric(); 
-        createNumberOfOpenOppsMetric(); 
-        createNumberOfWonOppsMetric();
-        createAvgAmountMetric();
-        createWinRateMetric();
+        Metrics metricCreator = getMetricCreator();
+        metricCreator.createNumberOfLostOppsMetric();
+        metricCreator.createNumberOfOpenOppsMetric();
+        metricCreator.createNumberOfWonOppsMetric();
+        metricCreator.createAvgAmountMetric();
+        metricCreator.createWinRateMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"})

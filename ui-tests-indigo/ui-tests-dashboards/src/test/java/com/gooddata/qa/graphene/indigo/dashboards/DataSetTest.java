@@ -30,10 +30,9 @@ public class DataSetTest extends AbstractDashboardTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createLostMetric();
-        createNumberOfActivitiesMetric();
-        createOppFirstSnapshotMetric();
+        getMetricCreator().createLostMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
+        getMetricCreator().createOppFirstSnapshotMetric();
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
     }
 

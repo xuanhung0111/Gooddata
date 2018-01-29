@@ -95,8 +95,8 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountMetric();
-        createNumberOfActivitiesMetric();
+        getMetricCreator().createAmountMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
 
         tabularReportDef = new UiReportDefinition().withName("tabular_report")
                 .withWhats(new WhatItem(METRIC_AMOUNT, ATTR_STATUS))

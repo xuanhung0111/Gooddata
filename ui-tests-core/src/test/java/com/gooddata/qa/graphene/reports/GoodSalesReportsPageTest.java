@@ -32,8 +32,8 @@ public class GoodSalesReportsPageTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createLostMetric();
-        createActivitiesByTypeReport();
+        getMetricCreator().createLostMetric();
+        getReportCreator().createActivitiesByTypeReport();
         createReport(GridReportDefinitionContent.create(TAG_REPORT,
                 singletonList(METRIC_GROUP),
                 singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_OPPORTUNITY))),

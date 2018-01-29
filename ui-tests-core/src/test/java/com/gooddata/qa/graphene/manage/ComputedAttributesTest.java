@@ -120,8 +120,8 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createExpectedPercentOfGoalMetric();
-        createNumberOfWonOppsMetric();
+        getMetricCreator().createExpectedPercentOfGoalMetric();
+        getMetricCreator().createNumberOfWonOppsMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"}, priority = 0,

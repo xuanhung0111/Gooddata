@@ -60,8 +60,8 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountMetric();
-        createProbabilityMetric();
+        getMetricCreator().createAmountMetric();
+        getMetricCreator().createProbabilityMetric();
 
         //create report on UI due to attribute order
         initReportCreation().createReport(new UiReportDefinition()

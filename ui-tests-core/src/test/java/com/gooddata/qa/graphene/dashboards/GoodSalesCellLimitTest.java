@@ -32,8 +32,8 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountMetric();
-        createQuotaMetric();
+        getMetricCreator().createAmountMetric();
+        getMetricCreator().createQuotaMetric();
 
         //using UI to create report with some special configures
         initReportsPage();

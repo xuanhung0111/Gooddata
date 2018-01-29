@@ -21,6 +21,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.List;
 
+import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import org.openqa.selenium.By;
 import org.testng.annotations.Test;
 
@@ -47,11 +48,12 @@ public class GoodSalesReportStatisticsTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountMetric();
-        createNumberOfActivitiesMetric();
-        createNumberOfLostOppsMetric();
-        createNumberOfOpenOppsMetric();
-        createNumberOfOpportunitiesBOPMetric();
+        Metrics metricCreator = getMetricCreator();
+        metricCreator.createAmountMetric();
+        metricCreator.createNumberOfActivitiesMetric();
+        metricCreator.createNumberOfLostOppsMetric();
+        metricCreator.createNumberOfOpenOppsMetric();
+        metricCreator.createNumberOfOpportunitiesBOPMetric();
 
         ReportDefinition definition = GridReportDefinitionContent.create(SIMPLE_REPORT, singletonList(METRIC_GROUP),
                 singletonList(new AttributeInGrid(getAttributeByTitle(SALES_REP).getDefaultDisplayForm().getUri(), SALES_REP)),

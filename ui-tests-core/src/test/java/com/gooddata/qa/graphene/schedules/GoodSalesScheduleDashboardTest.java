@@ -94,7 +94,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         sleepTightInSeconds(3);
 
 
-        createActivitiesByTypeReport();
+        getReportCreator().createActivitiesByTypeReport();
 
         Dashboard dashboard = Builder.of(Dashboard::new).with(dash -> {
             dash.setName(DASHBOARD_HAVING_MANY_TABS);

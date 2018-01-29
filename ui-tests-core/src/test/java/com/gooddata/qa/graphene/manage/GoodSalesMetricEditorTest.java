@@ -42,9 +42,9 @@ public class GoodSalesMetricEditorTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createNumberOfActivitiesMetric();
-        createStageDurationMetric();
-        createStageVelocityMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
+        getMetricCreator().createStageDurationMetric();
+        getMetricCreator().createStageVelocityMetric();
     }
 
     @DataProvider

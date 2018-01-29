@@ -40,9 +40,8 @@ public class GoodSalesUndoTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createAmountMetric();
-        createNumberOfActivitiesMetric();
+        getMetricCreator().createAmountMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"})

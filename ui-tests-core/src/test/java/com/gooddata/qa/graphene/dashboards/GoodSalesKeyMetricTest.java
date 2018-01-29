@@ -64,7 +64,7 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountMetric();
+        getMetricCreator().createAmountMetric();
         String productUri = getMdService().getObjUri(getProject(), Attribute.class, title(ATTR_PRODUCT));
         String variableUri = VariableRestUtils.createFilterVariable(getRestApiClient(), testParams.getProjectId(), VARIABLE_NAME, productUri);
 

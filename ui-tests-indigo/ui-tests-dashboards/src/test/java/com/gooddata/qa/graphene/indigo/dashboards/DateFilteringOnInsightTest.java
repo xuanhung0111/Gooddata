@@ -56,9 +56,9 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
-        createNumberOfActivitiesMetric();
-        createNumberOfLostOppsMetric();
-        createOppFirstSnapshotMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
+        getMetricCreator().createNumberOfLostOppsMetric();
+        getMetricCreator().createOppFirstSnapshotMetric();
         createInsight(getRestApiClient(), testParams.getProjectId(),
                 new InsightMDConfiguration(TEST_INSIGHT, ReportType.COLUMN_CHART).setMeasureBucket(
                         singletonList(MeasureBucket.getSimpleInstance(getMetric(METRIC_NUMBER_OF_ACTIVITIES)))));

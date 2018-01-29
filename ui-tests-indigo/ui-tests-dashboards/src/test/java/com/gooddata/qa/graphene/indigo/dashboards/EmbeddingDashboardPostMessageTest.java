@@ -41,8 +41,7 @@ public class EmbeddingDashboardPostMessageTest extends AbstractDashboardTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createAmountMetric();
+        getMetricCreator().createAmountMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"})

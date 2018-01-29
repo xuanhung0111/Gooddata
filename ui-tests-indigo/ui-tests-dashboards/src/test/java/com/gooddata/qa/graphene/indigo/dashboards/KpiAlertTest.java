@@ -54,8 +54,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createAvgAmountMetric();
+        getMetricCreator().createAvgAmountMetric();
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
     }
 

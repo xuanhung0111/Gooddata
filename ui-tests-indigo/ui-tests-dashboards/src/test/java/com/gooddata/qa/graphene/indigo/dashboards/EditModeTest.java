@@ -53,8 +53,8 @@ public class EditModeTest extends AbstractDashboardTest {
     protected void customizeProject() throws Throwable {
         super.customizeProject();
         disableAnalyticalDesignerFeatureFlag();
-        createNumberOfActivitiesMetric();
-        createAmountMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
+        getMetricCreator().createAmountMetric();
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
     }
 

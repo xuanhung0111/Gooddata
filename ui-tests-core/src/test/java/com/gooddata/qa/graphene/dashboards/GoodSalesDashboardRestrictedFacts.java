@@ -33,7 +33,7 @@ public class GoodSalesDashboardRestrictedFacts extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountByProductReport();
+        getReportCreator().createAmountByProductReport();
         FactRestUtils.setFactRestricted(getRestApiClient(), getProject(), getMdService().getObjUri(getProject(), Fact.class, title(FACT_AMOUNT)));
     }
 

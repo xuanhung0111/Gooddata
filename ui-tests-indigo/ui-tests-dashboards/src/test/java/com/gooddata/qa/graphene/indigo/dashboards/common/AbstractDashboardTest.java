@@ -12,7 +12,6 @@ import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createInsight;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidgetWrap;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAnalyticalDashboards;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAnalyticalDashboardIdentifier;
-import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProjectAndCheckResult;
 import static com.gooddata.qa.utils.mail.ImapUtils.getEmailBody;
 import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 import static com.google.common.collect.Iterables.getLast;
@@ -40,7 +39,6 @@ import com.gooddata.md.Restriction;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.enums.GDEmails;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.utils.http.RestApiClient;
@@ -145,7 +143,7 @@ public abstract class AbstractDashboardTest extends GoodSalesAbstractTest {
         try {
             getMetricByTitle(METRIC_AMOUNT);
         } catch (ObjNotFoundException e) {
-            createAmountMetric();
+            getMetricCreator().createAmountMetric();
         }
 
         return createKpiUsingRest(new KpiMDConfiguration.Builder()
@@ -161,7 +159,7 @@ public abstract class AbstractDashboardTest extends GoodSalesAbstractTest {
         try {
             getMetricByTitle(METRIC_LOST);
         } catch (ObjNotFoundException e) {
-            createLostMetric();
+            getMetricCreator().createLostMetric();
         }
 
         return createKpiUsingRest(new KpiMDConfiguration.Builder()
@@ -177,7 +175,7 @@ public abstract class AbstractDashboardTest extends GoodSalesAbstractTest {
         try {
             getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES);
         } catch (ObjNotFoundException e) {
-            createNumberOfActivitiesMetric();
+            getMetricCreator().createNumberOfActivitiesMetric();
         }
 
         return createKpiUsingRest(new KpiMDConfiguration.Builder()

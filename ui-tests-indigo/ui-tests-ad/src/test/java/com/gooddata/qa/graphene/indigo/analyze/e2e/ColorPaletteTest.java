@@ -52,9 +52,8 @@ public class ColorPaletteTest extends AbstractAdE2ETest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createNumberOfActivitiesMetric(); 
-        createNumberOfLostOppsMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
+        getMetricCreator().createNumberOfLostOppsMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"})

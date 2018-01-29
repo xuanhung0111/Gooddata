@@ -42,8 +42,7 @@ public class GoodSalesMetricNumberFormatTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createPercentOfGoalMetric();
+        getMetricCreator().createPercentOfGoalMetric();
         percentOfGoalUri = getMdService().getObjUri(getProject(), Metric.class, title(METRIC_PERCENT_OF_GOAL));
         oldPercentOfGoalMetricFormat = getMetricFormat(METRIC_PERCENT_OF_GOAL);
     }

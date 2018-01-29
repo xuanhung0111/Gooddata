@@ -8,7 +8,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
@@ -52,10 +51,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
-        createMetricIfNotExist(getGoodDataClient(), METRIC_NUMBER_OF_PERSONS,
-                format("SELECT COUNT([%s], [%s])",
-                        getAttributeByTitle(ATTR_PERSON).getUri(),
-                        getAttributeByTitle(ATTR_INVOICE_ITEM).getUri()), DEFAULT_METRIC_FORMAT);
+        getMetricCreator().createNumberOfActivitiesMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")

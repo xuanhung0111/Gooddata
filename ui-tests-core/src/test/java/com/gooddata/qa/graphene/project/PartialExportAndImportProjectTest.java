@@ -49,7 +49,7 @@ public class PartialExportAndImportProjectTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createAnotherProject"})
     public void partialExportAndImportReport() throws JSONException {
-        String exportToken = exportPartialProject(createActivitiesByTypeReport(), DEFAULT_PROJECT_CHECK_LIMIT);
+        String exportToken = exportPartialProject(getReportCreator().createActivitiesByTypeReport(), DEFAULT_PROJECT_CHECK_LIMIT);
         testParams.setProjectId(targetProjectId);
         try {
             importPartialProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);
@@ -66,7 +66,7 @@ public class PartialExportAndImportProjectTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"partialExportAndImportReport"})
     public void partialExportAndImportChartReport() throws JSONException {
         // using report will be changed from table to bar chart
-        String top5OpenByCashReportUri = createTop5OpenByCashReport();
+        String top5OpenByCashReportUri = getReportCreator().createTop5OpenByCashReport();
         initReportsPage().openReport(REPORT_TOP_5_OPEN_BY_CASH)
                 .selectReportVisualisation(ReportTypes.BAR)
                 .waitForReportExecutionProgress()
@@ -92,9 +92,9 @@ public class PartialExportAndImportProjectTest extends GoodSalesAbstractTest {
 
         List<String> dashUris = new ArrayList<>();
         dashUris.add(DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
-                initDashboard(dashboard1, createTop5WonByCashReport()).getMdObject()));
+                initDashboard(dashboard1, getReportCreator().createTop5WonByCashReport()).getMdObject()));
         dashUris.add(DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
-                initDashboard(dashboard2, createTop5LostByCashReport()).getMdObject()));
+                initDashboard(dashboard2, getReportCreator().createTop5LostByCashReport()).getMdObject()));
 
         String exportToken = exportPartialProject(
                 dashUris.stream().collect(Collectors.joining("\n")), DEFAULT_PROJECT_CHECK_LIMIT);
@@ -120,8 +120,8 @@ public class PartialExportAndImportProjectTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createAnotherProject"})
     public void partialExportAndImportMetric() throws JSONException {
-        String amountMetricUri = createAvgAmountMetric().getUri();
-        String numberOfActUri = createNumberOfActivitiesMetric().getUri();
+        String amountMetricUri = getMetricCreator().createAvgAmountMetric().getUri();
+        String numberOfActUri = getMetricCreator().createNumberOfActivitiesMetric().getUri();
         String exportToken = exportPartialProject(
                 amountMetricUri + "\n" + numberOfActUri, DEFAULT_PROJECT_CHECK_LIMIT);
         testParams.setProjectId(targetProjectId);
@@ -138,7 +138,7 @@ public class PartialExportAndImportProjectTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createAnotherProject"})
     public void partialExportAndImportVariable() throws JSONException {
-        String exportToken = exportPartialProject(createStatusVariable(), DEFAULT_PROJECT_CHECK_LIMIT);
+        String exportToken = exportPartialProject(getVariableCreator().createStatusVariable(), DEFAULT_PROJECT_CHECK_LIMIT);
         testParams.setProjectId(targetProjectId);
         try {
             importPartialProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);

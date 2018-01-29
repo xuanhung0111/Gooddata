@@ -41,7 +41,7 @@ public class GroupFiltersOnDashboardTest extends AbstractDashboardWidgetTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountByProductReport();
+        getReportCreator().createAmountByProductReport();
 
         Attribute product = getAttributeByTitle(ATTR_PRODUCT);
         List<String> attElements = asList("CompuSci", "Educationly", "Explorer");

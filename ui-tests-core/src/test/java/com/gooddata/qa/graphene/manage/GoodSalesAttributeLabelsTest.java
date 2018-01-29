@@ -80,7 +80,7 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        Metric amountMetric = createAmountMetric();
+        Metric amountMetric = getMetricCreator().createAmountMetric();
 
         Attribute productAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_PRODUCT));
         Attribute departmentAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_DEPARTMENT));

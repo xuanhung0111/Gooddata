@@ -32,7 +32,7 @@ public class GoodSalesAddingFilterFromReportContextMenuTest extends GoodSalesAbs
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountMetric();
+        getMetricCreator().createAmountMetric();
     }
 
     @Test(dependsOnGroups = "createProject")

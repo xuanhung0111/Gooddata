@@ -33,7 +33,7 @@ public class DragWidgetsTest extends AbstractDashboardTest {
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
-        createAmountMetric();
+        getMetricCreator().createAmountMetric();
 
         String dateDimensionUri = getDateDatasetUri(DATE_DATASET_CREATED);
 

@@ -52,9 +52,8 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createAmountMetric();
-        createAmountByDateClosedReport();
+        getMetricCreator().createAmountMetric();
+        getReportCreator().createAmountByDateClosedReport();
 
         final String amountFactUri = getMdService().getObjUri(getProject(), Fact.class, title(METRIC_AMOUNT));
         final String expression = format("SELECT SUM([%s])", amountFactUri);

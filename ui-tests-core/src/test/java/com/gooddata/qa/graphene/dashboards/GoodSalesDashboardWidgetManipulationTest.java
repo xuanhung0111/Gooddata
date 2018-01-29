@@ -35,7 +35,7 @@ public class GoodSalesDashboardWidgetManipulationTest extends GoodSalesAbstractT
 
     @Override
     protected void customizeProject() throws Throwable {
-        createActivitiesByTypeReport();
+        getReportCreator().createActivitiesByTypeReport();
     }
 
     @Test(dependsOnGroups = {"createProject"})

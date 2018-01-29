@@ -55,7 +55,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountMetric();
+        getMetricCreator().createAmountMetric();
 
         VariableRestUtils.createFilterVariable(getRestApiClient(), testParams.getProjectId(),
                 V_STAGE, getAttributeByTitle(ATTR_STAGE_NAME).getUri());

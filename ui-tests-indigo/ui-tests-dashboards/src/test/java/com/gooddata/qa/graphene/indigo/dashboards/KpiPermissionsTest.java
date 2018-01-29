@@ -22,8 +22,7 @@ public class KpiPermissionsTest extends AbstractDashboardTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createAmountMetric();
+        getMetricCreator().createAmountMetric();
     }
 
     @Override

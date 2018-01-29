@@ -69,14 +69,14 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        createAmountMetric();
-        createNumberOfActivitiesMetric();
+        getMetricCreator().createAmountMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
         createReport(new UiReportDefinition().withName(VERSION_REPORT).withWhats(METRIC_NUMBER_OF_ACTIVITIES),
                 "openUpToDateReport");
-        activitiesByTypeReport = createActivitiesByTypeReport();
-        amountByProductReport = createAmountByProductReport();
-        amountByDateClosedReport = createAmountByDateClosedReport();
-        topSalesRepsByWonAndLostReport = createTopSalesRepsByWonAndLostReport();
+        activitiesByTypeReport = getReportCreator().createActivitiesByTypeReport();
+        amountByProductReport = getReportCreator().createAmountByProductReport();
+        amountByDateClosedReport = getReportCreator().createAmountByDateClosedReport();
+        topSalesRepsByWonAndLostReport = getReportCreator().createTopSalesRepsByWonAndLostReport();
         // create dashboard contains report which will be used in test case 
         // to check some validations.
         DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),

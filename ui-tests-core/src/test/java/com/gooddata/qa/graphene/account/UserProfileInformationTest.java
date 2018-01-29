@@ -85,8 +85,8 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
                         .getUri(), stageNameAttribute.getTitle())),
                 singletonList(new MetricElement(avgAmountMetric))));
 
-        createStatusVariable();
-        createQuoteVariable();
+        getVariableCreator().createStatusVariable();
+        getVariableCreator().createQuoteVariable();
     }
 
     @Test(dependsOnGroups = {"createProject"})

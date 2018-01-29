@@ -51,9 +51,8 @@ public class GoodSalesSaveInsightTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createNumberOfActivitiesMetric();
-        createStageVelocityMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
+        getMetricCreator().createStageVelocityMetric();
     }
 
     @DataProvider(name = "chartTypeDataProvider")

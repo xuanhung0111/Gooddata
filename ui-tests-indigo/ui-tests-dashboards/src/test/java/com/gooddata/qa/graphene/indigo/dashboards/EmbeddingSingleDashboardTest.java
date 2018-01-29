@@ -46,8 +46,8 @@ public class EmbeddingSingleDashboardTest extends AbstractDashboardTest {
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
-        createAmountMetric();
-        createLostMetric();
+        getMetricCreator().createAmountMetric();
+        getMetricCreator().createLostMetric();
     }
 
     @DataProvider(name = "editPermissionProvider")

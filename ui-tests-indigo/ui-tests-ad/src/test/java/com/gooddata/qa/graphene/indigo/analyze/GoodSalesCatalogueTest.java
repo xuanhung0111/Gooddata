@@ -45,10 +45,9 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createNumberOfActivitiesMetric();
-        createAmountMetric();
-        createPercentOfGoalMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
+        getMetricCreator().createAmountMetric();
+        getMetricCreator().createPercentOfGoalMetric();
     }
 
     @Test(dependsOnGroups = {"createProject"})

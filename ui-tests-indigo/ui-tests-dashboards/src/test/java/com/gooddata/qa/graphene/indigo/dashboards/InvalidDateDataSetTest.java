@@ -27,10 +27,9 @@ public class InvalidDateDataSetTest extends AbstractDashboardTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createNumberOfActivitiesMetric();
-        createOppFirstSnapshotMetric();
-        createActiveLevelReport();
+        getMetricCreator().createNumberOfActivitiesMetric();
+        getMetricCreator().createOppFirstSnapshotMetric();
+        getReportCreator().createActiveLevelReport();
     }
 
     @Test(dependsOnGroups = {"createProject"})

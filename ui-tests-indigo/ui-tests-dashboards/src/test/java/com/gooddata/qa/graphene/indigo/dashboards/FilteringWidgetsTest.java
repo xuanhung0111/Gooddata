@@ -34,9 +34,8 @@ public class FilteringWidgetsTest extends AbstractDashboardTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-        createNumberOfActivitiesMetric();
-        createAmountMetric();
+        getMetricCreator().createNumberOfActivitiesMetric();
+        getMetricCreator().createAmountMetric();
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
                 singletonList(createAmountKpi()));
     }
