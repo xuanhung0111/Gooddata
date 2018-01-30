@@ -132,7 +132,7 @@ public class EmbeddedAdTest extends GoodSalesAbstractTest {
         takeScreenshot(browser, "Test-Table-Report-Render-On-Embedded-Ad", getClass());
         final TableReport table = getEmbeddedAnalysisPage().getTableReport();
         assertTrue(table.getContent().size() >= 1 && CollectionUtils.isEqualCollection(table.getHeaders(),
-                singletonList(METRIC_NUMBER_OF_ACTIVITIES.toUpperCase())), "Table is not rendered");
+                singletonList(METRIC_NUMBER_OF_ACTIVITIES)), "Table is not rendered");
     }
 
     @Test(dependsOnGroups = { "createProject" })
