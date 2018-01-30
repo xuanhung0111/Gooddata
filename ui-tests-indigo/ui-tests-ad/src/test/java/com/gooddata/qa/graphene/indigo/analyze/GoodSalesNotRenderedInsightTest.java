@@ -47,7 +47,7 @@ public class GoodSalesNotRenderedInsightTest extends AbstractAnalyseTest {
     public void saveMissingMetricTableInsight() throws JSONException, IOException {
         final String insight = "Test-Save-Table-Insight-Missing-Metric";
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).changeReportType(ReportType.TABLE).waitForReportComputing();
-        assertEquals(analysisPage.getTableReport().getHeaders(), singletonList(ATTR_ACTIVITY_TYPE),
+        assertEquals(analysisPage.getTableReport().getHeaders(), singletonList(ATTR_ACTIVITY_TYPE.toUpperCase()),
                 "Table was not displayed sucessfully");
         analysisPage.saveInsight(insight);
         assertTrue(getAllInsightNames(getRestApiClient(), testParams.getProjectId()).contains(insight),
