@@ -2,12 +2,11 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.base.Predicate;
 import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import java.util.function.Function;
 
 /**
  * button is hidden in DOM, find it when setReportType in order to click it properly
@@ -20,7 +19,7 @@ public class VisualizationReportTypePicker extends AbstractFragment {
 
         waitForElementVisible(type.getLocator(), browser).click();
 
-        Predicate<WebDriver> visualizationIsSelected = browser -> isSelected(type);
+        Function<WebDriver, Boolean> visualizationIsSelected = browser -> isSelected(type);
         Graphene.waitGui().until(visualizationIsSelected);
     }
 

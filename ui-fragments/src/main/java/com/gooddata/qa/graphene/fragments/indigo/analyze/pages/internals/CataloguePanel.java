@@ -4,7 +4,6 @@ import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.description.DescriptionPanel;
-import com.google.common.base.Predicate;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -15,7 +14,7 @@ import org.openqa.selenium.support.FindBy;
 
 import java.util.Collection;
 import java.util.List;
-
+import java.util.function.Function;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
@@ -225,7 +224,7 @@ public class CataloguePanel extends AbstractFragment {
     }
 
     private void waitForItemLoaded() {
-        Predicate<WebDriver> itemsLoaded = browser -> !isElementPresent(By.cssSelector(".gd-spinner.small"),
+        Function<WebDriver, Boolean> itemsLoaded = browser -> !isElementPresent(By.cssSelector(".gd-spinner.small"),
                 browser);
         Graphene.waitGui().until(itemsLoaded);
     }

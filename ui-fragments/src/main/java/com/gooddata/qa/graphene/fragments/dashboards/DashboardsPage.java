@@ -16,7 +16,7 @@ import static com.gooddata.qa.browser.DragAndDropUtils.dragAndDropWithCustomBack
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
+import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -41,7 +41,6 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 import com.gooddata.qa.graphene.fragments.reports.report.AbstractReport;
 import com.gooddata.qa.utils.CssUtils;
-import com.google.common.base.Predicate;
 
 public class DashboardsPage extends AbstractFragment {
     protected static final By BY_DASHBOARD_EDIT_BAR = By.className("s-dashboard-edit-bar");
@@ -391,7 +390,7 @@ public class DashboardsPage extends AbstractFragment {
         newDashboardNameInput.sendKeys(Keys.ENTER);
         getDashboardEditBar().saveDashboard();
 
-        Predicate<WebDriver> notificationPanelShowUp =
+        Function<WebDriver, Boolean> notificationPanelShowUp =
                 driver -> isElementVisible(cssSelector(".unlistedBubble .ss-delete"), driver);
 
         try {
@@ -422,7 +421,7 @@ public class DashboardsPage extends AbstractFragment {
         dialog.submit();
 
         if (listed) {
-            Predicate<WebDriver> notificationPanelShowUp =
+            Function<WebDriver, Boolean> notificationPanelShowUp =
                     b -> isElementVisible(cssSelector(".listedConfirmationBubble button"), browser);
 
             try {

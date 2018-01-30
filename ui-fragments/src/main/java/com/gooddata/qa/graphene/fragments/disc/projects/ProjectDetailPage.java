@@ -7,7 +7,7 @@ import static java.util.stream.Collectors.toList;
 import java.io.File;
 import java.util.Collection;
 import java.util.Optional;
-
+import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -20,7 +20,6 @@ import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
-import com.google.common.base.Predicate;
 
 public class ProjectDetailPage extends AbstractFragment {
 
@@ -137,7 +136,7 @@ public class ProjectDetailPage extends AbstractFragment {
         int processNumber = processes.size();
         getProcess(processName).deleteProcess();
 
-        Predicate<WebDriver> processDeleted = browser -> processes.size() == processNumber - 1;
+        Function<WebDriver, Boolean> processDeleted = browser -> processes.size() == processNumber - 1;
         Graphene.waitGui().until(processDeleted);
         return this;
     }

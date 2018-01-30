@@ -9,6 +9,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmp
 import static java.lang.String.format;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -25,7 +26,6 @@ import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 import com.gooddata.qa.graphene.utils.Sleeper;
-import com.google.common.base.Predicate;
 
 public class MetricEditorDialog extends AbstractFragment {
 
@@ -310,7 +310,7 @@ public class MetricEditorDialog extends AbstractFragment {
         // we need a short break to ensure that the state is actually changed, then start waiting
         Sleeper.sleepTightInSeconds(1);
 
-        Predicate<WebDriver> waitForLoadedState = browser -> isElementPresent(By.className("loaded"),
+        Function<WebDriver, Boolean> waitForLoadedState = browser -> isElementPresent(By.className("loaded"),
                 waitForElementVisible(By.className("yui3-c-simplecolumn-content"), browser));
         Graphene.waitGui().until(waitForLoadedState);
         return this;

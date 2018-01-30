@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.fragments.disc.schedule;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -14,7 +14,6 @@ import org.openqa.selenium.support.ui.Select;
 import com.gooddata.qa.graphene.enums.disc.schedule.Executable;
 import com.gooddata.qa.graphene.fragments.disc.ConfirmationDialog;
 import com.gooddata.qa.graphene.fragments.disc.schedule.common.AbstractScheduleDetail;
-import com.google.common.base.Predicate;
 
 public class ScheduleDetail extends AbstractScheduleDetail {
 
@@ -52,7 +51,7 @@ public class ScheduleDetail extends AbstractScheduleDetail {
         waitForElementVisible(runButton).click();
         ConfirmationDialog.getInstance(browser).confirm();
 
-        Predicate<WebDriver> scheduleExecuted = browser -> executionHistoryItems.size() == executionItems + 1;
+        Function<WebDriver, Boolean> scheduleExecuted = browser -> executionHistoryItems.size() == executionItems + 1;
         Graphene.waitGui().until(scheduleExecuted);
         return this;
     }

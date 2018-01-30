@@ -9,6 +9,7 @@ import static org.openqa.selenium.By.id;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,7 +30,6 @@ import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.utils.mail.ImapClient;
-import com.google.common.base.Predicate;
 
 public class ProjectAndUsersPage extends AbstractFragment {
 
@@ -165,7 +165,7 @@ public class ProjectAndUsersPage extends AbstractFragment {
         waitForElementVisible(inviteUserButton).click();
         final InviteUserDialog inviteUserDialog = Graphene.createPageFragment(InviteUserDialog.class,
                 waitForElementVisible(INVITE_USER_DIALOG_LOCATOR, browser));
-        final Predicate<WebDriver> predicate = browser -> inviteUserDialog.getInvitationRole()
+        final Function<WebDriver, Boolean> predicate = browser -> inviteUserDialog.getInvitationRole()
                 .getFirstSelectedOption().getText().equals(UserRoles.EDITOR.getName());
         Graphene.waitGui().until(predicate);
 
@@ -181,7 +181,7 @@ public class ProjectAndUsersPage extends AbstractFragment {
                 .findFirst()
                 .get()
                 .click();
-        Predicate<WebDriver> predicate = input -> getUsersCount() < numberOfUsers;
+        Function<WebDriver, Boolean> predicate = input -> getUsersCount() < numberOfUsers;
         Graphene.waitGui().until(predicate);
         return this;
     }
@@ -230,7 +230,7 @@ public class ProjectAndUsersPage extends AbstractFragment {
                 .findFirst()
                 .get()
                 .click();
-        Predicate<WebDriver> predicate = input -> getUsersCount() == numberOfUsers - 1;
+        Function<WebDriver, Boolean> predicate = input -> getUsersCount() == numberOfUsers - 1;
         Graphene.waitGui().until(predicate);
         return this;
     }
@@ -242,7 +242,7 @@ public class ProjectAndUsersPage extends AbstractFragment {
                 .map(e -> e.findElement(RESEND_INVITATION_BUTTON_LOCATOR)).get();
 
         waitForElementVisible(resendButton).click();
-        final Predicate<WebDriver> predicate = browser -> resendButton.getAttribute("class").contains("disabled");
+        final Function<WebDriver, Boolean> predicate = browser -> resendButton.getAttribute("class").contains("disabled");
         try {
             Graphene.waitGui().until(predicate);
         } catch (TimeoutException e) {
@@ -262,7 +262,7 @@ public class ProjectAndUsersPage extends AbstractFragment {
             final int currentInvitations = invitations.size();
             invitations.iterator().next().findElement(CANCEL_INVITATION_BUTTON_LOCATOR).click();
 
-            final Predicate<WebDriver> invitationCanceled = input -> invitations.size() == currentInvitations - 1;
+            final Function<WebDriver, Boolean> invitationCanceled = input -> invitations.size() == currentInvitations - 1;
             Graphene.waitGui().until(invitationCanceled);
         }
 

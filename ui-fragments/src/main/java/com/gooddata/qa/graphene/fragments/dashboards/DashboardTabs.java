@@ -5,8 +5,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.google.common.base.Predicate;
+import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -55,7 +54,7 @@ public class DashboardTabs extends AbstractFragment {
             scrollRightButton.click();
         tab.getRoot().click();
 
-        Predicate<WebDriver> isSelected = browser -> tab.isSelected();
+        Function<WebDriver, Boolean> isSelected = browser -> tab.isSelected();
         Graphene.waitGui().until(isSelected);
     }
 

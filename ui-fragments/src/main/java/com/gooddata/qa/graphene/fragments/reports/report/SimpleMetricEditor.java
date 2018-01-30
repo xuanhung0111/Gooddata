@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.fragments.reports.report;
 
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.base.Predicate;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -14,6 +13,7 @@ import org.openqa.selenium.support.ui.Select;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static java.util.Objects.nonNull;
+import java.util.function.Function;
 
 public class SimpleMetricEditor extends AbstractFragment {
 
@@ -65,7 +65,7 @@ public class SimpleMetricEditor extends AbstractFragment {
     }
 
     private SimpleMetricEditor selectFact(String fact) {
-        Predicate<WebDriver> isLoaded = browser -> factSelect.getOptions().size() > 1;
+        Function<WebDriver, Boolean> isLoaded = browser -> factSelect.getOptions().size() > 1;
         Graphene.waitGui().until(isLoaded);
 
         factSelect.selectByVisibleText(fact);

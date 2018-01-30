@@ -6,7 +6,7 @@ import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-
+import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -24,7 +24,6 @@ import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
-import com.google.common.base.Predicate;
 
 public class DeleteDatasetTest extends AbstractCsvUploaderTest {
 
@@ -140,7 +139,7 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
     }
 
     private void checkForDatasetRemoved(final String csvDatasetName) {
-        final Predicate<WebDriver> datasetSuccessfullyRemoved = input -> {
+        final Function<WebDriver, Boolean> datasetSuccessfullyRemoved = input -> {
             try {
                 DatasetsListPage.getInstance(browser).getMyDatasetsTable().getDataset(csvDatasetName);
                 return false;

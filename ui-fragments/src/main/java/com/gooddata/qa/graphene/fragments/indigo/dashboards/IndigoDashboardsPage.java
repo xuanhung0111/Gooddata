@@ -24,7 +24,6 @@ import com.gooddata.qa.graphene.fragments.indigo.HamburgerMenu;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Widget.DropZone;
 import com.gooddata.qa.graphene.utils.Sleeper;
-import com.google.common.base.Predicate;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -36,6 +35,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
@@ -413,7 +413,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
         // ensure dots element is present
         sleepTightInSeconds(1);
 
-        Predicate<WebDriver> isDotsElementPresent = browser -> !isElementPresent(className("gd-loading-dots"), browser);
+        Function<WebDriver, Boolean> isDotsElementPresent = browser -> !isElementPresent(className("gd-loading-dots"), browser);
         Graphene.waitGui().until(isDotsElementPresent);
 
         return this;

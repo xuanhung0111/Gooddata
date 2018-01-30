@@ -9,10 +9,8 @@ import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.gooddata.qa.utils.java.Builder;
-import com.google.common.base.Predicate;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
@@ -312,13 +310,8 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
 
     private ReportPage waitForReportLoading() {
         sleepTightInSeconds(1);
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-            @Override
-            public boolean apply(WebDriver browser) {
-                return !browser.findElement(id("reportContainerTab")).getAttribute("class")
-                        .contains("processingReport");
-            }
-        });
+        Graphene.waitGui().until(browser -> !browser.findElement(id("reportContainerTab")).getAttribute("class")
+                        .contains("processingReport"));
         return reportPage;
     }
 

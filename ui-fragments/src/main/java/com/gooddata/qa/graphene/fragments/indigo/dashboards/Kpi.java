@@ -7,14 +7,12 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static org.openqa.selenium.By.className;
-
+import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-
-import com.google.common.base.Predicate;
 
 /**
  * Kpi - key performance indicator widget
@@ -130,7 +128,7 @@ public class Kpi extends Widget {
     }
 
     public Kpi waitForContentLoading() {
-        Predicate<WebDriver> isContentLoaded = browser -> !waitForElementVisible(className("kpi"), getRoot())
+        Function<WebDriver, Boolean> isContentLoaded = browser -> !waitForElementVisible(className("kpi"), getRoot())
                 .getAttribute("class").contains("content-loading");
         Graphene.waitGui().until(isContentLoaded);
         return this;

@@ -21,7 +21,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.util.Calendar;
-
+import java.util.function.Function;
 import com.gooddata.qa.utils.http.variable.VariableRestUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -41,7 +41,6 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.Metric
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel.Tab;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
 public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
@@ -161,7 +160,7 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
 
     private void waitForKeyMetricUpdateValue() {
         sleepTight(1000); // need buffer time to make sure css class 'reloading' appear in DOM
-        Predicate<WebDriver> valueLoaded = browser -> !waitForElementPresent(
+        Function<WebDriver, Boolean> valueLoaded = browser -> !waitForElementPresent(
                 HEADLINE_WIDGET_LOCATOR, browser).getAttribute("class").contains("reloading") &&
                 !isElementPresent(className("c-report-overlap"), browser);
         Graphene.waitGui().until(valueLoaded);

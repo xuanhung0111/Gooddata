@@ -89,7 +89,7 @@ public final class ElementUtils {
     }
 
     public static void clickElementByVisibleLocator(SearchContext searchContext, By... bySelectors) {
-        Predicate<WebDriver> visibilityOfElement = browser ->
+        Function<WebDriver, Boolean> visibilityOfElement = browser ->
                 Stream.of(bySelectors).anyMatch(by -> isElementVisible(by, searchContext));
         Graphene.waitGui().until(visibilityOfElement);
 
@@ -111,7 +111,7 @@ public final class ElementUtils {
         // Move outside HTML body at position (-1, -1) to make sure no popup displayed
         new Actions(browser).moveToElement(browser.findElement(By.tagName("body")), -1, -1).perform();
 
-        Predicate<WebDriver> isDismissed = context -> !isElementVisible(popupElement, context);
+        Function<WebDriver, Boolean> isDismissed = context -> !isElementVisible(popupElement, context);
         Graphene.waitGui().until(isDismissed);
     }
 }
