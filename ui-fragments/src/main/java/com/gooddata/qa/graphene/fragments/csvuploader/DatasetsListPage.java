@@ -1,19 +1,18 @@
 package com.gooddata.qa.graphene.fragments.csvuploader;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static org.openqa.selenium.By.className;
 
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.indigo.Header;
+import com.gooddata.qa.graphene.utils.ElementUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.indigo.Header;
-import com.gooddata.qa.graphene.utils.ElementUtils;
 
 public class DatasetsListPage extends AbstractFragment {
 
@@ -76,7 +75,15 @@ public class DatasetsListPage extends AbstractFragment {
     }
 
     public boolean isMyDatasetsEmpty() {
-        return isElementPresent(BY_EMPTY_STATE, getRoot());
+        final int TIMEOUT_IN_SECONDS = 2;
+        //Before loading finishing for data page which has information, the empty page is always reloaded
+        //To make sure that data list isn't missed, should be handled waiting to load data content.
+        try {
+            waitForElementNotPresent(BY_EMPTY_STATE, TIMEOUT_IN_SECONDS);
+        } catch (Exception e) {
+            return true;
+        }
+        return false;
     }
 
     public int getMyDatasetsCount() {
