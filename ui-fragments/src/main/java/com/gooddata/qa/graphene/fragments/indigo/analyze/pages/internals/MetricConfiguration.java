@@ -6,25 +6,28 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.lang.String.format;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.tagName;
 import static org.testng.Assert.assertTrue;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Stream;
-
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.common.AbstractPicker;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.description.DescriptionPanel;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.common.AbstractPicker;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.description.DescriptionPanel;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MetricConfiguration extends AbstractFragment {
 
@@ -144,29 +147,36 @@ public class MetricConfiguration extends AbstractFragment {
         return this;
     }
 
-    public MetricConfiguration addFilterBySelectOnly(String attribute, String value) {
-        clickAddAttributeFilter().selectAttribute(attribute);
-
-        Graphene.createPageFragment(AttributeFilterPicker.class,
-                waitForElementVisible(BY_ATTRIBUTE_FILTER_PICKER, browser))
-                .clear()
-                .selectOnly(value)
-                .apply();
+    public MetricConfiguration addFilterWithAllValue(String attribute) {
+        addFilter(attribute, AttributeFilterPicker::cancel, null);
         return this;
     }
 
-    public void addFilterWithLargeNumberValues(String attribute, String... unselectedValues) {
-        clickAddAttributeFilter().selectAttribute(attribute);
+    public MetricConfiguration addFilterBySelectOnly(String attribute, String value) {
+        return addFilter(attribute, attributeFilterPicker -> attributeFilterPicker.clear().selectOnly(value).apply(), value);
+    }
 
-        Graphene.createPageFragment(AttributeFilterPicker.class,
-                waitForElementVisible(BY_ATTRIBUTE_FILTER_PICKER, browser))
-                .selectAll()
-                .selectItems(unselectedValues)
-                .apply();
+    public void addFilterWithLargeNumberValues(String attribute, String... unselectedValues) {
+        addFilter(attribute, attributeFilterPicker ->
+                attributeFilterPicker.selectAll().selectItems(unselectedValues).apply(), unselectedValues);
     }
 
     public String getFilterText() {
-        return waitForElementVisible(BY_ATTRIBUTE_FILTER_BUTTON, getRoot()).getText();
+        return waitForElementVisible(BY_ATTRIBUTE_FILTER_BUTTON, getRoot()).getText().replaceAll("[\\r\\n]+", " ");
+    }
+
+    public List<String> getAllFilterText() {
+        return Stream.of(waitForElementVisible(BY_ATTRIBUTE_FILTER_BUTTON, getRoot()))
+                .map(filter -> filter.getText().replaceAll("[\\r\\n]+", " "))
+                .collect(Collectors.toList());
+    }
+
+    public MetricConfiguration removeAttributeFilter(String attribute) {
+        getRoot().findElements(By.className("metric-filter-wrapper")).stream()
+                .filter(filter -> filter.getText().replaceAll("[\\r\\n]+", " ").equals(attribute))
+                .forEach(filter -> filter.findElement(BY_REMOVE_ATTRIBUTE_FILTER).click());
+
+        return this;
     }
 
     public boolean canAddAnotherFilter() {
@@ -182,6 +192,22 @@ public class MetricConfiguration extends AbstractFragment {
         return clickAddAttributeFilter().getDescription(attribute);
     }
 
+    public boolean isDisabledAttribute(String attribute) {
+        AttributeFilterPicker attributeFilterPicker = clickAddAttributeFilter();
+        boolean isDisable = attributeFilterPicker.isDisabledAttribute(attribute);
+        waitForElementVisible(addAttributeFilter).click(); //To close picker
+        waitForFragmentNotVisible(attributeFilterPicker);
+        return isDisable;
+    }
+
+    private MetricConfiguration addFilter(String att, Consumer<AttributeFilterPicker> howToSelect, String... values) {
+        clickAddAttributeFilter().selectAttribute(att);
+        howToSelect.accept(Graphene.createPageFragment(AttributeFilterPicker.class,
+                waitForElementVisible(BY_ATTRIBUTE_FILTER_PICKER, browser)));
+
+        return this;
+    }
+
     public static class AttributeFilterPicker extends AbstractPicker {
 
         @FindBy(className = "s-clear")
@@ -192,6 +218,9 @@ public class MetricConfiguration extends AbstractFragment {
 
         @FindBy(css = ".s-apply:not(.disabled)")
         private WebElement applyButton;
+
+        @FindBy(css = ".s-cancel")
+        private WebElement cancelButton;
 
         private static final By CLEAR_SEARCH_TEXT_SHORTCUT = className("gd-input-icon-clear");
 
@@ -218,6 +247,12 @@ public class MetricConfiguration extends AbstractFragment {
             }
 
             super.clearSearchText();
+        }
+
+        @Override
+        protected WebElement getElementByName(final String name) {
+            //Prevent to same attribute name
+            return getElement(".s-" + simplifyText(name) + ":not(.is-disabled)");
         }
 
         public AttributeFilterPicker clear() {
@@ -253,6 +288,11 @@ public class MetricConfiguration extends AbstractFragment {
             getElementByName(element).click();
         }
 
+        public boolean isDisabledAttribute(String element) {
+            searchForText(element);
+            return getElement(".s-" + simplifyText(element)).getAttribute("class").contains("is-disable");
+        }
+
         public List<String> getAllAttributesInViewPort() {
             return getElementTexts(getElements());
         }
@@ -269,6 +309,11 @@ public class MetricConfiguration extends AbstractFragment {
 
         public void apply() {
             waitForElementVisible(applyButton).click();
+            waitForElementNotVisible(getRoot());
+        }
+
+        public void cancel() {
+            waitForElementVisible(cancelButton).click();
             waitForElementNotVisible(getRoot());
         }
     }
