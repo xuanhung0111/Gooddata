@@ -103,9 +103,15 @@ public class MetricConfiguration extends AbstractFragment {
         new Select(getRoot().findElement(BY_FACT_AGGREGATION)).selectByVisibleText(newAggregation);
     }
 
+    private void clickMetricHeader() {
+        // now click with offset because clicking in the middle (default by graphene/selenium)
+        // causes activating editableLabel renaming instead of toggling measure configuration
+        getActions().moveToElement(header, 2, 2).click().perform();
+    }
+
     public MetricConfiguration expandConfiguration() {
         if (isConfigurationCollapsed()) {
-            waitForElementVisible(header).click();
+            clickMetricHeader();
         }
         return this;
     }
@@ -114,7 +120,7 @@ public class MetricConfiguration extends AbstractFragment {
         if (isConfigurationCollapsed()) {
             return;
         }
-        waitForElementVisible(header).click();
+        clickMetricHeader();
     }
 
     public boolean isConfigurationCollapsed() {
