@@ -54,7 +54,7 @@ import static org.testng.Assert.assertTrue;
 
 public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
-    private static final String EXPORT_ERROR_MESSAGE = "Insight is not compatible with Report Editor. "
+    private static final String EXPORT_ERROR_MESSAGE = "The insight is not compatible with Report Editor. "
             + "\"Stage Name\" is in configuration twice. Remove one attribute to open as a report.";
 
     @Override
