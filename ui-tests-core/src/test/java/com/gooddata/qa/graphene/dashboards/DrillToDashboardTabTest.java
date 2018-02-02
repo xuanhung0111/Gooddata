@@ -17,10 +17,12 @@ import com.gooddata.qa.mdObjects.dashboard.tab.TabItem.*;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.gooddata.qa.utils.java.Builder;
+import com.google.common.base.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
+import org.openqa.selenium.WebDriver;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -171,8 +173,10 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
 
             // att to drill to is CompuSci
             reportOnSourceTab.drillOnFirstValue(CellType.ATTRIBUTE_VALUE).waitForLoaded();
-            assertTrue(dashboardsPage.getTabs().getTab(TARGET_TAB).isSelected(),
-                    TARGET_TAB + " is not selected after drill action");
+
+            final Predicate<WebDriver> isTargetTabLoaded = browser -> dashboardsPage.getTabs()
+                    .getTab(TARGET_TAB).isSelected();
+            Graphene.waitGui().until(isTargetTabLoaded);
 
             TableReport reportOnTargetTab = dashboardsPage.getContent()
                     .getReport(REPORT_AMOUNT_BY_PRODUCT, TableReport.class).waitForLoaded();
@@ -243,8 +247,9 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
                     StringUtils.join(Arrays.asList(REPORT_AMOUNT_BY_PRODUCT, "CompuSci"), ">>"));
 
             reportAfterDrillingToReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE).waitForLoaded();
-            assertTrue(dashboardsPage.getTabs().getTab(TARGET_TAB).isSelected(),
-                    TARGET_TAB + " is not selected after drill action");
+            final Predicate<WebDriver> isTargetTabLoaded = browser -> dashboardsPage.getTabs()
+                    .getTab(TARGET_TAB).isSelected();
+            Graphene.waitGui().until(isTargetTabLoaded);
 
             TableReport reportAfterDrillingToTab = dashboardsPage.getContent().getLatestReport(TableReport.class);
             assertEquals(reportAfterDrillingToTab.getAttributeValues(), attributeValuesOfSalesReports,
