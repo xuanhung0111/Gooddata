@@ -1,0 +1,11 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="GD_UI_Selenium_Tests">
+    <test name="mobile-dropdown-navigation">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.dashboards.MobileDropdownNavigationTest" />
+        </classes>
+    </test>
+
+    <parameter name="windowSize" value="600,800" />
+    <parameter name="isMobileRunning" value="true" />
+</suite>

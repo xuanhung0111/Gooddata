@@ -13,6 +13,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.CssUtils.convertCSSClassTojQuerySelector;
+import static com.gooddata.qa.utils.CssUtils.isShortendTilteDesignByCss;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.id;
@@ -81,7 +82,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(className = "dash-title")
     private WebElement dashboardTitle;
 
-    @FindBy(className = "mobile-navigation-button")
+    @FindBy(className = "button-text")
     private WebElement dashboardTitleOnMobile;
 
     @FindBy(className = "navigation-list")
@@ -318,6 +319,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return waitForElementVisible(isMobileMode() ? dashboardTitleOnMobile : dashboardTitle).getText();
     }
 
+    public boolean isShortenTitleDesignByCss(int sizeText) {
+        return isShortendTilteDesignByCss(isMobileMode() ? dashboardTitleOnMobile : dashboardTitle, sizeText);
+    }
+
     public IndigoDashboardsPage changeDashboardTitle(String newTitle) {
         waitForElementVisible(dashboardTitle).click();
         dashboardTitle.findElement(By.tagName("textarea")).sendKeys(newTitle);
@@ -325,20 +330,20 @@ public class IndigoDashboardsPage extends AbstractFragment {
     }
 
     public List<String> getDashboardTitles() {
-        return waitForElementVisible(dashboardsList)
-                .findElements(By.className("navigation-list-item")).stream()
-                .map(WebElement::getText).collect(Collectors.toList());
+        List<String> listTitle;
+        if (isMobileMode()) {
+            waitForElementVisible(mobileNavigationButton).click();
+            listTitle = getDashboardTiltes(getMobileKpiDashboardSelection().dropdownList);
+        } else {
+            listTitle = getDashboardTiltes(dashboardsList);
+        }
+        return listTitle;
     }
 
     public IndigoDashboardsPage selectKpiDashboard(String title) {
         if (isMobileMode()) {
             waitForElementVisible(mobileNavigationButton).click();
-
-            MobileKpiDashboardSelection dashboardsListOnMobile = Graphene.createPageFragment(
-                    MobileKpiDashboardSelection.class,
-                    waitForElementVisible(className("gd-mobile-dropdown-overlay"), browser));
-
-            selectDashboard(title, dashboardsListOnMobile.dropdownList);
+            selectDashboard(title, getMobileKpiDashboardSelection().dropdownList);
             waitForFragmentVisible(this);
         } else {
             selectDashboard(title, dashboardsList);
@@ -527,6 +532,11 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return waitForElementVisible(cssSelector(DASHBOARD_BODY), browser).getSize();
     }
 
+    private MobileKpiDashboardSelection getMobileKpiDashboardSelection() {
+        return Graphene.createPageFragment(MobileKpiDashboardSelection.class,
+                waitForElementVisible(className("gd-mobile-dropdown-overlay"), browser));
+    }
+
     private IndigoDashboardsPage waitForWidgetsEditable() {
         waitForElementNotPresent(By.cssSelector(".dash-item-content > div:not(.is-editable)"));
         return this;
@@ -585,11 +595,6 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return isElementPresent(By.className("mobile-navigation-button"), browser);
     }
 
-    private class MobileKpiDashboardSelection extends AbstractFragment {
-        @FindBy(className = "gd-mobile-dropdown-content")
-        public WebElement dropdownList;
-    }
-
     private void selectDashboard(String title, WebElement element) {
         waitForElementVisible(element)
             .findElements(By.className(isMobileMode() ? "gd-list-item" : "navigation-list-item")).stream()
@@ -597,5 +602,18 @@ public class IndigoDashboardsPage extends AbstractFragment {
             .findFirst()
             .get()
             .click();
+    }
+
+    private List<String> getDashboardTiltes(WebElement element) {
+        return waitForElementVisible(element)
+                .findElements(cssSelector(".gd-list-item, .navigation-list-item"))
+                .stream()
+                .map(WebElement::getText)
+                .collect(Collectors.toList());
+    }
+
+    private class MobileKpiDashboardSelection extends AbstractFragment {
+        @FindBy(className = "gd-mobile-dropdown-content")
+        public WebElement dropdownList;
     }
 }

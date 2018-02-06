@@ -3,6 +3,8 @@
  */
 package com.gooddata.qa.utils;
 
+import org.openqa.selenium.WebElement;
+
 public final class CssUtils {
 
     private CssUtils() {
@@ -21,5 +23,17 @@ public final class CssUtils {
 
     public static String convertCSSClassTojQuerySelector(String cssClass) {
         return "." + cssClass.replaceAll(" ", ".");
+    }
+
+    /**
+     * Some cases have shorten text with CSS rules text-overflow set ellipse,
+     * Method support to detect above cases.
+     * @param title Web element of title
+     * @param width The width of title after being shorten (pixel)
+     * @return boolean
+     */
+    public static boolean isShortendTilteDesignByCss(WebElement title, int width) {
+        return title.getCssValue("text-overflow").equals("ellipsis") &&
+                title.getCssValue("width").equals(width + "px");
     }
 }

@@ -90,7 +90,8 @@ public class UITestsRegistry {
             "testng-mobile-SplashScreen.xml",
             "testng-mobile-KpiPopChangeValueExceedLimit.xml",
             "testng-mobile-ProjectSwitch.xml",
-            "testng-mobile-KpiDashboards.xml"
+            "testng-mobile-KpiDashboards.xml",
+            "testng-mobile-DropDownNavigation.xml"
         });
 
         suites.put("all", new Object[] {
@@ -146,7 +147,8 @@ public class UITestsRegistry {
             "testng-mobile-SplashScreen.xml",
             "testng-mobile-KpiPopChangeValueExceedLimit.xml",
             "testng-mobile-ProjectSwitch.xml",
-            "testng-mobile-KpiDashboards.xml"
+            "testng-mobile-KpiDashboards.xml",
+            "testng-mobile-DropDownNavigation.xml"
         });
 
         TestsRegistry.getInstance()
