@@ -53,14 +53,14 @@ public class TableTest extends AbstractAdE2ETest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void it_should_be_blank_by_default() throws ParseException, JSONException, IOException {
+    public void it_should_be_dash_if_null_not_formatted() throws ParseException, JSONException, IOException {
         DashboardsRestUtils.changeMetricFormat(getRestApiClient(), emptyMetricUri, "#,##0");
 
         analysisPage.addMetric("__EMPTY__")
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .changeReportType(ReportType.TABLE)
             .waitForReportComputing();
-        assertTrue(waitForElementPresent(cssSelector(".s-cell-0-0"), browser).getText().trim().isEmpty());
+        assertEquals(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim(), "–");
     }
 
     @Test(dependsOnGroups = {"createProject"})
