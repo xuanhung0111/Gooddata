@@ -7,6 +7,7 @@ public enum ReportType {
 
     TABLE("table"),
     COLUMN_CHART("column"),
+    PIE_CHART("pie"),
 
     LINE_CHART("line") {
         @Override

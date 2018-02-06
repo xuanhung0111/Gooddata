@@ -21,6 +21,10 @@ public class MetricsBucket extends AbstractBucket {
             .get();
     }
 
+    public MetricConfiguration getLastMetricConfiguration() {
+        return waitForCollectionIsNotEmpty(metrics).get(metrics.size()-1);
+    }
+
     public WebElement get(final String name) {
         return metrics.stream()
             .filter(input -> name.equals(input.getHeader()))

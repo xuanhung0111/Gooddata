@@ -1,5 +1,9 @@
 package com.gooddata.qa.graphene.fragments.reports.report;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toList;
+
 import com.gooddata.qa.graphene.entity.report.WhatItem;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 import com.gooddata.qa.graphene.fragments.manage.MetricEditorDialog;
@@ -8,9 +12,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.Collection;
-
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static java.util.Objects.nonNull;
+import java.util.List;
 
 public class MetricSndPanel extends AbstractSndPanel {
 
@@ -60,6 +62,13 @@ public class MetricSndPanel extends AbstractSndPanel {
         findItemElement(metric).click();
         waitForElementVisible(getItemDetailContainerRoot());
         return this;
+    }
+
+    public List<String> getSelectedMetrics() {
+        return getItemContainerRoot().findElements(By.className("sndInReport"))
+                .stream()
+                .map(WebElement::getText)
+                .collect(toList());
     }
 
     public MetricSndPanel addDrillStep(String toAttribute) {

@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.CssUtils.isShortendTilteDesignByCss;
 import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
@@ -29,6 +30,9 @@ public class ChartReport extends AbstractFragment {
 
     @FindBy(css = ".highcharts-series *")
     private List<WebElement> trackers;
+
+    @FindBy(css = ".highcharts-markers *")
+    private List<WebElement> markers;
 
     @FindBy(css = LEGEND_ITEM_ICON)
     private List<WebElement> legendIcons;
@@ -68,12 +72,13 @@ public class ChartReport extends AbstractFragment {
     }
 
     public List<List<String>> getTooltipTextOnTrackerByIndex(int index) {
-        waitForCollectionIsNotEmpty(trackers);
-        checkIndex(index);
-        getActions().moveToElement(trackers.get(index)).perform();
-
-        waitForElementVisible(tooltip);
+        displayTooltipOnTrackerByIndex(index);
         return getTooltipText();
+    }
+
+    public boolean isShortenTooltipTextOnTrackerByIndex(int index, int width) {
+        displayTooltipOnTrackerByIndex(index);
+        return isShortendTilteDesignByCss(waitForElementVisible(tooltip.findElement(By.className("title"))), width);
     }
 
     public boolean isLegendVisible() {
@@ -86,6 +91,11 @@ public class ChartReport extends AbstractFragment {
 
     public boolean areLegendsVertical() {
         return isElementVisible(By.cssSelector(".viz-legend.position-right"), browser);
+    }
+
+    public boolean isShortenNameInLegend(String measureName, int width) {
+        WebElement measure = legendNames.stream().filter(measures -> measures.getText().equals(measureName)).findFirst().get();
+        return isShortendTilteDesignByCss(measure, width);
     }
 
     public List<String> getLegends() {
@@ -145,5 +155,14 @@ public class ChartReport extends AbstractFragment {
         // without this it's specially unstable on embedded AD
         labels.stream().forEach(WaitUtils::waitForElementVisible);
         return getElementTexts(labels);
+    }
+
+    private void displayTooltipOnTrackerByIndex(int index) {
+        waitForCollectionIsNotEmpty(trackers);
+        checkIndex(index);
+        getActions().moveToElement(trackers.get(index)).perform();
+        if (isLineChart())
+            waitForElementVisible(markers.get(index)).click();
+        waitForElementVisible(tooltip);
     }
 }

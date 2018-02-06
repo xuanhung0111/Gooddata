@@ -34,6 +34,9 @@ public class MetricConfiguration extends AbstractFragment {
     @FindBy(className = "adi-bucket-item-header")
     private WebElement header;
 
+    @FindBy(className = "adi-bucket-item-sub-header")
+    private WebElement subHeader;
+
     @FindBy(className = ADD_ATTRIBUTE_FILTER_CLASS)
     private WebElement addAttributeFilter;
 
@@ -47,6 +50,7 @@ public class MetricConfiguration extends AbstractFragment {
     public static final By BY_ATTRIBUTE_FILTER_PICKER = By.className("adi-attr-filter-picker");
     private static final By BY_ATTRIBUTE_FILTER_BUTTON = By.className("adi-attr-filter-button");
     private static final By BY_FACT_AGGREGATION = By.className("s-fact-aggregation-switch");
+    private static final By BY_BUBBLE_CONTENT = By.className("bubble-content");
 
     private static final String ADD_ATTRIBUTE_FILTER_CLASS = "s-add_attribute_filter";
 
@@ -54,6 +58,15 @@ public class MetricConfiguration extends AbstractFragment {
 
     public String getHeader() {
         return waitForElementVisible(className("s-title"), waitForElementVisible(header)).getText();
+    }
+
+    public String getSubHeader() {
+        return waitForElementVisible(subHeader).getText();
+    }
+
+    public String getToolTipSubHeader() {
+        getActions().moveToElement(subHeader).perform();
+        return waitForElementVisible(BY_BUBBLE_CONTENT, browser).getText();
     }
 
     public MetricConfiguration showPercents() {

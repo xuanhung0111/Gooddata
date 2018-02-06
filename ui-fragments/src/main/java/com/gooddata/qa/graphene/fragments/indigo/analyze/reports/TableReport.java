@@ -11,6 +11,8 @@ import java.util.Objects;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.CssUtils.isShortendTilteDesignByCss;
 import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.tagName;
@@ -30,6 +32,15 @@ public class TableReport extends AbstractFragment {
 
     public List<String> getHeaders() {
         return getElementTexts(waitForCollectionIsNotEmpty(headers));
+    }
+
+    public boolean isShortenHeader(String headerName, int width) {
+        return isShortendTilteDesignByCss(getHeader(headerName), width);
+    }
+
+    public String getTooltipText(String headerName) {
+        getActions().moveToElement(getHeader(headerName)).perform();
+        return waitForElementVisible(className("content"), browser).getText();
     }
 
     public List<List<String>> getContent() {
@@ -79,5 +90,13 @@ public class TableReport extends AbstractFragment {
             .findElements(tagName("span"))
             .stream()
             .anyMatch(e -> e.getAttribute("class").contains(css));
+    }
+
+    private WebElement getHeader(String headerName) {
+        return waitForCollectionIsNotEmpty(headers)
+            .stream()
+            .filter(e -> e.getText().equals(headerName))
+            .findFirst()
+            .get();
     }
 }
