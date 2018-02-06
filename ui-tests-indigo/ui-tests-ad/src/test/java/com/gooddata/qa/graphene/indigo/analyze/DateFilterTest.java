@@ -13,6 +13,7 @@ import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static java.lang.String.format;
 
 import java.text.ParseException;
 import java.time.format.DateTimeFormatter;
@@ -51,7 +52,10 @@ public class DateFilterTest extends AbstractAnalyseTest {
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
-        getMetricCreator().createNumberOfActivitiesMetric();
+        createMetricIfNotExist(getGoodDataClient(), METRIC_NUMBER_OF_PERSONS,
+                format("SELECT COUNT([%s], [%s])",
+                        getAttributeByTitle(ATTR_PERSON).getUri(),
+                        getAttributeByTitle(ATTR_INVOICE_ITEM).getUri()), DEFAULT_METRIC_FORMAT);
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
