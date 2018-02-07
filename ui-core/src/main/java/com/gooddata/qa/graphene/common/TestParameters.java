@@ -21,6 +21,7 @@ public class TestParameters {
     private String password;
     private String editorUser;
     private String viewerUser;
+    private String dashboardOnlyUser;
     private String authorizationToken;
     private ProjectDriver projectDriver = ProjectDriver.POSTGRES;
     private DeleteMode deleteMode = DeleteMode.DELETE_NEVER;
@@ -228,5 +229,13 @@ public class TestParameters {
     public boolean isClientDemoEnvironment() {
         return Stream.of("client-demo\\.na\\.intgdc\\.com.*")
                 .anyMatch(this.host::matches);
+    }
+
+    public String getDashboardOnlyUser() {
+        return dashboardOnlyUser;
+    }
+
+    public void setDashboardOnlyUser(String dashboardOnlyUser) {
+        this.dashboardOnlyUser = dashboardOnlyUser;
     }
 }

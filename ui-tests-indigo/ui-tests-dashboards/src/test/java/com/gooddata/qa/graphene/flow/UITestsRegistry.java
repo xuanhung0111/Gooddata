@@ -14,6 +14,7 @@ import com.gooddata.qa.graphene.indigo.dashboards.HeaderTest;
 import com.gooddata.qa.graphene.indigo.dashboards.InsightOnDashboardTest;
 import com.gooddata.qa.graphene.indigo.dashboards.InvalidDateDataSetTest;
 import com.gooddata.qa.graphene.indigo.dashboards.KpiDashboardCreationTest;
+import com.gooddata.qa.graphene.indigo.dashboards.KpiDashboardsParamsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ManipulateWidgetsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.MetricsDropdownTest;
 import com.gooddata.qa.graphene.indigo.dashboards.NonProductionDatasetTest;
@@ -66,6 +67,7 @@ public class UITestsRegistry {
             DeleteAttributeFilterTest.class,
             KpiPermissionsTest.class,
             KpiDashboardCreationTest.class,
+            KpiDashboardsParamsTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-EditMode.xml",
@@ -118,6 +120,7 @@ public class UITestsRegistry {
             DeleteAttributeFilterTest.class,
             KpiPermissionsTest.class,
             KpiDashboardCreationTest.class,
+            KpiDashboardsParamsTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-EditMode.xml",

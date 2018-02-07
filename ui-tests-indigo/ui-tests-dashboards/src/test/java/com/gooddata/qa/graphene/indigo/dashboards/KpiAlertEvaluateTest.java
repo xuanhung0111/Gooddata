@@ -1,26 +1,5 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAnalyticalDashboards;
-import static java.lang.String.format;
-import static java.util.Collections.singletonList;
-import static org.testng.Assert.assertTrue;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.function.Supplier;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.http.ParseException;
-import org.json.JSONException;
-import org.jsoup.nodes.Document;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
 import com.gooddata.md.Metric;
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.entity.model.LdmModel;
@@ -31,6 +10,26 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
+import org.apache.http.ParseException;
+import org.json.JSONException;
+import org.jsoup.nodes.Document;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAnalyticalDashboards;
+import static java.lang.String.format;
+import static java.util.Collections.singletonList;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Need to run on empty project because neither csv upload (upload.html) nor
@@ -115,6 +114,39 @@ public class KpiAlertEvaluateTest extends AbstractDashboardTest {
             takeScreenshot(browser, "Kpi-" + metric.getTitle() + "-alert-triggered", getClass());
             assertTrue(kpi.isAlertTriggered(), "Kpi " + metric.getTitle() + " alert is not triggered");
 
+        } finally {
+            getMdService().removeObjByUri(getAnalyticalDashboards(restApiClient, testParams.getProjectId()).get(0));
+        }
+    }
+
+
+    @DataProvider(name = "viewPermissionProviderNonEmbeddedModeWithHidingParams")
+    public Object[][] getViewPermissionProviderNonEmbeddedModeWithHidingParams() {
+        return new Object[][]{
+                {"showNavigation=false"},
+                {"showNavigation=null"},
+                {"showNavigation=0"},
+        };
+    }
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "viewPermissionProviderNonEmbeddedModeWithHidingParams",
+            groups = "desktop")
+    public void testShowingNavigationParamInAlertEmail(String params) throws JSONException, IOException {
+        try {
+            setupData(CSV_PATH, UPLOADINFO_PATH);
+
+            Metric metric = createMetric("Metric-" + generateHashString(),
+                    format("select sum([%s])", factUri), "#,##0.00");
+            String kpiUri = createKpiUsingRest(createDefaultKpiConfigure(metric, dateDatasetUri));
+            createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(kpiUri));
+
+            initIndigoDashboardsPageWithWidgets(params);
+            setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, "2");
+            setupData(CSV_INCREASED_PATH, UPLOADINFO_INCREASED_PATH);
+
+            Document email = getLastAlertEmailContent(GDEmails.NOREPLY, metric.getTitle());
+            openDashboardFromLink(getDashboardLinkFromEmail(email));
+            assertFalse(browser.getCurrentUrl().contains(params),
+                    "Dashboard clicked from alert email should not contain showNavigation param");
         } finally {
             getMdService().removeObjByUri(getAnalyticalDashboards(restApiClient, testParams.getProjectId()).get(0));
         }

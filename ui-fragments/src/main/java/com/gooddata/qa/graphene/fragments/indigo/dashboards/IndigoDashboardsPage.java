@@ -135,6 +135,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return isElementPresent(className(SPLASH_SCREEN_CLASS_NAME), browser);
     }
 
+    public boolean isNavigationBarPresent() {
+        return isElementPresent(className("navigation"), browser);
+    }
+
     public boolean isNavigationBarVisible() {
         return isElementVisible(navigationBar);
     }
