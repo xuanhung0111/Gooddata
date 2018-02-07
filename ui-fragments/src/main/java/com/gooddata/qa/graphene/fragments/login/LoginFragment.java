@@ -5,9 +5,11 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.openqa.selenium.By.cssSelector;
 
+import com.google.common.base.Predicate;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -90,9 +92,12 @@ public class LoginFragment extends AbstractFragment {
         return LostPasswordPage.getInstance(browser);
     }
 
-    public RegistrationPage openRegistrationPage() {
+    public void startAFreeTrial() {
         waitForElementVisible(registrationLink).click();
-        return RegistrationPage.getInstance(browser);
+       Predicate<WebDriver> requestADemoPageDisplayed = browser ->
+               browser.getCurrentUrl().equals("https://www.gooddata.com/request-a-demo");
+        Graphene.waitGui().until(requestADemoPageDisplayed);
+        return;
     }
 
     public LoginFragment waitForNotificationMessageDisplayed() {
