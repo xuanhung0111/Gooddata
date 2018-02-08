@@ -57,8 +57,20 @@ public class MobileDropdownNavigationTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void addUsersToNewProject() throws IOException {
-        newProjectId = createProjectUsingFixture(projectTitle, GOODSALES);
-        UserManagementRestUtils.addUserToProject(getRestApiClient(), newProjectId, dynamicUser, UserRoles.EDITOR);
+        try {
+            //create a new project using domain user.
+            goodDataClient = getGoodDataClient(
+                    testParams.getDomainUser() == null ? testParams.getUser() : testParams.getDomainUser(),
+                    testParams.getPassword());
+            restApiClient = getDomainUserRestApiClient();
+            newProjectId = createProjectUsingFixture(projectTitle, GOODSALES);
+        } finally {
+            goodDataClient = getGoodDataClient(testParams.getUser(), testParams.getPassword());
+            restApiClient = getRestApiClient(testParams.getUser(), testParams.getPassword());
+        }
+
+        UserManagementRestUtils.addUserToProject(getDomainUserRestApiClient(), newProjectId, testParams.getUser(), UserRoles.ADMIN);
+        UserManagementRestUtils.addUserToProject(getDomainUserRestApiClient(), newProjectId, dynamicUser, UserRoles.EDITOR);
         testParams.setProjectId(newProjectId);
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
                 singletonList(createNumOfActivitiesKpi()), TARGET_DASHBOARD);
