@@ -272,6 +272,9 @@ public class AbstractGreyPageTest extends AbstractTest {
             case VIEWER:
                 testParams.setViewerUser(dynamicUser);
                 return dynamicUser;
+            case DASHBOARD_ONLY:
+                testParams.setDashboardOnlyUser(dynamicUser);
+                return dynamicUser;
             default:
                 return dynamicUser;
         }

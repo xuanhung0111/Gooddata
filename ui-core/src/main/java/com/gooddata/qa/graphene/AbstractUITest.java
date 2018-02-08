@@ -113,6 +113,10 @@ public class AbstractUITest extends AbstractGreyPageTest {
                 user = testParams.getViewerUser();
                 password = testParams.getPassword();
                 break;
+            case DASHBOARD_ONLY:
+                user = testParams.getDashboardOnlyUser();
+                password = testParams.getPassword();
+                break;
             default:
                 throw new IllegalArgumentException("Unknow user role " + userRole);
         }
@@ -554,6 +558,30 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForElementVisible(By.cssSelector("input[value='Go']"), browser).click();
     }
 
+    protected IndigoDashboardsPage initIndigoDashboardsPage(String params) {
+        openIndigoDashboardWithCustomSetting(params);
+        return IndigoDashboardsPage.getInstance(browser);
+    }
+
+    protected IndigoDashboardsPage initIndigoDashboardsPageWithWidgets(String params) {
+        openIndigoDashboardWithCustomSetting(params);
+
+        return IndigoDashboardsPage.getInstance(browser)
+                .waitForDashboardLoad()
+                .waitForWidgetsLoading();
+    }
+
+    protected IndigoDashboardsPage initEmbeddedIndigoDashboardPageByType(EmbeddedType type, String params) {
+        if (type == EmbeddedType.IFRAME) {
+            tryToInitEmbeddedIndigoDashboardPage(params);
+            browser.switchTo().frame(waitForElementVisible(BY_IFRAME, browser));
+            return IndigoDashboardsPage.getInstance(browser);
+        }
+
+        openUrl(getEmbeddedIndigoDashboardPageUri() + "?" + params);
+        return IndigoDashboardsPage.getInstance(browser);
+    }
+
     protected void waitForOpeningIndigoDashboard() {
         final By loadingLabel = className("gd-loading-equalizer");
         try {
@@ -564,6 +592,19 @@ public class AbstractUITest extends AbstractGreyPageTest {
         }
 
         waitForElementNotPresent(loadingLabel);
+    }
+
+    private void tryToInitEmbeddedIndigoDashboardPage(String params) {
+        browser.get(EMBEDDED_IFRAME_WRAPPER_URL);
+
+        waitForElementVisible(By.id("url"), browser)
+                .sendKeys(getRootUrl() + getEmbeddedIndigoDashboardPageUri() + "?" + params);
+        waitForElementVisible(By.cssSelector("input[value='Go']"), browser).click();
+    }
+
+    private void openIndigoDashboardWithCustomSetting(String params) {
+        openUrl(getIndigoDashboardsPageUri() + "?" + params);
+        waitForOpeningIndigoDashboard();
     }
 
     private IndigoDashboardsPage initEmbeddedIndigoDashboardPageByUrl() {
