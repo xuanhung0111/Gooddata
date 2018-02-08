@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Objects.isNull;
@@ -197,6 +198,9 @@ public class DrillingConfigPanel extends AbstractFragment {
         @FindBy(className = "addMoreDetail")
         private WebElement addNewInnerDrill;
 
+        @FindBy(className = "spinnerDrilling")
+        private WebElement drillingSpinner;
+
         private ItemPanel selectLeftItem(List<String> names) {
             openLeftPopup().searchAndSelectItems(names).submitPanel();
 
@@ -211,6 +215,7 @@ public class DrillingConfigPanel extends AbstractFragment {
             }
 
             panel.searchAndSelectItem(name).submitPanel();
+            waitForElementNotVisible(drillingSpinner);
 
             return this;
         }
