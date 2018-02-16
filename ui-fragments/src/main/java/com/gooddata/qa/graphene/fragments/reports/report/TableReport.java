@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.reports.report;
 
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
 import com.gooddata.qa.graphene.fragments.reports.filter.ContextMenu;
+import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.utils.browser.BrowserUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -241,7 +242,7 @@ public class TableReport extends AbstractDashboardReport {
         if (!isDrillable(element)) {
             throw new RuntimeException("Could not drill on undrillable element");
         }
-        getActions().moveToElement(element.findElement(By.tagName("span")), 5, 5).click().perform();
+        ElementUtils.moveToElementActions(element.findElement(By.tagName("span")), 5, 5).click().perform();
         return this;
     }
 
