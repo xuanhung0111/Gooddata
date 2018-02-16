@@ -52,16 +52,16 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
             .getMetricConfiguration("Sum of " + FACT_AMOUNT)
             .expandConfiguration();
 
-        expectAggregationSelected("SUM", "opportunitysnapshot_amount");
+        expectAggregationSelected("sum", "opportunitysnapshot_amount");
         expectAggregationAxisLabel("Sum of " + FACT_AMOUNT);
 
         configuration.changeAggregation("Average");
-        expectAggregationSelected("AVG", "opportunitysnapshot_amount");
+        expectAggregationSelected("avg", "opportunitysnapshot_amount");
         expectAggregationAxisLabel("Avg " + FACT_AMOUNT);
         expectBucketItemTitle("Avg " + FACT_AMOUNT);
 
         configuration.changeAggregation("Maximum");
-        expectAggregationSelected("MAX", "opportunitysnapshot_amount");
+        expectAggregationSelected("max", "opportunitysnapshot_amount");
         expectAggregationAxisLabel("Max " + FACT_AMOUNT);
         expectBucketItemTitle("Max " + FACT_AMOUNT);
     }
@@ -107,7 +107,7 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
             .getMetricsBucket()
             .getMetricConfiguration("Sum of " + FACT_AMOUNT)
             .expandConfiguration();
-        expectAggregationSelected("SUM", "opportunitysnapshot_amount");
+        expectAggregationSelected("sum", "opportunitysnapshot_amount");
 
         assertFalse(analysisPage.undo()
             .redo()
@@ -117,7 +117,7 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
         analysisPage.getMetricsBucket()
             .getMetricConfiguration("Sum of " + FACT_AMOUNT)
             .expandConfiguration();
-        expectAggregationSelected("SUM", "opportunitysnapshot_amount");
+        expectAggregationSelected("sum", "opportunitysnapshot_amount");
     }
 
     @Test(dependsOnGroups = {"createProject"})

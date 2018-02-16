@@ -9,7 +9,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.addWidgetToAnalyticalDashboard;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createInsight;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidgetWrap;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidget;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAnalyticalDashboards;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAnalyticalDashboardIdentifier;
 import static com.gooddata.qa.utils.mail.ImapUtils.getEmailBody;
@@ -104,11 +104,11 @@ public abstract class AbstractDashboardTest extends GoodSalesAbstractTest {
     protected String createInsightWidget(InsightMDConfiguration insightConfig) {
         String visualizationWidgetWrap;
         try {
-            visualizationWidgetWrap = createVisualizationWidgetWrap(getRestApiClient(), testParams.getProjectId(),
+            visualizationWidgetWrap = createVisualizationWidget(getRestApiClient(), testParams.getProjectId(),
                     createInsight(getRestApiClient(), testParams.getProjectId(), insightConfig),
                     insightConfig.getTitle());
         } catch (JSONException | IOException e){
-            throw new RuntimeException("There is error while creating Visualization Widget Wrap" , e);
+            throw new RuntimeException("There is error while creating Visualization widget" , e);
         }
         return visualizationWidgetWrap;
     }

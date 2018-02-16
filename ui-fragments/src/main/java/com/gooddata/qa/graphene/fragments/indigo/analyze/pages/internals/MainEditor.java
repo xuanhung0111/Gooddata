@@ -30,9 +30,14 @@ public class MainEditor extends AbstractFragment {
     private static final By BY_TABLE_REPORT = By.className("indigo-table-component-content");
     private static final By BY_CHART_REPORT = By.className("adi-report-visualization");
     private static final By BY_REPORT_COMPUTING = By.className("adi-computing");
+    private static final By BY_REPORT_NO_DATA = By.className("s-error-empty-result");
 
     public boolean isEmpty() {
         return isElementPresent(cssSelector(CSS_REPORT_EMPTY), browser);
+    }
+
+    public boolean isNoData() {
+        return isElementPresent(BY_REPORT_NO_DATA, browser);
     }
 
     public TableReport getTableReport() {

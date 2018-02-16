@@ -8,7 +8,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACT
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_LOST_OPPS;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
-import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -80,7 +79,7 @@ public class StackedChartsTest extends AbstractAdE2ETest {
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .changeReportType(ReportType.TABLE);
 
-        assertFalse(isElementPresent(className(StacksBucket.CSS_CLASS), browser));
+        assertFalse(isElementPresent(cssSelector(StacksBucket.CSS_SELECTOR), browser));
 
         analysisPage.changeReportType(ReportType.BAR_CHART);
         assertFalse(analysisPage.getMetricsBucket().isEmpty());

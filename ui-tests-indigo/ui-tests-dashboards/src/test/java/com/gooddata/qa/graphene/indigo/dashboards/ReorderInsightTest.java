@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
+import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidget;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -12,12 +12,12 @@ import java.io.IOException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.entity.visualization.VisualizationMDConfiguration;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Widget.DropZone;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidgetWrap;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createInsight;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidget;
 
 public class ReorderInsightTest extends AbstractDashboardTest {
 
@@ -87,13 +87,9 @@ public class ReorderInsightTest extends AbstractDashboardTest {
     }
 
     private String createBlankInsightWrapUsingRest(final String insightTitle) throws JSONException, IOException {
-        String insightUri = createVisualizationWidget(getRestApiClient(), testParams.getProjectId(),
-                new VisualizationMDConfiguration.Builder()
-                        .title(insightTitle)
-                        .type(ReportType.BAR_CHART.getLabel())
-                        .build());
+        String insightUri = createInsight(getRestApiClient(), testParams.getProjectId(), new InsightMDConfiguration(insightTitle, ReportType.BAR_CHART));
 
-        return createVisualizationWidgetWrap(getRestApiClient(), testParams.getProjectId(), insightUri, insightTitle);
+        return createVisualizationWidget(getRestApiClient(), testParams.getProjectId(), insightUri, insightTitle);
     }
 
     private void checkInsightOrder(final String firstWidget, final String secondWidget, final String thirdWidget,

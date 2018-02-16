@@ -30,6 +30,7 @@ public class MetricBucketTest extends AbstractAdE2ETest {
 
     @Override
     protected void customizeProject() throws Throwable {
+        super.customizeProject();
         getMetricCreator().createNumberOfActivitiesMetric();
         getMetricCreator().createNumberOfLostOppsMetric();
         getMetricCreator().createQuotaMetric();
@@ -42,7 +43,7 @@ public class MetricBucketTest extends AbstractAdE2ETest {
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
 
-        hover(".s-bucket-metrics .inlineBubbleHelp");
+        hover(".s-bucket-measures .inlineBubbleHelp");
         assertTrue(isElementPresent(cssSelector(".s-catalogue-bubble-loaded"), browser));
     }
 
@@ -52,7 +53,7 @@ public class MetricBucketTest extends AbstractAdE2ETest {
             .getMetricsBucket()
             .getMetricConfiguration("Sum of " + FACT_AMOUNT)
             .expandConfiguration();
-        hover(".s-bucket-metrics .inlineBubbleHelp");
+        hover(".s-bucket-measures .inlineBubbleHelp");
         assertTrue(isElementPresent(cssSelector(".s-catalogue-bubble-loaded"), browser));
     }
 
@@ -62,22 +63,22 @@ public class MetricBucketTest extends AbstractAdE2ETest {
             .getMetricsBucket()
             .getMetricConfiguration("Count of " + ATTR_ACTIVITY_TYPE)
             .expandConfiguration();
-        hover(".s-bucket-metrics .inlineBubbleHelp");
+        hover(".s-bucket-measures .inlineBubbleHelp");
         assertTrue(isElementPresent(cssSelector(".s-catalogue-bubble-loaded"), browser));
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_open_and_close_configuration() {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES);
-        assertFalse(isElementPresent(cssSelector(".s-bucket-metrics input[type=checkbox]"), browser));
+        assertFalse(isElementPresent(cssSelector(".s-bucket-measures input[type=checkbox]"), browser));
 
         MetricConfiguration configuration = analysisPage.getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
-        assertTrue(isElementPresent(cssSelector(".s-bucket-metrics input[type=checkbox]"), browser));
+        assertTrue(isElementPresent(cssSelector(".s-bucket-measures input[type=checkbox]"), browser));
 
         configuration.collapseConfiguration();
-        assertFalse(isElementPresent(cssSelector(".s-bucket-metrics input[type=checkbox]"), browser));
+        assertFalse(isElementPresent(cssSelector(".s-bucket-measures input[type=checkbox]"), browser));
     }
 
     @Test(dependsOnGroups = {"createProject"})

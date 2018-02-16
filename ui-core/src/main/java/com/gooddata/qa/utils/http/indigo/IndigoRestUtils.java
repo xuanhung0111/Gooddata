@@ -75,28 +75,6 @@ public class IndigoRestUtils {
     private static final Supplier<String> VISUALIZATION_WIDGET_BODY = () -> {
         try {
             return new JSONObject() {{
-                put("visualization", new JSONObject() {{
-                    put("meta", new JSONObject() {{
-                        put("title", "${title}");
-                    }});
-                    put("content", new JSONObject() {{
-                        put("type", "${type}");
-                        put("buckets", new JSONObject() {{
-                            put("measures", new JSONArray());
-                            put("categories", new JSONArray());
-                            put("filters", new JSONArray());
-                        }});
-                    }});
-                }});
-            }}.toString();
-        } catch (JSONException e) {
-            throw new IllegalStateException("There is an exception during json object initialization! ", e);
-        }
-    };
-
-    private static final Supplier<String> VISUALIZATION_WIDGET_WRAP_BODY = () -> {
-        try {
-            return new JSONObject() {{
                 put("visualizationWidget", new JSONObject() {{
                     put("meta", new JSONObject() {{
                         put("title", "${title}");
@@ -208,26 +186,32 @@ public class IndigoRestUtils {
     }
 
     /**
-     * Create Visualization widget
+     * Get uri of the visualizationClass for given visualization type (GD custom visualizations)
+     * Currently visualizationClass's content.url for gd visualizations is "local:<visualizationType>"
      *
      * @param restApiClient
      * @param projectId
-     * @param vizConfig
-     * @return Visualization uri
+     * @param type visualization type, e.g. table, bar...
+     * @return visualizationClass uri
      * @throws org.json.JSONException
      * @throws java.io.IOException
      */
-    public static String createVisualizationWidget(final RestApiClient restApiClient, final String projectId,
-            final VisualizationMDConfiguration vizConfig) throws JSONException, IOException {
-        String content = VISUALIZATION_WIDGET_BODY.get()
-                .replace("${title}", vizConfig.getTitle())
-                .replace("${type}", vizConfig.getType());
+    public static String getVisualizationClassUri(final RestApiClient restApiClient, final String projectId, final String type) throws JSONException, IOException {
+        final String queryUri = "/gdc/md/" + projectId + "/objects/query?category=visualizationClass&limit=50";
+        final String localType = "local:" + type;
 
-        return getJsonObject(restApiClient,
-                restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId), content))
-                    .getJSONObject("visualization")
-                    .getJSONObject("meta")
-                    .getString("uri");
+        final JSONArray visualizationClasses = getJsonObject(restApiClient, queryUri)
+            .getJSONObject("objects")
+            .getJSONArray("items");
+
+        for (int i = 0, n = visualizationClasses.length(); i < n; i++) {
+            final JSONObject visualizationClass = visualizationClasses.getJSONObject(i);
+            if (visualizationClass.getJSONObject("visualizationClass").getJSONObject("content").getString("url").equals(localType)) {
+                return visualizationClass.getJSONObject("visualizationClass").getJSONObject("meta").getString("uri");
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -243,9 +227,10 @@ public class IndigoRestUtils {
                                        final InsightMDConfiguration insightConfig) {
         String jsonObject;
         try {
+            String visualizationClassUri = getVisualizationClassUri(restApiClient, projectId, insightConfig.getType().getLabel());
             jsonObject = getJsonObject(restApiClient,
                     restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId),
-                            initInsightObject(insightConfig).toString())).getJSONObject("visualization")
+                            initInsightObject(visualizationClassUri, insightConfig).toString())).getJSONObject("visualizationObject")
                     .getJSONObject("meta").getString("uri");
         } catch (ParseException | JSONException | IOException e) {
             throw new RuntimeException("There error while creating Insight", e);
@@ -264,9 +249,9 @@ public class IndigoRestUtils {
      * @throws org.json.JSONException
      * @throws java.io.IOException
      */
-    public static String createVisualizationWidgetWrap(final RestApiClient restApiClient, final String projectId,
+    public static String createVisualizationWidget(final RestApiClient restApiClient, final String projectId,
             final String visualizationUri, final String visualizationTitle) throws JSONException, IOException {
-        String content = VISUALIZATION_WIDGET_WRAP_BODY.get()
+        String content = VISUALIZATION_WIDGET_BODY.get()
                 .replace("${title}", visualizationTitle)
                 .replace("${visualization}", visualizationUri);
 
@@ -350,7 +335,7 @@ public class IndigoRestUtils {
      */
     public static List<String> getAllInsightNames(final RestApiClient restApiClient, final String projectId)
             throws JSONException, IOException {
-        return getMdObjectValues(restApiClient, projectId, "visualizations", jsonObj -> jsonObj.getString("title"));
+        return getMdObjectValues(restApiClient, projectId, "visualizationobjects", jsonObj -> jsonObj.getString("title"));
     }
 
     /**
@@ -365,19 +350,19 @@ public class IndigoRestUtils {
      */
     public static String getInsightUri(final String insight, final RestApiClient restApiClient,
             final String projectId) throws JSONException, IOException {
-        return getMdObjectValue(restApiClient, projectId, "visualizations",
+        return getMdObjectValue(restApiClient, projectId, "visualizationobjects",
                 jsonObj -> insight.equals(jsonObj.getString("title")), jsonObj -> jsonObj.getString("link"));
     }
 
     /**
      * Get all insight uris
-     * 
+     *
      * @param restApiClient
      * @param projectId
      * @return
      */
     public static List<String> getInsightUris(final RestApiClient restApiClient, final String projectId) {
-        return getMdObjectValues(restApiClient, projectId, "visualizations", jsonObj -> jsonObj.getString("link"));
+        return getMdObjectValues(restApiClient, projectId, "visualizationobjects", jsonObj -> jsonObj.getString("link"));
     }
 
     /**
@@ -494,20 +479,33 @@ public class IndigoRestUtils {
                 .getJSONObject("content").getJSONArray("widgets").length();
     }
 
-    private static JSONObject initInsightObject(final InsightMDConfiguration insightConfig) throws JSONException {
+    private static JSONObject initInsightObject(final String visualizationClassUri,
+            final InsightMDConfiguration insightConfig) throws JSONException {
         return new JSONObject() {{
-            put("visualization", new JSONObject() {{
+            put("visualizationObject", new JSONObject() {{
                 put("content", new JSONObject() {{
-                    put("buckets", new JSONObject() {{
-                        put("measures", initMeasureObjects(insightConfig.getMeasureBuckets()));
-                        put("categories", initCategoryObjects(insightConfig.getCategoryBuckets()));
-                        put("filters", new JSONArray());
+                    put("visualizationClass", new JSONObject() {{
+                        put("uri", visualizationClassUri);
                     }});
-                    put("type", insightConfig.getType().getLabel());
+                    put("buckets", initBuckets(insightConfig.getMeasureBuckets(), insightConfig.getCategoryBuckets()));
+                    put("filters", new JSONArray());
                 }});
                 put("meta", new JSONObject() {{
                     put("title", insightConfig.getTitle());
                 }});
+            }});
+        }};
+    }
+
+    private static JSONArray initBuckets(final List<MeasureBucket> measureBuckets, final List<CategoryBucket> categoryBuckets) throws JSONException {
+        return new JSONArray() {{
+            put(new JSONObject() {{
+                put("localIdentifier", "measures");
+                put("items", initMeasureObjects(measureBuckets));
+            }});
+            put(new JSONObject() {{
+                put("localIdentifier", "categories");
+                put("items", initCategoryObjects(categoryBuckets));
             }});
         }};
     }
@@ -518,12 +516,16 @@ public class IndigoRestUtils {
                     for (MeasureBucket bucket : measureBuckets) {
                         put(new JSONObject() {{
                             put("measure", new JSONObject() {{
-                                put("measureFilters", new JSONArray());
-                                put("title", bucket.getTitle());
-                                put("showPoP", bucket.hasShowPoP());
-                                put("showInPercent", bucket.hasShowInPercent());
-                                put("type", bucket.getType());
-                                put("objectUri", bucket.getObjectUri());
+                                put("localIdentifier", bucket.getType());
+                                put("definition", new JSONObject() {{
+                                    put("measureDefinition", new JSONObject() {{
+                                        put("item", new JSONObject() {{
+                                            put("uri", bucket.getObjectUri());
+                                        }});
+                                        put("filters", new JSONArray());
+                                        put("computeRatio", bucket.hasShowInPercent());
+                                    }});
+                                }});
                             }});
                         }});
                     }
@@ -536,11 +538,11 @@ public class IndigoRestUtils {
                 if (!CollectionUtils.isEmpty(categoryBuckets)) {
                     for (CategoryBucket bucket : categoryBuckets) {
                         put(new JSONObject() {{
-                            put("category", new JSONObject() {{
-                                put("attribute", bucket.getAttribute());
-                                put("displayForm", bucket.getDisplayForm());
-                                put("collection", bucket.getCollection());
-                                put("type", bucket.getType());
+                            put("visualizationAttribute", new JSONObject() {{
+                                put("localIdentifier", bucket.getType());
+                                put("displayForm", new JSONObject() {{
+                                    put("uri", bucket.getDisplayForm());
+                                }});
                             }});
                         }});
                     }

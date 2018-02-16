@@ -12,7 +12,7 @@ public class StacksBucket extends AbstractBucket {
 
     private static final String BUCKET_WITH_WARN_MESSAGE = "bucket-with-warn-message";
 
-    public static final String CSS_CLASS = "s-bucket-stacks";
+    public static final String CSS_SELECTOR = ".s-bucket-stack, .s-bucket-segment";
 
     public boolean isDisabled() {
         return getRoot().getAttribute("class").contains(BUCKET_WITH_WARN_MESSAGE);

@@ -52,6 +52,9 @@ public class ComparisonRecommendationTest extends AbstractAdE2ETest {
             waitForElementVisible(RecommendationContainer.LOCATOR, browser))
             .<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).select(ATTR_ACTIVITY_TYPE).apply();
         analysisPage.waitForReportComputing();
+
+        waitForElementVisible(RecommendationContainer.LOCATOR, browser);
+
         assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison"), browser));
         assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
         assertTrue(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));

@@ -4,7 +4,6 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
-import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -19,6 +18,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksB
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import static org.openqa.selenium.By.cssSelector;
 
 public class GoodSalesDropAttributeTest extends AbstractAnalyseTest {
 
@@ -120,7 +120,7 @@ public class GoodSalesDropAttributeTest extends AbstractAnalyseTest {
         assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
 
         analysisPage.changeReportType(ReportType.TABLE);
-        assertFalse(isElementPresent(className(StacksBucket.CSS_CLASS), browser));
+        assertFalse(isElementPresent(cssSelector(StacksBucket.CSS_SELECTOR), browser));
     }
 
     @Test(dependsOnGroups = {"createProject"})

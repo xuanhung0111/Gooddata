@@ -44,13 +44,13 @@ public class AnalysisPage extends AbstractFragment {
     @FindBy(className = "s-visualization-picker")
     private VisualizationReportTypePicker reportTypePicker;
 
-    @FindBy(className = "s-bucket-metrics")
+    @FindBy(className = "s-bucket-measures")
     private MetricsBucket metricsBucket;
 
-    @FindBy(className = "s-bucket-categories")
+    @FindBy(css = ".s-bucket-attribute, .s-bucket-view, .s-bucket-trend")
     private AttributesBucket attributesBucket;
 
-    @FindBy(className = StacksBucket.CSS_CLASS)
+    @FindBy(css = StacksBucket.CSS_SELECTOR)
     private StacksBucket stacksBucket;
 
     @FindBy(className = "s-bucket-filters")
@@ -63,6 +63,8 @@ public class AnalysisPage extends AbstractFragment {
     private static final By SUCCESS_MESSAGE_LOCATOR = cssSelector("gd-message.success");
 
     private static final By ERROR_MESSAGE_LOCATOR = cssSelector("gd-message.error");
+
+    private static final By BY_BUCKET_NOT_EMPTY = className("s-bucket-not-empty");
 
     public static AnalysisPage getInstance(SearchContext context) {
         return Graphene.createPageFragment(AnalysisPage.class,
@@ -353,6 +355,11 @@ public class AnalysisPage extends AbstractFragment {
 
     public AnalysisPage setInsightTitle(final String title) {
         getPageHeader().setInsightTitle(title);
+        return this;
+    }
+
+    public AnalysisPage waitForNonEmptyBuckets() {
+        waitForElementVisible(BY_BUCKET_NOT_EMPTY, browser);
         return this;
     }
 
