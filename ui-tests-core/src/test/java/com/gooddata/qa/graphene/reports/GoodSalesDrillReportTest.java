@@ -142,19 +142,19 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             DashboardDrillDialog drillDialog = drillReportYear2010();
             TableReport tableReport = drillDialog.getReport(TableReport.class);
 
-            drillDialog.changeChartType("Line chart");
+            drillDialog.changeChartType("line");
             tableReport.waitForLoaded();
             checkRedBar(browser);
 
-            drillDialog.changeChartType("Bar chart");
+            drillDialog.changeChartType("bar");
             tableReport.waitForLoaded();
             checkRedBar(browser);
 
-            drillDialog.changeChartType("Pie chart");
+            drillDialog.changeChartType("pie");
             tableReport.waitForLoaded();
             checkRedBar(browser);
 
-            drillDialog.changeChartType("Table");
+            drillDialog.changeChartType("grid");
             tableReport.waitForLoaded();
             checkRedBar(browser);
             AssertUtils.assertIgnoreCase(tableReport.getAttributeHeaders(), Arrays.asList("Quarter/Year (Snapshot)", "Stage Name"));
