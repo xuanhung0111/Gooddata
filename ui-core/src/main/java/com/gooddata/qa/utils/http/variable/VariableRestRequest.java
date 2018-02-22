@@ -47,7 +47,6 @@ public class VariableRestRequest extends CommonRestRequest {
      * @return variable uri
      */
     public String createFilterVariable(String name, String attributeUri, String expression) {
-
         return createVariable(name, Prompt.PromptType.FILTER, attributeUri, expression);
     }
 
