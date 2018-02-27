@@ -133,7 +133,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     public void selectLoginLink() {
         initRegistrationPage()
             .selectLoginLink()
-            .startAFreeTrial();
+            .registerNewAccount();
     }
 
     @Test

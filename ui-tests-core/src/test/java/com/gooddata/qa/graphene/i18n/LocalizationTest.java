@@ -44,7 +44,7 @@ public class LocalizationTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"entry-point"})
     public void verifyRegistrationPage() {
-        LoginFragment.getInstance(browser).startAFreeTrial();
+        LoginFragment.getInstance(browser).registerNewAccount();
         checkLocalization(browser);
     }
 
