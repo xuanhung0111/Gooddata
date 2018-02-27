@@ -92,12 +92,18 @@ public class LoginFragment extends AbstractFragment {
         return LostPasswordPage.getInstance(browser);
     }
 
-    public void startAFreeTrial() {
-        waitForElementVisible(registrationLink).click();
-       Predicate<WebDriver> requestADemoPageDisplayed = browser ->
-               browser.getCurrentUrl().equals("https://www.gooddata.com/request-a-demo");
-        Graphene.waitGui().until(requestADemoPageDisplayed);
-        return;
+    public void registerNewAccount() {
+        // Use href to detect the environment instead of text which may be depend on user locale
+        String href = waitForElementVisible(registrationLink).getAttribute("href");
+        registrationLink.click();
+
+        if (href.endsWith("request-a-demo")) {
+            Predicate<WebDriver> requestADemoPageDisplayed = browser ->
+                    browser.getCurrentUrl().equals("https://www.gooddata.com/request-a-demo");
+            Graphene.waitGui().until(requestADemoPageDisplayed);
+        } else {
+            RegistrationPage.getInstance(browser);
+        }
     }
 
     public LoginFragment waitForNotificationMessageDisplayed() {
