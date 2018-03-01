@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
@@ -8,6 +9,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForEmailSchedulePageL
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.lang.String.format;
+import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -107,7 +109,7 @@ public class EmailSchedulePage extends AbstractFragment {
     @FindBy(css = ".dashboards .picker .selected label")
     private List<WebElement> attachedDashboards;
 
-    @FindBy(css = ".emailScheduleForm-atom")
+    @FindBy(css = ".emailScheduleForm-atom-email")
     private List<WebElement> emailScheduleItems;
 
     @FindBy(css = ".pickers > :not([style*='display: none']) input.gdc-input")
@@ -118,6 +120,9 @@ public class EmailSchedulePage extends AbstractFragment {
 
     @FindBy(css = ".pickers > :not([style*='display: none']) .dashboardsPicker input.gdc-input")
     private WebElement searchDashboardInput;
+
+    @FindBy(css = ".c-validationErrorMessages")
+    private WebElement validationErrorMessages;
 
     public static final EmailSchedulePage getInstance(SearchContext context) {
         return Graphene.createPageFragment(EmailSchedulePage.class, waitForElementVisible(id("p-emailSchedulePage"), context));
@@ -135,6 +140,10 @@ public class EmailSchedulePage extends AbstractFragment {
 
     public String getMessageFromInput() {
         return waitForElementVisible(emailMessageInput).getAttribute("value");
+    }
+
+    public String getValidationErrorMessages() {
+        return validationErrorMessages.getText();
     }
 
     public EmailSchedulePage openNewSchedule() {
@@ -227,17 +236,30 @@ public class EmailSchedulePage extends AbstractFragment {
     public EmailSchedulePage saveSchedule() {
         Graphene.guardAjax(waitForElementVisible(saveButton)).click();
         waitForElementNotVisible(scheduleDetail);
-        waitForElementVisible(globalSchedulesTable);
+        waitForScheduleTablesLoaded();
         return this;
     }
 
-    public void fillToField(String emailTo) {
-        searchEmail(emailTo);
-        selectEmail(emailTo);
+    public EmailSchedulePage waitForScheduleTablesLoaded() {
+        waitForElementPresent(By.cssSelector(".privateSchedulesLoader.hidden"), this.getRoot());
+        waitForElementPresent(By.cssSelector(".globalSchedulesLoader.hidden"), this.getRoot());
+        return this;
+    }
+
+    public EmailSchedulePage trySaveSchedule() {
+        Graphene.guardAjax(waitForElementVisible(saveButton)).click();
+        return this;
+    }
+
+    private void fillToField(List<String> emailsTo) {
+        waitForElementVisible(emailToInput).clear();
+        emailsTo.forEach(email -> {
+            searchEmail(email);
+            selectEmail(email);
+        });
     }
 
     private void searchEmail(String emailTo) {
-        waitForElementVisible(emailToInput).clear();
         emailToInput.sendKeys(emailTo);
         // there can be async call on the background after you search which fills the autocompletion.
         sleepTightInSeconds(2);
@@ -248,33 +270,33 @@ public class EmailSchedulePage extends AbstractFragment {
         acItem.click();
     }
 
-    public EmailSchedulePage scheduleNewDashboardEmail(String emailTo, String emailSubject, String emailBody,
-            String dashboardName) {
-        openNewSchedule();
-        fillToField(emailTo);
-        emailSubjectInput.sendKeys(emailSubject);
-        emailMessageInput.sendKeys(emailBody);
+    public EmailSchedulePage scheduleNewDashboardEmail(List<String> emailsTo, String emailSubject, String emailBody,
+            List<String> dashboardNames) {
+        openNewSchedule()
+            .changeEmailTo(emailsTo)
+            .changeSubject(emailSubject)
+            .changeMessage(emailBody);
         waitForElementVisible(dashboardsSelector);
         waitForEmailSchedulePageLoaded(browser);
         assertTrue(dashboardsSelector.getAttribute("class").contains("yui3-c-radiowidgetitem-selected"),
                 "Dashboards selector is not selected by default");
-        selectDashboard(dashboardName);
+        selectDashboards(dashboardNames);
         // TODO - schedule (will be sent in the nearest time slot now)
         saveSchedule();
         return this;
     }
 
-    public void scheduleNewReportEmail(String emailTo, String emailSubject, String emailBody, String reportName,
+    public void scheduleNewReportEmail(List<String> emailsTo, String emailSubject, String emailBody, String reportName,
             ExportFormat format) {
-        scheduleNewReportEmail(emailTo, emailSubject, emailBody, reportName, format, null);
+        scheduleNewReportEmail(emailsTo, emailSubject, emailBody, reportName, format, null);
     }
 
-    public void scheduleNewReportEmail(String emailTo, String emailSubject, String emailBody, String reportName,
+    public void scheduleNewReportEmail(List<String> emailsTo, String emailSubject, String emailBody, String reportName,
             ExportFormat format, RepeatTime repeatTime) {
-        openNewSchedule();
-        fillToField(emailTo);
-        emailSubjectInput.sendKeys(emailSubject);
-        emailMessageInput.sendKeys(emailBody);
+        openNewSchedule()
+            .changeEmailTo(emailsTo)
+            .changeSubject(emailSubject)
+            .changeMessage(emailBody);
         waitForElementVisible(reportsSelector).click();
         waitForEmailSchedulePageLoaded(browser);
         assertTrue(reportsSelector.getAttribute("class").contains("yui3-c-radiowidgetitem-selected"),
@@ -286,6 +308,27 @@ public class EmailSchedulePage extends AbstractFragment {
         }
         // TODO - schedule (will be sent in the nearest time slot now)
         saveSchedule();
+    }
+
+    public EmailSchedulePage changeEmailTo(String scheduleName, List<String> emailsTo) {
+        if (!isElementPresent(className("emailScheduleForm"), getRoot()))
+            openSchedule(scheduleName);
+        changeEmailTo(emailsTo).saveSchedule();
+        return this;
+    }
+
+    public EmailSchedulePage changeDashboards(String scheduleName, List<String> dashboardNames) {
+        if (!isElementPresent(className("emailScheduleForm"), getRoot()))
+            openSchedule(scheduleName);
+        selectDashboards(dashboardNames).saveSchedule();
+        return this;
+    }
+
+    public EmailSchedulePage changeMessage(String scheduleName, String message) {
+        if (!isElementPresent(className("emailScheduleForm"), getRoot()))
+            openSchedule(scheduleName);
+        changeMessage(message).saveSchedule();
+        return this;
     }
 
     public String getScheduleMailUriByName(String scheduleName) {
@@ -399,6 +442,21 @@ public class EmailSchedulePage extends AbstractFragment {
         return selectedFormats;
     }
 
+    private EmailSchedulePage changeEmailTo(List<String> emailsTo) {
+        fillToField(emailsTo);
+        return this;
+    }
+
+    private EmailSchedulePage changeMessage(String message) {
+        waitForElementVisible(emailMessageInput).sendKeys(message);
+        return this;
+    }
+
+    private EmailSchedulePage changeSubject(String subject) {
+        waitForElementVisible(emailSubjectInput).sendKeys(subject);
+        return this;
+    }
+
     private void selectCheckbox(WebElement checkbox) {
         if (checkbox.isSelected()) {
             return;
@@ -420,20 +478,25 @@ public class EmailSchedulePage extends AbstractFragment {
         sleepTightInSeconds(2);
     }
 
-    private void selectDashboard(String dashboardName) {
-        searchDashboardItem(dashboardName);
-        waitForCollectionIsNotEmpty(dashboardsList);
-        if (dashboardsList != null && dashboardsList.size() > 0) {
-            for (WebElement elem : dashboardsList) {
-                if (elem.findElement(By.tagName("label")).getText().equals(dashboardName)) {
-                    elem.findElement(By.tagName("input")).click();
-                    return;
+    private EmailSchedulePage selectDashboards(List<String> dashboardNames) {
+        dashboardNames.stream().forEach(dashboardName -> {
+            searchDashboardItem(dashboardName);
+            waitForCollectionIsNotEmpty(dashboardsList);
+            if (dashboardsList != null && dashboardsList.size() > 0) {
+                for (WebElement elem : dashboardsList) {
+                    if (elem.findElement(By.tagName("label")).getText().equals(dashboardName)) {
+                        if (elem.findElement(By.tagName("input")).isSelected())
+                            return;
+                        elem.findElement(By.tagName("input")).click();
+                        return;
+                    }
                 }
+                fail("Requested dashboard wasn't found");
+            } else {
+                fail("No dashboards are available");
             }
-            fail("Requested dashboard wasn't found");
-        } else {
-            fail("No dashboards are available");
-        }
+        });
+        return this;
     }
 
     private void selectReport(String reportName) {

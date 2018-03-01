@@ -23,6 +23,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.addMufToUser;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createSimpleMufObjByUri;
+import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.updateEmailOfAccount;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
@@ -49,9 +50,11 @@ import javax.mail.Part;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
+import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.java.Builder;
+import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
@@ -92,6 +95,8 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     private String tooLargeReportTitle = REPORT_TOO_LARGE;
 
     private static final String DASHBOARD_HAVING_TAB = "Dashboard having tab";
+    private static final String OTHER_DASHBOARD_HAVING_TAB = "Other dashboard having tab";
+    private static final String EDITOR_EMAIL = "editoremail@gooddata.com";
 
     private Map<String, List<Message>> messages;
     private Map<String, MessageContent> attachments = new HashMap<String, MessageContent>();
@@ -99,6 +104,8 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     @Override
     protected void addUsersWithOtherRolesToProject() throws IOException, JSONException {
         addUserToProject(imapUser, UserRoles.ADMIN);
+        String editor = createAndAddUserToProject(UserRoles.EDITOR);
+        updateEmailOfAccount(getRestApiClient(), testParams.getUserDomain(), editor, EDITOR_EMAIL);
     }
 
     @BeforeClass(alwaysRun = true)
@@ -126,12 +133,8 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         getReportCreator().createTooLargeReport();
         getReportCreator().createActivitiesByTypeReport();
 
-        Dashboard dashboard = Builder.of(Dashboard::new).with(dash -> {
-            dash.setName(DASHBOARD_HAVING_TAB);
-            dash.addTab(Builder.of(Tab::new).with(tab -> tab.setTitle("Tab")).build());
-        }).build();
-
-        DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(), dashboard.getMdObject());
+        createSimpleDashboard(DASHBOARD_HAVING_TAB);
+        createSimpleDashboard(OTHER_DASHBOARD_HAVING_TAB);
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
@@ -140,12 +143,75 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         signInAtGreyPages(imapUser, imapPassword);
     }
 
+    /**
+     * Automate testscase for Jira ticket CL-12102
+     * testcase is "disable a user which is the only one used in schedule email, then try to save the schedule email
+     * with empty Emails To field, and make sure schedule email to save success after add a new email".
+     * @throws JSONException
+     * @throws ParseException
+     * @throws IOException
+     */
+    @Test(dependsOnMethods = {"signInImapUser"}, groups = {"schedules"})
+    public void verifyEmailToWhenOnlyUserIsDisabled() throws JSONException, ParseException, IOException {
+        //automate testscase for Jira ticket CL-12102
+        String dashboard = "dashboard " + generateHashString();
+        EmailSchedulePage emailSchedulePage = initEmailSchedulesPage().scheduleNewDashboardEmail(
+                singletonList(testParams.getUser()), dashboard, "Scheduled email test - dashboard.",
+                singletonList(DASHBOARD_HAVING_TAB));
+        UserManagementRestUtils.updateUserStatusInProject(getDomainUserRestApiClient(), testParams.getProjectId(),
+                testParams.getUser(), UserManagementRestUtils.UserStatus.DISABLED);
+        try {
+            assertFalse(emailSchedulePage.openSchedule(dashboard).getEmailToListItem().contains(testParams.getUser()));
+
+            emailSchedulePage.trySaveSchedule();
+            assertEquals(emailSchedulePage.getValidationErrorMessages(), "Should not be empty");
+
+            emailSchedulePage.changeEmailTo(dashboard, singletonList(imapUser));
+            UserManagementRestUtils.updateUserStatusInProject(getDomainUserRestApiClient(), testParams.getProjectId(),
+                    testParams.getUser(), UserManagementRestUtils.UserStatus.ENABLED);
+            assertEquals(emailSchedulePage.openSchedule(dashboard).getEmailToListItem(), asList(imapUser, testParams.getUser()));
+        } finally {
+            waitForFragmentVisible(initEmailSchedulesPage()).deleteSchedule(dashboard);
+            UserManagementRestUtils.updateUserStatusInProject(getDomainUserRestApiClient(), testParams.getProjectId(),
+                    testParams.getUser(), UserManagementRestUtils.UserStatus.ENABLED);
+        }
+    }
+
+    /**
+     * Automate testscase for Jira ticket CL-12102
+     * testcase is "disable a user which is one of used users in schedule email, then change dashboard and save schedule".
+     * @throws JSONException
+     * @throws ParseException
+     * @throws IOException
+     */
+    @Test(dependsOnMethods = {"signInImapUser"}, groups = {"schedules"})
+    public void verifyEmailToWhenOneOfUsersIsDisabled() throws JSONException, ParseException, IOException {
+        String dashboard = "dashboard " + generateHashString();
+        EmailSchedulePage emailSchedulePage = initEmailSchedulesPage();
+        emailSchedulePage.scheduleNewDashboardEmail(asList(imapUser, testParams.getUser()), dashboard,
+                "Scheduled email test - dashboard.", singletonList(DASHBOARD_HAVING_TAB));
+        UserManagementRestUtils.updateUserStatusInProject(getDomainUserRestApiClient(), testParams.getProjectId(),
+                testParams.getUser(), UserManagementRestUtils.UserStatus.DISABLED);
+        try {
+            assertFalse(emailSchedulePage.openSchedule(dashboard).getEmailToListItem().contains(testParams.getUser()));
+            emailSchedulePage.changeDashboards(dashboard, asList(DASHBOARD_HAVING_TAB, OTHER_DASHBOARD_HAVING_TAB));
+            UserManagementRestUtils.updateUserStatusInProject(getDomainUserRestApiClient(), testParams.getProjectId(),
+                    testParams.getUser(), UserManagementRestUtils.UserStatus.ENABLED);
+            assertEquals(emailSchedulePage.openSchedule(dashboard).getEmailToListItem(),
+                    asList(imapUser, testParams.getUser()));
+        } finally {
+            waitForFragmentVisible(initEmailSchedulesPage()).deleteSchedule(dashboard);
+            UserManagementRestUtils.updateUserStatusInProject(getDomainUserRestApiClient(), testParams.getProjectId(),
+                    testParams.getUser(), UserManagementRestUtils.UserStatus.ENABLED);
+        }
+    }
+
     @Test(dependsOnGroups = {"precondition"}, groups = {"schedules"})
     public void createEmptyDashboardSchedule() {
         initDashboardsPage();
         dashboardsPage.addNewDashboard("Empty dashboard");
-        initEmailSchedulesPage().scheduleNewDashboardEmail(imapUser, emptyDashboardTitle,
-                "Scheduled email test - empty dashboard.", "First Tab");
+        initEmailSchedulesPage().scheduleNewDashboardEmail(singletonList(imapUser), emptyDashboardTitle,
+                "Scheduled email test - empty dashboard.", singletonList("First Tab"));
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-empty-dashboard", this.getClass());
     }
@@ -158,8 +224,8 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     @Test(dependsOnGroups = {"precondition"}, groups = {"schedules"})
     public void deleteDashboardUsedInSchedule() {
         String dashboardTitle = "Schedule dashboard";
-        initEmailSchedulesPage().scheduleNewDashboardEmail(imapUser, dashboardTitle,
-                "Scheduled email test - dashboard.", DASHBOARD_HAVING_TAB);
+        initEmailSchedulesPage().scheduleNewDashboardEmail(singletonList(imapUser), dashboardTitle,
+                "Scheduled email test - dashboard.", singletonList(DASHBOARD_HAVING_TAB));
 
         try {
             initDashboardsPage();
@@ -193,7 +259,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"schedules"})
     public void scheduleEmptyReport() {
-        initEmailSchedulesPage().scheduleNewReportEmail(imapUser, noDataReportTitle,
+        initEmailSchedulesPage().scheduleNewReportEmail(singletonList(imapUser), noDataReportTitle,
                 "Scheduled email test - no data report.", REPORT_NO_DATA, ExportFormat.ALL);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-no-data-report", this.getClass());
@@ -201,7 +267,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"schedules"})
     public void scheduleIncomputableReport() {
-        initEmailSchedulesPage().scheduleNewReportEmail(imapUser, incomputableReportTitle,
+        initEmailSchedulesPage().scheduleNewReportEmail(singletonList(imapUser), incomputableReportTitle,
                 "Scheduled email test - incomputable report.", REPORT_INCOMPUTABLE, ExportFormat.PDF);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-incomputable-report", this.getClass());
@@ -209,7 +275,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"schedules"})
     public void scheduleTooLargeReport() {
-        initEmailSchedulesPage().scheduleNewReportEmail(imapUser, tooLargeReportTitle,
+        initEmailSchedulesPage().scheduleNewReportEmail(singletonList(imapUser), tooLargeReportTitle,
                 "Scheduled email test - too large report.", REPORT_TOO_LARGE, ExportFormat.PDF);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-too-large-report", this.getClass());
@@ -227,8 +293,8 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         reportPage.addFilter(FilterItem.Factory.createPromptFilter("FVariable", "Email"));
         reportPage.saveReport();
 
-        initEmailSchedulesPage().scheduleNewReportEmail(imapUser, filteredVariableReportTitle,
-                "Scheduled email test - Filtered variable report.","Filtered variable report",
+        initEmailSchedulesPage().scheduleNewReportEmail(singletonList(imapUser), filteredVariableReportTitle,
+                "Scheduled email test - Filtered variable report.", "Filtered variable report",
                 ExportFormat.SCHEDULES_EMAIL_CSV);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-filtered-variable-report", this.getClass());
@@ -250,7 +316,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
-        initEmailSchedulesPage().scheduleNewReportEmail(imapUser, numericVariableReportTitle,
+        initEmailSchedulesPage().scheduleNewReportEmail(singletonList(imapUser), numericVariableReportTitle,
                 "Scheduled email test - Numeric variable report.", report, ExportFormat.SCHEDULES_EMAIL_CSV);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-numeric-variable-report", this.getClass());
@@ -281,7 +347,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
-        initEmailSchedulesPage().scheduleNewReportEmail(imapUser, mufReportTitle,
+        initEmailSchedulesPage().scheduleNewReportEmail(asList(imapUser, testParams.getUser(), EDITOR_EMAIL), mufReportTitle,
                 "Scheduled email test - MUF report.", report, ExportFormat.SCHEDULES_EMAIL_CSV);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-muf-report", this.getClass());
@@ -301,7 +367,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         definition = getMdService().createObj(getProject(), definition);
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
-        initEmailSchedulesPage().scheduleNewReportEmail(imapUser, title,
+        initEmailSchedulesPage().scheduleNewReportEmail(singletonList(imapUser), title,
                 "Scheduled email test - report.", report, ExportFormat.ALL);
 
         try {
@@ -328,7 +394,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     public void editSchedule() {
         String title = "verify-UI-title";
         String updatedTitle = title + "Updated";
-        initEmailSchedulesPage().scheduleNewReportEmail(imapUser, title,
+        initEmailSchedulesPage().scheduleNewReportEmail(singletonList(imapUser), title,
                 "Scheduled email test - report.", REPORT_ACTIVITIES_BY_TYPE, ExportFormat.SCHEDULES_EMAIL_CSV);
 
         try {
@@ -355,7 +421,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     @Test(dependsOnGroups = {"precondition"}, groups = {"verify-UI"})
     public void changeScheduleTime() {
         String title = "verify-UI-title";
-        initEmailSchedulesPage().scheduleNewReportEmail(imapUser, title,
+        initEmailSchedulesPage().scheduleNewReportEmail(singletonList(imapUser), title,
                 "Scheduled email test - report.", REPORT_ACTIVITIES_BY_TYPE, ExportFormat.ALL);
 
         try {
@@ -454,6 +520,23 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
                 attachments.get(mufReportTitle).savedAttachments.get(0).fileName));
         assertTrue(isEqualCollection(reportResult, asList("Explorer", "38596194.86")),
                 "Data in report is not correct!");
+    }
+
+    @Test(dependsOnMethods = {"waitForScheduleMessages"})
+    public void verifyEmailToWhenUserHasDifferentLoginAndEmail() {
+        //To test for issue CL-12072
+        assertEquals(initEmailSchedulesPage().openSchedule(mufReportTitle).getEmailToListItem(),
+                asList(imapUser, testParams.getUser(), EDITOR_EMAIL));
+        Screenshots.takeScreenshot(browser, "verify email", getClass());
+    }
+
+    private void createSimpleDashboard(String title) throws IOException {
+        Dashboard dashboard = Builder.of(Dashboard::new).with(dash -> {
+            dash.setName(title);
+            dash.addTab(Builder.of(Tab::new).with(tab -> tab.setTitle("Tab")).build());
+        }).build();
+
+        DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(), dashboard.getMdObject());
     }
 
     private void updateRecurrencies(Map<String, List<Message>> messages) throws IOException {

@@ -7,6 +7,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_ACTIVITIES_BY_TYPE;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
@@ -74,7 +75,7 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
 
     @Test(dependsOnMethods = {"signInImapUser"}, groups = {"schedules"})
     public void createReportSchedule() {
-        initEmailSchedulesPage().scheduleNewReportEmail(imapUser, reportTitle,
+        initEmailSchedulesPage().scheduleNewReportEmail(singletonList(imapUser), reportTitle,
                 "Unsubscribe bcc test - report.", REPORT_ACTIVITIES_BY_TYPE,
                 ExportFormat.SCHEDULES_EMAIL_CSV, RepeatTime.DAILY);
         checkRedBar(browser);

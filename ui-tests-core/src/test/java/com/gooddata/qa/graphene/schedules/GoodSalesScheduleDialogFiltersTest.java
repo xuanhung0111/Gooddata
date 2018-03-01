@@ -6,6 +6,7 @@ package com.gooddata.qa.graphene.schedules;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkGreenBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.utils.http.scheduleEmail.ScheduleEmailRestUtils.addExecutionContext;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -33,6 +34,8 @@ import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectScheduledEmailF
 import com.gooddata.qa.graphene.fragments.greypages.md.query.scheduledemails.QueryScheduledEmailsFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestUtils;
+
+import java.io.IOException;
 
 public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSchedulesTest {
 
@@ -122,6 +125,23 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
     @Test(dependsOnMethods = {"checkGreyPagesForScheduleExistence"}, groups = {"schedules"})
     public void checkScheduleExecutionContext() throws JSONException {
         assertTrue(scheduleHasValidExecutionContext(customSubject));
+    }
+
+    /**
+     * To test for bug CL-12132
+     * @throws JSONException
+     * @throws IOException
+     */
+    @Test(dependsOnMethods = "createDashboardSchedule", groups = {"schedules"})
+    public void checkPublicScheduleExecutionContext() throws JSONException, IOException {
+        final String PUBLIC_SCHEDULE = "Public schedule";
+        initEmailSchedulesPage().scheduleNewDashboardEmail(singletonList(testParams.getUser()),
+                PUBLIC_SCHEDULE, "Test ExecutionContext", singletonList(DASHBOARD_HAVING_FILTER));
+        addExecutionContext(getRestApiClient(), testParams.getProjectId(), getScheduleId(PUBLIC_SCHEDULE),
+                getExecutionContextId(getScheduleId(customSubject)));
+
+        initEmailSchedulesPage().changeMessage(PUBLIC_SCHEDULE, "check execution context");
+        assertTrue(scheduleHasValidExecutionContext(PUBLIC_SCHEDULE));
     }
 
     private void getMDBaseUri() {

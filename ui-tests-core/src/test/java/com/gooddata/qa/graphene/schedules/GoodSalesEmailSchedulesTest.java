@@ -5,6 +5,7 @@ package com.gooddata.qa.graphene.schedules;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_ACTIVITIES_BY_TYPE;
+import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -84,15 +85,15 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
 
     @Test(dependsOnMethods = {"signInImapUser"}, groups = {"schedules"})
     public void createDashboardSchedule() {
-        initEmailSchedulesPage().scheduleNewDashboardEmail(imapUser, dashboardTitle,
-                "Scheduled email test - dashboard.", DASHBOARD_HAVING_TAB);
+        initEmailSchedulesPage().scheduleNewDashboardEmail(singletonList(imapUser), dashboardTitle,
+                "Scheduled email test - dashboard.", singletonList(DASHBOARD_HAVING_TAB));
         checkRedBar(browser);
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard", this.getClass());
     }
 
     @Test(dependsOnMethods = {"signInImapUser"}, groups = {"schedules"})
     public void createReportSchedule() {
-        initEmailSchedulesPage().scheduleNewReportEmail(imapUser, reportTitle,
+        initEmailSchedulesPage().scheduleNewReportEmail(singletonList(imapUser), reportTitle,
                 "Scheduled email test - report.", REPORT_ACTIVITIES_BY_TYPE, ExportFormat.ALL);
         checkRedBar(browser);
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-report", this.getClass());
