@@ -30,7 +30,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     protected static final int expectedGoodSalesReportsCount = 0;
     protected static final int expectedGoodSalesReportsFoldersCount = 4;
 
-    private static final long expectedLineChartExportPDFSize = 110000L;
+    private static final long expectedLineChartExportPDFSize = 40000L; //quick fix for issue QA-7481
     private static final long expectedAreaChartReportExportPNGSize = 43000L;
     private static final long expectedBarChartReportExportCSVSize = 300L;
     private static final long expectedTabularReportExportPDFSize = 28000L;
