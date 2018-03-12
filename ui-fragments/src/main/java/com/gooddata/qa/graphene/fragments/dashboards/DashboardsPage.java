@@ -369,11 +369,11 @@ public class DashboardsPage extends AbstractFragment {
         Actions actions = new Actions(browser);
 
         try {
-            actions.sendKeys(Keys.chord(Keys.CONTROL, "a")).perform();
-            actions.sendKeys(Keys.chord(Keys.CONTROL, "c")).perform();
+            actions.keyDown(Keys.CONTROL).sendKeys("a").keyUp(Keys.CONTROL).perform();
+            actions.keyDown(Keys.CONTROL).sendKeys("c").keyUp(Keys.CONTROL).perform();
 
             openTab(toTab);
-            actions.sendKeys(Keys.chord(Keys.CONTROL, "v")).perform();
+            actions.keyDown(Keys.CONTROL).sendKeys("v").keyUp(Keys.CONTROL).perform();
 
         } finally {
             actions.release();

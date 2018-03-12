@@ -149,9 +149,9 @@ public class TableReport extends AbstractDashboardReport {
         Function<WebDriver, Boolean> isSelected = browser -> metricValue.getAttribute("class").contains("highlight");
         Graphene.waitGui().until(isSelected);
 
-        getActions().sendKeys(Keys.chord(Keys.CONTROL, "c")).perform();
+        getActions().keyDown(Keys.CONTROL).sendKeys("c").keyUp(Keys.CONTROL).perform();
     }
-
+    
     public TableReport waitForLoaded() {
         WebElement loadingElement = findLoadingElement();
 
