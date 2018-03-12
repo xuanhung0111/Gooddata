@@ -230,7 +230,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         final DataPreviewPage dataPreviewPage = DatasetsListPage.getInstance(browser).uploadFile(PAYROLL_LESS_COLUMNS.getFilePath());
         dataPreviewPage.selectHeader()
             .getRowSelectionTable()
-            .getRow(3)
+            .getCell(3, 0)
             .click();
 
         final DataPreviewTable dataPreviewTable = dataPreviewPage.getDataPreviewTable();
@@ -302,7 +302,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         final DataPreviewPage dataPreviewPage = DatasetsListPage.getInstance(browser).uploadFile(PAYROLL.getFilePath());
         dataPreviewPage.selectHeader()
             .getRowSelectionTable()
-            .getRow(3)
+            .getCell(3, 0)
             .click();
 
         final DataPreviewTable dataPreviewTable = dataPreviewPage.getDataPreviewTable();
@@ -368,7 +368,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         waitForFragmentVisible(dataPreviewPage)
             .selectHeader()
             .getRowSelectionTable()
-            .getRow(0)
+            .getCell(0, 0)
             .click();
 
         final List<String> customHeaderColumns = Lists.newArrayList("Xen", "01/01/2006", "29");
