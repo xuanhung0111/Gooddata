@@ -159,8 +159,13 @@ public class IndigoDashboardsPage extends AbstractFragment {
         waitForElementEnabled(waitForElementVisible(editButton)).click();
 
         waitForElementVisible(cancelButton);
-
-        getInsightSelectionPanel().waitForLoading();
+        if (isElementPresent(className("gd-visualizations-list"), getRoot())) {
+            getInsightSelectionPanel().waitForLoading();
+        } else {
+            // There's an animation switching to edit mode,
+            // so wait until the css transition is finished
+            Sleeper.sleepTight(500);
+        }
 
         // wait until editing is allowed
         return waitForWidgetsEditable();

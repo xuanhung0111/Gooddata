@@ -52,16 +52,9 @@ public class EditModeTest extends AbstractDashboardTest {
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
-        disableAnalyticalDesignerFeatureFlag();
         getMetricCreator().createNumberOfActivitiesMetric();
         getMetricCreator().createAmountMetric();
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
-    }
-
-    private void disableAnalyticalDesignerFeatureFlag() {
-        //This test only works if insight flag is disabled
-        setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.ANALYTICAL_DESIGNER, false);
     }
 
     @Override
@@ -251,10 +244,16 @@ public class EditModeTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkNoVisualizationsList() {
-        initIndigoDashboardsPageWithWidgets()
-                .switchToEditMode();
+        setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.ANALYTICAL_DESIGNER, false);
+        try {
+            initIndigoDashboardsPageWithWidgets().switchToEditMode();
 
-        takeScreenshot(browser, "checkNoVisualizationsList", getClass());
-        assertFalse(IndigoInsightSelectionPanel.isPresent(browser));
+            takeScreenshot(browser, "checkNoVisualizationsList", getClass());
+            assertFalse(IndigoInsightSelectionPanel.isPresent(browser));
+        } finally {
+            setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+                    ProjectFeatureFlags.ANALYTICAL_DESIGNER, true);
+        }
     }
 }
