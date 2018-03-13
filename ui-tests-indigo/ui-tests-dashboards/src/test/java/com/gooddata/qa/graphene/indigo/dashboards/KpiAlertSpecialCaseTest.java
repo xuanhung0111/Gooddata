@@ -19,7 +19,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
-import com.gooddata.qa.utils.http.fact.FactRestUtils;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.fact.FactRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.jsoup.nodes.Document;
@@ -218,10 +219,10 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
 
         String indigoDashboardUri = createAnalyticalDashboard(
                 getRestApiClient(), testParams.getProjectId(), singletonList(kpiUri));
-
+        FactRestRequest request = new FactRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        request.setFactRestricted(numberFactUri);
         try {
-            FactRestUtils.setFactRestricted(getRestApiClient(), getProject(), numberFactUri );
-
             setAlertForKpi(kpiName, TRIGGERED_WHEN_DROPS_BELOW, NUMBER_VALUE);
 
             updateCsvDataset(DATASET_NAME, otherCsvFilePath);
@@ -236,7 +237,7 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
         } finally {
             getMdService().removeObjByUri(indigoDashboardUri);
             updateCsvDataset(DATASET_NAME, csvFilePath);
-            FactRestUtils.unsetFactRestricted(getRestApiClient(), getProject(), numberFactUri );
+            request.unsetFactRestricted(numberFactUri);
         }
     }
 
