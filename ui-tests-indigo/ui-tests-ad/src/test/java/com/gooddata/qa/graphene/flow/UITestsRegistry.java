@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.flow;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.gooddata.qa.graphene.indigo.analyze.AggregationResultTest;
 import com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerSanityTest;
 import com.gooddata.qa.graphene.indigo.analyze.CustomDateDimensionsTest;
 import com.gooddata.qa.graphene.indigo.analyze.EmbeddedAdTest;
@@ -112,6 +113,7 @@ public class UITestsRegistry {
             GoodSalesMetricVisibilityTest.class,
             GoodSalesProjectNavigationTest.class,
             GoodSalesPopComparisonTest.class,
+            AggregationResultTest.class,
             "testng-ad-ChartLabelFormat.xml",
             "testng-ad-MetricNumberFormat.xml"
         });
