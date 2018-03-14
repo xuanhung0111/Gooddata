@@ -207,7 +207,7 @@ public class FilteringWidgetsTest extends AbstractDashboardTest {
         Metric metric = getMdService().getObj(getProject(), Metric.class, title(METRIC_NUMBER_OF_ACTIVITIES));
         String widgetUri = createInsightWidget(new InsightMDConfiguration("Modified-Date-Filter-Insight",
                 ReportType.COLUMN_CHART).setMeasureBucket(
-                        singletonList(MeasureBucket.getSimpleInstance(metric))));
+                        singletonList(MeasureBucket.createSimpleMeasureBucket(metric))));
 
         addWidgetToWorkingDashboard(widgetUri);
 

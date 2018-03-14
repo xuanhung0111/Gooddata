@@ -72,7 +72,7 @@ public class DateDatasetRecommendationTest extends AbstractDashboardTest {
     public void selectMostRelevantDateDimention() throws ParseException, JSONException, IOException {
         createInsight(getRestApiClient(), testParams.getProjectId(),
                 new InsightMDConfiguration(INSIGHT_WITHOUT_DATE_FILTER, ReportType.COLUMN_CHART).setMeasureBucket(
-                        singletonList(MeasureBucket.getSimpleInstance(getMetric(METRIC_NUMBER_OF_ACTIVITIES)))));
+                        singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_NUMBER_OF_ACTIVITIES)))));
 
         initIndigoDashboardsPage().getSplashScreen().startEditingWidgets().addInsight(INSIGHT_WITHOUT_DATE_FILTER)
                 .waitForWidgetsLoading();
@@ -94,7 +94,7 @@ public class DateDatasetRecommendationTest extends AbstractDashboardTest {
 
         createInsight(getRestApiClient(), testParams.getProjectId(),
                 new InsightMDConfiguration(INSIGHT_WITHOUT_DATE_FILTER, ReportType.COLUMN_CHART).setMeasureBucket(
-                        singletonList(MeasureBucket.getSimpleInstance(getMetric(METRIC_OPP_FIRST_SNAPSHOT)))));
+                        singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_OPP_FIRST_SNAPSHOT)))));
 
         initIndigoDashboardsPage().getSplashScreen().startEditingWidgets().addInsight(INSIGHT_WITHOUT_DATE_FILTER)
                 .waitForWidgetsLoading();
@@ -111,7 +111,7 @@ public class DateDatasetRecommendationTest extends AbstractDashboardTest {
 
         createInsight(getRestApiClient(), testParams.getProjectId(),
                 new InsightMDConfiguration(INSIGHT_WITHOUT_DATE_FILTER, ReportType.COLUMN_CHART).setMeasureBucket(
-                        singletonList(MeasureBucket.getSimpleInstance(getMetric(METRIC_OPP_FIRST_SNAPSHOT)))));
+                        singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_OPP_FIRST_SNAPSHOT)))));
 
         List<String> otherDimensions = initIndigoDashboardsPage().getSplashScreen().startEditingWidgets()
                 .addInsight(INSIGHT_WITHOUT_DATE_FILTER).waitForWidgetsLoading().getConfigurationPanel()
@@ -133,7 +133,7 @@ public class DateDatasetRecommendationTest extends AbstractDashboardTest {
 
         createInsight(getRestApiClient(), testParams.getProjectId(),
                 new InsightMDConfiguration(INSIGHT_WITHOUT_DATE_FILTER, ReportType.COLUMN_CHART).setMeasureBucket(
-                        singletonList(MeasureBucket.getSimpleInstance(getMetric(METRIC_OPP_FIRST_SNAPSHOT)))));
+                        singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_OPP_FIRST_SNAPSHOT)))));
 
         initIndigoDashboardsPage().getSplashScreen().startEditingWidgets().addInsight(INSIGHT_WITHOUT_DATE_FILTER)
                 .waitForWidgetsLoading();
@@ -151,7 +151,7 @@ public class DateDatasetRecommendationTest extends AbstractDashboardTest {
     public void testDateDatasetHavingNoGroup() throws ParseException, JSONException, IOException {
         createInsight(getRestApiClient(), testParams.getProjectId(),
                 new InsightMDConfiguration(INSIGHT_WITHOUT_DATE_FILTER, ReportType.COLUMN_CHART).setMeasureBucket(
-                        singletonList(MeasureBucket.getSimpleInstance(getMetric(METRIC_OPP_FIRST_SNAPSHOT)))));
+                        singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_OPP_FIRST_SNAPSHOT)))));
 
         initIndigoDashboardsPage().getSplashScreen().startEditingWidgets().addInsight(INSIGHT_WITHOUT_DATE_FILTER)
                 .waitForWidgetsLoading();

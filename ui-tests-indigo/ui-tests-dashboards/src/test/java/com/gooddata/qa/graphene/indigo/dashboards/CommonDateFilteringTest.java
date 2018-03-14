@@ -52,7 +52,7 @@ public class CommonDateFilteringTest extends AbstractDashboardTest {
         getMetricCreator().createNumberOfActivitiesMetric();
         // create an insight without using date filter
         addWidgetToWorkingDashboard(createInsightWidget(new InsightMDConfiguration(TEST_INSIGHT,
-                ReportType.COLUMN_CHART).setMeasureBucket(singletonList(MeasureBucket.getSimpleInstance(
+                ReportType.COLUMN_CHART).setMeasureBucket(singletonList(MeasureBucket.createSimpleMeasureBucket(
                 getMdService().getObj(getProject(), Metric.class, title(METRIC_NUMBER_OF_ACTIVITIES)))))));
     }
 
@@ -232,7 +232,7 @@ public class CommonDateFilteringTest extends AbstractDashboardTest {
 
         return createInsight(getRestApiClient(), testParams.getProjectId(),
                 new InsightMDConfiguration(UNRELATED_DATE_INSIGHT, ReportType.COLUMN_CHART)
-                        .setMeasureBucket(singletonList(MeasureBucket.getSimpleInstance(nonRelatedMetric))));
+                        .setMeasureBucket(singletonList(MeasureBucket.createSimpleMeasureBucket(nonRelatedMetric))));
     }
 
     private void createInsightUsingDateFilter(String insight) throws ParseException {
