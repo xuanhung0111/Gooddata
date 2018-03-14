@@ -132,9 +132,14 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
         Map when = (Map) content.get("when");
 
         String timeZone = (String) when.get("timeZone");
+        System.out.println(" - timezone of object: " + timeZone);
+        System.out.println(" - current recurrency: " + when.get("recurrency"));
+
         content.remove("lastSuccessfull");
         DateTime dateTime = new DateTime(DateTimeZone.forTimeZone(TimeZone.getTimeZone(timeZone)));
         DateTimeFormatter fmt = DateTimeFormat.forPattern("*Y:M:0:d:H:m:s");
+        System.out.println(" - current time: " + fmt.print(dateTime));
+
         // plusSeconds(1) - to be meta.updated <= recurrency (cannot be older)
         when.put("recurrency", fmt.print(dateTime.plusSeconds(1)));
         System.out.println(" - set recurrency to: " + when.get("recurrency"));
