@@ -15,7 +15,6 @@ import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import com.gooddata.qa.utils.asserts.AssertUtils;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -27,7 +26,7 @@ import org.testng.annotations.Test;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
-
+import java.util.function.Function;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY;
@@ -250,7 +249,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             int windowHandles = browser.getWindowHandles().size();
             tableReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
 
-            Predicate<WebDriver> newTabOpened = browser -> browser.getWindowHandles().size() > windowHandles;
+            Function<WebDriver, Boolean> newTabOpened = browser -> browser.getWindowHandles().size() > windowHandles;
             Graphene.waitGui().until(newTabOpened);
 
             try {
@@ -422,7 +421,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
 
             tableReport.drillOn("Interest", CellType.ATTRIBUTE_VALUE);
 
-            Predicate<WebDriver> waitDrilledDashboardLoaded = browser -> dashboardsPage.getDashboardName()
+            Function<WebDriver, Boolean> waitDrilledDashboardLoaded = browser -> dashboardsPage.getDashboardName()
                     .equals(TARGET_DASHBOAD_NAME);
             Graphene.waitGui().withTimeout(1, TimeUnit.MINUTES).until(waitDrilledDashboardLoaded);
 
@@ -470,7 +469,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
 
             tableReport.drillOn("Risk Assessment", CellType.ATTRIBUTE_VALUE);
 
-            Predicate<WebDriver> waitDrilledDashboardLoaded = browser -> dashboardsPage.getDashboardName()
+            Function<WebDriver, Boolean> waitDrilledDashboardLoaded = browser -> dashboardsPage.getDashboardName()
                     .equals(TARGET_DASHBOAD_NAME);
             Graphene.waitGui().withTimeout(1, TimeUnit.MINUTES).until(waitDrilledDashboardLoaded);
 
@@ -513,7 +512,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
 
             tableReport.drillOn("Interest", CellType.ATTRIBUTE_VALUE);
 
-            Predicate<WebDriver> waitDrilledDashboardLoaded = browser -> dashboardsPage.getDashboardName()
+            Function<WebDriver, Boolean> waitDrilledDashboardLoaded = browser -> dashboardsPage.getDashboardName()
                     .equals(TARGET_DASHBOAD_NAME);
             Graphene.waitGui().withTimeout(1, TimeUnit.MINUTES).until(waitDrilledDashboardLoaded);
 

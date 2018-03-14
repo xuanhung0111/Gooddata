@@ -21,7 +21,6 @@ import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.model.ModelRestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.webdav.WebDavClient;
-import com.google.common.base.Predicate;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
@@ -45,6 +44,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
@@ -302,7 +302,7 @@ public class AbstractGreyPageTest extends AbstractTest {
 
     private void refreshToken() {
         openUrl(PAGE_TOKEN);
-        Predicate<WebDriver> tokenIsRefreshed = browser -> waitForElementPresent(By.tagName("p"), browser)
+        Function<WebDriver, Boolean> tokenIsRefreshed = browser -> waitForElementPresent(By.tagName("p"), browser)
                 .getText()
                 .equals("Your authentication context has been refreshed and stays valid next 10 minutes.");
         Graphene.waitGui()

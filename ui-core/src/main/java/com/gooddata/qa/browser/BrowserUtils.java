@@ -38,7 +38,7 @@ public class BrowserUtils {
     public static String getCurrentBrowserAgent(WebDriver browser) {
         Capabilities capabilities = ((RemoteWebDriver) browser).getCapabilities();
 
-        return capabilities.getBrowserName() + " - " + capabilities.getCapability("platform");
+        return capabilities.getBrowserName() + " " + capabilities.getVersion() + " - " + capabilities.getCapability("platform");
     }
 
     public static boolean canAccessGreyPage(WebDriver browser) {

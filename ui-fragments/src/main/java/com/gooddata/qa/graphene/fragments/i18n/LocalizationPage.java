@@ -4,7 +4,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.tagName;
-
+import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -12,7 +12,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.base.Predicate;
 
 public class LocalizationPage extends AbstractFragment {
 
@@ -30,7 +29,7 @@ public class LocalizationPage extends AbstractFragment {
         button.click();
         waitForElementVisible(disableLocaleButton);
 
-        Predicate<WebDriver> buttonSelected = browser -> button.getAttribute("class").contains("button-positive");
+        Function<WebDriver, Boolean> buttonSelected = browser -> button.getAttribute("class").contains("button-positive");
         Graphene.waitGui().until(buttonSelected);
     }
 }

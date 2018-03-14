@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.manage;
 import com.gooddata.md.Attribute;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.models.GraphModel;
-import com.google.common.base.Predicate;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
@@ -14,7 +13,7 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-
+import java.util.function.Function;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.IMAGES;
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
@@ -62,7 +61,7 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
     private void changeAttributeName(String attributeName, String newName) {
         initAttributePage().renameAttribute(attributeName, newName);
 
-        Predicate<WebDriver> nameChanged = browser ->
+        Function<WebDriver, Boolean> nameChanged = browser ->
                 !getMdService().find(getProject(), Attribute.class, title(newName)).isEmpty();
         Graphene.waitGui().until(nameChanged);
     }

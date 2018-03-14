@@ -9,7 +9,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
-
+import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -18,7 +18,6 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.IpeEditor;
-import com.google.common.base.Predicate;
 
 public abstract class ObjectPropertiesPage extends AbstractFragment {
 
@@ -121,7 +120,7 @@ public abstract class ObjectPropertiesPage extends AbstractFragment {
         waitForElementVisible(addCommentButton).click();
         IpeEditor.getInstance(browser).setText(comment);
 
-        Predicate<WebDriver> commentAdded = browser ->
+        Function<WebDriver, Boolean> commentAdded = browser ->
                 waitForCollectionIsNotEmpty(commentItems).size() > currentComments;
         Graphene.waitGui().until(commentAdded);
 
@@ -152,7 +151,7 @@ public abstract class ObjectPropertiesPage extends AbstractFragment {
         waitForElementVisible(changeFolderButton).click();
         IpeEditor.getInstance(browser).setText(targetFolder);
 
-        Predicate<WebDriver> folderChanged = browser ->
+        Function<WebDriver, Boolean> folderChanged = browser ->
                 targetFolder.equals(browser.findElement(By.cssSelector(".folderText a")).getText());
         Graphene.waitGui().until(folderChanged);
 

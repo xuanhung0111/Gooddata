@@ -2,8 +2,8 @@ package com.gooddata.qa.graphene.fragments.reports.report;
 
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
 import com.gooddata.qa.graphene.fragments.reports.filter.ContextMenu;
+import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.utils.browser.BrowserUtils;
-import com.google.common.base.Predicate;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -145,7 +146,7 @@ public class TableReport extends AbstractDashboardReport {
         WebElement metricValue = getCellElement(value, CellType.METRIC_VALUE);
         metricValue.click();
 
-        Predicate<WebDriver> isSelected = browser -> metricValue.getAttribute("class").contains("highlight");
+        Function<WebDriver, Boolean> isSelected = browser -> metricValue.getAttribute("class").contains("highlight");
         Graphene.waitGui().until(isSelected);
 
         getActions().sendKeys(Keys.chord(Keys.CONTROL, "c")).perform();
@@ -241,7 +242,7 @@ public class TableReport extends AbstractDashboardReport {
         if (!isDrillable(element)) {
             throw new RuntimeException("Could not drill on undrillable element");
         }
-        getActions().moveToElement(element.findElement(By.tagName("span")), 5, 5).click().perform();
+        ElementUtils.moveToElementActions(element.findElement(By.tagName("span")), 5, 5).click().perform();
         return this;
     }
 

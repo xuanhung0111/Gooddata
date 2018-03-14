@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -24,7 +25,6 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.base.Predicate;
 
 public class SelectItemPopupPanel extends AbstractFragment {
 
@@ -106,13 +106,8 @@ public class SelectItemPopupPanel extends AbstractFragment {
                 String.format(BUTTON_GROUP_XPATH_LOCATOR, group)), browser);
         button.click();
 
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-            @Override
-            public boolean apply(WebDriver input) {
-                return button.findElement(BY_PARENT).getAttribute("class")
-                        .contains("yui3-c-label-selected");
-            }
-        });
+        Graphene.waitGui().until(input -> button.findElement(BY_PARENT).getAttribute("class")
+                        .contains("yui3-c-label-selected"));
 
         return this;
     }
@@ -159,7 +154,7 @@ public class SelectItemPopupPanel extends AbstractFragment {
         // In this case, we should wait until the items displayed and less than the full list.
         // There still has a risk in this approach when the list contains only items with the same search pattern.
         // This makes the list after search is same as before (Just a special case and never happen in reality)
-        Predicate<WebDriver> itemFound = browser -> waitForCollectionIsNotEmpty(getItemElements()).size() < currentItems;
+        Function<WebDriver, Boolean> itemFound = browser -> waitForCollectionIsNotEmpty(getItemElements()).size() < currentItems;
         Graphene.waitGui().until(itemFound);
 
         return this;

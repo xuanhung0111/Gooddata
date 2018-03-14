@@ -2,7 +2,7 @@ package com.gooddata.qa.graphene.fragments.dashboards.widget.configuration;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-
+import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -10,7 +10,6 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
-import com.google.common.base.Predicate;
 
 public class MetricConfigPanel extends AbstractFragment {
 
@@ -31,7 +30,7 @@ public class MetricConfigPanel extends AbstractFragment {
 
     public void selectMetric(String metric, String... dateDimension) {
         waitForElementVisible(metricSelect).click();
-        Predicate<WebDriver> popupDisplayed = browser -> browser.findElements(SelectItemPopupPanel.LOCATOR).size() > 1;
+        Function<WebDriver, Boolean> popupDisplayed = browser -> browser.findElements(SelectItemPopupPanel.LOCATOR).size() > 1;
         Graphene.waitGui().until(popupDisplayed);
 
         Graphene.createPageFragment(SelectItemPopupPanel.class,

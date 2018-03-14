@@ -9,7 +9,7 @@ import static org.openqa.selenium.By.cssSelector;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -23,7 +23,6 @@ import com.gooddata.qa.graphene.enums.user.UserStates;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.DropDown;
 import com.gooddata.qa.utils.CssUtils;
-import com.google.common.base.Predicate;
 
 public class UserManagementPage extends AbstractFragment {
 
@@ -113,7 +112,7 @@ public class UserManagementPage extends AbstractFragment {
     public UserManagementPage createNewGroup(String name) {
         int userGroupCount = getUserGroupsCount();
         openGroupDialog(GroupDialog.State.CREATE).submitDialogGroup(name);
-        Predicate<WebDriver> newGroupCreated = browser -> getUserGroupsCount() == userGroupCount + 1;
+        Function<WebDriver, Boolean> newGroupCreated = browser -> getUserGroupsCount() == userGroupCount + 1;
         Graphene.waitGui().until(newGroupCreated);
         waitForUsersContentLoaded();
         return this;
@@ -129,7 +128,7 @@ public class UserManagementPage extends AbstractFragment {
         int userGroupCount = getUserGroupsCount();
         openDeleteGroupDialog().submit();
         waitForElementNotPresent(DeleteGroupDialog.LOCATOR);
-        Predicate<WebDriver> newGroupCreated = browser -> getUserGroupsCount() == userGroupCount - 1;
+        Function<WebDriver, Boolean> newGroupCreated = browser -> getUserGroupsCount() == userGroupCount - 1;
         Graphene.waitGui().until(newGroupCreated);
         waitForUsersContentLoaded();
         return this;
@@ -350,7 +349,7 @@ public class UserManagementPage extends AbstractFragment {
     }
 
     private void waitForProgressMessageDisappear() {
-        Predicate<WebDriver> inProgressFinished = browser -> !(this.getMessageText().contains("changing")
+        Function<WebDriver, Boolean> inProgressFinished = browser -> !(this.getMessageText().contains("changing")
                 || this.getMessageText().contains("are being"));
         Graphene.waitGui(browser).until(inProgressFinished);
     }

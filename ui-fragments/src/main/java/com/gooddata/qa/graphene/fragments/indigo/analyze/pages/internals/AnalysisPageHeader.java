@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.base.Predicate;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -12,7 +11,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.tagName;
-
+import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -63,7 +62,7 @@ public class AnalysisPageHeader extends AbstractFragment {
         waitForElementVisible(exportToReportButton).click();
 
         //make sure the new window is displayed to prevent unexpected errors
-        Predicate<WebDriver> hasNewWindow = browser -> browser.getWindowHandles().size() == numberOfWindows + 1;
+        Function<WebDriver, Boolean> hasNewWindow = browser -> browser.getWindowHandles().size() == numberOfWindows + 1;
         Graphene.waitGui().until(hasNewWindow);
     }
 
@@ -140,7 +139,7 @@ public class AnalysisPageHeader extends AbstractFragment {
         textArea.sendKeys(title, Keys.ENTER); //make sure the title is applied
 
         if (!title.trim().isEmpty()) {
-            Predicate<WebDriver> savedButtonEnabled = driver -> isSaveButtonEnabled();
+            Function<WebDriver, Boolean> savedButtonEnabled = driver -> isSaveButtonEnabled();
             Graphene.waitGui().until(savedButtonEnabled);
         }
 

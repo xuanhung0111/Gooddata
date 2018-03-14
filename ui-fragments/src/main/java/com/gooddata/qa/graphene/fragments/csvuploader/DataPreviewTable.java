@@ -7,7 +7,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 
 import java.util.List;
 import java.util.Objects;
-
+import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -18,7 +18,6 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.fragments.FixedDataTable;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataTypeSelect.ColumnType;
 import com.gooddata.qa.graphene.fragments.csvuploader.DateFormatSelect.DateFormat;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 
 public class DataPreviewTable extends FixedDataTable {
@@ -66,7 +65,7 @@ public class DataPreviewTable extends FixedDataTable {
     public void changeColumnDateFormat(int fieldIndex, DateFormat type) {
         final DateFormatSelect selectedColumnType = columnTypes.get(fieldIndex).getDateFormatSelect();
         selectedColumnType.selectFormat(type);
-        final Predicate<WebDriver> formatIsSelected =
+        final Function<WebDriver, Boolean> formatIsSelected =
                 input -> type.getVisibleText().equals(selectedColumnType.getFormatSelection());
         Graphene.waitGui(browser)
                 .withMessage(
@@ -87,7 +86,7 @@ public class DataPreviewTable extends FixedDataTable {
     public void changeColumnType(int fieldIndex, ColumnType type) {
         final DataTypeSelect selectedColumnType = columnTypes.get(fieldIndex).getDataTypeSelect();
         selectedColumnType.selectByName(type.getVisibleText());
-        final Predicate<WebDriver> typeIsSelected =
+        final Function<WebDriver, Boolean> typeIsSelected =
                 input -> type.getVisibleText().equals(selectedColumnType.getTypeSelection());
         Graphene.waitGui(browser)
                 .withMessage(
@@ -102,9 +101,11 @@ public class DataPreviewTable extends FixedDataTable {
 
     public void changeColumnName(int fieldIndex, String columnName) {
         final WebElement editedColumn = columnNames.get(fieldIndex);
-        // editedColumn.clear() works very unstable with react.js. So use sendKeys to make this action more stable.
-        editedColumn.sendKeys(Keys.chord(Keys.CONTROL, "a") + Keys.DELETE + columnName);
-        final Predicate<WebDriver> columnNameUpdated =
+        // TODO: is this still true? - editedColumn.clear() works very unstable with react.js. So use sendKeys to make this action more stable.
+        //editedColumn.sendKeys(Keys.chord(Keys.CONTROL, "a") + Keys.DELETE + columnName);
+        editedColumn.clear();
+        editedColumn.sendKeys(columnName);
+        final Function<WebDriver, Boolean> columnNameUpdated =
                 input -> columnName.equals(editedColumn.getAttribute("value"));
         Graphene.waitGui(browser)
                 .withMessage(String.format("Expected name '%s' is not updated: '%s'", columnName, 

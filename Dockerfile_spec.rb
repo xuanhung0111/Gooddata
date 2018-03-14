@@ -13,14 +13,30 @@ describe "Dockerfile" do
   end
 
   packages = ['xorg-x11-server-Xvfb', 'xorg-x11-xinit',
-              'chromedriver-2.22-1*', 'chromium-52.0.2743.0-1*',
-              'firefox-45.0.2-1', 'dejavu-sans-fonts', 'dejavu-sans-mono-fonts',
+              'google-chrome-stable',
+              'dejavu-sans-fonts', 'dejavu-sans-mono-fonts',
               'dejavu-serif-fonts', 'phantomjs', 'maven-bin']
 
   it "installs required packages" do
     packages.each do |p|
       expect(package(p)).to be_installed
     end
+  end
+
+  it "installs Firefox" do
+    expect(command('firefox --version').stdout).to contain("Firefox")
+  end
+
+  it "installs Chrome" do
+    expect(command('chrome --version').stdout).to contain("Google Chrome")
+  end
+
+  it "installs Geckodriver" do
+    expect(command('geckodriver --version').stdout).to contain("geckodriver")
+  end
+
+  it "installs Chromedriver" do
+    expect(command('chromedriver --version').stdout).to contain("ChromeDriver")
   end
 
   it "can start Xvfb-run" do

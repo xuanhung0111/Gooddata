@@ -17,7 +17,6 @@ import com.gooddata.qa.mdObjects.dashboard.tab.TabItem.*;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.gooddata.qa.utils.java.Builder;
-import com.google.common.base.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
@@ -30,6 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -174,7 +174,7 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
             // att to drill to is CompuSci
             reportOnSourceTab.drillOnFirstValue(CellType.ATTRIBUTE_VALUE).waitForLoaded();
 
-            final Predicate<WebDriver> isTargetTabLoaded = browser -> dashboardsPage.getTabs()
+            final Function<WebDriver, Boolean> isTargetTabLoaded = browser -> dashboardsPage.getTabs()
                     .getTab(TARGET_TAB).isSelected();
             Graphene.waitGui().until(isTargetTabLoaded);
 
@@ -247,7 +247,7 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
                     StringUtils.join(Arrays.asList(REPORT_AMOUNT_BY_PRODUCT, "CompuSci"), ">>"));
 
             reportAfterDrillingToReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE).waitForLoaded();
-            final Predicate<WebDriver> isTargetTabLoaded = browser -> dashboardsPage.getTabs()
+            final Function<WebDriver, Boolean> isTargetTabLoaded = browser -> dashboardsPage.getTabs()
                     .getTab(TARGET_TAB).isSelected();
             Graphene.waitGui().until(isTargetTabLoaded);
 

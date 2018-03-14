@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.enrich;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 
 import org.jboss.arquillian.core.api.Instance;
@@ -64,6 +65,12 @@ public class GdcWebElementEnricher extends AbstractSearchContextEnricher {
     @Override
     public int getPrecedence() {
         return 1;
+    }
+
+    @Override
+    public Object[] resolve(SearchContext searchContext, Method method, Object[] resolvedParams) {
+        // TODO: add real implementation, what should this method do?
+        return new Object[0];
     }
 
 }

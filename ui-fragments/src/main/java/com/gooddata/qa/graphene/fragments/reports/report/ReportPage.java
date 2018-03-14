@@ -13,7 +13,6 @@ import com.gooddata.qa.graphene.fragments.reports.filter.AbstractFilterFragment;
 import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter;
 import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter.FilterFragment;
 import com.gooddata.qa.graphene.utils.WaitUtils;
-import com.google.common.base.Predicate;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -27,6 +26,7 @@ import org.openqa.selenium.support.FindBy;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter.REPORT_FILTER_LOCATOR;
@@ -328,7 +328,7 @@ public class ReportPage extends AbstractFragment {
     }
 
     public ReportPage waitForReportSaved() {
-        Predicate<WebDriver> createReportPredicate = input -> "Saved".equals(createReportButton.getText());
+        Function<WebDriver, Boolean> createReportPredicate = input -> "Saved".equals(createReportButton.getText());
         Graphene.waitGui().until(createReportPredicate);
 
         // When Create button change its name to Saving, and then Saved, the create report process is not finished.
@@ -529,7 +529,7 @@ public class ReportPage extends AbstractFragment {
     public ReportPage waitForReportExecutionProgress() {
         sleepTightInSeconds(1);
         final WebElement progress = waitForElementPresent(id("progressOverlay"), browser);
-        Predicate<WebDriver> waitForProgress = browser -> progress.getCssValue("display").equals("none");
+        Function<WebDriver, Boolean> waitForProgress = browser -> progress.getCssValue("display").equals("none");
         Graphene.waitGui().until(waitForProgress);
         return this;
     }
@@ -650,7 +650,7 @@ public class ReportPage extends AbstractFragment {
     }
 
     private void waitForSaveButtonEnabled() {
-        Predicate<WebDriver> saveButtonEnabled = browser -> !waitForElementVisible(createReportButton)
+        Function<WebDriver, Boolean> saveButtonEnabled = browser -> !waitForElementVisible(createReportButton)
                 .getAttribute("class")
                 .contains("disabled");
         Graphene.waitGui().until(saveButtonEnabled);

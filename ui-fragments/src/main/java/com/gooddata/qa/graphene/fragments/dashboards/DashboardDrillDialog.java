@@ -11,14 +11,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.reports.report.AbstractReport;
 import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
@@ -136,11 +134,6 @@ public class DashboardDrillDialog extends AbstractFragment {
     private void waitForBreadcrumbsLoaded() {
         waitForElementVisible(this.getRoot());
         waitForCollectionIsNotEmpty(breadcrumbs);
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-            @Override
-            public boolean apply(WebDriver input) {
-                return !LOADING.equals(breadcrumbs.get(breadcrumbs.size() - 1).getText());
-            }
-        });
+        Graphene.waitGui().until(input -> !LOADING.equals(breadcrumbs.get(breadcrumbs.size() - 1).getText()));
     }
 }

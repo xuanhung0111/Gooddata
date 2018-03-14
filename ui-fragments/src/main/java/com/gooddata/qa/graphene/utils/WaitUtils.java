@@ -8,7 +8,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import java.io.File;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
-
+import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -17,7 +17,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.base.Predicate;
 
 public final class WaitUtils {
 
@@ -37,12 +36,7 @@ public final class WaitUtils {
             if ("Dashboard no longer exists".equals(searchContext.findElement(BY_RED_BAR).getText())) {
                 waitForElementVisible(BY_DISMISS_BUTTON, searchContext).click();
             }
-            Graphene.waitGui().withTimeout(5, TimeUnit.SECONDS).until(new Predicate<WebDriver>() {
-                @Override
-                public boolean apply(WebDriver input) {
-                    return searchContext.findElements(BY_RED_BAR).isEmpty();
-                }
-            });
+            Graphene.waitGui().withTimeout(5, TimeUnit.SECONDS).until(input -> searchContext.findElements(BY_RED_BAR).isEmpty());
         }
         checkRedBar(searchContext);
     }
@@ -155,7 +149,7 @@ public final class WaitUtils {
         Graphene.waitGui().until().element(element).is().enabled();
 
         // check for other elements styled as button, input, etc. that are disabled programmatically and styled with css
-        Predicate<WebDriver> elementEnabled = browser -> !element.getAttribute("class").contains("disabled");
+        Function<WebDriver, Boolean> elementEnabled = browser -> !element.getAttribute("class").contains("disabled");
         Graphene.waitGui().until(elementEnabled);
 
         return element;
@@ -201,7 +195,7 @@ public final class WaitUtils {
     }
 
     public static void waitForCollectionIsEmpty(final Collection<?> items) {
-        Predicate<WebDriver> collectionEmpty = browser -> items.isEmpty();
+        Function<WebDriver, Boolean> collectionEmpty = browser -> items.isEmpty();
         Graphene.waitGui().until(collectionEmpty);
     }
 
@@ -214,26 +208,26 @@ public final class WaitUtils {
     }
 
     public static <T extends Collection<?>> T waitForCollectionIsNotEmpty(final T items) {
-        Predicate<WebDriver> collectionNotEmpty = browser -> !items.isEmpty();
+        Function<WebDriver, Boolean> collectionNotEmpty = browser -> !items.isEmpty();
         Graphene.waitGui().until(collectionNotEmpty);
 
         return items;
     }
 
     public static void waitForStringInUrl(final String url) {
-        Predicate<WebDriver> containsString = driver -> driver.getCurrentUrl().contains(url);
+        Function<WebDriver, Boolean> containsString = driver -> driver.getCurrentUrl().contains(url);
         Graphene.waitGui().until(containsString);
     }
 
     public static void waitForStringMissingInUrl(final String url) {
-        Predicate<WebDriver> missingString = driver -> !driver.getCurrentUrl().contains(url);
+        Function<WebDriver, Boolean> missingString = driver -> !driver.getCurrentUrl().contains(url);
         Graphene.waitGui().until(missingString);
     }
 
     public static void waitForExportReport(final File destination, final long minimalSize) {
         System.out.println("waiting for export " + destination.getName());
 
-        Predicate<WebDriver> isExportCompleted = browser -> destination.length() >= minimalSize;
+        Function<WebDriver, Boolean> isExportCompleted = browser -> destination.length() >= minimalSize;
         Graphene.waitGui().pollingEvery(5, TimeUnit.SECONDS)
                 .withTimeout(5, TimeUnit.MINUTES)
                 .until(isExportCompleted);

@@ -4,8 +4,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.openqa.selenium.By.cssSelector;
-
-import com.google.common.base.Predicate;
+import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -98,7 +97,7 @@ public class LoginFragment extends AbstractFragment {
         registrationLink.click();
 
         if (href.endsWith("request-a-demo")) {
-            Predicate<WebDriver> requestADemoPageDisplayed = browser ->
+            Function<WebDriver, Boolean> requestADemoPageDisplayed = browser ->
                     browser.getCurrentUrl().equals("https://www.gooddata.com/request-a-demo");
             Graphene.waitGui().until(requestADemoPageDisplayed);
         } else {
