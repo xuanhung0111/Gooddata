@@ -44,17 +44,8 @@ public class GroupFiltersOnDashboardTest extends AbstractDashboardWidgetTest {
         getReportCreator().createAmountByProductReport();
 
         Attribute product = getAttributeByTitle(ATTR_PRODUCT);
-        List<String> attElements = asList("CompuSci", "Educationly", "Explorer");
-
-        String filterExpression = format("[%s] IN (%s)", product.getUri(),
-                getMdService().getAttributeElements(product).stream()
-                        .filter(e -> attElements.contains(e.getTitle()))
-                        .map(AttributeElement::getUri)
-                        .map(uri -> "[" + uri + "]")
-                        .collect(Collectors.joining(", ")));
-
-        createFilterVarIfNotExist(getRestApiClient(), testParams.getProjectId(),
-                VARIABLE_PRODUCT, product.getUri(), filterExpression);
+        getVariableCreator().createFilterVariable(
+                VARIABLE_PRODUCT, product.getUri(), asList("CompuSci", "Educationly", "Explorer"));
 
         initReportsPage().openReport(REPORT_AMOUNT_BY_PRODUCT)
                 .addFilter(FilterItem.Factory.createPromptFilter(VARIABLE_PRODUCT))

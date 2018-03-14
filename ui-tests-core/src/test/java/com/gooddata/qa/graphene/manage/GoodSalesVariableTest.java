@@ -16,6 +16,8 @@ import com.gooddata.qa.graphene.fragments.manage.VariableDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.VariablesPage;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 import com.gooddata.qa.utils.http.RestApiClient;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.variable.VariableRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
@@ -35,7 +37,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileUri;
-import static com.gooddata.qa.utils.http.variable.VariableRestUtils.getVariableUri;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -222,7 +223,8 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
                 .withAttributeValues(ATTRIBUTE_VALUES));
 
         Metric amountMetric = getMdService().getObj(getProject(), Metric.class, title(METRIC_AMOUNT));
-        String promptFilterUri = getVariableUri(getRestApiClient(), testParams.getProjectId(), variable);
+        String promptFilterUri = new VariableRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId()).getVariableUri(variable);
         Attribute stageNameAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_STAGE_NAME));
 
         Report report = createReportViaRest(GridReportDefinitionContent.create("Report",

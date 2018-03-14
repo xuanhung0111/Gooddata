@@ -182,6 +182,7 @@ public class CommonRestRequest {
     public Attribute getAttributeByIdentifier(String id) {
         return getMdService().getObj(getProject(), Attribute.class, identifier(id));
     }
+
     public Metric getMetricByTitle(String title) {
         return getMdService().getObj(getProject(), Metric.class, title(title));
     }

@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CREATED;
@@ -22,14 +21,13 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.Calendar;
 
-import com.gooddata.qa.utils.http.variable.VariableRestUtils;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.variable.VariableRestRequest;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.Test;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.md.Metric;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
@@ -64,14 +62,14 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        getMetricCreator().createAmountMetric();
-        String productUri = getMdService().getObjUri(getProject(), Attribute.class, title(ATTR_PRODUCT));
-        String variableUri = VariableRestUtils.createFilterVariable(getRestApiClient(), testParams.getProjectId(), VARIABLE_NAME, productUri);
+        VariableRestRequest request = new VariableRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        String productUri = request.getAttributeByTitle(ATTR_PRODUCT).getUri();
+        String variableUri = request.createFilterVariable(VARIABLE_NAME, productUri);
 
         createMetric(COUNT_OF_PRODUCT, format("SELECT COUNT([%s])", productUri), "#,##0");
-
-        createMetric(METRIC_VARIABLE, format("SELECT [%s] WHERE [%s]", getMdService().getObjUri(getProject(),
-                Metric.class, title(METRIC_AMOUNT)), variableUri), "#,##0");
+        createMetric(METRIC_VARIABLE, format("SELECT [%s] WHERE [%s]",
+                getMetricCreator().createAmountMetric().getUri(), variableUri), "#,##0");
     }
 
     @Test(dependsOnGroups = "createProject")
