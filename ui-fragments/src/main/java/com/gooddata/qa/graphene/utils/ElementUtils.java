@@ -108,8 +108,8 @@ public final class ElementUtils {
     public static void makeSureNoPopupVisible(By popupElement) {
         WebDriver browser = BrowserUtils.getBrowserContext();
 
-        // Move outside HTML body at position (-1, -1) to make sure no popup displayed
-        moveToElementActions(browser.findElement(By.tagName("body")), -1, -1).perform();
+        // Move to top left corner of HTML body to make sure no popup is displayed
+        moveToElementActions(browser.findElement(By.tagName("body")), 0, 0).perform();
 
         Function<WebDriver, Boolean> isDismissed = context -> !isElementVisible(popupElement, context);
         Graphene.waitGui().until(isDismissed);
