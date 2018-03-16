@@ -89,8 +89,7 @@ public class ReportPage extends AbstractFragment {
     private static final By CUSTOM_METRIC_FORMAT_LOCATOR = className("customMetricFormatItem-format");
 
     private static final String XPATH_REPORT_VISUALIZATION_TYPE =
-            "//div[contains(@class, 's-enabled')]/div[contains(@class, 'c-chartType') and"
-            + " ./span[@title='${type}']]";
+            "//div[contains(@class, 's-enabled') and contains(@class, 'yui3-c-charttype') and .//span[@title='${type}']]";
 
     private static final By VISIBILITY_CHECKBOX_LOCATOR = id("settings-visibility");
 

@@ -17,6 +17,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
@@ -201,7 +202,7 @@ public class TimeFilterPanel extends AbstractFragment {
         if(isElementPresent(By.className("s-btn-default"), getRoot())) {
             if(!isElementVisible(By.className("s-btn-apply"), getRoot())
                     && !isElementVisible((By.className("s-btn-cancel")), getRoot())) {
-                waitForElementVisible(By.cssSelector(".inline.dateExample"), getRoot()).sendKeys(Keys.ESCAPE);
+                getActions().sendKeys(Keys.ESCAPE).perform();
                 return;
             }
         }

@@ -7,6 +7,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.Drilli
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
+import com.gooddata.qa.graphene.utils.WaitUtils;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
 import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
@@ -14,6 +15,7 @@ import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem.*;
+import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.gooddata.qa.utils.java.Builder;
@@ -189,7 +191,8 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
 
             assertEquals(reportOnTargetTab.getAttributeValues().size(), expectedReportSize);
 
-            browser.navigate().refresh();
+            BrowserUtils.refreshCurrentPage(browser);
+            WaitUtils.waitForDashboardPageLoaded(browser);
             assertEquals(
                     dashboardsPage.getContent().getLatestReport(TableReport.class)
                             .waitForLoaded().getAttributeValues().size(),
