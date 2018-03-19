@@ -210,7 +210,7 @@ public class ReportsPage extends AbstractFragment {
 
     public PersonalInfo getReportOwnerInfoFrom(String reportName) {
         AccountCard.makeDismiss();
-        getActions().moveToElement(getReport(reportName).getOwner()).perform();
+        getActions().moveToElement(getReport(reportName).getOwner()).moveByOffset(1, 1).perform();
         return AccountCard.getInstance(browser).getUserInfo();
     }
 
