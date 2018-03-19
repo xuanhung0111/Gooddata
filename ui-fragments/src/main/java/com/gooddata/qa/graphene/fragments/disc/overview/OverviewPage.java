@@ -28,7 +28,7 @@ public class OverviewPage extends AbstractFragment {
     private WebElement overviewSection;
 
     public OverviewPage selectState(OverviewState state) {
-        waitForElementVisible(state.getLocator(), getRoot()).click();
+        waitForElementVisible(state.getLocator(), getRoot()).findElement(By.cssSelector("div")).click();
         waitForPageLoaded();
         return this;
     }
