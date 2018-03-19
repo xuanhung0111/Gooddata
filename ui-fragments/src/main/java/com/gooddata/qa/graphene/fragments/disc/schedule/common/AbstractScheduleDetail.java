@@ -196,10 +196,15 @@ public class AbstractScheduleDetail extends AbstractScheduleFragment {
 
     public AbstractScheduleDetail waitForExecutionFinish() {
         Function<WebDriver, Boolean> executionFinished = browser -> {
-            String executionStatus = getLastExecutionHistoryItem().getStatusDescription();
-
-            return !executionStatus.equals(ScheduleStatus.SCHEDULED.toString()) &&
-                    !executionStatus.equals(ScheduleStatus.RUNNING.toString());
+            try {
+                String executionStatus = getLastExecutionHistoryItem().getStatusDescription();
+    
+                return !executionStatus.equals(ScheduleStatus.SCHEDULED.toString()) &&
+                        !executionStatus.equals(ScheduleStatus.RUNNING.toString());
+            } catch (NullPointerException e) {
+                // ignore exception and retry
+                return false;
+            }
         };
 
         Graphene.waitGui().withTimeout(15, TimeUnit.MINUTES)
