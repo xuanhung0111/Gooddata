@@ -39,7 +39,7 @@ public class TableReport extends AbstractDashboardReport {
     public TableReport sortBy(String value, CellType type, Sort howToSort) {
         WebElement cell = getCellElement(value, type);
 
-        getActions().moveToElement(cell).perform();
+        getActions().moveToElement(cell).moveByOffset(1, 1).perform();
         waitForElementVisible(howToSort.getLocator(), cell).click();
         return this;
     }
@@ -47,7 +47,7 @@ public class TableReport extends AbstractDashboardReport {
     public boolean isSortableAt(String value, CellType type) {
         WebElement cellElement = getCellElement(value, type);
 
-        getActions().moveToElement(cellElement).perform();
+        getActions().moveToElement(cellElement).moveByOffset(1, 1).perform();
         return isElementPresent(By.className("sort"), cellElement);
     }
 
