@@ -204,7 +204,7 @@ public class ReportPage extends AbstractFragment {
     }
 
     public ReportPage showConfiguration() {
-        waitForElementVisible(SHOW_CONFIGURATION_LOCATOR, getRoot()).click();
+        waitForElementEnabled(waitForElementVisible(SHOW_CONFIGURATION_LOCATOR, getRoot())).click();
         waitForElementEnabled(waitForElementVisible(HIDE_CONFIGURATION_LOCATOR, getRoot()));
         return this;
     }

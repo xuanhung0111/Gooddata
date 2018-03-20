@@ -51,12 +51,14 @@ public abstract class AbstractAnalyseTest extends GoodSalesAbstractTest {
         analysisPage.exportReport();
 
         BrowserUtils.switchToLastTab(browser);
-        waitForAnalysisPageLoaded(browser);
-        waitForFragmentVisible(reportPage);
-        takeScreenshot(browser, screenShot, getClass());
-        checkRedBar(browser);
+        try {
+            waitForAnalysisPageLoaded(browser);
+            takeScreenshot(browser, screenShot, getClass());
+            checkRedBar(browser);
 
-        browser.close();
-        BrowserUtils.switchToFirstTab(browser);
+        } finally {
+            browser.close();
+            BrowserUtils.switchToFirstTab(browser);
+        }
     }
 }
