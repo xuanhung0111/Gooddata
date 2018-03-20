@@ -33,7 +33,7 @@ public class DatasetDetailPage extends AbstractFragment {
     @FindBy(className = "s-dataset-columns-table")
     private DatasetColumnsTable datasetColumns;
 
-    @FindBy(xpath = "//.[@class='datasets-sidebar']//a")
+    @FindBy(xpath = "//*[@class='datasets-sidebar']//a")
     private WebElement latestCsvFileUpload;
 
     @FindBy(css = ".file-detail")
