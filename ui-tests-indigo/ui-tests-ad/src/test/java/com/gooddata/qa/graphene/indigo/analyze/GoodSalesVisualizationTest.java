@@ -199,6 +199,7 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
         assertTrue(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .changeReportType(ReportType.TABLE)
+                .waitForReportComputing()
                 .getPageHeader()
                 .isExportButtonEnabled());
         TableReport analysisReport = analysisPage.waitForReportComputing().getTableReport();

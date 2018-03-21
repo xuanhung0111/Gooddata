@@ -120,14 +120,17 @@ public class DateFilterTest extends AbstractAnalyseTest {
         assertEquals(report.getTrackersCount(), 13);
         analysisPage.exportReport();
         BrowserUtils.switchToLastTab(browser);
-        waitForFragmentVisible(reportPage);
-        List<String> filters = reportPage.getFilters();
-        takeScreenshot(browser, "allowDateFilterByRange-dateFilters", getClass());
-        assertEquals(filters.size(), 1);
-        assertEquals(filters.get(0), "Date (templ:DateInvoice) is between 12/12/2016 and 01/12/2017");
-        checkRedBar(browser);
-        browser.close();
-        BrowserUtils.switchToFirstTab(browser);
+        try {
+            waitForAnalysisPageLoaded(browser);
+            List<String> filters = reportPage.getFilters();
+            takeScreenshot(browser, "allowDateFilterByRange-dateFilters", getClass());
+            assertEquals(filters.size(), 1);
+            assertEquals(filters.get(0), "Date (templ:DateInvoice) is between 12/12/2016 and 01/12/2017");
+            checkRedBar(browser);
+        } finally {
+            browser.close();
+            BrowserUtils.switchToFirstTab(browser);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
@@ -234,8 +237,9 @@ public class DateFilterTest extends AbstractAnalyseTest {
             takeScreenshot(browser, "export-date-filter", getClass());
             assertTrue(reportFilter.getFilterElement("Quarter/Year (templ:DateInvoice) is the last 4 quarters").isDisplayed(),
                     dateFilterValue + " filter is not displayed");
-            browser.close();
+
         } finally {
+            browser.close();
             BrowserUtils.switchToFirstTab(browser);
         }
     }

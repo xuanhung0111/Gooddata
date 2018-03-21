@@ -105,13 +105,14 @@ public class GoodSalesTableReportTest extends AbstractAnalyseTest {
         analysisPage.exportReport();
         BrowserUtils.switchToLastTab(browser);
 
-        assertEquals(analysisContent, getTableContentFromReportPage(Graphene.createPageFragment(
-                com.gooddata.qa.graphene.fragments.reports.report.TableReport.class,
-                waitForElementVisible(id("gridContainerTab"), browser))));
-        checkRedBar(browser);
-
-        browser.close();
-        BrowserUtils.switchToFirstTab(browser);
+        try {
+            waitForAnalysisPageLoaded(browser);
+            assertEquals(reportPage.getTableReport().getDataContent(), analysisContent);
+            checkRedBar(browser);
+        } finally {
+            browser.close();
+            BrowserUtils.switchToFirstTab(browser);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})

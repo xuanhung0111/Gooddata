@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
@@ -29,6 +30,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
@@ -190,40 +192,28 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
         Iterator<String> analysisHeaders = analysisReport.getHeaders().iterator();
 
         analysisPage.exportReport();
-        String currentWindowHandle = browser.getWindowHandle();
-        for (String handle : browser.getWindowHandles()) {
-            if (!handle.equals(currentWindowHandle))
-                browser.switchTo().window(handle);
+        BrowserUtils.switchToLastTab(browser);
+
+        try {
+            waitForAnalysisPageLoaded(browser);
+
+            com.gooddata.qa.graphene.fragments.reports.report.TableReport tableReport =
+                    reportPage.getTableReport();
+
+            assertThat(tableReport.getDataContent(), equalTo(analysisContent));
+
+            List<String> headers = tableReport.getAttributeHeaders();
+            headers.addAll(tableReport.getMetricHeaders());
+            Iterator<String> reportheaders = headers.iterator();
+
+            while (analysisHeaders.hasNext() && reportheaders.hasNext()) {
+                assertThat(reportheaders.next().toLowerCase(), equalTo(analysisHeaders.next().toLowerCase()));
+            }
+            checkRedBar(browser);
+        } finally {
+            browser.close();
+            BrowserUtils.switchToFirstTab(browser);
         }
-
-        com.gooddata.qa.graphene.fragments.reports.report.TableReport tableReport =
-                Graphene.createPageFragment(
-                        com.gooddata.qa.graphene.fragments.reports.report.TableReport.class,
-                        waitForElementVisible(By.id("gridContainerTab"), browser));
-
-        Iterator<String> attributes = tableReport.getAttributeValues().iterator();
-
-        sleepTight(2000); // wait for metric values is calculated and loaded
-        Iterator<String> metrics = tableReport.getRawMetricValues().iterator();
-
-        List<List<String>> content = new ArrayList<>();
-        while (attributes.hasNext() && metrics.hasNext()) {
-            content.add(asList(attributes.next(), metrics.next()));
-        }
-
-        assertThat(content, equalTo(analysisContent));
-
-        List<String> headers = tableReport.getAttributeHeaders();
-        headers.addAll(tableReport.getMetricHeaders());
-        Iterator<String> reportheaders = headers.iterator();
-
-        while (analysisHeaders.hasNext() && reportheaders.hasNext()) {
-            assertThat(reportheaders.next().toLowerCase(), equalTo(analysisHeaders.next().toLowerCase()));
-        }
-        checkRedBar(browser);
-
-        browser.close();
-        browser.switchTo().window(currentWindowHandle);
     }
 
     @Test(dependsOnGroups = {"createProject"})
