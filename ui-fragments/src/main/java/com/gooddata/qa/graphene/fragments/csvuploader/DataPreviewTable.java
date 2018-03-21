@@ -101,10 +101,10 @@ public class DataPreviewTable extends FixedDataTable {
 
     public void changeColumnName(int fieldIndex, String columnName) {
         final WebElement editedColumn = columnNames.get(fieldIndex);
-        // TODO: is this still true? - editedColumn.clear() works very unstable with react.js. So use sendKeys to make this action more stable.
-        //editedColumn.sendKeys(Keys.chord(Keys.CONTROL, "a") + Keys.DELETE + columnName);
-        editedColumn.clear();
-        editedColumn.sendKeys(columnName);
+        // editedColumn.clear() works very unstable with react.js. So use sendKeys to make this action more stable.
+        // Issue still appear with latest Chrome 65
+        editedColumn.click(); // get focus on editedColumn
+        getActions().keyDown(Keys.CONTROL).sendKeys("a").keyUp(Keys.CONTROL).sendKeys(Keys.DELETE + columnName).perform();
         final Function<WebDriver, Boolean> columnNameUpdated =
                 input -> columnName.equals(editedColumn.getAttribute("value"));
         Graphene.waitGui(browser)
