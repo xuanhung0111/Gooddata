@@ -212,7 +212,8 @@ public class EmailSchedulePage extends AbstractFragment {
 
     public String getUnsubscribed(String scheduleName) {
         openSchedule(scheduleName);
-        waitForElementPresent(unsubscribeTooltip).click();
+        waitForElementVisible(unsubscribeTooltip);
+        getActions().moveToElement(unsubscribeTooltip).moveByOffset(1, 1).perform();
         String unsubscribed = waitForElementPresent(unsubscribedTooltipAddresses).getText();
         System.out.println("Unsubscribed: " + unsubscribed);
         return unsubscribed;
