@@ -2,14 +2,11 @@ package com.gooddata.qa.graphene.fragments.dashboards.widget.configuration;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
-import com.google.common.base.Predicate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.testng.Assert;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -189,7 +186,7 @@ public class DrillingConfigPanel extends AbstractFragment {
         @FindBy(css = "button.rightCol")
         private WebElement rightButton;
 
-        @FindBy(className = "deleteButton ")
+        @FindBy(className = "deleteButton")
         private WebElement deleteButton;
 
         @FindBy(className = "innerDrills")
