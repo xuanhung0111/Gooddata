@@ -629,6 +629,7 @@ public class DashboardsPage extends AbstractFragment {
 
         saveAsDialog.saveAs(dashboardName, isSavedViews, permissionType);
         waitForFragmentNotVisible(saveAsDialog);
+        waitForDashboardPageLoaded(browser);
 
         getDashboardEditBar().saveDashboard();
         waitForDashboardPageLoaded(browser);

@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.*;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.*;
@@ -249,10 +250,11 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
             assertEquals(drillDialog.getBreadcrumbsString(),
                     StringUtils.join(Arrays.asList(REPORT_AMOUNT_BY_PRODUCT, "CompuSci"), ">>"));
 
-            reportAfterDrillingToReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE).waitForLoaded();
+            reportAfterDrillingToReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
             final Function<WebDriver, Boolean> isTargetTabLoaded = browser -> dashboardsPage.getTabs()
                     .getTab(TARGET_TAB).isSelected();
             Graphene.waitGui().until(isTargetTabLoaded);
+            waitForDashboardPageLoaded(browser);
 
             TableReport reportAfterDrillingToTab = dashboardsPage.getContent().getLatestReport(TableReport.class);
             assertEquals(reportAfterDrillingToTab.getAttributeValues(), attributeValuesOfSalesReports,
@@ -339,6 +341,7 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
             reportAfterDrillingToReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
             waitForFragmentVisible(popupDialog);
             popupDialog.saveAndContinue();
+            waitForDashboardPageLoaded(browser);
             dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
             assertTrue(dashboardsPage.getTabs().getTab(TAB_ANOTHER_DASHBOARD).isSelected(),
                     TAB_ANOTHER_DASHBOARD + " is not selected after drill action");
