@@ -64,7 +64,7 @@ public abstract class AbstractSndPanel extends AbstractFragment {
             return getItemContainerRoot().findElement(itemLocator);
         }
 
-        if (isElementVisible(itemLocator, getItemContainerRoot())) {
+        if (isItemFullyVisible(itemLocator)) {
             return getItemContainerRoot().findElement(itemLocator);
         }
 
@@ -74,7 +74,7 @@ public abstract class AbstractSndPanel extends AbstractFragment {
             waitForElementVisible(scrollBarLocator, getItemContainerRoot());
         }
 
-        if (!isElementVisible(itemLocator, getItemContainerRoot())) {
+        if (!isItemFullyVisible(itemLocator)) {
             search(item);
         }
         return getItemContainerRoot().findElement(itemLocator);
@@ -155,5 +155,17 @@ public abstract class AbstractSndPanel extends AbstractFragment {
         howToSelect.accept(itemElement);
         waitForElementAttributeContainValue(itemElement, "class", "sndInReport");
         return this;
+    }
+
+    private boolean isItemFullyVisible(By itemLocator) {
+        if (isElementVisible(itemLocator, getItemContainerRoot())) {
+            WebElement element = getItemContainerRoot().findElement(itemLocator);
+            int elementBottomY = element.getLocation().getY() + element.getSize().getHeight();
+            int containerBottomY = getItemContainerRoot().getLocation().getY() + getItemContainerRoot().getSize().getHeight(); 
+            if (elementBottomY <= containerBottomY) {
+                return true;
+            }
+        }
+        return false;
     }
 }
