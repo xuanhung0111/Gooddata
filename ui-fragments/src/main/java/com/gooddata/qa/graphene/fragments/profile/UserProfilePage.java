@@ -33,6 +33,7 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.AbstractTable;
 import com.gooddata.qa.graphene.fragments.common.IpeEditor;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
+import com.gooddata.qa.graphene.utils.Sleeper;
 
 public class UserProfilePage extends AbstractFragment {
 
@@ -138,6 +139,10 @@ public class UserProfilePage extends AbstractFragment {
 
         Function<WebDriver, Boolean> saved = browser -> saveChangesButton.getAttribute("class").contains("disabled");
         Graphene.waitGui().until(saved);
+
+        // Existing table content is now refreshed in DOM, short sleep is to avoid possible StaleElementReferenceException,
+        // because it was observed that the exception was not handled by Graphene when occurred in filter part of getRowOf(). 
+        Sleeper.sleepTight(500);
 
         return this;
     }
