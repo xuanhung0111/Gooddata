@@ -34,7 +34,6 @@ import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.common.TestParameters;
 import com.gooddata.qa.graphene.utils.Sleeper;
-import com.gooddata.qa.utils.ads.AdsHelper;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.testng.listener.AuxiliaryFailureScreenshotListener;
 import com.gooddata.qa.utils.testng.listener.ConsoleStatusListener;
@@ -57,7 +56,6 @@ public abstract class AbstractTest extends Arquillian {
 
     protected GoodData goodDataClient = null;
     protected RestApiClient restApiClient = null;
-    protected AdsHelper adsHelper = null;
 
     protected StartPageContext startPageContext = null;
 
@@ -171,16 +169,6 @@ public abstract class AbstractTest extends Arquillian {
         return new GoodData(httpHost.getHostName(), userLogin, userPassword, httpHost.getPort());
     }
 
-    public AdsHelper getAdsHelper() {
-        if (adsHelper == null)
-            adsHelper = new AdsHelper(getGoodDataClient(), getRestApiClient());
-        return adsHelper;
-    }
-
-    public AdsHelper getAdsHelper(final String userLogin, final String userPassword) {
-        return new AdsHelper(getGoodDataClient(userLogin, userPassword), getRestApiClient(userLogin, userPassword));
-    }
-
     public String generateEmail(String email) {
         return email.replace("@", "+" + generateHashString() + "@");
     }
@@ -233,6 +221,14 @@ public abstract class AbstractTest extends Arquillian {
         switch (profile) {
             case DOMAIN:
                 username = testParams.getDomainUser();
+                password = testParams.getPassword();
+                break;
+            case EDITOR:
+                username = testParams.getEditorUser();
+                password = testParams.getPassword();
+                break;
+            case VIEWER:
+                username = testParams.getViewerUser();
                 password = testParams.getPassword();
                 break;
             default:

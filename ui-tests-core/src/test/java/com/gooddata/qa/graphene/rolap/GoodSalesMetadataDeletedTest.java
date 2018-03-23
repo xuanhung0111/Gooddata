@@ -35,6 +35,7 @@ import java.util.List;
 
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.variable.VariableRestRequest;
+import com.gooddata.qa.utils.http.rolap.RolapRestRequest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -63,7 +64,7 @@ import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.utils.http.InvalidStatusCodeException;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
-import com.gooddata.qa.utils.http.rolap.RolapRestUtils;
+
 public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
 
     private static final int STATUS_POLLING_CHECK_ITERATIONS = 60;
@@ -505,12 +506,13 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         postMAQL(strategy.getMaql(identifier), STATUS_POLLING_CHECK_ITERATIONS);
     }
 
-    private void tryDropObject(final String identifier, final DropStrategy strategy) throws JSONException,
+    private void tryDropObject(String identifier, DropStrategy strategy) throws JSONException,
             ParseException, IOException {
-        String pollingUri = RolapRestUtils.executeMAQL(getRestApiClient(), testParams.getProjectId(),
-                strategy.getMaql(identifier));
-        RolapRestUtils.waitingForAsyncTask(getRestApiClient(), pollingUri);
-        assertEquals(RolapRestUtils.getAsyncTaskStatus(getRestApiClient(), pollingUri), "ERROR");
+        RolapRestRequest request = new RolapRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        String pollingUri = request.executeMAQL(strategy.getMaql(identifier));
+        request.waitingForAsyncTask(pollingUri);
+        assertEquals(request.getAsyncTaskStatus(pollingUri), "ERROR");
         assertTrue(getErrorMessageFromPollingUri(pollingUri).startsWith(DROP_OBJECT_ERROR_MESSAGE));
     }
 

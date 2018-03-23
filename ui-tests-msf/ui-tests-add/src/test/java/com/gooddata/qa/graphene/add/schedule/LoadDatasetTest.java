@@ -38,7 +38,7 @@ public class LoadDatasetTest extends AbstractDataloadProcessTest {
 
     @Test(dependsOnGroups = {"precondition"})
     public void testAdsHasClientIdColumn() throws ParseException, JSONException, IOException {
-        getAdsHelper().associateAdsWithProject(ads, testParams.getProjectId(), CLIENT_ID);
+        adsHelper.associateAdsWithProject(ads, testParams.getProjectId(), CLIENT_ID, "");
 
         CsvFile opportunity = new CsvFile(DATASET_OPPORTUNITY)
                 .columns(new CsvFile.Column(ATTR_OPPORTUNITY), new CsvFile.Column(FACT_PRICE),
@@ -59,7 +59,7 @@ public class LoadDatasetTest extends AbstractDataloadProcessTest {
             assertEquals(getAttributeValues(opportunityAttr), asList("OOP1", "OOP2"));
 
         } finally {
-            getAdsHelper().associateAdsWithProject(ads, testParams.getProjectId());
+            adsHelper.associateAdsWithProject(ads);
             getProcessService().removeSchedule(schedule);
         }
     }
@@ -99,7 +99,7 @@ public class LoadDatasetTest extends AbstractDataloadProcessTest {
     @Test(dependsOnGroups = {"precondition"}, dataProvider = "setClientIdInOutputStageProvider")
     public void testAdsNotHaveClientIdColumn(boolean shouldSetClientId) throws ParseException, JSONException, IOException {
         if (shouldSetClientId) {
-            getAdsHelper().associateAdsWithProject(ads, testParams.getProjectId(), CLIENT_ID);
+            adsHelper.associateAdsWithProject(ads, testParams.getProjectId(), CLIENT_ID, "");
         }
 
         CsvFile opportunity = new CsvFile(DATASET_OPPORTUNITY)
@@ -120,7 +120,7 @@ public class LoadDatasetTest extends AbstractDataloadProcessTest {
 
         } finally {
             if (shouldSetClientId) {
-                getAdsHelper().associateAdsWithProject(ads, testParams.getProjectId());
+                adsHelper.associateAdsWithProject(ads);
             }
             getProcessService().removeSchedule(schedule);
         }
@@ -129,7 +129,7 @@ public class LoadDatasetTest extends AbstractDataloadProcessTest {
     @Test(dependsOnGroups = {"precondition"})
     public void setOutputStateWithPrefix() throws ParseException, JSONException, IOException {
         final String prefix = "gDC_";
-        getAdsHelper().associateAdsWithProject(ads, testParams.getProjectId(), "", prefix);
+        adsHelper.associateAdsWithProject(ads, testParams.getProjectId(), "", prefix);
 
         CsvFile opportunity = new CsvFile(prefix + DATASET_OPPORTUNITY)
                 .columns(new CsvFile.Column(ATTR_OPPORTUNITY), new CsvFile.Column(FACT_PRICE))
@@ -148,7 +148,7 @@ public class LoadDatasetTest extends AbstractDataloadProcessTest {
             assertEquals(getAttributeValues(opportunityAttr), asList("OOP111", "OOP222"));
 
         } finally {
-            getAdsHelper().associateAdsWithProject(ads, testParams.getProjectId());
+            adsHelper.associateAdsWithProject(ads);
             getProcessService().removeSchedule(schedule);
         }
     }

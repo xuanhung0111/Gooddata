@@ -56,30 +56,30 @@ public class DataloadProcessTest extends AbstractDataloadProcessTest {
 
     @Test(dependsOnGroups = {"precondition"})
     public void changeAdsInstanceWhenHavingDataloadProcess() throws ParseException, JSONException, IOException {
-        final Warehouse newAds = getAdsHelper().createAds("anotherAds", getAdsToken());
+        final Warehouse newAds = adsHelper.createAds("anotherAds", getAdsToken());
 
         try {
-            getAdsHelper().associateAdsWithProject(newAds, testParams.getProjectId());
+            adsHelper.associateAdsWithProject(newAds);
             assertTrue(hasDataloadProcess(), "Dataload process not found after associate with other ads");
 
         } finally {
-            getAdsHelper().associateAdsWithProject(ads, testParams.getProjectId());
-            getAdsHelper().removeAds(newAds);
+            adsHelper.associateAdsWithProject(ads);
+            adsHelper.removeAds(newAds);
         }
     }
 
     @Test(dependsOnGroups = {"precondition"})
     public void changeAdsInstanceAfterDeleteDataloadProcess() throws ParseException, JSONException, IOException {
-        final Warehouse newAds = getAdsHelper().createAds("anotherAds", getAdsToken());
+        final Warehouse newAds = adsHelper.createAds("anotherAds", getAdsToken());
 
         try {
             getProcessService().removeProcess(getDataloadProcess());
-            getAdsHelper().associateAdsWithProject(newAds, testParams.getProjectId());
+            adsHelper.associateAdsWithProject(newAds);
             assertTrue(hasDataloadProcess(), "Dataload process not created after associate with other ads");
 
         } finally {
-            getAdsHelper().associateAdsWithProject(ads, testParams.getProjectId());
-            getAdsHelper().removeAds(newAds);
+            adsHelper.associateAdsWithProject(ads);
+            adsHelper.removeAds(newAds);
         }
     }
 

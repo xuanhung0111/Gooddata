@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.manage;
 
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
@@ -44,7 +45,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.gooddata.qa.models.GraphModel;
-import com.gooddata.qa.utils.http.model.ModelRestUtils;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.model.ModelRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -646,8 +648,9 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     }
 
     private String getLDMImageFile() throws ParseException, IOException, JSONException {
-        String imageURI = ModelRestUtils.getLDMImageURI(getRestApiClient(), testParams.getProjectId(),
-                testParams.getHost());
+        String imageURI = new ModelRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
+                .getLDMImageURI(testParams.getHost());
+
         int indexSVG = imageURI.indexOf(".svg");
         String imageFileName = imageURI.substring(0, indexSVG + 4);
         imageFileName = imageFileName.substring(imageFileName.lastIndexOf("/") + 1);

@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.common;
 
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.utils.ads.AdsHelper.ADS_DB_CONNECTION_URL;
 import static java.lang.String.format;
 
@@ -10,6 +11,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import com.gooddata.qa.utils.ads.AdsHelper;
+import com.gooddata.qa.utils.http.RestClient;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -50,15 +53,17 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
 
     private static final String DATALOAD_PROCESS_TYPE = "DATALOAD";
 
+    protected AdsHelper adsHelper;
     protected Warehouse ads;
     protected DataloadProcess updateAdsTableProcess;
     protected Supplier<Parameters> defaultParameters;
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"initDataload"})
     public void setup() throws ParseException, JSONException, IOException {
-        ads = getAdsHelper().createAds("ads-" + generateHashString(), getAdsToken());
+        adsHelper = new AdsHelper(new RestClient(getProfile(ADMIN)), testParams.getProjectId());
+        ads = adsHelper.createAds("ads-" + generateHashString(), getAdsToken());
 
-        getAdsHelper().associateAdsWithProject(ads, testParams.getProjectId());
+        adsHelper.associateAdsWithProject(ads);
 
         updateAdsTableProcess = getProcessService().createProcess(getProject(),
                 new DataloadProcess(generateProcessName(), ProcessType.GRAPH), PackageFile.ADS_TABLE.loadFile());
@@ -71,7 +76,7 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
 
     @AfterClass(alwaysRun = true)
     public void removeAdsInstance() throws ParseException, JSONException, IOException {
-        getAdsHelper().removeAds(ads);
+        adsHelper.removeAds(ads);
     }
 
     protected DataloadProcess createDataloadProcess() {
@@ -168,7 +173,7 @@ public class AbstractDataloadProcessTest extends AbstractDataIntegrationTest {
 
         private String name;
 
-        private TxtFile(String name) {
+        TxtFile(String name) {
             this.name = name;
         }
 

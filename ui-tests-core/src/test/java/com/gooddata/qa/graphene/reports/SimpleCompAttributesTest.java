@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.reports;
 
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.postEtlPullIntegration;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.rolap.RolapRestRequest;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
@@ -58,7 +60,8 @@ public class SimpleCompAttributesTest extends AbstractProjectTest {
         URL uploadInfoResource = getClass().getResource("/etl/upload_info.json");
         uploadFileToWebDav(uploadInfoResource, webdavURL);
 
-        postEtlPullIntegration(getRestApiClient(), testParams.getProjectId(), parseIntegrationEntry(webdavURL));
+        RolapRestRequest rolapRequest = new RolapRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId());
+        rolapRequest.postEtlPullIntegration(parseIntegrationEntry(webdavURL));
 
         // create comp-attrs model
         maqlResource = getClass().getResource("/comp-attributes/extended/ca-model2-maql.txt");
@@ -70,7 +73,7 @@ public class SimpleCompAttributesTest extends AbstractProjectTest {
         uploadInfoResource = getClass().getResource("/comp-attributes/extended/upload_info.json");
         uploadFileToWebDav(uploadInfoResource, webdavURL);
 
-        postEtlPullIntegration(getRestApiClient(), testParams.getProjectId(), parseIntegrationEntry(webdavURL));
+        rolapRequest.postEtlPullIntegration(parseIntegrationEntry(webdavURL));
     }
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "defaultRelations")

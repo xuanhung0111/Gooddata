@@ -22,14 +22,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.http.RestRequest.initGetRequest;
 import static com.gooddata.qa.utils.http.RestRequest.initPostRequest;
 import static java.util.Objects.isNull;
 
 public class CommonRestRequest {
+
+    private static final Logger log = Logger.getLogger(CommonRestRequest.class.getName());
 
     protected RestClient restClient;
     protected String projectId;
@@ -228,6 +232,36 @@ public class CommonRestRequest {
 
     public Report getReportByTitle(String title) {
         return getMdService().getObj(getProject(), Report.class, title(title));
+    }
+
+    public int waitingForAsyncTask(String pollingUri) {
+        HttpRequestBase request = RestRequest.initGetRequest(pollingUri);
+        while (executeRequest(request) == HttpStatus.ACCEPTED.value()) {
+            log.info("Async task is running...");
+            sleepTightInSeconds(2);
+        }
+
+        return executeRequest(request);
+    }
+
+    /**
+     * Get asynchronous task status
+     *
+     * @param pollingUri
+     * @return status
+     */
+    public String getAsyncTaskStatus(String pollingUri) throws IOException, JSONException {
+        final JSONObject taskObject = getJsonObject(pollingUri);
+
+        String key = "";
+        if (!taskObject.isNull("wTaskStatus")) key = "wTaskStatus";
+        else if (!taskObject.isNull("taskState")) key = "taskState";
+        else throw new IllegalStateException("The status object is not existing! The current response is: "
+                    + taskObject.toString());
+
+        final String status = taskObject.getJSONObject(key).getString("status");
+        log.info("Async task status is: " + status);
+        return status;
     }
 
     protected Project getProject() {
