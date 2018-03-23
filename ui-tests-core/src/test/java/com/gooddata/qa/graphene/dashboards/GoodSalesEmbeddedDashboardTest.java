@@ -47,6 +47,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.GOODSALES_TEMPLATE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -445,6 +446,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         embeddedDashboard.getReport(tabularReportDef.getName(), TableReport.class)
                 .openReportInfoViewPanel()
                 .clickViewReportButton();
+        waitForAnalysisPageLoaded(browser);
 
         TableReport tableReport = Graphene.createPageFragment(ReportPage.class,
                 waitForElementVisible(ReportPage.LOCATOR, browser))
