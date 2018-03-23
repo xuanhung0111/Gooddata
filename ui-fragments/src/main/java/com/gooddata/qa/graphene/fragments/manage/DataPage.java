@@ -54,15 +54,12 @@ public class DataPage extends AbstractFragment {
     private static final By FOLDERS_XPATH_LOCATOR = xpath("//*[contains(@style,'display: block') and ./*[contains(@class,'listList')]]//li/a");
     protected static final By ROOT_LOCATOR = cssSelector("#p-dataPage.s-displayed");
 
-    @FindBy(id = "p-dataPage")
-    private ObjectFolder objectFolder;
-
     public static DataPage getInstance(SearchContext context) {
         return Graphene.createPageFragment(DataPage.class, waitForElementVisible(ROOT_LOCATOR, context));
     }
 
     public ObjectFolder getObjectFolder() {
-        return objectFolder;
+        return Graphene.createPageFragment(ObjectFolder.class, waitForElementVisible(By.id("p-dataPage"), browser));
     }
 
     public List<WebElement> getFolders() {
