@@ -160,7 +160,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         final DashboardEditBar editBar = dashboardsPage.getDashboardEditBar();
         editBar.tryToDeleteDashboard();
         Graphene.waitGui().until(browser -> browser.findElements(BY_RED_BAR).size() != 0);
-        assertEquals(browser.findElement(BY_RED_BAR).getText(), CANNOT_DELETE_DASHBOARD_MESSAGE);
+        assertEquals(waitForElementVisible(browser.findElement(BY_RED_BAR)).getText(), CANNOT_DELETE_DASHBOARD_MESSAGE);
         logRedBarMessageInfo(browser);
         waitForElementVisible(By.cssSelector("div#status .s-btn-dismiss"), browser).click();
         editBar.cancelDashboard();

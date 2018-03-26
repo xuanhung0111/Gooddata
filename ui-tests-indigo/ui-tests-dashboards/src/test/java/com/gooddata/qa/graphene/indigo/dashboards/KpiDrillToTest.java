@@ -326,7 +326,7 @@ public class KpiDrillToTest extends AbstractDashboardTest {
                 Function<WebDriver, Boolean> redBarAppear = browser -> browser.findElements(BY_RED_BAR).size() != 0;
                 Graphene.waitGui().until(redBarAppear);
 
-                assertEquals(browser.findElement(BY_RED_BAR).getText(), "Dashboard cannot be deleted because"
+                assertEquals(waitForElementVisible(browser.findElement(BY_RED_BAR)).getText(), "Dashboard cannot be deleted because"
                         + " it is linked from a scheduled email or KPI dashboard. Remove all links and retry.");
                 waitForElementVisible(BY_DISMISS_BUTTON, browser).click();
                 dashboardsPage.getDashboardEditBar().saveDashboard();
