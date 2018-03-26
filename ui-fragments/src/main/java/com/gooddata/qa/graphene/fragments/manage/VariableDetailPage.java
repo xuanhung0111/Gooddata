@@ -25,6 +25,7 @@ import com.gooddata.qa.graphene.entity.variable.NumericVariable;
 import com.gooddata.qa.graphene.fragments.AbstractTable;
 import com.gooddata.qa.graphene.fragments.common.IpeEditor;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
+import com.gooddata.qa.graphene.utils.Sleeper;
 
 public class VariableDetailPage extends ObjectPropertiesPage {
 
@@ -116,7 +117,9 @@ public class VariableDetailPage extends ObjectPropertiesPage {
     public VariableDetailPage saveChange() {
         waitForElementVisible(BY_SAVE_CHANGES_BUTTON, getRoot()).click();
         waitForElementNotPresent(BY_SAVE_CHANGES_BUTTON);
-        return this;
+        // make sure we will not look up the old fragment
+        Sleeper.sleepTightInSeconds(1);
+        return waitForFragmentVisible(this);
     }
 
     public VariablesPage goToVariablesPage() {
