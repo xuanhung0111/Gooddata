@@ -165,7 +165,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
             dashboardsPage.editDashboard();
             dashboardsPage.getDashboardEditBar().tryToDeleteDashboard();
             Graphene.waitGui().until(browser -> browser.findElements(BY_RED_BAR).size() != 0);
-            assertEquals(browser.findElement(BY_RED_BAR).getText(), CANNOT_DELETE_DASHBOARD_MESSAGE);
+            assertEquals(waitForElementVisible(browser.findElement(BY_RED_BAR)).getText(), CANNOT_DELETE_DASHBOARD_MESSAGE);
             logRedBarMessageInfo(browser);
             waitForElementVisible(BY_DISMISS_BUTTON, browser).click();
             dashboardsPage.getDashboardEditBar().cancelDashboard();
@@ -300,7 +300,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
             initReportsPage()
                 .tryDeleteReports(report);
             Graphene.waitGui().until(browser -> browser.findElements(BY_RED_BAR_WARNING).size() != 0);
-            assertEquals(browser.findElement(BY_RED_BAR_WARNING).getText(), "0 report(s) deleted."
+            assertEquals(waitForElementVisible(browser.findElement(BY_RED_BAR_WARNING)).getText(), "0 report(s) deleted."
                     + " 1 report(s) are in use on a dashboard or an email distribution list and were not deleted.");
             logRedBarMessageInfo(browser);
             waitForElementVisible(BY_DISMISS_BUTTON, browser).click();
