@@ -2,6 +2,8 @@ package com.gooddata.qa.utils.http.variable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.gooddata.md.AbstractObj;
+import com.gooddata.md.Attribute;
+import com.gooddata.md.AttributeElement;
 import com.gooddata.md.Meta;
 import com.gooddata.md.ObjNotFoundException;
 import com.gooddata.md.Queryable;
@@ -15,6 +17,8 @@ import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -48,6 +52,31 @@ public class VariableRestRequest extends CommonRestRequest {
      */
     public String createFilterVariable(String name, String attributeUri, String expression) {
         return createVariable(name, Prompt.PromptType.FILTER, attributeUri, expression);
+    }
+
+    /**
+     * Create filter variable with given values
+     *
+     * @param name
+     * @param attributeUri
+     * @param filteredValues
+     * @return variable uri
+     */
+    public String createFilterVariable(String name, String attributeUri, List<String> filteredValues) {
+        Attribute att = getAttributeByUri(attributeUri);
+        List<AttributeElement> filteredElements = getMdService().getAttributeElements(att).stream()
+                .filter(element -> filteredValues.contains(element.getTitle()))
+                .collect(Collectors.toList());
+
+        if (filteredElements.isEmpty())
+            throw new IllegalArgumentException("filtered values not found");
+
+        return createFilterVariable(name, att.getUri(),
+                format("[%s] IN (%s)",
+                        att.getUri(),
+                        filteredElements.stream()
+                                .map(element -> "[" + element.getUri() + "]")
+                                .collect(Collectors.joining(", "))));
     }
 
     /**

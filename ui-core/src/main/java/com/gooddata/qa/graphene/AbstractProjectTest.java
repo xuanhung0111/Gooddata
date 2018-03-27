@@ -25,7 +25,6 @@ import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
 import com.gooddata.qa.utils.http.RestUtils;
-import com.gooddata.qa.utils.http.variable.VariableRestUtils;
 import com.gooddata.qa.utils.java.Builder;
 import org.json.JSONException;
 import org.openqa.selenium.Dimension;
@@ -492,25 +491,6 @@ public abstract class AbstractProjectTest extends AbstractUITest {
             return getMetricByTitle(name);
         } catch (ObjNotFoundException e) {
             return gooddata.getMetadataService().createObj(getProject(), new Metric(name, expression, format));
-        }
-    }
-
-    protected String createNumericVarIfNotExit(RestApiClient restApiClient, String projectId,
-                                               String title, String defaultValue) {
-        try {
-            return VariableRestUtils.getVariableUri(restApiClient, projectId, title);
-        } catch (ObjNotFoundException e) {
-            return VariableRestUtils.createNumericVariable(restApiClient, projectId, title, defaultValue);
-        }
-    }
-
-    protected String createFilterVarIfNotExist(RestApiClient restApiClient, String projectId,
-                                               String title, String attributeUri, String expression) {
-        try {
-            return VariableRestUtils.getVariableUri(restApiClient, projectId, title);
-        } catch (ObjNotFoundException e) {
-            return VariableRestUtils.createFilterVariable(
-                    restApiClient, projectId, title, attributeUri, expression);
         }
     }
 

@@ -7,13 +7,14 @@ import com.gooddata.md.report.Filter;
 import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.MetricElement;
 import com.gooddata.qa.graphene.AbstractDashboardWidgetTest;
-import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
 import com.gooddata.qa.utils.asserts.AssertUtils;
 import com.gooddata.qa.utils.http.RestApiClient;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.variable.VariableRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.ITestContext;
@@ -28,7 +29,6 @@ import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.variable.VariableRestUtils.getVariableUri;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileUri;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
@@ -68,16 +68,15 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
 
     @Override
     protected void customizeProject() throws Throwable {
-        initVariablePage().createVariable(new AttributeVariable(DF_VARIABLE)
-                .withAttribute(ATTR_STAGE_NAME)
-                .withAttributeValues(asList(INTEREST, DISCOVERY, SHORT_LIST, RISK_ASSESSMENT)));
-
         Metric amountMetric = getMetricCreator().createAmountMetric();
-
         Attribute stageNameAttribute = getAttributeByTitle(ATTR_STAGE_NAME);
         Attribute departmentAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_DEPARTMENT));
 
-        String promptFilterUri = getVariableUri(getRestApiClient(), testParams.getProjectId(), DF_VARIABLE);
+        VariableRestRequest request = new VariableRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+
+        String promptFilterUri = request.createFilterVariable(DF_VARIABLE, stageNameAttribute.getUri(),
+                asList(INTEREST, DISCOVERY, SHORT_LIST, RISK_ASSESSMENT));
 
         createReportViaRest(GridReportDefinitionContent.create(REPORT_WITH_ADDITIONAL_ATTRIBUTE,
                 singletonList(METRIC_GROUP),
