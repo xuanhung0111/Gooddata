@@ -228,7 +228,8 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         reportPage.saveReport();
 
         initEmailSchedulesPage().scheduleNewReportEmail(imapUser, filteredVariableReportTitle,
-                "Scheduled email test - Filtered variable report.", "Filtered variable report", ExportFormat.CSV);
+                "Scheduled email test - Filtered variable report.","Filtered variable report",
+                ExportFormat.SCHEDULES_EMAIL_CSV);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-filtered-variable-report", this.getClass());
     }
@@ -250,7 +251,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
         initEmailSchedulesPage().scheduleNewReportEmail(imapUser, numericVariableReportTitle,
-                "Scheduled email test - Numeric variable report.", report, ExportFormat.CSV);
+                "Scheduled email test - Numeric variable report.", report, ExportFormat.SCHEDULES_EMAIL_CSV);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-numeric-variable-report", this.getClass());
     }
@@ -281,7 +282,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
         initEmailSchedulesPage().scheduleNewReportEmail(imapUser, mufReportTitle,
-                "Scheduled email test - MUF report.", report, ExportFormat.CSV);
+                "Scheduled email test - MUF report.", report, ExportFormat.SCHEDULES_EMAIL_CSV);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-muf-report", this.getClass());
     }
@@ -328,7 +329,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         String title = "verify-UI-title";
         String updatedTitle = title + "Updated";
         initEmailSchedulesPage().scheduleNewReportEmail(imapUser, title,
-                "Scheduled email test - report.", REPORT_ACTIVITIES_BY_TYPE, ExportFormat.CSV);
+                "Scheduled email test - report.", REPORT_ACTIVITIES_BY_TYPE, ExportFormat.SCHEDULES_EMAIL_CSV);
 
         try {
             EmailSchedulePage.getInstance(browser).openSchedule(title)

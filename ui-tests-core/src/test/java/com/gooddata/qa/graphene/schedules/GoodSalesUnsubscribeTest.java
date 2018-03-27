@@ -75,7 +75,8 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
     @Test(dependsOnMethods = {"signInImapUser"}, groups = {"schedules"})
     public void createReportSchedule() {
         initEmailSchedulesPage().scheduleNewReportEmail(imapUser, reportTitle,
-                "Unsubscribe bcc test - report.", REPORT_ACTIVITIES_BY_TYPE, ExportFormat.CSV, RepeatTime.DAILY);
+                "Unsubscribe bcc test - report.", REPORT_ACTIVITIES_BY_TYPE,
+                ExportFormat.SCHEDULES_EMAIL_CSV, RepeatTime.DAILY);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-report", this.getClass());
     }

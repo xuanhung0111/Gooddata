@@ -6,9 +6,11 @@ public enum ExportFormat {
     PDF_PORTRAIT("pdf", "PDF (Portrait)"),
     PDF_LANDSCAPE("pdf", "PDF (Landscape)"),
     IMAGE_PNG("png", "Image (PNG)"),
-    CSV("csv", "CSV"),
-    RAW_CSV("csv", "Raw data (CSV)"),
-    EXCEL_XLSX("xlsx", "Excel (XLSX)"),
+    CSV("csv", "CSV (formatted)"),
+    RAW_CSV("csv", "CSV (raw data)"),
+    SCHEDULES_EMAIL_CSV("csv", "CSV"),
+    EXCEL_XLSX("xlsx", "XLSX..."),
+    SCHEDULES_EMAIL_EXCEL_XLSX("xlsx", "Excel (XLSX)"),
     ALL("all", "Used for schedules...");
 
     private final String name;
