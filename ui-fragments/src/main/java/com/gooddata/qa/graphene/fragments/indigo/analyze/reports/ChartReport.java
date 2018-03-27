@@ -160,7 +160,7 @@ public class ChartReport extends AbstractFragment {
     private void displayTooltipOnTrackerByIndex(int index) {
         waitForCollectionIsNotEmpty(trackers);
         checkIndex(index);
-        getActions().moveToElement(trackers.get(index)).perform();
+        getActions().moveToElement(trackers.get(index)).moveByOffset(1, 1).perform();
         if (isLineChart())
             waitForElementVisible(markers.get(index)).click();
         waitForElementVisible(tooltip);
