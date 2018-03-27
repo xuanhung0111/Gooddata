@@ -53,6 +53,9 @@ public class SelectItemPopupPanel extends AbstractFragment {
     })
     private List<WebElement> items;
 
+    @FindBy(className = "is-unlisted")
+    private List<WebElement> hiddenItems;
+
     public static SelectItemPopupPanel getInstance(SearchContext searchContext) {
         return getInstance(LOCATOR, searchContext);
     }
@@ -154,6 +157,10 @@ public class SelectItemPopupPanel extends AbstractFragment {
 
     public boolean isSearchInputVisible() {
         return waitForElementVisible(searchInput).isDisplayed();
+    }
+
+    public List<String> getHiddenItems() {
+        return getElementTexts(hiddenItems);
     }
 
     private Stream<WebElement> getAllItemCheckboxes() {

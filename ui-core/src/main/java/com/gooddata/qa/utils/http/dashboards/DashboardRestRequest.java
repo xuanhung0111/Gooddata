@@ -285,6 +285,33 @@ public class DashboardRestRequest extends CommonRestRequest {
         setDrillReportTarget(dashboardID, TARGET_EXPORT, exportFormat);
     }
 
+    /**
+     *
+     * @param dashboard
+     * @param metric
+     * @throws IOException
+     */
+    public void addUseAvailableMetricToDashboardFilters(final String dashboard, final String metric)
+            throws IOException {
+        final String dashboardUri = getDashboardUri(dashboard);
+        final JSONObject dashboarObject = getJsonObject(initGetRequest(dashboardUri));
+        final JSONArray filters = dashboarObject.getJSONObject("projectDashboard").getJSONObject("content")
+                .getJSONArray("filters");
+        JSONObject currentObj;
+
+        for (int i = 0, n = filters.length(); i < n; i++) {
+            currentObj = filters.getJSONObject(i).getJSONObject("filterItemContent");
+            if (currentObj.has("useAvailable")) {
+                continue;
+            }
+            currentObj.put("useAvailable", new JSONObject() {{
+                put("metrics", new JSONArray().put(getMetricByTitle(metric).getUri()));
+            }});
+        }
+
+        executeRequest(initPostRequest(dashboardUri + "?mode=edit", dashboarObject.toString()), HttpStatus.OK);
+    }
+
     private void setDrillReportTarget(final String dashboardID, final String target, final String exportFormat)
             throws IOException {
         final String dashboardEditModeURI = format(DASHBOARD_EDIT_MODE_LINK, projectId, dashboardID);

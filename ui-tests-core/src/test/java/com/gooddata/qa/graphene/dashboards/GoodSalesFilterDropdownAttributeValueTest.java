@@ -140,7 +140,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
         DashboardWidgetDirection.UP.moveElementToRightPlace(filter);
         dashboardEditBar.saveDashboard();
 
-        configureUseAvailableToDashboard(getCurrentDashboardUri());
+        dashboardRequest.addUseAvailableMetricToDashboardFilters(USE_AVAILABLE_DASHBOARD_1, METRIC_AVAILABLE);
     }
 
     @Test(dependsOnMethods = {"createUseAvailableDashboardWithOneReport"}, groups = {"init"})
@@ -162,7 +162,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
         DashboardWidgetDirection.DOWN.moveElementToRightPlace(filter);
         dashboardEditBar.saveDashboard();
 
-        configureUseAvailableToDashboard(getCurrentDashboardUri());
+        dashboardRequest.addUseAvailableMetricToDashboardFilters(USE_AVAILABLE_DASHBOARD_2, METRIC_AVAILABLE);
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -383,14 +383,6 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
         }));
     }
 
-    private void configureUseAvailableToDashboard(String dashboardUri) throws IOException, JSONException {
-        JSONObject json = getJsonObject(getRestApiClient(), dashboardUri);
-        json = addUseAvailableContentToJson(json);
-        executeRequest(getRestApiClient(),
-                getRestApiClient().newPostMethod(dashboardUri + "?mode=edit", json.toString()),
-                HttpStatus.OK);
-    }
-
     private String buildFirstMetricExpression(String amountUri, String stageNameUri) {
         String expressionTemplate = "SELECT SUM([%s]) WHERE [%s] IN ([%s],[%s],[%s])";
         return format(expressionTemplate, amountUri, stageNameUri,
@@ -428,24 +420,6 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
         executeRequest(getRestApiClient(),
                 getRestApiClient().newPostMethod(metricAvailable.getUri() + "?mode=edit", json.toString()),
                 HttpStatus.OK);
-    }
-
-    private JSONObject addUseAvailableContentToJson(JSONObject json) throws JSONException {
-        JSONArray filters = json.getJSONObject("projectDashboard").getJSONObject("content")
-                .getJSONArray("filters");
-        JSONObject currentObj;
-
-        for (int i = 0, n = filters.length(); i < n; i++) {
-            currentObj = filters.getJSONObject(i).getJSONObject("filterItemContent");
-            if (currentObj.has("useAvailable")) {
-                continue;
-            }
-            currentObj.put("useAvailable", new JSONObject() {{
-                put("metrics", new JSONArray().put(metricAvailable.getUri()));
-            }});
-        }
-
-        return json;
     }
 
     private boolean isUseAvailableStillRemainInDashboard(String dashboardUri) throws IOException, JSONException {
