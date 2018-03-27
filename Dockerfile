@@ -8,7 +8,7 @@ LABEL name="Checklist xvfb image based on CentOS-7" \
 COPY google-chrome.repo /etc/yum.repos.d/google-chrome.repo
 
 ARG CHROME_DRIVER_VERSION=latest
-ARG FIREFOX_VERSION=58.0.2
+ARG FIREFOX_VERSION=59.0.1
 ARG GECKODRIVER_VERSION=0.20.0
 
 # Commands are chained to squeeze the image size (~950 MB).
