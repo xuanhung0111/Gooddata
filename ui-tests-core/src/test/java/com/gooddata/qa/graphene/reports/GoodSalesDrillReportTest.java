@@ -254,7 +254,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
 
             try {
                 BrowserUtils.switchToLastTab(browser);
-                assertTrue(browser.getCurrentUrl().contains("www.google.com"));
+                Graphene.waitGui().until(browser -> browser.getCurrentUrl().contains("www.google.com"));
             } finally {
                 BrowserUtils.closeCurrentTab(browser);
                 BrowserUtils.switchToFirstTab(browser);
