@@ -200,16 +200,12 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
         Stream.of(CatalogFilterType.values()).forEach(type -> {
             assertFalse(analysisPage.getCataloguePanel().filterCatalog(type)
                     .search("abcxyz"));
-            assertTrue(isElementPresent(ByJQuery.selector(
-                    ".adi-no-items:contains('No data matching\"abcxyz\"')"), browser));
         });
 
         analysisPage.getCataloguePanel().filterCatalog(CatalogFilterType.ALL);
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE);
         Stream.of(CatalogFilterType.values()).forEach(type -> {
             assertFalse(analysisPage.getCataloguePanel().filterCatalog(type).search("Am"));
-            assertTrue(isElementPresent(ByJQuery.selector(
-                    ".adi-no-items:contains('No data matching\"Am\"')"), browser));
 
             assertTrue(waitForElementVisible(className("s-unavailable-items-matched"), browser)
                     .getText().matches("^\\d unrelated data item[s]? hidden$"));
