@@ -5,13 +5,14 @@ import com.gooddata.md.report.Filter;
 import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.MetricElement;
 import com.gooddata.qa.graphene.AbstractDashboardWidgetTest;
-import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.utils.asserts.AssertUtils;
+import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.variable.VariableRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -22,7 +23,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_PIPELINE_ANALYSIS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_TAB_OUTLOOK;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.variable.VariableRestUtils.getVariableUri;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -44,15 +44,16 @@ public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest 
 
     @Override
     protected void customizeProject() throws Throwable {
-        initVariablePage().createVariable(new AttributeVariable(DF_VARIABLE)
-                .withAttribute(ATTR_STAGE_NAME)
-                .withAttributeValues(asList(INTEREST, DISCOVERY, SHORT_LIST, RISK_ASSESSMENT)));
-
-        String promptFilterUri = getVariableUri(getRestApiClient(), testParams.getProjectId(), DF_VARIABLE);
+        VariableRestRequest request = new VariableRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        String promptFilterUri = request.createFilterVariable(DF_VARIABLE,
+                request.getAttributeByTitle(ATTR_STAGE_NAME).getUri(),
+                asList(INTEREST, DISCOVERY, SHORT_LIST, RISK_ASSESSMENT, DIRECT_SALES));
 
         createReportViaRest(GridReportDefinitionContent.create(REPORT_WITH_PROMPT_FILTER,
                 singletonList(METRIC_GROUP),
-                singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_STAGE_NAME).getDefaultDisplayForm().getUri(), 
+                singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_STAGE_NAME).getDefaultDisplayForm()
+                        .getUri(),
                         ATTR_STAGE_NAME)),
                 singletonList(new MetricElement(getMetricCreator().createAmountMetric())),
                 singletonList(new Filter(format("[%s]", promptFilterUri)))));
@@ -61,7 +62,6 @@ public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest 
             dash.setName(DASH_PIPELINE_ANALYSIS);
             dash.addTab(Builder.of(Tab::new).with(tab -> tab.setTitle(DASH_TAB_OUTLOOK)).build());
         }).build();
-
         DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(), dashboard.getMdObject());
     }
 

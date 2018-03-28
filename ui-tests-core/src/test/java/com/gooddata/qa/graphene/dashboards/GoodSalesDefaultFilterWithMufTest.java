@@ -5,13 +5,14 @@ import com.gooddata.md.report.Filter;
 import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.MetricElement;
 import com.gooddata.qa.graphene.AbstractDashboardWidgetTest;
-import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
 import com.gooddata.qa.utils.asserts.AssertUtils;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.variable.VariableRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.ITestContext;
@@ -30,7 +31,6 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.addMufToUser;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createMufObjectByUri;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.removeAllMufFromUser;
-import static com.gooddata.qa.utils.http.variable.VariableRestUtils.getVariableUri;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -83,9 +83,9 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
     @Override
     protected void customizeProject() throws Throwable {
         //prepare Dashboard For Muf User
-        initVariablePage().createVariable(new AttributeVariable(MUF_DF_VARIABLE).withAttribute(ATTR_PRODUCT));
-
-        String promptFilterUri = getVariableUri(getRestApiClient(), testParams.getProjectId(), MUF_DF_VARIABLE);
+        VariableRestRequest request = new VariableRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        String promptFilterUri = request.createFilterVariable(MUF_DF_VARIABLE, request.getAttributeByTitle(ATTR_PRODUCT).getUri());
 
         createReportViaRest(GridReportDefinitionContent.create(REPORT_MUF,
                 singletonList(METRIC_GROUP),

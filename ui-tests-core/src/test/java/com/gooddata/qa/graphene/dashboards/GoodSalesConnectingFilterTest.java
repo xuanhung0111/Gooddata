@@ -13,7 +13,8 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPan
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.utils.Sleeper;
 import com.gooddata.qa.utils.asserts.AssertUtils;
-import com.gooddata.qa.utils.http.variable.VariableRestUtils;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.variable.VariableRestRequest;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
@@ -57,8 +58,9 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
     protected void customizeProject() throws Throwable {
         getMetricCreator().createAmountMetric();
 
-        VariableRestUtils.createFilterVariable(getRestApiClient(), testParams.getProjectId(),
-                V_STAGE, getAttributeByTitle(ATTR_STAGE_NAME).getUri());
+        VariableRestRequest request = new VariableRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        request.createFilterVariable(V_STAGE, request.getAttributeByTitle(ATTR_STAGE_NAME).getUri());
 
         createReport(GridReportDefinitionContent.create(REPORT_1,
                 singletonList(METRIC_GROUP),
