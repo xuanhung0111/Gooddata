@@ -41,6 +41,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACT
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForReportsPageLoaded;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -241,7 +242,7 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
         Graphene.createPageFragment(EmbeddedReportPage.class,
                 waitForElementVisible(EmbeddedReportPage.LOCATOR, browser))
                 .cancel();
-        waitForFragmentVisible(embeddedReportsPage);
+        waitForReportsPageLoaded(browser);
 
         embeddedReportsPage
                 .addNewFolder(reportFolder)
@@ -257,7 +258,7 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
         Graphene.createPageFragment(EmbeddedReportPage.class,
                 waitForElementVisible(EmbeddedReportPage.LOCATOR, browser))
                 .deleteCurrentReport();
-        waitForFragmentVisible(embeddedReportsPage);
+        waitForReportsPageLoaded(browser);
 
         takeScreenshot(browser, "Delete-report-in-embedded-Domain-page", getClass());
         assertFalse(embeddedReportsPage.openFolder(reportFolder).isReportVisible(report.getTitle()),
