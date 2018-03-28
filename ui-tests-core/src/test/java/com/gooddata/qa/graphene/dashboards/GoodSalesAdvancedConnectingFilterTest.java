@@ -647,14 +647,14 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
                 .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR, THIS)
                 .addTimeFilterToDashboard(DATE_DIMENSION_CLOSED, DateGranularity.YEAR, THIS);
 
-        moveElementToRightPlace(getDateCreatedFilter().getRoot(), DashboardWidgetDirection.RIGHT);
+        moveElementToRightPlace(getDateClosedFilter().getRoot(), DashboardWidgetDirection.RIGHT);
 
         dashboardsPage
                 .addNewTab(DASHBOARD_TAB)
                 .addTimeFilterToDashboard(DATE_DIMENSION_CREATED, DateGranularity.YEAR, LAST)
                 .addTimeFilterToDashboard(DATE_DIMENSION_CLOSED, DateGranularity.YEAR, THIS);
 
-        moveElementToRightPlace(getDateCreatedFilter().getRoot(), DashboardWidgetDirection.RIGHT);
+        moveElementToRightPlace(getDateClosedFilter().getRoot(), DashboardWidgetDirection.RIGHT);
         dashboardsPage.saveDashboard();
 
         dashboardsPage.editDashboard();
