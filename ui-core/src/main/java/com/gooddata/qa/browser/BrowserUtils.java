@@ -2,16 +2,16 @@ package com.gooddata.qa.browser;
 
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
-import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
-
+import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.Point;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import com.gooddata.qa.graphene.utils.WaitUtils;
 
 public class BrowserUtils {
     public static List<String> getWindowHandles(WebDriver browser) {
@@ -38,7 +38,8 @@ public class BrowserUtils {
     public static String getCurrentBrowserAgent(WebDriver browser) {
         Capabilities capabilities = ((RemoteWebDriver) browser).getCapabilities();
 
-        return capabilities.getBrowserName() + " - " + capabilities.getCapability("platform");
+        return capabilities.getBrowserName() + " " + capabilities.getVersion() + " - "
+                + capabilities.getCapability("platform");
     }
 
     public static boolean canAccessGreyPage(WebDriver browser) {
@@ -58,5 +59,24 @@ public class BrowserUtils {
 
     public static void switchToMainWindow(WebDriver browser) {
         browser.switchTo().defaultContent();
+    }
+    
+    public static void refreshCurrentPage(WebDriver browser) {
+        // Refresh the page and wait until the old content disappears.
+        // In general, performing page refresh and locating a page fragment
+        // can fail because old fragment is found just before the DOM refresh.
+        
+        // 1) Insert new element with unique class name
+        // It is not possible to locate "body", then refresh and then wait for stale element exception,
+        // because Graphene will automatically locate gone element - we must work with element that will disappear.
+        String MAGIC = "MAGICrefreshCurrentPage";
+        String script = "var magic = document.createElement('div'); magic.className='" + MAGIC + "'; "
+                + "document.getElementsByTagName('body')[0].appendChild(magic);";
+        ((JavascriptExecutor) browser).executeScript(script);
+        
+        // 2) Locate magic element, refresh and wait until magic element disappears
+        WebElement magic = browser.findElement(By.className(MAGIC));
+        browser.navigate().refresh();
+        WaitUtils.waitForElementNotPresent(magic);
     }
 }

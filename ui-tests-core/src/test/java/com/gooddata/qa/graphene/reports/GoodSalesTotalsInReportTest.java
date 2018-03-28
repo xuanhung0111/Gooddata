@@ -9,6 +9,7 @@ import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.reports.filter.ContextMenu.AggregationType;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
+import com.gooddata.qa.graphene.utils.ElementUtils;
 import org.openqa.selenium.By;
 import org.supercsv.io.CsvListReader;
 import org.supercsv.prefs.CsvPreference;
@@ -278,8 +279,8 @@ public class GoodSalesTotalsInReportTest extends GoodSalesAbstractTest {
         final By contextMenuLocator = By.id("ctxMenu");
         assertTrue(isElementVisible(contextMenuLocator, browser), "The context menu is not displayed");
 
-        //click on anywhere to close context menu
-        reportPage.getRoot().click();
+        // click near top left corner of report page to close context menu
+        ElementUtils.moveToElementActions(reportPage.getRoot(), 5, 5).click().perform();
         assertFalse(isElementVisible(contextMenuLocator, browser), "The context menu is displayed");
     }
 

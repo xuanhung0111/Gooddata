@@ -21,7 +21,6 @@ import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import com.gooddata.qa.graphene.utils.WaitUtils;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
-import com.google.common.base.Predicate;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -29,7 +28,7 @@ import org.openqa.selenium.WebDriver;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-
+import java.util.function.Function;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
@@ -262,7 +261,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
 
     private void checkExternalPageUrl(final String currentWindow) {
         try {
-            final Predicate<WebDriver> predicate = browser -> browser.getWindowHandles().size() == 2;
+            final Function<WebDriver, Boolean> predicate = browser -> browser.getWindowHandles().size() == 2;
             Graphene.waitGui().until(predicate);
 
             BrowserUtils.switchToLastTab(browser);

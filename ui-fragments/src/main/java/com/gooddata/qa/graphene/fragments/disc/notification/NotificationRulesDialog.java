@@ -5,7 +5,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible
 import static com.google.common.collect.Iterables.getLast;
 
 import java.util.Collection;
-
+import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -15,7 +15,6 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.entity.disc.NotificationRule;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.base.Predicate;
 
 public class NotificationRulesDialog extends AbstractFragment {
 
@@ -46,7 +45,7 @@ public class NotificationRulesDialog extends AbstractFragment {
         int notificationRuleNumber = getNotificationRuleNumber();
         waitForElementVisible(addNotificationRuleButton).click();
 
-        Predicate<WebDriver> newRuleItemCreated = browser -> getNotificationRuleNumber() > notificationRuleNumber;
+        Function<WebDriver, Boolean> newRuleItemCreated = browser -> getNotificationRuleNumber() > notificationRuleNumber;
         Graphene.waitGui().until(newRuleItemCreated);
 
         return getLastNotificationRuleItem();

@@ -38,7 +38,6 @@ public class DashboardGeoChart extends AbstractFragment {
             List<String> expectedColorList, List<String> expectedSvgDataList,
             List<String> expectedMetricValuesList, List<String> expectedAttrValuesList) {
         // Verify color rank based on metric values
-        browser.navigate().refresh();
         waitForElementVisible(metricName); 
         assertEquals(metricName.getText(), metricLabel, "Metric label of GEO is not properly in Geo.");
         waitForElementVisible(startValueDiv);
@@ -49,8 +48,10 @@ public class DashboardGeoChart extends AbstractFragment {
         // expected Style of GradientView: background: -moz-linear-gradient(0px 50% , rgb(230, 230, 230), rgb(43, 107, 174)) repeat scroll 0% 0% transparent;
         String style = colorGradientView.getAttribute("style");
         assertTrue(style.startsWith("background: "));
-        assertTrue(style.contains("transparent"));
-        assertTrue(style.contains("-moz-linear-gradient(0px 50% , rgb(230, 230, 230), rgb(43, 107, 174)) repeat scroll 0% 0%"));
+        //assertTrue(style.contains("transparent"));
+        //assertTrue(style.contains("-moz-linear-gradient(0px 50% , rgb(230, 230, 230), rgb(43, 107, 174)) repeat scroll 0% 0%"));
+        assertTrue(style.contains("gradient") && style.contains("linear"));
+        assertTrue(style.contains("rgb(230, 230, 230)") && style.contains("rgb(43, 107, 174)"));
         
         // Verify map area on GEO
         List<String> actualColorList = new ArrayList<String>();

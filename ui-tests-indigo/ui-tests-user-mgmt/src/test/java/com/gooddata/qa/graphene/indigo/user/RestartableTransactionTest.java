@@ -2,10 +2,11 @@ package com.gooddata.qa.graphene.indigo.user;
 
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static org.openqa.selenium.By.className;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static org.testng.Assert.assertFalse;
 
 import org.json.JSONException;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
@@ -55,7 +56,15 @@ public class RestartableTransactionTest extends AbstractUITest {
     }
 
     private void checkError() {
-        final WebElement e = waitForElementVisible(className("gd-message"), browser);
+        final WebElement e = waitForElementVisible(By.className("gd-message"), browser);
         assertFalse(e.getAttribute("class").contains("error"));
+        // dismiss the message to avoid catching it as old one next time
+        try {
+            e.findElement(By.cssSelector(".gd-message-dismiss-container")).click();
+        } catch (Exception ex) {
+            // ignore any exception here, most likely the element disappeared by itself
+            System.out.println("Unable to dismiss message: " + ex.getClass().getSimpleName());
+        }
+        waitForElementNotPresent(e);
     }
 }

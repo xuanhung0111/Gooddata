@@ -37,7 +37,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
@@ -54,7 +53,6 @@ import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.google.common.base.Joiner;
-import com.google.common.base.Predicate;
 
 public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedulesTest {
 
@@ -161,13 +159,8 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         dashboardsPage.editDashboard();
         final DashboardEditBar editBar = dashboardsPage.getDashboardEditBar();
         editBar.tryToDeleteDashboard();
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-            @Override
-            public boolean apply(WebDriver browser) {
-                return browser.findElements(BY_RED_BAR).size() != 0;
-            }
-        });
-        assertEquals(browser.findElement(BY_RED_BAR).getText(), CANNOT_DELETE_DASHBOARD_MESSAGE);
+        Graphene.waitGui().until(browser -> browser.findElements(BY_RED_BAR).size() != 0);
+        assertEquals(waitForElementVisible(browser.findElement(BY_RED_BAR)).getText(), CANNOT_DELETE_DASHBOARD_MESSAGE);
         logRedBarMessageInfo(browser);
         waitForElementVisible(By.cssSelector("div#status .s-btn-dismiss"), browser).click();
         editBar.cancelDashboard();

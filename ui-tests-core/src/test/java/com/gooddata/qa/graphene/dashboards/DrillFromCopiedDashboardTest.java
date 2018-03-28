@@ -15,7 +15,6 @@ import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.gooddata.qa.utils.java.Builder;
-import com.google.common.base.Predicate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -25,6 +24,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -167,7 +167,7 @@ public class DrillFromCopiedDashboardTest extends GoodSalesAbstractTest {
         TableReport tableReport = dashboardsPage.getReport(REPORT_AMOUNT_BY_PRODUCT, TableReport.class);
         tableReport.drillOn(GRAMMAR_PLUS, TableReport.CellType.ATTRIBUTE_VALUE);
 
-        final Predicate<WebDriver> targetTabIsLoaded =
+        final Function<WebDriver, Boolean> targetTabIsLoaded =
                 browser -> dashboardsPage.getDashboardName().equals(expectedDashboard) &&
                         dashboardsPage.getTabs().getSelectedTab().getLabel().equals(expectedTab);
         Graphene.waitGui().until(targetTabIsLoaded);

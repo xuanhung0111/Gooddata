@@ -6,7 +6,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static org.openqa.selenium.By.className;
 
 import java.util.List;
-
+import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -15,7 +15,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.base.Predicate;
 
 public class DatasetDetailPage extends AbstractFragment {
 
@@ -34,7 +33,7 @@ public class DatasetDetailPage extends AbstractFragment {
     @FindBy(className = "s-dataset-columns-table")
     private DatasetColumnsTable datasetColumns;
 
-    @FindBy(xpath = "//.[@class='datasets-sidebar']//a")
+    @FindBy(xpath = "//*[@class='datasets-sidebar']//a")
     private WebElement latestCsvFileUpload;
 
     @FindBy(css = ".file-detail")
@@ -61,7 +60,7 @@ public class DatasetDetailPage extends AbstractFragment {
             return;
         }
 
-        final Predicate<WebDriver> progressFinished = b -> !message.getAttribute("class").contains("progress");
+        final Function<WebDriver, Boolean> progressFinished = b -> !message.getAttribute("class").contains("progress");
         Graphene.waitGui().until(progressFinished);
     }
 

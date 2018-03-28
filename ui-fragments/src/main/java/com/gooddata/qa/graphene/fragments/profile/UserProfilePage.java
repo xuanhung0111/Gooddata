@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -32,7 +33,7 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.AbstractTable;
 import com.gooddata.qa.graphene.fragments.common.IpeEditor;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
-import com.google.common.base.Predicate;
+import com.gooddata.qa.graphene.utils.Sleeper;
 
 public class UserProfilePage extends AbstractFragment {
 
@@ -107,7 +108,7 @@ public class UserProfilePage extends AbstractFragment {
         WebElement roleElement = waitForElementPresent(role);
         try {
             //wait for the role text is updated
-            Predicate<WebDriver> waitUntil = browser -> !roleElement.getText().trim().isEmpty();
+            Function<WebDriver, Boolean> waitUntil = browser -> !roleElement.getText().trim().isEmpty();
             Graphene.waitGui(browser).withTimeout(10, TimeUnit.SECONDS).until(waitUntil);
         } catch (TimeoutException e) {
             //ignore TimeoutException because in case Unverified Admin, no text displayed
@@ -136,8 +137,12 @@ public class UserProfilePage extends AbstractFragment {
     public UserProfilePage saveChanges() {
         waitForElementVisible(saveChangesButton).click();
 
-        Predicate<WebDriver> saved = browser -> saveChangesButton.getAttribute("class").contains("disabled");
+        Function<WebDriver, Boolean> saved = browser -> saveChangesButton.getAttribute("class").contains("disabled");
         Graphene.waitGui().until(saved);
+
+        // Existing table content is now refreshed in DOM, short sleep is to avoid possible StaleElementReferenceException,
+        // because it was observed that the exception was not handled by Graphene when occurred in filter part of getRowOf(). 
+        Sleeper.sleepTight(500);
 
         return this;
     }

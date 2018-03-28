@@ -13,7 +13,6 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
-import com.google.common.base.Predicate;
 
 import javax.security.auth.login.Configuration;
 
@@ -22,6 +21,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import java.util.List;
+import java.util.function.Function;
 
 public class ConfigurationPanel extends AbstractFragment {
 
@@ -79,7 +79,7 @@ public class ConfigurationPanel extends AbstractFragment {
     private static final By DATE_DATASET_ERROR_LOCATOR = By.cssSelector(".gd-message.error");
 
     private ConfigurationPanel waitForVisDateDataSetsLoaded() {
-        final Predicate<WebDriver> dataSetLoaded =
+        final Function<WebDriver, Boolean> dataSetLoaded =
                 browser -> !dataSetSelectLoaded.getAttribute("class").contains("is-loading");
         Graphene.waitGui().until(dataSetLoaded);
         return this;

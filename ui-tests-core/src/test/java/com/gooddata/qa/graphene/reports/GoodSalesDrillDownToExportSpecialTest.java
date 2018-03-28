@@ -18,7 +18,6 @@ import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import com.gooddata.qa.graphene.utils.UrlParserUtils;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
-import com.google.common.base.Predicate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -35,7 +34,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
+import java.util.function.Function;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
@@ -266,7 +265,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
 
     private void checkRebBarVisible() {
         try {
-            Predicate<WebDriver> isRedBarVisible = browser -> isElementVisible(BY_RED_BAR, browser);
+            Function<WebDriver, Boolean> isRedBarVisible = browser -> isElementVisible(BY_RED_BAR, browser);
             Graphene.waitGui().withTimeout(20, TimeUnit.SECONDS).until(isRedBarVisible);
         } catch (TimeoutException e) {
             fail("Red Bar is not displayed");

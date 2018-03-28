@@ -11,7 +11,7 @@ import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 
 import java.util.List;
-
+import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
@@ -21,7 +21,6 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.dialog.SaveInsightDialog;
-import com.google.common.base.Predicate;
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractInsightSelectionPanel extends AbstractFragment {
@@ -107,7 +106,7 @@ public abstract class AbstractInsightSelectionPanel extends AbstractFragment {
 
 
     public <T extends AbstractInsightSelectionPanel> T waitForLoading() {
-        Predicate<WebDriver> isDataLoaded = browser ->
+        Function<WebDriver, Boolean> isDataLoaded = browser ->
                 !isElementPresent(cssSelector(".gd-spinner.large"), getRoot());
         Graphene.waitGui().until(isDataLoaded);
         return (T) this;

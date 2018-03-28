@@ -13,7 +13,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.util.Collection;
-
+import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -26,7 +26,6 @@ import com.gooddata.qa.graphene.enums.AttributeLabelTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 import com.gooddata.qa.utils.CssUtils;
-import com.google.common.base.Predicate;
 
 public class AttributeDetailPage extends ObjectPropertiesPage {
 
@@ -108,7 +107,7 @@ public class AttributeDetailPage extends ObjectPropertiesPage {
             clearDrillingSetting();
         }
         //add here to wait Attribute button loading successfully
-        Predicate<WebDriver> drillAttributeButtonEnabled = browser -> !waitForElementVisible(selectDrillAttributeButton)
+        Function<WebDriver, Boolean> drillAttributeButtonEnabled = browser -> !waitForElementVisible(selectDrillAttributeButton)
                 .getAttribute("class")
                 .contains("disabled");
         Graphene.waitGui().until(drillAttributeButtonEnabled);

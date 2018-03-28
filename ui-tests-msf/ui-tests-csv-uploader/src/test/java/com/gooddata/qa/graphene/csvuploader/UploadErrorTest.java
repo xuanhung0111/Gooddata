@@ -99,7 +99,7 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
 
         dataPreviewPage.selectHeader()
             .getRowSelectionTable()
-            .getRow(3)
+            .getCell(3, 0)
             .click(); // select data row as header
 
         dataPreviewPage.triggerIntegration(); // confirm header row

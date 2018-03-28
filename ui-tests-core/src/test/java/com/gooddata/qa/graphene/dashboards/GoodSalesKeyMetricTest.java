@@ -1,5 +1,27 @@
 package com.gooddata.qa.graphene.dashboards;
 
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
+import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
+import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardAddWidgetPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.FiltersConfigPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.MetricConfigPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.MetricStyleConfigPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel.Tab;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.variable.VariableRestRequest;
+import com.google.common.collect.Iterables;
+import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.testng.annotations.Test;
+
+import java.util.Calendar;
+import java.util.function.Function;
+
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CREATED;
@@ -18,29 +40,6 @@ import static org.openqa.selenium.By.xpath;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-
-import java.util.Calendar;
-
-import com.gooddata.qa.utils.http.RestClient;
-import com.gooddata.qa.utils.http.variable.VariableRestRequest;
-import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.testng.annotations.Test;
-
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
-import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
-import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardAddWidgetPanel;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.FiltersConfigPanel;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.MetricConfigPanel;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.MetricStyleConfigPanel;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel.Tab;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 
 public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
 
@@ -159,7 +158,7 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
 
     private void waitForKeyMetricUpdateValue() {
         sleepTight(1000); // need buffer time to make sure css class 'reloading' appear in DOM
-        Predicate<WebDriver> valueLoaded = browser -> !waitForElementPresent(
+        Function<WebDriver, Boolean> valueLoaded = browser -> !waitForElementPresent(
                 HEADLINE_WIDGET_LOCATOR, browser).getAttribute("class").contains("reloading") &&
                 !isElementPresent(className("c-report-overlap"), browser);
         Graphene.waitGui().until(valueLoaded);

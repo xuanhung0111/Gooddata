@@ -54,7 +54,6 @@ import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.java.Builder;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
-import org.openqa.selenium.WebDriver;
 import org.supercsv.io.CsvListReader;
 import org.supercsv.io.ICsvListReader;
 import org.supercsv.prefs.CsvPreference;
@@ -79,7 +78,6 @@ import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage.RepeatTime;
 import com.gooddata.qa.utils.http.scheduleEmail.ScheduleEmailRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;
-import com.google.common.base.Predicate;
 
 public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSchedulesTest {
 
@@ -166,13 +164,8 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
             dashboardsPage.selectDashboard(DASHBOARD_HAVING_TAB);
             dashboardsPage.editDashboard();
             dashboardsPage.getDashboardEditBar().tryToDeleteDashboard();
-            Graphene.waitGui().until(new Predicate<WebDriver>() {
-                @Override
-                public boolean apply(WebDriver browser) {
-                    return browser.findElements(BY_RED_BAR).size() != 0;
-                }
-            });
-            assertEquals(browser.findElement(BY_RED_BAR).getText(), CANNOT_DELETE_DASHBOARD_MESSAGE);
+            Graphene.waitGui().until(browser -> browser.findElements(BY_RED_BAR).size() != 0);
+            assertEquals(waitForElementVisible(browser.findElement(BY_RED_BAR)).getText(), CANNOT_DELETE_DASHBOARD_MESSAGE);
             logRedBarMessageInfo(browser);
             waitForElementVisible(BY_DISMISS_BUTTON, browser).click();
             dashboardsPage.getDashboardEditBar().cancelDashboard();
@@ -306,13 +299,8 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         try {
             initReportsPage()
                 .tryDeleteReports(report);
-            Graphene.waitGui().until(new Predicate<WebDriver>() {
-                @Override
-                public boolean apply(WebDriver browser) {
-                    return browser.findElements(BY_RED_BAR_WARNING).size() != 0;
-                }
-            });
-            assertEquals(browser.findElement(BY_RED_BAR_WARNING).getText(), "0 report(s) deleted."
+            Graphene.waitGui().until(browser -> browser.findElements(BY_RED_BAR_WARNING).size() != 0);
+            assertEquals(waitForElementVisible(browser.findElement(BY_RED_BAR_WARNING)).getText(), "0 report(s) deleted."
                     + " 1 report(s) are in use on a dashboard or an email distribution list and were not deleted.");
             logRedBarMessageInfo(browser);
             waitForElementVisible(BY_DISMISS_BUTTON, browser).click();
