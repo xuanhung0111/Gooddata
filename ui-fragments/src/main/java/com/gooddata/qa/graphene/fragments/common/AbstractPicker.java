@@ -89,6 +89,7 @@ public abstract class AbstractPicker extends AbstractFragment {
     }
 
     protected List<WebElement> getElements() {
+        waitForPickerLoaded();
         return getPanelRoot().findElements(cssSelector(getListItemsCssSelector()));
     }
 }
