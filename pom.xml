@@ -26,6 +26,7 @@
         <targetJdk>1.8</targetJdk>
 
         <browser>firefox</browser>
+        <firefoxDriverBinaryPath>/usr/bin/geckodriver</firefoxDriverBinaryPath>
 
         <!--The key fullscreen does not work with xvfb so it should be overridden by a specific
         resolution (width x height) when running inside docker-->
@@ -331,6 +332,10 @@
                                             <property>
                                                 <name>chromeDriverBinaryPath</name>
                                                 <value>${chromeDriverBinaryPath}</value>
+                                            </property>
+                                            <property>
+                                                <name>firefoxDriverBinaryPath</name>
+                                                <value>${firefoxDriverBinaryPath}</value>
                                             </property>
                                             <property>
                                                 <name>chromeDriverArguments</name>
