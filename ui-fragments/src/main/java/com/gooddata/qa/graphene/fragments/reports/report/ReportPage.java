@@ -268,18 +268,22 @@ public class ReportPage extends AbstractFragment {
                 exportXpath = format(exportXpath, "image__png_");
                 break;
             case EXCEL_XLSX:
-                exportXpath = format(exportXpath, "excel_xlsx");
+                exportXpath = format(exportXpath, "xlsx___");
                 break;
             case CSV:
-                exportXpath = format(exportXpath, "csv");
+                exportXpath = format(exportXpath, "csv__formatted_");
                 break;
             case RAW_CSV:
-                exportXpath = format(exportXpath, "raw_data__csv_");
+                exportXpath = format(exportXpath, "csv__raw_data_");
                 break;
             default:
                 break;
         }
         waitForElementVisible(xpath(exportXpath), browser).click();
+
+        if (format == ExportFormat.EXCEL_XLSX) {
+            ExportXLSXDialog.getInstance(browser).confirmExport();
+        }
 
         sleepTightInSeconds(5);
         final int reportExportingTimeoutInSeconds = 300;
