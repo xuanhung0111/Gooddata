@@ -370,10 +370,10 @@ public class EmailSchedulePage extends AbstractFragment {
             case PDF:
                 selectCheckbox(formatsList.get(1).findElement(checkboxLocator));
                 break;
-            case EXCEL_XLSX:
+            case SCHEDULES_EMAIL_EXCEL_XLSX:
                 selectCheckbox(formatsList.get(2).findElement(checkboxLocator));
                 break;
-            case CSV:
+            case SCHEDULES_EMAIL_CSV:
                 selectCheckbox(formatsList.get(3).findElement(checkboxLocator));
                 break;
             default:
