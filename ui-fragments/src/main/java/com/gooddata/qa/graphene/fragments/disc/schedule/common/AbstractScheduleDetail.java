@@ -164,7 +164,7 @@ public class AbstractScheduleDetail extends AbstractScheduleFragment {
     public AbstractScheduleDetail waitForStatus(ScheduleStatus status) {
         Function<WebDriver, Boolean> statusReached = browser ->
                 getLastExecutionHistoryItem().getStatusDescription().equals(status.toString());
-        Graphene.waitGui().until(statusReached);
+        Graphene.waitGui().withTimeout(3, TimeUnit.MINUTES).until(statusReached);
 
         return this;
     }
