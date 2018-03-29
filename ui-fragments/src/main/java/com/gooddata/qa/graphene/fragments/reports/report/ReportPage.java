@@ -525,11 +525,16 @@ public class ReportPage extends AbstractFragment {
         return this;
     }
 
-    public ReportPage waitForReportExecutionProgress() {
+    public ReportPage waitForProgressOverlayNotVisible() {
         sleepTightInSeconds(1);
         final WebElement progress = waitForElementPresent(id("progressOverlay"), browser);
         Function<WebDriver, Boolean> waitForProgress = browser -> progress.getCssValue("display").equals("none");
         Graphene.waitGui().until(waitForProgress);
+        return this;
+    }
+    
+    public ReportPage waitForReportExecutionProgress() {
+        waitForProgressOverlayNotVisible();
         Function<WebDriver, Boolean> waitForFilterButton = browser -> !filterButton.getAttribute("class").contains("disabled");
         Graphene.waitGui().until(waitForFilterButton);
         return this;
