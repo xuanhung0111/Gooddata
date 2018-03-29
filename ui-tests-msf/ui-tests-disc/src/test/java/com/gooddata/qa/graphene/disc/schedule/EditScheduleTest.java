@@ -335,7 +335,7 @@ public class EditScheduleTest extends AbstractProcessTest {
 
             ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
 
-            scheduleDetail.addRetryDelay(5).clickSaveButton();
+            scheduleDetail.addRetryDelay(5);
             assertTrue(scheduleDetail.isRetryDelayInputError(), "Retry delay input not show error");
             assertEquals(getBubbleMessage(browser), "The minimal delay is every 15 minutes.\nUse numbers only.");
 
