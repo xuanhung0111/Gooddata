@@ -128,7 +128,7 @@ public class ContextMenu extends AbstractFragment {
             subItemElement.click();
     }
     private void waitForReportReloaded() {
-        ReportPage.getInstance(browser).waitForReportExecutionProgress();
+        ReportPage.getInstance(browser).waitForProgressOverlayNotVisible();
     }
     public static enum AggregationType {
         SUM("Sum"),
