@@ -7,6 +7,7 @@ import static org.testng.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -16,6 +17,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractTable;
+import com.gooddata.qa.utils.CssUtils;
 
 public class ObjectsTable extends AbstractTable {
 
@@ -44,17 +46,20 @@ public class ObjectsTable extends AbstractTable {
         return Graphene.createPageFragment(ObjectsTable.class, waitForElementVisible(rootLocator, context));
     }
 
-    public boolean selectObject(String objectName) {
-        for (int i = 0; i < getNumberOfRows(); i++) {
-            WebElement row = waitForElementVisible(rows.get(i));
-            WebElement link = row.findElement(BY_OBJECT_LINK);
-            if (link.getText().equals(objectName)) {
-                link.sendKeys(Keys.ENTER);
-                waitForElementVisible(BY_OBJECT_DETAIL_PAGE, browser);
-                return true;
+    public void selectObject(String objectName) {
+        List<WebElement> links = getRoot().findElements(
+                By.cssSelector(".s-title-" + CssUtils.simplifyText(objectName) + " a"));
+        
+        if (links.size() > 0) {
+            if (links.size() > 1) {
+                log.warning("selectObject matched " + links.size() + " elements, selecting first one");
             }
+            links.get(0).sendKeys(Keys.ENTER);
+            waitForElementVisible(BY_OBJECT_DETAIL_PAGE, browser);
+            return;
         }
-        return false;
+        
+        throw new NoSuchElementException("Unable to find object with title matching: " + objectName);
     }
 
     public List<String> getAllItems() {
