@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.manage;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
@@ -61,6 +62,7 @@ public abstract class ObjectPropertiesPage extends AbstractFragment {
         }
 
         IpeEditor.getInstance(browser).setText(name);
+        waitForElementNotPresent(By.cssSelector(".gdc-busy-mask-visible"));
         return this;
     }
 
