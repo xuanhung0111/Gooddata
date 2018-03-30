@@ -51,6 +51,7 @@ public class GoodSalesAddingFilterFromReportContextMenuTest extends GoodSalesAbs
                 .openAttributeDetail(ATTR_YEAR_SNAPSHOT)
                 .deleteFilter()
                 .done();
+        waitForReportLoaded();
 
         reportPage.saveReport();
         checkRedBar(browser);

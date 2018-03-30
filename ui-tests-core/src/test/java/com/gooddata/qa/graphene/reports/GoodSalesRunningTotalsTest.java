@@ -32,6 +32,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PROBABILITY;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
@@ -124,6 +125,7 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
                 .selectItem(METRIC_AVG_AMOUNT)
                 .deselectItem(METRIC_PROBABILITY) //minimize number of metrics to avoid handling scroll bar
                 .done();
+        waitForAnalysisPageLoaded(browser);
 
         assertTrue(table.getMetricHeaders().stream().filter(e -> e.equals(RUNNING_SUM)).count() == 1,
                 "Running sum header is calculated for new metric");
@@ -136,6 +138,7 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
                 .selectAttribtues(singletonList(new HowItem(ATTR_QUARTER_YEAR_SNAPSHOT, Position.TOP,
                         Q1_2011, Q2_2011)))
                 .done();
+        waitForAnalysisPageLoaded(browser);
 
         //use List.equal() to check value's order
         assertTrue(

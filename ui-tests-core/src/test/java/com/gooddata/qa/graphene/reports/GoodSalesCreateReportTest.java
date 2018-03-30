@@ -32,6 +32,7 @@ import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static java.util.Arrays.asList;
@@ -141,6 +142,7 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
         AttributeSndPanel attributePanel = initReportCreation().openHowPanel();
         attributePanel.selectItem("Stage Name");
         attributePanel.changeDisplayLabel("Order").done();
+        waitForAnalysisPageLoaded(browser);
 
         assertThat(reportPage.getTableReport().getAttributeValues(),
                 equalTo(asList("101", "102", "103", "104", "105", "106", "107", "108")));

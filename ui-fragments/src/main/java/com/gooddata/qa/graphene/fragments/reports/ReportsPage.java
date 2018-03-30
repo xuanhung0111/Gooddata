@@ -140,10 +140,12 @@ public class ReportsPage extends AbstractFragment {
     }
 
     public ReportsPage moveReportsToFolder(String folder, String... reports) {
+        String reportNumber = getReportNumberFrom(folder);
         selectReportsAndOpenMoveDialog(reports);
 
         waitForElementVisible(By.cssSelector(".c-ipeEditor:not([style*='display: none']) input"), browser).sendKeys(folder);
         waitForElementVisible(By.className("s-ipeSaveButton"), browser).click();
+        waitForReportUpdatedFrom(folder, reportNumber);
         checkGreenBar(browser);
         waitForElementVisible(By.cssSelector("#status .box-success button"), browser).click();
 
@@ -151,14 +153,16 @@ public class ReportsPage extends AbstractFragment {
     }
 
     public ReportsPage moveReportsToFolderByDragDrop(String folderName, String reportName) {
+        String reportNumber = getReportNumberFrom(folderName);
         WebElement report = reports.stream()
             .filter(entry -> reportName.equals(entry.getLabel()))
             .findFirst()
             .orElseThrow(() -> new NoSuchElementException("Cannot find report: " + reportName))
             .getRoot();
 
-        getActions().dragAndDrop(report, getFolder(folderName)).perform();
-        sleepTightInSeconds(2);
+        getActions().clickAndHold(report).moveToElement(getFolder(folderName))
+                .moveByOffset(1, 1).release().perform();
+        waitForReportUpdatedFrom(folderName, reportNumber);
         return this;
     }
 
@@ -275,6 +279,15 @@ public class ReportsPage extends AbstractFragment {
                 .filter(entry -> reportName.equals(entry.getLabel()))
                 .findFirst()
                 .get();
+    }
+
+    private void waitForReportUpdatedFrom(String folder, String oldReportNumber) {
+        Graphene.waitGui().ignoring(NoSuchElementException.class)
+                .until(browser -> !getReportNumberFrom(folder).equals(oldReportNumber));
+    }
+
+    private String getReportNumberFrom(String folder) {
+        return getFolder(folder).findElement(By.className("rate")).getText();
     }
 
     public static class ReportEntry extends AbstractFragment {

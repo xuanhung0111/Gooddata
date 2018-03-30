@@ -460,6 +460,7 @@ public class ReportPage extends AbstractFragment {
 
         openWhatPanel().selectMetrics(reportDefinition.getWhats());
         openHowPanel().selectAttribtues(reportDefinition.getHows()).done();
+        waitForAnalysisPageLoaded(browser);
 
         addFilters(reportDefinition.getFilters()).selectReportVisualisation(reportDefinition.getType());
         waitForAnalysisPageLoaded(browser);
