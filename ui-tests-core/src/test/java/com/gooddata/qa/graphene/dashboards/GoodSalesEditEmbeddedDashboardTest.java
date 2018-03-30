@@ -209,8 +209,6 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
         String editedMetricName = "Edited-" + metric;
         embeddedReportPage.clickEditInSndMetricDetail().enterMetricName(editedMetricName).save();
-        switchToParentFrame();
-        waitForElementNotPresent(MetricEditorDialog.IFRAME);
 
         switchToMainWindow(browser);
         assertTrue(initMetricPage().isMetricVisible(editedMetricName), "There is an error when editing metric name");

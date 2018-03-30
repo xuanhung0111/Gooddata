@@ -17,6 +17,7 @@ import com.google.common.collect.Iterables;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
 import java.util.Calendar;
@@ -102,9 +103,7 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
         metricConfigPanel.selectMetric(METRIC_AMOUNT, "Created");
 
         waitForKeyMetricUpdateValue();
-        assertTrue(waitForFragmentVisible(metricConfigPanel).isWhenDropdownVisibled());
         assertFalse(waitForFragmentVisible(metricConfigPanel).isWhenDropdownEnabled());
-        assertTrue(waitForFragmentVisible(metricConfigPanel).isLinkExternalFilterVisible());
         assertTrue(waitForFragmentVisible(metricConfigPanel).isLinkExternalFilterSelected());
         widgetConfigPanel.getTab(Tab.METRIC_STYLE, MetricStyleConfigPanel.class)
             .editMetricFormat("#,##0.00USD");
@@ -158,9 +157,7 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
 
     private void waitForKeyMetricUpdateValue() {
         sleepTight(1000); // need buffer time to make sure css class 'reloading' appear in DOM
-        Function<WebDriver, Boolean> valueLoaded = browser -> !waitForElementPresent(
-                HEADLINE_WIDGET_LOCATOR, browser).getAttribute("class").contains("reloading") &&
-                !isElementPresent(className("c-report-overlap"), browser);
-        Graphene.waitGui().until(valueLoaded);
+        WebElement keyMetricElement = Iterables.getLast(browser.findElements(HEADLINE_WIDGET_LOCATOR));
+        Graphene.waitGui().until(browser -> !keyMetricElement.getAttribute("class").contains("reloading"));
     }
 }
