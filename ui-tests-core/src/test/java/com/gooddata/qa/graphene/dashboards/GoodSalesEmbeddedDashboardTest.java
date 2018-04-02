@@ -460,6 +460,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         embeddedDashboard.getReport(tabularReportDef.getName(), TableReport.class)
                 .openReportInfoViewPanel()
                 .clickViewReportButton();
+        waitForAnalysisPageLoaded(browser);
 
         tableReport = Graphene.createPageFragment(ReportPage.class, waitForElementVisible(ReportPage.LOCATOR, browser))
                 .getTableReport();

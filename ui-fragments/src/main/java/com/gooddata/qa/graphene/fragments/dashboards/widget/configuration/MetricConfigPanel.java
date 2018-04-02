@@ -45,21 +45,13 @@ public class MetricConfigPanel extends AbstractFragment {
                 .searchAndSelectItem(dateDimension[0]);
     }
 
-    public boolean isWhenDropdownVisibled() {
-        return waitForElementPresent(whenFilter).isDisplayed() && waitForElementPresent(periodSelect).isDisplayed();
-    }
-
     public boolean isWhenDropdownEnabled() {
-        return isElementEnabled(waitForElementPresent(whenFilter)) &&
-                isElementEnabled(waitForElementPresent(periodSelect));
-    }
-
-    public boolean isLinkExternalFilterVisible() {
-        return waitForElementPresent(linkExternalFilter).isDisplayed();
+        return isElementEnabled(waitForElementVisible(whenFilter)) &&
+                isElementEnabled(waitForElementVisible(periodSelect));
     }
 
     public boolean isLinkExternalFilterSelected() {
-        return waitForElementPresent(linkExternalFilter).isSelected();
+        return waitForElementVisible(linkExternalFilter).isSelected();
     }
 
     private boolean isElementEnabled(WebElement element) {

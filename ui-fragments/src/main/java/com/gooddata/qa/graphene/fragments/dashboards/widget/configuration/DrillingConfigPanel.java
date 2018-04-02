@@ -41,6 +41,7 @@ public class DrillingConfigPanel extends AbstractFragment {
 
     public DrillingConfigPanel editDrilling(Pair<List<String>, String> oldDrilling,
                                             Pair<List<String>, String> newDrilling, String group) {
+        waitForElementVisible(addDrillingButton);
         getItemPanelBySelectedValues(oldDrilling.getLeft(), oldDrilling.getRight())
                 .selectLeftItem(newDrilling.getLeft())
                 .selectRightItem(newDrilling.getRight(), group);
