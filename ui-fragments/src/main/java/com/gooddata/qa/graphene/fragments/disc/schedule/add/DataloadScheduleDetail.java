@@ -5,7 +5,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static java.util.Objects.nonNull;
 
 import java.util.Collection;
-
+import java.util.function.Function;
 import com.gooddata.qa.graphene.entity.add.IncrementalPeriod;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -16,7 +16,6 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.entity.add.SyncDatasets;
 import com.gooddata.qa.graphene.fragments.disc.schedule.add.RunOneOffDialog.LoadMode;
 import com.gooddata.qa.graphene.fragments.disc.schedule.common.AbstractScheduleDetail;
-import com.google.common.base.Predicate;
 
 public class DataloadScheduleDetail extends AbstractScheduleDetail {
 
@@ -106,7 +105,7 @@ public class DataloadScheduleDetail extends AbstractScheduleDetail {
         }
         dialog.confirm();
 
-        Predicate<WebDriver> scheduleExecuted = browser -> executionHistoryItems.size() == executionItems + 1;
+        Function<WebDriver, Boolean> scheduleExecuted = browser -> executionHistoryItems.size() == executionItems + 1;
         Graphene.waitGui().until(scheduleExecuted);
         return this;
     }

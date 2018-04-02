@@ -33,7 +33,9 @@ public final class CssUtils {
      * @return boolean
      */
     public static boolean isShortendTilteDesignByCss(WebElement title, int width) {
+        int actualWidth = Integer.parseInt(title.getCssValue("width").replace("px", ""));
+
         return title.getCssValue("text-overflow").equals("ellipsis") &&
-                title.getCssValue("width").equals(width + "px");
+                Math.abs(actualWidth - width) <= 10;
     }
 }

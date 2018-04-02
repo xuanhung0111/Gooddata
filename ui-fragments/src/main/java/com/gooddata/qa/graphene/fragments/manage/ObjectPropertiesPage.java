@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.manage;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
@@ -9,7 +10,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
-
+import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -18,7 +19,6 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.IpeEditor;
-import com.google.common.base.Predicate;
 
 public abstract class ObjectPropertiesPage extends AbstractFragment {
 
@@ -62,6 +62,7 @@ public abstract class ObjectPropertiesPage extends AbstractFragment {
         }
 
         IpeEditor.getInstance(browser).setText(name);
+        waitForElementNotPresent(By.cssSelector(".gdc-busy-mask-visible"));
         return this;
     }
 
@@ -121,7 +122,7 @@ public abstract class ObjectPropertiesPage extends AbstractFragment {
         waitForElementVisible(addCommentButton).click();
         IpeEditor.getInstance(browser).setText(comment);
 
-        Predicate<WebDriver> commentAdded = browser ->
+        Function<WebDriver, Boolean> commentAdded = browser ->
                 waitForCollectionIsNotEmpty(commentItems).size() > currentComments;
         Graphene.waitGui().until(commentAdded);
 
@@ -152,7 +153,7 @@ public abstract class ObjectPropertiesPage extends AbstractFragment {
         waitForElementVisible(changeFolderButton).click();
         IpeEditor.getInstance(browser).setText(targetFolder);
 
-        Predicate<WebDriver> folderChanged = browser ->
+        Function<WebDriver, Boolean> folderChanged = browser ->
                 targetFolder.equals(browser.findElement(By.cssSelector(".folderText a")).getText());
         Graphene.waitGui().until(folderChanged);
 

@@ -170,6 +170,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
         switchToPopUpWindow(EMBEDDED_REPORT_TITLE);
         waitForFragmentVisible(reportPage);
+        reportPage.waitForReportExecutionProgress();
         assertEquals(reportPage.getReportName(), EMBEDDED_REPORT_TITLE, "Incorrect report title!");
 
         TableReport tableReport = reportPage.getTableReport();

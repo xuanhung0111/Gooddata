@@ -73,7 +73,7 @@ public class DashboardContent extends AbstractFragment {
         java.util.function.Predicate<? super WebElement> neededReport = report ->
             name.equals(report.findElement(REPORT_TITLE_LOCATOR).findElement(BY_LINK).getAttribute("title"));
 
-        Predicate<WebDriver> reportAppeared = driver -> getReports().stream().anyMatch(neededReport);
+        Function<WebDriver, Boolean> reportAppeared = driver -> getReports().stream().anyMatch(neededReport);
         Graphene.waitGui().until(reportAppeared);
 
         return createPageFragment(clazz, getReports()
@@ -171,7 +171,7 @@ public class DashboardContent extends AbstractFragment {
         WebElement applyButton = waitForElementVisible(By.cssSelector(".s-active-tab .s-btn-apply"), getRoot());
         applyButton.click();
 
-        Predicate<WebDriver> filterApplied = browser -> applyButton.getAttribute("class").contains("disabled");
+        Function<WebDriver, Boolean> filterApplied = browser -> applyButton.getAttribute("class").contains("disabled");
         Graphene.waitGui().until(filterApplied);
         return this;
     }

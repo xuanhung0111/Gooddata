@@ -7,6 +7,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.Drilli
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
+import com.gooddata.qa.graphene.utils.WaitUtils;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
 import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
@@ -14,10 +15,10 @@ import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem.*;
+import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.gooddata.qa.utils.java.Builder;
-import com.google.common.base.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
@@ -30,10 +31,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.*;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.*;
@@ -174,7 +177,7 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
             // att to drill to is CompuSci
             reportOnSourceTab.drillOnFirstValue(CellType.ATTRIBUTE_VALUE).waitForLoaded();
 
-            final Predicate<WebDriver> isTargetTabLoaded = browser -> dashboardsPage.getTabs()
+            final Function<WebDriver, Boolean> isTargetTabLoaded = browser -> dashboardsPage.getTabs()
                     .getTab(TARGET_TAB).isSelected();
             Graphene.waitGui().until(isTargetTabLoaded);
 
@@ -189,7 +192,8 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
 
             assertEquals(reportOnTargetTab.getAttributeValues().size(), expectedReportSize);
 
-            browser.navigate().refresh();
+            BrowserUtils.refreshCurrentPage(browser);
+            WaitUtils.waitForDashboardPageLoaded(browser);
             assertEquals(
                     dashboardsPage.getContent().getLatestReport(TableReport.class)
                             .waitForLoaded().getAttributeValues().size(),
@@ -246,10 +250,11 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
             assertEquals(drillDialog.getBreadcrumbsString(),
                     StringUtils.join(Arrays.asList(REPORT_AMOUNT_BY_PRODUCT, "CompuSci"), ">>"));
 
-            reportAfterDrillingToReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE).waitForLoaded();
-            final Predicate<WebDriver> isTargetTabLoaded = browser -> dashboardsPage.getTabs()
+            reportAfterDrillingToReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
+            final Function<WebDriver, Boolean> isTargetTabLoaded = browser -> dashboardsPage.getTabs()
                     .getTab(TARGET_TAB).isSelected();
             Graphene.waitGui().until(isTargetTabLoaded);
+            waitForDashboardPageLoaded(browser);
 
             TableReport reportAfterDrillingToTab = dashboardsPage.getContent().getLatestReport(TableReport.class);
             assertEquals(reportAfterDrillingToTab.getAttributeValues(), attributeValuesOfSalesReports,
@@ -336,6 +341,7 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
             reportAfterDrillingToReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
             waitForFragmentVisible(popupDialog);
             popupDialog.saveAndContinue();
+            waitForDashboardPageLoaded(browser);
             dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
             assertTrue(dashboardsPage.getTabs().getTab(TAB_ANOTHER_DASHBOARD).isSelected(),
                     TAB_ANOTHER_DASHBOARD + " is not selected after drill action");

@@ -83,14 +83,15 @@ public class AttributeFilteringTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"}, dataProvider = "widgetTypeProvider")
     public void checkStatusOfAttributeOnConfigurationPanelWithEditor(final String clazz, final String headLine)
-            throws ClassNotFoundException, IOException, JSONException {
+            throws ClassNotFoundException, JSONException {
         logoutAndLoginAs(true, UserRoles.EDITOR);
 
         try {
             Class widget = Class.forName(clazz);
 
             initIndigoDashboardsPageWithWidgets().switchToEditMode().addAttributeFilter(ATTR_ACCOUNT)
-                    .selectWidgetByHeadline(widget, headLine);
+                    .getAttributeFiltersPanel().getAttributeFilter(ATTR_ACCOUNT).ensureDropdownClosed();
+            indigoDashboardsPage.selectWidgetByHeadline(widget, headLine);
 
             FilterByItem accountFilter = indigoDashboardsPage.getConfigurationPanel()
                     .getFilterByAttributeFilter(ATTR_ACCOUNT);

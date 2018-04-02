@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
-import com.google.common.base.Predicate;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -10,7 +9,7 @@ import org.openqa.selenium.support.FindBy;
 import java.text.ParseException;
 import java.util.List;
 import java.util.NoSuchElementException;
-
+import java.util.function.Function;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.*;
 import static org.testng.Assert.*;
@@ -160,7 +159,7 @@ public class FiltersBucket extends AbstractBucket {
     }
 
     private WebElement waitForFilterLoaded(final WebElement filter) {
-        Predicate<WebDriver> filterLoaded = browser -> !LOADING.equals(getFilterTextHelper(filter));
+        Function<WebDriver, Boolean> filterLoaded = browser -> !LOADING.equals(getFilterTextHelper(filter));
         Graphene.waitGui().until(filterLoaded);
         return filter;
     }

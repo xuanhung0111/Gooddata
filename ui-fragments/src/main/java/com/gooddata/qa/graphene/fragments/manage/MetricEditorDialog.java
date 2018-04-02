@@ -6,9 +6,11 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static java.lang.String.format;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -16,6 +18,7 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -25,7 +28,6 @@ import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 import com.gooddata.qa.graphene.utils.Sleeper;
-import com.google.common.base.Predicate;
 
 public class MetricEditorDialog extends AbstractFragment {
 
@@ -221,6 +223,15 @@ public class MetricEditorDialog extends AbstractFragment {
 
     public void save() {
         waitForElementVisible(BY_SAVE_BUTTON, getRoot()).click();
+        try {
+            waitForFragmentNotVisible(this);
+
+        // According to https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/Dead_object,
+        // any closed iframe will become DEAD_OBJECT and trying to access these will make WebDriver
+        // thrown WebDriverException. In this case, we should ignore and consider the iframe is closed completely.
+        } catch (WebDriverException e) {
+            log.info("Metric editor saved and closed");
+        }
     }
 
     public void back() {
@@ -310,7 +321,7 @@ public class MetricEditorDialog extends AbstractFragment {
         // we need a short break to ensure that the state is actually changed, then start waiting
         Sleeper.sleepTightInSeconds(1);
 
-        Predicate<WebDriver> waitForLoadedState = browser -> isElementPresent(By.className("loaded"),
+        Function<WebDriver, Boolean> waitForLoadedState = browser -> isElementPresent(By.className("loaded"),
                 waitForElementVisible(By.className("yui3-c-simplecolumn-content"), browser));
         Graphene.waitGui().until(waitForLoadedState);
         return this;

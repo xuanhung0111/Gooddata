@@ -125,7 +125,8 @@ public class GoodSalesMetricEditorTest extends GoodSalesAbstractTest {
                 initMetricPage().openMetricEditor().clickShareMetricLink().hoverOnHeader(header);
 
         takeScreenshot(browser, "Test-Header-Color-Text-When-Hovering", getClass());
-        assertEquals(dialog.getHeaderTextColor(header), "rgba(0, 0, 0, 1)", "Text color is not black");
+        String color = dialog.getHeaderTextColor(header);
+        assertTrue("rgba(0, 0, 0, 1)".equals(color) || "rgb(0, 0, 0)".equals(color), "Text color is not black");
     }
 
     @Test(dependsOnGroups = {"createProject"},

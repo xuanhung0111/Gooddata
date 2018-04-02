@@ -27,6 +27,7 @@ import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.apache.http.ParseException;
@@ -54,7 +55,6 @@ import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.gooddata.qa.utils.java.Builder;
-import com.google.common.base.Predicate;
 
 public class KpiDrillToTest extends AbstractDashboardTest {
 
@@ -323,10 +323,10 @@ public class KpiDrillToTest extends AbstractDashboardTest {
                 dashboardsPage.editDashboard();
                 dashboardsPage.getDashboardEditBar().tryToDeleteDashboard();
 
-                Predicate<WebDriver> redBarAppear = browser -> browser.findElements(BY_RED_BAR).size() != 0;
+                Function<WebDriver, Boolean> redBarAppear = browser -> browser.findElements(BY_RED_BAR).size() != 0;
                 Graphene.waitGui().until(redBarAppear);
 
-                assertEquals(browser.findElement(BY_RED_BAR).getText(), "Dashboard cannot be deleted because"
+                assertEquals(waitForElementVisible(browser.findElement(BY_RED_BAR)).getText(), "Dashboard cannot be deleted because"
                         + " it is linked from a scheduled email or KPI dashboard. Remove all links and retry.");
                 waitForElementVisible(BY_DISMISS_BUTTON, browser).click();
                 dashboardsPage.getDashboardEditBar().saveDashboard();

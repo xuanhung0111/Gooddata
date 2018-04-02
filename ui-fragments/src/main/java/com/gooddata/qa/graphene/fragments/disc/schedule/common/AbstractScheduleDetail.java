@@ -13,6 +13,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,7 +28,6 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.disc.ConfirmationDialog;
-import com.google.common.base.Predicate;
 
 public class AbstractScheduleDetail extends AbstractScheduleFragment {
 
@@ -145,7 +145,7 @@ public class AbstractScheduleDetail extends AbstractScheduleFragment {
     public AbstractScheduleDetail saveChanges() {
         clickSaveButton();
 
-        Predicate<WebDriver> saved = browser -> !findSaveButtonsGroup().isPresent();
+        Function<WebDriver, Boolean> saved = browser -> !findSaveButtonsGroup().isPresent();
         Graphene.waitGui().until(saved);
 
         return this;
@@ -162,9 +162,9 @@ public class AbstractScheduleDetail extends AbstractScheduleFragment {
     }
 
     public AbstractScheduleDetail waitForStatus(ScheduleStatus status) {
-        Predicate<WebDriver> statusReached = browser ->
+        Function<WebDriver, Boolean> statusReached = browser ->
                 getLastExecutionHistoryItem().getStatusDescription().equals(status.toString());
-        Graphene.waitGui().until(statusReached);
+        Graphene.waitGui().withTimeout(3, TimeUnit.MINUTES).until(statusReached);
 
         return this;
     }
@@ -185,7 +185,7 @@ public class AbstractScheduleDetail extends AbstractScheduleFragment {
         }
 
         try {
-            Predicate<WebDriver> autoExecutionTriggered = browser -> executionHistoryItems.size() == executionItems + 1;
+            Function<WebDriver, Boolean> autoExecutionTriggered = browser -> executionHistoryItems.size() == executionItems + 1;
             Graphene.waitGui().withTimeout(3, TimeUnit.MINUTES).until(autoExecutionTriggered);
             return true;
 
@@ -195,11 +195,16 @@ public class AbstractScheduleDetail extends AbstractScheduleFragment {
     }
 
     public AbstractScheduleDetail waitForExecutionFinish() {
-        Predicate<WebDriver> executionFinished = browser -> {
-            String executionStatus = getLastExecutionHistoryItem().getStatusDescription();
-
-            return !executionStatus.equals(ScheduleStatus.SCHEDULED.toString()) &&
-                    !executionStatus.equals(ScheduleStatus.RUNNING.toString());
+        Function<WebDriver, Boolean> executionFinished = browser -> {
+            try {
+                String executionStatus = getLastExecutionHistoryItem().getStatusDescription();
+    
+                return !executionStatus.equals(ScheduleStatus.SCHEDULED.toString()) &&
+                        !executionStatus.equals(ScheduleStatus.RUNNING.toString());
+            } catch (NullPointerException e) {
+                // ignore exception and retry
+                return false;
+            }
         };
 
         Graphene.waitGui().withTimeout(15, TimeUnit.MINUTES)

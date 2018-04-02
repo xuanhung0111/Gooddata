@@ -8,7 +8,7 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 import java.util.concurrent.TimeUnit;
-
+import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,7 +21,6 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.connectors.AbstractConnectorsCheckTest;
 import com.gooddata.qa.graphene.enums.Connectors;
 import com.gooddata.qa.graphene.fragments.greypages.connectors.CoupaInstanceFragment;
-import com.google.common.base.Predicate;
 
 public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 
@@ -95,7 +94,7 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
     private void verifyCoupaInstance(final String apiUrl) {
         openUrl(getIntegrationUri() + "/config/settings/instances");
 
-        final Predicate<WebDriver> predicate = browser -> {
+        final Function<WebDriver, Boolean> predicate = browser -> {
             browser.navigate().refresh();
             System.out.println("Checking existence of instance with API URL: " + apiUrl);
             return isInstanceCreated(apiUrl);

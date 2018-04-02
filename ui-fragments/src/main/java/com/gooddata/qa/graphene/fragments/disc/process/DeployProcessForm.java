@@ -11,11 +11,13 @@ import java.io.File;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.utils.browser.BrowserUtils;
 
 public class DeployProcessForm extends AbstractFragment {
 
@@ -135,7 +137,13 @@ public class DeployProcessForm extends AbstractFragment {
     }
 
     public DeployProcessForm inputPackageFile(File packageFile) {
-        waitForElementPresent(packageInput).sendKeys(packageFile.getAbsolutePath());
+        waitForElementPresent(packageInput);
+        // TODO: https://github.com/mozilla/geckodriver/issues/1173
+        // Workaround for sendKeys() with input element with opacity=0
+        BrowserUtils.runScript(browser, "arguments[0].style.opacity=1;", packageInput);
+        // now we have to lose focus from the input field
+        waitForElementVisible(By.cssSelector(".form-title"), getRoot()).click();
+        waitForElementVisible(packageInput).sendKeys(packageFile.getAbsolutePath());
         return this;
     }
 

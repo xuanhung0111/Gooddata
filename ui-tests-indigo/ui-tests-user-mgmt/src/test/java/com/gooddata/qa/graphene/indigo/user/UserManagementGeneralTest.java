@@ -12,7 +12,7 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-
+import java.util.function.Function;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
@@ -41,7 +41,6 @@ import com.gooddata.qa.graphene.utils.Sleeper;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
 public class UserManagementGeneralTest extends AbstractProjectTest {
@@ -347,7 +346,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
 
             initUserManagementPage()
                     .changeRoleOfUsers(UserRoles.ADMIN, testParams.getEditorUser(), testParams.getViewerUser());
-            Predicate<WebDriver> changeRoleSuccessfully = 
+            Function<WebDriver, Boolean> changeRoleSuccessfully = 
                     browser -> String.format(CHANGE_ROLE_SUCCESSFUL_MESSAGE, adminText)
                         .equals(UserManagementPage.getInstance(browser).getMessageText());
             Graphene.waitGui().until(changeRoleSuccessfully);
@@ -366,7 +365,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
         initDashboardsPage();
         initUserManagementPage().changeRoleOfUsers(UserRoles.EDITOR, testParams.getUser());
 
-        Predicate<WebDriver> changeRoleFailed = 
+        Function<WebDriver, Boolean> changeRoleFailed = 
                 browser -> String.format(CHANGE_ROLE_FAILED_MESSAGE, UserRoles.EDITOR.getName())
                     .equals(UserManagementPage.getInstance(browser).getMessageText());
         Graphene.waitGui().until(changeRoleFailed);
@@ -704,7 +703,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
     }
 
     private void waitForNewTabOpen(int currentTabs) {
-        Predicate<WebDriver> newTabOpen = browser -> BrowserUtils.getWindowHandles(browser).size() > currentTabs;
+        Function<WebDriver, Boolean> newTabOpen = browser -> BrowserUtils.getWindowHandles(browser).size() > currentTabs;
         Graphene.waitGui().until(newTabOpen);
     }
 }

@@ -184,13 +184,15 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
     public void createDashboardOnImportedProject() {
         final DashboardEditBar editBar = initDashboardsPage().editDashboard();
         dashboardsPage.addNewTab("Tab contains new reports");
-        editBar.addReportToDashboard(REPORT_WITH_EXISTING_OBJS).addReportToDashboard(REPORT_WITH_NEW_OBJS);
+        editBar.addReportToDashboard(REPORT_WITH_EXISTING_OBJS);
 
         final TableReport existingObjsTableReport = dashboardsPage.getContent()
                 .getReport(REPORT_WITH_EXISTING_OBJS, TableReport.class);
 
         existingObjsTableReport.getRoot().click();
         DashboardWidgetDirection.LEFT.moveElementToRightPlace(existingObjsTableReport.getRoot());
+        
+        editBar.addReportToDashboard(REPORT_WITH_NEW_OBJS);
 
         final TableReport newObjsTableReport = dashboardsPage.getContent()
                 .getReport(REPORT_WITH_NEW_OBJS, TableReport.class);

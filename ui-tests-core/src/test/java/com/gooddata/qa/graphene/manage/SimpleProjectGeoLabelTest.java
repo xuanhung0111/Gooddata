@@ -21,6 +21,7 @@ import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.AttributeLabelTypes;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataTypeSelect.ColumnType;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
+import com.gooddata.qa.browser.BrowserUtils;
 
 public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
 
@@ -90,6 +91,9 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
             dashboardsPage.addNewTab("tab");
             dashboardEditBar.addGeoChart(attributeLayer.metricName, attributeLayer.name);
             dashboardEditBar.saveDashboard();
+            
+            // refresh the page to fix possible differences in SVG values, e.g. AUS_STATE_NAME (M-39 instead of M-40)
+            BrowserUtils.refreshCurrentPage(browser);
             waitForDashboardPageLoaded(browser);
             dashboardsPage
                     .getContent()

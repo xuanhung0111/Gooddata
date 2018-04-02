@@ -18,9 +18,9 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
-import com.google.common.base.Predicate;
 import org.jboss.arquillian.graphene.Graphene;
 import org.jboss.arquillian.graphene.findby.ByJQuery;
 import org.openqa.selenium.WebDriver;
@@ -123,7 +123,7 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
         // but next steps is initAnalysePage which load all attributes/metrics/facts immediately
         // so sometimes, the new name is not updated in Analyse page (see bug QA-6981).
         // Using the following wait to handle this bug
-        Predicate<WebDriver> renameSuccess = browser -> !getMdService()
+        Function<WebDriver, Boolean> renameSuccess = browser -> !getMdService()
                 .findUris(getProject(), Metric.class, title(xssMetric)).isEmpty();
         Graphene.waitGui().withTimeout(3, TimeUnit.SECONDS).until(renameSuccess);
         try {
@@ -200,16 +200,12 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
         Stream.of(CatalogFilterType.values()).forEach(type -> {
             assertFalse(analysisPage.getCataloguePanel().filterCatalog(type)
                     .search("abcxyz"));
-            assertTrue(isElementPresent(ByJQuery.selector(
-                    ".adi-no-items:contains('No data matching\"abcxyz\"')"), browser));
         });
 
         analysisPage.getCataloguePanel().filterCatalog(CatalogFilterType.ALL);
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE);
         Stream.of(CatalogFilterType.values()).forEach(type -> {
             assertFalse(analysisPage.getCataloguePanel().filterCatalog(type).search("Am"));
-            assertTrue(isElementPresent(ByJQuery.selector(
-                    ".adi-no-items:contains('No data matching\"Am\"')"), browser));
 
             assertTrue(waitForElementVisible(className("s-unavailable-items-matched"), browser)
                     .getText().matches("^\\d unrelated data item[s]? hidden$"));

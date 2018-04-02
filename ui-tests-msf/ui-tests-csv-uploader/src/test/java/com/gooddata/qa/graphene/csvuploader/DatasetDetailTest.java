@@ -8,13 +8,12 @@ import java.io.File;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.concurrent.TimeUnit;
-
+import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;
-import com.google.common.base.Predicate;
 
 public class DatasetDetailTest extends AbstractCsvUploaderTest {
 
@@ -44,7 +43,7 @@ public class DatasetDetailTest extends AbstractCsvUploaderTest {
 
         final File downloadedCsvFile = new File(testParams.getDownloadFolder(), PAYROLL.getFileName());
 
-        final Predicate<WebDriver> fileDownloadComplete = browser ->
+        final Function<WebDriver, Boolean> fileDownloadComplete = browser ->
             downloadedCsvFile.length() > PAYROLL_FILE_SIZE_MINIMUM;
         Graphene.waitGui()
             .withTimeout(3, TimeUnit.MINUTES)

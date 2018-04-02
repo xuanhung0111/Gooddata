@@ -70,19 +70,19 @@ public class EmbeddedDashboardDrillReportLocalizationTest extends AbstractEmbedd
         TableReport tableReport = drillDialog.getReport(TableReport.class);
         checkLocalization(browser);
 
-        drillDialog.changeChartType("Line chart");
+        drillDialog.changeChartType("line");
         tableReport.waitForLoaded();
         checkLocalization(browser);
 
-        drillDialog.changeChartType("Bar chart");
+        drillDialog.changeChartType("bar");
         tableReport.waitForLoaded();
         checkLocalization(browser);
 
-        drillDialog.changeChartType("Pie chart");
+        drillDialog.changeChartType("pie");
         tableReport.waitForLoaded();
         checkLocalization(browser);
 
-        drillDialog.changeChartType("Table");
+        drillDialog.changeChartType("grid");
         tableReport.waitForLoaded();
         checkLocalization(browser);
 

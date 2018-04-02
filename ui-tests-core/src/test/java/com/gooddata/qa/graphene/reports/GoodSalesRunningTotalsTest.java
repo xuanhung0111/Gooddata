@@ -32,6 +32,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PROBABILITY;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
@@ -124,6 +125,7 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
                 .selectItem(METRIC_AVG_AMOUNT)
                 .deselectItem(METRIC_PROBABILITY) //minimize number of metrics to avoid handling scroll bar
                 .done();
+        waitForAnalysisPageLoaded(browser);
 
         assertTrue(table.getMetricHeaders().stream().filter(e -> e.equals(RUNNING_SUM)).count() == 1,
                 "Running sum header is calculated for new metric");
@@ -136,6 +138,7 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
                 .selectAttribtues(singletonList(new HowItem(ATTR_QUARTER_YEAR_SNAPSHOT, Position.TOP,
                         Q1_2011, Q2_2011)))
                 .done();
+        waitForAnalysisPageLoaded(browser);
 
         //use List.equal() to check value's order
         assertTrue(
@@ -231,6 +234,7 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
                 23767077.60f, 0.0f));
 
         table.sortBy(METRIC_AMOUNT, CellType.METRIC_HEADER, Sort.DESC);
+        reportPage.waitForReportExecutionProgress();
         takeScreenshot(browser, "not-calculate-running-totals-for-total-columns", getClass());
         assertEquals(table.getTotalValues(), asList(23767077.60f, 0.0f));
     }
@@ -253,6 +257,7 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
         reportPage.waitForReportExecutionProgress().openFilterPanel()
                 .addFilter(FilterItem.Factory.createAttributeFilter(ATTR_QUARTER_YEAR_SNAPSHOT, Q1_2011, Q2_2011));
 
+        reportPage.waitForReportExecutionProgress();
         takeScreenshot(browser, "drill-on-report-containing-running-totals", getClass());
         assertTrue(table.getAttributeHeaders().contains(ATTR_QUARTER_YEAR_SNAPSHOT) && table.getAttributeValues()
                 .containsAll(asList(Q1_2011, Q2_2011)), "The drill values are not displayed");
@@ -269,6 +274,7 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
                 .done();
 
         //click on any metric value to drill in
+        reportPage.waitForReportExecutionProgress();
         table.drillOnFirstValue(CellType.METRIC_VALUE);
         reportPage.waitForReportExecutionProgress();
         assertEquals(table.getMetricValues(), asList(1719072.21f, 1719072.21f));

@@ -14,7 +14,7 @@ import static com.gooddata.qa.graphene.fragments.account.LostPasswordPage.PASSWO
 
 import java.io.IOException;
 import java.util.Objects;
-
+import java.util.function.Function;
 import javax.mail.MessagingException;
 
 import org.apache.http.ParseException;
@@ -37,7 +37,6 @@ import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
-import com.google.common.base.Predicate;
 
 public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
 
@@ -193,7 +192,7 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
         final By dashboardPageLocator = By.cssSelector("#p-projectDashboardPage.s-displayed");
         final By walkmeCloseLocator = By.className("walkme-action-close");
 
-        Predicate<WebDriver> dashboardOrWalkmeAppear = browser ->
+        Function<WebDriver, Boolean> dashboardOrWalkmeAppear = browser ->
                 isElementPresent(dashboardPageLocator, browser) || isElementPresent(walkmeCloseLocator, browser);
 
         Graphene.waitGui().until(dashboardOrWalkmeAppear);

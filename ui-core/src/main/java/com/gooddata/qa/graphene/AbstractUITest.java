@@ -26,7 +26,6 @@ import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.utils.PdfUtils;
 import com.gooddata.qa.utils.mail.ImapClientAction;
-import com.google.common.base.Predicate;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -40,7 +39,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
+import java.util.function.Function;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
@@ -304,7 +303,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
         File pdfExport = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
                 + dashboardName.replaceAll(" ", "_") + ".pdf");
         System.out.println("pdfExport = " + pdfExport);
-        Predicate<WebDriver> exportCompleted = browser -> pdfExport.length() > minimalSize;
+        Function<WebDriver, Boolean> exportCompleted = browser -> pdfExport.length() > minimalSize;
         Graphene.waitGui()
             .pollingEvery(5, TimeUnit.SECONDS)
             .withTimeout(5, TimeUnit.MINUTES)
@@ -324,7 +323,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
         System.out.println("pdfExport = " + export);
 
         try {
-            Predicate<WebDriver> exportCompleted = browser -> export.length() > minimalSize;
+            Function<WebDriver, Boolean> exportCompleted = browser -> export.length() > minimalSize;
             Graphene.waitGui()
                 .pollingEvery(5, TimeUnit.SECONDS)
                 .withTimeout(5, TimeUnit.MINUTES)
@@ -585,7 +584,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     protected void waitForOpeningIndigoDashboard() {
         final By loadingLabel = className("gd-loading-equalizer");
         try {
-            Predicate<WebDriver> isLoadingLabelPresent = browser -> isElementPresent(loadingLabel, browser);
+            Function<WebDriver, Boolean> isLoadingLabelPresent = browser -> isElementPresent(loadingLabel, browser);
             Graphene.waitGui().withTimeout(2, TimeUnit.SECONDS).until(isLoadingLabelPresent);
         } catch (TimeoutException e) {
             //do nothing

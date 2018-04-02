@@ -7,7 +7,7 @@ import static java.lang.Integer.parseInt;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.graphene.utils.WaitUtils;
 import java.util.concurrent.TimeUnit;
-
+import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -16,7 +16,6 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.disc.overview.OverviewProjects.OverviewProjectItem;
-import com.google.common.base.Predicate;
 
 public class OverviewPage extends AbstractFragment {
 
@@ -29,7 +28,7 @@ public class OverviewPage extends AbstractFragment {
     private WebElement overviewSection;
 
     public OverviewPage selectState(OverviewState state) {
-        waitForElementVisible(state.getLocator(), getRoot()).click();
+        waitForElementVisible(state.getLocator(), getRoot()).findElement(By.cssSelector("div")).click();
         waitForPageLoaded();
         return this;
     }
@@ -82,7 +81,7 @@ public class OverviewPage extends AbstractFragment {
     }
 
     public OverviewPage waitForExecutionFinish() {
-        Predicate<WebDriver> executionFinish = browser -> refreshStateNumber(OverviewState.SCHEDULED) == 0 &&
+        Function<WebDriver, Boolean> executionFinish = browser -> refreshStateNumber(OverviewState.SCHEDULED) == 0 &&
                 refreshStateNumber(OverviewState.RUNNING) == 0;
 
         Graphene.waitGui()
@@ -94,7 +93,7 @@ public class OverviewPage extends AbstractFragment {
     }
 
     public OverviewPage waitForPageLoaded() {
-        Predicate<WebDriver> pageLoaded = browser -> getRoot().findElements(By.cssSelector("[class*='loading']")).size() == 0;
+        Function<WebDriver, Boolean> pageLoaded = browser -> getRoot().findElements(By.cssSelector("[class*='loading']")).size() == 0;
 
         Graphene.waitGui().until(pageLoaded);
         return this;

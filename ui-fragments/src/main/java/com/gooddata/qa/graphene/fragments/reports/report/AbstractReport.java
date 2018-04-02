@@ -21,7 +21,7 @@ public abstract class AbstractReport extends AbstractFragment {
     public ReportInfoViewPanel openReportInfoViewPanel() {
         waitForElementVisible(this.getRoot());
         waitForElementPresent(reportInfoButton);
-        new Actions(browser).moveToElement(this.getRoot()).perform();
+        new Actions(browser).moveToElement(this.getRoot()).moveByOffset(1, 1).perform();
         waitForElementVisible(reportInfoButton).click();
         return Graphene.createPageFragment(ReportInfoViewPanel.class,
                 waitForElementVisible(By.cssSelector(".reportInfoView"), browser));

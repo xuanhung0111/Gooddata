@@ -20,14 +20,12 @@ import java.util.stream.Collectors;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 
 
@@ -214,7 +212,8 @@ public class EmailSchedulePage extends AbstractFragment {
 
     public String getUnsubscribed(String scheduleName) {
         openSchedule(scheduleName);
-        waitForElementPresent(unsubscribeTooltip).click();
+        waitForElementVisible(unsubscribeTooltip);
+        getActions().moveToElement(unsubscribeTooltip).moveByOffset(1, 1).perform();
         String unsubscribed = waitForElementPresent(unsubscribedTooltipAddresses).getText();
         System.out.println("Unsubscribed: " + unsubscribed);
         return unsubscribed;
@@ -301,12 +300,7 @@ public class EmailSchedulePage extends AbstractFragment {
         final int numberOfSchedule = getNumberOfGlobalSchedules();
         waitForElementVisible(By.cssSelector(format(DELETE_SELECTOR, simplifyText(scheduleName))), browser)
             .click();
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-            @Override
-            public boolean apply(WebDriver browser) {
-                return getNumberOfGlobalSchedules() == numberOfSchedule - 1;
-            }
-        });
+        Graphene.waitGui().until(browser -> getNumberOfGlobalSchedules() == numberOfSchedule - 1);
         return this;
     }
 

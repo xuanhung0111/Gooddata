@@ -14,6 +14,7 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.gooddata.qa.utils.java.Builder;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -118,9 +119,7 @@ public class DrillToDashBoardTabApplyingDateFilterTest extends GoodSalesAbstract
 
             // att to drill to is CompuSci
             reportOnSourceTab.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
-
-            assertTrue(dashboardsPage.getTabs().getTab(TARGET_TAB).isSelected(),
-                    TARGET_TAB + "is not selected after drill action");
+            Graphene.waitGui().until(browser -> dashboardsPage.getTabs().getTab(TARGET_TAB).isSelected());
 
             TableReport reportOnTargetTab = dashboardsPage.getContent()
                     .getReport(REPORT_AMOUNT_BY_PRODUCT, TableReport.class);

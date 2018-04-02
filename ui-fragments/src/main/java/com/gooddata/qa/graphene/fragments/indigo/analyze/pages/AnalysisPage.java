@@ -7,7 +7,6 @@ import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.*;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
-import com.google.common.base.Predicate;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -18,7 +17,7 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.*;
@@ -109,7 +108,7 @@ public class AnalysisPage extends AbstractFragment {
             // the target will have a risk that it cannot drop to the right position of target element
             // and element will not be droppable.
             // The solution is move element continuously until the target element is in viewport and droppable.
-            Predicate<WebDriver> droppable = browser -> {
+            Function<WebDriver, Boolean> droppable = browser -> {
                 getActions().moveToElement(target).perform();
 
                 return target.getAttribute("class").contains("adi-droppable-hover");

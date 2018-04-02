@@ -9,6 +9,7 @@ import org.jboss.arquillian.drone.api.annotation.Default;
 import org.jboss.arquillian.graphene.context.GrapheneContext;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.logging.LogEntries;
@@ -47,10 +48,15 @@ public class FailureLoggingListener extends TestListenerAdapter {
 
         String htmlSource = driver.getPageSource();
 
-        LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
+        // Geckodriver does not implement this command, because it is not in WebDriver specification.
+        // It is sad to be so strict when it is de facto standard. 
+        String name = ((RemoteWebDriver) driver).getCapabilities().getBrowserName().toLowerCase();
+        if (!"firefox".equals(name)) {
+            LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
 
-        for (LogEntry entry : logEntries) {
-            consolelog += entry.toString() + "\n";
+            for (LogEntry entry : logEntries) {
+                consolelog += entry.toString() + "\n";
+            }
         }
 
         File consoleLogOutputFile = new File(failuresOutputDir, filenameIdentification + "/console.log");
