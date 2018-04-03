@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
-import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.postEtlPullIntegration;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
@@ -17,6 +17,8 @@ import java.text.ParseException;
 import java.util.List;
 
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.rolap.RolapRestRequest;
 import org.apache.commons.io.IOUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.Test;
@@ -50,9 +52,8 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
         String webdavURL = uploadFileToWebDav(retailDateResouce, null);
         getFileFromWebDav(webdavURL, retailDateResouce);
 
-        postEtlPullIntegration(getRestApiClient(), testParams.getProjectId(),
-                webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()));
-
+        new RolapRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
+                .postEtlPullIntegration(webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()));
         setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.FISCAL_CALENDAR_ENABLED, true);
     }

@@ -15,7 +15,9 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.rolap.RolapRestRequest;
 import org.apache.commons.io.IOUtils;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.DataProvider;
@@ -27,9 +29,9 @@ import java.util.List;
 
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
-import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.postEtlPullIntegration;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -62,9 +64,8 @@ public class DashboardFiscalCalendarTest extends AbstractDashboardWidgetTest {
         String webdavURL = uploadFileToWebDav(fiscalDateResouce, null);
         getFileFromWebDav(webdavURL, fiscalDateResouce);
 
-        postEtlPullIntegration(getRestApiClient(), testParams.getProjectId(),
-                webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()));
-
+        new RolapRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
+                .postEtlPullIntegration(webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()));
         setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.FISCAL_CALENDAR_ENABLED, true);
     }

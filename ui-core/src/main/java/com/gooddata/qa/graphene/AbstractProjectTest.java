@@ -4,6 +4,7 @@ import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.browser.BrowserUtils.getCurrentBrowserAgent;
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
 
 import java.io.IOException;
@@ -24,7 +25,9 @@ import com.gooddata.qa.mdObjects.dashboard.filter.FloatingFilterConstraint;
 import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
+import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.rolap.RolapRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.json.JSONException;
 import org.openqa.selenium.Dimension;
@@ -50,7 +53,6 @@ import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static java.util.stream.Collectors.toList;
 import static org.testng.Assert.assertFalse;
 
-import com.gooddata.qa.utils.http.rolap.RolapRestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 import java.net.URISyntaxException;
@@ -341,8 +343,8 @@ public abstract class AbstractProjectTest extends AbstractUITest {
             uploadFileToWebDav(uploadInfoResource, webdavUrl);
 
             String integrationEntry = webdavUrl.substring(webdavUrl.lastIndexOf("/") + 1, webdavUrl.length());
-            RolapRestUtils.postEtlPullIntegration(getRestApiClient(), testParams.getProjectId(),
-                    integrationEntry);
+            new RolapRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
+                    .postEtlPullIntegration(integrationEntry);
         } catch (JSONException | IOException | URISyntaxException e) {
             throw new RuntimeException("There is error while setupData");
         }

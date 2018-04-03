@@ -1,15 +1,20 @@
 package com.gooddata.qa.graphene.add;
 
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
+import static com.gooddata.qa.graphene.AbstractTest.Profile.EDITOR;
+import static com.gooddata.qa.graphene.AbstractTest.Profile.VIEWER;
 import static com.gooddata.qa.utils.ads.AdsHelper.OUTPUT_STAGE_METADATA_URI;
 import static com.gooddata.qa.utils.ads.AdsHelper.OUTPUT_STAGE_URI;
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
-import static com.gooddata.qa.utils.http.model.ModelRestUtils.getProductionProjectModelView;
 import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
+import com.gooddata.qa.utils.http.CommonRestRequest;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.model.ModelRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,6 +36,10 @@ public class DataloadResourcesPermissionTest extends AbstractDataloadProcessTest
     private RestApiClient editorRestApiClient;
     private RestApiClient viewerRestApiClient;
 
+    private RestClient adminRestClient;
+    private RestClient editorRestClient;
+    private RestClient viewerRestClient;
+
     @Override
     protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
         createAndAddUserToProject(UserRoles.EDITOR);
@@ -38,6 +47,11 @@ public class DataloadResourcesPermissionTest extends AbstractDataloadProcessTest
 
         editorRestApiClient = getRestApiClient(testParams.getEditorUser(), testParams.getPassword());
         viewerRestApiClient = getRestApiClient(testParams.getViewerUser(), testParams.getPassword());
+
+        // this should be used after completing QA-7283
+        adminRestClient = new RestClient(getProfile(ADMIN));
+        editorRestClient = new RestClient(getProfile(EDITOR));
+        viewerRestClient = new RestClient(getProfile(VIEWER));
     }
 
     @DataProvider(name = "accessDataloadResourceProvider")
@@ -92,16 +106,16 @@ public class DataloadResourcesPermissionTest extends AbstractDataloadProcessTest
 
     @Test(dependsOnGroups = {"initDataload"})
     public void canAccessToProjectModelView() throws ParseException, JSONException, IOException {
-        JSONObject adminModelView = getProductionProjectModelView(getRestApiClient(),
-                testParams.getProjectId(), false);
+        JSONObject adminModelView = new ModelRestRequest(adminRestClient, testParams.getProjectId())
+                .getProductionProjectModelView(false);
         assertTrue(adminModelView.has("projectModelView"), "Model view structure shows wrong!");
 
-        JSONObject editorModelView = getProductionProjectModelView(editorRestApiClient,
-                testParams.getProjectId(), false);
+        JSONObject editorModelView = new ModelRestRequest(editorRestClient, testParams.getProjectId())
+                .getProductionProjectModelView(false);
         assertTrue(editorModelView.has("projectModelView"), "Model view structure shows wrong!");
 
-        JSONObject viewerModelView = getProductionProjectModelView(viewerRestApiClient,
-                testParams.getProjectId(), false);
+        JSONObject viewerModelView = new ModelRestRequest(viewerRestClient, testParams.getProjectId())
+                .getProductionProjectModelView(false);
         assertTrue(viewerModelView.has("projectModelView"), "Model view structure shows wrong!");
     }
 }

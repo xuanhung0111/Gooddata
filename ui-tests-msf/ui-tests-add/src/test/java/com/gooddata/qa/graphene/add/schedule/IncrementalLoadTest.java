@@ -191,7 +191,7 @@ public class IncrementalLoadTest extends AbstractDataloadProcessTest {
 
     @Test(dependsOnGroups = {"setFirstLSLTS"})
     public void checkIncrementalLoadWithPrefixTable() throws ParseException, JSONException, IOException {
-        getAdsHelper().associateAdsWithProject(ads, testParams.getProjectId(), "", "gDC_");
+        adsHelper.associateAdsWithProject(ads, testParams.getProjectId(), "", "gDC_");
 
         String time = parseDateTime(LocalDateTime.now(), TIMESTAMP_FORMAT);
         lastLSLTS = parseDateTime(LocalDateTime.now().plusSeconds(5), TIMESTAMP_FORMAT);
@@ -216,7 +216,7 @@ public class IncrementalLoadTest extends AbstractDataloadProcessTest {
                     containsInAnyOrder(person.getColumnValues(ATTR_PERSON).toArray()));
 
         } finally {
-            getAdsHelper().associateAdsWithProject(ads, testParams.getProjectId());
+            adsHelper.associateAdsWithProject(ads);
             person.setName(DATASET_PERSON);
         }
     }

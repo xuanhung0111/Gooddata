@@ -3,11 +3,11 @@ package com.gooddata.qa.graphene.add;
 import static org.testng.Assert.assertEquals;
 import static java.lang.String.format;
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
-import static com.gooddata.qa.utils.http.RestUtils.getResource;
-import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.waitingForAsyncTask;
 
 import java.io.IOException;
 
+import com.gooddata.qa.utils.http.CommonRestRequest;
+import com.gooddata.qa.utils.http.RestClient;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.springframework.http.HttpStatus;
@@ -41,13 +41,13 @@ public class SqlDiffTest extends AbstractDataloadProcessTest {
     @Test(dependsOnGroups = {"precondition"})
     public void verifyInCaseOutputStagePrefix() throws ParseException, JSONException, IOException {
         final String prefix = "gDc_";
-        getAdsHelper().associateAdsWithProject(ads, testParams.getProjectId(), "", prefix);
+        adsHelper.associateAdsWithProject(ads, testParams.getProjectId(), "", prefix);
 
         try {
             assertEquals(getSqlDiffFromOutputStage(),
                     getExpectedSqlDiff().replace("${table}", prefix + DATASET_OPPORTUNITY));
         } finally {
-            getAdsHelper().associateAdsWithProject(ads, testParams.getProjectId());
+            adsHelper.associateAdsWithProject(ads);
         }
     }
 
@@ -55,11 +55,11 @@ public class SqlDiffTest extends AbstractDataloadProcessTest {
     public void setupWrongAdsInstance() throws ParseException, JSONException, IOException {
         String anotherUser = createAndAddUserToProject(UserRoles.ADMIN);
 
-        final AdsHelper anotherAdsHelper = getAdsHelper(anotherUser, testParams.getPassword());
+        final AdsHelper anotherAdsHelper = new AdsHelper(new RestClient(new RestClient.RestProfile(testParams
+                .getHost(), anotherUser, testParams.getPassword(), true)), testParams.getProjectId());
         final Warehouse anotherAdsInstance = anotherAdsHelper.createAds("Another DDP - ADS instance", getAdsToken());
-
         try {
-            getAdsHelper().associateAdsWithProject(anotherAdsInstance, testParams.getProjectId());
+            adsHelper.associateAdsWithProject(anotherAdsInstance);
         } catch (InvalidStatusCodeException e) {
             assertEquals(e.getStatusCode(), 403);
         } finally {
@@ -74,8 +74,10 @@ public class SqlDiffTest extends AbstractDataloadProcessTest {
                 .getJSONObject("link")
                 .getString("poll");
 
-        waitingForAsyncTask(getRestApiClient(), pollingUri);
-        return getResource(getRestApiClient(), pollingUri, HttpStatus.OK).trim();
+        CommonRestRequest request = new CommonRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        request.waitingForAsyncTask(pollingUri);
+        return request.getResource(pollingUri, HttpStatus.OK).trim();
     }
 
     private String getExpectedSqlDiff() {

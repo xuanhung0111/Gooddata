@@ -15,13 +15,10 @@ import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectElementsFragmen
 import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.query.attributes.QueryAttributesFragment;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
-import com.gooddata.qa.models.GraphModel;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.model.ModelRestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.webdav.WebDavClient;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
@@ -31,25 +28,17 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static java.util.Objects.isNull;
-import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 public class AbstractGreyPageTest extends AbstractTest {

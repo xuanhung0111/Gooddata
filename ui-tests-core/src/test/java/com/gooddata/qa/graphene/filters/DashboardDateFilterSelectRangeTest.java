@@ -4,15 +4,17 @@ import com.gooddata.qa.graphene.AbstractDashboardWidgetTest;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.rolap.RolapRestRequest;
 import org.apache.commons.io.IOUtils;
 import org.testng.annotations.Test;
 
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static org.testng.Assert.assertEquals;
 
 import java.net.URL;
 
 import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
-import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.postEtlPullIntegration;
 
 public class DashboardDateFilterSelectRangeTest extends AbstractDashboardWidgetTest {
     private static final String FILTER_NAME = "DATE (SALARY)";
@@ -34,9 +36,8 @@ public class DashboardDateFilterSelectRangeTest extends AbstractDashboardWidgetT
         String webdavURL = uploadFileToWebDav(fiscalDateResouce, null);
         getFileFromWebDav(webdavURL, fiscalDateResouce);
 
-        postEtlPullIntegration(getRestApiClient(), testParams.getProjectId(),
-                webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()));
-
+        new RolapRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
+                .postEtlPullIntegration(webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()));
         setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.FISCAL_CALENDAR_ENABLED, true);
     }

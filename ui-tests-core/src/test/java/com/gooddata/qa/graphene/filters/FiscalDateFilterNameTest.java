@@ -10,6 +10,8 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.rolap.RolapRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,6 +27,7 @@ import java.util.List;
 import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
@@ -32,7 +35,6 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.postEtlPullIntegration;
 
 public class FiscalDateFilterNameTest extends AbstractDashboardWidgetTest {
     private static final String GOODDATA_DATE_CREATED_DATASET_ID = "created.dataset.dt";
@@ -75,10 +77,8 @@ public class FiscalDateFilterNameTest extends AbstractDashboardWidgetTest {
         URL fiscalDateResouce = getClass().getResource("/fiscal-date/upload.zip");
         String webdavURL = uploadFileToWebDav(fiscalDateResouce, null);
         getFileFromWebDav(webdavURL, fiscalDateResouce);
-
-        postEtlPullIntegration(getRestApiClient(), testParams.getProjectId(),
-                webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()));
-
+        new RolapRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
+                .postEtlPullIntegration(webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()));
         setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.FISCAL_CALENDAR_ENABLED, true);
 

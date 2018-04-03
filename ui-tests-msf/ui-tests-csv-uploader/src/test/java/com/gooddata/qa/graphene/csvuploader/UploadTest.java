@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.csvuploader;
 
 import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.model.ModelRestUtils.getProductionProjectModelView;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -19,6 +19,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.model.ModelRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -274,10 +276,11 @@ public class UploadTest extends AbstractCsvUploaderTest {
         assertTrue(dataset.getStatus().matches(SUCCESSFUL_STATUS_MESSAGE_REGEX));
         datasetNames.addAll(asList("opportunity", "person", datasetName, "Date (Paydate)"));
 
-        final JSONObject onlyProductionDataModel = getProductionProjectModelView(getRestApiClient(),
-                testParams.getProjectId(), false);
-        final JSONObject allDataModel = getProductionProjectModelView(getRestApiClient(), testParams.getProjectId(),
-                true);
+        ModelRestRequest modelRequest = new ModelRestRequest(new RestClient(getProfile(ADMIN)), testParams
+                .getProjectId());
+
+        final JSONObject onlyProductionDataModel = modelRequest .getProductionProjectModelView(false);
+        final JSONObject allDataModel = modelRequest .getProductionProjectModelView(true);
 
         assertThat(getListOfDatasets(onlyProductionDataModel), containsInAnyOrder("opportunity", "person"));
         assertThat(getListOfDatasets(allDataModel), containsInAnyOrder("opportunity", "person", datasetName));

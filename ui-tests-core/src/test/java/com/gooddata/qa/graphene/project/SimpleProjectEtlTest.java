@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.project;
 
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.postEtlPullIntegration;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.zip.CRC32;
 
 import com.gooddata.GoodDataException;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.rolap.RolapRestRequest;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -79,9 +81,8 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
         fileFromWebDav = getFileFromWebDav(webdavURL, uploadInfoResource);
         System.out.println("Checking local and remote CRC");
         assertEquals(getCRC(uploadInfoResource.openStream()), getCRC(fileFromWebDav), "Local and remote file CRC checksum do not match");
-
-        postEtlPullIntegration(getRestApiClient(), testParams.getProjectId(),
-                webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()));
+        new RolapRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
+                .postEtlPullIntegration(webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()));
     }
 
     @Test(dependsOnGroups = {"createProject"})
