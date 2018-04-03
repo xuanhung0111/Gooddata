@@ -52,6 +52,7 @@ import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.scheduleEmail.ScheduleEmailRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.java.Builder;
 import org.apache.http.ParseException;
@@ -78,7 +79,6 @@ import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage.RepeatTime;
-import com.gooddata.qa.utils.http.scheduleEmail.ScheduleEmailRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;
 
@@ -442,13 +442,14 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
 
     @Test(dependsOnMethods = {"updateScheduledMailRecurrency"})
     public void waitForScheduleMessages() throws MessagingException, IOException {
+        ScheduleEmailRestRequest scheduleEmailRestRequest = initScheduleEmailRestRequest();
         try (ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword)) {
             System.out.println("ACCELERATE scheduled mails processing");
-            ScheduleEmailRestUtils.accelerate(getRestApiClient(imapUser, imapPassword), testParams.getProjectId());
+            scheduleEmailRestRequest.accelerate();
             checkMailbox(imapClient);
         } finally {
             System.out.println("DECELERATE scheduled mails processing");
-            ScheduleEmailRestUtils.decelerate(getRestApiClient(imapUser, imapPassword), testParams.getProjectId());
+            scheduleEmailRestRequest.decelerate();
         }
     }
 

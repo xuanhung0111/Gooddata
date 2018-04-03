@@ -22,6 +22,8 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.scheduleEmail.ScheduleEmailRestRequest;
 import org.json.JSONException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -31,7 +33,6 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage.RepeatTime;
-import com.gooddata.qa.utils.http.scheduleEmail.ScheduleEmailRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;
 
@@ -97,9 +98,10 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
 
     @Test(dependsOnMethods = {"updateScheduledMail"})
     public void waitForMessageAndUnsubscribe() throws MessagingException, IOException {
+        ScheduleEmailRestRequest scheduleEmailRestRequest = initScheduleEmailRestRequest();
         try (ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword)) {
             System.out.println("ACCELERATE scheduled mails processing");
-            ScheduleEmailRestUtils.accelerate(getRestApiClient(imapUser, imapPassword), testParams.getProjectId());
+            scheduleEmailRestRequest.accelerate();
 
             // wait for expected messages to arrive
             int expectedMessageCount = 2;
@@ -116,7 +118,7 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
                     this.getClass());
             }
             updateRecurrencyString(initEmailSchedulesPage().getScheduleMailUriByName(reportTitle));
-            ScheduleEmailRestUtils.accelerate(getRestApiClient(imapUser, imapPassword), testParams.getProjectId());
+            scheduleEmailRestRequest.accelerate();
 
             // check that no more email is sent
             assertFalse(areMessagesArrived(imapClient, GDEmails.NOREPLY, reportTitle, expectedMessageCount + 1),
@@ -124,7 +126,7 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
 
         } finally {
             System.out.println("DECELERATE scheduled mails processing");
-            ScheduleEmailRestUtils.decelerate(getRestApiClient(imapUser, imapPassword), testParams.getProjectId());
+            scheduleEmailRestRequest.decelerate();
         }
     }
 

@@ -3,10 +3,10 @@
  */
 package com.gooddata.qa.graphene.schedules;
 
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkGreenBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
-import static com.gooddata.qa.utils.http.scheduleEmail.ScheduleEmailRestUtils.addExecutionContext;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -18,7 +18,9 @@ import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
+import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.scheduleEmail.ScheduleEmailRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.json.JSONException;
 import org.openqa.selenium.support.FindBy;
@@ -137,9 +139,9 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
         final String PUBLIC_SCHEDULE = "Public schedule";
         initEmailSchedulesPage().scheduleNewDashboardEmail(singletonList(testParams.getUser()),
                 PUBLIC_SCHEDULE, "Test ExecutionContext", singletonList(DASHBOARD_HAVING_FILTER));
-        addExecutionContext(getRestApiClient(), testParams.getProjectId(), getScheduleId(PUBLIC_SCHEDULE),
-                getExecutionContextId(getScheduleId(customSubject)));
-
+        new ScheduleEmailRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
+                .addExecutionContext(getScheduleId(PUBLIC_SCHEDULE),
+                        getExecutionContextId(getScheduleId(customSubject)));
         initEmailSchedulesPage().changeMessage(PUBLIC_SCHEDULE, "check execution context");
         assertTrue(scheduleHasValidExecutionContext(PUBLIC_SCHEDULE));
     }
