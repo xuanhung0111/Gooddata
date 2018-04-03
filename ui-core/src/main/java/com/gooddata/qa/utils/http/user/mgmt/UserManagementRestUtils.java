@@ -252,6 +252,35 @@ public final class UserManagementRestUtils {
     }
 
     /**
+     * Update email of user
+     *
+     * @param restApiClient
+     * @param userEmail
+     * @param userDomain
+     * @param email
+     * @return email
+     */
+    public static String updateEmailOfAccount(final RestApiClient restApiClient, final String userDomain,
+                                              final String userEmail, final String email)
+            throws ParseException, JSONException, IOException {
+        final JSONObject userProfile = getUserProfileByEmail(restApiClient, userDomain, userEmail);
+        final String profileUri = userProfile.getJSONObject("links").getString("self");
+        executeRequest(restApiClient,
+                restApiClient.newPutMethod(profileUri,
+                        new JSONObject().put("accountSetting",
+                                new JSONObject().put("country", userProfile.get("country"))
+                                        .put("phoneNumber", userProfile.get("phoneNumber"))
+                                        .put("timezone", userProfile.get("timezone"))
+                                        .put("companyName", userProfile.get("companyName"))
+                                        .put("lastName", userProfile.get("lastName"))
+                                        .put("firstName", userProfile.get("firstName"))
+                                        .put("email", email)
+                        ).toString()),
+                HttpStatus.OK);
+        return email;
+    }
+
+    /**
      * Get current user profile
      * 
      * @param restApiClient
