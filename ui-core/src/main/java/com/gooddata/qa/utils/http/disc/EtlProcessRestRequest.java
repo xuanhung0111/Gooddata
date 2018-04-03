@@ -1,7 +1,8 @@
 package com.gooddata.qa.utils.http.disc;
 
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm;
-import com.gooddata.qa.utils.http.RestApiClient;
+import com.gooddata.qa.utils.http.CommonRestRequest;
+import com.gooddata.qa.utils.http.RestClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,14 +10,14 @@ import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 
-import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
-import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
+import static com.gooddata.qa.utils.http.RestRequest.initGetRequest;
+import static com.gooddata.qa.utils.http.RestRequest.initPostRequest;
 import static java.lang.String.format;
 
 /**
  * Copyright (C) 2007-2018, GoodData(R) Corporation. All rights reserved.
  */
-public class EtlProcessRestUtils {
+public class EtlProcessRestRequest extends CommonRestRequest {
 
     public static final String ETL_PROCESS_TYPE = "ETL";
     public static final String ETL_PROCESS_TYPE_LABEL = "DATA LOADING";
@@ -25,67 +26,50 @@ public class EtlProcessRestUtils {
     private static final String COMPONENT_PROCESS_CREATE_URI = "/gdc/projects/%s/dataload/processes";
     private static final String COMPONENT_PROCESS_SCHEDULE_CREATE_URI = "/gdc/projects/%s/schedules";
 
+    public EtlProcessRestRequest(RestClient restClient, String projectId) {
+        super(restClient, projectId);
+    }
+
     /**
      * Create ETL process in specified project.
      *
-     * @param restApiClient rest API client
-     * @param projectId id of project where process will be created
      * @param processName name of process will be created
      * @param processType type of process will be created
      * @param s3ConfigurationPath configuration path will be used when run process
      * @param s3AccessKey access key will be used when run process
      * @param s3SecretKey secret key will be used when run process
      */
-    public static void createEtlProcess(RestApiClient restApiClient,
-                                    String projectId,
-                                    String processName,
-                                    DeployProcessForm.ProcessType processType,
-                                    String s3ConfigurationPath,
-                                    String s3AccessKey,
-                                    String s3SecretKey) {
-        String version = getEtlProcessTypeVersion(restApiClient, projectId, processType);
+    public void createEtlProcess(String processName, DeployProcessForm.ProcessType processType,
+                                 String s3ConfigurationPath, String s3AccessKey, String s3SecretKey) {
+        String version = getEtlProcessTypeVersion(processType);
         if (version == null) {
             throw new IllegalStateException(format("Does not support process type='%s'", processType));
         }
-        String jsonStr = buildEtlProcessJson(processName,
-                processType,
-                version,
-                s3ConfigurationPath,
-                s3AccessKey,
-                s3SecretKey);
-
-        executeRequest(restApiClient,
-                restApiClient.newPostMethod(format(COMPONENT_PROCESS_CREATE_URI, projectId), jsonStr),
-                HttpStatus.CREATED);
+        String jsonStr = buildEtlProcessJson(
+                processName, processType, version, s3ConfigurationPath, s3AccessKey, s3SecretKey);
+        executeRequest(initPostRequest(
+                format(COMPONENT_PROCESS_CREATE_URI, projectId), jsonStr), HttpStatus.CREATED);
     }
 
     /**
      * Create schedule for ETL process in specified project.
      *
-     * @param restApiClient rest API client
-     * @param projectId id of project where schedule will be created
      * @param processId id of process that schedule will be created in
      * @param scheduleName name of schedule will be created
      * @param cron cron of schedule will be created
      */
-    public static void createEtlProcessSchedule(RestApiClient restApiClient,
-                                                String projectId,
-                                                String processId,
-                                                String scheduleName, String cron) {
+    public void createEtlProcessSchedule(String processId, String scheduleName, String cron) {
         String json = buildEtlProcessScheduleJson(processId, scheduleName, cron);
-        executeRequest(restApiClient,
-                restApiClient.newPostMethod(format(COMPONENT_PROCESS_SCHEDULE_CREATE_URI, projectId), json),
-                HttpStatus.CREATED);
+        executeRequest(initPostRequest(
+                format(COMPONENT_PROCESS_SCHEDULE_CREATE_URI, projectId), json), HttpStatus.CREATED);
     }
 
-    private static String getEtlProcessTypeVersion(RestApiClient restApiClient,
-                                                   String projectId,
-                                                   DeployProcessForm.ProcessType processType) {
+    private String getEtlProcessTypeVersion(DeployProcessForm.ProcessType processType) {
         String componentVersionUri = format(COMPONENT_VERSION_URI, projectId);
         try {
-            final JSONObject json = getJsonObject(restApiClient, restApiClient.newGetMethod(componentVersionUri));
+            final JSONObject json = getJsonObject(initGetRequest(componentVersionUri));
             JSONArray items = json.getJSONObject("pipelineComponents").getJSONArray("items");
-            for(int i=0; i<items.length(); i++) {
+            for (int i = 0; i < items.length(); i++) {
                 JSONObject item = items.getJSONObject(i).getJSONObject("pipelineComponent");
                 if (processType.getValue().equals(item.getString("name"))) {
                     String version = item.getString("version");
@@ -99,12 +83,9 @@ public class EtlProcessRestUtils {
         return null;
     }
 
-    private static String buildEtlProcessJson(String processName,
-                                         DeployProcessForm.ProcessType processType,
-                                         String version,
-                                         String s3ConfigurationPath,
-                                         String s3AccessKey,
-                                         String s3SecretKey) {
+    private String buildEtlProcessJson(String processName, DeployProcessForm.ProcessType processType,
+                                       String version, String s3ConfigurationPath, String s3AccessKey,
+                                       String s3SecretKey) {
         String jsonStr;
         try {
             jsonStr = new JSONObject() {{
@@ -153,5 +134,4 @@ public class EtlProcessRestUtils {
         }
         return jsonStr;
     }
-
 }

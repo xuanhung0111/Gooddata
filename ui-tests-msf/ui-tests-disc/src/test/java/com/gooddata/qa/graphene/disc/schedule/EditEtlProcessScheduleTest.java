@@ -7,7 +7,6 @@ import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleCronTime;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
-import com.gooddata.qa.utils.http.disc.EtlProcessRestUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.testng.annotations.Test;
 
@@ -66,14 +65,13 @@ public class EditEtlProcessScheduleTest extends AbstractEtlProcessTest {
 
     private void testEditScheduleWithCustomName(ProcessType processType) {
         String processName = generateProcessName();
-        createEtlProcessWithDefaultConfig(getProject().getId(), processName, processType);
+        createEtlProcessWithDefaultConfig(processName, processType);
         DataloadProcess process = getProcessByName(processName);
 
         assertTrue(process != null, "Failed to deploy process");
         String scheduleName = generateScheduleName();
-        EtlProcessRestUtils.createEtlProcessSchedule(getRestApiClient(), getProject().getId(), process.getId(),
-                scheduleName, ScheduleCronTime.EVERY_30_MINUTES.getExpression());
-
+        etlProcessRequest.createEtlProcessSchedule(process.getId(), scheduleName,
+                ScheduleCronTime.EVERY_30_MINUTES.getExpression());
         Schedule schedule = getEtlProcessScheduleByName(process, scheduleName);
         assertTrue(schedule != null, "Failed to create schedule");
         try {
@@ -91,7 +89,7 @@ public class EditEtlProcessScheduleTest extends AbstractEtlProcessTest {
 
     private void testEditScheduleParameters(ProcessType processType) {
         String processName = generateProcessName();
-        createEtlProcessWithDefaultConfig(getProject().getId(), processName, processType);
+        createEtlProcessWithDefaultConfig(processName, processType);
         DataloadProcess process = getProcessByName(processName);
 
         assertTrue(process != null, "Failed to deploy process");
