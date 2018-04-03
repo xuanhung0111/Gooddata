@@ -246,7 +246,7 @@ public class EmailSchedulePage extends AbstractFragment {
     }
 
     public EmailSchedulePage trySaveSchedule() {
-        Graphene.guardAjax(waitForElementVisible(saveButton)).click();
+        waitForElementVisible(saveButton).click();
         return this;
     }
 
