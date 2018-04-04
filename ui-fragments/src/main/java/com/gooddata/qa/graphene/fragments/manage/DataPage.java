@@ -20,7 +20,7 @@ import com.gooddata.qa.graphene.fragments.common.IpeEditor;
 
 public class DataPage extends AbstractFragment {
 
-    @FindBy(xpath = "//*[contains(@class,'listTitle')]/..[contains(@style,'display: block')]//button[contains(@class,'s-btn-add_folder')]")
+    @FindBy(css = "#foldersList[style*='block'] button, #dimensionList[style*='block'] button")
     private WebElement addFolderButton;
 
     @FindBy(css = "div.objectsCloud")
