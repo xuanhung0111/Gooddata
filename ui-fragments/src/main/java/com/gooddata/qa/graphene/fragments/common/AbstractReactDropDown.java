@@ -122,9 +122,7 @@ public abstract class AbstractReactDropDown extends AbstractDropDown {
         // for larger number of values, it should be managed by scrolling (use js) to the end of scrollbar.
         Sleeper.sleepTightInSeconds(1);
 
-        // use javascript which is not affected by scrollbar to get all attributes
-        List<WebElement> elements = (List<WebElement>) BrowserUtils.runScript(
-                browser, "return document.querySelectorAll(\"" + getListItemsCssSelector() + "\")");
+        List<WebElement> elements = getPanelRoot().findElements(By.cssSelector(getListItemsCssSelector()));
 
         return elements.stream()
                 .map(e -> {
