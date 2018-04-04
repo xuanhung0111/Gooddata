@@ -300,8 +300,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
             return; 
         }
 
-        File pdfExport = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
-                + dashboardName.replaceAll(" ", "_") + ".pdf");
+        File pdfExport = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator() + dashboardName + ".pdf");
         System.out.println("pdfExport = " + pdfExport);
         Function<WebDriver, Boolean> exportCompleted = browser -> pdfExport.length() > minimalSize;
         Graphene.waitGui()
