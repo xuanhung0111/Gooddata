@@ -41,7 +41,7 @@ public class EmbedDashboardDialog extends AbstractFragment {
 
     private By SELECT_ATTRIBUTE_BUTTON_LOCATOR = By.cssSelector(".s-btn-select_attribute___");
     private By ADD_FILTER_BUTTON_LOCATOR = By.cssSelector(".s-btn-add_filter");
-    private By ATTRIBUTE_VALUES_TEXT_BOX_LOCATOR = By.xpath("//.[contains(@class, 'attributeValue')]/input");
+    private By ATTRIBUTE_VALUES_TEXT_BOX_LOCATOR = By.cssSelector(".attributeValue input");
 
     public String getEmbedCode() {
         return embedCode.getAttribute("value");
