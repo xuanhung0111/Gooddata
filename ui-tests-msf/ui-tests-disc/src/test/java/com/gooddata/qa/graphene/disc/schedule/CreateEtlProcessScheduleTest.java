@@ -20,7 +20,7 @@ public class CreateEtlProcessScheduleTest extends AbstractEtlProcessTest {
     @Test(dependsOnGroups = {"createProject"})
     public void createCSVDownloaderSchedule() {
         String processName = generateProcessName();
-        createEtlProcessWithDefaultConfig(getProject().getId(), processName, ProcessType.CSV_DOWNLOADER);
+        createEtlProcessWithDefaultConfig(processName, ProcessType.CSV_DOWNLOADER);
         DataloadProcess process = getProcessByName(processName);
 
         assertTrue(process != null, "Failed to deploy CSV Downloader process");
@@ -45,7 +45,7 @@ public class CreateEtlProcessScheduleTest extends AbstractEtlProcessTest {
     @Test(dependsOnGroups = {"createProject"})
     public void createSQLDownloaderSchedule() {
         String processName = generateProcessName();
-        createEtlProcessWithDefaultConfig(getProject().getId(), processName, ProcessType.SQL_DOWNLOADER);
+        createEtlProcessWithDefaultConfig(processName, ProcessType.SQL_DOWNLOADER);
         DataloadProcess process = getProcessByName(processName);
 
         assertTrue(process != null, "Failed to deploy SQL Downloader process");
@@ -70,7 +70,7 @@ public class CreateEtlProcessScheduleTest extends AbstractEtlProcessTest {
     @Test(dependsOnGroups = {"createProject"})
     public void createADSIntegratorSchedule() {
         String processName = generateProcessName();
-        createEtlProcessWithDefaultConfig(getProject().getId(), processName, ProcessType.ADS_INTEGRATOR);
+        createEtlProcessWithDefaultConfig(processName, ProcessType.ADS_INTEGRATOR);
         DataloadProcess process = getProcessByName(processName);
 
         assertTrue(process != null, "Failed to deploy ADS Integrator process");
@@ -95,7 +95,7 @@ public class CreateEtlProcessScheduleTest extends AbstractEtlProcessTest {
     @Test(dependsOnGroups = {"createProject"})
     public void createSQLExecutorSchedule() {
         String processName = generateProcessName();
-        createEtlProcessWithDefaultConfig(getProject().getId(), processName, ProcessType.SQL_DOWNLOADER);
+        createEtlProcessWithDefaultConfig(processName, ProcessType.SQL_DOWNLOADER);
         DataloadProcess process = getProcessByName(processName);
 
         assertTrue(process != null, "Failed to deploy SQL Executor process");

@@ -5,7 +5,8 @@ import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.disc.EtlProcessRestUtils;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.disc.EtlProcessRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,6 +14,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.Optional;
 
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 
 /**
@@ -26,10 +28,14 @@ public class AbstractEtlProcessTest extends AbstractProcessTest {
     public static final String DEFAULT_S3_REGION = "";
     public static final boolean DEFAULT_S3_SERVER_SIDE_ENCRYPTION = false;
 
+    protected EtlProcessRestRequest etlProcessRequest;
+
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
-        ProjectRestUtils.setFeatureFlagInProjectAndCheckResult(getGoodDataClient(), testParams.getProjectId(), ProjectFeatureFlags.ENABLE_ETL_COMPONENT, true);
+        ProjectRestUtils.setFeatureFlagInProjectAndCheckResult(
+                getGoodDataClient(), testParams.getProjectId(), ProjectFeatureFlags.ENABLE_ETL_COMPONENT, true);
+        etlProcessRequest = new EtlProcessRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId());
     }
 
     protected void deployEtlProcessFromDiscWithDefaultConfig(String processName, ProcessType processType) {
@@ -42,14 +48,9 @@ public class AbstractEtlProcessTest extends AbstractProcessTest {
                 DEFAULT_S3_SERVER_SIDE_ENCRYPTION);
     }
 
-    protected void createEtlProcessWithDefaultConfig(String projectId, String processName, DeployProcessForm.ProcessType processType) {
-        EtlProcessRestUtils.createEtlProcess(getRestApiClient(),
-                projectId,
-                processName,
-                processType,
-                DEFAULT_S3_CONFIGURATION_PATH,
-                DEFAULT_S3_ACCESS_KEY,
-                DEFAULT_S3_SECRET_KEY);
+    protected void createEtlProcessWithDefaultConfig(String processName, DeployProcessForm.ProcessType processType) {
+        etlProcessRequest.createEtlProcess(processName, processType, DEFAULT_S3_CONFIGURATION_PATH,
+                DEFAULT_S3_ACCESS_KEY, DEFAULT_S3_SECRET_KEY);
     }
 
     protected DataloadProcess getProcessByName(String processName) {

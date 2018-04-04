@@ -6,11 +6,11 @@ import com.gooddata.qa.graphene.fragments.disc.process.AbstractProcessDetail;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
-import com.gooddata.qa.utils.http.disc.EtlProcessRestUtils;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.utils.http.disc.EtlProcessRestRequest.ETL_PROCESS_TYPE_LABEL;
 import static java.lang.String.format;
 import static org.testng.Assert.assertTrue;
 
@@ -132,7 +132,7 @@ public class DeployEtlProcessTest extends AbstractEtlProcessTest {
             assertTrue(processDetail.getMetadata("Author").equals(testParams.getUser()));
             assertTrue(processDetail.getMetadata("Component").equals(processType.getTitle()));
             assertTrue(processDetail.getMetadata("Configuration Path").equals(s3ConfigurationPath));
-            assertTrue(EtlProcessRestUtils.ETL_PROCESS_TYPE_LABEL.equals(processDetail.getMetadata("Type")));
+            assertTrue(ETL_PROCESS_TYPE_LABEL.equals(processDetail.getMetadata("Type")));
             validateProcessMetadata(processName, processType, s3ConfigurationPath, s3AccessKey, s3Region,
                     serverSideEncryption);
         } finally {
