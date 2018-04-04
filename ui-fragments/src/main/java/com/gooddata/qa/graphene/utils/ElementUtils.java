@@ -4,6 +4,7 @@ import com.gooddata.qa.utils.browser.BrowserUtils;
 import com.google.common.base.Predicate;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -136,5 +137,15 @@ public final class ElementUtils {
         } else {
             return actions.moveToElement(target, xOffset, yOffset);
         }
+    }
+
+    // Selenium action senkeys not work properly with some kind of inputs (calendar picker input, ...).
+    // Use this method as a replacement.
+    public static void sendKeys(WebElement element, String value) {
+        WebDriver browser = BrowserUtils.getBrowserContext();
+        new Actions(browser).click(element)
+                .keyDown(Keys.CONTROL).sendKeys("a").keyUp(Keys.CONTROL).sendKeys(Keys.DELETE)
+                .sendKeys(value)
+                .perform();
     }
 }

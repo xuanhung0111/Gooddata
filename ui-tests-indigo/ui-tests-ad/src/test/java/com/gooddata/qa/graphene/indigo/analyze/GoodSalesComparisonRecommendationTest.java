@@ -156,7 +156,7 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
                 "Activity: Jan 1, 2012 - Dec 31, 2012");
         ChartReport report = analysisPage.waitForReportComputing().getChartReport();
         assertThat(report.getTrackersCount(), equalTo(1));
-        RecommendationContainer recommendationContainer = 
+        RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));

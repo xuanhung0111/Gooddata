@@ -8,8 +8,10 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible
 import java.util.Collection;
 import java.util.List;
 
+import com.gooddata.qa.graphene.utils.ElementUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -118,11 +120,10 @@ public class DateFilterPickerPanel extends AbstractFragment {
 
     private void configTimeFilterByRangeHelper(String from, String to, boolean apply) {
         waitForElementVisible(dateRangeSection).click();
-        waitForElementVisible(fromDate).clear();
-        fromDate.sendKeys(from);
 
-        waitForElementVisible(toDate).clear();
-        toDate.sendKeys(to);
+        ElementUtils.sendKeys(fromDate, from);
+        ElementUtils.sendKeys(toDate, to);
+
         waitForElementVisible(toDateCalendarIcon).click();
 
         waitForElementVisible(apply ? applyButton : cancelButton).click();

@@ -1,26 +1,25 @@
 package com.gooddata.qa.graphene.fragments.indigo.insight;
 
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.dialog.SaveInsightDialog;
+import com.gooddata.qa.graphene.utils.Sleeper;
+import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+
+import java.util.List;
+
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
-
-import java.util.List;
-import java.util.function.Function;
-import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.dialog.SaveInsightDialog;
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractInsightSelectionPanel extends AbstractFragment {
@@ -106,9 +105,10 @@ public abstract class AbstractInsightSelectionPanel extends AbstractFragment {
 
 
     public <T extends AbstractInsightSelectionPanel> T waitForLoading() {
-        Function<WebDriver, Boolean> isDataLoaded = browser ->
-                !isElementPresent(cssSelector(".gd-spinner.large"), getRoot());
-        Graphene.waitGui().until(isDataLoaded);
+        // Make some sleep here to wait for spinner element appear
+        Sleeper.sleepTight(500);
+
+        waitForElementNotPresent(cssSelector(".gd-spinner.large"));
         return (T) this;
     }
 

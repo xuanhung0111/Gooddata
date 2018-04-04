@@ -172,7 +172,7 @@ public class GoodSalesUndoRedoSavedInsightTest extends AbstractAnalyseTest {
         final String savedTitle = header.getInsightTitle();
         final int numberOfInsights = getAllInsightNames(getRestApiClient(), testParams.getProjectId()).size();
         
-        analysisPage.undo();
+        analysisPage.undo().waitForReportComputing();
         assertEquals(header.getInsightTitle(), savedTitle,
                 "The expected title is NOT displayed after undo");
         assertTrue(header.isUnsavedMessagePresent(), "Unsaved notification is not displayed after undo");
@@ -180,7 +180,7 @@ public class GoodSalesUndoRedoSavedInsightTest extends AbstractAnalyseTest {
         assertEquals(getAllInsightNames(getRestApiClient(), testParams.getProjectId()).size(),
                 numberOfInsights, "The insight does not exist after undo");
 
-        analysisPage.redo();
+        analysisPage.redo().waitForReportComputing();
         assertEquals(header.getInsightTitle(), savedTitle,
                 "The expected title is NOT displayed after redo");
         assertFalse(header.isUnsavedMessagePresent(), "Unsave notification is displayed after redo");
