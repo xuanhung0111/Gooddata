@@ -11,7 +11,6 @@ import org.openqa.selenium.support.FindBy;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static java.lang.String.format;
 
 public class DataproductsPage extends AbstractFragment {
 
@@ -21,10 +20,10 @@ public class DataproductsPage extends AbstractFragment {
     @FindBy(className = "s-dialog-submit-button")
     private WebElement createDataproductButton;
 
-    @FindBy( css = "[href='#/domains']")
+    @FindBy(css = "[href='#/domains']")
     private WebElement domainsLink;
 
-    public static final DataproductsPage getInstance(SearchContext searchContext) {
+    public static DataproductsPage getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(DataproductsPage.class, waitForElementVisible(DATA_PRODUCTS_ID, searchContext));
     }
 
@@ -39,7 +38,8 @@ public class DataproductsPage extends AbstractFragment {
     }
 
     public boolean isDataproductPresent(String dataproductId) {
-        return ElementUtils.isElementPresent(getCssSelectorDataproduct(dataproductId), browser);
+        waitForElementVisible(getSelectorForDataproduct(dataproductId), getRoot());
+        return ElementUtils.isElementPresent(getSelectorForDataproduct(dataproductId), getRoot());
     }
 
     public boolean isSegmentsPresent(String dataproductId, List<String> segmentIds) {
@@ -47,16 +47,16 @@ public class DataproductsPage extends AbstractFragment {
             return false;
         }
 
-        WebElement dataproduct = waitForElementVisible(browser.findElement(getCssSelectorDataproduct(dataproductId)));
+        WebElement dataproduct = waitForElementVisible(getSelectorForDataproduct(dataproductId), getRoot());
         return segmentIds.stream().allMatch(segmentId -> dataproduct.getText().contains(segmentId));
     }
 
     public DataproductDetailPage openDataproductDetailPage(String dataproductId) {
-        waitForElementVisible(browser.findElement(getCssSelectorDataproduct(dataproductId))).click();
+        waitForElementVisible(getSelectorForDataproduct(dataproductId), getRoot()).click();
         return DataproductDetailPage.getInstance(browser);
     }
 
-    private By getCssSelectorDataproduct(String dataproductId) {
-        return By.cssSelector(format("[id = 'data-products-item-%s']", dataproductId));
+    private By getSelectorForDataproduct(String dataproductId) {
+        return By.id("data-products-item-" + dataproductId);
     }
 }
