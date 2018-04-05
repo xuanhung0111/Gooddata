@@ -76,7 +76,7 @@ public class AnalysisPage extends AbstractFragment {
         Point location = editor.getLocation();
         Dimension dimension = editor.getSize();
         getActions().clickAndHold(source)
-                .moveByOffset(location.x + dimension.width / 2, location.y + dimension.height / 2).perform();
+                .moveByOffset(location.x + dimension.width / 3, location.y + dimension.height / 3).perform();
         return this;
     }
 
