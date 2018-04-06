@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -46,6 +47,8 @@ public class TableReport extends AbstractFragment {
     private WebElement removeTotalsCellButton;
 
     private static final String CELL_CONTENT = "public_fixedDataTableCell_cellContent";
+    private static final By BY_TOTALS_RESULTS =
+            cssSelector(".col-0:not(.fixedDataTableCellLayout_wrap1):not(.indigo-totals-add-cell)");
 
     public List<String> getHeaders() {
         return getElementTexts(waitForCollectionIsNotEmpty(headers));
@@ -99,6 +102,22 @@ public class TableReport extends AbstractFragment {
         return isHeaderSorted(name, "gd-table-arrow-down");
     }
 
+    public boolean hasTotalsResult() {
+        return isElementVisible(BY_TOTALS_RESULTS, getRoot());
+    }
+
+    public boolean isRemoveTotalsResultCellButtonVisible() {
+        return isElementVisible(removeTotalsCellButton);
+    }
+
+    public boolean isRemoveTotalsResultButtonVisible() {
+        return isElementVisible(className("indigo-totals-row-remove-button"), browser);
+    }
+
+    public boolean isAddTotalResultCellButtonVisible() {
+        return isElementVisible(addTotalsCellButton);
+    }
+
     public TableReport addNewTotals(AggregationItem type, String metricName) {
         openAggregationPopup(metricName).selectItem(type);
         AnalysisPage.getInstance(browser).waitForReportComputing();
@@ -134,7 +153,14 @@ public class TableReport extends AbstractFragment {
         return this;
     }
 
-    public List<String> getListAggregation(String metricName) {
+    public List<String> getEnabledAggregations(String metricName) {
+        List<String> list = openAggregationPopup(metricName).getEnabledItemList();
+        //click again to close Aggregation Popup
+        waitForElementVisible(addTotalsRowButton).click();
+        return list;
+    }
+
+    public List<String> getAggregations(String metricName) {
         List<String> list = openAggregationPopup(metricName).getItemsList();
         //click again to close Aggregation Popup
         waitForElementVisible(addTotalsRowButton).click();
@@ -190,8 +216,11 @@ public class TableReport extends AbstractFragment {
 
     private class AggregationPopup extends AbstractFragment {
 
-        @FindBy(css = ".gd-list-item:not(.gd-list-item-header)")
+        @FindBy(className = "gd-list-item-shortened")
         private List<WebElement> items;
+
+        @FindBy(css = ".gd-list-item-shortened:not(.indigo-totals-select-type-item-disabled)")
+        private List<WebElement> enableItems;
 
         private List<String> getItemsList() {
             return items.stream().map(e-> e.getText()).collect(toList());
@@ -199,6 +228,10 @@ public class TableReport extends AbstractFragment {
 
         private void selectItem(AggregationItem item) {
             waitForElementVisible(className(format("s-totals-select-type-item-%s", item.shortenedName)), getRoot()).click();
+        }
+
+        private List<String> getEnabledItemList() {
+            return enableItems.stream().map(e-> e.getText()).collect(toList());
         }
     }
 
