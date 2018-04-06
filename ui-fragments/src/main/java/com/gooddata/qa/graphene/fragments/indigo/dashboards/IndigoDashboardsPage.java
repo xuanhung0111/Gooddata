@@ -333,8 +333,13 @@ public class IndigoDashboardsPage extends AbstractFragment {
     }
 
     public IndigoDashboardsPage changeDashboardTitle(String newTitle) {
+        waitForElementVisible(By.cssSelector(".dash-title.editable"), getRoot());
+        // in the very first time, the label dash-title is not ready to click and could make the test unstable.
+        // So sleep for 1 second for sure.
+        // fix for ticket QA-7610
+        sleepTightInSeconds(1);
         waitForElementVisible(dashboardTitle).click();
-        dashboardTitle.findElement(By.tagName("textarea")).sendKeys(newTitle, Keys.ENTER);
+        waitForElementVisible(By.tagName("textarea"), dashboardTitle).sendKeys(newTitle, Keys.ENTER);
         return this;
     }
 
