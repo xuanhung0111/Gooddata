@@ -17,6 +17,8 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Part;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.scheduleEmail.ScheduleEmailRestRequest;
 import org.apache.commons.lang.math.IntRange;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -55,6 +57,11 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
             }
         }
         return null;
+    }
+
+    protected ScheduleEmailRestRequest initScheduleEmailRestRequest() {
+        return new ScheduleEmailRestRequest(new RestClient(
+                new RestClient.RestProfile(testParams.getHost(), imapUser, imapPassword, true)), testParams.getProjectId());
     }
 
     protected void updateRecurrencyString(String scheduleUri) throws IOException {
