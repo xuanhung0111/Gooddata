@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.lcmconsole.tests;
 import com.gooddata.qa.graphene.fragments.lcmconsole.ClientDetailDialog;
 import com.gooddata.qa.graphene.fragments.lcmconsole.SegmentDetailPage;
 import com.gooddata.qa.graphene.lcmconsole.AbstractLcmConsoleTest;
+import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -13,7 +14,6 @@ import static com.gooddata.qa.graphene.lcmconsole.NamingConstants.SEGMENT_1_CLIE
 import static com.gooddata.qa.graphene.lcmconsole.NamingConstants.SEGMENT_1_CLIENT_ID_2;
 import static com.gooddata.qa.graphene.lcmconsole.NamingConstants.SEGMENT_1_CLIENT_ID_3;
 import static com.gooddata.qa.graphene.lcmconsole.NamingConstants.SEGMENT_ID_1;
-import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -62,11 +62,9 @@ public class SegmentDetailTest extends AbstractLcmConsoleTest {
         final String newProjectId = segmentDetail.getClientProjectId(SEGMENT_1_CLIENT_ID_1);
 
         segmentDetail.openMasterProjectDialog().changeMasterProject(newProjectId);
-        assertEquals(segmentDetail.getMasterProjectId(), newProjectId,
-                format("Segment %s should have new master project %s", SEGMENT_ID_1, newProjectId));
+        Graphene.waitGui().until(browser -> segmentDetail.getMasterProjectId().equals(newProjectId));
 
         segmentDetail.openMasterProjectDialog().changeMasterProject(oldProjectId);
-        assertEquals(segmentDetail.getMasterProjectId(), oldProjectId,
-                format("Segment %s should have new master project %s", SEGMENT_ID_1, oldProjectId));
+        Graphene.waitGui().until(browser -> segmentDetail.getMasterProjectId().equals(oldProjectId));
     }
 }

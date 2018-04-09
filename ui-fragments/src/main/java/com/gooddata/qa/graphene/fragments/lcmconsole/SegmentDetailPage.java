@@ -35,7 +35,7 @@ public class SegmentDetailPage extends AbstractFragment {
     @FindBy(className = "table-container")
     private WebElement tableContainer;
 
-    @FindBy(xpath = "//table[@class='segment-detail-table']//tr[2]/td[2]")
+    @FindBy(xpath = ".//table[@class='segment-detail-table']//tr[2]/td[2]")
     private WebElement masterProjectId;
 
     @FindBy(css = ".table-filter h3")
@@ -46,7 +46,12 @@ public class SegmentDetailPage extends AbstractFragment {
     }
 
     public static SegmentDetailPage getInstance(SearchContext searchContext) {
-        return Graphene.createPageFragment(SegmentDetailPage.class, waitForElementVisible(SEGMENT_DETAIL_ID, searchContext));
+        final SegmentDetailPage segmentDetailPage = Graphene.createPageFragment(
+                SegmentDetailPage.class, waitForElementVisible(SEGMENT_DETAIL_ID, searchContext));
+        // wait for the master project id to load, because its value is updated after the fragment is loaded
+        Graphene.waitGui().until(browser -> !segmentDetailPage.getMasterProjectId().isEmpty());
+
+        return segmentDetailPage;
     }
 
     public MasterProjectDialog openMasterProjectDialog() {
@@ -75,7 +80,7 @@ public class SegmentDetailPage extends AbstractFragment {
     }
 
     public String getMasterProjectId() {
-        return waitForElementVisible(masterProjectId).getText();
+        return masterProjectId.getText();
     }
 
     public int getClientCount() {

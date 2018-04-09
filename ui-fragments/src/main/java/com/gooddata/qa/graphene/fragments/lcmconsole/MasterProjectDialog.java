@@ -11,13 +11,10 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 public class MasterProjectDialog extends AbstractFragment {
 
-    private static final By DIALOG_CLASS = By.className("gd-dialog");
+    private static final By DIALOG_CLASS = By.className("change-master-project-dialog");
 
     @FindBy(className = "dialog-input-field")
     private WebElement projectInputField;
-
-    @FindBy(className = "s-change")
-    private WebElement changeButton;
 
     public static MasterProjectDialog getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(MasterProjectDialog.class, waitForElementVisible(DIALOG_CLASS, searchContext));
@@ -26,6 +23,6 @@ public class MasterProjectDialog extends AbstractFragment {
     public void changeMasterProject(String newProjectId) {
         waitForElementVisible(projectInputField).clear();
         projectInputField.sendKeys(newProjectId);
-        changeButton.click();
+        projectInputField.submit();
     }
 }
