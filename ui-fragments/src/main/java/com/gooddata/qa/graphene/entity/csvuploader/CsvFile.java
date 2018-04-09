@@ -139,6 +139,10 @@ public class CsvFile {
         return name + ".csv";
     }
 
+    public String getName() {
+        return name;
+    }
+
     public List<String> getColumnNames() {
         return columns.stream().map(Column::getTitle).map(WordUtils::capitalize).collect(toList());
     }
