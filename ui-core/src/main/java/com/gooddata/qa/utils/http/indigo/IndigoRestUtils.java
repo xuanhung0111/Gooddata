@@ -21,7 +21,6 @@ import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
-import com.gooddata.qa.graphene.entity.visualization.VisualizationMDConfiguration;
 import com.gooddata.qa.utils.http.RestApiClient;
 
 import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
