@@ -51,7 +51,7 @@ public class GoodSalesChartLegendTest extends AbstractAnalyseTest {
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration()
                 .showPercents();
-        sleepTight(5000);
+        analysisPage.waitForReportComputing();
         assertTrue(report.getDataLabels().get(0).endsWith("%"));
 
         analysisPage.addMetric(METRIC_QUOTA).waitForReportComputing();

@@ -68,6 +68,9 @@ public final class WaitUtils {
 
     public static void waitForAnalysisPageLoaded(SearchContext searchContext) {
         waitForElementVisible(By.xpath("//div[@id='p-analysisPage' and contains(@class,'s-displayed')]"), searchContext);
+
+        WebElement filterButton = waitForElementVisible(By.className("s-reportEditorFilter"), searchContext);
+        waitForElementAttributeNotContainValue(filterButton, "class", "disabled");
     }
 
     public static void waitForSchedulesPageLoaded(SearchContext searchContext) {

@@ -19,6 +19,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_STAGE_VELOCITY;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAllInsightNames;
 import static java.util.Arrays.asList;
@@ -289,8 +290,9 @@ public class GoodSalesSaveInsightTest extends AbstractAnalyseTest {
         analysisPage.exportReport();
         BrowserUtils.switchToLastTab(browser);
         try {
-            reportPage.getTableReport().waitForLoaded();
+            waitForAnalysisPageLoaded(browser);
         } finally {
+            browser.close();
             BrowserUtils.switchToFirstTab(browser);
         }
 
