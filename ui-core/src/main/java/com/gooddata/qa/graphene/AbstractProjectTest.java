@@ -391,6 +391,12 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     protected Attribute getAttributeByIdentifier(String id) {
         return getMdService().getObj(getProject(), Attribute.class, identifier(id));
     }
+
+    protected String getAttributeElementUri(String attributeName, String elementName) {
+        return getMdService().getAttributeElements(getAttributeByTitle(attributeName)).stream()
+                .filter(e -> e.getTitle().equals(elementName)).findFirst().get().getUri();
+    }
+
     protected Metric getMetricByTitle(String title) {
         return getMdService().getObj(getProject(), Metric.class, title(title));
     }
@@ -443,6 +449,13 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     protected FilterItemContent createSingleValueFilter(Attribute attribute) {
         return Builder.of(FilterItemContent::new).with(item -> {
             item.setObjUri(attribute.getDefaultDisplayForm().getUri());
+            item.setType(FilterType.LIST);
+        }).build();
+    }
+
+    protected FilterItemContent createSingleValuesFilterBy(String uri) {
+        return Builder.of(FilterItemContent::new).with(item -> {
+            item.setObjUri(uri);
             item.setType(FilterType.LIST);
         }).build();
     }
