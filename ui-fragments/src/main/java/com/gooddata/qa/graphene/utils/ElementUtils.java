@@ -139,13 +139,19 @@ public final class ElementUtils {
         }
     }
 
-    // Selenium action senkeys not work properly with some kind of inputs (calendar picker input, ...).
+    // Selenium action clear() not work properly with some kind of inputs (calendar picker input, ...).
     // Use this method as a replacement.
-    public static void sendKeys(WebElement element, String value) {
+    public static void clear(WebElement element) {
         WebDriver browser = BrowserUtils.getBrowserContext();
         new Actions(browser).click(element)
                 .keyDown(Keys.CONTROL).sendKeys("a").keyUp(Keys.CONTROL).sendKeys(Keys.DELETE)
-                .sendKeys(value)
                 .perform();
+    }
+
+    // Selenium action senkeys not work properly with some kind of inputs (calendar picker input, ...).
+    // Use this method as a replacement.
+    public static void sendKeys(WebElement element, String value) {
+        clear(element);
+        element.sendKeys(value);
     }
 }

@@ -1,37 +1,32 @@
 package com.gooddata.qa.graphene.fragments.common;
 
-import static com.gooddata.qa.graphene.utils.ElementUtils.clickElementByVisibleLocator;
-import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsEmpty;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static java.util.Arrays.asList;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.utils.ElementUtils;
+import com.gooddata.qa.graphene.utils.Sleeper;
+import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.FindBys;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
-import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.FindBys;
-
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import static com.gooddata.qa.graphene.utils.ElementUtils.clickElementByVisibleLocator;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static java.util.Arrays.asList;
 
 public class SelectItemPopupPanel extends AbstractFragment {
 
     public static final By LOCATOR = By
             .cssSelector(".gdc-overlay-simple:not(.hidden):not(.yui3-overlay-hidden):not(.ember-view)");
-
-    private static final String WEIRD_STRING_TO_CLEAR_ALL_ITEMS = "!@#$%^";
 
     private static final String BUTTON_GROUP_XPATH_LOCATOR = "//*[contains(@class,'overlayPlugin-plugged') " +
             "and not(contains(@class,'gdc-hidden'))]//span[.='%s']";
@@ -140,36 +135,16 @@ public class SelectItemPopupPanel extends AbstractFragment {
 
     // Just use this action when the expected item not visible in list
     public SelectItemPopupPanel searchItem(final String searchText) {
-        final int currentItems = waitForCollectionIsNotEmpty(getItemElements()).size();
-
-        waitForElementVisible(searchInput).clear();
         searchInput.sendKeys(searchText);
-
-        // After searching, the item list will change stage from full list --> empty --> list contains items 
-        // with search pattern.
-        // If using waitForCollectionIsNotEmpty() like normal way, there has a risk that code run too fast,
-        // it catches the item list at stage 1, then the next action to get or select item 
-        // will fail with IndexOutOfBoundException thrown because the list changes to empty stage
-
-        // In this case, we should wait until the items displayed and less than the full list.
-        // There still has a risk in this approach when the list contains only items with the same search pattern.
-        // This makes the list after search is same as before (Just a special case and never happen in reality)
-        Function<WebDriver, Boolean> itemFound = browser -> waitForCollectionIsNotEmpty(getItemElements()).size() < currentItems;
-        Graphene.waitGui().until(itemFound);
-
+        waitForLoaded();
         return this;
     }
 
     public SelectItemPopupPanel clearSearchInput() {
-        waitForElementVisible(searchInput).clear();
-        searchInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
-        waitForCollectionIsEmpty(getItemElements());
+        // Sometimes clear() does nothing, so use custom method instead
+        ElementUtils.clear(searchInput);
 
-        // Sometimes clear() does nothing, so using hot keys instead
-        searchInput.sendKeys(Keys.BACK_SPACE);
-        searchInput.sendKeys(Keys.chord(Keys.CONTROL, "a"));
-        searchInput.sendKeys(Keys.DELETE);
-
+        waitForLoaded();
         return this;
     }
 
@@ -225,5 +200,11 @@ public class SelectItemPopupPanel extends AbstractFragment {
             clearSearchInput();
 
         return waitForCollectionIsNotEmpty(getItemElements());
+    }
+
+    private void waitForLoaded() {
+        // Put some sleep to wait for loading wheel appear
+        Sleeper.sleepTightInSeconds(1);
+        waitForElementVisible(By.className("loaded"), getRoot());
     }
 }
