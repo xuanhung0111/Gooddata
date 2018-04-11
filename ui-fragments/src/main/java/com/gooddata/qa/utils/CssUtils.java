@@ -36,6 +36,6 @@ public final class CssUtils {
         int actualWidth = Integer.parseInt(title.getCssValue("width").replace("px", ""));
 
         return title.getCssValue("text-overflow").equals("ellipsis") &&
-                Math.abs(actualWidth - width) <= 10;
+                Math.abs(actualWidth - width) <= 20;
     }
 }
