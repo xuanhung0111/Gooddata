@@ -39,12 +39,6 @@ public class NavigationErrorTest extends AbstractCsvUploaderTest {
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = "csv")
-    public void showUploadsPageWhenBadUrlAfterExistingProjectId() {
-        openUrl(format(CSV_UPLOADER_PROJECT_ROOT_TEMPLATE + "/this/is/bad/url", testParams.getProjectId()));
-        DatasetsListPage.getInstance(browser);
-    }
-
-    @Test(dependsOnGroups = {"createProject"}, groups = "csv")
     public void redirectToErrorPageWhenInsufficientAccessRights() throws ParseException, IOException, JSONException {
         try {
             logoutAndLoginAs(true, UserRoles.VIEWER);
