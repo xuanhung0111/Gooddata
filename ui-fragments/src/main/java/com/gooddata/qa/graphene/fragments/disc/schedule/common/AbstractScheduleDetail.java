@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -217,6 +218,12 @@ public class AbstractScheduleDetail extends AbstractScheduleFragment {
 
         waitForElementVisible(retryDelayInput).clear();
         retryDelayInput.sendKeys(String.valueOf(retryInMinute));
+
+        // Gecko driver has problem with "retryDelayInput" when it automatically triggers the input error event
+        // without clicking save button while Chrome driver is not.
+        // Using keypress "TAB" to make "retryDelayInput" lose focus and the error event go away,
+        // so next actions can work properly.
+        getActions().sendKeys(Keys.TAB).perform();
 
         return this;
     }
