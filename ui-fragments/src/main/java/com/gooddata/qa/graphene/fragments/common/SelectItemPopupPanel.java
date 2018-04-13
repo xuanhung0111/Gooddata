@@ -6,6 +6,7 @@ import com.gooddata.qa.graphene.utils.Sleeper;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
@@ -14,11 +15,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.clickElementByVisibleLocator;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
@@ -205,6 +209,11 @@ public class SelectItemPopupPanel extends AbstractFragment {
     private void waitForLoaded() {
         // Put some sleep to wait for loading wheel appear
         Sleeper.sleepTightInSeconds(1);
-        waitForElementVisible(By.className("loaded"), getRoot());
+
+        // Cause that some popups have many groups and only one of them is visible
+        // This code handles for below case which recommends in ticket QA-7679
+        final Function<WebDriver, Boolean> predicate = browser -> getRoot().findElements(By.className("loaded"))
+                .stream().filter(element -> isElementVisible(element)).collect(Collectors.toList()).size() > 0;
+        Graphene.waitGui().until(predicate);
     }
 }
