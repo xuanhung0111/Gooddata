@@ -12,7 +12,7 @@ import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONException;
@@ -33,17 +33,18 @@ public class DrillToUpdatedDashboardTabTest extends GoodSalesAbstractTest {
     private final String THIRD_TAB = "Third Tab";
 
     private String reportUri;
+    private DashboardRestRequest dashboardRequest;
 
     @Override
     protected void customizeProject() throws Throwable {
         reportUri = getReportCreator().createAmountByProductReport();
+        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void drillToDeletedTab() throws IOException, JSONException {
         Dashboard dash = initDashboardHavingManyTabs();
-        String dashUri = DashboardsRestUtils.createDashboard(getRestApiClient(),
-                testParams.getProjectId(), dash.getMdObject());
+        String dashUri = dashboardRequest.createDashboard(dash.getMdObject());
         try {
             initDashboardsPage().selectDashboard(dash.getName());
             dashboardsPage.getTabs().getTab(FIRST_TAB).open();
@@ -83,8 +84,7 @@ public class DrillToUpdatedDashboardTabTest extends GoodSalesAbstractTest {
     public void drillToRenameTab() throws IOException, JSONException {
         final String RENAME_TAB = "Rename Tab";
         Dashboard dash = initDashboardHavingManyTabs();
-        String dashUri = DashboardsRestUtils.createDashboard(getRestApiClient(),
-                testParams.getProjectId(), dash.getMdObject());
+        String dashUri = dashboardRequest.createDashboard(dash.getMdObject());
         try {
             initDashboardsPage().selectDashboard(dash.getName());
             dashboardsPage.getTabs().getTab(FIRST_TAB).open();
@@ -125,8 +125,7 @@ public class DrillToUpdatedDashboardTabTest extends GoodSalesAbstractTest {
     public void drillToCreatedDashboardTab() throws IOException, JSONException {
         final String FOURTH_TAB = "Fourth Tab";
         Dashboard dash = initDashboardHavingManyTabs();
-        String dashUri = DashboardsRestUtils.createDashboard(getRestApiClient(),
-                testParams.getProjectId(), dash.getMdObject());
+        String dashUri = dashboardRequest.createDashboard(dash.getMdObject());
         try {
             initDashboardsPage().selectDashboard(dash.getName());
             dashboardsPage.addNewTab(FOURTH_TAB);

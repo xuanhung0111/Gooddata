@@ -11,7 +11,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.Das
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
 import com.gooddata.qa.utils.asserts.AssertUtils;
-import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.variable.VariableRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -28,9 +28,6 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.addMufToUser;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createMufObjectByUri;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.removeAllMufFromUser;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -55,6 +52,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
     private static final String ALL = "All";
 
     private boolean multipleChoice;
+    private DashboardRestRequest dashboardRequest;
 
     @BeforeClass(alwaysRun = true)
     public void setUp(ITestContext context) {
@@ -72,7 +70,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
                 .collect(joining(","));
 
         final String expression = format("[%s] IN (%s)", getAttributeByTitle(ATTR_PRODUCT).getUri(), productValues);
-        final String mufUri = createMufObjectByUri(getRestApiClient(), testParams.getProjectId(), "muf", expression);
+        final String mufUri = dashboardRequest.createMufObjectByUri("muf", expression);
 
         return new Object[][] {
             {testParams.getEditorUser(), UserRoles.EDITOR, mufUri},
@@ -83,8 +81,8 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
     @Override
     protected void customizeProject() throws Throwable {
         //prepare Dashboard For Muf User
-        VariableRestRequest request = new VariableRestRequest(
-                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
+        VariableRestRequest request = new VariableRestRequest(getAdminRestClient(), testParams.getProjectId());
         String promptFilterUri = request.createFilterVariable(MUF_DF_VARIABLE, request.getAttributeByTitle(ATTR_PRODUCT).getUri());
 
         createReportViaRest(GridReportDefinitionContent.create(REPORT_MUF,
@@ -121,7 +119,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
         String assignedMufUserId = UserManagementRestUtils
                 .getUserProfileUri(getDomainUserRestApiClient(), testParams.getUserDomain(), user);
 
-        addMufToUser(getRestApiClient(), testParams.getProjectId(), assignedMufUserId, mufObjectUri);
+        dashboardRequest.addMufToUser(assignedMufUserId, mufObjectUri);
 
         try {
             initDashboardsPage().selectDashboard(DASHBOARD_MUF).editDashboard();
@@ -157,7 +155,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
 
         } finally {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
-            removeAllMufFromUser(getRestApiClient(), testParams.getProjectId(), assignedMufUserId);
+            dashboardRequest.removeAllMufFromUser(assignedMufUserId);
         }
     }
 
@@ -168,7 +166,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
         String assignedMufUserId = UserManagementRestUtils
                 .getUserProfileUri(getDomainUserRestApiClient(), testParams.getUserDomain(), user);
 
-        addMufToUser(getRestApiClient(), testParams.getProjectId(), assignedMufUserId, mufObjectUri);
+        dashboardRequest.addMufToUser(assignedMufUserId, mufObjectUri);
 
         try {
             initDashboardsPage().selectDashboard(DASHBOARD_MUF).editDashboard();
@@ -188,7 +186,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
 
         } finally {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
-            removeAllMufFromUser(getRestApiClient(), testParams.getProjectId(), assignedMufUserId);
+            dashboardRequest.removeAllMufFromUser(assignedMufUserId);
         }
     }
 
@@ -216,7 +214,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             getFilter(MUF_DF_VARIABLE).changeAttributeFilterValues(COMPUSCI, WONDERKID);
             savedViewWidget.openSavedViewMenu().saveCurrentView(savedView2);
 
-            addMufToUser(getRestApiClient(), testParams.getProjectId(), assignedMufUserId, mufObjectUri);
+            dashboardRequest.addMufToUser(assignedMufUserId, mufObjectUri);
 
             savedViewWidget = refreshDashboardsPage()
                     .getSavedViewWidget()
@@ -236,7 +234,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
 
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
-            removeAllMufFromUser(getRestApiClient(), testParams.getProjectId(), assignedMufUserId);
+            dashboardRequest.removeAllMufFromUser(assignedMufUserId);
         }
     }
 
@@ -258,7 +256,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             getFilter(MUF_DF_VARIABLE).changeAttributeFilterValues(WONDERKID);
             savedViewWidget.openSavedViewMenu().saveCurrentView(savedView);
 
-            addMufToUser(getRestApiClient(), testParams.getProjectId(), assignedMufUserId, mufObjectUri);
+            dashboardRequest.addMufToUser(assignedMufUserId, mufObjectUri);
 
             refreshDashboardsPage()
                     .getSavedViewWidget()
@@ -273,7 +271,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
 
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
-            removeAllMufFromUser(getRestApiClient(), testParams.getProjectId(), assignedMufUserId);
+            dashboardRequest.removeAllMufFromUser(assignedMufUserId);
         }
     }
 

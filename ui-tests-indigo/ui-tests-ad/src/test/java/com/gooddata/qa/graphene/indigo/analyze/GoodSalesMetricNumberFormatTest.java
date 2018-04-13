@@ -6,6 +6,7 @@ import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.DataProvider;
@@ -22,7 +23,6 @@ import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.changeMetricFormat;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -33,6 +33,7 @@ public class GoodSalesMetricNumberFormatTest extends AbstractAnalyseTest {
 
     private String percentOfGoalUri;
     private String oldPercentOfGoalMetricFormat;
+    private DashboardRestRequest dashboardRequest;
 
     @Override
     public void initProperties() {
@@ -45,6 +46,7 @@ public class GoodSalesMetricNumberFormatTest extends AbstractAnalyseTest {
         getMetricCreator().createPercentOfGoalMetric();
         percentOfGoalUri = getMdService().getObjUri(getProject(), Metric.class, title(METRIC_PERCENT_OF_GOAL));
         oldPercentOfGoalMetricFormat = getMetricFormat(METRIC_PERCENT_OF_GOAL);
+        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
     }
 
     @DataProvider(name = "formattingProvider")
@@ -62,7 +64,7 @@ public class GoodSalesMetricNumberFormatTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "formattingProvider", groups = {"metricFormat"})
     public void testMetricNumberFormat(Formatter format, String expectedValue, boolean compareFormat)
             throws ParseException, JSONException, IOException {
-        changeMetricFormat(getRestApiClient(), percentOfGoalUri, format.toString());
+        dashboardRequest.changeMetricFormat(percentOfGoalUri, format.toString());
 
         try {
             verifyFormatInAdReport(format, expectedValue, compareFormat);
@@ -89,14 +91,14 @@ public class GoodSalesMetricNumberFormatTest extends AbstractAnalyseTest {
             browser.close();
             browser.switchTo().window(currentWindowHandle);
         } finally {
-            changeMetricFormat(getRestApiClient(), percentOfGoalUri, oldPercentOfGoalMetricFormat);
+            dashboardRequest.changeMetricFormat(percentOfGoalUri, oldPercentOfGoalMetricFormat);
         }
     }
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "formattingProvider", groups = {"chartLabel"})
     public void checkDataLabelShowOnBarChart(Formatter format, String expectedValue, boolean compareFormat)
             throws ParseException, JSONException, IOException {
-        changeMetricFormat(getRestApiClient(), percentOfGoalUri, format.toString());
+        dashboardRequest.changeMetricFormat(percentOfGoalUri, format.toString());
 
         try {
             String dataLabel = analysisPage.addMetric(METRIC_PERCENT_OF_GOAL)
@@ -117,7 +119,7 @@ public class GoodSalesMetricNumberFormatTest extends AbstractAnalyseTest {
                 assertEquals(dataLabel, expectedValue);
             }
         } finally {
-            changeMetricFormat(getRestApiClient(), percentOfGoalUri, oldPercentOfGoalMetricFormat);
+            dashboardRequest.changeMetricFormat(percentOfGoalUri, oldPercentOfGoalMetricFormat);
         }
     }
 

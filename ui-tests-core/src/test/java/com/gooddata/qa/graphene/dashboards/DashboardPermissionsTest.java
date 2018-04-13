@@ -15,10 +15,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.ParseException;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
@@ -41,12 +43,18 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     private static final String UNCHANGED_DASHBOARD = "Unchanged dashboard";
     private String userGroup1Id;
     private String userGroup2Id;
+    private DashboardRestRequest dashboardRequest;
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
+    }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests", "sanity"}, priority = 0)
     public void checkBackToTheOnlyOneVisibileDashboard() throws IOException, JSONException {
         String dashboardName = "Admin Unpublished Dashboard";
         try {
-            String dashboardUri = createDashboard(getRestApiClient(), dashboardName);
+            String dashboardUri = createTestDashboard(dashboardName);
             publishDashboard(false);
 
             logout();
@@ -65,43 +73,43 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
 
     /**
      * lock dashboard - only admins can edit
-     * 
+     *
      * @throws Exception
      */
     @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests", "sanity"})
     public void shouldLockDashboard() throws Exception {
-        createDashboard(getRestApiClient(), "Locked dashboard");
+        createTestDashboard("Locked dashboard");
         lockDashboard(true);
         assertEquals(dashboardsPage.isLocked(), true);
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests", "sanity"})
     public void shouldUnlockDashboard() throws Exception {
-        createDashboard(getRestApiClient(), "Unlocked dashboard");
+        createTestDashboard("Unlocked dashboard");
         lockDashboard(false);
         assertEquals(dashboardsPage.isLocked(), false);
     }
 
     /**
      * publish - make dashboard visible to every1 ( don't touch locking )
-     * @throws IOException 
-     * @throws JSONException 
+     * @throws IOException
+     * @throws JSONException
      */
     @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests", "sanity"})
     public void shouldPublishDashboard() throws JSONException, IOException {
-        createDashboard(getRestApiClient(), "Published dashboard");
+        createTestDashboard("Published dashboard");
         publishDashboard(true);
         assertFalse(dashboardsPage.isUnlisted());
     }
 
     /**
      * unpublish - make dashboard visible to owner only ( don't touch locking )
-     * @throws IOException 
-     * @throws JSONException 
+     * @throws IOException
+     * @throws JSONException
      */
     @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests", "sanity"})
     public void shouldUnpublishDashboard() throws JSONException, IOException {
-        createDashboard(getRestApiClient(), "Unpublished dashboard");
+        createTestDashboard("Unpublished dashboard");
         publishDashboard(false);
         assertTrue(dashboardsPage.isUnlisted());
     }
@@ -110,12 +118,12 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
      * when a dashboard is created, its default settings are "visibility:specific user" + editing
      * unlocked change visibility to everyone can access, editing locked and hit cancel button to
      * forget changes
-     * @throws IOException 
-     * @throws JSONException 
+     * @throws IOException
+     * @throws JSONException
      */
     @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests"})
     public void shouldNotChangePermissionsWhenCancelled() throws JSONException, IOException {
-        createDashboard(getRestApiClient(), UNCHANGED_DASHBOARD);
+        createTestDashboard(UNCHANGED_DASHBOARD);
 
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
         permissionsDialog.publish(PublishType.EVERYONE_CAN_ACCESS);
@@ -165,7 +173,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
      */
     @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests", "sanity"})
     public void checkPermissionDialogInDashboardEditMode() throws JSONException, IOException {
-        createDashboard(getRestApiClient(), "Check Permission in Edit Mode");
+        createTestDashboard("Check Permission in Edit Mode");
 
         PermissionsDialog permissionsDialog = dashboardsPage.unlistedIconClick();
         permissionsDialog.publish(PublishType.EVERYONE_CAN_ACCESS);
@@ -175,7 +183,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
 
     /**
      * check dashboard names visible to viewer - should see both - both are visible to every1
-     * @throws IOException 
+     * @throws IOException
      */
     @Test(dependsOnGroups = {"admin-tests"}, groups = {"viewer-tests", "sanity"}, alwaysRun = true)
     public void prepareEditorAndViewerTests() throws JSONException, IOException {
@@ -185,21 +193,21 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         signIn(false, UserRoles.ADMIN);
         initDashboardsPage();
 
-        createDashboard(getRestApiClient(), "Unlocked and published for viewer");
+        createTestDashboard("Unlocked and published for viewer");
         publishDashboard(true);
 
-        createDashboard(getRestApiClient(), "Locked and published for viewer");
+        createTestDashboard("Locked and published for viewer");
         publishDashboard(true);
         lockDashboard(true);
 
-        createDashboard(getRestApiClient(), "Unlocked and unpublished for viewer");
+        createTestDashboard("Unlocked and unpublished for viewer");
         publishDashboard(false);
 
-        createDashboard(getRestApiClient(), "Locked and unpublished for viewer");
+        createTestDashboard("Locked and unpublished for viewer");
         publishDashboard(false);
         lockDashboard(true);
 
-        createDashboard(getRestApiClient(), "Locked and published for editor to share");
+        createTestDashboard("Locked and published for editor to share");
         publishDashboard(true);
         lockDashboard(true);
     }
@@ -316,7 +324,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests", "sanity"})
     public void shouldHaveGranteeCandidatesAvailable() throws JSONException, IOException {
-        createDashboard(getRestApiClient(), "ACL test dashboard");
+        createTestDashboard("ACL test dashboard");
         publishDashboard(false);
 
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
@@ -361,7 +369,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests", "sanity"})
     public void shouldShareDashboardToUsers() throws JSONException, IOException {
         closeDialogIfVisible();
-        createDashboard(getRestApiClient(), "Dashboard shared to users");
+        createTestDashboard("Dashboard shared to users");
 
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
         final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
@@ -374,7 +382,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests", "sanity"})
     public void shouldShareDashboardToGroups() throws JSONException, IOException {
         closeDialogIfVisible();
-        createDashboard(getRestApiClient(), "Dashboard shared to groups");
+        createTestDashboard("Dashboard shared to groups");
 
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
         final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
@@ -419,7 +427,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests"})
     public void shouldNotShowGranteesInCandidatesDialog() throws JSONException, IOException {
-        createDashboard(getRestApiClient(), "No duplicate grantees dashboard");
+        createTestDashboard("No duplicate grantees dashboard");
 
         PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
         AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
@@ -436,7 +444,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests", "sanity"})
     public void shouldShowDashboardSharedWithAllUser() throws JSONException, IOException {
         closeDialogIfVisible();
-        createDashboard(getRestApiClient(), "Dashboard shared to all users and groups");
+        createTestDashboard("Dashboard shared to all users and groups");
 
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
         final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
@@ -459,7 +467,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests"})
     public void shouldCacheSpecificUsersWhenSwitchFromEveryoneToSpecificUsers() throws JSONException, IOException {
-        createDashboard(getRestApiClient(), "Dashboard shared to some specific users");
+        createTestDashboard("Dashboard shared to some specific users");
 
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
         final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
@@ -501,7 +509,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
 
             waitForElementPresent(permissionsDialog.getRoot().findElement(ALERT_INFOBOX_CSS_SELECTOR));
 
-            assertTrue(permissionsDialog.checkCannotRemoveOwner(), 
+            assertTrue(permissionsDialog.checkCannotRemoveOwner(),
                     "There is the delete icon of dashboard owner grantee");
 
             permissionsDialog.undoRemoveUser(testParams.getEditorUser());
@@ -515,9 +523,9 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
             assertEquals(permissionsDialog.getAddedGrantees().size(), 3);
 
             final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
-           
+
             if (testParams.getDomainUser() != null) {
-                selectCandidatesAndShare(addGranteesDialog, testParams.getDomainUser(), testParams.getViewerUser(), 
+                selectCandidatesAndShare(addGranteesDialog, testParams.getDomainUser(), testParams.getViewerUser(),
                         XENOFOBES_XYLOPHONES);
                 assertEquals(permissionsDialog.getAddedGrantees().size(), 6);
             } else {
@@ -592,7 +600,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"prepareUsergroupTests"}, groups = {"acl-tests-usergroups", "sanity"})
     public void shouldVisibleToUserInGroup() throws JSONException, IOException {
-        createDashboard(getRestApiClient(), "Dashboard shared to user group");
+        createTestDashboard("Dashboard shared to user group");
 
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
         final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
@@ -644,21 +652,21 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
 
         dashboardsPage.openPermissionsDialog();
         if (testParams.getDomainUser() != null) {
-            assertEquals(permissionsDialog.getAddedGrantees().size(), 6); 
+            assertEquals(permissionsDialog.getAddedGrantees().size(), 6);
         } else {
-            assertEquals(permissionsDialog.getAddedGrantees().size(), 5); 
+            assertEquals(permissionsDialog.getAddedGrantees().size(), 5);
         }
     }
 
     /**
      * CL-6045 test case - user (nor owner or grantee) can see warn message before kick himself from
      * grantees
-     * @throws IOException 
+     * @throws IOException
      */
     @Test(dependsOnMethods = {"prepareUsergroupTests"}, groups = {"acl-tests-usergroups"})
     public void shouldShowHidingFromYourselfNotificationToEditor() throws JSONException, IOException {
         try {
-            createDashboard(getRestApiClient(), "Hide yourself test dashboard");
+            createTestDashboard("Hide yourself test dashboard");
             publishDashboard(true);
 
             logout();
@@ -765,8 +773,29 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         }
     }
 
-    private String createDashboard(RestApiClient restApiClient, String name) throws JSONException, IOException {
-        String dashboardURI = DashboardsRestUtils.createDashboard(restApiClient, testParams.getProjectId(), name);
+    private String createTestDashboard(String name) throws JSONException, IOException {
+        JSONObject dashboardObj = new JSONObject() {{
+            put("projectDashboard", new JSONObject() {{
+                put("content", new JSONObject() {{
+                    put("rememberFilters", 0);
+                    put("tabs", new JSONArray() {{
+                        put(new JSONObject() {{
+                            put("title", "First Tab");
+                            put("items", new JSONArray());
+                        }});
+                    }});
+                    put("filters", new JSONArray());
+                }});
+                put("meta", new JSONObject() {{
+                    put("title", name);
+                    put("locked", 0);
+                    put("unlisted", 1); // need this value to display unlisted/eye icon
+                }});
+            }});
+        }};
+
+        String dashboardURI = dashboardRequest.createDashboard(dashboardObj);
+
         //refresh page to update the dashboards has just been created
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + DASHBOARD_PAGE_SUFFIX + "|" + dashboardURI);
         WaitUtils.waitForDashboardPageLoaded(browser);

@@ -29,6 +29,7 @@ import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.http.RestRequest.initGetRequest;
 import static com.gooddata.qa.utils.http.RestRequest.initPostRequest;
+import static java.lang.String.format;
 import static java.util.Objects.isNull;
 
 public class CommonRestRequest {
@@ -262,6 +263,25 @@ public class CommonRestRequest {
         final String status = taskObject.getJSONObject(key).getString("status");
         log.info("Async task status is: " + status);
         return status;
+    }
+
+    /**
+     * Delete object and its dependencies
+     *
+     * @param objectUris
+     * @throws JSONException
+     * @throws IOException
+     */
+    public void deleteObjectsUsingCascade(String... objectUris) {
+        JSONObject payload = new JSONObject() {{
+            put("delete", new JSONObject() {{
+                put("items", new JSONArray(objectUris));
+                put("mode", "cascade");
+            }});
+        }};
+
+        executeRequest(initPostRequest(format("/gdc/md/%s/objects/delete", projectId),
+                payload.toString()), HttpStatus.NO_CONTENT);
     }
 
     protected Project getProject() {

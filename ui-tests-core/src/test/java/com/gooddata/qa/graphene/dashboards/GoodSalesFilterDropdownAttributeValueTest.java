@@ -18,6 +18,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.google.common.base.Function;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,8 +44,6 @@ import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.addMufToUser;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createSimpleMufObjByUri;
 import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.format;
@@ -82,6 +81,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
     private Metric metricAvailable;
     private Attribute stageName;
     private Metric amountMetric;
+    private DashboardRestRequest dashboardRequest;
 
     @Override
     public void initProperties() {
@@ -91,6 +91,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
 
     @Override
     protected void customizeProject() throws Throwable {
+        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
         getMetricCreator().createAmountMetric();
         stageName = getMdService().getObj(getProject(), Attribute.class, identifier("attr.stage.name"));
         amountMetric = getMetricByTitle(METRIC_AMOUNT);
@@ -322,11 +323,8 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
         Map<String, Collection<String>> conditions = new HashMap<String, Collection<String>>();
         conditions.put(stageNameUri, buildStageElementUris());
 
-        String mufUri = createSimpleMufObjByUri(getRestApiClient(),
-                getProject().getId(), "Stage Name user filter", conditions);
-        addMufToUser(getRestApiClient(), getProject().getId(),
-                UserManagementRestUtils.getCurrentUserProfileUri(getRestApiClient()), mufUri);
-
+        String mufUri = dashboardRequest.createSimpleMufObjByUri("Stage Name user filter", conditions);
+        dashboardRequest.addMufToUser(UserManagementRestUtils.getCurrentUserProfileUri(getRestApiClient()), mufUri);
         makeCopyFromDashboard(USE_AVAILABLE_DASHBOARD_2);
 
         try {
@@ -353,8 +351,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
         } finally {
             dashboardsPage.deleteDashboard();
             editMetricExpression(buildFirstMetricExpression(amountMetric.getUri(), stageNameUri));
-            addMufToUser(getRestApiClient(), getProject().getId(),
-                    UserManagementRestUtils.getCurrentUserProfileUri(getRestApiClient()), "");
+            dashboardRequest.addMufToUser(UserManagementRestUtils.getCurrentUserProfileUri(getRestApiClient()), "");
         }
     }
 

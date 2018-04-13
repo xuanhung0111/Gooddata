@@ -4,7 +4,6 @@ import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createSimpleMufObjByUri;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getRoleUriFromInvitation;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileByEmail;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUsersUsingMuf;
@@ -25,6 +24,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -55,6 +56,7 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
     private RegistrationForm registrationForm;
     private String defaultMufUri;
     private String updatedMufUri;
+    private DashboardRestRequest dashboardRequest;
 
     private int expectedMessageCount; // Use this variable to avoid connecting to inbox many times
 
@@ -92,6 +94,7 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
 
         defaultMufUri = createEducationMuf(Arrays.asList("Partial College", "Partial High School"), "Education user filter");
         updatedMufUri = createEducationMuf(singletonList("Partial College"), "Education-Partial college user filter");
+        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
     }
 
     @Test(dependsOnMethods = {"setUpProject"})
@@ -263,6 +266,6 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
         final Map<String, Collection<String>> conditions = new HashMap<>();
         conditions.put(education.getUri(), filteredElementUris);
 
-        return createSimpleMufObjByUri(getRestApiClient(), testParams.getProjectId(), mufTitle, conditions);
+        return dashboardRequest.createSimpleMufObjByUri(mufTitle, conditions);
     }
 }

@@ -16,7 +16,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPan
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.http.RestClient;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.rolap.RolapRestRequest;
 import org.apache.commons.io.IOUtils;
 import org.openqa.selenium.WebElement;
@@ -48,6 +48,7 @@ public class DashboardFiscalCalendarTest extends AbstractDashboardWidgetTest {
     private String monthAtFiscalDate;
     private String quarterAtFiscalDate;
     private int yearAtFiscalDate;
+    private DashboardRestRequest dashboardRequest;
 
     @Override
     public void initProperties() {
@@ -64,10 +65,13 @@ public class DashboardFiscalCalendarTest extends AbstractDashboardWidgetTest {
         String webdavURL = uploadFileToWebDav(fiscalDateResouce, null);
         getFileFromWebDav(webdavURL, fiscalDateResouce);
 
-        new RolapRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
+        RestClient restClient = new RestClient(getProfile(ADMIN));
+        new RolapRestRequest(restClient, testParams.getProjectId())
                 .postEtlPullIntegration(webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()));
         setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.FISCAL_CALENDAR_ENABLED, true);
+
+        dashboardRequest = new DashboardRestRequest(restClient, testParams.getProjectId());
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -197,7 +201,7 @@ public class DashboardFiscalCalendarTest extends AbstractDashboardWidgetTest {
             assertEquals(timeFilterPanel.getFromValue(), "12/28/2009");
             assertEquals(timeFilterPanel.getToValue(), "12/27/2015");
         } finally {
-            DashboardsRestUtils.deleteAllDashboards(getRestApiClient(), testParams.getProjectId());
+            dashboardRequest.deleteAllDashboards();
         }
     }
 
@@ -230,7 +234,7 @@ public class DashboardFiscalCalendarTest extends AbstractDashboardWidgetTest {
             assertEquals(timeFilterPanel.getFromValue(), "12/31/1900");
             assertEquals(timeFilterPanel.getToValue(), "12/25/2050");
         } finally {
-            DashboardsRestUtils.deleteAllDashboards(getRestApiClient(), testParams.getProjectId());
+            dashboardRequest.deleteAllDashboards();
         }
     }
 

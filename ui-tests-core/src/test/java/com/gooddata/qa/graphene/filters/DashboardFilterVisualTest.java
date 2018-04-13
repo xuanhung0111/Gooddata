@@ -8,15 +8,12 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 
 import java.util.List;
 
-import com.gooddata.md.ProjectDashboard;
-import com.gooddata.qa.graphene.utils.GoodSalesUtils;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
 import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
-import com.gooddata.qa.utils.http.RestUtils;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -54,7 +51,8 @@ public class DashboardFilterVisualTest extends GoodSalesAbstractTest {
         }).build();
 
         // dashboard is set as default dashboard
-        DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(), dashboard.getMdObject());
+        new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId())
+                .createDashboard(dashboard.getMdObject());
     }
 
     @Test(dependsOnGroups = {"createProject"})

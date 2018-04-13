@@ -7,7 +7,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import com.gooddata.qa.utils.asserts.AssertUtils;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -31,6 +31,8 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
     private static final String TEST_DASHBOAD_NAME = "test-drill-report-to-export";
     private static final String REPORT_NAME = "Drill report to export";
 
+    private DashboardRestRequest dashboardRequest;
+
     @Override
     public void initProperties() {
         super.initProperties();
@@ -41,6 +43,7 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
     protected void customizeProject() throws Throwable {
         getMetricCreator().createAmountMetric();
         getMetricCreator().createNumberOfActivitiesMetric();
+        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -143,15 +146,13 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
     }
 
     private void setDrillReportTargetAsPopup() throws JSONException, IOException {
-        DashboardsRestUtils.setDrillReportTargetAsPopup(getRestApiClient(), testParams.getProjectId(),
-                getDashboardID());
+        dashboardRequest.setDrillReportTargetAsPopup(getDashboardID());
         browser.navigate().refresh();
         waitForDashboardPageLoaded(browser);
     }
 
     private void setDrillReportTargetAsExport(String exportFormat) throws JSONException, IOException {
-        DashboardsRestUtils.setDrillReportTargetAsExport(getRestApiClient(), testParams.getProjectId(),
-                getDashboardID(), exportFormat);
+        dashboardRequest.setDrillReportTargetAsExport(getDashboardID(), exportFormat);
         browser.navigate().refresh();
         waitForDashboardPageLoaded(browser);
     }

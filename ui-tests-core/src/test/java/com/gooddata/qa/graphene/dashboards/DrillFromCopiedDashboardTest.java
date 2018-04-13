@@ -13,7 +13,7 @@ import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
@@ -30,7 +30,6 @@ import java.util.stream.Stream;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_AMOUNT_BY_PRODUCT;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.deleteAllDashboards;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 
@@ -52,6 +51,7 @@ public class DrillFromCopiedDashboardTest extends GoodSalesAbstractTest {
 
     private String amountByProductReportUri;
     private String amountByStageNameReportUri;
+    private DashboardRestRequest dashboardRequest;
 
     @Override
     public void initProperties() {
@@ -63,7 +63,7 @@ public class DrillFromCopiedDashboardTest extends GoodSalesAbstractTest {
     protected void customizeProject() throws Throwable {
         amountByProductReportUri = getReportCreator().createAmountByProductReport();
         amountByStageNameReportUri = getReportCreator().createAmountByStageNameReport();
-
+        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
         prepareDashboards();
     }
 
@@ -83,10 +83,8 @@ public class DrillFromCopiedDashboardTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void drillReportToDeletedTabFromCopiedDashboard()
-            throws JSONException, IOException {
-        DashboardsRestUtils.createDashboard(getRestApiClient(),
-                testParams.getProjectId(), dashboard1.getMdObject());
+    public void drillReportToDeletedTabFromCopiedDashboard() throws JSONException, IOException {
+        dashboardRequest.createDashboard(dashboard1.getMdObject());
         try {
             initDashboardsPage().selectDashboard(DASHBOAD_1_NAME);
             dashboardsPage.getTabs().getTab(TAB1_NAME).open();
@@ -105,17 +103,14 @@ public class DrillFromCopiedDashboardTest extends GoodSalesAbstractTest {
 
             assertEquals(StatusBar.getInstance(browser).getMessage(), ERROR_MSG);
         } finally {
-            deleteAllDashboards(getRestApiClient(), testParams.getProjectId());
+            dashboardRequest.deleteAllDashboards();
         }
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void drillCopiedBetweenDashboards() throws JSONException, IOException {
-        DashboardsRestUtils.createDashboard(getRestApiClient(),
-                testParams.getProjectId(), dashboard1.getMdObject());
-
-        DashboardsRestUtils.createDashboard(getRestApiClient(),
-                testParams.getProjectId(), dashboard2.getMdObject());
+        dashboardRequest.createDashboard(dashboard1.getMdObject());
+        dashboardRequest.createDashboard(dashboard2.getMdObject());
         try {
             initDashboardsPage().selectDashboard(DASHBOAD_1_NAME).editDashboard();
             addDrillSettingsToLatestReport(
@@ -129,7 +124,7 @@ public class DrillFromCopiedDashboardTest extends GoodSalesAbstractTest {
             assertEquals(dashboardsPage.getDashboardName(), DASHBOAD_2_NAME);
             assertEquals(dashboardsPage.getTabs().getSelectedTab().getLabel(), TAB3_NAME);
         } finally {
-            deleteAllDashboards(getRestApiClient(), testParams.getProjectId());
+            dashboardRequest.deleteAllDashboards();
         }
     }
 
@@ -138,8 +133,7 @@ public class DrillFromCopiedDashboardTest extends GoodSalesAbstractTest {
                                                                     final String targetTab,
                                                                     final String saveAsDashboard)
             throws JSONException, IOException {
-        DashboardsRestUtils.createDashboard(getRestApiClient(),
-                testParams.getProjectId(), dashboard1.getMdObject());
+        dashboardRequest.createDashboard(dashboard1.getMdObject());
         try {
             initDashboardsPage().selectDashboard(sourceDashboard);
             if (!dashboardsPage.getTabs().getAllTabNames().contains(targetTab)) {
@@ -159,7 +153,7 @@ public class DrillFromCopiedDashboardTest extends GoodSalesAbstractTest {
             assertEquals(dashboardsPage.getDashboardName(), saveAsDashboard);
             assertEquals(dashboardsPage.getTabs().getSelectedTab().getLabel(), targetTab);
         } finally {
-            deleteAllDashboards(getRestApiClient(), testParams.getProjectId());
+            dashboardRequest.deleteAllDashboards();
         }
     }
 

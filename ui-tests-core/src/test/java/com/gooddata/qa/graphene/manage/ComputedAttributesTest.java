@@ -4,7 +4,6 @@ import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.changeMetricExpression;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForObjectPageLoaded;
@@ -46,6 +45,7 @@ import java.util.stream.Collectors;
 
 import com.gooddata.qa.models.GraphModel;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.model.ModelRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import org.apache.http.ParseException;
@@ -78,7 +78,6 @@ import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 
 public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
@@ -109,6 +108,8 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             .withBucket(new AttributeBucket(2, "Great", "250"))
             .withBucket(new AttributeBucket(3, "Best"));
 
+    private DashboardRestRequest dashboardRequest;
+
     @Override
     protected void initProperties() {
         super.initProperties();
@@ -124,6 +125,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     protected void customizeProject() throws Throwable {
         getMetricCreator().createExpectedPercentOfGoalMetric();
         getMetricCreator().createNumberOfWonOppsMetric();
+        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
     }
 
     @Test(dependsOnGroups = {"createProject"}, priority = 0,
@@ -278,7 +280,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
          String newMaqlExpression = format("SELECT SUM([%s]) WHERE [%s] = [%s]",
                  amountFactUri, saleRepAttributeUri, saleRepValueUri);
-        changeMetricExpression(getRestApiClient(), sumOfAmountMetricUri, newMaqlExpression);
+        dashboardRequest.changeMetricExpression(sumOfAmountMetricUri, newMaqlExpression);
 
         initReportsPage().openReport(CHANGEMAQL_REPORT_NAME).initPage();
         checkRedBar(browser);
@@ -465,10 +467,8 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             restApiClient = getRestApiClient();
 
             String mufUri = createStageMuf(Arrays.asList("Won", "Lost"), "Status User Filters");
-            DashboardsRestUtils.addMufToUser(restApiClient, testParams.getProjectId(),
-                    UserManagementRestUtils.getUserProfileUri(
-                            getDomainUserRestApiClient(), testParams.getUserDomain(), testParams.getEditorUser()),
-                    mufUri);
+            dashboardRequest.addMufToUser(UserManagementRestUtils.getUserProfileUri(
+                    getDomainUserRestApiClient(), testParams.getUserDomain(), testParams.getEditorUser()), mufUri);
             logout();
 
             signInAtUI(testParams.getEditorUser(), testParams.getPassword());
@@ -629,8 +629,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         final Map<String, Collection<String>> conditions = new HashMap<>();
         conditions.put(stage.getUri(), elementUris);
 
-        return DashboardsRestUtils
-                .createSimpleMufObjByUri(getRestApiClient(), testParams.getProjectId(), mufTitle, conditions);
+        return dashboardRequest.createSimpleMufObjByUri(mufTitle, conditions);
     }
 
     private void verifyLDMModelProject(Set<String> expectedNodes, Set<String> expectedEdges)

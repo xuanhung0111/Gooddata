@@ -85,6 +85,8 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     // this flag will enable feature: create new user for each test instead of using provided user account
     protected boolean useDynamicUser;
 
+    private RestClient restClient;
+
     @BeforeClass(alwaysRun = true)
     public void enableDynamicUser() {
         useDynamicUser = Boolean.parseBoolean(testParams.loadProperty("useDynamicUser"));
@@ -310,6 +312,13 @@ public abstract class AbstractProjectTest extends AbstractUITest {
                 .setRestApiClient(getRestApiClient(user, testParams.getPassword()))
                 .deploy(title, testParams.getAuthorizationToken(),
                         testParams.getProjectDriver(), testParams.getProjectEnvironment());
+    }
+
+    protected RestClient getAdminRestClient() {
+        if (Objects.isNull(restClient))
+            restClient = new RestClient(getProfile(ADMIN));
+
+        return restClient;
     }
 
     protected Collection<String> getAttributeValues(Attribute attribute) {

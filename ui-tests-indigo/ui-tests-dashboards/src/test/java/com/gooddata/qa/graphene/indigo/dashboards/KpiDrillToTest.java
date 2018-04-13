@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_DISMISS_BUTTON;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
@@ -30,6 +31,8 @@ import java.io.IOException;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -53,7 +56,6 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.gooddata.qa.utils.java.Builder;
 
 public class KpiDrillToTest extends AbstractDashboardTest {
@@ -71,6 +73,7 @@ public class KpiDrillToTest extends AbstractDashboardTest {
         .build();
 
     private boolean isMobileRunning;
+    private DashboardRestRequest dashboardRequest;
 
     @BeforeClass(alwaysRun = true)
     public void addUsersOnDesktopExecution(ITestContext context) {
@@ -79,6 +82,7 @@ public class KpiDrillToTest extends AbstractDashboardTest {
 
     @Override
     protected void customizeProject() throws Throwable {
+        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
         getMetricCreator().createAmountMetric();
         getMetricCreator().createLostMetric();
         getMetricCreator().createWonMetric();
@@ -331,9 +335,7 @@ public class KpiDrillToTest extends AbstractDashboardTest {
                 waitForElementVisible(BY_DISMISS_BUTTON, browser).click();
                 dashboardsPage.getDashboardEditBar().saveDashboard();
 
-                DashboardsRestUtils.deleteDashboardTab(getRestApiClient(), getObjectUriFromUrl(browser.getCurrentUrl()),
-                        DASH_TAB_OUTLOOK);
-
+                dashboardRequest.deleteDashboardTab(getObjectUriFromUrl(browser.getCurrentUrl()), DASH_TAB_OUTLOOK);
                 initIndigoDashboardsPageWithWidgets()
                     .switchToEditMode()
                     .selectLastWidget(Kpi.class);
@@ -428,13 +430,11 @@ public class KpiDrillToTest extends AbstractDashboardTest {
     }
 
     private void addNewDashboard(String newDashboard) throws JSONException, IOException {
-        Dashboard dashboard = Builder.of(Dashboard::new).with(dash -> {
+        dashboardRequest.createDashboard(Builder.of(Dashboard::new).with(dash -> {
             dash.setName(newDashboard);
             dash.addTab(Builder.of(Tab::new).with(tab -> tab.setTitle(DASH_TAB_OUTLOOK)).build());
             dash.addTab(Builder.of(Tab::new).with(tab -> tab.setTitle(DASH_TAB_WHATS_CHANGED)).build());
-        }).build();
-
-        DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(), dashboard.getMdObject());
+        }).build().getMdObject());
     }
 
     private IndigoDashboardsPage startIndigoDashboardEditMode() {

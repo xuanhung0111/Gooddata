@@ -13,6 +13,8 @@ import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.io.ResourceUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -29,8 +31,8 @@ import java.io.IOException;
 
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.changeMetricFormat;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
@@ -94,13 +96,15 @@ public class CopyReportTableTest extends AbstractProjectTest {
     public void copyFormattedCell()
             throws HeadlessException, UnsupportedFlavorException, IOException, ParseException, JSONException {
 
-        changeMetricFormat(getRestApiClient(), amountSum.getUri(), Formatter.COLORS.toString());
+        DashboardRestRequest dashboardRequest = new DashboardRestRequest(
+                new RestClient(getProfile(ADMIN)), testParams.getProjectId());
+        dashboardRequest.changeMetricFormat(amountSum.getUri(), Formatter.COLORS.toString());
         try {
             initReportsPage().openReport(SIMPLE_REPORT).getTableReport().copyMetricValue(CONDITION_FORMAT_VALUE);
             takeScreenshot(browser, "copy-formatted-cell", getClass());
             assertEquals(getClipboardContent(), CONDITION_FORMAT_VALUE);
         } finally {
-            changeMetricFormat(getRestApiClient(), amountSum.getUri(), Formatter.DEFAULT.toString());
+            dashboardRequest.changeMetricFormat(amountSum.getUri(), Formatter.DEFAULT.toString());
         }
     }
 

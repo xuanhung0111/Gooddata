@@ -20,7 +20,7 @@ import com.gooddata.qa.graphene.fragments.reports.report.AttributeSndPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import com.gooddata.qa.graphene.utils.WaitUtils;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -251,10 +251,8 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
         reportPage.waitForReportExecutionProgress();
 
         final String durationUri = getMdService().getObj(getProject(), Fact.class, title("Duration")).getUri();
-        DashboardsRestUtils.changeMetricExpression(getRestApiClient(),
-                simpleMetricUri,
-                "SELECT SUM([" + amountUri + "]+[" + durationUri + "])");
-
+        new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId())
+                .changeMetricExpression(simpleMetricUri, "SELECT SUM([" + amountUri + "]+[" + durationUri + "])");
         assertThat(initReportsPage().openReport(headlineReport).getInvalidDataReportMessage(),
                 equalTo(REPORT_NOT_COMPUTABLE_MESSAGE));
     }
