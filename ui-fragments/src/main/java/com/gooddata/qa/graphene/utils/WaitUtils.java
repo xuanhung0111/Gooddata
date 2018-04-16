@@ -4,11 +4,15 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.BY_DISMISS_BUTTON;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -68,9 +72,18 @@ public final class WaitUtils {
 
     public static void waitForAnalysisPageLoaded(SearchContext searchContext) {
         waitForElementVisible(By.xpath("//div[@id='p-analysisPage' and contains(@class,'s-displayed')]"), searchContext);
-
-        WebElement filterButton = waitForElementVisible(By.className("s-reportEditorFilter"), searchContext);
-        waitForElementAttributeNotContainValue(filterButton, "class", "disabled");
+        List<WebElement> visibleElements = searchContext.findElements(By.cssSelector(".reportEditorHeader button")).stream()
+                .filter(elememt -> isElementVisible(elememt)).collect(Collectors.toList());
+        //Case1(Creating report): There are 3 visible elements such as: What, How and Filter
+        //Case2(Saving report): There are 4 visible elements such as: What, How ,Filter and Show Configuration
+        //Case3(Restoring another version): There are 4 visible elements such as: What, How ,Filter and Show Configuration
+        //In Case1 & 2: Wait until enable elements equal visible elements(3 or 4)
+        //In Case3: Wait until enable element equals 1(Just show configuration be enabled)
+        Graphene.waitGui().until(browser -> {
+            long enabledElementsCount = visibleElements.stream().filter(element -> !element.getAttribute("class")
+                    .contains("disabled")).count();
+            return enabledElementsCount == visibleElements.size() || enabledElementsCount == 1;
+        });
     }
 
     public static void waitForSchedulesPageLoaded(SearchContext searchContext) {
