@@ -19,6 +19,7 @@ import java.util.UUID;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAllInsightNames;
 import static java.util.Arrays.asList;
@@ -342,11 +343,13 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
         analysisPage.exportReport();
         BrowserUtils.switchToLastTab(browser);
         try {
-            List<String> attributes = reportPage.getTableReport().waitForLoaded().getAttributeValues();
+            waitForAnalysisPageLoaded(browser);
+            List<String> attributes = reportPage.getTableReport().getAttributeValues();
             takeScreenshot(browser, "openAsReportAfterSaveInsight", getClass());
             assertEquals(attributes, asList("Email", "In Person Meeting", "Phone Call", "Web Meeting"),
                     "Report is not rendered correctly");
         } finally {
+            browser.close();
             BrowserUtils.switchToFirstTab(browser);
         }
     }

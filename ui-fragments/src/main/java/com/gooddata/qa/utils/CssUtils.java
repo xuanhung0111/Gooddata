@@ -3,6 +3,7 @@
  */
 package com.gooddata.qa.utils;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.openqa.selenium.WebElement;
 
 public final class CssUtils {
@@ -17,8 +18,9 @@ public final class CssUtils {
      * classes.
      */
     public static String simplifyText(String text) {
-        String replacedText = text.replaceAll("[^a-zA-Z0-9]", "_");
-        return replacedText.toLowerCase();
+        return StringEscapeUtils.escapeHtml(text)
+                .replaceAll("[^a-zA-Z0-9]", "_")
+                .toLowerCase();
     }
 
     public static String convertCSSClassTojQuerySelector(String cssClass) {
