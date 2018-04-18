@@ -110,19 +110,34 @@ public class TimeFilterPanel extends AbstractFragment {
     public TimeFilterPanel selectRange(final String startTime, final String endTime) {
         waitForElementVisible(timelineContent);
 
+        int steps = 0;
         while (!isExistingTimeline(startTime)) {
             if (!moveLeftOnTimeline()) {
                 break;
             }
+            steps++;
+            // Limit steps to avoid infinitive loop in case the timeline content load incorrect date dataset
+            // due to https://jira.intgdc.com/browse/CL-12774
+            if (steps > 20) {
+                throw new RuntimeException("Error on finding element: " + startTime);
+            }
         }
 
         WebElement startTimeElement = getTimeLineElement(startTime);
-
         startTimeElement.click();
+
         WebElement moveButton;
+        steps = 0;
         while ((moveButton = getMoveButton(endTime)) != null) {
             moveButton.click();
+            steps++;
+            // Limit steps to avoid infinitive loop in case the timeline content load incorrect date dataset
+            // due to https://jira.intgdc.com/browse/CL-12774
+            if (steps > 20) {
+                throw new RuntimeException("Error on finding element: " + endTime);
+            }
         }
+
         WebElement endTimeElement = getTimeLineElement(endTime);
         try {
             getActions().keyDown(Keys.SHIFT).perform();
