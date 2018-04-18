@@ -283,7 +283,6 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
         final String insight = "Chart-Icon-On-Insight-List-Test-" + type.getLabel();
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .changeReportType(type)
-                .getPageHeader()
                 .saveInsight(insight);
 
         assertEquals(
