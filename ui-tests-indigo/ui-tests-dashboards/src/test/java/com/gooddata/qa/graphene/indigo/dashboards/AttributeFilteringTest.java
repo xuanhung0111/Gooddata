@@ -356,11 +356,11 @@ public class AttributeFilteringTest extends AbstractDashboardTest {
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void testEmptyStateWhenFilterOut() {
         initIndigoDashboardsPageWithWidgets().switchToEditMode()
-                .addAttributeFilter(ATTR_OPPORTUNITY)
+                .addAttributeFilter(ATTR_DEPARTMENT)
                 .getAttributeFiltersPanel()
-                .getAttributeFilter(ATTR_OPPORTUNITY)
+                .getAttributeFilter(ATTR_DEPARTMENT)
                 .clearAllCheckedValues()
-                .selectByNames("1000Bulbs.com > Educationly");
+                .selectByNames("Direct Sales");
 
         indigoDashboardsPage.addAttributeFilter(ATTR_ACCOUNT)
                 .getAttributeFiltersPanel()
