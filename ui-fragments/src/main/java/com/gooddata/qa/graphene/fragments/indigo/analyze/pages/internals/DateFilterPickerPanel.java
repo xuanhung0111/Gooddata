@@ -121,8 +121,11 @@ public class DateFilterPickerPanel extends AbstractFragment {
     private void configTimeFilterByRangeHelper(String from, String to, boolean apply) {
         waitForElementVisible(dateRangeSection).click();
 
-        ElementUtils.sendKeys(fromDate, from);
-        ElementUtils.sendKeys(toDate, to);
+        ElementUtils.clear(fromDate);
+        fromDate.sendKeys(from);
+
+        ElementUtils.clear(toDate);
+        toDate.sendKeys(to);
 
         waitForElementVisible(toDateCalendarIcon).click();
 

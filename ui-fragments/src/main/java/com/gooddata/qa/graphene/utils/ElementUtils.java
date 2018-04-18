@@ -147,11 +147,4 @@ public final class ElementUtils {
                 .keyDown(Keys.CONTROL).sendKeys("a").keyUp(Keys.CONTROL).sendKeys(Keys.DELETE)
                 .perform();
     }
-
-    // Selenium action senkeys not work properly with some kind of inputs (calendar picker input, ...).
-    // Use this method as a replacement.
-    public static void sendKeys(WebElement element, String value) {
-        clear(element);
-        element.sendKeys(value);
-    }
 }
