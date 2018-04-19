@@ -362,11 +362,11 @@ public class AttributeFilteringTest extends AbstractDashboardTest {
                 .clearAllCheckedValues()
                 .selectByNames("Direct Sales");
 
-        indigoDashboardsPage.addAttributeFilter(ATTR_ACCOUNT)
+        indigoDashboardsPage.addAttributeFilter(ATTR_SALES_REP)
                 .getAttributeFiltersPanel()
-                .getAttributeFilter(ATTR_ACCOUNT)
+                .getAttributeFilter(ATTR_SALES_REP)
                 .clearAllCheckedValues()
-                .selectByNames("(add)ventures");
+                .selectByNames("Huey Jonas");
 
         indigoDashboardsPage.waitForWidgetsLoading();
         takeScreenshot(browser, "testEmptyStateWhenFilterOut", getClass());
