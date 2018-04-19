@@ -57,6 +57,7 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
         assertTrue(isEqualCollection(panel.getDimensionSwitchs(), asList(ACTIVITY, CREATED)));
 
         panel.select("This year");
+        panel.apply();
         analysisPage.waitForReportComputing();
         assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ": This year");
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
