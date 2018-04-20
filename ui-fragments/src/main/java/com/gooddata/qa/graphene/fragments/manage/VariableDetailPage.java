@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementAttributeContainValue;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
@@ -37,7 +38,13 @@ public class VariableDetailPage extends ObjectPropertiesPage {
     private UserSpecificTable userSpecificTable;
 
     public static VariableDetailPage getInstance(SearchContext searchContext) {
-        return Graphene.createPageFragment(VariableDetailPage.class, waitForElementVisible(LOCATOR, searchContext));
+        VariableDetailPage page =  Graphene.createPageFragment(VariableDetailPage.class,
+                waitForElementVisible(LOCATOR, searchContext));
+
+        if (page.isUserSpecificTableDisplayed()) {
+            page.waitForUserSpecificTableLoaded();
+        }
+        return page;
     }
 
     public String createNumericVariable(NumericVariable variable) {
@@ -202,6 +209,11 @@ public class VariableDetailPage extends ObjectPropertiesPage {
 
     private String getVariableUri() {
         return browser.getCurrentUrl().split("objectPage\\|")[1].split("\\|\\|")[0];
+    }
+
+    private VariableDetailPage waitForUserSpecificTableLoaded() {
+        waitForElementAttributeContainValue(userSpecificTable.getRoot(), "style", "display: table;");
+        return this;
     }
 
     public static class UserSpecificTable extends AbstractTable {
