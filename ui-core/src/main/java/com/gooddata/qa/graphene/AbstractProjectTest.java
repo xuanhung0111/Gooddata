@@ -290,13 +290,24 @@ public abstract class AbstractProjectTest extends AbstractUITest {
      * @return project id
      */
     protected String createProjectUsingFixture(String title, ResourceTemplate appliedFixture) {
+        return createProjectUsingFixture(title, appliedFixture, testParams.getUser());
+    }
+
+    /**
+     *
+     * @param title project title
+     * @param appliedFixture fixture which is applied to an empty project
+     * @param user Using to create project
+     * @return project id
+     */
+    protected String createProjectUsingFixture(String title, ResourceTemplate appliedFixture, String user) {
         if (Objects.isNull(appliedFixture)) {
             throw new FixtureException("Fixture can't be null");
         }
 
         return new Fixture(appliedFixture)
-                .setGoodDataClient(getGoodDataClient())
-                .setRestApiClient(getRestApiClient())
+                .setGoodDataClient(getGoodDataClient(user, testParams.getPassword()))
+                .setRestApiClient(getRestApiClient(user, testParams.getPassword()))
                 .deploy(title, testParams.getAuthorizationToken(),
                         testParams.getProjectDriver(), testParams.getProjectEnvironment());
     }
