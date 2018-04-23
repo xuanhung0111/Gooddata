@@ -38,7 +38,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPP
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON_OPPS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PERCENT_OF_GOAL;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_QUOTA;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
@@ -218,9 +217,7 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
                         com.gooddata.qa.graphene.fragments.reports.report.TableReport.class,
                         waitForElementVisible(By.id("gridContainerTab"), browser));
 
-        Iterator<String> attributes = tableReport.getAttributeValues().iterator();
-
-        sleepTight(2000); // wait for metric values is calculated and loaded
+        Iterator<String> attributes = tableReport.waitForLoaded().getAttributeValues().iterator();
         Iterator<String> metrics = tableReport.getRawMetricValues().iterator();
 
         List<List<String>> content = new ArrayList<>();
