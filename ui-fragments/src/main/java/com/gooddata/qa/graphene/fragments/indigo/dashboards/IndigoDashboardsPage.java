@@ -629,6 +629,6 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     private class MobileKpiDashboardSelection extends AbstractFragment {
         @FindBy(className = "gd-mobile-dropdown-content")
-        public WebElement dropdownList;
+        private WebElement dropdownList;
     }
 }
