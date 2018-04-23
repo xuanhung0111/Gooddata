@@ -36,10 +36,10 @@ public class KpiDashboardsParamsTest extends AbstractDashboardTest {
         createAnalyticalDashboard(getRestApiClient(),
                 testParams.getProjectId(), singletonList(createLostKpi()), DASHBOARD_LOST);
         createInsightWidget(new InsightMDConfiguration(INSIGHT_ACTIVITIES,
-                ReportType.COLUMN_CHART).setMeasureBucket(singletonList(MeasureBucket.getSimpleInstance(
+                ReportType.COLUMN_CHART).setMeasureBucket(singletonList(MeasureBucket.createSimpleMeasureBucket(
                 getMdService().getObj(getProject(), Metric.class, title(METRIC_NUMBER_OF_ACTIVITIES))))));
         createInsightWidget(new InsightMDConfiguration(INSIGHT_LOST,
-                ReportType.COLUMN_CHART).setMeasureBucket(singletonList(MeasureBucket.getSimpleInstance(
+                ReportType.COLUMN_CHART).setMeasureBucket(singletonList(MeasureBucket.createSimpleMeasureBucket(
                 getMdService().getObj(getProject(), Metric.class, title(METRIC_LOST))))));
     }
 

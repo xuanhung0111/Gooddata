@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
@@ -34,21 +35,20 @@ public class TableReport extends AbstractFragment {
     @FindBy(className = "public_fixedDataTable_bodyRow")
     private List<WebElement> rows;
 
-    @FindBy(className = "indigo-totals-add-row-button")
-    private WebElement addTotalsRowButton;
-
     @FindBy(className = "indigo-totals-enable-column-button")
     private WebElement addTotalsCellButton;
 
     @FindBy(css = ".indigo-table-footer-cell.col-0:not(.indigo-totals-add-cell)")
     private List<WebElement> totalsTitleElements;
 
-    @FindBy(className = "indigo-totals-disable-column-button")
+    @FindBy(className = REMOVE_TOTALS_CELL_BUTTON)
     private WebElement removeTotalsCellButton;
 
-    private static final String CELL_CONTENT = "public_fixedDataTableCell_cellContent";
     private static final By BY_TOTALS_RESULTS =
             cssSelector(".col-0:not(.fixedDataTableCellLayout_wrap1):not(.indigo-totals-add-cell)");
+    private static final By ADD_TOTAL_ROW_BUTTON = className("indigo-totals-add-row-button");
+    private static final String CELL_CONTENT = "public_fixedDataTableCell_cellContent";
+    private static final String REMOVE_TOTALS_CELL_BUTTON = "indigo-totals-disable-column-button";
 
     public List<String> getHeaders() {
         return getElementTexts(waitForCollectionIsNotEmpty(headers));
@@ -139,9 +139,9 @@ public class TableReport extends AbstractFragment {
     }
 
     public TableReport deleteTotalsResultCell(AggregationItem type, String metricName) {
-        hoverItem(getTotalsElement(type, metricName));
-        waitForElementVisible(removeTotalsCellButton).click();
-        waitForElementNotVisible(removeTotalsCellButton);
+        WebElement totalsElement = getTotalsElement(type, metricName);
+        hoverItem(totalsElement);
+        waitForElementVisible(className(REMOVE_TOTALS_CELL_BUTTON), totalsElement).click();
         //To be handled wait for computing in test
         //If totals cell is only one.
         AnalysisPage.getInstance(browser).waitForReportComputing();
@@ -156,14 +156,14 @@ public class TableReport extends AbstractFragment {
     public List<String> getEnabledAggregations(String metricName) {
         List<String> list = openAggregationPopup(metricName).getEnabledItemList();
         //click again to close Aggregation Popup
-        waitForElementVisible(addTotalsRowButton).click();
+        waitForElementVisible(ADD_TOTAL_ROW_BUTTON, getRoot()).click();
         return list;
     }
 
     public List<String> getAggregations(String metricName) {
         List<String> list = openAggregationPopup(metricName).getItemsList();
         //click again to close Aggregation Popup
-        waitForElementVisible(addTotalsRowButton).click();
+        waitForElementVisible(ADD_TOTAL_ROW_BUTTON, getRoot()).click();
         return list;
     }
 
@@ -185,13 +185,14 @@ public class TableReport extends AbstractFragment {
     }
 
     private AggregationPopup openAggregationPopup(String metricName) {
-        final By CELL_CONTENT = By.className(format("col-%d", getColumn(metricName)));
-        hoverItem(waitForElementVisible(
-            rows.stream()
-                .findFirst()
-                .get()
-                .findElement(CELL_CONTENT)));
-        waitForElementVisible(addTotalsRowButton).click();
+        String column = format("col-%d", getColumn(metricName));
+        WebElement addTotalRowButton = getRoot().findElements(className(column))
+            .stream()
+            .filter(element -> isElementPresent(ADD_TOTAL_ROW_BUTTON, element))
+            .findFirst()
+            .get();
+        hoverItem(addTotalRowButton);
+        waitForElementVisible(addTotalRowButton).click();
         return Graphene.createPageFragment(AggregationPopup.class,
                 waitForElementVisible(className("indigo-totals-select-type-list"), browser));
     }

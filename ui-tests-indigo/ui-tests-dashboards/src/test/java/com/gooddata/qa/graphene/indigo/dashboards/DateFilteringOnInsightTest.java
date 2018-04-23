@@ -61,7 +61,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
         getMetricCreator().createOppFirstSnapshotMetric();
         createInsight(getRestApiClient(), testParams.getProjectId(),
                 new InsightMDConfiguration(TEST_INSIGHT, ReportType.COLUMN_CHART).setMeasureBucket(
-                        singletonList(MeasureBucket.getSimpleInstance(getMetric(METRIC_NUMBER_OF_ACTIVITIES)))));
+                        singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_NUMBER_OF_ACTIVITIES)))));
 
         // creating insight which is set date filter via REST is not recommended in these tests
         initIndigoDashboardsPage().getSplashScreen().startEditingWidgets().addInsight(TEST_INSIGHT)
@@ -74,7 +74,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
         String anotherInsight = "Another-Insight";
         String anotherInsightUri = createInsightWidget(
                 new InsightMDConfiguration(anotherInsight, ReportType.COLUMN_CHART).setMeasureBucket(
-                        singletonList(MeasureBucket.getSimpleInstance(getMetric(METRIC_NUMBER_OF_LOST_OPPS)))));
+                        singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_NUMBER_OF_LOST_OPPS)))));
 
         addWidgetToWorkingDashboard(anotherInsightUri);
 
@@ -166,7 +166,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
         String insight = "Disabled-Date-Filter-Insight";
         String insightUri = createInsight(getRestApiClient(), testParams.getProjectId(),
                 new InsightMDConfiguration(insight, ReportType.COLUMN_CHART).setMeasureBucket(
-                        singletonList(MeasureBucket.getSimpleInstance(getMetric(METRIC_NUMBER_OF_ACTIVITIES)))));
+                        singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_NUMBER_OF_ACTIVITIES)))));
 
         initIndigoDashboardsPageWithWidgets().switchToEditMode().addInsight(insight).waitForWidgetsLoading()
                 .getConfigurationPanel().disableDateFilter();
@@ -188,7 +188,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
         String insight = "Enabled-Date-Filter-Insight";
         String insightUri = createInsight(getRestApiClient(), testParams.getProjectId(),
                 new InsightMDConfiguration(insight, ReportType.COLUMN_CHART).setMeasureBucket(
-                        singletonList(MeasureBucket.getSimpleInstance(getMetric(METRIC_NUMBER_OF_ACTIVITIES)))));
+                        singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_NUMBER_OF_ACTIVITIES)))));
 
         initIndigoDashboardsPageWithWidgets().switchToEditMode().addInsight(insight).waitForWidgetsLoading();
         // this test should not depend on default state of date filter
@@ -209,7 +209,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
     public void rememberModifiedDateFilterAfterSaving() throws JSONException, IOException {
         String widgetUri = createInsightWidget(new InsightMDConfiguration("Modified-Date-Filter-Insight",
                 ReportType.COLUMN_CHART).setMeasureBucket(
-                        singletonList(MeasureBucket.getSimpleInstance(getMetric(METRIC_NUMBER_OF_ACTIVITIES)))));
+                        singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_NUMBER_OF_ACTIVITIES)))));
 
         addWidgetToWorkingDashboard(widgetUri);
 
@@ -233,7 +233,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
         // which need to modify date in order to narrow affected area
         String widgetUri = createInsightWidget(new InsightMDConfiguration("Renamed-Date-Filter-Insight",
                 ReportType.COLUMN_CHART).setMeasureBucket(
-                        singletonList(MeasureBucket.getSimpleInstance(getMetric(METRIC_OPP_FIRST_SNAPSHOT)))));
+                        singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_OPP_FIRST_SNAPSHOT)))));
 
         addWidgetToWorkingDashboard(widgetUri);
 
@@ -267,7 +267,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
         String insight = "Insight-Containing-Date-Filter";
         String widgetUri =
                 createInsightWidget(new InsightMDConfiguration(insight, ReportType.COLUMN_CHART).setMeasureBucket(
-                        singletonList(MeasureBucket.getSimpleInstance(getMetric(METRIC_OPP_FIRST_SNAPSHOT)))));
+                        singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_OPP_FIRST_SNAPSHOT)))));
 
         addWidgetToWorkingDashboard(widgetUri);
 

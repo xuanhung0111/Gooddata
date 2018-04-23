@@ -69,9 +69,6 @@ public abstract class AbstractInsightSelectionPanel extends AbstractFragment {
     }
 
     public boolean searchInsight(final String insight) {
-        if (isEmpty())
-            return false;
-
         clearInputText();
         waitForElementVisible(searchTextBox).sendKeys(insight);
 
