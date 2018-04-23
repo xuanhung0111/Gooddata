@@ -3,13 +3,8 @@ package com.gooddata.qa.graphene.fragments.dashboards.widget;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
 import com.gooddata.qa.graphene.fragments.reports.report.EmbeddedReportContainer;
-import com.gooddata.qa.graphene.utils.Sleeper;
-import com.gooddata.qa.graphene.utils.WaitUtils;
-import com.google.common.base.Predicate;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -35,6 +30,15 @@ public class EmbeddedWidget extends AbstractFragment {
         try {
             browser.switchTo().frame(iframe);
             return waitForElementVisible(browser.findElement(By.tagName("body"))).getText();
+        } finally {
+            browser.switchTo().defaultContent();
+        }
+    }
+
+    public String getImageUri() {
+        try {
+            browser.switchTo().frame(iframe);
+            return waitForElementVisible(browser.findElement(By.tagName("img"))).getAttribute("src");
         } finally {
             browser.switchTo().defaultContent();
         }

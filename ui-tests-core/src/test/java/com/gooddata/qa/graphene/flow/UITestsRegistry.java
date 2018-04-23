@@ -17,6 +17,7 @@ import com.gooddata.qa.graphene.dashboards.DrillToDashboardTabTest;
 import com.gooddata.qa.graphene.dashboards.DrillToDashboardTabSettingTest;
 import com.gooddata.qa.graphene.dashboards.DrillToHiddenDashboardTabTest;
 import com.gooddata.qa.graphene.dashboards.DrillToUpdatedDashboardTabTest;
+import com.gooddata.qa.graphene.dashboards.DynamicImageOnDashboardTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesCascadingFilterTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesCellLimitTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesConnectingFilterTest;
@@ -144,6 +145,7 @@ public class UITestsRegistry {
             GroupFiltersOnDashboardTest.class,
             FiscalDateFilterNameTest.class,
             DashboardFiscalCalendarTest.class,
+            DynamicImageOnDashboardTest.class,
             "testng-dashboard-default-filter-multiple-choice.xml",
             "testng-dashboard-default-filter-single-choice.xml",
             "testng-dashboard-default-filter-savedView-multiple-choice.xml",
@@ -219,6 +221,7 @@ public class UITestsRegistry {
                     FiscalDateFilterNameTest.class,
                     GoodSalesDashboardMacroTest.class,
                     GoodSalesPublicDashboardTest.class,
+                    DynamicImageOnDashboardTest.class,
                     "testng-dashboard-default-filter-multiple-choice.xml",
                     "testng-dashboard-default-filter-single-choice.xml",
                     "testng-dashboard-default-filter-savedView-multiple-choice.xml",
