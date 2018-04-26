@@ -13,17 +13,17 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.*;
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.dismissSuccessMessage;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.openqa.selenium.By.className;
-import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -58,10 +58,6 @@ public class AnalysisPage extends AbstractFragment {
     public static final String MAIN_CLASS = "adi-editor";
 
     private static final By BY_TRASH_PANEL = className("s-trash");
-
-    private static final By SUCCESS_MESSAGE_LOCATOR = cssSelector("gd-message.success");
-
-    private static final By ERROR_MESSAGE_LOCATOR = cssSelector("gd-message.error");
 
     private static final By BY_BUCKET_NOT_EMPTY = className("s-bucket-not-empty");
 
@@ -332,7 +328,7 @@ public class AnalysisPage extends AbstractFragment {
 
     public AnalysisPage saveInsight() {
         getPageHeader().saveInsight();
-        waitForSaveFinished();
+        dismissSuccessMessage(browser);
         return this;
     }
 
@@ -342,13 +338,13 @@ public class AnalysisPage extends AbstractFragment {
 
     public AnalysisPage saveInsight(final String insight) {
         getPageHeader().saveInsight(insight);
-        waitForSaveFinished();
+        dismissSuccessMessage(browser);
         return this;
     }
 
     public AnalysisPage saveInsightAs(final String insight) {
         getPageHeader().saveInsightAs(insight);
-        waitForSaveFinished();
+        dismissSuccessMessage(browser);
         return this;
     }
 
@@ -362,16 +358,4 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
-    private void waitForSaveFinished() {
-        int timeoutInSeconds = 10;
-        try {
-            waitForElementVisible(SUCCESS_MESSAGE_LOCATOR, browser, timeoutInSeconds);
-            waitForElementNotPresent(SUCCESS_MESSAGE_LOCATOR);
-        } catch (TimeoutException e) {
-            if (isElementVisible(ERROR_MESSAGE_LOCATOR, browser)) {
-                throw new RuntimeException("Indigo saving failed");
-            }
-            //do nothing, exception could be thrown because the success message flashes so quickly that we missed it.
-        }
-    }
 }
