@@ -7,13 +7,12 @@ import static java.util.Collections.singletonList;
 
 import java.io.IOException;
 
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 
 import static com.gooddata.md.Restriction.*;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.addMufToUser;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createMufObjectByUri;
 import static java.lang.String.format;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileUri;
@@ -42,6 +41,7 @@ public class GoodSalesMufOnUserProfileTest extends GoodSalesAbstractTest {
 
     private Attribute stageNameAttribute;
     private AttributeElement stageNameValue;
+    private DashboardRestRequest dashboardRequest;
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
     public void addMufForUser() throws ParseException, JSONException, IOException {
@@ -50,13 +50,9 @@ public class GoodSalesMufOnUserProfileTest extends GoodSalesAbstractTest {
                 .filter(e -> "Interest".equals(e.getTitle())).findFirst().get();
 
         final String expression = format(EXPRESSION, stageNameAttribute.getUri(), stageNameValue.getUri());
-        final String mufUri = createMufObjectByUri(getRestApiClient(), testParams.getProjectId(), MUF_NAME, expression);
-
-        addMufToUser(getRestApiClient(), testParams.getProjectId(),
-                getUserProfileUri(getDomainUserRestApiClient(),
-                        testParams.getUserDomain(),
-                        testParams.getEditorUser()),
-                mufUri);
+        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
+        dashboardRequest.addMufToUser(getUserProfileUri(getDomainUserRestApiClient(), testParams.getUserDomain(),
+                testParams.getEditorUser()), dashboardRequest.createMufObjectByUri(MUF_NAME, expression));
     }
 
     @DataProvider(name = "userProvider")

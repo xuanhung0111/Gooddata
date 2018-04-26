@@ -10,6 +10,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
@@ -20,7 +21,6 @@ import com.gooddata.md.Restriction;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 
 public class EmptyErrorKpiValuesTest extends AbstractDashboardTest {
 
@@ -60,7 +60,9 @@ public class EmptyErrorKpiValuesTest extends AbstractDashboardTest {
 
     @Test(dependsOnMethods = {"testEmptyMetricWithoutConditionalFormat"}, groups = {"desktop"})
     public void testEmptyMetricWithConditionalFormat() throws ParseException, JSONException, IOException {
-        DashboardsRestUtils.changeMetricFormat(getRestApiClient(), errorMetric.getUri(), "[=NULL]empty;#,##0.00");
+        DashboardRestRequest dashboardRequest = new DashboardRestRequest(
+                getAdminRestClient(), testParams.getProjectId());
+        dashboardRequest.changeMetricFormat(errorMetric.getUri(), "[=NULL]empty;#,##0.00");
 
         try {
             Kpi lastKpi = initIndigoDashboardsPageWithWidgets().getLastWidget(Kpi.class);
@@ -69,16 +71,15 @@ public class EmptyErrorKpiValuesTest extends AbstractDashboardTest {
 
             assertEquals(lastKpi.getValue(), "empty");
         } finally {
-            DashboardsRestUtils.changeMetricFormat(getRestApiClient(), errorMetric.getUri(), "#,##0.00");
+            dashboardRequest.changeMetricFormat(errorMetric.getUri(), "#,##0.00");
         }
     }
 
     @Test(dependsOnMethods = {"testEmptyMetricWithoutConditionalFormat"}, groups = {"desktop"})
     public void testInvalidKpiValue() throws ParseException, JSONException, IOException {
         String accountUri = getMdService().getObjUri(getProject(), Attribute.class, Restriction.title(ATTR_ACCOUNT));
-        DashboardsRestUtils.changeMetricExpression(getRestApiClient(), errorMetric.getUri(),
-                "SELECT [" + accountUri + "] WHERE 2 = 1");
-
+        new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId())
+                .changeMetricExpression(errorMetric.getUri(), "SELECT [" + accountUri + "] WHERE 2 = 1");
         Kpi lastKpi = initIndigoDashboardsPageWithWidgets().getLastWidget(Kpi.class);
 
         takeScreenshot(browser, "testEmptyMetricWithoutConditionalFormat", getClass());

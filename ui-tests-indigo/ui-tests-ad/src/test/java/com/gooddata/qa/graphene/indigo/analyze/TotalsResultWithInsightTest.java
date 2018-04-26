@@ -15,6 +15,7 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import org.apache.http.ParseException;
 import org.json.JSONArray;
@@ -33,8 +34,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_ACTIVITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_CLOSE_EOP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.addMufToUser;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createMufObjectByUri;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createInsight;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getInsightUri;
 import static java.lang.String.format;
@@ -217,11 +216,13 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
         final String productValues = format("[%s]",
             getMdService().getAttributeElements(getAttributeByTitle(ATTR_DEPARTMENT)).get(1).getUri());
         final String expression = format("[%s] IN (%s)", getAttributeByTitle(ATTR_DEPARTMENT).getUri(), productValues);
-        final String mufUri = createMufObjectByUri(getRestApiClient(), testParams.getProjectId(), "muf", expression);
+        DashboardRestRequest dashboardRestRequest = new DashboardRestRequest(getAdminRestClient(), testParams
+                .getProjectId());
+        final String mufUri = dashboardRestRequest.createMufObjectByUri("muf", expression);
         String assignedMufUserId = UserManagementRestUtils
             .getUserProfileUri(getDomainUserRestApiClient(), testParams.getUserDomain(), testParams.getEditorUser());
 
-        addMufToUser(getRestApiClient(), testParams.getProjectId(), assignedMufUserId, mufUri);
+        dashboardRestRequest.addMufToUser(assignedMufUserId, mufUri);
 
         AnalysisPage analysisPage = initAnalysePage();
         TableReport tableReport = analysisPage.openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE).getTableReport();

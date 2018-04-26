@@ -19,7 +19,7 @@ import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.reports.report.AttributeSndPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.MetricSndPanel;
 import com.gooddata.qa.utils.http.RestUtils;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.Keys;
@@ -196,9 +196,8 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
         definition = mdService.createObj(project, definition);
         mdService.createObj(project, new Report(definition.getTitle(), definition));
 
-        DashboardsRestUtils.changeMetricExpression(getRestApiClient(), testMetric.getUri(),
-                "SELECT ["+ amount.getUri() + "]");
-
+        new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId())
+                .changeMetricExpression(testMetric.getUri(), "SELECT ["+ amount.getUri() + "]");
         assertThat(initReportsPage().openReport(reportName).getInvalidDataReportMessage(),
                 equalTo(REPORT_NOT_COMPUTABLE_MESSAGE));
     }

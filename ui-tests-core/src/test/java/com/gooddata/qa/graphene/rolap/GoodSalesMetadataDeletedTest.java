@@ -33,7 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.variable.VariableRestRequest;
 import com.gooddata.qa.utils.http.rolap.RolapRestRequest;
 import org.apache.commons.lang3.tuple.Pair;
@@ -63,7 +63,6 @@ import com.gooddata.qa.graphene.fragments.manage.VariablesPage;
 import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.utils.http.InvalidStatusCodeException;
 import com.gooddata.qa.utils.http.RestUtils;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 
 public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
 
@@ -75,6 +74,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     private static final String DROP_OBJECT_ERROR_MESSAGE = "Can't delete object (%s) while referenced by "
             + "dependent objects (%s).";
     private VariableRestRequest varRequest;
+    private DashboardRestRequest dashboardRequest;
 
     @Override
     public void initProperties() {
@@ -90,7 +90,8 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         getReportCreator().createNewWonDrillInReport();
         getReportCreator().createActivitiesByTypeReport();
         getMetricCreator().createWinRateMetric();
-        varRequest = new VariableRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        varRequest = new VariableRestRequest(getAdminRestClient(), testParams.getProjectId());
+        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
@@ -112,8 +113,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
                 .deleteSchedule(reportSchedule);
 
             assertFalse(isObjectDeleted(getReportByTitle(REPORT_ACTIVITIES_BY_TYPE).getUri()));
-            assertFalse(isObjectDeleted(DashboardsRestUtils.getDashboardUri(getRestApiClient(), testParams.getProjectId(), 
-                    DASHBOARD_NAME)));
+            assertFalse(isObjectDeleted(dashboardRequest.getDashboardUri(DASHBOARD_NAME)));
         } finally {
             tryDeleteDashboard();
         }
@@ -121,19 +121,15 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
     public void deleteComment() throws IOException, JSONException {
+        DashboardRestRequest dashboardRequest = new DashboardRestRequest(
+                getAdminRestClient(), testParams.getProjectId());
         String[] objectLinks = {
-            DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT,
-                    getReportByTitle(REPORT_NEW_LOST_DRILL_IN).getUri()),
-            DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT, 
-                    getAttributeByTitle(ATTR_ACCOUNT).getUri()),
-            DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT,
-                    getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri()),
-            DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT, 
-                    getDatasetByTitle("Account").getUri()),
-            DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT, 
-                    varRequest.getVariableUri(VARIABLE_QUOTA)),
-            DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT, 
-                    getFactByTitle(FACT_VELOCITY).getUri())
+                dashboardRequest.addComment(COMMENT, getReportByTitle(REPORT_NEW_LOST_DRILL_IN).getUri()),
+                dashboardRequest.addComment(COMMENT, getAttributeByTitle(ATTR_ACCOUNT).getUri()),
+                dashboardRequest.addComment(COMMENT, getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri()),
+                dashboardRequest.addComment(COMMENT, getDatasetByTitle("Account").getUri()),
+                dashboardRequest.addComment(COMMENT, varRequest.getVariableUri(VARIABLE_QUOTA)),
+                dashboardRequest.addComment(COMMENT, getFactByTitle(FACT_VELOCITY).getUri())
         };
 
         for (String link: objectLinks) {
@@ -509,7 +505,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     private void tryDropObject(String identifier, DropStrategy strategy) throws JSONException,
             ParseException, IOException {
         RolapRestRequest request = new RolapRestRequest(
-                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+                getAdminRestClient(), testParams.getProjectId());
         String pollingUri = request.executeMAQL(strategy.getMaql(identifier));
         request.waitingForAsyncTask(pollingUri);
         assertEquals(request.getAsyncTaskStatus(pollingUri), "ERROR");

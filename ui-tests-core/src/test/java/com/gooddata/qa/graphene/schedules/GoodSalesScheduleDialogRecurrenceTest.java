@@ -7,7 +7,7 @@ import static org.testng.Assert.assertTrue;
 
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.json.JSONException;
 import org.testng.annotations.Test;
@@ -83,7 +83,8 @@ public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmai
             dash.addTab(Builder.of(Tab::new).with(tab -> tab.setTitle("Tab")).build());
         }).build();
 
-        DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(), dashboard.getMdObject());
+        new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId())
+                .createDashboard(dashboard.getMdObject());
     }
 
     @Test(dependsOnGroups = {"createProject"})

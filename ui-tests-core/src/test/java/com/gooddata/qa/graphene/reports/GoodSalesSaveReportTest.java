@@ -7,7 +7,7 @@ import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -77,8 +77,8 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         topSalesRepsByWonAndLostReport = getReportCreator().createTopSalesRepsByWonAndLostReport();
         // create dashboard contains report which will be used in test case 
         // to check some validations.
-        DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
-                initDashboardHavingReport(DASHBOARD_HAS_ONE_REPORT).getMdObject());
+        new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId())
+                .createDashboard(initDashboardHavingReport(DASHBOARD_HAS_ONE_REPORT).getMdObject());
     }
 
     @Test(dependsOnGroups = {"createProject"})

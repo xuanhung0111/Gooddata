@@ -9,7 +9,7 @@ import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
@@ -22,6 +22,7 @@ import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import java.io.IOException;
 import java.util.List;
 import java.util.function.Function;
+
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOP_SALES_REPS_BY_WON_AND_LOST;
 import static java.util.Arrays.asList;
@@ -37,9 +38,16 @@ public class DrillToHiddenDashboardTabTest extends GoodSalesAbstractTest {
     private final String TAB_ON_PRIVATE_DASHBOARD = "Tab On Private Dashboard";
     private final String TAB_ON_PUBLIC_DASHBOARD = "Tab On Public Dashboard";
 
+    private DashboardRestRequest dashboardRequest;
+
     @Override
     protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
         createAndAddUserToProject(UserRoles.EDITOR);
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -60,7 +68,7 @@ public class DrillToHiddenDashboardTabTest extends GoodSalesAbstractTest {
         }).build();
 
         for (Dashboard dashboard : asList(privateDash, publicDash)) {
-            DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(), dashboard.getMdObject());
+            dashboardRequest.createDashboard(dashboard.getMdObject());
         }
 
         initDashboardsPage().selectDashboard(PUBLIC_DASHBOARD).publishDashboard(true);

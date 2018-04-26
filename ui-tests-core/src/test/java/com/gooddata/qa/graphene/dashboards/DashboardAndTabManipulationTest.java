@@ -23,6 +23,7 @@ import com.gooddata.qa.graphene.fragments.reports.report.ChartReport;
 import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
@@ -30,7 +31,6 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.deleteAllDashboards;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
@@ -70,6 +70,7 @@ public class DashboardAndTabManipulationTest extends AbstractProjectTest {
     private final static String AMOUNT_METRIC = "Amount-Metric";
     private final static String DEFAULT_TAB_TITLE = "First Tab";
     private Metric amountSum;
+    private DashboardRestRequest dashboardRequest;
 
     @BeforeClass
     public void setProjectTitle() {
@@ -78,11 +79,10 @@ public class DashboardAndTabManipulationTest extends AbstractProjectTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        super.customizeProject();
-
         uploadCSV(getFilePathFromResource("/" + PAYROLL_CSV + "/payroll.csv"));
         takeScreenshot(browser, "uploaded-payroll", getClass());
 
+        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
         final String amountUri = getMdService()
                 .getObj(getProject(), Fact.class, title(AMOUNT))
                 .getUri();
@@ -143,7 +143,7 @@ public class DashboardAndTabManipulationTest extends AbstractProjectTest {
             dashboardsPage.saveAsDashboard(DASHBOARD_NAME_2, SaveAsDialog.PermissionType.USE_EXISTING_PERMISSIONS);
             assertEquals(dashboardsPage.getDashboardName(), DASHBOARD_NAME_2);
         } finally {
-            deleteAllDashboards(getRestApiClient(), testParams.getProjectId());
+            dashboardRequest.deleteAllDashboards();
         }
     }
 
@@ -162,7 +162,7 @@ public class DashboardAndTabManipulationTest extends AbstractProjectTest {
             assertEquals(tabs.getNumberOfTabs(), 2);
             assertTrue(tabs.isTabSelected(1), "tab:" + TAB_NAME_1 + " must be selected");
         } finally {
-            deleteAllDashboards(getRestApiClient(), testParams.getProjectId());
+            dashboardRequest.deleteAllDashboards();
         }
     }
 
@@ -191,7 +191,7 @@ public class DashboardAndTabManipulationTest extends AbstractProjectTest {
             assertEquals(dashboardsPage.getDashboardsCount(), 4);
             assertEquals(dashboardsPage.getDashboardName(), "Copy of " + SAVE_AS_DASHBOARD_NAME_DEFAULT);
         } finally {
-            deleteAllDashboards(getRestApiClient(), testParams.getProjectId());
+            dashboardRequest.deleteAllDashboards();
         }
     }
 
@@ -219,7 +219,7 @@ public class DashboardAndTabManipulationTest extends AbstractProjectTest {
             assertFalse(dashboardsPage.getContent().getGeoCharts().get(0).isMetricNameDisplayed(),
                     "dashboard should not contain chart");
         } finally {
-            deleteAllDashboards(getRestApiClient(), testParams.getProjectId());
+            dashboardRequest.deleteAllDashboards();
         }
     }
 
@@ -238,7 +238,7 @@ public class DashboardAndTabManipulationTest extends AbstractProjectTest {
             assertEquals(tabs.getNumberOfTabs(), 2);
             assertTrue(tabs.isTabSelected(1), "tab:" + TAB_NAME_1 + " must be selected");
         } finally {
-            deleteAllDashboards(getRestApiClient(), testParams.getProjectId());
+            dashboardRequest.deleteAllDashboards();
         }
     }
 
@@ -269,7 +269,7 @@ public class DashboardAndTabManipulationTest extends AbstractProjectTest {
             assertTrue(dashboardsPage.getReport(SIMPLE_REPORT_3, ChartReport.class).isChart(),
                     "Report visualisation should be chart");
         } finally {
-            deleteAllDashboards(getRestApiClient(), testParams.getProjectId());
+            dashboardRequest.deleteAllDashboards();
         }
     }
 
@@ -302,7 +302,7 @@ public class DashboardAndTabManipulationTest extends AbstractProjectTest {
             dashboardsPage.selectDashboard(DASHBOARD_NAME_1);
             assertEquals(dashboardsPage.getDashboardName(), DASHBOARD_NAME_1);
         } finally {
-            deleteAllDashboards(getRestApiClient(), testParams.getProjectId());
+            dashboardRequest.deleteAllDashboards();
         }
     }
 
@@ -343,7 +343,7 @@ public class DashboardAndTabManipulationTest extends AbstractProjectTest {
             assertFalse(dashboardsPage.isSettingEmbedButtonVisible(), "Dashboard setting embed should be disabled");
             dashboardsPage.closeEditExportEmbedMenu();
         } finally {
-            deleteAllDashboards(getRestApiClient(), testParams.getProjectId());
+            dashboardRequest.deleteAllDashboards();
         }
     }
 
@@ -373,7 +373,7 @@ public class DashboardAndTabManipulationTest extends AbstractProjectTest {
             assertEquals(dashboardsPage.getTabs().getTabLabel(0), TAB_NAME_1 + " renamed");
             assertEquals(dashboardsPage.getTabs().getTabLabel(3), TAB_NAME_FIRST);
         } finally {
-            deleteAllDashboards(getRestApiClient(), testParams.getProjectId());
+            dashboardRequest.deleteAllDashboards();
         }
     }
 
@@ -404,7 +404,7 @@ public class DashboardAndTabManipulationTest extends AbstractProjectTest {
                     "Dashboard does not contains report: " + SIMPLE_REPORT_4);
             assertEquals(dashboardsPage.getFilters().size(), 0);
         } finally {
-            deleteAllDashboards(getRestApiClient(), testParams.getProjectId());
+            dashboardRequest.deleteAllDashboards();
         }
     }
 
@@ -439,7 +439,7 @@ public class DashboardAndTabManipulationTest extends AbstractProjectTest {
 
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
         } finally {
-            deleteAllDashboards(getRestApiClient(), testParams.getProjectId());
+            dashboardRequest.deleteAllDashboards();
         }
     }
 

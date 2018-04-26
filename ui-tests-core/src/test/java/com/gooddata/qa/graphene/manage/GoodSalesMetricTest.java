@@ -19,9 +19,8 @@ import com.gooddata.qa.graphene.fragments.manage.MetricPage;
 import com.gooddata.qa.graphene.fragments.reports.report.AttributeSndPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
-import com.gooddata.qa.graphene.utils.Sleeper;
 import com.gooddata.qa.utils.http.InvalidStatusCodeException;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.report.ReportExportFormat;
 import com.gooddata.report.ReportService;
 import org.apache.commons.collections.CollectionUtils;
@@ -701,7 +700,8 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         String metricExpression =
                 "SELECT RUNSUM( [" + amount.getUri() + "] ) ROWS BETWEEN 5.5 PRECEDING AND CURRENT ROW";
         try {
-            DashboardsRestUtils.changeMetricExpression(getRestApiClient(), m1.getUri(), metricExpression);
+            new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId())
+                    .changeMetricExpression(m1.getUri(), metricExpression);
         } catch (InvalidStatusCodeException e) {
             //expected the invalid status code exception should be thrown
             //when editing metric expression into invalid

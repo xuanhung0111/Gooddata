@@ -21,8 +21,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOO_LARGE;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.addMufToUser;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createSimpleMufObjByUri;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.updateEmailOfAccount;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
@@ -51,7 +49,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.scheduleEmail.ScheduleEmailRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.java.Builder;
@@ -99,6 +97,8 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     private Map<String, List<Message>> messages;
     private Map<String, MessageContent> attachments = new HashMap<String, MessageContent>();
 
+    private DashboardRestRequest dashboardRequest;
+
     @Override
     protected void addUsersWithOtherRolesToProject() throws IOException, JSONException {
         addUserToProject(imapUser, UserRoles.ADMIN);
@@ -131,8 +131,9 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         getReportCreator().createTooLargeReport();
         getReportCreator().createActivitiesByTypeReport();
 
-        createSimpleDashboard(DASHBOARD_HAVING_TAB);
-        createSimpleDashboard(OTHER_DASHBOARD_HAVING_TAB);
+        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
+        dashboardRequest.createDashboard(createSimpleDashboard(DASHBOARD_HAVING_TAB).getMdObject());
+        dashboardRequest.createDashboard(createSimpleDashboard(OTHER_DASHBOARD_HAVING_TAB).getMdObject());
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
@@ -327,12 +328,9 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
 
         Map<String, Collection<String>> conditions = new HashMap();
         conditions.put(product.getUri(), singletonList(explorerUri));
-        String mufUri =
-                createSimpleMufObjByUri(getRestApiClient(), getProject().getId(), "Product user filter", conditions);
-        addMufToUser(getRestApiClient(), getProject().getId(),
-                UserManagementRestUtils.getUserProfileUri(
-                        getDomainUserRestApiClient(), testParams.getUserDomain(), imapUser),
-                mufUri);
+        dashboardRequest.addMufToUser(UserManagementRestUtils.getUserProfileUri(getDomainUserRestApiClient(),
+                testParams.getUserDomain(), imapUser), dashboardRequest.createSimpleMufObjByUri("Product user " +
+                "filter", conditions));
 
         ReportDefinition definition = GridReportDefinitionContent.create(report, singletonList(METRIC_GROUP),
                 singletonList(new AttributeInGrid(product.getDefaultDisplayForm().getUri(), product.getTitle())),
@@ -519,13 +517,11 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         Screenshots.takeScreenshot(browser, "verify email", getClass());
     }
 
-    private void createSimpleDashboard(String title) throws IOException {
-        Dashboard dashboard = Builder.of(Dashboard::new).with(dash -> {
+    private Dashboard createSimpleDashboard(String title) throws IOException {
+        return Builder.of(Dashboard::new).with(dash -> {
             dash.setName(title);
             dash.addTab(Builder.of(Tab::new).with(tab -> tab.setTitle("Tab")).build());
         }).build();
-
-        DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(), dashboard.getMdObject());
     }
 
     private void updateRecurrencies(Map<String, List<Message>> messages) throws IOException {

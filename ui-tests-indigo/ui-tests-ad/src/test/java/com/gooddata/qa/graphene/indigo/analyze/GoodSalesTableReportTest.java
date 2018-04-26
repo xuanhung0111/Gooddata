@@ -6,10 +6,9 @@ import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.google.common.collect.Lists;
 import org.apache.http.ParseException;
-import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
@@ -31,12 +30,10 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_QUOTA;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
-import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
@@ -202,7 +199,9 @@ public class GoodSalesTableReportTest extends AbstractAnalyseTest {
         String oldFormat = initMetricPage().openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES)
                 .getMetricFormat();
         String metricUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
-        DashboardsRestUtils.changeMetricFormat(getRestApiClient(), metricUri, oldFormat + "[red]");
+        DashboardRestRequest dashboardRequest = new DashboardRestRequest(
+                getAdminRestClient(), testParams.getProjectId());
+        dashboardRequest.changeMetricFormat(metricUri, oldFormat + "[red]");
 
         try {
             initAnalysePage();
@@ -212,7 +211,7 @@ public class GoodSalesTableReportTest extends AbstractAnalyseTest {
                         .addMetric(METRIC_NUMBER_OF_ACTIVITIES).getTableReport();
             assertEquals(tableReport.getFormatFromValue(), "color: rgb(255, 0, 0);");
         } finally {
-            DashboardsRestUtils.changeMetricFormat(getRestApiClient(), metricUri, oldFormat);
+            dashboardRequest.changeMetricFormat(metricUri, oldFormat);
             assertEquals(initMetricPage().openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES)
                     .getMetricFormat(), oldFormat);
         }

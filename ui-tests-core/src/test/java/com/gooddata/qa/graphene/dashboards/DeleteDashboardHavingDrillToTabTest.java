@@ -13,7 +13,7 @@ import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONException;
@@ -41,17 +41,20 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
 
     private String reportHavingOneMetric;
     private String reportHavingTwoMetrics;
+    private DashboardRestRequest dashboardRequest;
 
     @Override
     protected void customizeProject() throws Throwable {
         reportHavingOneMetric = getReportCreator().createAmountByProductReport();
         reportHavingTwoMetrics = getReportCreator().createTopSalesRepsByWonAndLostReport();
+        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void deleteDashboard() throws IOException, JSONException {
-        String dashUri = DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
+        String dashUri = dashboardRequest.createDashboard(
                 initDashboardHavingDrillSetting(DASHBOARD_HAS_DRILL_SETTINGS).getMdObject());
+
         try {
             initDashboardsPage().selectDashboard(DASHBOARD_HAS_DRILL_SETTINGS)
                     .getTabs().getTab(SOURCE_TAB).open();
@@ -70,7 +73,7 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void deleteTab() throws IOException, JSONException {
-        String dashUri = DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
+        String dashUri = dashboardRequest.createDashboard(
                 initDashboardHavingDrillSetting(DASHBOARD_HAS_DRILL_SETTINGS).getMdObject());
         try {
             initDashboardsPage().selectDashboard(DASHBOARD_HAS_DRILL_SETTINGS)
@@ -92,7 +95,7 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void drillToDeletedTab() throws IOException, JSONException {
-        String dashUri = DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
+        String dashUri = dashboardRequest.createDashboard(
                 initDashboardHavingDrillSetting(DASHBOARD_HAS_DRILL_SETTINGS).getMdObject());
         try {
             DashboardTabs tabs = initDashboardsPage().selectDashboard(DASHBOARD_HAS_DRILL_SETTINGS).getTabs();
@@ -122,7 +125,7 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testDrillSettingsAfterDeletingTab() throws IOException, JSONException {
-        String dashUri = DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
+        String dashUri = dashboardRequest.createDashboard(
                 initDashboardHavingDrillSetting(DASHBOARD_HAS_DRILL_SETTINGS).getMdObject());
         try {
             DashboardTabs tabs = initDashboardsPage().selectDashboard(DASHBOARD_HAS_DRILL_SETTINGS).getTabs();
@@ -172,8 +175,7 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
             dash.addTab(targetTab);
         }).build();
 
-        String dashUri = DashboardsRestUtils.createDashboard(getRestApiClient(),
-                testParams.getProjectId(), dashboard.getMdObject());
+        String dashUri = dashboardRequest.createDashboard(dashboard.getMdObject());
 
         try {
             DashboardTabs tabs = initDashboardsPage().selectDashboard(dashboardName).getTabs();

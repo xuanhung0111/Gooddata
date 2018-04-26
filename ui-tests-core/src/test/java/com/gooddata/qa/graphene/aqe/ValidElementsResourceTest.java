@@ -18,7 +18,7 @@ import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.ParseException;
@@ -53,6 +53,8 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
     private String top5OpenReportUri;
     private String top5LostReportUri;
 
+    private DashboardRestRequest dashboardRequest;
+
     @Override
     protected void initProperties() {
         super.initProperties();
@@ -61,6 +63,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
+        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
         getMetricCreator().createAmountMetric();
         getVariableCreator().createStatusVariable();
         top5WonReportUri = getReportCreator().createTop5WonByCashReport();
@@ -133,8 +136,8 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
                         483.1f, 36.7f, 2.3f, 1.9f, 1.4f, 1.3f);
 
         System.out.println("Verifying element resource of time filter ...");
-        String workingDashboard = DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
-                initTop5Dashboard().getMdObject());
+        String workingDashboard = dashboardRequest.createDashboard(initTop5Dashboard().getMdObject());
+
         try {
             initDashboardsPage().selectDashboard(TOP_5_REPORTS_DASHBOARD).editDashboard()
                     .addTimeFilterToDashboard(DATE_DIMENSION_CLOSED, TimeFilterPanel.DateGranularity.QUARTER, "this")
@@ -170,9 +173,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"})
     public void checkVariableFilterDashboard() throws ParseException, IOException, JSONException {
         String newAdminUser = createAndAddUserToProject(UserRoles.ADMIN);
-        String workingDashboard = DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
-                initTop5Dashboard().getMdObject());
-
+        String workingDashboard = dashboardRequest.createDashboard(initTop5Dashboard().getMdObject());
         try {
             initDashboardsPage().selectDashboard(TOP_5_REPORTS_DASHBOARD).editDashboard()
                     .addAttributeFilterToDashboard(DashAttributeFilterTypes.PROMPT, "Status")

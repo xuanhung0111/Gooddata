@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.dashboards;
 
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
+import static com.gooddata.qa.graphene.AbstractTest.Profile.DOMAIN;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_PIPELINE_ANALYSIS;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
@@ -14,6 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
@@ -23,7 +28,6 @@ import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.gooddata.qa.utils.java.Builder;
 
 public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
@@ -33,6 +37,7 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
     private final String TARGET_TAB = "Target Tab";
     private String exportedDashboardName;
     private Map<String, String[]> expectedGoodSalesDashboardsAndTabs;
+    private DashboardRestRequest dashboardRequest;
 
     @Override
     protected void customizeProject() throws Throwable {
@@ -45,7 +50,8 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
             dash.addTab(targetTab);
         }).build();
 
-        DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(), dashboard.getMdObject());
+        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
+        dashboardRequest.createDashboard(dashboard.getMdObject());
 
         expectedGoodSalesDashboardsAndTabs = new HashMap<>();
         expectedGoodSalesDashboardsAndTabs.put(DASH_PIPELINE_ANALYSIS, new String[] {SOURCE_TAB, TARGET_TAB});
@@ -134,16 +140,27 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"})
     public void openDefaultDashboardWithoutPID() throws JSONException, IOException {
         String domainUser = testParams.getDomainUser() == null ? testParams.getUser() : testParams.getDomainUser();
-        DashboardsRestUtils.setDefaultDashboardForDomainUser(getDomainUserRestApiClient(), testParams.getProjectId(),
-                DASH_PIPELINE_ANALYSIS, TARGET_TAB);
+
+        String defaultUserUri = UserManagementRestUtils
+                .getCurrentUserProfile(getDomainUserRestApiClient())
+                .getJSONObject("links")
+                .getString("self")
+                .concat("/settings/defaults");
+
+        new DashboardRestRequest(new RestClient(getProfile(DOMAIN)), testParams.getProjectId())
+                .setDefaultDashboardForUser(DASH_PIPELINE_ANALYSIS, TARGET_TAB, defaultUserUri);
+
         logout();
         signInAtGreyPages(domainUser, testParams.getPassword());
         try {
             openDefaultDashboardOfDomainUser();
-            String dashboardUri = DashboardsRestUtils.getDashboardUri(getRestApiClient(), testParams.getProjectId(), 
-                    DASH_PIPELINE_ANALYSIS);
-            String tabID = DashboardsRestUtils.getTabId(getRestApiClient(), testParams.getProjectId(), 
-                    DASH_PIPELINE_ANALYSIS, TARGET_TAB);
+
+            DashboardRestRequest dashboardRequest = new DashboardRestRequest(
+                    new RestClient(getProfile(ADMIN)), testParams.getProjectId());
+
+            String dashboardUri = dashboardRequest.getDashboardUri(DASH_PIPELINE_ANALYSIS);
+            String tabID = dashboardRequest.getTabId(DASH_PIPELINE_ANALYSIS, TARGET_TAB);
+
             assertThat(browser.getCurrentUrl(), containsString(dashboardUri));
             assertThat(browser.getCurrentUrl(), containsString(tabID));
         } finally {

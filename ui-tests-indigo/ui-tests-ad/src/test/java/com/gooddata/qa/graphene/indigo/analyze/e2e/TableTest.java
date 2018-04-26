@@ -5,7 +5,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Collections.sort;
@@ -18,6 +17,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
@@ -26,11 +26,11 @@ import com.gooddata.md.Metric;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 
 public class TableTest extends AbstractAdE2ETest {
 
     private String emptyMetricUri;
+    private DashboardRestRequest dashboardRequest;
 
     @Override
     public void initProperties() {
@@ -50,11 +50,12 @@ public class TableTest extends AbstractAdE2ETest {
         }
 
         emptyMetricUri = metric.getUri();
+        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void it_should_be_dash_if_null_not_formatted() throws ParseException, JSONException, IOException {
-        DashboardsRestUtils.changeMetricFormat(getRestApiClient(), emptyMetricUri, "#,##0");
+        dashboardRequest.changeMetricFormat(emptyMetricUri, "#,##0");
 
         analysisPage.addMetric("__EMPTY__")
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
@@ -65,7 +66,7 @@ public class TableTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void it_should_be_empty_if_formatted() throws ParseException, JSONException, IOException {
-        DashboardsRestUtils.changeMetricFormat(getRestApiClient(), emptyMetricUri, "[=null] empty");
+        dashboardRequest.changeMetricFormat(emptyMetricUri, "[=null] empty");
 
         analysisPage.addMetric("__EMPTY__")
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
@@ -76,7 +77,7 @@ public class TableTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_show_zeros_as_usual() throws ParseException, JSONException, IOException {
-        DashboardsRestUtils.changeMetricFormat(getRestApiClient(), emptyMetricUri, "[=null] 0.00 $");
+        dashboardRequest.changeMetricFormat(emptyMetricUri, "[=null] 0.00 $");
 
         analysisPage.addMetric("__EMPTY__")
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)

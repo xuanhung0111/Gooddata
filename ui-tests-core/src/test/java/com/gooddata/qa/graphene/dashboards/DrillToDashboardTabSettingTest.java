@@ -9,7 +9,7 @@ import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONException;
@@ -35,10 +35,12 @@ public class DrillToDashboardTabSettingTest extends GoodSalesAbstractTest {
     private WidgetConfigPanel widgetConfigPanel;
     private DrillingConfigPanel drillingConfigPanel;
     private TableReport report;
+    private DashboardRestRequest dashboardRequest;
 
     @Override
     protected void customizeProject() throws Throwable {
         reportUri = getReportCreator().createAmountByProductReport();
+        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
         getReportCreator().createActivitiesByTypeReport();
     }
 
@@ -49,8 +51,7 @@ public class DrillToDashboardTabSettingTest extends GoodSalesAbstractTest {
         final String toolTipIconHelp =
                 "By clicking on an attribute value or a metric value, the linked dashboard tab will open.";
         Dashboard dash = initDashboard();
-        String dashUri = DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
-                dash.getMdObject());
+        String dashUri = dashboardRequest.createDashboard(dash.getMdObject());
         try {
             initDashboardsPage().selectDashboard(dash.getName());
             dashboardsPage.getTabs().getTab(FIRST_TAB).open();
@@ -72,8 +73,7 @@ public class DrillToDashboardTabSettingTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"})
     public void tryToAddDrillingToDashboardTabTest() throws IOException, JSONException {
         Dashboard dash = initDashboard();
-        String dashUri = DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
-                dash.getMdObject());
+        String dashUri = dashboardRequest.createDashboard(dash.getMdObject());
         try {
             initDashboardsPage().selectDashboard(dash.getName());
             dashboardsPage.getTabs().getTab(FIRST_TAB).open();
@@ -90,8 +90,7 @@ public class DrillToDashboardTabSettingTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"})
     public void addMultiDrillingToDashboardTabTest() throws IOException, JSONException {
         Dashboard dash = initDashboard();
-        String dashUri = DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
-                dash.getMdObject());
+        String dashUri = dashboardRequest.createDashboard(dash.getMdObject());
         try {
             initDashboardsPage().selectDashboard(dash.getName());
             dashboardsPage.getTabs().getTab(FIRST_TAB).open();
@@ -125,8 +124,7 @@ public class DrillToDashboardTabSettingTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"})
     public void addMultiInnerDrillingTest() throws IOException, JSONException {
         Dashboard dash = initDashboard();
-        String dashUri = DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
-                dash.getMdObject());
+        String dashUri = dashboardRequest.createDashboard(dash.getMdObject());
         try {
             initDashboardsPage().selectDashboard(dash.getName());
             dashboardsPage.getTabs().getTab(FIRST_TAB).open();

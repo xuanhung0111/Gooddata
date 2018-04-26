@@ -10,8 +10,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.Das
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.utils.asserts.AssertUtils;
-import com.gooddata.qa.utils.http.RestClient;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.variable.VariableRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.testng.annotations.DataProvider;
@@ -45,7 +44,7 @@ public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest 
     @Override
     protected void customizeProject() throws Throwable {
         VariableRestRequest request = new VariableRestRequest(
-                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+                getAdminRestClient(), testParams.getProjectId());
         String promptFilterUri = request.createFilterVariable(DF_VARIABLE,
                 request.getAttributeByTitle(ATTR_STAGE_NAME).getUri(),
                 asList(INTEREST, DISCOVERY, SHORT_LIST, RISK_ASSESSMENT, DIRECT_SALES));
@@ -58,11 +57,11 @@ public class GoodSalesDefaultFilterMiscTest extends AbstractDashboardWidgetTest 
                 singletonList(new MetricElement(getMetricCreator().createAmountMetric())),
                 singletonList(new Filter(format("[%s]", promptFilterUri)))));
 
-        Dashboard dashboard = Builder.of(Dashboard::new).with(dash -> {
-            dash.setName(DASH_PIPELINE_ANALYSIS);
-            dash.addTab(Builder.of(Tab::new).with(tab -> tab.setTitle(DASH_TAB_OUTLOOK)).build());
-        }).build();
-        DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(), dashboard.getMdObject());
+        new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId())
+                .createDashboard(Builder.of(Dashboard::new).with(dash -> {
+                    dash.setName(DASH_PIPELINE_ANALYSIS);
+                    dash.addTab(Builder.of(Tab::new).with(tab -> tab.setTitle(DASH_TAB_OUTLOOK)).build());
+                }).build().getMdObject());
     }
 
     @Test(dependsOnGroups = {"createProject"})
