@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.cssSelector;
@@ -15,6 +16,7 @@ import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
+import org.jboss.arquillian.graphene.Graphene;
 
 public class DateFiltersTest extends AbstractAdE2ETest {
 
@@ -75,7 +77,10 @@ public class DateFiltersTest extends AbstractAdE2ETest {
             .getDateFilter()
             .click();
 
-        waitForElementVisible(cssSelector(".s-filter-picker .s-tab-range"), browser).click();
+        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
+            waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+
+        panel.selectStaticPeriod();
 
         assertTrue(isElementPresent(cssSelector(".s-filter-picker .s-interval-from input"), browser));
         assertTrue(isElementPresent(cssSelector(".s-filter-picker .s-interval-to input"), browser));
@@ -95,7 +100,11 @@ public class DateFiltersTest extends AbstractAdE2ETest {
             .getFilterBuckets()
             .getDateFilter()
             .click();
-        waitForElementVisible(cssSelector(".s-filter-picker .s-tab-range"), browser).click();
+        
+        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
+            waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+
+        panel.selectStaticPeriod();
 
         String nextYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR) + 1);
         fillInDateRange(".s-interval-from input", "01/01/" + nextYear);
@@ -107,7 +116,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
                 "01/01/2003");
 
         fillInDateRange(".s-interval-to input", "01/01/200");
-        waitForElementVisible(cssSelector(".adi-tab-range"), browser).click();
+        waitForElementVisible(cssSelector(".s-interval-from input"), browser).click();
         assertEquals(waitForElementVisible(cssSelector(".s-interval-from input"), browser).getAttribute("value"),
                 "01/01/2003");
     }
