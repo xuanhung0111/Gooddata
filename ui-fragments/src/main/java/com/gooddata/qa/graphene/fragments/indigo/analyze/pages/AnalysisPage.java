@@ -4,10 +4,16 @@ import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.*;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MainEditor;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.VisualizationReportTypePicker;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
-
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -16,10 +22,14 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.dismissSuccessMessage;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
@@ -161,7 +171,20 @@ public class AnalysisPage extends AbstractFragment {
     public AnalysisPage addMetricAfter(String metric, String newMetric) {
         WebElement source = getCataloguePanel().searchAndGet(newMetric, FieldType.METRIC);
         WebElement target = getMetricsBucket().get(metric);
-        return drag(source, target);
+
+        try {
+            startDrag(source);
+            getActions().moveToElement(target).perform();
+
+            Graphene.waitGui().until(browser -> {
+                getActions().moveByOffset(0, 5).perform();
+                return isElementPresent(By.className("adi-drop-line-bottom"), target.findElement(BY_PARENT));
+            });
+
+        } finally {
+            getActions().release().perform();
+        }
+        return this;
     }
 
     public AnalysisPage replaceAttribute(String oldAttr, String newAttr) {
