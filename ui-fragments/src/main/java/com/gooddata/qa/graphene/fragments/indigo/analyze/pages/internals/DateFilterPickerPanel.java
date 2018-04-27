@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.gooddata.qa.graphene.fragments.indigo.analyze.DatePresetsSelect;
-import com.gooddata.qa.graphene.utils.ElementUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -68,16 +68,20 @@ public class DateFilterPickerPanel extends AbstractFragment {
     }
 
     /**
-     * @param from format MM/DD/YYYY
-     * @param to format MM/DD/YYYY
+     * @param from
+     *         format MM/DD/YYYY
+     * @param to
+     *         format MM/DD/YYYY
      */
     public void configTimeFilterByRangeButNotApply(String from, String to) {
         configTimeFilterByRangeHelper(from, to, false);
     }
 
     /**
-     * @param from format MM/DD/YYYY
-     * @param to format MM/DD/YYYY
+     * @param from
+     *         format MM/DD/YYYY
+     * @param to
+     *         format MM/DD/YYYY
      */
     public void configTimeFilter(String from, String to) {
         configTimeFilterByRangeHelper(from, to, true);
@@ -125,15 +129,20 @@ public class DateFilterPickerPanel extends AbstractFragment {
     private void configTimeFilterByRangeHelper(String from, String to, boolean apply) {
         selectStaticPeriod();
 
-        ElementUtils.clear(fromDate);
-        fromDate.sendKeys(from);
+        fillInDateRange(fromDate, from);
+        waitForElementVisible(fromDateCalendarIcon).click();
 
-        ElementUtils.clear(toDate);
-        toDate.sendKeys(to);
-
+        fillInDateRange(toDate, to);
         waitForElementVisible(toDateCalendarIcon).click();
 
         waitForElementVisible(apply ? applyButton : cancelButton).click();
         waitForFragmentNotVisible(this);
+    }
+
+    private void fillInDateRange(WebElement dateInput, String date) {
+        for (int i = 0, n = dateInput.getAttribute("value").trim().length(); i < n; i++) {
+            dateInput.sendKeys(Keys.BACK_SPACE);
+        }
+        dateInput.sendKeys(date, Keys.ENTER);
     }
 }
