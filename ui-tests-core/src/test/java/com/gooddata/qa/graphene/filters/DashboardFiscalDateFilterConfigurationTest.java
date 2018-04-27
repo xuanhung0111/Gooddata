@@ -96,7 +96,7 @@ public class DashboardFiscalDateFilterConfigurationTest extends AbstractDashboar
         DashboardWidgetDirection.LEFT.moveElementToRightPlace(tableReport.getRoot());
         FilterWidget timeFilter = getFilter("DATE (SALARY)");
         DashboardWidgetDirection.RIGHT.moveElementToRightPlace(timeFilter.getRoot());
-        
+
         timeFilter.changeTimeFilterValueByClickInTimeLine("FY2006");
         dashboardContent.waitForLastKeyMetricUpdated();
         assertEquals(timeFilter.getCurrentValue(), "FY2006");
