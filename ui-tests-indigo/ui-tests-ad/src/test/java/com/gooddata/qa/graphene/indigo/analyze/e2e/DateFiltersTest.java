@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
+
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.cssSelector;
@@ -29,22 +30,28 @@ public class DateFiltersTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_be_possible_to_add_and_remove_date_from_filter_bucket() {
         assertTrue(analysisPage.addDateFilter()
-            // try to drag a second date filter
-            .addDateFilter()
-            .removeDateFilter()
-            .getFilterBuckets()
-            .isEmpty());
+                .removeDateFilter()
+                .getFilterBuckets()
+                .isEmpty());
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
+    public void should_not_be_possible_to_add_second_date_to_filter_bucket() {
+        assertEquals(analysisPage.addDateFilter()
+                .addDateFilter() // try to drag a second date filter
+                .getFilterBuckets()
+                .getFiltersCount(), 1);
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_reflect_changes_in_category_bucket() {
         analysisPage.addDate()
-            .getAttributesBucket()
-            .changeDateDimension("Created");
+                .getAttributesBucket()
+                .changeDateDimension("Created");
 
         analysisPage.getFilterBuckets()
-            .getDateFilter()
-            .click();
+                .getDateFilter()
+                .click();
 
         takeScreenshot(browser, "Selected-date-filter-applied", getClass());
         assertEquals(getValueFrom(".s-filter-date-date-dataset-switch"), "Created");
@@ -53,17 +60,21 @@ public class DateFiltersTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_display_picker() {
         analysisPage.addDateFilter()
-            .getFilterBuckets()
-            .getDateFilter()
-            .click();
+                .getFilterBuckets()
+                .getDateFilter()
+                .click();
         assertTrue(isElementPresent(cssSelector(".s-filter-picker"), browser));
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_keep_selection_if_date_dimensions_reloaded_in_the_background() {
         analysisPage.addDateFilter()
-            .getFilterBuckets()
-            .changeDateDimension("Activity", "Created");
+                .getFilterBuckets()
+                .changeDateDimension("Activity", "Created");
+
+        analysisPage.getFilterBuckets()
+                .getDateFilter()
+                .click();
 
         takeScreenshot(browser, "Date-filter-applied-on-filter-buckets", getClass());
         assertEquals(getValueFrom(".s-filter-date-date-dataset-switch"), "Created");
@@ -72,13 +83,13 @@ public class DateFiltersTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_prefill_interval_filters_when_floating_filter_is_selected() {
         analysisPage.addDateFilter()
-            .getFilterBuckets()
-            .configDateFilter("Last quarter")
-            .getDateFilter()
-            .click();
+                .getFilterBuckets()
+                .configDateFilter("Last quarter")
+                .getDateFilter()
+                .click();
 
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
-            waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
 
         panel.selectStaticPeriod();
 
@@ -89,20 +100,20 @@ public class DateFiltersTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_support_date_ranges() throws ParseException {
         assertTrue(analysisPage.addDateFilter()
-            .getFilterBuckets()
-            .configDateFilter("11/17/2015", "11/19/2015")
-            .getDateFilterText().contains("Nov 17, 2015 - Nov 19, 2015"));
+                .getFilterBuckets()
+                .configDateFilter("11/17/2015", "11/19/2015")
+                .getDateFilterText().contains("Nov 17, 2015 - Nov 19, 2015"));
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_correct_ranges_when_editing() {
         analysisPage.addDateFilter()
-            .getFilterBuckets()
-            .getDateFilter()
-            .click();
-        
+                .getFilterBuckets()
+                .getDateFilter()
+                .click();
+
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
-            waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
 
         panel.selectStaticPeriod();
 
