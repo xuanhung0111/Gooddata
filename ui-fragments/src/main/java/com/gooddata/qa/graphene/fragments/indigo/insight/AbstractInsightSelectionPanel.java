@@ -5,12 +5,12 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.dialog.SaveInsightDialo
 import com.gooddata.qa.graphene.utils.Sleeper;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
 
+import static com.gooddata.qa.graphene.utils.CheckUtils.dismissSuccessMessage;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
@@ -157,9 +157,6 @@ public abstract class AbstractInsightSelectionPanel extends AbstractFragment {
         @FindBy(className = "gd-vis-type")
         private WebElement vizTypeIcon;
 
-        private static final By SUCCESS_MESSAGE_LOCATOR = cssSelector("gd-message.success");
-        private static final By ERROR_MESSAGE_LOCATOR = cssSelector("gd-message.error");
-
         public String getName() {
             return waitForElementVisible(nameLabel).getText();
         }
@@ -178,7 +175,7 @@ public abstract class AbstractInsightSelectionPanel extends AbstractFragment {
             getActions().moveToElement(vizTypeIcon).perform();
             waitForElementVisible(deleteIcon).click();
             SaveInsightDialog.getInstance(browser).clickSubmitButton();
-            waitForDeleteFinished();
+            dismissSuccessMessage(browser);
         }
 
         public void open() {
@@ -192,17 +189,5 @@ public abstract class AbstractInsightSelectionPanel extends AbstractFragment {
                     .trim();
         }
 
-        private void waitForDeleteFinished() {
-            int timeoutInSeconds = 10;
-            try {
-                waitForElementVisible(SUCCESS_MESSAGE_LOCATOR, browser, timeoutInSeconds);
-                waitForElementNotPresent(SUCCESS_MESSAGE_LOCATOR);
-            } catch (TimeoutException e) {
-                if (isElementVisible(ERROR_MESSAGE_LOCATOR, browser)) {
-                    throw new RuntimeException("Indigo delete failed");
-                }
-                //do nothing, exception could be thrown because the success message flashes so quickly that we missed it.
-            }
-        }
     }
 }
