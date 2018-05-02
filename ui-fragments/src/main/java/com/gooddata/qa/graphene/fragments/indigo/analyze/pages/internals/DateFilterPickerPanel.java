@@ -1,14 +1,13 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
-import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import com.gooddata.qa.graphene.utils.ElementUtils;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.DatePresetsSelect;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -16,21 +15,18 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.common.AbstractReactDropDown;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
 
 public class DateFilterPickerPanel extends AbstractFragment {
 
-    // presets and date range sections are just small parts. No need to separate more fragments now.
+    public static final String STATIC_PERIOD_DROPDOWN_ITEM = "Static period";
 
-    @FindBy(className = "s-tab-presets")
-    private WebElement presetsSection;
+    @FindBy(className = "s-date-preset-button")
+    private WebElement presetsDropdown;
 
-    @FindBy(css = ".adi-tab-presets .filter-picker-text")
+    @FindBy(css = ".s-date-presets-list .gd-list-item")
     private List<WebElement> periods;
-
-    // ****************  date range section  ****************
-    @FindBy(className = "s-tab-range")
-    private WebElement dateRangeSection;
 
     @FindBy(css = ".adi-date-input-from .input-text")
     private WebElement fromDate;
@@ -44,49 +40,55 @@ public class DateFilterPickerPanel extends AbstractFragment {
     @FindBy(css = ".adi-date-input-to > span")
     private WebElement toDateCalendarIcon;
 
-    @FindBy(className = "s-date-range-cancel")
+    @FindBy(className = "s-date-filter-cancel")
     private WebElement cancelButton;
 
-    @FindBy(className = "s-date-range-apply")
+    @FindBy(className = "s-date-filter-apply")
     private WebElement applyButton;
 
     public static final By LOCATOR = By.className("adi-date-filter-picker");
 
     public void select(final String period) {
-        waitForCollectionIsNotEmpty(periods).stream()
-            .filter(e -> period.equals(e.getText()))
-            .findFirst()
-            .get()
-            .click();
-        waitForFragmentNotVisible(this);
+        getDatePresetSelect().selectByName(period);
+        getDatePresetSelect().ensureDropdownClosed();
     }
 
     public List<String> getPeriods() {
-        return getElementTexts(waitForCollectionIsNotEmpty(periods));
+        return getDatePresetSelect()
+                .getValues()
+                .stream()
+                .collect(Collectors.toList());
     }
 
     public Collection<String> getDimensionSwitchs() {
-        return getDateDatasetSelect().getValues();
+        DateDimensionSelect select = getDateDatasetSelect();
+        Collection<String> values = select.getValues();
+        select.ensureDropdownClosed();
+        return values;
     }
 
     /**
-     * @param from format MM/DD/YYYY
-     * @param to   format MM/DD/YYYY
+     * @param from
+     *         format MM/DD/YYYY
+     * @param to
+     *         format MM/DD/YYYY
      */
     public void configTimeFilterByRangeButNotApply(String from, String to) {
         configTimeFilterByRangeHelper(from, to, false);
     }
 
     /**
-     * @param from format MM/DD/YYYY
-     * @param to   format MM/DD/YYYY
+     * @param from
+     *         format MM/DD/YYYY
+     * @param to
+     *         format MM/DD/YYYY
      */
     public void configTimeFilter(String from, String to) {
         configTimeFilterByRangeHelper(from, to, true);
     }
 
-    public void changeToDateRangeSection() {
-        waitForElementVisible(dateRangeSection).click();
+    public void selectStaticPeriod() {
+        select(STATIC_PERIOD_DROPDOWN_ITEM);
     }
 
     public String getFromDate() {
@@ -95,10 +97,6 @@ public class DateFilterPickerPanel extends AbstractFragment {
 
     public String getToDate() {
         return waitForElementVisible(toDate).getAttribute("value");
-    }
-
-    public void changeToPresetsSection() {
-        waitForElementVisible(presetsSection).click();
     }
 
     public void changeDateDimension(String switchDimension) {
@@ -118,18 +116,33 @@ public class DateFilterPickerPanel extends AbstractFragment {
                 waitForElementVisible(By.className("adi-date-dataset-select-dropdown"), browser));
     }
 
+    public AbstractReactDropDown getDatePresetSelect() {
+        return Graphene.createPageFragment(DatePresetsSelect.class,
+                waitForElementVisible(By.className("adi-date-preset-select-dropdown"), browser));
+    }
+
+    public void apply() {
+        waitForElementVisible(applyButton).click();
+        waitForFragmentNotVisible(this);
+    }
+
     private void configTimeFilterByRangeHelper(String from, String to, boolean apply) {
-        waitForElementVisible(dateRangeSection).click();
+        selectStaticPeriod();
 
-        ElementUtils.clear(fromDate);
-        fromDate.sendKeys(from);
+        fillInDateRange(fromDate, from);
+        waitForElementVisible(fromDateCalendarIcon).click();
 
-        ElementUtils.clear(toDate);
-        toDate.sendKeys(to);
-
+        fillInDateRange(toDate, to);
         waitForElementVisible(toDateCalendarIcon).click();
 
         waitForElementVisible(apply ? applyButton : cancelButton).click();
         waitForFragmentNotVisible(this);
+    }
+
+    private void fillInDateRange(WebElement dateInput, String date) {
+        for (int i = 0, n = dateInput.getAttribute("value").trim().length(); i < n; i++) {
+            dateInput.sendKeys(Keys.BACK_SPACE);
+        }
+        dateInput.sendKeys(date, Keys.ENTER);
     }
 }

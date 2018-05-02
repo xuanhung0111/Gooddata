@@ -17,7 +17,7 @@ import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import com.gooddata.qa.graphene.utils.UrlParserUtils;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -70,6 +70,8 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
     private static final String RAW_FORMAT = "raw";
     private static final String DRILL_DOWN_VALUE = "2,647";
 
+    private DashboardRestRequest dashboardRequest;
+
     @Override
     public void initProperties() {
         super.initProperties();
@@ -78,6 +80,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
 
     @Override
     protected void customizeProject() throws Throwable {
+        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
         Metrics metricCreator = getMetricCreator();
         metricCreator.createNumberOfActivitiesMetric();
         metricCreator.createWonMetric();
@@ -253,9 +256,8 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
 
     private void setDrillReportTargetAsExport(final String format) throws JSONException, IOException {
         final String workingDashboard = dashboardsPage.getDashboardName();
-        DashboardsRestUtils.setDrillReportTargetAsExport(getRestApiClient(), testParams.getProjectId(),
-                UrlParserUtils.getObjId(browser.getCurrentUrl()), format);
-        //refresh to make sure drill settings are applied 
+        dashboardRequest.setDrillReportTargetAsExport(UrlParserUtils.getObjId(browser.getCurrentUrl()), format);
+        //refresh to make sure drill settings are applied
         browser.navigate().refresh();
         waitForDashboardPageLoaded(browser);
         //make sure that we are on correct dashboard

@@ -8,7 +8,7 @@ import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.java.Builder;
 import org.json.JSONException;
@@ -91,9 +91,11 @@ public class PartialExportAndImportProjectTest extends GoodSalesAbstractTest {
         String dashboard2 = "Dashboard contains Top 5 Lost";
 
         List<String> dashUris = new ArrayList<>();
-        dashUris.add(DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
+        DashboardRestRequest dashboardRequest = new DashboardRestRequest(
+                getAdminRestClient(), testParams.getProjectId());
+        dashUris.add(dashboardRequest.createDashboard(
                 initDashboard(dashboard1, getReportCreator().createTop5WonByCashReport()).getMdObject()));
-        dashUris.add(DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(),
+        dashUris.add(dashboardRequest.createDashboard(
                 initDashboard(dashboard2, getReportCreator().createTop5LostByCashReport()).getMdObject()));
 
         String exportToken = exportPartialProject(

@@ -28,7 +28,7 @@ import java.util.Set;
 
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
@@ -99,7 +99,8 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
             tabNames.forEach(name -> dash.addTab(Builder.of(Tab::new).with(tab -> tab.setTitle(name)).build()));
         }).build();
 
-        DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(), dashboard.getMdObject());
+        new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId())
+                .createDashboard(dashboard.getMdObject());
 
         initDashboardsPage();
         dashboardsPage.publishDashboard(true);

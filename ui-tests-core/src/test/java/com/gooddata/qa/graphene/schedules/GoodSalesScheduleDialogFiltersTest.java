@@ -3,7 +3,6 @@
  */
 package com.gooddata.qa.graphene.schedules;
 
-import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkGreenBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
@@ -18,8 +17,7 @@ import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
-import com.gooddata.qa.utils.http.RestClient;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.scheduleEmail.ScheduleEmailRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.json.JSONException;
@@ -84,7 +82,8 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
             dash.addFilter(regionFilter);
         }).build();
 
-        DashboardsRestUtils.createDashboard(getRestApiClient(), testParams.getProjectId(), dashboard.getMdObject());
+        new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId())
+                .createDashboard(dashboard.getMdObject());
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"schedules"})
@@ -139,7 +138,7 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
         final String PUBLIC_SCHEDULE = "Public schedule";
         initEmailSchedulesPage().scheduleNewDashboardEmail(singletonList(testParams.getUser()),
                 PUBLIC_SCHEDULE, "Test ExecutionContext", singletonList(DASHBOARD_HAVING_FILTER));
-        new ScheduleEmailRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
+        new ScheduleEmailRestRequest(getAdminRestClient(), testParams.getProjectId())
                 .addExecutionContext(getScheduleId(PUBLIC_SCHEDULE),
                         getExecutionContextId(getScheduleId(customSubject)));
         initEmailSchedulesPage().changeMessage(PUBLIC_SCHEDULE, "check execution context");

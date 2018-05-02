@@ -10,6 +10,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.Recommen
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -42,7 +43,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.changeMetricFormat;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -174,7 +174,9 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
                 .getMetricFormat();
 
         String uri = getMetricByTitle(METRIC_PERCENT_OF_GOAL).getUri();
-        changeMetricFormat(getRestApiClient(), uri, "<script> alert('test'); </script> #,##0.00");
+        DashboardRestRequest dashboardRequest = new DashboardRestRequest(
+                getAdminRestClient(), testParams.getProjectId());
+        dashboardRequest.changeMetricFormat(uri, "<script> alert('test'); </script> #,##0.00");
 
         try {
             initAnalysePage();
@@ -189,7 +191,7 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
             assertEquals(report.getTooltipTextOnTrackerByIndex(0),
                     asList(asList(ATTR_IS_WON, "true"), asList("true", "<script> alert('test')")));
         } finally {
-            changeMetricFormat(getRestApiClient(), uri, oldFormat);
+            dashboardRequest.changeMetricFormat(uri, oldFormat);
         }
     }
 

@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
+import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel.STATIC_PERIOD_DROPDOWN_ITEM;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -18,12 +19,21 @@ import static org.testng.Assert.*;
  * Locator for filters differs in React app.
  */
 public class FiltersBucket extends AbstractBucket {
+    
+    private static final String DATE_RANGE_REGEX = ".*: [A-Z][a-z]+ \\d{1,2}, \\d{4} - [A-Z][a-z]+ \\d{1,2}, \\d{4}$";
 
     @FindBy(css = ".adi-bucket-item .button")
     private List<WebElement> filters;
 
     private static final String LOADING = "...";
     private static final By BY_FILTER_TEXT = By.cssSelector(".button-text");
+    
+    private DateFilterPickerPanel getFilterPickerPanel() {
+        return Graphene.createPageFragment(
+            DateFilterPickerPanel.class,
+            waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser)
+        );
+    }
 
     public int getFiltersCount() {
         return filters.size();
@@ -32,9 +42,16 @@ public class FiltersBucket extends AbstractBucket {
     public FiltersBucket configDateFilter(String period) {
         WebElement filter = getDateFilter();
         filter.click();
-        Graphene.createPageFragment(DateFilterPickerPanel.class,
-                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser)).select(period);
-        assertTrue(getFilterTextHelper(filter).endsWith(": " + period));
+        
+        DateFilterPickerPanel panel = getFilterPickerPanel();
+        panel.select(period);
+        panel.apply();
+
+        if (STATIC_PERIOD_DROPDOWN_ITEM.equals(period)) {
+            assertTrue(getFilterTextHelper(filter).matches(DATE_RANGE_REGEX));
+        } else {
+            assertTrue(getFilterTextHelper(filter).endsWith(": " + period));
+        }
         return this;
     }
 
@@ -98,8 +115,7 @@ public class FiltersBucket extends AbstractBucket {
     public List<String> getDateFilterOptions() {
         WebElement filter = getDateFilter();
         filter.click();
-        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
-                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+        DateFilterPickerPanel panel = getFilterPickerPanel();
         List<String> ret = panel.getPeriods();
         filter.click();
         waitForFragmentNotVisible(panel);
@@ -120,10 +136,16 @@ public class FiltersBucket extends AbstractBucket {
     public void changeDateDimension(String currentDimension, String switchDimension) {
         WebElement filter = getFilter(currentDimension);
         openDatePanelOfFilter(filter).changeDateDimension(switchDimension);
+
+        DateFilterPickerPanel panel = getFilterPickerPanel();
+        panel.apply();
     }
 
     public FiltersBucket changeDateDimension(String switchDimension) {
         openDatePanelOfFilter(getDateFilter()).changeDateDimension(switchDimension);
+
+        DateFilterPickerPanel panel = getFilterPickerPanel();
+        panel.apply();
 
         return this;
     } 

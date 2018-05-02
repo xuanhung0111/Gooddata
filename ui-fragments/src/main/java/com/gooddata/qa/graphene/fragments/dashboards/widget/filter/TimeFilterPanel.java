@@ -12,6 +12,7 @@ import com.gooddata.qa.graphene.entity.filter.TimeRange;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.SelectTimeRangePanel;
 import com.gooddata.qa.graphene.utils.ElementUtils;
+import com.gooddata.qa.graphene.utils.Sleeper;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -21,7 +22,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class TimeFilterPanel extends AbstractFragment {
@@ -109,43 +110,34 @@ public class TimeFilterPanel extends AbstractFragment {
 
     public TimeFilterPanel selectRange(final String startTime, final String endTime) {
         waitForElementVisible(timelineContent);
+        WebElement startTimeElement = makeTimelineElementInViewPort(startTime).getTimeLineElement(startTime);
 
-        int steps = 0;
-        while (!isExistingTimeline(startTime)) {
-            if (!moveLeftOnTimeline()) {
-                break;
-            }
-            steps++;
-            // Limit steps to avoid infinitive loop in case the timeline content load incorrect date dataset
-            // due to https://jira.intgdc.com/browse/CL-12774
-            if (steps > 20) {
-                throw new RuntimeException("Error on finding element: " + startTime);
-            }
-        }
+        Actions actions = getActions();
+        actions.clickAndHold(startTimeElement).perform();
 
-        WebElement startTimeElement = getTimeLineElement(startTime);
-        startTimeElement.click();
-
-        WebElement moveButton;
-        steps = 0;
-        while ((moveButton = getMoveButton(endTime)) != null) {
-            moveButton.click();
-            steps++;
-            // Limit steps to avoid infinitive loop in case the timeline content load incorrect date dataset
-            // due to https://jira.intgdc.com/browse/CL-12774
-            if (steps > 20) {
-                throw new RuntimeException("Error on finding element: " + endTime);
-            }
-        }
-
-        WebElement endTimeElement = getTimeLineElement(endTime);
         try {
-            getActions().keyDown(Keys.SHIFT).perform();
-            endTimeElement.click();
+            if (!isExistingTimeline(endTime)) {
+                WebElement arrow = getArrowToFindTimeline(endTime);
+
+                Graphene.waitGui().until(browser -> {
+                    // According to https://bugzilla.mozilla.org/show_bug.cgi?id=1405370,
+                    // Gecko driver not working with SHIFT key properly. So we should change the way to
+                    // select time range by making drag at timeline items
+
+                    // Move to arrow element and sleep a little bit to make an auto selection
+                    actions.moveToElement(arrow).perform();
+                    Sleeper.sleepTight(500);
+
+                    // Move outside arrow element to make auto selection finish and check for end time element exist
+                    actions.moveByOffset(50, 50).perform();
+                    return isExistingTimeline(endTime);
+                });
+            }
+            actions.moveToElement(getTimeLineElement(endTime)).perform();
         } finally {
-            getActions().keyUp(Keys.SHIFT).perform();
-            return this;
+            actions.release().perform();
         }
+        return this;
     }
 
     public TimeFilterPanel setValueFromDateAndToDateByAdvance(TimeRange timeFrom, TimeRange timeTo) {
@@ -154,17 +146,7 @@ public class TimeFilterPanel extends AbstractFragment {
     }
 
     public TimeFilterPanel selectTimeLine(final String timeLine) {
-        waitForElementVisible(timelineContent);
-        while (!isExistingTimeline(timeLine)) {
-            if (!moveLeftOnTimeline()) {
-                break;
-            }
-        }
-        if (isExistingTimeline(timeLine)) {
-            selectTimeFilter(timeLineItems, timeLine);
-        } else {
-            throw new NoSuchElementException("No value present");
-        }
+        makeTimelineElementInViewPort(timeLine).getTimeLineElement(timeLine).click();
         return this;
     }
 
@@ -260,41 +242,32 @@ public class TimeFilterPanel extends AbstractFragment {
         return this;
     }
 
-    private boolean moveLeftOnTimeline() {
-        boolean hasMoved = false;
-        waitForElementVisible(timelineContent);
-        if (leftArrow.isDisplayed()) {
-            leftArrow.click();
-            hasMoved = true;
-        }
-        return hasMoved;
-    }
-
     private boolean isExistingTimeline(String timeline) {
         return timeLineItems.stream().filter(item -> item.getText().contains(timeline)).findFirst().isPresent();
     }
 
-    private WebElement getMoveButton(final String timeLine) {
-        if (isExistingTimeline(timeLine)) {
-            return null;
-        }
-
-        WebElement firstElement = timeLineItems.get(0);
-        if (timeLine.compareTo(firstElement.getText()) < 0) {
-            //move left
-            return leftArrow.isDisplayed() ? leftArrow : null;
-        } else {
-            //move right
-            return rightArrow.isDisplayed() ? rightArrow : null;
-        }
-    }
-
     private WebElement getTimeLineElement(final String timeValue) {
-        waitForCollectionIsNotEmpty(timeLineItems);
         return timeLineItems.stream()
                 .filter(e -> timeValue.equalsIgnoreCase(e.getText()))
                 .findFirst()
                 .get();
+    }
+
+    private TimeFilterPanel makeTimelineElementInViewPort(String timeline) {
+        waitForElementVisible(timelineContent);
+
+        if (!isExistingTimeline(timeline)) {
+            WebElement arrow = getArrowToFindTimeline(timeline);
+            Graphene.waitGui().withTimeout(10, TimeUnit.MINUTES).until(browser -> {
+                arrow.click();
+                return isExistingTimeline(timeline);
+            });
+        }
+        return this;
+    }
+
+    private WebElement getArrowToFindTimeline(String timeline) {
+        return timeline.compareTo(timeLineItems.get(0).getText()) < 0 ? leftArrow : rightArrow;
     }
 
     public enum DateGranularity {

@@ -53,7 +53,7 @@ public class KpiDashboardNamingTest extends AbstractDashboardTest {
 
         createInsightWidget(new InsightMDConfiguration(INSIGHT_ACTIVITIES, ReportType.COLUMN_CHART)
                 .setMeasureBucket(singletonList(MeasureBucket
-                        .getSimpleInstance(getMetricCreator().createNumberOfActivitiesMetric()))));
+                        .createSimpleMeasureBucket(getMetricCreator().createNumberOfActivitiesMetric()))));
     }
 
     @Test(dependsOnGroups = {"createProject"})

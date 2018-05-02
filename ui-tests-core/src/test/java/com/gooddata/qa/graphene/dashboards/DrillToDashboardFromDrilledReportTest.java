@@ -13,7 +13,7 @@ import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.deleteAllDashboards;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_AMOUNT_BY_PRODUCT;
@@ -69,6 +68,8 @@ public class DrillToDashboardFromDrilledReportTest extends GoodSalesAbstractTest
 
     private String amountByProductReportUri;
     private String amountByStageNameReportUri;
+    private DashboardRestRequest dashboardRequest;
+
     private final static int year = 2011 - LocalDate.now().getYear();
 
     @Override
@@ -80,7 +81,7 @@ public class DrillToDashboardFromDrilledReportTest extends GoodSalesAbstractTest
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
-
+        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
         amountByProductReportUri = getReportCreator().createAmountByProductReport();
         amountByStageNameReportUri = getReportCreator().createAmountByStageNameReport();
 
@@ -115,8 +116,7 @@ public class DrillToDashboardFromDrilledReportTest extends GoodSalesAbstractTest
                                                  final String expectedReport,
                                                  final List<Pair<String, List<String>>> expectedFilterValues)
             throws JSONException, IOException {
-        DashboardsRestUtils.createDashboard(getRestApiClient(),
-                testParams.getProjectId(), dashboard1.getMdObject());
+        dashboardRequest.createDashboard(dashboard1.getMdObject());
         try {
             initDashboardsPage().selectDashboard(dashboard);
 
@@ -141,17 +141,14 @@ public class DrillToDashboardFromDrilledReportTest extends GoodSalesAbstractTest
                 }
             }
         } finally {
-            deleteAllDashboards(getRestApiClient(), testParams.getProjectId());
+            dashboardRequest.deleteAllDashboards();
         }
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void drillReportToTabInDefferentDashboard() throws JSONException, IOException {
-        DashboardsRestUtils.createDashboard(getRestApiClient(),
-                testParams.getProjectId(), dashboard1.getMdObject());
-
-        DashboardsRestUtils.createDashboard(getRestApiClient(),
-                testParams.getProjectId(), dashboard2.getMdObject());
+        dashboardRequest.createDashboard(dashboard1.getMdObject());
+        dashboardRequest.createDashboard(dashboard2.getMdObject());
 
         try {
             initDashboardsPage().selectDashboard(DASHBOAD_1_NAME).editDashboard();
@@ -175,7 +172,7 @@ public class DrillToDashboardFromDrilledReportTest extends GoodSalesAbstractTest
             assertEquals(dashboardsPage.getContent().getFilterWidgetByName(ATTR_PRODUCT).getCurrentValue(),
                     GRAMMAR_PLUS);
         } finally {
-            deleteAllDashboards(getRestApiClient(), testParams.getProjectId());
+            dashboardRequest.deleteAllDashboards();
         }
     }
 

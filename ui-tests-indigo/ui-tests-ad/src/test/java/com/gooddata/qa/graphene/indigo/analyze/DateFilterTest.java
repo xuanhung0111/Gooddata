@@ -5,13 +5,11 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static java.lang.String.format;
 
@@ -21,7 +19,6 @@ import java.util.*;
 
 import com.gooddata.qa.graphene.enums.DateRange;
 import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.browser.BrowserUtils;
@@ -67,33 +64,9 @@ public class DateFilterTest extends AbstractAnalyseTest {
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
 
-        panel.changeToDateRangeSection();
+        panel.selectStaticPeriod();
         assertEquals(panel.getToDate(), DateRange.now().format(dateTimeFormatter));
         assertEquals(panel.getFromDate(), DateRange.LAST_30_DAYS.getFrom().format(dateTimeFormatter));
-    }
-
-    @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
-    public void switchingDateRangeNotComputeReport() {
-        final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
-
-        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_PERSONS)
-                .addAttribute(ATTR_PERSON)
-                .addDateFilter()
-                .waitForReportComputing()
-                .getChartReport();
-        assertEquals(report.getTrackersCount(), 15);
-        assertEquals(filtersBucketReact.getFilterText(DATE_INVOICE), "templ:DateInvoice: All time");
-
-        WebElement dateFilter = filtersBucketReact.getFilter(DATE_INVOICE);
-        dateFilter.click();
-        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
-                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
-        panel.changeToDateRangeSection();
-        assertFalse(analysisPage.isReportComputing());
-        panel.changeToPresetsSection();
-        assertFalse(analysisPage.isReportComputing());
-        dateFilter.click();
-        waitForFragmentNotVisible(panel);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -144,29 +117,6 @@ public class DateFilterTest extends AbstractAnalyseTest {
         assertEquals(analysisPage.getAttributesBucket().getAllGranularities(),
                 Arrays.asList("Day", "Week (Sun-Sat)", "Month", "Quarter", "Year"));
         checkingOpenAsReport("testDateInCategoryAndDateInFilter");
-    }
-
-    @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
-    public void switchBetweenPresetsAndDataRange() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_PERSONS).addDate().getFilterBuckets()
-                .configDateFilter(DateRange.LAST_90_DAYS.toString());
-        analysisPage.waitForReportComputing();
-
-        WebElement dateFilter = analysisPage.getFilterBuckets().getFilter(DATE_INVOICE);
-        dateFilter.click();
-        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
-                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
-        panel.changeToDateRangeSection();
-        assertFalse(analysisPage.isReportComputing());
-        panel.configTimeFilter("01/14/2016", "04/13/2019");
-        analysisPage.waitForReportComputing();
-
-        dateFilter.click();
-        panel.changeToPresetsSection();
-        assertFalse(analysisPage.isReportComputing());
-        panel.select(DateRange.THIS_MONTH.toString());
-        analysisPage.waitForReportComputing();
-        checkingOpenAsReport("switchBetweenPresetsAndDataRange");
     }
 
     @Test(dependsOnGroups = {"createProject"})

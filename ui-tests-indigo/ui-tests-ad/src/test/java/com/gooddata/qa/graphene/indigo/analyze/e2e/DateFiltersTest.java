@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
+
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.cssSelector;
@@ -15,6 +17,7 @@ import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
+import org.jboss.arquillian.graphene.Graphene;
 
 public class DateFiltersTest extends AbstractAdE2ETest {
 
@@ -27,22 +30,28 @@ public class DateFiltersTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_be_possible_to_add_and_remove_date_from_filter_bucket() {
         assertTrue(analysisPage.addDateFilter()
-            // try to drag a second date filter
-            .addDateFilter()
-            .removeDateFilter()
-            .getFilterBuckets()
-            .isEmpty());
+                .removeDateFilter()
+                .getFilterBuckets()
+                .isEmpty());
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
+    public void should_not_be_possible_to_add_second_date_to_filter_bucket() {
+        assertEquals(analysisPage.addDateFilter()
+                .addDateFilter() // try to drag a second date filter
+                .getFilterBuckets()
+                .getFiltersCount(), 1);
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_reflect_changes_in_category_bucket() {
         analysisPage.addDate()
-            .getAttributesBucket()
-            .changeDateDimension("Created");
+                .getAttributesBucket()
+                .changeDateDimension("Created");
 
         analysisPage.getFilterBuckets()
-            .getDateFilter()
-            .click();
+                .getDateFilter()
+                .click();
 
         takeScreenshot(browser, "Selected-date-filter-applied", getClass());
         assertEquals(getValueFrom(".s-filter-date-date-dataset-switch"), "Created");
@@ -51,17 +60,21 @@ public class DateFiltersTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_display_picker() {
         analysisPage.addDateFilter()
-            .getFilterBuckets()
-            .getDateFilter()
-            .click();
+                .getFilterBuckets()
+                .getDateFilter()
+                .click();
         assertTrue(isElementPresent(cssSelector(".s-filter-picker"), browser));
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_keep_selection_if_date_dimensions_reloaded_in_the_background() {
         analysisPage.addDateFilter()
-            .getFilterBuckets()
-            .changeDateDimension("Activity", "Created");
+                .getFilterBuckets()
+                .changeDateDimension("Activity", "Created");
+
+        analysisPage.getFilterBuckets()
+                .getDateFilter()
+                .click();
 
         takeScreenshot(browser, "Date-filter-applied-on-filter-buckets", getClass());
         assertEquals(getValueFrom(".s-filter-date-date-dataset-switch"), "Created");
@@ -70,12 +83,15 @@ public class DateFiltersTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_prefill_interval_filters_when_floating_filter_is_selected() {
         analysisPage.addDateFilter()
-            .getFilterBuckets()
-            .configDateFilter("Last quarter")
-            .getDateFilter()
-            .click();
+                .getFilterBuckets()
+                .configDateFilter("Last quarter")
+                .getDateFilter()
+                .click();
 
-        waitForElementVisible(cssSelector(".s-filter-picker .s-tab-range"), browser).click();
+        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
+                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+
+        panel.selectStaticPeriod();
 
         assertTrue(isElementPresent(cssSelector(".s-filter-picker .s-interval-from input"), browser));
         assertTrue(isElementPresent(cssSelector(".s-filter-picker .s-interval-to input"), browser));
@@ -84,18 +100,22 @@ public class DateFiltersTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_support_date_ranges() throws ParseException {
         assertTrue(analysisPage.addDateFilter()
-            .getFilterBuckets()
-            .configDateFilter("11/17/2015", "11/19/2015")
-            .getDateFilterText().contains("Nov 17, 2015 - Nov 19, 2015"));
+                .getFilterBuckets()
+                .configDateFilter("11/17/2015", "11/19/2015")
+                .getDateFilterText().contains("Nov 17, 2015 - Nov 19, 2015"));
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_correct_ranges_when_editing() {
         analysisPage.addDateFilter()
-            .getFilterBuckets()
-            .getDateFilter()
-            .click();
-        waitForElementVisible(cssSelector(".s-filter-picker .s-tab-range"), browser).click();
+                .getFilterBuckets()
+                .getDateFilter()
+                .click();
+
+        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
+                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+
+        panel.selectStaticPeriod();
 
         String nextYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR) + 1);
         fillInDateRange(".s-interval-from input", "01/01/" + nextYear);
@@ -107,7 +127,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
                 "01/01/2003");
 
         fillInDateRange(".s-interval-to input", "01/01/200");
-        waitForElementVisible(cssSelector(".adi-tab-range"), browser).click();
+        waitForElementVisible(cssSelector(".s-interval-from input"), browser).click();
         assertEquals(waitForElementVisible(cssSelector(".s-interval-from input"), browser).getAttribute("value"),
                 "01/01/2003");
     }

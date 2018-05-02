@@ -11,7 +11,7 @@ import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
@@ -32,7 +32,6 @@ import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 public class DrillToDashBoardTabApplyingDateFilterTest extends GoodSalesAbstractTest {
 
@@ -52,10 +51,12 @@ public class DrillToDashBoardTabApplyingDateFilterTest extends GoodSalesAbstract
     private static final String DATE_DIMENSION_SNAPSHOT = "Date dimension (Snapshot)";
 
     private String testReportUri;
+    private DashboardRestRequest dashboardRequest;
 
     @Override
     protected void customizeProject() throws Throwable {
         testReportUri = getReportCreator().createAmountByProductReport();
+        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
     }
 
     @DataProvider
@@ -102,10 +103,7 @@ public class DrillToDashBoardTabApplyingDateFilterTest extends GoodSalesAbstract
     public void drillToTabHavingDateFilter(String dashboard, Pair<String, String> filterValuesToChange,
                                            Pair<String, String> expectedFilterValue,
                                            int expectedReportRowCount) throws IOException, JSONException {
-
-        String dashboardUri = DashboardsRestUtils.createDashboard(getRestApiClient(),
-                testParams.getProjectId(), getDashboardByName(dashboard).getMdObject());
-
+        String dashboardUri = dashboardRequest.createDashboard(getDashboardByName(dashboard).getMdObject());
         try {
             initDashboardsPage().selectDashboard(dashboard).editDashboard();
 
@@ -161,8 +159,7 @@ public class DrillToDashBoardTabApplyingDateFilterTest extends GoodSalesAbstract
 
         List<String> dashboardUris = new ArrayList<>();
         for (Dashboard dashboard : asList(dashboard_1, dashboard2)) {
-            dashboardUris.add(DashboardsRestUtils
-                    .createDashboard(getRestApiClient(), testParams.getProjectId(), dashboard.getMdObject()));
+            dashboardUris.add(dashboardRequest.createDashboard(dashboard.getMdObject()));
         }
 
         try {

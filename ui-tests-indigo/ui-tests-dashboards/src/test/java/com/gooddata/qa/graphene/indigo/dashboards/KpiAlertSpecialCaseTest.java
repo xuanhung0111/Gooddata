@@ -4,7 +4,6 @@ import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_DROPS_BELOW;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.changeMetricExpression;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createKpiWidget;
 import static com.gooddata.qa.utils.mail.ImapUtils.areMessagesArrived;
@@ -20,6 +19,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.fact.FactRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -190,8 +190,8 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
             String newMaqlExpression = format("SELECT SUM([%s]) WHERE [%s] = [%s]",
                     numberFactUri, firstNameAttributeUri, firstNameValueUri);
 
-            changeMetricExpression(getRestApiClient(), sumOfNumberMetricUri, newMaqlExpression);
-
+            new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId())
+                    .changeMetricExpression(sumOfNumberMetricUri, newMaqlExpression);
             updateCsvDataset(DATASET_NAME, otherCsvFilePath);
 
             Kpi kpi = initIndigoDashboardsPageWithWidgets().getWidgetByHeadline(Kpi.class, kpiName);

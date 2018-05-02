@@ -20,8 +20,12 @@ public class MeasureBucket {
         this.objectUri = objectUri;
     }
 
-    public static MeasureBucket getSimpleInstance(Metric metric) {
+    public static MeasureBucket createSimpleMeasureBucket(Metric metric) {
         return new MeasureBucket("", metric.getTitle(), false, false, "metric", metric.getUri());
+    }
+
+    public static MeasureBucket createMeasureBucketWithShowInPercent (Metric metric, boolean hasShowInPercent) {
+        return new MeasureBucket("", metric.getTitle(), false, hasShowInPercent, "metric", metric.getUri());
     }
 
     public String getMeasureFilters() {

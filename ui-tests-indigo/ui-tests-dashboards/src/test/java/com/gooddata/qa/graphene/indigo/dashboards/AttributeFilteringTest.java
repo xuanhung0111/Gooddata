@@ -67,7 +67,7 @@ public class AttributeFilteringTest extends AbstractDashboardTest {
         getMetricCreator().createNumberOfWonOppsMetric();
 
         String insightWidget = createInsightWidget(new InsightMDConfiguration(TEST_INSIGHT, ReportType.COLUMN_CHART)
-                .setMeasureBucket(singletonList(MeasureBucket.getSimpleInstance(getMdService().getObj(getProject(),
+                .setMeasureBucket(singletonList(MeasureBucket.createSimpleMeasureBucket(getMdService().getObj(getProject(),
                         Metric.class, title(METRIC_NUMBER_OF_ACTIVITIES))))));
         createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
                 asList(createAmountKpi(), insightWidget));
