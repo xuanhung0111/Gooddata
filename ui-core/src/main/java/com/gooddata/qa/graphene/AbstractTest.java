@@ -15,6 +15,7 @@ import com.gooddata.project.Project;
 import com.gooddata.project.ProjectDriver;
 import com.gooddata.project.ProjectService;
 import com.gooddata.project.ProjectValidationResults;
+import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.utils.http.RestClient.RestProfile;
 import org.apache.http.HttpHost;
 import org.apache.http.ParseException;
@@ -119,7 +120,7 @@ public abstract class AbstractTest extends Arquillian {
         // We need to call browser#get(String) before refreshing page to make sure the last request to browser has
         // method is GET unless we will get an alert about re-sending information to browser
         if (getUrlWithoutHash(pageURL).equals(getUrlWithoutHash(currentUrl))) {
-            browser.navigate().refresh();
+            BrowserUtils.refreshCurrentPage(browser);
         }
     }
 
