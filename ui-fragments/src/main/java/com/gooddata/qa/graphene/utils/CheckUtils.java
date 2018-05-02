@@ -26,7 +26,7 @@ public final class CheckUtils {
     public static final By BY_ERROR_ID = By.cssSelector("div#status .c-error-errorId");
     public static final By BY_ERROR_MESSAGE = By.cssSelector("div#status .c-error-message");
 
-    public static final By BY_INDIGO_MESSAGE = By.cssSelector(".gd-message");
+    public static final By BY_INDIGO_MESSAGE = By.cssSelector(".gd-message:not(.progress)");
     public static final By BY_INDIGO_DISMISS_BUTTON = By.cssSelector(".gd-message-dismiss");
 
     private CheckUtils() {
