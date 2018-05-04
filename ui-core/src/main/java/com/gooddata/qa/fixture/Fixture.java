@@ -8,33 +8,35 @@ import com.gooddata.GoodData;
 import com.gooddata.GoodDataRestException;
 import com.gooddata.PollResult;
 import com.gooddata.fixture.ResourceManagement;
+import com.gooddata.fixture.ResourceManagement.ResourceTemplate;
 import com.gooddata.gdc.GdcError;
 import com.gooddata.gdc.TaskStatus;
 import com.gooddata.project.Environment;
 import com.gooddata.project.Project;
 import com.gooddata.project.ProjectDriver;
 import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
-import com.gooddata.fixture.ResourceManagement.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static java.lang.String.format;
@@ -76,7 +78,7 @@ public class Fixture {
             throw new RuntimeException("Rest api or Goodata client has not been initialized !");
         }
 
-        projectId = ProjectRestUtils.createBlankProject(goodDataClient, title, authToken, driver, environment);
+        projectId = createBlankProject(goodDataClient, title, authToken, driver, environment);
         log.info("a blank project has been created " + projectId);
 
         Project workingProject = goodDataClient.getProjectService().getProjectById(projectId);
@@ -232,5 +234,25 @@ public class Fixture {
         try (InputStream workingStream = stream) {
             return IOUtils.readLines(workingStream, "UTF-8").stream().collect(Collectors.joining());
         }
+    }
+
+    /**
+     * Create project with specific template
+     *
+     * @param goodData
+     * @param title
+     * @param authorizationToken
+     * @param projectDriver
+     * @param environment
+     * @return project id
+     */
+    private String createBlankProject(final GoodData goodData, final String title,
+                                 final String authorizationToken, final ProjectDriver projectDriver,
+                                 final Environment environment) {
+        final Project project = new Project(title, authorizationToken);
+        project.setDriver(projectDriver);
+        project.setEnvironment(environment);
+
+        return goodData.getProjectService().createProject(project).get().getId();
     }
 }

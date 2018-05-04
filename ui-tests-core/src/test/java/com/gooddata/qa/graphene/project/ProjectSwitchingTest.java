@@ -13,8 +13,6 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import java.io.IOException;
 import java.util.UUID;
 
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
-
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
@@ -42,9 +40,7 @@ public class ProjectSwitchingTest extends AbstractProjectTest {
     public void getMoreProject() {
         currentProjectId = testParams.getProjectId();
 
-        newProjectId = ProjectRestUtils.createBlankProject(getGoodDataClient(), NEW_PROJECT_NAME,
-                testParams.getAuthorizationToken(), testParams.getProjectDriver(),
-                testParams.getProjectEnvironment());
+        newProjectId = createNewEmptyProject(NEW_PROJECT_NAME);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -118,7 +114,7 @@ public class ProjectSwitchingTest extends AbstractProjectTest {
             assertThat(browser.getCurrentUrl(), containsString(currentProjectId));
 
         } finally {
-            ProjectRestUtils.deleteProject(getGoodDataClient(), newProjectId);
+            deleteProject(newProjectId);
         }
     }
 

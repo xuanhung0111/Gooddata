@@ -17,6 +17,7 @@ import com.gooddata.md.AttributeElement;
 import com.gooddata.md.Dataset;
 import com.gooddata.md.Fact;
 import com.gooddata.md.ObjNotFoundException;
+import com.gooddata.project.ProjectService;
 import com.gooddata.project.ProjectValidationResults;
 import com.gooddata.qa.fixture.FixtureException;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
@@ -26,7 +27,9 @@ import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.RestClient.RestProfile;
 import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.rolap.RolapRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.json.JSONException;
@@ -47,7 +50,6 @@ import com.gooddata.qa.fixture.Fixture;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static java.util.stream.Collectors.toList;
@@ -122,7 +124,9 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         createNewProject();
 
         projectTitle = testParams.getProjectId().substring(0, 6) + "-" + projectTitle;
-        ProjectRestUtils.updateProjectTitle(getRestApiClient(), getProject(), projectTitle);
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(
+                new RestClient(getProfile(ADMIN)), testParams.getProjectId());
+        projectRestRequest.updateProjectTitle(projectTitle);
         log.info("Project title: " + projectTitle);
     }
 
@@ -133,21 +137,23 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     @Test(dependsOnMethods = {"inviteUsersIntoProject"}, groups = {"createProject"})
     public void createAndUseDynamicUser() throws ParseException, JSONException, IOException {
-        if (!useDynamicUser) {
-            log.warning("This test does not need to use dynamic user!");
-            return;
-        }
-
         if (!isCurrentUserDomainUser()) {
             log.warning("Main user in this test is not domain user. Cannot use dynamic user! Use the current to test!");
             return;
         }
 
+        // update domain user
+        testParams.setDomainUser(testParams.getUser());
+
+        if (!useDynamicUser) {
+            log.warning("This test does not need to use dynamic user!");
+            return;
+        }
+
+        // update user into dynamic user
         String dynamicUser = createDynamicUserFrom(testParams.getUser().replace("@", "+dynamic@"));
         addUserToProject(dynamicUser, UserRoles.ADMIN);
 
-        // update domain user
-        testParams.setDomainUser(testParams.getUser());
         testParams.setUser(dynamicUser);
 
         // update REST clients to the correct user because they can be generated and cached
@@ -205,12 +211,12 @@ public abstract class AbstractProjectTest extends AbstractUITest {
             switch (testParams.getDeleteMode()) {
                 case DELETE_ALWAYS:
                     log.info("Project will be deleted: " + projectId);
-                    ProjectRestUtils.deleteProject(getGoodDataClient(), projectId);
+                    deleteProject(getProfile(ADMIN), projectId);
                     break;
                 case DELETE_IF_SUCCESSFUL:
                     if (context.getFailedTests().size() == 0) {
                         log.info("Test was successful, project will be deleted: " + projectId);
-                        ProjectRestUtils.deleteProject(getGoodDataClient(), projectId);
+                        deleteProject(getProfile(ADMIN), projectId);
                     } else {
                         log.info("Test wasn't successful, project won't be deleted...");
                     }
@@ -239,9 +245,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     protected void createNewProject() throws Throwable{
         if (Objects.isNull(appliedFixture)) {
             log.info("Using REST api to create an empty project.");
-            testParams.setProjectId(ProjectRestUtils.createProject(getGoodDataClient(), projectTitle,
-                    null, testParams.getAuthorizationToken(), testParams.getProjectDriver(),
-                    testParams.getProjectEnvironment()));
+            testParams.setProjectId(createNewEmptyProject(projectTitle));
         } else {
             log.info("Using fixture named " + appliedFixture.getPath() + " to create project");
             testParams.setProjectId(createProjectUsingFixture(projectTitle, appliedFixture));
@@ -514,6 +518,33 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         } catch (ObjNotFoundException e) {
             return gooddata.getMetadataService().createObj(getProject(), new Metric(name, expression, format));
         }
+    }
+
+    protected String createNewEmptyProject(final RestProfile profile, final String projectTitle) {
+        RestClient restClient = new RestClient(profile);
+        return createNewEmptyProject(restClient, projectTitle);
+    }
+
+    protected String createNewEmptyProject(final RestClient restClient, final String projectTitle) {
+        final Project project = new Project(projectTitle, testParams.getAuthorizationToken());
+        project.setDriver(testParams.getProjectDriver());
+        project.setEnvironment(testParams.getProjectEnvironment());
+
+        return restClient.getProjectService().createProject(project).get().getId();
+    }
+
+    protected String createNewEmptyProject(final String projectTitle) {
+        return createNewEmptyProject(getProfile(ADMIN), projectTitle);
+    }
+
+    protected void deleteProject(final RestProfile profile, final String projectId) {
+        RestClient restClient = new RestClient(profile);
+        final ProjectService service = restClient.getProjectService();
+        service.removeProject(service.getProjectById(projectId));
+    }
+
+    protected void deleteProject(final String projectId) {
+        deleteProject(getProfile(ADMIN), projectId);
     }
 
     //------------------------- REPORT, METRIC MD OBJECTS - END ------------------------

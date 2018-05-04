@@ -12,6 +12,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.Widget
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.rolap.RolapRestRequest;
 import org.apache.commons.io.IOUtils;
 import org.openqa.selenium.WebElement;
@@ -22,7 +23,6 @@ import java.util.List;
 
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
-import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
 import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -52,8 +52,8 @@ public class DashboardFiscalDateFilterTest extends AbstractDashboardWidgetTest {
         getFileFromWebDav(webdavURL, fiscalDateResouce);
         new RolapRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
                 .postEtlPullIntegration(webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()));
-        setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.FISCAL_CALENDAR_ENABLED, true);
+        new ProjectRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
+                .setFeatureFlagInProject(ProjectFeatureFlags.FISCAL_CALENDAR_ENABLED, true);
 
         initDashboardsPage().addNewDashboard(DASHBOARD_NAME)
                 .editDashboard()

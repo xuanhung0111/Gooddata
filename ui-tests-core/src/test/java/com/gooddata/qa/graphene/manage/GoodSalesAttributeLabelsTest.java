@@ -19,7 +19,6 @@ import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage.AttributeLa
 import com.gooddata.qa.graphene.fragments.manage.VariableDetailPage;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
@@ -274,8 +273,7 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
     @Test(dependsOnGroups = {"createProject"})
     public void updateDataAfterChangingAttributeLabel() throws IOException {
         String currentProjectId = testParams.getProjectId();
-        String newProjectId = ProjectRestUtils.createBlankProject(getGoodDataClient(), projectTitle,
-                testParams.getAuthorizationToken(), testParams.getProjectDriver(), testParams.getProjectEnvironment());
+        String newProjectId = createNewEmptyProject(projectTitle);
         testParams.setProjectId(newProjectId);
 
         try {
@@ -321,7 +319,7 @@ public class GoodSalesAttributeLabelsTest extends AbstractDashboardWidgetTest {
 
         } finally {
             testParams.setProjectId(currentProjectId);
-            ProjectRestUtils.deleteProject(getGoodDataClient(), newProjectId);
+            deleteProject(newProjectId);
         }
     }
 

@@ -18,6 +18,8 @@ import javax.mail.MessagingException;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -37,8 +39,6 @@ import com.gooddata.qa.graphene.fragments.indigo.user.DeleteGroupDialog;
 import com.gooddata.qa.graphene.fragments.indigo.user.GroupDialog;
 import com.gooddata.qa.graphene.fragments.indigo.user.UserInvitationDialog;
 import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
-import com.gooddata.qa.graphene.utils.Sleeper;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.google.common.collect.Iterables;
@@ -94,8 +94,8 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.DISPLAY_USER_MANAGEMENT, true);
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .setFeatureFlagInProject(ProjectFeatureFlags.DISPLAY_USER_MANAGEMENT, true);
 
         //we need to upload dummy data so we can work with Dashboard page.
         String csvFilePath = new CsvFile("data.csv")
@@ -625,8 +625,8 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
     @Test(dependsOnGroups = { "activeUser", "userManagement", "verifyUI", "initialize", "deleteGroup" },
             alwaysRun = true)
     public void turnOffUserManagementFeature() throws IOException, JSONException {
-        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.DISPLAY_USER_MANAGEMENT, false);
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .setFeatureFlagInProject(ProjectFeatureFlags.DISPLAY_USER_MANAGEMENT, false);
     }
 
     private void checkEditorCannotAccessUserGroupsLinkInDashboardPage(PermissionsDialog permissionsDialog) {

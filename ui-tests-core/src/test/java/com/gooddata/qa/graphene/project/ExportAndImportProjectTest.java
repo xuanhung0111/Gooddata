@@ -15,7 +15,6 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.manage.VariablesPage;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.io.ResourceUtils;
 import org.json.JSONException;
 import org.openqa.selenium.WebElement;
@@ -89,10 +88,9 @@ public class ExportAndImportProjectTest extends AbstractProjectTest {
     @Test(dependsOnGroups = {"createProject"})
     public void testExportImportProject() throws JSONException {
         final String exportToken = exportProject(true, true, false, DEFAULT_PROJECT_CHECK_LIMIT);
-        ProjectRestUtils.deleteProject(getGoodDataClient(), testParams.getProjectId());
+        deleteProject(testParams.getProjectId());
 
-        final String targetProjectId = ProjectRestUtils.createBlankProject(getGoodDataClient(), TARGET_PROJECT_TITLE,
-                testParams.getAuthorizationToken(), testParams.getProjectDriver(), testParams.getProjectEnvironment());
+        final String targetProjectId = createNewEmptyProject(TARGET_PROJECT_TITLE);
 
         testParams.setProjectId(targetProjectId);
         importProject(exportToken, DEFAULT_PROJECT_CHECK_LIMIT);

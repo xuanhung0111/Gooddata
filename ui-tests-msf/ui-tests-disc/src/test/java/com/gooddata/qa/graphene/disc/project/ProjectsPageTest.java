@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.disc.project;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.project.ProjectRestUtils.createBlankProject;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -30,7 +29,6 @@ import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleCronTime;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.disc.projects.ProjectsPage.FilterOption;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class ProjectsPageTest extends AbstractProcessTest {
 
@@ -217,7 +215,7 @@ public class ProjectsPageTest extends AbstractProcessTest {
 
         } finally {
             if (!additionalProjects.isEmpty()) {
-                additionalProjects.stream().forEach(p -> ProjectRestUtils.deleteProject(getGoodDataClient(), p));
+                additionalProjects.stream().forEach(p -> deleteProject(p));
             }
         }
     }
@@ -260,8 +258,7 @@ public class ProjectsPageTest extends AbstractProcessTest {
     @Test(dependsOnGroups = {"createProject"})
     public void searchProjectWithUnicodeName() {
         String newProjectTitle = "Tiếng Việt ພາສາລາວ résumé";
-        String newProjectId = createBlankProject(getGoodDataClient(), newProjectTitle,
-                testParams.getAuthorizationToken(), testParams.getProjectDriver(), testParams.getProjectEnvironment());
+        String newProjectId = createNewEmptyProject(newProjectTitle);
 
         try {
             initDiscProjectsPage().searchProject(newProjectTitle);
@@ -269,7 +266,7 @@ public class ProjectsPageTest extends AbstractProcessTest {
             assertTrue(projectsPage.hasProject(newProjectTitle), "Project not found");
 
         } finally {
-            ProjectRestUtils.deleteProject(getGoodDataClient(), newProjectId);
+            deleteProject(newProjectId);
         }
     }
 
@@ -312,8 +309,7 @@ public class ProjectsPageTest extends AbstractProcessTest {
         }
 
         return IntStream.rangeClosed(1, 21 - totalProjects)
-                .mapToObj(i -> createBlankProject(getGoodDataClient(), "Test-paging" + i, testParams.getAuthorizationToken(),
-                        testParams.getProjectDriver(), testParams.getProjectEnvironment()))
+                .mapToObj(i -> createNewEmptyProject("Test-paging" + i))
                 .collect(toList());
     }
 

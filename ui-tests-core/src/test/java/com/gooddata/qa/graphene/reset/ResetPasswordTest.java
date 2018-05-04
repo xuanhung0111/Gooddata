@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.reset;
 
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
+import static com.gooddata.qa.graphene.AbstractTest.Profile.DOMAIN;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -7,14 +9,16 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static com.gooddata.qa.graphene.fragments.account.LostPasswordPage.PASSWORD_HINT;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.updateUserPassword;
-import static com.gooddata.qa.utils.http.project.ProjectRestUtils.createBlankProject;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
 import javax.mail.MessagingException;
 
+import com.gooddata.project.Project;
+import com.gooddata.project.ProjectService;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
+import com.gooddata.qa.utils.http.RestClient;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
@@ -22,7 +26,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
-import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.AbstractUITest;
 import com.gooddata.qa.graphene.fragments.account.LostPasswordPage;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
@@ -67,10 +70,7 @@ public class ResetPasswordTest extends AbstractUITest {
     @Test
     public void prepareUserForTest() throws ParseException, JSONException, IOException {
         testUser = createDynamicUserFrom(imapUser);
-
-        GoodData goodDataClient = getGoodDataClient(testUser, testParams.getPassword());
-        testParams.setProjectId(createBlankProject(goodDataClient, "Reset-password-test",
-                testParams.getAuthorizationToken(), testParams.getProjectDriver(), testParams.getProjectEnvironment()));
+        testParams.setProjectId(createNewEmptyProject("Reset-password-test"));
     }
 
     @Test(dependsOnMethods = {"prepareUserForTest"})
@@ -154,5 +154,14 @@ public class ResetPasswordTest extends AbstractUITest {
         } finally {
             updateUserPassword(getRestApiClient(), testParams.getUserDomain(), testUser, NEW_PASSWORD, testParams.getPassword());
         }
+    }
+
+    protected String createNewEmptyProject(String projectTitle) {
+        RestClient restClient = new RestClient(getProfile(ADMIN));
+        final Project project = new Project(projectTitle, testParams.getAuthorizationToken());
+        project.setDriver(testParams.getProjectDriver());
+        project.setEnvironment(testParams.getProjectEnvironment());
+
+        return restClient.getProjectService().createProject(project).get().getId();
     }
 }

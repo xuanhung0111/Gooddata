@@ -19,7 +19,6 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.HamburgerMenu;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -141,7 +140,7 @@ public class MobileDropdownNavigationTest extends AbstractDashboardTest {
 
     @Test(dependsOnMethods = {"testMobileProjectList"})
     public void tearDown() {
-        ProjectRestUtils.deleteProject(goodDataClient, newProjectId);
+       deleteProject(newProjectId);
     }
 
     private boolean isScrollBarVisibleOnNavigation() {

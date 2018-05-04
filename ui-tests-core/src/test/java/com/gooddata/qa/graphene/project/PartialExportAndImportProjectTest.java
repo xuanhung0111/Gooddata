@@ -9,7 +9,6 @@ import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.java.Builder;
 import org.json.JSONException;
 import org.testng.annotations.AfterClass;
@@ -169,7 +168,7 @@ public class PartialExportAndImportProjectTest extends GoodSalesAbstractTest {
 
     @AfterClass
     public void tearDown() {
-        ProjectRestUtils.deleteProject(getGoodDataClient(), targetProjectId);
+        deleteProject(targetProjectId);
         testParams.setProjectId(sourceProjectId);
     }
 }

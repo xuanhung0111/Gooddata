@@ -5,7 +5,6 @@ import static com.gooddata.qa.graphene.enums.ResourceDirectory.UPLOAD_CSV;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.*;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.project.ProjectRestUtils.createBlankProject;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.lang.String.format;
 import static java.lang.String.join;
@@ -33,7 +32,6 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.*;
 import com.gooddata.qa.graphene.fragments.manage.DatasetDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import org.testng.annotations.DataProvider;
 
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFiltersPanel;
@@ -382,9 +380,7 @@ public class AttributeFilteringTest extends AbstractDashboardTest {
         String workingProject = testParams.getProjectId();
         String attributeName = "Name";
 
-        testParams.setProjectId(createBlankProject(getGoodDataClient(),
-                "Delete-Dataset-Having-KPI-Attribute-Filter", testParams.getAuthorizationToken(),
-                testParams.getProjectDriver(), testParams.getProjectEnvironment()));
+        testParams.setProjectId(createNewEmptyProject("Delete-Dataset-Having-KPI-Attribute-Filter"));
         try {
             uploadCSV(getFilePathFromResource(WITHOUT_DATE_CSV_PATH));
             takeScreenshot(browser, "uploaded-" + WITHOUT_DATE_DATASET + "-dataset", getClass());
@@ -418,7 +414,7 @@ public class AttributeFilteringTest extends AbstractDashboardTest {
             assertEquals(initIndigoDashboardsPage().getAttributeFiltersPanel().getAttributeFilters().size(),
                     0, "Attribute filter is not deleted");
         } finally {
-            ProjectRestUtils.deleteProject(getGoodDataClient(), testParams.getProjectId());
+           deleteProject(testParams.getProjectId());
             testParams.setProjectId(workingProject);
         }
     }

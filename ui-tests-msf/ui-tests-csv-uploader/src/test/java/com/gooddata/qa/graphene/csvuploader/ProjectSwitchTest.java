@@ -11,7 +11,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class ProjectSwitchTest extends AbstractCsvUploaderTest {
 
@@ -30,9 +29,7 @@ public class ProjectSwitchTest extends AbstractCsvUploaderTest {
     public void getMoreProject() {
         currentProjectId = testParams.getProjectId();
 
-        newProjectId = ProjectRestUtils.createBlankProject(getGoodDataClient(), NEW_PROJECT_NAME,
-                testParams.getAuthorizationToken(), testParams.getProjectDriver(),
-                testParams.getProjectEnvironment());
+        newProjectId = createNewEmptyProject(NEW_PROJECT_NAME);
     }
 
     @Test(dependsOnGroups = {"precondition"})

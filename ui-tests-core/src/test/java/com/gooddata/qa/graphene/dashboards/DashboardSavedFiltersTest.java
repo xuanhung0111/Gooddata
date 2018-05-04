@@ -16,6 +16,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.json.JSONException;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
@@ -30,7 +32,6 @@ import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget.SavedViewPopupMenu;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class DashboardSavedFiltersTest extends AbstractProjectTest{
 
@@ -86,9 +87,10 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
 
     @Test(dependsOnGroups = {"createProject"}, priority = 2)
     public void checkDisableSavedFiltersFeatureFlagsTest() throws IOException, JSONException {
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         try {
-            ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(),
-                    testParams.getProjectId(), ProjectFeatureFlags.DISABLE_SAVED_FILTERS, true);
+            projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.DISABLE_SAVED_FILTERS, true);
 
             initDashboardsPage();
             browser.navigate().refresh();
@@ -106,8 +108,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
             waitForElementNotVisible(dashboardSettingsDialog.getRoot());
             dashboardEditBar.cancelDashboard();
         } finally {
-            ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(),
-                    testParams.getProjectId(), ProjectFeatureFlags.DISABLE_SAVED_FILTERS, false);
+            projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.DISABLE_SAVED_FILTERS, false);
     
             browser.navigate().refresh();
             waitForDashboardPageLoaded(browser);

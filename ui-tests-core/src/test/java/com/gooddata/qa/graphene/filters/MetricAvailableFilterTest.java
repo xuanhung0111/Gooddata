@@ -15,6 +15,8 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.Availa
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel.Tab;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.io.ResourceUtils;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
@@ -28,7 +30,6 @@ import java.util.stream.Collectors;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
-import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
 import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -86,8 +87,8 @@ public class MetricAvailableFilterTest extends AbstractDashboardWidgetTest {
                 attrEleUris.get(3)), DEFAULT_METRIC_FORMAT);
 
         // turn on the "useAvailableEnabled" feature flag
-        setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.USE_AVAILABLE_ENABLED, true);
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .setFeatureFlagInProject(ProjectFeatureFlags.USE_AVAILABLE_ENABLED, true);
     }
 
     @Test(dependsOnGroups = {"createProject"})

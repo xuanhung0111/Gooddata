@@ -2,10 +2,11 @@ package com.gooddata.qa.graphene.account;
 
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
+import static com.gooddata.qa.graphene.AbstractTest.Profile.DOMAIN;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getCurrentUserProfile;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
@@ -16,6 +17,9 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 import java.util.List;
 
+import com.gooddata.project.Project;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
@@ -39,7 +43,6 @@ import com.gooddata.qa.graphene.fragments.common.StatusBar.Status;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.UserStatus;
 
@@ -91,8 +94,8 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void changeUserLanguage() throws JSONException, IOException {
-        setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.ENABLE_CHANGE_LANGUAGE, true);
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_CHANGE_LANGUAGE, true);
 
         try {
             initAccountPage().changeLanguage("Français");
@@ -100,8 +103,7 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
         } finally {
             initAccountPage().changeLanguage("English US");
             assertEquals(getCurrentUserProfile(getRestApiClient()).getString("language"), "en-US");
-            setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                    ProjectFeatureFlags.ENABLE_CHANGE_LANGUAGE, false);
+            projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_CHANGE_LANGUAGE, false);
         }
     }
 
@@ -188,12 +190,7 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void accessProfileOfDisabledUserButEnabledInOtherProject() throws ParseException, JSONException, IOException {
-        GoodData domainGoodData = getGoodDataClient(
-                testParams.getDomainUser() == null ? testParams.getUser() : testParams.getDomainUser(),
-                        testParams.getPassword());
-        String sameProject = ProjectRestUtils.createProject(domainGoodData, "Copy of " + projectTitle,
-                null,testParams.getAuthorizationToken(), testParams.getProjectDriver(),
-                testParams.getProjectEnvironment());
+        String sameProject = createNewEmptyProject(getProfile(DOMAIN), "Copy of " + projectTitle);
         UserManagementRestUtils.addUserToProject(
                 getDomainUserRestApiClient(), sameProject, testParams.getEditorUser(), UserRoles.EDITOR);
         UserManagementRestUtils.addUserToProject(
@@ -211,10 +208,9 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
             UserManagementRestUtils.updateUserStatusInProject(
                     getDomainUserRestApiClient(), testParams.getProjectId(),
                     testParams.getEditorUser(), UserStatus.ENABLED);
-            ProjectRestUtils.deleteProject(domainGoodData, sameProject);
+            deleteProject(getProfile(DOMAIN), sameProject);
         }
     }
-
     private GoodData getEditorGoodData() {
         if (editorGoodData == null) {
             editorGoodData = getGoodDataClient(testParams.getEditorUser(), testParams.getPassword());

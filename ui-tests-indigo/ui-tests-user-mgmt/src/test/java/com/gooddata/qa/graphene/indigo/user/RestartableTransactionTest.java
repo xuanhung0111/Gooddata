@@ -4,7 +4,10 @@ import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static org.testng.Assert.assertFalse;
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -15,7 +18,6 @@ import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.enums.user.UserStates;
 import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class RestartableTransactionTest extends AbstractUITest {
 
@@ -26,8 +28,9 @@ public class RestartableTransactionTest extends AbstractUITest {
 
     @Test(dependsOnMethods = {"userLogin"}, groups = {"precondition"})
     public void turnOnUserManagementFlag() {
-        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.DISPLAY_USER_MANAGEMENT, true);
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(ADMIN)),
+                testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.DISPLAY_USER_MANAGEMENT, true);
     }
 
     @Test(dependsOnGroups = {"precondition"})

@@ -7,7 +7,6 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.Analysi
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.FilterType;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.DataProvider;
@@ -207,9 +206,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"})
     public void testNoInsightMessageOnInsightListForBlankProject() {
         final String blankProject = "Blank-Project-For-Insight-Test";
-        final String blankProjectId = ProjectRestUtils.createBlankProject(getGoodDataClient(), blankProject,
-                testParams.getAuthorizationToken(), testParams.getProjectDriver(), testParams
-                        .getProjectEnvironment());
+        final String blankProjectId = createNewEmptyProject(blankProject);
         final String insightTestProjectId = testParams.getProjectId();
         testParams.setProjectId(blankProjectId);
         try {
@@ -217,7 +214,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
                     "No insight message is not displayed");
         } finally {
             testParams.setProjectId(insightTestProjectId);
-            ProjectRestUtils.deleteProject(getGoodDataClient(), blankProjectId);
+            deleteProject(blankProjectId);
         }
     }
 
@@ -311,9 +308,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"})
     public void testBlankInsightAfterSwitchingProject() {
         final String blankProject = "Blank-Project-For-Insight-Test";
-        final String blankProjectId = ProjectRestUtils.createBlankProject(getGoodDataClient(),
-                blankProject, testParams.getAuthorizationToken(),
-                testParams.getProjectDriver(), testParams.getProjectEnvironment());
+        final String blankProjectId = createNewEmptyProject(blankProject);
 
         assertFalse(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing().isBlankState(),
                 "Workspace is blank before switching project");
@@ -326,7 +321,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
         } finally {
             testParams.setProjectId(mainProjectId);
             initAnalysePage();
-            ProjectRestUtils.deleteProject(getGoodDataClient(), blankProjectId);
+            deleteProject(blankProjectId);
             assertTrue(browser.getCurrentUrl().contains(mainProjectId));
             assertTrue(analysisPage.isBlankState(), "AD does not show blank state after switching project");
         }

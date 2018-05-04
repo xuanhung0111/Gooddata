@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.dashboards;
 
+import com.gooddata.fixture.ResourceManagement.ResourceTemplate;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.report.WhatItem;
@@ -24,7 +25,8 @@ import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
@@ -44,7 +46,6 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_CREATED;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.GOODSALES_TEMPLATE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
@@ -162,9 +163,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = "createDashboardToShare")
     public void createAdditionalProject() throws JSONException {
-        additionalProjectId = ProjectRestUtils
-                .createProject(getGoodDataClient(), ADDITIONAL_PROJECT_TITLE, GOODSALES_TEMPLATE,
-                        testParams.getAuthorizationToken(), testParams.getProjectDriver(), testParams.getProjectEnvironment());
+        additionalProjectId = createProjectUsingFixture(ADDITIONAL_PROJECT_TITLE, ResourceTemplate.GOODSALES);
     }
 
     @DataProvider(name = "embeddedDashboard")
@@ -471,8 +470,8 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = "createAdditionalProject")
     public void createScheduleOfEmbeddedDashboard() throws JSONException {
-        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS, true);
+        new ProjectRestRequest(new RestClient(getProfile(Profile.DOMAIN)), testParams.getProjectId())
+                .setFeatureFlagInProject(ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS, true);
 
         String defaultScheduleSubject = EMBEDDED_DASHBOARD_NAME + " Dashboard";
 
@@ -522,7 +521,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
     @AfterClass(alwaysRun = true)
     public void cleanUp() throws JSONException {
-        ProjectRestUtils.deleteProject(getGoodDataClient(), additionalProjectId);
+        deleteProject(additionalProjectId);
     }
 
     @Override
