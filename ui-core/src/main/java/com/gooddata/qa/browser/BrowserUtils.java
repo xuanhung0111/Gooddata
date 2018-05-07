@@ -14,6 +14,8 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import com.gooddata.qa.graphene.utils.WaitUtils;
 
 public class BrowserUtils {
+    private static final String MAGIC = "MagicElementClassForPageReload";
+
     public static List<String> getWindowHandles(WebDriver browser) {
         //http://stackoverflow.com/questions/12729265/switch-tabs-using-selenium-webdriver
         return new ArrayList<> (browser.getWindowHandles());
@@ -60,23 +62,31 @@ public class BrowserUtils {
     public static void switchToMainWindow(WebDriver browser) {
         browser.switchTo().defaultContent();
     }
-    
+
+    public static void addMagicElementToDOM(WebDriver browser) {
+        String script = "var magic = document.createElement('div'); magic.className='" + MAGIC + "'; "
+                + "document.getElementsByTagName('body')[0].appendChild(magic);";
+        ((JavascriptExecutor) browser).executeScript(script);
+
+        WaitUtils.waitForElementPresent(By.className(MAGIC), browser);
+    }
+
+    public static boolean isMagicElementPresentInDOM(WebDriver browser) {
+        return browser.findElements(By.className(MAGIC)).size() > 0;
+    }
+
     public static void refreshCurrentPage(WebDriver browser) {
         // Refresh the page and wait until the old content disappears.
         // In general, performing page refresh and locating a page fragment
         // can fail because old fragment is found just before the DOM refresh.
-        
+
         // 1) Insert new element with unique class name
         // It is not possible to locate "body", then refresh and then wait for stale element exception,
         // because Graphene will automatically locate gone element - we must work with element that will disappear.
-        String MAGIC = "MAGICrefreshCurrentPage";
-        String script = "var magic = document.createElement('div'); magic.className='" + MAGIC + "'; "
-                + "document.getElementsByTagName('body')[0].appendChild(magic);";
-        ((JavascriptExecutor) browser).executeScript(script);
-        
-        // 2) Locate magic element, refresh and wait until magic element disappears
-        WebElement magic = browser.findElement(By.className(MAGIC));
+        addMagicElementToDOM(browser);
+
+        // 2) Refresh and wait until magic element disappears
         browser.navigate().refresh();
-        WaitUtils.waitForElementNotPresent(magic);
+        WaitUtils.waitForElementNotPresent(By.className(MAGIC), browser);
     }
 }
