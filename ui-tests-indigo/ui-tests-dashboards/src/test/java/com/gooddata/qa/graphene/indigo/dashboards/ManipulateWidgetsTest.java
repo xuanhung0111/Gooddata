@@ -6,7 +6,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -16,6 +15,8 @@ import static org.testng.Assert.assertTrue;
 import java.util.List;
 import java.util.UUID;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
@@ -40,7 +41,8 @@ public class ManipulateWidgetsTest extends AbstractDashboardTest {
     protected void customizeProject() throws Throwable {
         super.customizeProject();
         final List<String> kpiUris = asList(createAmountKpi(), createLostKpi(), createNumOfActivitiesKpi());
-        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), kpiUris);
+        new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .createAnalyticalDashboard(kpiUris);
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})

@@ -10,6 +10,8 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.jsoup.nodes.Document;
@@ -24,8 +26,6 @@ import java.util.regex.Pattern;
 
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAnalyticalDashboards;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertFalse;
@@ -91,12 +91,14 @@ public class KpiAlertEvaluateTest extends AbstractDashboardTest {
     public void checkKpiAlertEvaluation(Supplier<Metric> metricSupplier, String threshold)
             throws JSONException,IOException, URISyntaxException {
 
+        IndigoRestRequest indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
+                testParams.getProjectId());
         try {
             setupData(CSV_PATH, UPLOADINFO_PATH);
 
             Metric metric = metricSupplier.get();
             String kpiUri = createKpiUsingRest(createDefaultKpiConfigure(metric, dateDatasetUri));
-            createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(kpiUri));
+            indigoRestRequest.createAnalyticalDashboard(singletonList(kpiUri));
 
             initIndigoDashboardsPageWithWidgets();
             setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, threshold);
@@ -115,7 +117,7 @@ public class KpiAlertEvaluateTest extends AbstractDashboardTest {
             assertTrue(kpi.isAlertTriggered(), "Kpi " + metric.getTitle() + " alert is not triggered");
 
         } finally {
-            getMdService().removeObjByUri(getAnalyticalDashboards(restApiClient, testParams.getProjectId()).get(0));
+            getMdService().removeObjByUri(indigoRestRequest.getAnalyticalDashboards().get(0));
         }
     }
 
@@ -131,13 +133,15 @@ public class KpiAlertEvaluateTest extends AbstractDashboardTest {
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "viewPermissionProviderNonEmbeddedModeWithHidingParams",
             groups = "desktop")
     public void testShowingNavigationParamInAlertEmail(String params) throws JSONException, IOException {
+        IndigoRestRequest indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
+                testParams.getProjectId());
         try {
             setupData(CSV_PATH, UPLOADINFO_PATH);
 
             Metric metric = createMetric("Metric-" + generateHashString(),
                     format("select sum([%s])", factUri), "#,##0.00");
             String kpiUri = createKpiUsingRest(createDefaultKpiConfigure(metric, dateDatasetUri));
-            createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(kpiUri));
+            indigoRestRequest.createAnalyticalDashboard(singletonList(kpiUri));
 
             initIndigoDashboardsPageWithWidgets(params);
             setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, "2");
@@ -148,7 +152,7 @@ public class KpiAlertEvaluateTest extends AbstractDashboardTest {
             assertFalse(browser.getCurrentUrl().contains(params),
                     "Dashboard clicked from alert email should not contain showNavigation param");
         } finally {
-            getMdService().removeObjByUri(getAnalyticalDashboards(restApiClient, testParams.getProjectId()).get(0));
+            getMdService().removeObjByUri(indigoRestRequest.getAnalyticalDashboards().get(0));
         }
     }
 

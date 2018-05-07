@@ -4,7 +4,6 @@ import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.UPLOAD_CSV;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.*;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.lang.String.format;
 import static java.lang.String.join;
@@ -21,6 +20,8 @@ import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
@@ -31,7 +32,6 @@ import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.*;
 import com.gooddata.qa.graphene.fragments.manage.DatasetDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
-import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
 import org.testng.annotations.DataProvider;
 
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFiltersPanel;
@@ -45,6 +45,7 @@ public class AttributeFilteringTest extends AbstractDashboardTest {
     private static String TEST_INSIGHT = "Test-Insight";
     private static final String WITHOUT_DATE_CSV_PATH = "/" + UPLOAD_CSV + "/without.date.csv";
     private static final String WITHOUT_DATE_DATASET = "Without Date";
+    private IndigoRestRequest indigoRestRequest;
 
     @Override
     public void initProperties() {
@@ -63,12 +64,12 @@ public class AttributeFilteringTest extends AbstractDashboardTest {
         getMetricCreator().createNumberOfActivitiesMetric();
         getMetricCreator().createAmountMetric();
         getMetricCreator().createNumberOfWonOppsMetric();
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
 
         String insightWidget = createInsightWidget(new InsightMDConfiguration(TEST_INSIGHT, ReportType.COLUMN_CHART)
                 .setMeasureBucket(singletonList(MeasureBucket.createSimpleMeasureBucket(getMdService().getObj(getProject(),
                         Metric.class, title(METRIC_NUMBER_OF_ACTIVITIES))))));
-        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
-                asList(createAmountKpi(), insightWidget));
+        indigoRestRequest.createAnalyticalDashboard(asList(createAmountKpi(), insightWidget));
     }
 
     @DataProvider(name = "widgetTypeProvider")
@@ -171,8 +172,7 @@ public class AttributeFilteringTest extends AbstractDashboardTest {
                             .getValue(),
                     "$33,622.95", "Kpi value is not correct after refresh");
         } finally {
-            IndigoRestUtils.deleteAttributeFilterIfExist(getRestApiClient(), testParams.getProjectId(),
-                    getAttributeDisplayFormUri(ATTR_OPP_SNAPSHOT));
+            indigoRestRequest.deleteAttributeFilterIfExist(getAttributeDisplayFormUri(ATTR_OPP_SNAPSHOT));
         }
     }
 
@@ -199,8 +199,7 @@ public class AttributeFilteringTest extends AbstractDashboardTest {
                             .getValue(),
                     "$116,625,456.54", "Kpi value is not correct after refresh");
         } finally {
-            IndigoRestUtils.deleteAttributeFilterIfExist(getRestApiClient(), testParams.getProjectId(),
-                    getAttributeDisplayFormUri(ATTR_OPP_SNAPSHOT));
+            indigoRestRequest.deleteAttributeFilterIfExist(getAttributeDisplayFormUri(ATTR_OPP_SNAPSHOT));
         }
     }
 
@@ -414,7 +413,7 @@ public class AttributeFilteringTest extends AbstractDashboardTest {
             assertEquals(initIndigoDashboardsPage().getAttributeFiltersPanel().getAttributeFilters().size(),
                     0, "Attribute filter is not deleted");
         } finally {
-           deleteProject(testParams.getProjectId());
+            deleteProject(testParams.getProjectId());
             testParams.setProjectId(workingProject);
         }
     }
@@ -452,8 +451,7 @@ public class AttributeFilteringTest extends AbstractDashboardTest {
 
     private void deleteAttributeFilters(Collection<String> attributes) throws IOException, JSONException {
         for (String att : attributes) {
-            IndigoRestUtils.deleteAttributeFilterIfExist(getRestApiClient(), testParams.getProjectId(),
-                    getAttributeDisplayFormUri(att));
+            indigoRestRequest.deleteAttributeFilterIfExist(getAttributeDisplayFormUri(att));
         }
     }
 

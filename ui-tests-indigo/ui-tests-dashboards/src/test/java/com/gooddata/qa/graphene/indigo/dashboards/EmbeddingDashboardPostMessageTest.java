@@ -4,7 +4,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -15,6 +14,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,11 +33,13 @@ public class EmbeddingDashboardPostMessageTest extends AbstractDashboardTest {
     private static final By FANCYBOX_LOADED = By.className("fancybox-opened");
 
     private String dashboardOnlyUser;
+    private IndigoRestRequest indigoRestRequest;
 
     @Override
     protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
         createAndAddUserToProject(UserRoles.VIEWER);
         dashboardOnlyUser = createAndAddUserToProject(UserRoles.DASHBOARD_ONLY);
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
     }
 
     @Override
@@ -46,8 +49,7 @@ public class EmbeddingDashboardPostMessageTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testPostMessageForDashboardLoadEvent() throws JSONException, IOException {
-        String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
-                singletonList(createAmountKpi()));
+        String dashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(createAmountKpi()));
 
         try {
             initEmbeddedIndigoDashboardPageByIframe()
@@ -105,8 +107,7 @@ public class EmbeddingDashboardPostMessageTest extends AbstractDashboardTest {
         logout();
         signInAtUI(user,password);
 
-        String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
-                singletonList(createAmountKpi()));
+        String dashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(createAmountKpi()));
 
         try {
             tryToInitEmbeddedIndigoDashboardPage();
@@ -129,8 +130,7 @@ public class EmbeddingDashboardPostMessageTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testPostMessageForUpdateDashboard() throws JSONException, IOException {
-        String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
-                singletonList(createAmountKpi()));
+        String dashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(createAmountKpi()));
 
         try {
             initEmbeddedIndigoDashboardPageByIframe()
@@ -167,8 +167,7 @@ public class EmbeddingDashboardPostMessageTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "editDeniedUserProvider")
     public void testPostMessageForEditDeniedUser(UserRoles role) throws JSONException, IOException {
-        String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
-                singletonList(createAmountKpi()));
+        String dashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(createAmountKpi()));
 
         logoutAndLoginAs(role);
 

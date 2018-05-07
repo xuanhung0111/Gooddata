@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_EOP;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteDashboardsUsingCascade;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
@@ -13,17 +12,21 @@ import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
-import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
 import java.io.IOException;
+
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
 public class KpiPermissionsTest extends AbstractDashboardTest {
-
+    private IndigoRestRequest indigoRestRequest;
     @Override
     protected void customizeProject() throws Throwable {
         getMetricCreator().createAmountMetric();
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
+                testParams.getProjectId());
     }
 
     @Override
@@ -59,9 +62,8 @@ public class KpiPermissionsTest extends AbstractDashboardTest {
             assertThat(indigoDashboardsPage.isOnEditMode(), is(false));
             assertThat(indigoDashboardsPage.getDashboardTitle(), equalTo(dashboardTitle));
             assertThat(indigoDashboardsPage.getDashboardTitles(), contains(dashboardTitle));
-            assertThat(browser.getCurrentUrl().endsWith(IndigoRestUtils
-                    .getAnalyticalDashboardIdentifier(dashboardTitle, getRestApiClient(),
-                            testParams.getProjectId())), is(true));
+            assertThat(browser.getCurrentUrl().endsWith(indigoRestRequest
+                    .getAnalyticalDashboardIdentifier(dashboardTitle)), is(true));
         } finally {
             deleteDashboard(dashboardTitle);
         }
@@ -87,18 +89,16 @@ public class KpiPermissionsTest extends AbstractDashboardTest {
             assertThat(indigoDashboardsPage.getDashboardTitle(), equalTo(newTitle));
             assertThat(indigoDashboardsPage.getFirstWidget(Kpi.class).getHeadline(),
                     equalTo(METRIC_SNAPSHOT_EOP));
-            assertThat(browser.getCurrentUrl().endsWith(IndigoRestUtils
-                    .getAnalyticalDashboardIdentifier(newTitle, getRestApiClient(),
-                            testParams.getProjectId())), is(true));
+            assertThat(browser.getCurrentUrl().endsWith(indigoRestRequest
+                    .getAnalyticalDashboardIdentifier(newTitle)), is(true));
         } finally {
-            deleteDashboardsUsingCascade(getRestApiClient(), testParams.getProjectId());
+            indigoRestRequest.deleteDashboardsUsingCascade();
         }
     }
 
     private void deleteDashboard(String dashboardTitle) throws IOException, JSONException {
-        IndigoRestUtils.deleteAnalyticalDashboard(getRestApiClient(), IndigoRestUtils
-                .getAnalyticalDashboardUri(dashboardTitle, getRestApiClient(),
-                        testParams.getProjectId()));
+        indigoRestRequest.deleteAnalyticalDashboard(indigoRestRequest
+                .getAnalyticalDashboardUri(dashboardTitle));
     }
 
 }

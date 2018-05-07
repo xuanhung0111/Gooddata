@@ -5,8 +5,6 @@ import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_DROPS_BELOW;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createKpiWidget;
 import static java.lang.String.format;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
@@ -19,6 +17,8 @@ import java.util.UUID;
 
 import javax.mail.MessagingException;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.jsoup.nodes.Document;
@@ -79,11 +79,13 @@ public class KpiValueFormatInAlertEmailTest extends AbstractDashboardTest {
                 new Metric(generateUniqueMetricName(), maqlExpression, "[>5000]#,##0.0 VND"));
 
         List<String> kpiUris = new ArrayList<>();
+        IndigoRestRequest indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
+                testParams.getProjectId());
 
         for (Metric metric : metrics) {
             kpiNames.add(metric.getTitle());
 
-            kpiUris.add(createKpiWidget(getRestApiClient(), testParams.getProjectId(),
+            kpiUris.add(indigoRestRequest.createKpiWidget(
                     new KpiMDConfiguration.Builder()
                             .title(metric.getTitle())
                             .metric(getMdService().createObj(getProject(), metric).getUri())
@@ -93,7 +95,7 @@ public class KpiValueFormatInAlertEmailTest extends AbstractDashboardTest {
                             .build()));
         }
 
-        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), kpiUris);
+        indigoRestRequest.createAnalyticalDashboard(kpiUris);
     }
 
     @Test(dependsOnMethods = "initIndigoDashboardWithKpi", groups = "precondition")

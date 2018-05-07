@@ -15,7 +15,9 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import org.apache.http.ParseException;
 import org.json.JSONArray;
@@ -33,9 +35,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_SALES_REP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_ACTIVITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_CLOSE_EOP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
-import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createInsight;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getInsightUri;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -50,6 +49,7 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
     private static final String INSIGHT_HAS_DATE_ATTRIBUTE_AND_MEASURE = "Insight has date attribute and measure";
     private static final String INSIGHT_SHOW_POP = "Insight show POP";
     private static final String INSIGHT_SHOW_PERCENT = "Insight show percent";
+    private IndigoRestRequest indigoRestRequest;
 
     @Override
     public void initProperties() {
@@ -68,6 +68,8 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
         metrics.createNumberOfActivitiesMetric();
         metrics.createCloseEOPMetric();
         metrics.createAmountMetric();
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
+                testParams.getProjectId());
     }
 
     @Test(dependsOnGroups = "createProject")
@@ -75,7 +77,7 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
         createSimpleInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE, METRIC_NUMBER_OF_ACTIVITIES, ATTR_DEPARTMENT);
         createSimpleInsight(INSIGHT_HAS_DATE_ATTRIBUTE_AND_MEASURE, METRIC_NUMBER_OF_ACTIVITIES, ATTR_YEAR_ACTIVITY);
 
-        createInsight(getRestApiClient(), testParams.getProjectId(),
+        indigoRestRequest.createInsight(
             new InsightMDConfiguration(INSIGHT_HAS_ATTRIBUTES_AND_MEASURES, ReportType.TABLE)
                     .setMeasureBucket(asList(
                             MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_NUMBER_OF_ACTIVITIES)),
@@ -84,7 +86,7 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
                             CategoryBucket.createViewByBucket(getAttribute(ATTR_DEPARTMENT)),
                             CategoryBucket.createViewByBucket(getAttribute(ATTR_SALES_REP)))));
 
-        createInsight(getRestApiClient(), testParams.getProjectId(),
+        indigoRestRequest.createInsight(
             new InsightMDConfiguration(INSIGHT_SHOW_PERCENT, ReportType.TABLE)
                     .setMeasureBucket(singletonList(MeasureBucket.createMeasureBucketWithShowInPercent(
                             getMetric(METRIC_NUMBER_OF_ACTIVITIES), true)))
@@ -242,7 +244,7 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
 
     private int countTotalsDefinitions(String insight) throws JSONException, IOException {
         int countTotals = 0;
-        JSONArray buckets = getJsonObject(restApiClient, getInsightUri(insight, getRestApiClient(), testParams.getProjectId()))
+        JSONArray buckets = indigoRestRequest.getJsonObject(indigoRestRequest.getInsightUri(insight))
             .getJSONObject("visualizationObject")
             .getJSONObject("content")
             .getJSONArray("buckets");
@@ -266,7 +268,7 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
     }
 
     private void createSimpleInsight(String title, String metric, String attribute) {
-        createInsight(getRestApiClient(), testParams.getProjectId(),
+        indigoRestRequest.createInsight(
             new InsightMDConfiguration(title, ReportType.TABLE)
                     .setMeasureBucket(singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(metric))))
                     .setCategoryBucket(singletonList(CategoryBucket.createViewByBucket(getAttribute(attribute)))));

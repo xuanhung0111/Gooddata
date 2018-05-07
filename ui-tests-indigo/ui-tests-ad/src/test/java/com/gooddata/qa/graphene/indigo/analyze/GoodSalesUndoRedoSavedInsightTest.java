@@ -5,7 +5,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAllInsightNames;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -14,6 +13,8 @@ import static java.util.Arrays.asList;
 import java.io.IOException;
 import java.text.ParseException;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
@@ -170,14 +171,15 @@ public class GoodSalesUndoRedoSavedInsightTest extends AbstractAnalyseTest {
     private void checkUndoRedoAfterSaveInsight() throws JSONException, IOException {
         final AnalysisPageHeader header = analysisPage.getPageHeader();
         final String savedTitle = header.getInsightTitle();
-        final int numberOfInsights = getAllInsightNames(getRestApiClient(), testParams.getProjectId()).size();
+        final IndigoRestRequest indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        final int numberOfInsights = indigoRestRequest.getAllInsightNames().size();
         
         analysisPage.undo().waitForReportComputing();
         assertEquals(header.getInsightTitle(), savedTitle,
                 "The expected title is NOT displayed after undo");
         assertTrue(header.isUnsavedMessagePresent(), "Unsaved notification is not displayed after undo");
         assertTrue(header.isSaveButtonEnabled(), "Save button is not enabled after undo");
-        assertEquals(getAllInsightNames(getRestApiClient(), testParams.getProjectId()).size(),
+        assertEquals(indigoRestRequest.getAllInsightNames().size(),
                 numberOfInsights, "The insight does not exist after undo");
 
         analysisPage.redo().waitForReportComputing();

@@ -4,8 +4,6 @@ import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createKpiWidget;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
@@ -20,6 +18,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -79,7 +79,8 @@ public class KpiPopChangeValueExceedLimitTest extends AbstractDashboardTest {
         String numberMetricUri = getMdService().createObj(getProject(), new Metric(METRIC_NUMBER, maqlExpression, "#,##0"))
                 .getUri();
 
-        String sumOfNumberKpi = createKpiWidget(getRestApiClient(), testParams.getProjectId(),
+        IndigoRestRequest indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        String sumOfNumberKpi = indigoRestRequest.createKpiWidget(
                 new KpiMDConfiguration.Builder()
                 .title("Number")
                 .metric(numberMetricUri)
@@ -88,7 +89,7 @@ public class KpiPopChangeValueExceedLimitTest extends AbstractDashboardTest {
                 .comparisonDirection(ComparisonDirection.GOOD)
                 .build());
 
-        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(sumOfNumberKpi));
+        indigoRestRequest.createAnalyticalDashboard(singletonList(sumOfNumberKpi));
     }
 
     @Test(dependsOnGroups = "precondition", groups = {"desktop", "mobile"})

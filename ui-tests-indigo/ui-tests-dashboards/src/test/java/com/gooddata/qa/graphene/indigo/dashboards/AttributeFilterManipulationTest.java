@@ -3,11 +3,11 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFiltersPanel;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
-import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.json.JSONException;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.interactions.Actions;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -22,7 +22,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
 import static java.lang.String.join;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
@@ -30,6 +29,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 public class AttributeFilterManipulationTest extends AbstractDashboardTest {
+    private IndigoRestRequest indigoRestRequest;
 
     @Override
     public void initProperties() {
@@ -39,8 +39,9 @@ public class AttributeFilterManipulationTest extends AbstractDashboardTest {
 
     @Override
     protected void customizeProject() throws Throwable {
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         getMetricCreator().createAmountMetric();
-        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
+        indigoRestRequest.createAnalyticalDashboard(singletonList(createAmountKpi()));
         initIndigoDashboardsPageWithWidgets().switchToEditMode().addAttributeFilter(ATTR_ACCOUNT)
                 .saveEditModeWithWidgets();
     }
@@ -121,8 +122,7 @@ public class AttributeFilterManipulationTest extends AbstractDashboardTest {
                     indigoDashboardsPage.getWidgetByHeadline(Kpi.class, METRIC_AMOUNT).getValue(),
                     "$8,218,356.06", "The kpi value is not correct after switching to edit mode");
         } finally {
-            IndigoRestUtils.deleteAttributeFilterIfExist(getRestApiClient(), testParams.getProjectId(),
-                    getAttributeDisplayFormUri(ATTR_STAGE_NAME));
+            indigoRestRequest.deleteAttributeFilterIfExist(getAttributeDisplayFormUri(ATTR_STAGE_NAME));
         }
     }
 
@@ -199,8 +199,7 @@ public class AttributeFilterManipulationTest extends AbstractDashboardTest {
             assertTrue(indigoDashboardsPage.getAttributeFiltersPanel().isFilterVisible(ATTR_PRODUCT),
                     "The attribute filter named " + ATTR_PRODUCT + "is removed after user reloads page");
         } finally {
-            IndigoRestUtils.deleteAttributeFilterIfExist(getRestApiClient(), testParams.getProjectId(),
-                    getAttributeDisplayFormUri(ATTR_PRODUCT));
+            indigoRestRequest.deleteAttributeFilterIfExist(getAttributeDisplayFormUri(ATTR_PRODUCT));
         }
     }
 
@@ -223,8 +222,7 @@ public class AttributeFilterManipulationTest extends AbstractDashboardTest {
                             .getAttributeFiltersPanel().isFilterVisible(ATTR_PRIORITY),
                     "The attribute filter" + " named " + ATTR_PRIORITY + " is displayed after user reloads page");
         } finally {
-            IndigoRestUtils.deleteAttributeFilterIfExist(getRestApiClient(), testParams.getProjectId(),
-                    getAttributeDisplayFormUri(ATTR_PRIORITY));
+            indigoRestRequest.deleteAttributeFilterIfExist(getAttributeDisplayFormUri(ATTR_PRIORITY));
         }
     }
 

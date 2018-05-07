@@ -3,6 +3,8 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import com.google.common.collect.Ordering;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -15,8 +17,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteAnalyticalDashboard;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -27,12 +27,15 @@ import static org.testng.Assert.assertTrue;
 public class KpiDashboardsTest extends AbstractDashboardTest {
 
     private static final String ALL_TIME = "All time";
+    private IndigoRestRequest indigoRestRequest;
 
     @Override
     protected void customizeProject() {
-        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
-                singletonList(createNumOfActivitiesKpi()), METRIC_NUMBER_OF_ACTIVITIES);
-        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createLostKpi()), METRIC_LOST);
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
+                testParams.getProjectId());
+        indigoRestRequest.createAnalyticalDashboard(singletonList(createNumOfActivitiesKpi()),
+                METRIC_NUMBER_OF_ACTIVITIES);
+        indigoRestRequest.createAnalyticalDashboard(singletonList(createLostKpi()), METRIC_LOST);
     }
 	
     @Override
@@ -87,8 +90,8 @@ public class KpiDashboardsTest extends AbstractDashboardTest {
     public void kpiDashboardsSortByAlphabetTest(UserRoles role) throws JSONException {
         String urlAmountKpiDashboard;
         logoutAndLoginAs(true, role);
-        urlAmountKpiDashboard = createAnalyticalDashboard(
-                getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()), METRIC_AMOUNT);
+        urlAmountKpiDashboard = indigoRestRequest.createAnalyticalDashboard(singletonList(createAmountKpi()),
+                METRIC_AMOUNT);
         try {
             initIndigoDashboardsPageWithWidgets();
             assertFalse(indigoDashboardsPage.isOnEditMode(), "should be on View Mode");
@@ -96,7 +99,7 @@ public class KpiDashboardsTest extends AbstractDashboardTest {
             assertTrue(Ordering.natural().isOrdered(indigoDashboardsPage.getDashboardTitles()),
                     "New kpi dashboards should be sorted by alphabet in list");
         } finally {
-            deleteAnalyticalDashboard(getRestApiClient(), urlAmountKpiDashboard);
+            indigoRestRequest.deleteAnalyticalDashboard(urlAmountKpiDashboard);
             logoutAndLoginAs(true, UserRoles.ADMIN);
         }
     }

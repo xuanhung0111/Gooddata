@@ -185,33 +185,6 @@ public abstract class AbstractTest extends Arquillian {
         return results;
     }
 
-    /**
-     * Create {@link com.gooddata.qa.utils.http.RestApiClient} for admin user.
-     * The request will be resent if the exception is handled
-     * 
-     * @param maximumTries
-     * @return {@link com.gooddata.qa.utils.http.RestApiClient} client for admin user
-     */
-    public RestApiClient getRepeatableRestApiClient(int maximumTries) {
-        return new RestApiClient(testParams.getHost(), testParams.getUser(), testParams.getPassword(), true, false,
-                new HttpRequestRetryHandler() {
-                    @Override
-                    public boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
-                        if (executionCount > maximumTries) {
-                            return false;
-                        }
-
-                        if (exception instanceof NoHttpResponseException) {
-                            log.info("Catch NoHttpResponseException: retry count = " + executionCount);
-                            Sleeper.sleepTightInSeconds(2);
-                            return true;
-                        }
-
-                        return false;
-                    }
-                });
-    }
-
     protected RestProfile getProfile(Profile profile) {
         String username;
         String password;

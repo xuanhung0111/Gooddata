@@ -10,12 +10,13 @@ import static java.lang.String.format;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
 import static java.util.Collections.singletonList;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
 
 import java.io.IOException;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
@@ -42,12 +43,15 @@ public class EmbeddingSingleDashboardTest extends AbstractDashboardTest {
             + "\nAsk your administrator to grant you permissions.";
 
     private String dashboardOnlyUser;
+    private IndigoRestRequest indigoRestRequest;
 
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
         getMetricCreator().createAmountMetric();
         getMetricCreator().createLostMetric();
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
+                testParams.getProjectId());
     }
 
     @DataProvider(name = "editPermissionProvider")
@@ -63,8 +67,7 @@ public class EmbeddingSingleDashboardTest extends AbstractDashboardTest {
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "editPermissionProvider")
     public void loginEmbeddedDashboardWithEditPermission(UserRoles role, EmbeddedType type)
             throws JSONException, IOException {
-        String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
-                singletonList(createAmountKpi()));
+        String dashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(createAmountKpi()));
 
         if (role != UserRoles.ADMIN) {
             logoutAndLoginAs(role);
@@ -132,8 +135,7 @@ public class EmbeddingSingleDashboardTest extends AbstractDashboardTest {
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "viewPermissionProvider")
     public void loginEmbeddedDashboardWithViewPermission(UserRoles role, EmbeddedType type)
             throws JSONException, IOException {
-        String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
-                singletonList(createAmountKpi()));
+        String dashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(createAmountKpi()));
         logoutAndLoginAs(role);
 
         try {
@@ -179,8 +181,7 @@ public class EmbeddingSingleDashboardTest extends AbstractDashboardTest {
     public void loginEmbeddedDashboardWithUnauthorizedUser(EmbeddedType type)
             throws ParseException, JSONException, IOException {
         String unauthorizedUser = createDynamicUserFrom(testParams.getUser());
-        String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
-                singletonList(createAmountKpi()));
+        String dashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(createAmountKpi()));
 
         logout();
         signInAtGreyPages(unauthorizedUser, testParams.getPassword());
@@ -218,8 +219,7 @@ public class EmbeddingSingleDashboardTest extends AbstractDashboardTest {
                 .drillToDashboardTab(TAB_OUTLOOK_IDENTIFIER)
                 .build());
 
-        String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
-                singletonList(drillKpiUri));
+        String dashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(drillKpiUri));
 
         try {
             IndigoDashboardsPage indigoDashboardsPage = initEmbeddedIndigoDashboardPageByType(type)
@@ -247,8 +247,7 @@ public class EmbeddingSingleDashboardTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "embeddedTypeProvider")
     public void setAlertInEmbeddedDashboard(EmbeddedType type) throws JSONException, IOException {
-        String dashboardUri = createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
-                singletonList(createAmountKpi()));
+        String dashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(createAmountKpi()));
 
         try {
             IndigoDashboardsPage indigoDashboardsPage = initEmbeddedIndigoDashboardPageByType(type)

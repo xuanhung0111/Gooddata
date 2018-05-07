@@ -5,8 +5,6 @@ import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialo
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteWidgetsUsingCascade;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -17,7 +15,10 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
+import com.gooddata.qa.utils.java.RetryCommand;
+import org.apache.http.NoHttpResponseException;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.ITestContext;
@@ -36,6 +37,7 @@ public class EditModeTest extends AbstractDashboardTest {
     private static final int MAXIMUM_TRIES = 2;
 
     private boolean isMobileRunning;
+    private IndigoRestRequest indigoRestRequest;
 
     @BeforeClass(alwaysRun = true)
     public void addUsersOnDesktopExecution(ITestContext context) {
@@ -53,15 +55,13 @@ public class EditModeTest extends AbstractDashboardTest {
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         getMetricCreator().createNumberOfActivitiesMetric();
         getMetricCreator().createAmountMetric();
-        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
-    }
-
-    @Override
-    public RestApiClient getRestApiClient() {
         // see https://jira.intgdc.com/browse/QA-6170
-        return getRepeatableRestApiClient(MAXIMUM_TRIES);
+        new RetryCommand(MAXIMUM_TRIES)
+                .retryOnException(NoHttpResponseException.class,
+                        () -> indigoRestRequest.createAnalyticalDashboard(singletonList(createAmountKpi())));
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
@@ -134,7 +134,9 @@ public class EditModeTest extends AbstractDashboardTest {
                     .getConfigurationPanel()
                     .waitForAlertEditWarning();
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            new RetryCommand(MAXIMUM_TRIES)
+                    .retryOnException(NoHttpResponseException.class,
+                            () -> indigoRestRequest.deleteWidgetsUsingCascade(kpiUri));
         }
     }
 
@@ -163,7 +165,9 @@ public class EditModeTest extends AbstractDashboardTest {
                     .getConfigurationPanel()
                     .waitForAlertEditWarning();
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            new RetryCommand(MAXIMUM_TRIES)
+                    .retryOnException(NoHttpResponseException.class,
+                            () -> indigoRestRequest.deleteWidgetsUsingCascade(kpiUri));
         }
     }
 
@@ -197,7 +201,9 @@ public class EditModeTest extends AbstractDashboardTest {
                     .getKpiAlertMessage(), containsString("2 alerts"));
 
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            new RetryCommand(MAXIMUM_TRIES)
+                    .retryOnException(NoHttpResponseException.class,
+                            () -> indigoRestRequest.deleteWidgetsUsingCascade(kpiUri));
         }
     }
 
@@ -239,7 +245,9 @@ public class EditModeTest extends AbstractDashboardTest {
             assertEquals(kpi.getHeadline(), METRIC_NUMBER_OF_ACTIVITIES);
 
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            new RetryCommand(MAXIMUM_TRIES)
+                    .retryOnException(NoHttpResponseException.class,
+                            () -> indigoRestRequest.deleteWidgetsUsingCascade(kpiUri));
         }
     }
 

@@ -9,9 +9,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AVG_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteWidgetsUsingCascade;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getKpiUri;
 import static com.gooddata.qa.utils.mail.ImapUtils.areMessagesArrived;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
@@ -23,6 +20,8 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 import java.util.UUID;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.DataProvider;
@@ -43,6 +42,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
 
     private static final String KPI_ALERT_DIALOG_HEADER = "Email me when this KPI is";
     private static final String KPI_ALERT_THRESHOLD = "100"; // TODO: consider parsing value from KPI to avoid immediate alert trigger
+    private IndigoRestRequest indigoRestRequest;
 
     @Override
     public void initProperties() {
@@ -54,8 +54,10 @@ public class KpiAlertTest extends AbstractDashboardTest {
 
     @Override
     protected void customizeProject() throws Throwable {
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
+                testParams.getProjectId());
         getMetricCreator().createAvgAmountMetric();
-        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
+        indigoRestRequest.createAnalyticalDashboard(singletonList(createAmountKpi()));
     }
 
     @Override
@@ -74,8 +76,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
             takeScreenshot(browser, "checkNewKpiDoesNotHaveAlertSet", getClass());
             assertFalse(getLastKpiAfterAlertsLoaded().hasSetAlert());
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(),
-                    getKpiUri(METRIC_AVG_AMOUNT, getRestApiClient(), testParams.getProjectId()));
+            indigoRestRequest.deleteWidgetsUsingCascade(indigoRestRequest.getKpiUri(METRIC_AVG_AMOUNT));
         }
     }
 
@@ -120,7 +121,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
             takeScreenshot(browser, "checkAddKpiAlert", getClass());
             assertTrue(getLastKpiAfterAlertsLoaded().hasSetAlert());
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            indigoRestRequest.deleteWidgetsUsingCascade(kpiUri);
         }
     }
 
@@ -157,7 +158,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
             assertEquals(kpiAlertDialog.getTriggeredWhen(), TRIGGERED_WHEN_DROPS_BELOW);
             assertEquals(kpiAlertDialog.getThreshold(), updatedThreshold);
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            indigoRestRequest.deleteWidgetsUsingCascade(kpiUri);
         }
     }
 
@@ -176,7 +177,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
             takeScreenshot(browser, "checkKpiAlertDialogWithPercentMetric", getClass());
             assertTrue(hasPercentSymbol);
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), percentMetric.getUri());
+            indigoRestRequest.deleteWidgetsUsingCascade(percentMetric.getUri());
         }
     }
 
@@ -205,7 +206,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
             assertTrue(isAlertMessageDisplayed);
 
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            indigoRestRequest.deleteWidgetsUsingCascade(kpiUri);
         }
     }
 
@@ -230,7 +231,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
             assertEquals(dateFilterSelection, DATE_FILTER_THIS_MONTH);
 
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            indigoRestRequest.deleteWidgetsUsingCascade(kpiUri);
         }
     }
 
@@ -283,7 +284,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
             assertEquals(kpiAlertDialogTextBefore, kpiAlertDialogTextAfter);
 
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            indigoRestRequest.deleteWidgetsUsingCascade(kpiUri);
         }
     }
 
@@ -304,7 +305,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
         } finally {
             // working dashboard should not be empty after delete the kpi
             // because following method will delete it in that case
-            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            indigoRestRequest.deleteWidgetsUsingCascade(kpiUri);
         }
     }
 
@@ -324,7 +325,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
 
             dialog.discardAlert();
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            indigoRestRequest.deleteWidgetsUsingCascade(kpiUri);
         }
     }
 

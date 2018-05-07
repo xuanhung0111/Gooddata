@@ -6,8 +6,10 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteAnalyticalDashboard;
 import java.io.IOException;
+
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.json.JSONException;
 import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
@@ -49,7 +51,8 @@ public class RoutingTest extends AbstractDashboardTest {
             initIndigoDashboardsPageWithWidgets();
             assertTrue(browser.getCurrentUrl().contains("/dashboard/"));
         } finally {
-            deleteAnalyticalDashboard(getRestApiClient(), getWorkingDashboardUri());
+            new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                    .deleteAnalyticalDashboard(getWorkingDashboardUri());
         }
     }
 }

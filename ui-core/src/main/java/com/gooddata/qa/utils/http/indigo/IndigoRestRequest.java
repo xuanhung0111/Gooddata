@@ -1,7 +1,6 @@
 package com.gooddata.qa.utils.http.indigo;
 
 import static com.gooddata.qa.utils.http.RestUtils.CREATE_AND_GET_OBJ_LINK;
-import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,6 +9,9 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
+import com.gooddata.qa.utils.http.CommonRestRequest;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.RestRequest;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.ParseException;
 import org.json.JSONArray;
@@ -21,18 +23,17 @@ import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
-import com.gooddata.qa.utils.http.RestApiClient;
-
-import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
-import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static java.lang.String.format;
 
 /**
- * REST utilities for Indigo task
+ * REST request for Indigo task
  */
-public class IndigoRestUtils {
+public class IndigoRestRequest extends CommonRestRequest{
 
-    private static final Logger log = Logger.getLogger(IndigoRestUtils.class.getName());
+    public IndigoRestRequest(final RestClient restClient, final String projectId){
+        super(restClient, projectId);
+    }
+    private static final Logger log = Logger.getLogger(IndigoRestRequest.class.getName());
 
     private static final Supplier<String> ANALYTICAL_DASHBOARD_BODY = () -> {
         try {
@@ -94,60 +95,49 @@ public class IndigoRestUtils {
      * Get uri for specific analytical dashboard
      *
      * @param dashboardTitle dashboard title / name
-     * @param restApiClient rest client
-     * @param projectId project ID
      * @return Uri of analytical dashboard
      * @throws JSONException
      * @throws IOException
      */
-    public static String getAnalyticalDashboardUri(final String dashboardTitle, final RestApiClient restApiClient,
-            final String projectId) throws JSONException, IOException {
-        return getMdObjectValue(restApiClient, projectId, "analyticaldashboard",
+    public String getAnalyticalDashboardUri(final String dashboardTitle) throws JSONException, IOException {
+        return getMdObjectValue("analyticaldashboard",
                 jsonObj -> dashboardTitle.equals(jsonObj.getString("title")), jsonObj -> jsonObj.getString("link"));
     }
 
     /**
      * Get analytical dashboards of a project
      *
-     * @param restApiClient
-     * @param projectId
      * @return list of analytical dashboard links
      * @throws org.json.JSONException
      * @throws java.io.IOException
      */
-    public static List<String> getAnalyticalDashboards(final RestApiClient restApiClient, final String projectId)
+    public List<String> getAnalyticalDashboards()
             throws JSONException, IOException {
-        return getMdObjectValues(restApiClient, projectId, "analyticaldashboard", jsonObj -> jsonObj.getString("link"));
+        return getMdObjectValues("analyticaldashboard", jsonObj -> jsonObj.getString("link"));
     }
 
     /**
      * Get identifier of analytical dashboard
      *
      * @param dashboardTitle dashboard title / name
-     * @param restApiClient rest client
-     * @param projectId project ID
      * @return identifier of analytical dashboard
      * @throws JSONException
      * @throws IOException
      */
-    public static String getAnalyticalDashboardIdentifier(final String dashboardTitle, final RestApiClient restApiClient,
-            final String projectId) throws JSONException, IOException {
-        return getMdObjectValue(restApiClient, projectId, "analyticaldashboard",
+    public String getAnalyticalDashboardIdentifier(final String dashboardTitle) throws JSONException, IOException {
+        return getMdObjectValue("analyticaldashboard",
                 jsonObj -> dashboardTitle.equals(jsonObj.getString("title")), jsonObj -> jsonObj.getString("identifier"));
     }
 
     /**
      * Create KPI widget
      *
-     * @param restApiClient
-     * @param projectId
      * @param kpiConfig
      * @return KPI uri
      * @throws org.json.JSONException
      * @throws java.io.IOException
      */
-    public static String createKpiWidget(final RestApiClient restApiClient, final String projectId,
-            final KpiMDConfiguration kpiConfig) throws JSONException, IOException {
+    public String createKpiWidget(final KpiMDConfiguration kpiConfig) throws JSONException, IOException {
         String content = KPI_WIDGET_BODY.get()
                 .replace("${title}", kpiConfig.getTitle())
                 .replace("${metric}", kpiConfig.getMetric())
@@ -177,8 +167,8 @@ public class IndigoRestUtils {
             content = contentJson.toString();
         }
 
-        return getJsonObject(restApiClient,
-                restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId), content))
+        return getJsonObject(
+                RestRequest.initPostRequest(format(CREATE_AND_GET_OBJ_LINK, projectId), content))
                     .getJSONObject("kpi")
                     .getJSONObject("meta")
                     .getString("uri");
@@ -188,18 +178,16 @@ public class IndigoRestUtils {
      * Get uri of the visualizationClass for given visualization type (GD custom visualizations)
      * Currently visualizationClass's content.url for gd visualizations is "local:<visualizationType>"
      *
-     * @param restApiClient
-     * @param projectId
      * @param type visualization type, e.g. table, bar...
      * @return visualizationClass uri
      * @throws org.json.JSONException
      * @throws java.io.IOException
      */
-    public static String getVisualizationClassUri(final RestApiClient restApiClient, final String projectId, final String type) throws JSONException, IOException {
+    public String getVisualizationClassUri(final String type) throws JSONException, IOException {
         final String queryUri = "/gdc/md/" + projectId + "/objects/query?category=visualizationClass&limit=50";
         final String localType = "local:" + type;
 
-        final JSONArray visualizationClasses = getJsonObject(restApiClient, queryUri)
+        final JSONArray visualizationClasses = getJsonObject(queryUri)
             .getJSONObject("objects")
             .getJSONArray("items");
 
@@ -217,18 +205,15 @@ public class IndigoRestUtils {
      * Create an insight. Currently, the insight could be a combination of measure, view by
      * and stack by.
      *
-     * @param restApiClient
-     * @param projectId
      * @param insightConfig
      * @return insight uri
      */
-    public static String createInsight(final RestApiClient restApiClient, final String projectId,
-                                       final InsightMDConfiguration insightConfig) {
+    public String createInsight(final InsightMDConfiguration insightConfig) {
         String jsonObject;
         try {
-            String visualizationClassUri = getVisualizationClassUri(restApiClient, projectId, insightConfig.getType().getLabel());
-            jsonObject = getJsonObject(restApiClient,
-                    restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId),
+            String visualizationClassUri = getVisualizationClassUri(insightConfig.getType().getLabel());
+            jsonObject = getJsonObject(
+                    RestRequest.initPostRequest(format(CREATE_AND_GET_OBJ_LINK, projectId),
                             initInsightObject(visualizationClassUri, insightConfig).toString())).getJSONObject("visualizationObject")
                     .getJSONObject("meta").getString("uri");
         } catch (ParseException | JSONException | IOException e) {
@@ -240,22 +225,20 @@ public class IndigoRestUtils {
     /**
      * Create Visualization widget wrap
      *
-     * @param restApiClient
-     * @param projectId
      * @param visualizationTitle
      * @param visualizationUri
      * @return Visualization widget uri
      * @throws org.json.JSONException
      * @throws java.io.IOException
      */
-    public static String createVisualizationWidget(final RestApiClient restApiClient, final String projectId,
-            final String visualizationUri, final String visualizationTitle) throws JSONException, IOException {
+    public String createVisualizationWidget(final String visualizationUri, final String visualizationTitle)
+            throws JSONException, IOException {
         String content = VISUALIZATION_WIDGET_BODY.get()
                 .replace("${title}", visualizationTitle)
                 .replace("${visualization}", visualizationUri);
 
-        JSONObject response = getJsonObject(restApiClient,
-                restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId), content));
+        JSONObject response = getJsonObject(
+                RestRequest.initPostRequest(format(CREATE_AND_GET_OBJ_LINK, projectId), content));
 
         return response
                     .getJSONObject("visualizationWidget")
@@ -266,35 +249,30 @@ public class IndigoRestUtils {
     /**
      * Add widget to analytical dashboard
      *
-     * @param restApiClient
-     * @param projectId
      * @param dashboardUri
      * @param widgetUri
      * @throws org.json.JSONException
      * @throws java.io.IOException
      */
-    public static void addWidgetToAnalyticalDashboard(final RestApiClient restApiClient, final String projectId,
-            final String dashboardUri, final String widgetUri) throws JSONException, IOException {
-        final JSONObject dashboard = getJsonObject(restApiClient, dashboardUri);
+    public void addWidgetToAnalyticalDashboard(final String dashboardUri, final String widgetUri)
+            throws JSONException, IOException {
+        final JSONObject dashboard = getJsonObject(dashboardUri);
         dashboard.getJSONObject("analyticalDashboard")
             .getJSONObject("content")
             .getJSONArray("widgets")
             .put(widgetUri);
 
-        executeRequest(restApiClient, restApiClient.newPutMethod(dashboardUri, dashboard.toString()), HttpStatus.OK);
+        executeRequest(RestRequest.initPutRequest(dashboardUri, dashboard.toString()), HttpStatus.OK);
     }
 
     /**
      * Create new analytical dashboard
      *
-     * @param restApiClient
-     * @param projectId
      * @param widgetUris
      * @param title
      * @return new analytical dashboard uri
      */
-    public static String createAnalyticalDashboard(final RestApiClient restApiClient, final String projectId,
-                                                   final Collection<String> widgetUris, final String title) {
+    public String createAnalyticalDashboard(final Collection<String> widgetUris, final String title) {
         // TODO: consider better with .put() and have clever template
         final String widgets = new JSONArray(widgetUris).toString();
         final String content = ANALYTICAL_DASHBOARD_BODY.get()
@@ -302,8 +280,8 @@ public class IndigoRestUtils {
                 .replace("${title}", title);
         String uri;
         try {
-            uri = getJsonObject(restApiClient,
-                    restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId), content))
+            uri = getJsonObject(
+                    RestRequest.initPostRequest(format(CREATE_AND_GET_OBJ_LINK, projectId), content))
                     .getJSONObject("analyticalDashboard")
                     .getJSONObject("meta")
                     .getString("uri");
@@ -315,107 +293,91 @@ public class IndigoRestUtils {
 
     /**
      * Create new analytical dashboard with default title
-     * @param restApiClient
-     * @param projectId
      * @param widgetUris
      * @return
      */
-    public static String createAnalyticalDashboard(final RestApiClient restApiClient, final String projectId,
-                                                   final Collection<String> widgetUris) {
-        return createAnalyticalDashboard(restApiClient, projectId, widgetUris, "title");
+    public String createAnalyticalDashboard(final Collection<String> widgetUris) {
+        return createAnalyticalDashboard(widgetUris, "title");
     }
 
     /**
      * Get all created insight names in a specified project
      *
-     * @param restApiClient
-     * @param projectId
      * @return a list of insight names
      */
-    public static List<String> getAllInsightNames(final RestApiClient restApiClient, final String projectId)
+    public List<String> getAllInsightNames()
             throws JSONException, IOException {
-        return getMdObjectValues(restApiClient, projectId, "visualizationobjects", jsonObj -> jsonObj.getString("title"));
+        return getMdObjectValues("visualizationobjects", jsonObj -> jsonObj.getString("title"));
     }
 
     /**
      * Get insight uri by a specified name
      *
      * @param insight
-     * @param restApiClient
-     * @param projectId
      * @return
      * @throws JSONException
      * @throws IOException
      */
-    public static String getInsightUri(final String insight, final RestApiClient restApiClient,
-            final String projectId) throws JSONException, IOException {
-        return getMdObjectValue(restApiClient, projectId, "visualizationobjects",
+    public String getInsightUri(final String insight) throws JSONException, IOException {
+        return getMdObjectValue("visualizationobjects",
                 jsonObj -> insight.equals(jsonObj.getString("title")), jsonObj -> jsonObj.getString("link"));
     }
 
     /**
      * Get all insight uris
      *
-     * @param restApiClient
-     * @param projectId
      * @return
      */
-    public static List<String> getInsightUris(final RestApiClient restApiClient, final String projectId) {
-        return getMdObjectValues(restApiClient, projectId, "visualizationobjects", jsonObj -> jsonObj.getString("link"));
+    public List<String> getInsightUris() {
+        return getMdObjectValues("visualizationobjects", jsonObj -> jsonObj.getString("link"));
     }
 
     /**
      * get all insight widget titles
      *
-     * @param restApiClient
-     * @param projectId
      * @return list of titles. Otherwise, return empty list
      * @throws JSONException
      * @throws IOException
      */
-    public static List<String> getInsightWidgetTitles(final RestApiClient restApiClient, final String projectId)
+    public List<String> getInsightWidgetTitles()
             throws JSONException, IOException {
-        return getMdObjectValues(restApiClient, projectId, "visualizationwidgets",
+        return getMdObjectValues("visualizationwidgets",
                 jsonObj -> jsonObj.getString("title"));
     }
 
     /**
      * Delete a dashboard by its uri
      *
-     * @param restApiClient
      * @param dashboardUri
      */
-    public static void deleteAnalyticalDashboard(final RestApiClient restApiClient, final String dashboardUri) {
-        executeRequest(restApiClient, restApiClient.newDeleteMethod(dashboardUri), HttpStatus.NO_CONTENT);
+    public void deleteAnalyticalDashboard(final String dashboardUri) {
+        executeRequest(RestRequest.initDeleteRequest(dashboardUri), HttpStatus.NO_CONTENT);
     }
 
-    public static String getKpiUri(final String kpi, final RestApiClient restApiClient, final String projectId)
+    public String getKpiUri(final String kpi)
             throws JSONException, IOException {
-        return getMdObjectValue(restApiClient, projectId, "kpi", jsonObj -> kpi.equals(jsonObj.getString("title")),
+        return getMdObjectValue("kpi", jsonObj -> kpi.equals(jsonObj.getString("title")),
                 jsonObj -> jsonObj.getString("link"));
     }
 
     /**
      * Delete widget and its dependencies and dashboards will be deleted when it contains no widget.
      *
-     * @param restApiClient
-     * @param projectId
      * @param widgetUris
      * @throws JSONException
      * @throws IOException
      */
-    public static void deleteWidgetsUsingCascade(final RestApiClient restApiClient, final String projectId,
-            final String... widgetUris) throws JSONException, IOException {
+    public void deleteWidgetsUsingCascade(final String... widgetUris) throws JSONException, IOException {
 
-        deleteObjectsUsingCascade(restApiClient, projectId, widgetUris);
+        deleteObjectsUsingCascade(widgetUris);
 
         // empty dashboard should be deleted right after widgets
         // this makes UI & automation consistent
         // if having more than 1 dashboard, the first one will be working project by default
-        final String workingDashboardUri = getAnalyticalDashboards(restApiClient, projectId).get(0);
+        final String workingDashboardUri = getAnalyticalDashboards().get(0);
 
-        if (getDashboardWidgetCount(restApiClient, workingDashboardUri) == 0) {
-            deleteAnalyticalDashboard(restApiClient, workingDashboardUri);
+        if (getDashboardWidgetCount(workingDashboardUri) == 0) {
+            deleteAnalyticalDashboard(workingDashboardUri);
             log.info("The working dashboard has been deleted");
         }
     }
@@ -425,32 +387,26 @@ public class IndigoRestUtils {
      * Theoretically, we can create many dashboards using REST
      * This method helps us clean up environment
      *
-     * @param restApiClient
-     * @param projectId
      * @throws JSONException
      * @throws IOException
      */
-    public static void deleteDashboardsUsingCascade(final RestApiClient restApiClient, final String projectId)
+    public void deleteDashboardsUsingCascade()
             throws JSONException, IOException {
-        final List<String> dashboardUris = getAnalyticalDashboards(restApiClient, projectId);
-        deleteObjectsUsingCascade(restApiClient, projectId,
-                dashboardUris.toArray(new String[dashboardUris.size()]));
+        final List<String> dashboardUris = getAnalyticalDashboards();
+        deleteObjectsUsingCascade(dashboardUris.toArray(new String[dashboardUris.size()]));
     }
 
     /**
      * Delete attribute filter on Indigo dashboard
-     * @param restApiClient
-     * @param projectId
      * @param attributeDisplayFormUri
      * @throws IOException
      * @throws JSONException
      */
-    public static void deleteAttributeFilterIfExist(final RestApiClient restApiClient, final String projectId,
-                                                    final String attributeDisplayFormUri) throws IOException, JSONException {
+    public void deleteAttributeFilterIfExist(final String attributeDisplayFormUri) throws IOException, JSONException {
         // dashboard is now containing 1 filter context
-        String targetUri = getFilterContextUris(restApiClient, projectId).get(0);
+        String targetUri = getFilterContextUris().get(0);
 
-        JSONObject filterContext = getJsonObject(restApiClient, targetUri);
+        JSONObject filterContext = getJsonObject(targetUri);
         JSONArray filtersArray = filterContext.getJSONObject("filterContext")
                 .getJSONObject("content").getJSONArray("filters");
 
@@ -469,16 +425,16 @@ public class IndigoRestUtils {
                 .getJSONObject("content")
                 .put("filters", newArray);
 
-        executeRequest(restApiClient, restApiClient.newPutMethod(targetUri, filterContext.toString()), HttpStatus.OK);
+        executeRequest(RestRequest.initPutRequest(targetUri, filterContext.toString()), HttpStatus.OK);
     }
 
-    private static int getDashboardWidgetCount(final RestApiClient restApiClient, final String dashboardUri)
+    private int getDashboardWidgetCount(final String dashboardUri)
             throws JSONException, IOException {
-        return getJsonObject(restApiClient, dashboardUri).getJSONObject("analyticalDashboard")
+        return getJsonObject(dashboardUri).getJSONObject("analyticalDashboard")
                 .getJSONObject("content").getJSONArray("widgets").length();
     }
 
-    private static JSONObject initInsightObject(final String visualizationClassUri,
+    private JSONObject initInsightObject(final String visualizationClassUri,
             final InsightMDConfiguration insightConfig) throws JSONException {
         return new JSONObject() {{
             put("visualizationObject", new JSONObject() {{
@@ -496,7 +452,8 @@ public class IndigoRestUtils {
         }};
     }
 
-    private static JSONArray initBuckets(final List<MeasureBucket> measureBuckets, final List<CategoryBucket> categoryBuckets) throws JSONException {
+    private JSONArray initBuckets(final List<MeasureBucket> measureBuckets, final List<CategoryBucket> categoryBuckets)
+            throws JSONException {
         return new JSONArray() {{
             put(new JSONObject() {{
                 put("localIdentifier", "measures");
@@ -509,7 +466,7 @@ public class IndigoRestUtils {
         }};
     }
 
-    private static JSONArray initMeasureObjects(final List<MeasureBucket> measureBuckets) throws JSONException {
+    private JSONArray initMeasureObjects(final List<MeasureBucket> measureBuckets) throws JSONException {
         return new JSONArray() {{
                 if (!CollectionUtils.isEmpty(measureBuckets)) {
                     for (MeasureBucket bucket : measureBuckets) {
@@ -532,7 +489,7 @@ public class IndigoRestUtils {
         }};
     }
 
-    private static JSONArray initCategoryObjects(final List<CategoryBucket> categoryBuckets) throws JSONException {
+    private JSONArray initCategoryObjects(final List<CategoryBucket> categoryBuckets) throws JSONException {
         return new JSONArray() {{
                 if (!CollectionUtils.isEmpty(categoryBuckets)) {
                     for (CategoryBucket bucket : categoryBuckets) {
@@ -549,10 +506,9 @@ public class IndigoRestUtils {
         }};
     }
 
-    private static <T> List<T> getMdObjectValues(final RestApiClient restApiClient, final String projectId,
-            final String type, final ThrowingFunction<JSONObject, T> func) {
+    private <T> List<T> getMdObjectValues(final String type, final ThrowingFunction<JSONObject, T> func) {
         try {
-            JSONArray jsonArray = getMdObjects(restApiClient, projectId, type);
+            JSONArray jsonArray = getMdObjects(type);
             List<T> results = new ArrayList<>();
 
             for (int i = 0, n = jsonArray.length(); i < n; i++) {
@@ -565,11 +521,10 @@ public class IndigoRestUtils {
         }
     }
 
-    private static <T> T getMdObjectValue(final RestApiClient restApiClient, final String projectId,
-            final String type, final ThrowingPredicate<JSONObject> filter,
+    private <T> T getMdObjectValue(final String type, final ThrowingPredicate<JSONObject> filter,
             final ThrowingFunction<JSONObject, T> func) {
         try {
-            JSONArray jsonArray = getMdObjects(restApiClient, projectId, type);
+            JSONArray jsonArray = getMdObjects(type);
             JSONObject foundObject = null;
 
             for (int i = 0, n = jsonArray.length(); i < n; i++) {
@@ -585,9 +540,8 @@ public class IndigoRestUtils {
         throw new RuntimeException("Can't find the object");
     }
 
-    private static JSONArray getMdObjects(final RestApiClient restApiClient, final String projectId,
-            final String type) throws JSONException, IOException {
-        return getJsonObject(restApiClient, "/gdc/md/" + projectId + "/query/" + type).getJSONObject("query")
+    private JSONArray getMdObjects(final String type) throws JSONException, IOException {
+        return getJsonObject("/gdc/md/" + projectId + "/query/" + type).getJSONObject("query")
                 .getJSONArray("entries");
     }
 
@@ -599,7 +553,7 @@ public class IndigoRestUtils {
         boolean test(T t) throws Exception;
     }
 
-    private static List<String> getFilterContextUris(final RestApiClient restApiClient, final String projectId) {
-        return getMdObjectValues(restApiClient, projectId, "filtercontexts", jsonObj -> jsonObj.getString("link"));
+    private List<String> getFilterContextUris() {
+        return getMdObjectValues("filtercontexts", jsonObj -> jsonObj.getString("link"));
     }
 }

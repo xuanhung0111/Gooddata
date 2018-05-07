@@ -4,17 +4,16 @@ import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createKpiWidget;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getInsightUri;
 
 import java.io.IOException;
 import java.util.List;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.json.JSONException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -50,6 +49,8 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
     private Metric metric2;
     private Metric metric3;
 
+    private IndigoRestRequest indigoRestRequest;
+
     @Override
     protected void customizeProject() throws Throwable {
         getMetricCreator().createAmountMetric();
@@ -65,13 +66,13 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
         createdDateUri = getMdService().getObjUri(getProject(), Dataset.class, identifier("created.dataset.dt"));
         closedDateUri = getMdService().getObjUri(getProject(), Dataset.class, identifier("closed.dataset.dt"));
         snapshotDateUri = getMdService().getObjUri(getProject(), Dataset.class, identifier("snapshot.dataset.dt"));
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkRecommendedForKpiMetricInViewBy() throws JSONException, IOException {
         final String kpiUri = createKpi(metric1.getTitle(), metric1.getUri(), createdDateUri);
-        final String indigoDashboardUri = createAnalyticalDashboard(
-                getRestApiClient(), testParams.getProjectId(), singletonList(kpiUri));
+        final String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(kpiUri));
 
         try {
             analysisPage.addMetric(metric1.getTitle()).addDate();
@@ -99,8 +100,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
     @Test(dependsOnGroups = {"createProject"})
     public void checkRecommendedForKpiMetricInFilterBucket() throws JSONException, IOException {
         final String kpiUri = createKpi(metric1.getTitle(), metric1.getUri(), createdDateUri);
-        final String indigoDashboardUri = createAnalyticalDashboard(
-                getRestApiClient(), testParams.getProjectId(), singletonList(kpiUri));
+        final String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(kpiUri));
 
         try {
             analysisPage.addMetric(metric1.getTitle()).addDateFilter();
@@ -152,7 +152,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
             assertEquals(dateDatasetSelect.getHiddenDescription(), HIDDEN_DATE_DIMENSION_DESCRIPTION);
 
         } finally {
-            getMdService().removeObjByUri(getInsightUri(INSIGHT, getRestApiClient(), testParams.getProjectId()));
+            getMdService().removeObjByUri(indigoRestRequest.getInsightUri(INSIGHT));
         }
     }
 
@@ -183,7 +183,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
             assertEquals(dateDatasetSelect.getHiddenDescription(), HIDDEN_DATE_DIMENSION_DESCRIPTION);
 
         } finally {
-            getMdService().removeObjByUri(getInsightUri(INSIGHT, getRestApiClient(), testParams.getProjectId()));
+            getMdService().removeObjByUri(indigoRestRequest.getInsightUri(INSIGHT));
         }
     }
 
@@ -222,8 +222,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
         final String kpiUri1 = createKpi(metric1.getTitle(), metric1.getUri(), createdDateUri);
         final String kpiUri2 = createKpi(metric2.getTitle(), metric2.getUri(), createdDateUri);
 
-        final String indigoDashboardUri = createAnalyticalDashboard(
-                getRestApiClient(), testParams.getProjectId(), asList(kpiUri1, kpiUri2));
+        final String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(asList(kpiUri1, kpiUri2));
 
         try {
             analysisPage
@@ -251,8 +250,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
         final String kpiUri1 = createKpi(metric1.getTitle(), metric1.getUri(), createdDateUri);
         final String kpiUri2 = createKpi(metric2.getTitle(), metric2.getUri(), createdDateUri);
 
-        final String indigoDashboardUri = createAnalyticalDashboard(
-                getRestApiClient(), testParams.getProjectId(), asList(kpiUri1, kpiUri2));
+        final String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(asList(kpiUri1, kpiUri2));
 
         try {
             analysisPage
@@ -291,8 +289,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
         final String kpiUri1 = createKpi(metric1.getTitle(), metric1.getUri(), createdDateUri);
         final String kpiUri2 = createKpi(metric2.getTitle(), metric2.getUri(), closedDateUri);
 
-        final String indigoDashboardUri = createAnalyticalDashboard(
-                getRestApiClient(), testParams.getProjectId(), asList(kpiUri1, kpiUri2));
+        final String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(asList(kpiUri1, kpiUri2));
 
         try {
             analysisPage
@@ -322,8 +319,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
         final String kpiUri1 = createKpi(metric1.getTitle(), metric1.getUri(), createdDateUri);
         final String kpiUri2 = createKpi(metric2.getTitle(), metric2.getUri(), closedDateUri);
 
-        final String indigoDashboardUri = createAnalyticalDashboard(
-                getRestApiClient(), testParams.getProjectId(), asList(kpiUri1, kpiUri2));
+        final String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(asList(kpiUri1, kpiUri2));
 
         try {
             analysisPage
@@ -357,8 +353,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
         final String kpiUri2 = createKpi(metric1.getTitle(), metric1.getUri(), createdDateUri);
         final String kpiUri3 = createKpi(metric2.getTitle(), metric2.getUri(), closedDateUri);
 
-        final String indigoDashboardUri = createAnalyticalDashboard(
-                getRestApiClient(), testParams.getProjectId(), asList(kpiUri1, kpiUri2, kpiUri3));
+        final String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(asList(kpiUri1, kpiUri2, kpiUri3));
 
         try {
             analysisPage.addMetric(metric1.getTitle());
@@ -394,8 +389,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
         final String kpiUri2 = createKpi(metric2.getTitle(), metric2.getUri(), closedDateUri);
         final String kpiUri3 = createKpi(metric3.getTitle(), metric3.getUri(), snapshotDateUri);
 
-        final String indigoDashboardUri = createAnalyticalDashboard(
-                getRestApiClient(), testParams.getProjectId(), asList(kpiUri1, kpiUri2, kpiUri3));
+        final String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(asList(kpiUri1, kpiUri2, kpiUri3));
 
         try {
             analysisPage
@@ -424,8 +418,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
         final String kpiUri2 = createKpi(metric2.getTitle(), metric2.getUri(), closedDateUri);
         final String kpiUri3 = createKpi(metric3.getTitle(), metric3.getUri(), snapshotDateUri);
 
-        final String indigoDashboardUri = createAnalyticalDashboard(
-                getRestApiClient(), testParams.getProjectId(), asList(kpiUri1, kpiUri2, kpiUri3));
+        final String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(asList(kpiUri1, kpiUri2, kpiUri3));
 
         try {
             analysisPage
@@ -469,8 +462,8 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
             assertEquals(hiddenDateDimension, HIDDEN_DATE_DIMENSION_DESCRIPTION);
 
         } finally {
-            getMdService().removeObjByUri(getInsightUri(INSIGHT, getRestApiClient(), testParams.getProjectId()));
-            getMdService().removeObjByUri(getInsightUri(INSIGHT_NEW, getRestApiClient(), testParams.getProjectId()));
+            getMdService().removeObjByUri(indigoRestRequest.getInsightUri(INSIGHT));
+            getMdService().removeObjByUri(indigoRestRequest.getInsightUri(INSIGHT_NEW));
         }
     }
 
@@ -508,7 +501,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
     }
 
     private String createKpi(String title, String metricUri, String dateDatasetUri) throws JSONException, IOException {
-        return createKpiWidget(getRestApiClient(), testParams.getProjectId(),
+        return indigoRestRequest.createKpiWidget(
                 new KpiMDConfiguration.Builder()
                         .title(title)
                         .metric(metricUri)

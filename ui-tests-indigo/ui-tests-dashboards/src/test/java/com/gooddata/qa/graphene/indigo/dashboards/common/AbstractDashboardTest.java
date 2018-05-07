@@ -6,12 +6,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.addWidgetToAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createInsight;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidget;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAnalyticalDashboards;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAnalyticalDashboardIdentifier;
 import static com.gooddata.qa.utils.mail.ImapUtils.getEmailBody;
 import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 import static com.google.common.collect.Iterables.getLast;
@@ -27,8 +21,9 @@ import com.gooddata.md.Dataset;
 import com.gooddata.md.Metric;
 import com.gooddata.md.ObjNotFoundException;
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
-import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.json.JSONException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -41,7 +36,6 @@ import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
-import com.gooddata.qa.utils.http.RestApiClient;
 
 public abstract class AbstractDashboardTest extends GoodSalesAbstractTest {
 
@@ -61,21 +55,19 @@ public abstract class AbstractDashboardTest extends GoodSalesAbstractTest {
         super.initProperties(); // use GoodSales by default
         validateAfterClass = false;
     }
-
     @Override
     public void configureStartPage() {
         // remove start page context configuration
     }
 
     protected String addWidgetToWorkingDashboard(final String widgetUri) throws JSONException, IOException {
-        final RestApiClient client = getRestApiClient();
-        final String projectId = testParams.getProjectId();
-
-        if (getAnalyticalDashboards(client, projectId).isEmpty())
-            createAnalyticalDashboard(client, projectId, singletonList(widgetUri));
-        else
-            addWidgetToAnalyticalDashboard(client, projectId, getWorkingDashboardUri(), widgetUri);
-
+        final IndigoRestRequest indigoRestRequest = new IndigoRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        if (indigoRestRequest.getAnalyticalDashboards().isEmpty()) {
+            indigoRestRequest.createAnalyticalDashboard(singletonList(widgetUri));
+        } else {
+            indigoRestRequest.addWidgetToAnalyticalDashboard(getWorkingDashboardUri(), widgetUri);
+        }
         // need widget uri in most of cases which use this helper method
         return widgetUri;
     }
@@ -98,14 +90,17 @@ public abstract class AbstractDashboardTest extends GoodSalesAbstractTest {
 
     protected String getWorkingDashboardUri() throws JSONException, IOException {
         // if having more than 1 dashboard, the first one will be working project by default
-        return getAnalyticalDashboards(getRestApiClient(), testParams.getProjectId()).get(0);
+        return new IndigoRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId()).getAnalyticalDashboards().get(0);
     }
 
     protected String createInsightWidget(InsightMDConfiguration insightConfig) {
         String visualizationWidgetWrap;
+        final IndigoRestRequest indigoRestRequest = new IndigoRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         try {
-            visualizationWidgetWrap = createVisualizationWidget(getRestApiClient(), testParams.getProjectId(),
-                    createInsight(getRestApiClient(), testParams.getProjectId(), insightConfig),
+            visualizationWidgetWrap = indigoRestRequest.createVisualizationWidget(
+                    indigoRestRequest.createInsight(insightConfig),
                     insightConfig.getTitle());
         } catch (JSONException | IOException e){
             throw new RuntimeException("There is error while creating Visualization widget" , e);
@@ -200,7 +195,8 @@ public abstract class AbstractDashboardTest extends GoodSalesAbstractTest {
     protected String createKpiUsingRest(final KpiMDConfiguration kpiConfig) {
         String kpiWidget;
         try{
-            kpiWidget = IndigoRestUtils.createKpiWidget(getRestApiClient(), testParams.getProjectId(), kpiConfig);
+            kpiWidget = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                    .createKpiWidget(kpiConfig);
         } catch (JSONException | IOException e) {
             throw new RuntimeException("There is error while create Kpi Widget");
         }
@@ -208,6 +204,7 @@ public abstract class AbstractDashboardTest extends GoodSalesAbstractTest {
     }
 
     protected String getKpiDashboardIdentifierByTitle(String title) throws IOException, JSONException {
-        return getAnalyticalDashboardIdentifier(title, getRestApiClient(), testParams.getProjectId());
+        return new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .getAnalyticalDashboardIdentifier(title);
     }
 }

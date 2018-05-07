@@ -4,7 +4,6 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForStringInUrl;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
 import static java.util.Collections.singletonList;
 import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertFalse;
@@ -12,6 +11,8 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.List;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
@@ -25,7 +26,8 @@ public class ResponsiveNavigationTest extends AbstractDashboardTest {
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
-        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
+        new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .createAnalyticalDashboard(singletonList(createAmountKpi()));
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})

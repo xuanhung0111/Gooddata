@@ -9,6 +9,8 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import com.gooddata.qa.browser.DragAndDropUtils;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -18,7 +20,6 @@ import java.util.List;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.*;
 import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
 
@@ -37,9 +38,11 @@ public class DragWidgetsTest extends AbstractDashboardTest {
 
         String dateDimensionUri = getDateDatasetUri(DATE_DATASET_CREATED);
 
+        IndigoRestRequest indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
+                testParams.getProjectId());
         List<String> kpiUris = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            kpiUris.add(createKpiWidget(getRestApiClient(), testParams.getProjectId(),
+            kpiUris.add(indigoRestRequest.createKpiWidget(
                     new KpiMDConfiguration.Builder()
                             .title("Drag-Drop-" + i)
                             .metric(getMetricByTitle(METRIC_AMOUNT).getUri())
@@ -49,7 +52,7 @@ public class DragWidgetsTest extends AbstractDashboardTest {
                             .build()));
         }
 
-        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), kpiUris);
+        indigoRestRequest.createAnalyticalDashboard(kpiUris);
     }
 
     @DataProvider(name = "dragKpiProvider")

@@ -7,10 +7,11 @@ import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
 
 import java.io.IOException;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
@@ -20,7 +21,6 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteWidgetsUsingCascade;
 import java.util.Arrays;
 import static java.util.Collections.singletonList;
 import java.util.List;
@@ -31,13 +31,14 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
 public class FilteringWidgetsTest extends AbstractDashboardTest {
+    private IndigoRestRequest indigoRestRequest;
 
     @Override
     protected void customizeProject() throws Throwable {
         getMetricCreator().createNumberOfActivitiesMetric();
         getMetricCreator().createAmountMetric();
-        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
-                singletonList(createAmountKpi()));
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        indigoRestRequest.createAnalyticalDashboard(singletonList(createAmountKpi()));
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"setupFilters", "desktop"})
@@ -69,7 +70,7 @@ public class FilteringWidgetsTest extends AbstractDashboardTest {
 
             indigoDashboardsPage.leaveEditMode();
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            indigoRestRequest.deleteWidgetsUsingCascade(kpiUri);
         }
     }
 
@@ -120,7 +121,7 @@ public class FilteringWidgetsTest extends AbstractDashboardTest {
 
             indigoDashboardsPage.leaveEditMode();
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            indigoRestRequest.deleteWidgetsUsingCascade(kpiUri);
         }
     }
 
@@ -160,7 +161,7 @@ public class FilteringWidgetsTest extends AbstractDashboardTest {
 
             indigoDashboardsPage.leaveEditMode();
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            indigoRestRequest.deleteWidgetsUsingCascade(kpiUri);
         }
     }
 
@@ -196,7 +197,7 @@ public class FilteringWidgetsTest extends AbstractDashboardTest {
 
             indigoDashboardsPage.leaveEditMode();
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            indigoRestRequest.deleteWidgetsUsingCascade(kpiUri);
         }
     }
 
@@ -241,7 +242,7 @@ public class FilteringWidgetsTest extends AbstractDashboardTest {
 
             indigoDashboardsPage.leaveEditMode();
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), widgetUri);
+            indigoRestRequest.deleteWidgetsUsingCascade(widgetUri);
         }
 
     }
@@ -288,7 +289,7 @@ public class FilteringWidgetsTest extends AbstractDashboardTest {
             takeScreenshot(browser, "testAttributeFiltersForKpiCorrectlyApplied-valueNotFiltered-valueFilteredAgain", getClass());
             assertEquals(getLastKpiValue(), filtered);
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), kpiUri);
+            indigoRestRequest.deleteWidgetsUsingCascade(kpiUri);
         }
     }
 
