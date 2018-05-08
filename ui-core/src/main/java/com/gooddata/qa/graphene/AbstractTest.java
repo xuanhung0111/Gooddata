@@ -101,27 +101,24 @@ public abstract class AbstractTest extends Arquillian {
         }
     }
 
-    private String getUrlWithoutHash(String url) {
-        if (!url.contains("#")) {
-            return url;
-        }
-
-        return url.substring(0, url.indexOf("#"));
-    }
-
     public void openUrl(String url) {
-        String currentUrl = browser.getCurrentUrl();
         String pageURL = getRootUrl() + url.replaceAll("^/", "");
         System.out.println("Loading page ... " + pageURL);
 
+        BrowserUtils.addMagicElementToDOM(browser);
         // Request Selenium to load a URL. If current URL is the one we want to load, page is NOT reloaded.
         browser.get(pageURL);
 
-        // We need to call browser#get(String) before refreshing page to make sure the last request to browser has
-        // method is GET unless we will get an alert about re-sending information to browser
-        if (getUrlWithoutHash(pageURL).equals(getUrlWithoutHash(currentUrl))) {
-            BrowserUtils.refreshCurrentPage(browser);
+        // If Magic element is still present, refresh the page.
+        for (int attempts = 0; attempts < 3; attempts++) {
+            if (!BrowserUtils.isMagicElementPresentInDOM(browser)) {
+                return;
+            }
+
+            browser.navigate().refresh();
         }
+
+        log.warning("Page content might not be fully reloaded");
     }
 
     public String getRootUrl() {
