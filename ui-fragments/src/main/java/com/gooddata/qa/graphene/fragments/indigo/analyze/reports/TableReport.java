@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
@@ -186,13 +185,15 @@ public class TableReport extends AbstractFragment {
 
     private AggregationPopup openAggregationPopup(String metricName) {
         String column = format("col-%d", getColumn(metricName));
-        WebElement addTotalRowButton = getRoot().findElements(className(column))
-            .stream()
-            .filter(element -> isElementPresent(ADD_TOTAL_ROW_BUTTON, element))
-            .findFirst()
-            .get();
-        hoverItem(addTotalRowButton);
-        waitForElementVisible(addTotalRowButton).click();
+        getRoot().findElements(className(column)).stream()
+                .filter(element -> {
+                    hoverItem(element);
+                    return isElementVisible(ADD_TOTAL_ROW_BUTTON, element);
+                })
+                .findFirst()
+                .get()
+                .click();
+        
         return Graphene.createPageFragment(AggregationPopup.class,
                 waitForElementVisible(className("indigo-totals-select-type-list"), browser));
     }
