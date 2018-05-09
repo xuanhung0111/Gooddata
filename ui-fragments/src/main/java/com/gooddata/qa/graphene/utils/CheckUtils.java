@@ -7,6 +7,7 @@ import static org.testng.Assert.fail;
 import java.util.logging.Logger;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -85,8 +86,12 @@ public final class CheckUtils {
         String nodeClass = message.getAttribute("class");
 
         if (nodeClass.contains("success")) {
-            waitForElementVisible(BY_INDIGO_DISMISS_BUTTON, message).click();
-            waitForElementNotPresent(message);
+            try {
+                waitForElementVisible(BY_INDIGO_DISMISS_BUTTON, message).click();
+                waitForElementNotPresent(message);
+            } catch (NoSuchElementException e) {
+                log.info("Success message flash so quickly and no need to dismiss it by manually");
+            }
         } else if (nodeClass.contains("error")) {
             throw new RuntimeException("Indigo error message found");
         } else {
