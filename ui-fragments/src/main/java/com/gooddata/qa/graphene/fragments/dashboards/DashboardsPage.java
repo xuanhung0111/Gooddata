@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+
+import com.gooddata.qa.graphene.enums.dashboard.TextObject;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -525,6 +527,11 @@ public class DashboardsPage extends AbstractFragment {
 
     public DashboardsPage addWebContentToDashboard(String content) {
         editDashboard().addWebContentToDashboard(content);
+        return this;
+    }
+
+    public DashboardsPage addTextToDashboard(TextObject textObject, String text, String link) {
+        editDashboard().addTextToDashboard(textObject, text, link);
         return this;
     }
 
