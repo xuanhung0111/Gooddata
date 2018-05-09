@@ -140,7 +140,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
                 .addReportToDashboard(headlineReportDef.getName())
                 .addNewTab("other_widgets")
                 .addLineToDashboard()
-                .addWebContentToDashboard("https://s3.amazonaws.com/gdc-testing/images/publicImage.png")
+                .addWebContentToDashboard("https://s3.amazonaws.com/gdc-testing-public/images/publicImage.png")
                 .addWidgetToDashboard(WidgetTypes.KEY_METRIC, METRIC_AMOUNT)
                 .addWidgetToDashboard(WidgetTypes.GEO_CHART, METRIC_AMOUNT)
                 .addNewTab("drilling_report")

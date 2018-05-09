@@ -1,3 +1,3 @@
 "Image","Image_SFDC","Hyperlink","Amount"
-"source=web&url=https://s3.amazonaws.com/gdc-testing/images/publicImage.png","source=sfdc&userId=005U0000000cgeyIAA","http://www.gooddata.com/","102300"
-"source=web&url=https://s3.amazonaws.com/gdc-testing/images/publicImage2.png","source=sfdc&userId=005U0000000cgeyIAA","http://www.gooddata.com/","102301"
+"source=web&url=https://s3.amazonaws.com/gdc-testing-public/images/publicImage.png","source=sfdc&userId=005U0000000cgeyIAA","http://www.gooddata.com/","102300"
+"source=web&url=https://s3.amazonaws.com/gdc-testing-public/images/publicImage2.png","source=sfdc&userId=005U0000000cgeyIAA","http://www.gooddata.com/","102301"
