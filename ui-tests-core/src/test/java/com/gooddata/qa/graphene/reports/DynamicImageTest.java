@@ -27,11 +27,11 @@ public class DynamicImageTest extends AbstractProjectTest {
     private final static String ID_METRIC = "Id-Metric";
 
     private final static String IMAGE_SOURCE_1 =
-            "source=web&url=https://s3.amazonaws.com/gdc-testing/images/publicImage.png";
+            "source=web&url=https://s3.amazonaws.com/gdc-testing-public/images/publicImage.png";
     private final static String IMAGE_SOURCE_2 =
-            "source=web&url=https://s3.amazonaws.com/gdc-testing/images/publicImage2.png";
+            "source=web&url=https://s3.amazonaws.com/gdc-testing-public/images/publicImage2.png";
     private final static String IMAGE_SOURCE_3 =
-            "source=web&url=https://s3.amazonaws.com/gdc-testing/images/publicImage3.png";
+            "source=web&url=https://s3.amazonaws.com/gdc-testing-public/images/publicImage3.png";
 
     @Override
     protected void customizeProject() throws Throwable {
