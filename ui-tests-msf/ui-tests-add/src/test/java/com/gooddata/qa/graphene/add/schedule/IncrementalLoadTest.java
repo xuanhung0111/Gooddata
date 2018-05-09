@@ -237,8 +237,6 @@ public class IncrementalLoadTest extends AbstractDataloadProcessTest {
             DataloadScheduleDetail scheduleDetail = initScheduleDetail(loadPersonSchedule);
             assertFalse(scheduleDetail.getDatasetDropdown().expand().hasLSLTSValueFor(DATASET_PERSON),
                     "LSLTS still show up for dataset" + DATASET_PERSON);
-            assertTrue(getResource(getRestApiClient(), scheduleDetail.getLastExecutionLogUri(), HttpStatus.OK)
-                    .contains(format("The LSLTS for dataset with id dataset.%s is: %s", DATASET_PERSON, lastLSLTS)));
 
             Attribute personAttr = getMdService().getObj(getProject(), Attribute.class, title(ATTR_PERSON));
             assertThat(getAttributeValues(personAttr),

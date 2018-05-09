@@ -92,9 +92,9 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
         uploadCSV(ResourceUtils.getFilePathFromResource("/" + ResourceDirectory.PAYROLL_CSV + "/payroll.csv"));
         takeScreenshot(browser, "uploaded-payroll-file", getClass());
 
+        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
         defaultMufUri = createEducationMuf(Arrays.asList("Partial College", "Partial High School"), "Education user filter");
         updatedMufUri = createEducationMuf(singletonList("Partial College"), "Education-Partial college user filter");
-        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
     }
 
     @Test(dependsOnMethods = {"setUpProject"})
