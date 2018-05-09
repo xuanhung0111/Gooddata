@@ -12,16 +12,17 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static com.gooddata.qa.utils.http.project.ProjectRestUtils.createBlankProject;
 
 import java.io.IOException;
 
+import com.gooddata.project.Project;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.RestClient.RestProfile;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
-import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.AbstractUITest;
 import com.gooddata.qa.graphene.entity.account.PersonalInfo;
 import com.gooddata.qa.graphene.fragments.account.AccountPage;
@@ -70,10 +71,7 @@ public class UserAccountSettingTest extends AbstractUITest {
     @Test
     public void prepareDataForTest() throws ParseException, JSONException, IOException {
         accountSettingUser = createDynamicUserFrom(testParams.getUser());
-
-        GoodData goodDataClient = getGoodDataClient(accountSettingUser, testParams.getPassword());
-        testParams.setProjectId(createBlankProject(goodDataClient, "Account-setting-test",
-                testParams.getAuthorizationToken(), testParams.getProjectDriver(), testParams.getProjectEnvironment()));
+        testParams.setProjectId(createNewEmptyProject(accountSettingUser, "Account-setting-test"));
 
         signInAtGreyPages(accountSettingUser, testParams.getPassword());
 
@@ -239,5 +237,15 @@ public class UserAccountSettingTest extends AbstractUITest {
         ChangePasswordDialog changePasswordDialog = initAccountPage().openChangePasswordDialog();
         changePasswordDialog.changePassword(oldPassword, newPassword);
         checkGreenBar(browser, format(SUCCESS_MESSAGE, "password", ""));
+    }
+
+    private String createNewEmptyProject(String user, String projectTitle) {
+        RestClient restClient = new RestClient(
+                new RestProfile(testParams.getHost(), user, testParams.getPassword(), true));
+        final Project project = new Project(projectTitle, testParams.getAuthorizationToken());
+        project.setDriver(testParams.getProjectDriver());
+        project.setEnvironment(testParams.getProjectEnvironment());
+
+        return restClient.getProjectService().createProject(project).get().getId();
     }
 }

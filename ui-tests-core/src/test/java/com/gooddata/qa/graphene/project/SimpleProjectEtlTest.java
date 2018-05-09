@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.project;
 
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsAndUsersPageLoaded;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.zip.CRC32;
 
 import com.gooddata.GoodDataException;
+import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.rolap.RolapRestRequest;
 import org.apache.commons.io.IOUtils;
@@ -133,7 +135,7 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
             validationTimeoutOK = false;
             e.printStackTrace();
         }
-        deleteProject(testParams.getProjectId());
+        deleteProjectUI(testParams.getProjectId());
 
         testParams.setProjectId(parentProjectId);
         assertTrue(validationTimeoutOK,"Project validation on imported project timeouted");
@@ -154,5 +156,13 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
             crc.update(cnt);
         }
         return crc.getValue();
+    }
+
+    private void deleteProjectUI(String projectId) {
+        openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|projectPage");
+        waitForProjectsAndUsersPageLoaded(browser);
+        System.out.println("Going to delete project: " + projectId);
+        ProjectAndUsersPage.getInstance(browser).deteleProject();
+        System.out.println("Deleted project: " + projectId);
     }
 }

@@ -4,7 +4,6 @@ import static com.gooddata.md.Restriction.title;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -30,7 +29,6 @@ import com.gooddata.project.ProjectDriver;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.fragments.greypages.md.validate.ValidateFragment;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 import static com.gooddata.fixture.ResourceManagement.ResourceTemplate.GOODSALES;
 
@@ -88,14 +86,13 @@ public class ValidateProjectTest extends AbstractProjectTest {
 
         } finally {
             testParams.setProjectId(currentProjectId);
-            ProjectRestUtils.deleteProject(getGoodDataClient(), projectId);
+            deleteProject(getProfile(Profile.ADMIN), projectId);
         }
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void validateProjectUsingUploadData() throws IOException {
-        String projectId = ProjectRestUtils.createBlankProject(getGoodDataClient(), projectTitle,
-                testParams.getAuthorizationToken(), testParams.getProjectDriver(), testParams.getProjectEnvironment());
+        String projectId = createNewEmptyProject(projectTitle);
         testParams.setProjectId(projectId);
 
         try {
@@ -132,7 +129,7 @@ public class ValidateProjectTest extends AbstractProjectTest {
 
         } finally {
             testParams.setProjectId(currentProjectId);
-            ProjectRestUtils.deleteProject(getGoodDataClient(), projectId);
+            deleteProject(projectId);
         }
     }
 

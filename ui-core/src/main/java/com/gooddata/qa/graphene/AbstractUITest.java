@@ -216,14 +216,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
         }
     }
 
-    public void deleteProject(String projectId) {
-        openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|projectPage");
-        waitForProjectsAndUsersPageLoaded(browser);
-        System.out.println("Going to delete project: " + projectId);
-        ProjectAndUsersPage.getInstance(browser).deteleProject();
-        System.out.println("Deleted project: " + projectId);
-    }
-
     public void addNewTabOnDashboard(String dashboardName, String tabName, String screenshotName) {
         initDashboardsPage();
         dashboardsPage.selectDashboard(dashboardName);

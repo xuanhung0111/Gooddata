@@ -7,7 +7,7 @@ import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.Process
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.disc.EtlProcessRestRequest;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -33,8 +33,8 @@ public class AbstractEtlProcessTest extends AbstractProcessTest {
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
-        ProjectRestUtils.setFeatureFlagInProjectAndCheckResult(
-                getGoodDataClient(), testParams.getProjectId(), ProjectFeatureFlags.ENABLE_ETL_COMPONENT, true);
+        new ProjectRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
+                .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ETL_COMPONENT, true);
         etlProcessRequest = new EtlProcessRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId());
     }
 

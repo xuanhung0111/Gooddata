@@ -14,15 +14,16 @@ import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import java.io.IOException;
 import java.util.UUID;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.RestClient.RestProfile;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
-import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class ProjectSwitchTest extends AbstractDashboardTest {
     private static final String UNIQUE_ID = UUID.randomUUID().toString().substring(0, 10);
@@ -57,8 +58,9 @@ public class ProjectSwitchTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"switchProject", "desktop", "mobile"})
     public void switchProjectWithFeatureFlagDisabled() {
-        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), newProjectId,
-                ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, false);
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), newProjectId);
+        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, false);
 
         try {
             initIndigoDashboardsPageWithWidgets().switchProject(NEW_PROJECT_NAME);
@@ -67,8 +69,7 @@ public class ProjectSwitchTest extends AbstractDashboardTest {
             takeScreenshot(browser, "User-is-directed-to-dashboard-when-feature-flag-disabled", getClass());
             assertThat(browser.getCurrentUrl(), containsString(newProjectId));
         } finally {
-            ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), newProjectId,
-                    ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
+            projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
         }
     }
 
@@ -120,13 +121,13 @@ public class ProjectSwitchTest extends AbstractDashboardTest {
     @Test(dependsOnGroups = {"precondition"}, groups = {"desktop", "mobile"})
     public void switchProjectWithEmbededDashboardUser() throws JSONException, ParseException, IOException {
         String embeddedDashboardUser = createAndAddUserToProject(UserRoles.DASHBOARD_ONLY);
-        GoodData goodDataClient = getGoodDataClient(embeddedDashboardUser, testParams.getPassword());
         String newProjectId = "";
-
+        RestProfile embeddedRestProfile = new RestProfile(testParams.getHost(),
+                embeddedDashboardUser, testParams.getPassword(), true);
         try {
-            newProjectId = ProjectRestUtils.createBlankProject(goodDataClient, NEW_PROJECT_NAME,
-                    testParams.getAuthorizationToken(), testParams.getProjectDriver(),
-                    testParams.getProjectEnvironment());
+            newProjectId = createNewEmptyProject(
+                    embeddedRestProfile,
+                    NEW_PROJECT_NAME);
 
             logout();
             signInAtUI(embeddedDashboardUser, testParams.getPassword());
@@ -143,7 +144,7 @@ public class ProjectSwitchTest extends AbstractDashboardTest {
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
 
             if(!newProjectId.isEmpty()) {
-                ProjectRestUtils.deleteProject(goodDataClient, newProjectId);
+                deleteProject(embeddedRestProfile, newProjectId);
             }
         }
     }

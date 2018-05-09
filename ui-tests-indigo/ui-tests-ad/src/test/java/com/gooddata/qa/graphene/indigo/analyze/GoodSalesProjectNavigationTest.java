@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.GOODSALES_TEMPLATE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
@@ -9,21 +8,24 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 
 import java.io.IOException;
 import java.util.UUID;
 
+import com.gooddata.fixture.ResourceManagement.ResourceTemplate;
+import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.RestClient.RestProfile;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
-import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class GoodSalesProjectNavigationTest extends AbstractAnalyseTest {
 
@@ -50,10 +52,8 @@ public class GoodSalesProjectNavigationTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
     public void getMoreProject() {
         currentProjectId = testParams.getProjectId();
-
-        newProjectId = ProjectRestUtils.createProject(getGoodDataClient(), NEW_PROJECT_NAME, GOODSALES_TEMPLATE,
-                testParams.getAuthorizationToken(), testParams.getProjectDriver(),
-                testParams.getProjectEnvironment());
+        newProjectId = createProjectUsingFixture(NEW_PROJECT_NAME, ResourceTemplate.GOODSALES);
+        new Metrics(new RestClient(getProfile(ADMIN)), newProjectId).createAmountMetric();
     }
 
     @DataProvider(name = "userRoleProvider")
@@ -67,17 +67,15 @@ public class GoodSalesProjectNavigationTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"precondition"}, dataProvider = "userRoleProvider", groups = {"switchProject"})
     public void switchProjectWithOtherUserRoles(String user, String password, UserRoles role)
             throws ParseException, IOException, JSONException {
-        GoodData goodDataClient = getGoodDataClient(user, password);
+        final RestClient restClient = new RestClient(new RestProfile(testParams.getHost(), user, password, true));
 
         logout();
         signInAtGreyPages(user, password);
 
-        String newProjectId = ProjectRestUtils.createBlankProject(goodDataClient, NEW_PROJECT_NAME,
-                testParams.getAuthorizationToken(), testParams.getProjectDriver(),
-                testParams.getProjectEnvironment());
+        String newProjectId = createNewEmptyProject(restClient, NEW_PROJECT_NAME);
+        final ProjectRestRequest newProjectRestRequest = new ProjectRestRequest(restClient, newProjectId);
 
-        ProjectRestUtils.setFeatureFlagInProject(goodDataClient, newProjectId,
-                ProjectFeatureFlags.ANALYTICAL_DESIGNER, true);
+        newProjectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ANALYTICAL_DESIGNER, true);
 
         testParams.setProjectId(newProjectId);
         try {
@@ -107,14 +105,14 @@ public class GoodSalesProjectNavigationTest extends AbstractAnalyseTest {
             logout();
             signIn(false, UserRoles.ADMIN);
 
-            ProjectRestUtils.deleteProject(goodDataClient, newProjectId);
+            newProjectRestRequest.deleteProject();
         }
     }
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"switchProject"})
     public void switchProjectWithFeatureFlagDisabled() {
-        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), newProjectId,
-                ProjectFeatureFlags.ANALYTICAL_DESIGNER, false);
+         new ProjectRestRequest(new RestClient(getProfile(ADMIN)), newProjectId).setFeatureFlagInProject(
+                 ProjectFeatureFlags.ANALYTICAL_DESIGNER, false);
 
         initAnalysePage();
 
@@ -127,7 +125,7 @@ public class GoodSalesProjectNavigationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"switchProject"})
     public void switchProject() {
-        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), newProjectId,
+        new ProjectRestRequest(new RestClient(getProfile(ADMIN)), newProjectId).setFeatureFlagInProject(
                 ProjectFeatureFlags.ANALYTICAL_DESIGNER, true);
 
         initAnalysePage();
@@ -147,7 +145,7 @@ public class GoodSalesProjectNavigationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"switchProject"})
     public void checkLastVisitedProject() throws JSONException {
-        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), newProjectId,
+        new ProjectRestRequest(new RestClient(getProfile(ADMIN)), newProjectId).setFeatureFlagInProject(
                 ProjectFeatureFlags.ANALYTICAL_DESIGNER, true);
 
         initAnalysePage();

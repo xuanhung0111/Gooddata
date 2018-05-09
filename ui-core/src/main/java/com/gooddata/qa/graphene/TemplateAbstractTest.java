@@ -1,9 +1,12 @@
 package com.gooddata.qa.graphene;
 
 
+import com.gooddata.GoodData;
+import com.gooddata.project.Environment;
+import com.gooddata.project.Project;
 import com.gooddata.project.ProjectDriver;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,9 +52,8 @@ public class TemplateAbstractTest extends AbstractProjectTest{
     protected void createNewProject() throws Throwable {
         if (!canAccessGreyPage(browser)) {
             System.out.println("Use REST api to create project.");
-            testParams.setProjectId(ProjectRestUtils.createProject(getGoodDataClient(), projectTitle,
-                    projectTemplate, testParams.getAuthorizationToken(), ProjectDriver.POSTGRES,
-                    testParams.getProjectEnvironment()));
+            testParams.setProjectId(createProject(getGoodDataClient(), projectTitle, projectTemplate,
+                    testParams.getAuthorizationToken(), ProjectDriver.POSTGRES, testParams.getProjectEnvironment()));
 
         } else {
             openUrl(PAGE_GDC_PROJECTS);
@@ -69,5 +71,27 @@ public class TemplateAbstractTest extends AbstractProjectTest{
             }
             Screenshots.takeScreenshot(browser, projectTitle + "-created", this.getClass());
         }
+    }
+
+    /**
+     * Create project with specific template
+     *
+     * @param goodData
+     * @param title
+     * @param template
+     * @param authorizationToken
+     * @param projectDriver
+     * @param environment
+     * @return project id
+     */
+    private String createProject(final GoodData goodData, final String title, final String template,
+                                 final String authorizationToken, final ProjectDriver projectDriver,
+                                 final Environment environment) {
+        final Project project = new Project(title, authorizationToken);
+        if (!StringUtils.isBlank(template)) project.setProjectTemplate(template);
+        project.setDriver(projectDriver);
+        project.setEnvironment(environment);
+
+        return goodData.getProjectService().createProject(project).get().getId();
     }
 }

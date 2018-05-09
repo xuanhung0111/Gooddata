@@ -7,7 +7,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteWidgetsUsingCascade;
-import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -17,6 +16,8 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.ITestContext;
@@ -244,16 +245,15 @@ public class EditModeTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkNoVisualizationsList() {
-        setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.ANALYTICAL_DESIGNER, false);
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ANALYTICAL_DESIGNER, false);
         try {
             initIndigoDashboardsPageWithWidgets().switchToEditMode();
 
             takeScreenshot(browser, "checkNoVisualizationsList", getClass());
             assertFalse(IndigoInsightSelectionPanel.isPresent(browser));
         } finally {
-            setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                    ProjectFeatureFlags.ANALYTICAL_DESIGNER, true);
+            projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ANALYTICAL_DESIGNER, true);
         }
     }
 }

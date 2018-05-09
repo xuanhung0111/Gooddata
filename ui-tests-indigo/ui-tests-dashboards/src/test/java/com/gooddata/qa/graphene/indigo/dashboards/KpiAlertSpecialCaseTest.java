@@ -21,6 +21,7 @@ import java.util.UUID;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.fact.FactRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.jsoup.nodes.Document;
@@ -43,7 +44,6 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirect
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
 
@@ -68,6 +68,11 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
         imapHost = testParams.loadProperty("imap.host");
         imapUser = testParams.loadProperty("imap.user");
         imapPassword = testParams.loadProperty("imap.password");
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
@@ -390,8 +395,9 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
         String indigoDashboardUri = createAnalyticalDashboard(
                 getRestApiClient(), testParams.getProjectId(), singletonList(kpiUri));
 
-        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.HIDE_KPI_ALERT_LINK, true);
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)),
+                testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.HIDE_KPI_ALERT_LINK, true);
 
         try {
             initEmbeddedIndigoDashboardPageByType(type)
@@ -415,8 +421,7 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
         } finally {
             getMdService().removeObjByUri(indigoDashboardUri);
 
-            ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                    ProjectFeatureFlags.HIDE_KPI_ALERT_LINK, false);
+            projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.HIDE_KPI_ALERT_LINK, false);
 
             updateCsvDataset(DATASET_NAME, csvFilePath);
         }

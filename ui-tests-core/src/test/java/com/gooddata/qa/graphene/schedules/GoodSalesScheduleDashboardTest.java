@@ -28,7 +28,9 @@ import java.util.Set;
 
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
+import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
@@ -50,7 +52,6 @@ import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.google.common.base.Joiner;
 
@@ -438,23 +439,23 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     }
 
     private void enableHideDashboardScheduleFlag() throws JSONException {
-        ProjectRestUtils.setFeatureFlagInProjectAndCheckResult(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.HIDE_DASHBOARD_SCHEDULE, true);
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.HIDE_DASHBOARD_SCHEDULE, true);
     }
 
     private void disableHideDashboardScheduleFlag() throws JSONException, IOException {
-        ProjectRestUtils.setFeatureFlagInProjectAndCheckResult(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.HIDE_DASHBOARD_SCHEDULE, false);
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.HIDE_DASHBOARD_SCHEDULE, false);
     }
 
     private void enableDashboardScheduleRecipientsFlag() throws JSONException {
-        ProjectRestUtils.setFeatureFlagInProjectAndCheckResult(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS, true);
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS, true);
     }
 
     private void disableDashboardScheduleRecipientsFlag() throws JSONException, IOException {
-        ProjectRestUtils.setFeatureFlagInProjectAndCheckResult(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS, false);
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS, false);
     }
 
     private void assertDashboardScheduleInfo(String title, String authorUri, Collection<String> bccEmails) {

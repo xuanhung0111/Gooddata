@@ -11,6 +11,8 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
@@ -20,20 +22,20 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class HeaderTest extends AbstractDashboardTest {
+    private ProjectRestRequest projectRestRequest;
 
     @Override
     protected void customizeProject() throws Throwable {
         getMetricCreator().createAmountMetric();
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkKpiLinkMissingIfFeatureFlagOff() throws JSONException {
         try {
-            ProjectRestUtils.setFeatureFlagInProjectAndCheckResult(getGoodDataClient(), testParams.getProjectId(),
-                    ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, false);
+            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, false);
 
             // ensure that feature flag is applied
             initDashboardsPage();
@@ -44,8 +46,7 @@ public class HeaderTest extends AbstractDashboardTest {
             assertFalse(ApplicationHeaderBar.isKpisLinkVisible(browser));
 
         } finally {
-            ProjectRestUtils.setFeatureFlagInProjectAndCheckResult(getGoodDataClient(), testParams.getProjectId(),
-                    ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
+            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
         }
     }
 
@@ -66,8 +67,8 @@ public class HeaderTest extends AbstractDashboardTest {
 
             // need another try finally block because not deleting kpi affects to other tests.
             try {
-                ProjectRestUtils.setFeatureFlagInProjectAndCheckResult(getGoodDataClient(),
-                        testParams.getProjectId(), ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, false);
+                projectRestRequest.setFeatureFlagInProjectAndCheckResult(
+                        ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, false);
 
                 // ensure that feature flag is applied
                 initDashboardsPage();
@@ -87,7 +88,7 @@ public class HeaderTest extends AbstractDashboardTest {
             assertFalse(ApplicationHeaderBar.isKpisLinkVisible(browser));
 
         } finally {
-            ProjectRestUtils.setFeatureFlagInProjectAndCheckResult(getGoodDataClient(), testParams.getProjectId(),
+            projectRestRequest.setFeatureFlagInProjectAndCheckResult(
                     ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
         }
     }

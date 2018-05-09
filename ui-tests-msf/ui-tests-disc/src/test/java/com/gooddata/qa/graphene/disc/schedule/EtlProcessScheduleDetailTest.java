@@ -2,11 +2,9 @@ package com.gooddata.qa.graphene.disc.schedule;
 
 import com.gooddata.qa.graphene.common.AbstractEtlProcessTest;
 import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 

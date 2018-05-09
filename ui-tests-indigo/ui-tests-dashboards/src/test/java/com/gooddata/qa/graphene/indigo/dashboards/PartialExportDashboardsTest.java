@@ -24,7 +24,6 @@ import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertTrue;
@@ -97,7 +96,7 @@ public class PartialExportDashboardsTest extends GoodSalesAbstractTest {
         } finally {
             testParams.setProjectId(oldPid);
             if (nonNull(newPid)) {
-                ProjectRestUtils.deleteProject(getGoodDataClient(), newPid);
+                deleteProject(newPid);
             }
         }
     }

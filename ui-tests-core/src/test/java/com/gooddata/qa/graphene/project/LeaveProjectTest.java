@@ -13,7 +13,6 @@ import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
 import com.gooddata.qa.graphene.fragments.projects.PopupDialog;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class LeaveProjectTest extends AbstractProjectTest {
 
@@ -41,20 +40,20 @@ public class LeaveProjectTest extends AbstractProjectTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testProjectHavingOneAdmin() {
-        String blankProjectID = createBlankProject("Project-Having-One-Admin");
+        String blankProjectID = createNewEmptyProject("Project-Having-One-Admin");
         try {
             initProjectsPage().getProjectItem(blankProjectID).leave();
             assertEquals(PopupDialog.getInstance(browser).getMessage(),
                     ERROR_MESSAGE, "The error msg is not correct");
         } finally {
-            ProjectRestUtils.deleteProject(getGoodDataClient(), blankProjectID);
+            deleteProject(blankProjectID);
         }
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testProjectHavingMultipleAdmins() throws IOException, JSONException {
         String workingProjectID = testParams.getProjectId();
-        testParams.setProjectId(createBlankProject("Project-Having-Two-Admins"));
+        testParams.setProjectId(createNewEmptyProject("Project-Having-Two-Admins"));
         try {
             String anotherUser = createAndAddUserToProject(UserRoles.ADMIN);
 
@@ -67,7 +66,7 @@ public class LeaveProjectTest extends AbstractProjectTest {
         } finally {
             // switch to domain user because the new user which is created in this test has just left created project
             logoutAndLoginAs(true, UserRoles.ADMIN);
-            ProjectRestUtils.deleteProject(getGoodDataClient(), testParams.getProjectId());
+            deleteProject(testParams.getProjectId());
             testParams.setProjectId(workingProjectID);
         }
     }
@@ -111,11 +110,5 @@ public class LeaveProjectTest extends AbstractProjectTest {
             addUserToProject(testParams.getViewerUser(), UserRoles.VIEWER);
             addUserToProject(anotherAdminUser, UserRoles.ADMIN);
         }
-    }
-
-    private String createBlankProject(String name) {
-        return ProjectRestUtils.createProject(getGoodDataClient(testParams.getUser(), testParams.getPassword()),
-                name, null, testParams.getAuthorizationToken(), testParams.getProjectDriver(), testParams
-                        .getProjectEnvironment());
     }
 }

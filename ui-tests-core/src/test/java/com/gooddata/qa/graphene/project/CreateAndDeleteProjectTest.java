@@ -19,7 +19,6 @@ import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class CreateAndDeleteProjectTest extends AbstractProjectTest {
 
@@ -41,8 +40,7 @@ public class CreateAndDeleteProjectTest extends AbstractProjectTest {
         openUrl(PAGE_GDC_PROJECTS);
         assertEquals(waitForFragmentVisible(gpProject).getDwhDriverSelected(), ProjectDriver.POSTGRES.getValue());
 
-        secondProjectId = ProjectRestUtils.createBlankProject(getGoodDataClient(), projectTitle,
-                testParams.getAuthorizationToken(), testParams.getProjectDriver(), testParams.getProjectEnvironment());
+        secondProjectId = createNewEmptyProject(projectTitle);
     }
 
     @Test(dependsOnMethods = {"createAnotherProject"})

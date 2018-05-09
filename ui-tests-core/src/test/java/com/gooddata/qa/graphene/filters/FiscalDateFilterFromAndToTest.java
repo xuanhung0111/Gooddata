@@ -12,6 +12,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.DayTimeFilter
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.DayTimeFilterPanel.DayAgo;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.rolap.RolapRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -26,7 +27,6 @@ import java.time.temporal.ChronoUnit;
 
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
-import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlagInProject;
 import static org.testng.Assert.assertEquals;
 
 public class FiscalDateFilterFromAndToTest extends AbstractDashboardWidgetTest {
@@ -69,8 +69,8 @@ public class FiscalDateFilterFromAndToTest extends AbstractDashboardWidgetTest {
 
         new RolapRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
                 .postEtlPullIntegration(webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()));
-        setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.FISCAL_CALENDAR_ENABLED, true);
+        new ProjectRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
+                .setFeatureFlagInProject(ProjectFeatureFlags.FISCAL_CALENDAR_ENABLED, true);
         currentFiscalYear = getCurrentFiscalYear();
     }
 

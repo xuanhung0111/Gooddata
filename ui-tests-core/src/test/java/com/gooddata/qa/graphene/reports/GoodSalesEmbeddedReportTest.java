@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.reports;
 
 import com.gooddata.GoodData;
+import com.gooddata.fixture.ResourceManagement.ResourceTemplate;
 import com.gooddata.md.report.AttributeInGrid;
 import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.MetricElement;
@@ -18,7 +19,6 @@ import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportEmbedDialog;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.google.common.collect.Lists;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
@@ -36,7 +36,6 @@ import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_ACTIVE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.GOODSALES_TEMPLATE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
@@ -120,9 +119,8 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"editorGetEmbedCode"})
     public void createAdditionalProject() throws JSONException, InterruptedException {
-        additionalProjectId = ProjectRestUtils.createProject(getEditorGoodDataClient(),
-                ADDITIONAL_PROJECT_TITLE, GOODSALES_TEMPLATE, testParams.getAuthorizationToken(),
-                testParams.getProjectDriver(), testParams.getProjectEnvironment());
+        additionalProjectId = createProjectUsingFixture(ADDITIONAL_PROJECT_TITLE, ResourceTemplate.GOODSALES,
+                testParams.getEditorUser());
     }
 
     @DataProvider(name = "embeddedReport")
@@ -445,7 +443,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
     @AfterClass(alwaysRun = true)
     public void cleanUp() throws JSONException {
-        ProjectRestUtils.deleteProject(getEditorGoodDataClient(), additionalProjectId);
+        deleteProject(getProfile(Profile.EDITOR), additionalProjectId);
     }
 
     @Override
