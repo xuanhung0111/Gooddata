@@ -521,7 +521,9 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
     @AfterClass(alwaysRun = true)
     public void cleanUp() throws JSONException {
-        deleteProject(additionalProjectId);
+        if (!"".equals(additionalProjectId)) {
+            deleteProject(additionalProjectId);
+        }
     }
 
     @Override
