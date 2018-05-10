@@ -39,6 +39,7 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -169,16 +170,19 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     @DataProvider(name = "embeddedDashboard")
     public Object[][] getEmbeddedDashboardProvider() {
         return new Object[][] {
-            {true},
-            {false}
+            {true, false},
+            {false, false},
+            {false, true}
         };
     }
 
     @Test(dependsOnMethods = "createAdditionalProject", dataProvider = "embeddedDashboard")
-    public void embedDashboard(boolean withIframe) throws IOException {
+    public void embedDashboard(boolean withIframe, boolean useDashboardUriWithIdentifier) throws IOException {
         EmbeddedDashboard embeddedDashboard;
 
-        if (withIframe) {
+        if (useDashboardUriWithIdentifier) {
+            embeddedDashboard = initEmbeddedDashboardWithUri(getEmbeddedUriWithIdentifier());
+        } else if (withIframe) {
             embeddedDashboard = embedDashboardToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, 
                     EMBEDDED_DASHBOARD_NAME);
         } else {
@@ -231,11 +235,13 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = "createAdditionalProject", dataProvider = "embeddedDashboard")
-    public void configReportTitleVisibility(boolean withIframe) {
+    public void configReportTitleVisibility(boolean withIframe, boolean useDashboardUriWithIdentifier) {
         String dashboardName = "Config Report Title On Embedded Dashboard";
         EmbeddedDashboard embeddedDashboard;
 
-        if (withIframe) {
+        if (useDashboardUriWithIdentifier) {
+            embeddedDashboard = initEmbeddedDashboardWithUri(getEmbeddedUriWithIdentifier());
+        } else if (withIframe) {
             embeddedDashboard = embedDashboardToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, dashboardName);
         } else {
             embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
@@ -568,5 +574,27 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
     private String getExportFilePath(String name, ExportFormat format) {
         return testParams.getDownloadFolder() + testParams.getFolderSeparator() + name + "." + format.getName();
+    }
+
+    private String getEmbeddedUriWithIdentifier() {
+        String embeddedUriWithIdentifier = "";
+        String [] strSplit = embedUri.split("#");
+        String [] embeddedParams = strSplit[1].split("&");
+
+        embeddedUriWithIdentifier += strSplit[0] + "#";
+        for (int i = 0; i < embeddedParams.length; i++) {
+            if (i > 0) {
+                embeddedUriWithIdentifier += "&";
+            }
+
+            if (embeddedParams[i].startsWith("dashboard=")) {
+                String dashboardUri = embeddedParams[i].split("=")[1];
+                String dashboardIdentifier = getObjIdentifiers(Arrays.asList(dashboardUri)).get(0);
+                embeddedParams[i] = embeddedParams[i].replace(
+                        embeddedParams[i].split("/obj/")[1], "identifier:" + dashboardIdentifier);
+            }
+            embeddedUriWithIdentifier += embeddedParams[i];
+        }
+        return embeddedUriWithIdentifier;
     }
 }
