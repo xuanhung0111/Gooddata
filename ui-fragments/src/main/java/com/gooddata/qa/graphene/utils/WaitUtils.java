@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -24,6 +25,7 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public final class WaitUtils {
 
+    private static final Logger log = Logger.getLogger(WaitUtils.class.getName());
     private static final int TIMEOUT_WAIT_OLD_CLIENT_LOADED = 5 * 60; // minutes
 
     private WaitUtils() {
@@ -247,5 +249,24 @@ public final class WaitUtils {
         Graphene.waitGui().pollingEvery(5, TimeUnit.SECONDS)
                 .withTimeout(5, TimeUnit.MINUTES)
                 .until(isExportCompleted);
+    }
+
+    public static void waitForIndigoMessageDisappear(SearchContext context) {
+        WebElement message = waitForElementVisible(By.className("gd-messages"), context);
+
+        Graphene.waitGui().withTimeout(10, TimeUnit.SECONDS).until(browser -> {
+            if (isElementPresent(By.className("success"), message)) {
+                waitForElementNotVisible(message);
+                return true;
+            }
+            if (isElementPresent(By.className("error"), message)) {
+                throw new RuntimeException("Indigo error message found");
+            }
+            if (!isElementVisible(message)) {
+                log.info("Success message flash so quickly and consider this is correct behavior");
+                return true;
+            }
+            return false;
+        });
     }
 }
