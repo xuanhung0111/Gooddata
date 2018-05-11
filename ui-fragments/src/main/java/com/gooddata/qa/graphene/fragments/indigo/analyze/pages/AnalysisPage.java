@@ -26,11 +26,11 @@ import org.openqa.selenium.support.FindBy;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.dismissSuccessMessage;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForIndigoMessageDisappear;
 import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertTrue;
 
@@ -349,7 +349,7 @@ public class AnalysisPage extends AbstractFragment {
 
     public AnalysisPage saveInsight() {
         getPageHeader().saveInsight();
-        dismissSuccessMessage(browser);
+        waitForIndigoMessageDisappear(browser);
         return this;
     }
 
@@ -359,13 +359,13 @@ public class AnalysisPage extends AbstractFragment {
 
     public AnalysisPage saveInsight(final String insight) {
         getPageHeader().saveInsight(insight);
-        dismissSuccessMessage(browser);
+        waitForIndigoMessageDisappear(browser);
         return this;
     }
 
     public AnalysisPage saveInsightAs(final String insight) {
         getPageHeader().saveInsightAs(insight);
-        dismissSuccessMessage(browser);
+        waitForIndigoMessageDisappear(browser);
         return this;
     }
 

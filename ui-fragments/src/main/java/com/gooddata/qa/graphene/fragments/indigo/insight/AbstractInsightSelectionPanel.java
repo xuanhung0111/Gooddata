@@ -10,12 +10,12 @@ import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.dismissSuccessMessage;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForIndigoMessageDisappear;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
@@ -175,7 +175,7 @@ public abstract class AbstractInsightSelectionPanel extends AbstractFragment {
             getActions().moveToElement(vizTypeIcon).perform();
             waitForElementVisible(deleteIcon).click();
             SaveInsightDialog.getInstance(browser).clickSubmitButton();
-            dismissSuccessMessage(browser);
+            waitForIndigoMessageDisappear(browser);
         }
 
         public void open() {

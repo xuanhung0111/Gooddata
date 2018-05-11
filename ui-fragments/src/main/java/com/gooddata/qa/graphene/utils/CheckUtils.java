@@ -1,16 +1,14 @@
 package com.gooddata.qa.graphene.utils;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.*;
-import static java.lang.String.format;
-import static org.testng.Assert.fail;
+import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 
 import java.util.logging.Logger;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static java.lang.String.format;
+import static org.testng.Assert.fail;
 
 public final class CheckUtils {
 
@@ -26,9 +24,6 @@ public final class CheckUtils {
     public static final By BY_DISMISS_BUTTON = By.cssSelector("div#status .s-btn-dismiss");
     public static final By BY_ERROR_ID = By.cssSelector("div#status .c-error-errorId");
     public static final By BY_ERROR_MESSAGE = By.cssSelector("div#status .c-error-message");
-
-    public static final By BY_INDIGO_MESSAGE = By.cssSelector(".gd-message:not(.progress)");
-    public static final By BY_INDIGO_DISMISS_BUTTON = By.cssSelector(".gd-message-dismiss");
 
     private CheckUtils() {
     }
@@ -76,26 +71,6 @@ public final class CheckUtils {
 
         if (desiredMessage.length() != 0 && !greenBarMessage.equals(desiredMessage)) {
             fail("WRONG GREEN BAR MESSAGE - is: " + greenBarMessage + " expected: " + desiredMessage);
-        }
-    }
-
-    public static void dismissSuccessMessage(WebDriver browser) {
-        int timeoutInSeconds = 10;
-
-        WebElement message = waitForElementVisible(BY_INDIGO_MESSAGE, browser, timeoutInSeconds);
-        String nodeClass = message.getAttribute("class");
-
-        if (nodeClass.contains("success")) {
-            try {
-                waitForElementVisible(BY_INDIGO_DISMISS_BUTTON, message).click();
-                waitForElementNotPresent(message);
-            } catch (NoSuchElementException e) {
-                log.info("Success message flash so quickly and no need to dismiss it by manually");
-            }
-        } else if (nodeClass.contains("error")) {
-            throw new RuntimeException("Indigo error message found");
-        } else {
-            throw new RuntimeException("Unknown indigo message found");
         }
     }
 }
