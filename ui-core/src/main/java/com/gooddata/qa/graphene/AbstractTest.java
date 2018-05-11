@@ -1,7 +1,5 @@
 package com.gooddata.qa.graphene;
 
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.deleteUserByEmail;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,7 +14,9 @@ import com.gooddata.project.ProjectDriver;
 import com.gooddata.project.ProjectService;
 import com.gooddata.project.ProjectValidationResults;
 import com.gooddata.qa.browser.BrowserUtils;
+import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestClient.RestProfile;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.HttpHost;
 import org.apache.http.ParseException;
 import org.apache.http.NoHttpResponseException;
@@ -94,10 +94,13 @@ public abstract class AbstractTest extends Arquillian {
 
     @AfterClass(alwaysRun = true)
     public void deleteUsers() throws ParseException, IOException, JSONException {
-        RestApiClient restApiClient = testParams.getDomainUser() == null ? getRestApiClient() : getDomainUserRestApiClient();
+        final String domainUser = testParams.getDomainUser() != null ? testParams.getDomainUser() : testParams.getUser();
+        final UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(
+                new RestClient(new RestProfile(testParams.getHost(), domainUser, testParams.getPassword(), true)),
+                testParams.getProjectId());
 
         for (String user : extraUsers) {
-            deleteUserByEmail(restApiClient, testParams.getUserDomain(), user);
+            userManagementRestRequest.deleteUserByEmail(testParams.getUserDomain(), user);
         }
     }
 

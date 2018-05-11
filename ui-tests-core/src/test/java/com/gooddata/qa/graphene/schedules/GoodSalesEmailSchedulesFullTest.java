@@ -21,7 +21,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOO_LARGE;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.updateEmailOfAccount;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
@@ -49,9 +48,11 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.scheduleEmail.ScheduleEmailRestRequest;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest.UserStatus;
 import com.gooddata.qa.utils.java.Builder;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
@@ -98,12 +99,14 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     private Map<String, MessageContent> attachments = new HashMap<String, MessageContent>();
 
     private DashboardRestRequest dashboardRequest;
+    private UserManagementRestRequest userManagementRestRequest;
 
     @Override
     protected void addUsersWithOtherRolesToProject() throws IOException, JSONException {
         addUserToProject(imapUser, UserRoles.ADMIN);
         String editor = createAndAddUserToProject(UserRoles.EDITOR);
-        updateEmailOfAccount(getRestApiClient(), testParams.getUserDomain(), editor, EDITOR_EMAIL);
+        new UserManagementRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .updateEmailOfAccount(testParams.getUserDomain(), editor, EDITOR_EMAIL);
     }
 
     @BeforeClass(alwaysRun = true)
@@ -134,6 +137,8 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
         dashboardRequest.createDashboard(createSimpleDashboard(DASHBOARD_HAVING_TAB).getMdObject());
         dashboardRequest.createDashboard(createSimpleDashboard(OTHER_DASHBOARD_HAVING_TAB).getMdObject());
+        userManagementRestRequest = new UserManagementRestRequest(
+                new RestClient(getProfile(Profile.DOMAIN)), testParams.getProjectId());
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
@@ -157,8 +162,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         EmailSchedulePage emailSchedulePage = initEmailSchedulesPage().scheduleNewDashboardEmail(
                 singletonList(testParams.getUser()), dashboard, "Scheduled email test - dashboard.",
                 singletonList(DASHBOARD_HAVING_TAB));
-        UserManagementRestUtils.updateUserStatusInProject(getDomainUserRestApiClient(), testParams.getProjectId(),
-                testParams.getUser(), UserManagementRestUtils.UserStatus.DISABLED);
+        userManagementRestRequest.updateUserStatusInProject(testParams.getUser(), UserStatus.DISABLED);
         try {
             assertFalse(emailSchedulePage.openSchedule(dashboard).getEmailToListItem().contains(testParams.getUser()));
 
@@ -166,13 +170,11 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
             assertEquals(emailSchedulePage.getValidationErrorMessages(), "Should not be empty");
 
             emailSchedulePage.changeEmailTo(dashboard, singletonList(imapUser));
-            UserManagementRestUtils.updateUserStatusInProject(getDomainUserRestApiClient(), testParams.getProjectId(),
-                    testParams.getUser(), UserManagementRestUtils.UserStatus.ENABLED);
+            userManagementRestRequest.updateUserStatusInProject(testParams.getUser(), UserStatus.ENABLED);
             assertEquals(emailSchedulePage.openSchedule(dashboard).getEmailToListItem(), asList(imapUser, testParams.getUser()));
         } finally {
             waitForFragmentVisible(initEmailSchedulesPage()).deleteSchedule(dashboard);
-            UserManagementRestUtils.updateUserStatusInProject(getDomainUserRestApiClient(), testParams.getProjectId(),
-                    testParams.getUser(), UserManagementRestUtils.UserStatus.ENABLED);
+            userManagementRestRequest.updateUserStatusInProject(testParams.getUser(), UserStatus.ENABLED);
         }
     }
 
@@ -189,19 +191,16 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         EmailSchedulePage emailSchedulePage = initEmailSchedulesPage();
         emailSchedulePage.scheduleNewDashboardEmail(asList(imapUser, testParams.getUser()), dashboard,
                 "Scheduled email test - dashboard.", singletonList(DASHBOARD_HAVING_TAB));
-        UserManagementRestUtils.updateUserStatusInProject(getDomainUserRestApiClient(), testParams.getProjectId(),
-                testParams.getUser(), UserManagementRestUtils.UserStatus.DISABLED);
+        userManagementRestRequest.updateUserStatusInProject(testParams.getUser(), UserStatus.DISABLED);
         try {
             assertFalse(emailSchedulePage.openSchedule(dashboard).getEmailToListItem().contains(testParams.getUser()));
             emailSchedulePage.changeDashboards(dashboard, asList(DASHBOARD_HAVING_TAB, OTHER_DASHBOARD_HAVING_TAB));
-            UserManagementRestUtils.updateUserStatusInProject(getDomainUserRestApiClient(), testParams.getProjectId(),
-                    testParams.getUser(), UserManagementRestUtils.UserStatus.ENABLED);
+            userManagementRestRequest.updateUserStatusInProject(testParams.getUser(), UserStatus.ENABLED);
             assertEquals(emailSchedulePage.openSchedule(dashboard).getEmailToListItem(),
                     asList(imapUser, testParams.getUser()));
         } finally {
             waitForFragmentVisible(initEmailSchedulesPage()).deleteSchedule(dashboard);
-            UserManagementRestUtils.updateUserStatusInProject(getDomainUserRestApiClient(), testParams.getProjectId(),
-                    testParams.getUser(), UserManagementRestUtils.UserStatus.ENABLED);
+            userManagementRestRequest.updateUserStatusInProject(testParams.getUser(), UserStatus.ENABLED);
         }
     }
 
@@ -328,8 +327,8 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
 
         Map<String, Collection<String>> conditions = new HashMap();
         conditions.put(product.getUri(), singletonList(explorerUri));
-        dashboardRequest.addMufToUser(UserManagementRestUtils.getUserProfileUri(getDomainUserRestApiClient(),
-                testParams.getUserDomain(), imapUser), dashboardRequest.createSimpleMufObjByUri("Product user " +
+        dashboardRequest.addMufToUser(userManagementRestRequest.getUserProfileUri(testParams.getUserDomain(), imapUser),
+                dashboardRequest.createSimpleMufObjByUri("Product user " +
                 "filter", conditions));
 
         ReportDefinition definition = GridReportDefinitionContent.create(report, singletonList(METRIC_GROUP),

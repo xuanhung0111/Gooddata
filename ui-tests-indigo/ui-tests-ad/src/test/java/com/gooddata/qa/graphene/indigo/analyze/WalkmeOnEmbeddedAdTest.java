@@ -1,13 +1,14 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.deleteUserByEmail;
 import static java.lang.String.format;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
@@ -34,7 +35,8 @@ public class WalkmeOnEmbeddedAdTest extends AbstractUITest {
             assertTrue(EmbeddedAnalysisPage.getInstance(browser).isEmbeddedPage(), "Embedded AD page was not loaded");
             assertFalse(WalkmeDialog.isPresent(browser), "Walkme dialog was loaded");
         } finally {
-            deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), newUserEmail);
+            new UserManagementRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                    .deleteUserByEmail(testParams.getUserDomain(), newUserEmail);
         }
     }
 

@@ -31,6 +31,7 @@ import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
@@ -52,7 +53,6 @@ import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.google.common.base.Joiner;
 
 public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedulesTest {
@@ -342,17 +342,18 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         String userB = createDynamicUserFrom(scheduleEmail);
         String scheduleUserA = "Schedule with deleted bcc email";
         String scheduleUserB = "Schedule with deleted author";
-        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
+        UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(
+                new RestClient(getProfile(Profile.DOMAIN)), testParams.getProjectId());
 
         try {
             String userUri = getGoodDataClient().getAccountService().getCurrent().getUri();
-            UserManagementRestUtils.addUserToProject(restApiClient, testParams.getProjectId(), userA, UserRoles.EDITOR);
-            UserManagementRestUtils.addUserToProject(restApiClient, testParams.getProjectId(), userB, UserRoles.ADMIN);
+            userManagementRestRequest.addUserToProject(userA, UserRoles.EDITOR);
+            userManagementRestRequest.addUserToProject(userB, UserRoles.ADMIN);
 
             initDashboardsPage();
             dashboardsPage.selectDashboard(DASHBOARD_HAVING_MANY_TABS);
             createDashboardSchedule(scheduleUserA, asList(userA));
-            UserManagementRestUtils.deleteUserByEmail(restApiClient, testParams.getUserDomain(), userA);
+            userManagementRestRequest.deleteUserByEmail(testParams.getUserDomain(), userA);
 
             initEmailSchedulesPage();
             assertDashboardScheduleInfo(scheduleUserA, userUri, asList(userA));
@@ -364,7 +365,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
 
             logout();
             signIn(true, UserRoles.ADMIN);
-            UserManagementRestUtils.deleteUserByEmail(restApiClient, testParams.getUserDomain(), userB);
+            userManagementRestRequest.deleteUserByEmail(testParams.getUserDomain(), userB);
 
             assertFalse(initEmailSchedulesPage().isPrivateSchedulePresent(scheduleUserB),
                     "Schedule of deleted user was not hidden.");

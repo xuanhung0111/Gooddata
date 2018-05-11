@@ -6,7 +6,9 @@ import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.DataProvider;
@@ -27,8 +29,6 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.joda.time.DateTime.now;
 import static org.testng.Assert.assertEquals;
 
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
-
 public class GoodsalesMufReportTest extends GoodSalesAbstractTest {
     private final static int PERIOD_UNTIL_2012 = now().getYear() - 2012;
     private Attribute stageNameAttribute;
@@ -39,10 +39,13 @@ public class GoodsalesMufReportTest extends GoodSalesAbstractTest {
 
     private String combinedMufExpression;
     private DashboardRestRequest dashboardRequest;
+    private UserManagementRestRequest userManagementRestRequest;
 
     @Override
     protected void customizeProject() throws Throwable {
         dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
+        userManagementRestRequest = new UserManagementRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         stageNameAttribute = getMdService().getObj(getProject(), Attribute.class, identifier("attr.stage.name"));
         stageNameValue = getMdService()
                 .getAttributeElements(stageNameAttribute)
@@ -77,7 +80,7 @@ public class GoodsalesMufReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "mufProvider", groups = "combinedMuf")
     public void checkMufApplied(String mufName, String expression, String attribute, String attributeValue)
             throws ParseException, JSONException, IOException {
-        dashboardRequest.addMufToUser(UserManagementRestUtils.getCurrentUserProfileUri(getRestApiClient()),
+        dashboardRequest.addMufToUser(userManagementRestRequest.getCurrentUserProfileUri(),
                 dashboardRequest.createMufObjectByUri(mufName, expression));
 
         final String uniqueString = UUID.randomUUID().toString().substring(0, 6);
@@ -121,7 +124,7 @@ public class GoodsalesMufReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = "combinedMuf")
     public void checkCombinedMuf() throws ParseException, IOException, JSONException {
-        dashboardRequest.addMufToUser(UserManagementRestUtils.getCurrentUserProfileUri(getRestApiClient()),
+        dashboardRequest.addMufToUser(userManagementRestRequest.getCurrentUserProfileUri(),
                 dashboardRequest.createMufObjectByUri("combinedMuf", combinedMufExpression));
         final String uniqueString = UUID.randomUUID().toString().substring(0, 6);
         final String reportName = "Report" + uniqueString;

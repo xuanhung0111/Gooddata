@@ -28,7 +28,7 @@ import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import com.gooddata.qa.utils.http.variable.VariableRestRequest;
 import com.gooddata.qa.utils.io.ResourceUtils;
 import com.gooddata.qa.utils.java.Builder;
@@ -59,7 +59,6 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 public class MetricAvailableFilterTest extends AbstractDashboardWidgetTest {
-
     private static final String MORE_INFO = "More info";
     private static final String AVAILABLE_VALUES = "Available Values";
     private static final String STATE = "State";
@@ -144,8 +143,9 @@ public class MetricAvailableFilterTest extends AbstractDashboardWidgetTest {
         final String expression = format("[%s] IN ([%s], [%s], [%s])",
                 getAttributeByTitle(STATE).getUri(), attrEleOfMufUris.get(0), attrEleOfMufUris.get(1), attrEleOfMufUris.get(2));
         mufUri = dashboardRequest.createMufObjectByUri("muf", expression);
-        assignedMufUserId = UserManagementRestUtils
-                .getUserProfileUri(getDomainUserRestApiClient(), testParams.getUserDomain(), testParams.getEditorUser());
+        assignedMufUserId = new UserManagementRestRequest(
+                new RestClient(getProfile(Profile.DOMAIN)), testParams.getProjectId())
+                .getUserProfileUri(testParams.getUserDomain(), testParams.getEditorUser());
 
         // There is first report to avoid case doesn't have any dashboard
         createDashboardHasReportAndFilter();

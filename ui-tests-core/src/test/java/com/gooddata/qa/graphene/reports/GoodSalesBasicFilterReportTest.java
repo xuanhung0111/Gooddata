@@ -8,7 +8,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileUri;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -21,6 +20,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
@@ -149,13 +150,14 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
         reportPage.saveReport();
         checkRedBar(browser);
 
-        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
+        UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(
+                new RestClient(getProfile(Profile.DOMAIN)), testParams.getProjectId());
         listAttributeValues.add("Closed Won");
 
         initVariablePage()
                 .openVariableFromList(VARIABLE_NAME)
                 .selectUserSpecificAttributeValues(
-                        getUserProfileUri(restApiClient, testParams.getUserDomain(), testParams.getUser()),
+                        userManagementRestRequest.getUserProfileUri(testParams.getUserDomain(), testParams.getUser()),
                         listAttributeValues)
                 .saveChange();
 

@@ -1,13 +1,11 @@
 package com.gooddata.qa.graphene.account;
 
 import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
+import static com.gooddata.qa.graphene.AbstractTest.Profile.DOMAIN;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getRoleUriFromInvitation;
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileByEmail;
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUsersUsingMuf;
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.inviteUserWithMufObj;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -26,6 +24,7 @@ import java.util.stream.Collectors;
 
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -43,8 +42,6 @@ import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.account.RegistrationPage;
-import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.io.ResourceUtils;
 
 public class InviteUserWithMufTest extends AbstractProjectTest {
@@ -125,11 +122,13 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
 
         ++expectedMessageCount;
 
-        final String invitationUri = inviteUserWithMufObj(getRestApiClient(),
-                testParams.getProjectId(), nonRegistedUser, updatedMufUri, UserRoles.EDITOR, INVITATION_MESSAGE);
+        final UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(
+                new RestClient(getProfile(ADMIN)), testParams.getProjectId());
+        final String invitationUri = userManagementRestRequest.inviteUserWithMufObj(nonRegistedUser, updatedMufUri,
+                UserRoles.EDITOR, INVITATION_MESSAGE);
 
-        final String mufUriInInvitation = UserManagementRestUtils
-                .getMufUriFromInvitation(getRestApiClient(), invitationUri);
+        final String mufUriInInvitation = userManagementRestRequest
+                .getMufUriFromInvitation(invitationUri);
         assertEquals(updatedMufUri, mufUriInInvitation, "The MUF in invitation content has not been updated ");
 
         final String activitionLink = getLinkInLastInvitation(expectedMessageCount + 1);
@@ -153,27 +152,27 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
 
             ++expectedMessageCount;
         } finally {
-            RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
-            UserManagementRestUtils.deleteUserByEmail(restApiClient, testParams.getUserDomain(),
-                    nonRegistedUser);
+            new UserManagementRestRequest(new RestClient(getProfile(DOMAIN)), testParams.getProjectId())
+                    .deleteUserByEmail(testParams.getUserDomain(), nonRegistedUser);
         }
     }
 
     @Test(dependsOnMethods = {"inviteUserWithMuf"})
     public void updateRoleInInvitation() throws JSONException, IOException {
         final String nonRegistedUser = generateEmail(imapUser);
+        final UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(
+                new RestClient(getProfile(ADMIN)), testParams.getProjectId());
 
-        final String previousRoleUri = getRoleUriFromInvitation(getRestApiClient(),
+        final String previousRoleUri = userManagementRestRequest.getRoleUriFromInvitation(
                 sendDefaultInvitation(nonRegistedUser));
         final String previousActivitionLink = getLinkInLastInvitation(expectedMessageCount + 1);
 
         ++expectedMessageCount;
 
-        final String invitationUri = inviteUserWithMufObj(getRestApiClient(), 
-                testParams.getProjectId(), nonRegistedUser,
-                defaultMufUri, UserRoles.VIEWER, INVITATION_MESSAGE);
+        final String invitationUri = userManagementRestRequest.inviteUserWithMufObj(nonRegistedUser, defaultMufUri,
+                UserRoles.VIEWER, INVITATION_MESSAGE);
 
-        final String roleUri = getRoleUriFromInvitation(getRestApiClient(), invitationUri);
+        final String roleUri = userManagementRestRequest.getRoleUriFromInvitation(invitationUri);
         assertTrue(!previousRoleUri.equals(roleUri) && roleUri.contains("roles/" + UserRoles.VIEWER.getRoleId()),
                 "The role in invitation content has not been updated ");
         assertTrue(previousActivitionLink.equals(getLinkInLastInvitation(expectedMessageCount + 1)),
@@ -196,8 +195,8 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
         ++expectedMessageCount;
 
         final String updatedMessage = "The message has been updated";
-        inviteUserWithMufObj(getRestApiClient(), testParams.getProjectId(), nonRegistedUser,
-                defaultMufUri, UserRoles.VIEWER, updatedMessage);
+        new UserManagementRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
+                .inviteUserWithMufObj(nonRegistedUser, defaultMufUri, UserRoles.VIEWER, updatedMessage);
 
         lastEmail = doActionWithImapClient(imapClient ->
                 getLastEmail(imapClient, GDEmails.INVITATION, getInvitationSubject(), expectedMessageCount + 1));
@@ -213,13 +212,16 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
     }
 
     private boolean isUserUsingMuf(String mufUri, String userEmail) throws JSONException, IOException {
-        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
-        final JSONObject userProfile = getUserProfileByEmail(restApiClient, testParams.getUserDomain(), userEmail);
+        final JSONObject userProfile = new UserManagementRestRequest(
+                new RestClient(getProfile(DOMAIN)), testParams.getProjectId())
+                .getUserProfileByEmail(testParams.getUserDomain(), userEmail);
         if(Objects.isNull(userProfile))
             return false;
         final String userProfileUri = userProfile.getJSONObject("links").getString("self");
 
-        final List<String> users = getUsersUsingMuf(getRestApiClient(), testParams.getProjectId(), mufUri);
+        final List<String> users = new UserManagementRestRequest(
+                new RestClient(getProfile(ADMIN)), testParams.getProjectId())
+                .getUsersUsingMuf(mufUri);
         return users.stream().anyMatch(u -> u.equals(userProfileUri));
     }
 
@@ -237,10 +239,12 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
     }
 
     private String sendDefaultInvitation(String userEmail) throws IOException, JSONException {
-        final String uri = inviteUserWithMufObj(getRestApiClient(), testParams.getProjectId(),
-                userEmail, defaultMufUri, UserRoles.EDITOR, INVITATION_MESSAGE);
+        final UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(
+                new RestClient(getProfile(ADMIN)), testParams.getProjectId());
+        final String uri = userManagementRestRequest
+                .inviteUserWithMufObj(userEmail, defaultMufUri, UserRoles.EDITOR, INVITATION_MESSAGE);
 
-        assertEquals(defaultMufUri, UserManagementRestUtils.getMufUriFromInvitation(getRestApiClient(), uri),
+        assertEquals(defaultMufUri, userManagementRestRequest.getMufUriFromInvitation(uri),
                 "The value in invitation content is different from created MUFUri");
         return uri;
     }

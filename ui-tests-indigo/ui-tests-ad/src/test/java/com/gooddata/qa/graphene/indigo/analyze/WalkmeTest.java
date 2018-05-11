@@ -2,13 +2,14 @@ package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static org.testng.Assert.assertEquals;
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.deleteUserByEmail;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.AfterClass;
@@ -55,7 +56,8 @@ public class WalkmeTest extends AbstractUITest {
 
     @Test
     public void registerNewUser() throws ParseException, JSONException, IOException {
-        deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), REGISTRATION_USER);
+        new UserManagementRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .deleteUserByEmail(testParams.getUserDomain(), REGISTRATION_USER);
 
         String registrationString = String.valueOf(System.currentTimeMillis());
         initRegistrationPage().registerNewUserSuccessfully(new RegistrationForm()
@@ -102,7 +104,8 @@ public class WalkmeTest extends AbstractUITest {
 
     @AfterClass(alwaysRun = true)
     public void tearDown() throws ParseException, JSONException, IOException {
-        deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), REGISTRATION_USER);
+        new UserManagementRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .deleteUserByEmail(testParams.getUserDomain(), REGISTRATION_USER);
     }
 
     private String getProjectId(String name) {

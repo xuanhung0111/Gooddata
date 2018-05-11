@@ -17,8 +17,8 @@ import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import org.apache.http.ParseException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -221,8 +221,10 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
         DashboardRestRequest dashboardRestRequest = new DashboardRestRequest(getAdminRestClient(), testParams
                 .getProjectId());
         final String mufUri = dashboardRestRequest.createMufObjectByUri("muf", expression);
-        String assignedMufUserId = UserManagementRestUtils
-            .getUserProfileUri(getDomainUserRestApiClient(), testParams.getUserDomain(), testParams.getEditorUser());
+        final UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(
+                new RestClient(getProfile(Profile.DOMAIN)), testParams.getProjectId());
+        String assignedMufUserId = userManagementRestRequest
+                .getUserProfileUri(testParams.getUserDomain(), testParams.getEditorUser());
 
         dashboardRestRequest.addMufToUser(assignedMufUserId, mufUri);
 
