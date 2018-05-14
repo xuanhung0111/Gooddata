@@ -251,7 +251,7 @@ public class DashboardsPage extends AbstractFragment {
         waitForElementVisible(BY_PRINTING_PANEL, browser);
         waitForElementNotPresent(BY_PRINTING_PANEL);
 
-        return tabs.getTabLabel(tabIndex).replace(" ", "_");
+        return tabs.getTabLabel(tabIndex);
     }
 
     public boolean isPrintButtonVisible() {

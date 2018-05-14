@@ -35,6 +35,7 @@ import com.gooddata.qa.graphene.dashboards.GoodSalesPersonalObjectsInDashboardWi
 import com.gooddata.qa.graphene.dashboards.GoodSalesReportWidgetOnDashboardTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesSavedViewWithAllValuesTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardMacroTest;
+import com.gooddata.qa.graphene.dashboards.GoodSalesPublicDashboardTest;
 import com.gooddata.qa.graphene.filters.DashboardDateFilterSelectRangeTest;
 import com.gooddata.qa.graphene.filters.DashboardFilterVisualTest;
 import com.gooddata.qa.graphene.filters.DashboardFiscalDateFilterConfigurationTest;
@@ -212,6 +213,7 @@ public class UITestsRegistry {
                     GroupFiltersOnDashboardTest.class,
                     FiscalDateFilterNameTest.class,
                     GoodSalesDashboardMacroTest.class,
+                    GoodSalesPublicDashboardTest.class,
                     "testng-dashboard-default-filter-multiple-choice.xml",
                     "testng-dashboard-default-filter-single-choice.xml",
                     "testng-dashboard-default-filter-savedView-multiple-choice.xml",

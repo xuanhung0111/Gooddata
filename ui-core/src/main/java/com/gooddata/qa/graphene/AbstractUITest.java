@@ -399,13 +399,17 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void initEmptyDashboardsPage() {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + DASHBOARD_PAGE_SUFFIX);
+        openUrl(getDashboardsPageUri());
         waitForElementVisible(By.id("p-projectDashboardPage"), browser);
     }
 
     public DashboardsPage initDashboardsPage() {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + DASHBOARD_PAGE_SUFFIX);
+        openUrl(getDashboardsPageUri());
         return waitForDashboardPage();
+    }
+
+    public String getDashboardsPageUri() {
+        return PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + DASHBOARD_PAGE_SUFFIX;
     }
 
     public ReportsPage initReportsPage() {
