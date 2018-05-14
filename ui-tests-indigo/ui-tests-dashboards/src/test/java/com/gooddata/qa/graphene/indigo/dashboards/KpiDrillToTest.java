@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
-import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_DISMISS_BUTTON;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
@@ -18,7 +17,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoade
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteDashboardsUsingCascade;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.not;
@@ -33,6 +31,7 @@ import java.util.stream.Stream;
 
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -74,6 +73,7 @@ public class KpiDrillToTest extends AbstractDashboardTest {
 
     private boolean isMobileRunning;
     private DashboardRestRequest dashboardRequest;
+    private IndigoRestRequest indigoRestRequest;
 
     @BeforeClass(alwaysRun = true)
     public void addUsersOnDesktopExecution(ITestContext context) {
@@ -83,6 +83,7 @@ public class KpiDrillToTest extends AbstractDashboardTest {
     @Override
     protected void customizeProject() throws Throwable {
         dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         getMetricCreator().createAmountMetric();
         getMetricCreator().createLostMetric();
         getMetricCreator().createWonMetric();
@@ -127,7 +128,7 @@ public class KpiDrillToTest extends AbstractDashboardTest {
             // check that url is the same, but after refresh it has /dashboard/<id> appended
             assertTrue(browser.getCurrentUrl().startsWith(currentUrl));
         } finally {
-            deleteDashboardsUsingCascade(getRestApiClient(), testParams.getProjectId());
+            indigoRestRequest.deleteDashboardsUsingCascade();
         }
     }
 
@@ -150,7 +151,7 @@ public class KpiDrillToTest extends AbstractDashboardTest {
 
             assertNotEquals(browser.getCurrentUrl(), currentUrl);
         } finally {
-            deleteDashboardsUsingCascade(getRestApiClient(), testParams.getProjectId());
+            indigoRestRequest.deleteDashboardsUsingCascade();
         }
     }
 
@@ -200,7 +201,7 @@ public class KpiDrillToTest extends AbstractDashboardTest {
 
             BrowserUtils.switchToFirstTab(browser);
         } finally {
-            deleteDashboardsUsingCascade(getRestApiClient(), testParams.getProjectId());
+            indigoRestRequest.deleteDashboardsUsingCascade();
         }
     }
 
@@ -228,7 +229,7 @@ public class KpiDrillToTest extends AbstractDashboardTest {
             assertNotEquals(drillToValue, drillToPlaceholder);
             assertEquals(drillToPlaceholder, DrillToSelect.PLACEHOLDER);
         } finally {
-            deleteDashboardsUsingCascade(getRestApiClient(), testParams.getProjectId());
+            indigoRestRequest.deleteDashboardsUsingCascade();
         }
     }
 
@@ -254,7 +255,7 @@ public class KpiDrillToTest extends AbstractDashboardTest {
             assertFalse(dashboardsPage.getTabs().isTabSelected(0));
             assertTrue(dashboardsPage.getTabs().isTabSelected(1));
         } finally {
-            deleteDashboardsUsingCascade(getRestApiClient(), testParams.getProjectId());
+            indigoRestRequest.deleteDashboardsUsingCascade();
         }
     }
 
@@ -300,7 +301,7 @@ public class KpiDrillToTest extends AbstractDashboardTest {
                 logout();
                 signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
 
-                deleteDashboardsUsingCascade(getRestApiClient(), testParams.getProjectId());
+                indigoRestRequest.deleteDashboardsUsingCascade();
             }
         } finally {
             initDashboardsPage();
@@ -350,7 +351,7 @@ public class KpiDrillToTest extends AbstractDashboardTest {
                 DashboardTabs tabs = dashboardsPage.getTabs();
                 assertThat(tabs.getAllTabNames(), not(contains(DASH_TAB_OUTLOOK)));
             } finally {
-                deleteDashboardsUsingCascade(getRestApiClient(), testParams.getProjectId());
+                indigoRestRequest.deleteDashboardsUsingCascade();
             }
         } finally {
             initDashboardsPage();
@@ -386,7 +387,7 @@ public class KpiDrillToTest extends AbstractDashboardTest {
 
             assertNotEquals(browser.getCurrentUrl(), currentUrl);
         } finally {
-            deleteDashboardsUsingCascade(getRestApiClient(), testParams.getProjectId());
+            indigoRestRequest.deleteDashboardsUsingCascade();
         }
     }
 
@@ -408,7 +409,7 @@ public class KpiDrillToTest extends AbstractDashboardTest {
 
             checkNoNewBrowserTabOrWindowNorRedirected(currentUrl);
         } finally {
-            deleteDashboardsUsingCascade(getRestApiClient(), testParams.getProjectId());
+            indigoRestRequest.deleteDashboardsUsingCascade();
         }
     }
 

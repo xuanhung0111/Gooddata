@@ -9,8 +9,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_SNAPSHO
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteWidgetsUsingCascade;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
@@ -20,6 +18,8 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.ConfigurationPanel;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.DataProvider;
@@ -36,6 +36,7 @@ import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 public class DateFilteringTest extends AbstractDashboardTest {
 
     private static final String DEFAULT_METRIC_FORMAT = "#,##0";
+    private IndigoRestRequest indigoRestRequest;
 
     @Override
     protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
@@ -45,7 +46,9 @@ public class DateFilteringTest extends AbstractDashboardTest {
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
-        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
+                testParams.getProjectId());
+        indigoRestRequest.createAnalyticalDashboard(singletonList(createAmountKpi()));
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop", "mobile"})
@@ -139,7 +142,7 @@ public class DateFilteringTest extends AbstractDashboardTest {
                                 .getWidgetByHeadline(Kpi.class, filteredOutMetric.getTitle()).isEmptyValue());
                     });
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), attributeFilterKpiUri,
+            indigoRestRequest.deleteWidgetsUsingCascade(attributeFilterKpiUri,
                     timeMacrosKpiUri, filteredOutKpiUri);
         }
     }

@@ -5,8 +5,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.browser.BrowserUtils.runScript;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteAnalyticalDashboard;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -19,6 +17,8 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.HamburgerMenu;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -43,10 +43,10 @@ public class MobileDropdownNavigationTest extends AbstractDashboardTest {
     @Override
     protected void customizeProject() {
         currentProjectId = testParams.getProjectId();
-        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
-                singletonList(createLostKpi()), DASHBOARD_LOST);
-        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
-                singletonList(createLostKpi()), DASHBOARD_LONG_NAME);
+        IndigoRestRequest indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
+                testParams.getProjectId());
+        indigoRestRequest.createAnalyticalDashboard(singletonList(createLostKpi()), DASHBOARD_LOST);
+        indigoRestRequest.createAnalyticalDashboard(singletonList(createLostKpi()), DASHBOARD_LONG_NAME);
     }
 
     @Override
@@ -61,10 +61,10 @@ public class MobileDropdownNavigationTest extends AbstractDashboardTest {
         UserManagementRestUtils.addUserToProject(getDomainUserRestApiClient(), newProjectId, testParams.getUser(), UserRoles.ADMIN);
         UserManagementRestUtils.addUserToProject(getDomainUserRestApiClient(), newProjectId, dynamicUser, UserRoles.EDITOR);
         testParams.setProjectId(newProjectId);
-        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
-                singletonList(createNumOfActivitiesKpi()), TARGET_DASHBOARD);
-        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
-                singletonList(createNumOfActivitiesKpi()), SUB_DASHBOARD);
+        IndigoRestRequest indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
+                testParams.getProjectId());
+        indigoRestRequest.createAnalyticalDashboard(singletonList(createNumOfActivitiesKpi()), TARGET_DASHBOARD);
+        indigoRestRequest.createAnalyticalDashboard(singletonList(createNumOfActivitiesKpi()), SUB_DASHBOARD);
         testParams.setProjectId(currentProjectId);
     }
 
@@ -124,16 +124,18 @@ public class MobileDropdownNavigationTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "getUserRoles")
     public void testVisibilityOfScrollbarOnProjectList(UserRoles role) {
+        IndigoRestRequest indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
+                testParams.getProjectId());
         List<String> dashboardLists = new ArrayList<>();
         for (int i = 0; i < 15; i++)
-            dashboardLists.add(createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
-                    singletonList(createLostKpi()), "Dashboard " + i));
+            dashboardLists.add(indigoRestRequest.createAnalyticalDashboard(singletonList(createLostKpi()),
+                    "Dashboard " + i));
         logoutAndLoginAs(true, role);
         try {
             initIndigoDashboardsPageWithWidgets();
             assertTrue(isScrollBarVisibleOnNavigation(), "Should display scroll bar on navigation");
         } finally {
-            dashboardLists.stream().forEach(dashboard -> deleteAnalyticalDashboard(getRestApiClient(), dashboard));
+            dashboardLists.stream().forEach(dashboard -> indigoRestRequest.deleteAnalyticalDashboard(dashboard));
             logoutAndLoginAs(true, UserRoles.ADMIN);
         }
     }

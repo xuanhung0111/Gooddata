@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAllInsightNames;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -9,6 +8,8 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.json.JSONException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -50,7 +51,9 @@ public class GoodSalesNotRenderedInsightTest extends AbstractAnalyseTest {
         assertEquals(analysisPage.getTableReport().getHeaders(), singletonList(ATTR_ACTIVITY_TYPE),
                 "Table was not displayed sucessfully");
         analysisPage.saveInsight(insight);
-        assertTrue(getAllInsightNames(getRestApiClient(), testParams.getProjectId()).contains(insight),
+        IndigoRestRequest indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
+                testParams.getProjectId());
+        assertTrue(indigoRestRequest.getAllInsightNames().contains(insight),
                 insight + " was not saved ");
     }
 }

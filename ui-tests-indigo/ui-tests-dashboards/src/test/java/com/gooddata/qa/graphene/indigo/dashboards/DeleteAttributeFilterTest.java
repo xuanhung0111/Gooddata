@@ -9,6 +9,8 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFilter;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.Dimension;
@@ -27,8 +29,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteAttributeFilterIfExist;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
@@ -39,6 +39,7 @@ public class DeleteAttributeFilterTest extends AbstractDashboardTest {
 
     private static final String TEST_INSIGHT = "Test-Insight";
     private static final String ALL_VALUE = "All";
+    private IndigoRestRequest indigoRestRequest;
 
     @Override
     public void initProperties() {
@@ -54,8 +55,8 @@ public class DeleteAttributeFilterTest extends AbstractDashboardTest {
         String insightWidget = createInsightWidget(new InsightMDConfiguration(TEST_INSIGHT, ReportType.COLUMN_CHART)
                 .setMeasureBucket(singletonList(MeasureBucket.createSimpleMeasureBucket(getMdService().getObj(getProject(),
                         Metric.class, title(METRIC_NUMBER_OF_ACTIVITIES))))));
-
-        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), asList(createAmountKpi(), insightWidget));
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        indigoRestRequest.createAnalyticalDashboard(asList(createAmountKpi(), insightWidget));
 
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put(ATTR_ACTIVITY, ALL_VALUE);
@@ -170,8 +171,7 @@ public class DeleteAttributeFilterTest extends AbstractDashboardTest {
             assertFalse(indigoDashboardsPage.getFirstWidget(Kpi.class).getValue().equals(kpiValue),
                     "Kpi value is not re-executed");
         } finally {
-            deleteAttributeFilterIfExist(getRestApiClient(), testParams.getProjectId(),
-                    getAttributeDisplayFormUri(ATTR_REGION));
+            indigoRestRequest.deleteAttributeFilterIfExist(getAttributeDisplayFormUri(ATTR_REGION));
         }
     }
 

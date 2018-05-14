@@ -6,6 +6,8 @@ import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
@@ -16,7 +18,6 @@ import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.*;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -32,6 +33,7 @@ public class KpiDashboardCreationTest extends AbstractDashboardTest {
     private static final String INSIGHT_LOST = "Insight Lost";
     private static final String DASHBOARD_ACTIVITIES = "Dashboard Activites";
     private static final String DASHBOARD_LOST = "Dashboard Lost";
+    private IndigoRestRequest indigoRestRequest;
 
     @Override
     protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
@@ -40,10 +42,10 @@ public class KpiDashboardCreationTest extends AbstractDashboardTest {
 
     @Override
     protected void customizeProject() throws IOException, JSONException {
-        createAnalyticalDashboard(getRestApiClient(),
-                testParams.getProjectId(), singletonList(createNumOfActivitiesKpi()), DASHBOARD_ACTIVITIES);
-        createAnalyticalDashboard(getRestApiClient(),
-                testParams.getProjectId(), singletonList(createLostKpi()), DASHBOARD_LOST);
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
+                testParams.getProjectId());
+        indigoRestRequest.createAnalyticalDashboard(singletonList(createNumOfActivitiesKpi()), DASHBOARD_ACTIVITIES);
+        indigoRestRequest.createAnalyticalDashboard(singletonList(createLostKpi()), DASHBOARD_LOST);
         createInsightWidget(new InsightMDConfiguration(INSIGHT_ACTIVITIES,
                 ReportType.COLUMN_CHART).setMeasureBucket(singletonList(MeasureBucket.createSimpleMeasureBucket(
                 getMdService().getObj(getProject(), Metric.class, title(METRIC_NUMBER_OF_ACTIVITIES))))));
@@ -66,8 +68,7 @@ public class KpiDashboardCreationTest extends AbstractDashboardTest {
             assertFalse(indigoDashboardsPage.isOnEditMode(), "Should be on view mode");
             assertThat(browser.getCurrentUrl(), containsString(getKpiDashboardIdentifierByTitle(DEFAULT_TITLE)));
         } finally {
-            deleteAnalyticalDashboard(getRestApiClient(), getAnalyticalDashboardUri(DEFAULT_TITLE,
-                    getRestApiClient(), testParams.getProjectId()));
+            indigoRestRequest.deleteAnalyticalDashboard(indigoRestRequest.getAnalyticalDashboardUri(DEFAULT_TITLE));
         }
     }
 

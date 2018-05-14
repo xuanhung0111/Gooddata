@@ -3,9 +3,6 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.UPLOAD_CSV;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAnalyticalDashboards;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getInsightUri;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -16,6 +13,8 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
@@ -33,7 +32,6 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
-import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
 
 public class NonProductionDatasetTest extends AbstractDashboardTest {
 
@@ -55,11 +53,18 @@ public class NonProductionDatasetTest extends AbstractDashboardTest {
     private static final String ATTRIBUTE_RECORDS_OF_PAYROLL = "Records of Payroll";
 
     private static final String DATASET_PAYDATE = "Paydate";
+    private IndigoRestRequest indigoRestRequest;
 
     @Override
     public void initProperties() {
         // create empty project
         projectTitle = "Non-Production-Dataset-Test";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
@@ -133,8 +138,8 @@ public class NonProductionDatasetTest extends AbstractDashboardTest {
                     .getWidgetByHeadline(Kpi.class, METRIC_AMOUNT_SUM).getValue(), expectedKpiValue,
                     "The saved kpi value is not correct");
         } finally {
-            IndigoRestUtils.deleteAnalyticalDashboard(getRestApiClient(),
-                    getAnalyticalDashboards(getRestApiClient(), testParams.getProjectId()).get(0));
+            indigoRestRequest.deleteAnalyticalDashboard(
+                    indigoRestRequest.getAnalyticalDashboards().get(0));
         }
     }
 
@@ -153,8 +158,8 @@ public class NonProductionDatasetTest extends AbstractDashboardTest {
             assertTrue(indigoDashboardsPage.getConfigurationPanel().isDateDataSetSelectCollapsed(),
                     "The date dataset is not collapsed");
         } finally {
-            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(),
-                    getInsightUri(insight, getRestApiClient(), testParams.getProjectId()));
+            indigoRestRequest.deleteObjectsUsingCascade(
+                    indigoRestRequest.getInsightUri(insight));
         }
     }
 
@@ -175,8 +180,8 @@ public class NonProductionDatasetTest extends AbstractDashboardTest {
             assertTrue(dropDown.getValues().size() > 10, "The number of dimensions is not correct");
             assertTrue(dropDown.isScrollable(), "The scroll bar is not present");
         } finally {
-            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(),
-                    getInsightUri(insight, getRestApiClient(), testParams.getProjectId()));
+            indigoRestRequest.deleteObjectsUsingCascade(
+                    indigoRestRequest.getInsightUri(insight));
             initDataUploadPage().getMyDatasetsTable().getDataset(DATASET_CONTAINING_11_DATES).clickDeleteButton()
                     .clickDelete();
             Dataset.waitForDatasetLoaded(browser);

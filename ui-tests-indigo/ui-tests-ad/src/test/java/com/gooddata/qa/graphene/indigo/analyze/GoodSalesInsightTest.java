@@ -7,6 +7,8 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.Analysi
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.FilterType;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.DataProvider;
@@ -20,7 +22,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAllInsightNames;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -29,6 +30,7 @@ import static org.testng.Assert.assertTrue;
 public class GoodSalesInsightTest extends AbstractAnalyseTest {
 
     private static final String INSIGHT_TEST = "Insight-Test";
+    private IndigoRestRequest indigoRestRequest;
 
     @Override
     public void initProperties() {
@@ -41,6 +43,8 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
         getMetricCreator().createNumberOfActivitiesMetric();
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing().saveInsight(INSIGHT_TEST);
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
+                testParams.getProjectId());
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -50,7 +54,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
         analysisPage.openInsight(INSIGHT_TEST)
                 .waitForReportComputing()
                 .saveInsightAs(copyOfInsightTest);
-        final int numberOfInsights = getAllInsightNames(getRestApiClient(), testParams.getProjectId()).size();
+        final int numberOfInsights = indigoRestRequest.getAllInsightNames().size();
         analysisPage.setInsightTitle(renamedInsight).saveInsight();
         checkRenamedInsight(numberOfInsights, copyOfInsightTest, renamedInsight);
     }
@@ -72,7 +76,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
                 .waitForReportComputing()
                 .saveInsightAs(insight);
 
-        final int numberOfInsights = getAllInsightNames(getRestApiClient(), testParams.getProjectId()).size();
+        final int numberOfInsights = indigoRestRequest.getAllInsightNames().size();
         analysisPage.setInsightTitle(name).saveInsight();
         takeScreenshot(browser, insight, getClass());
         checkRenamedInsight(numberOfInsights, insight, name);
@@ -108,7 +112,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
                 .getInsightItem(insight)
                 .delete();
         assertTrue(analysisPage.isBlankState(), "Workspace has not been cleared");
-        assertFalse(getAllInsightNames(getRestApiClient(), testParams.getProjectId())
+        assertFalse(indigoRestRequest.getAllInsightNames()
                 .contains(insight), insight + " has not been deleted");
     }
 
@@ -122,7 +126,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
                 .getInsightItem(insight)
                 .delete();
         assertTrue(analysisPage.isBlankState(), "Workspace has not been cleared");
-        assertFalse(getAllInsightNames(getRestApiClient(), testParams.getProjectId())
+        assertFalse(indigoRestRequest.getAllInsightNames()
                 .contains(insight), insight + " has not been deleted");
     }
 
@@ -130,7 +134,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
     public void deleteNotCurrentlyOpenedInsight() throws JSONException, IOException {
         final String insight = "Delete-Currently-Opened-Insight";
         analysisPage.openInsight(INSIGHT_TEST).saveInsightAs(insight);
-        assertTrue(getAllInsightNames(getRestApiClient(), testParams.getProjectId())
+        assertTrue(indigoRestRequest.getAllInsightNames()
                 .contains(insight), insight + " does not exist");
         analysisPage.openInsight(INSIGHT_TEST)
                 .getPageHeader()
@@ -138,7 +142,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
                 .getInsightItem(insight)
                 .delete();
         assertFalse(analysisPage.isBlankState(), "Workspace is cleared");
-        assertFalse(getAllInsightNames(getRestApiClient(), testParams.getProjectId())
+        assertFalse(indigoRestRequest.getAllInsightNames()
                 .contains(insight), insight + " has not been deleted");
     }
 
@@ -222,7 +226,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
     public void testInsightListWithCreatedByMeFilter() throws JSONException, IOException {
         final String insight = "Insight-List-Test-With-Filter-Created-By-Me";
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
-        assertFalse(getAllInsightNames(getRestApiClient(), testParams.getProjectId()).contains(insight),
+        assertFalse(indigoRestRequest.getAllInsightNames().contains(insight),
                 insight + " exists before saving");
         analysisPage.saveInsight(insight);
         final AnalysisInsightSelectionPanel insightSelectionPanel = analysisPage
@@ -356,7 +360,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
 
     private void checkRenamedInsight(final int expectedNumberOfInsights, final String oldInsight,
                                      final String newInsight) throws JSONException, IOException {
-        final List<String> savedInsightNames = getAllInsightNames(getRestApiClient(), testParams.getProjectId());
+        final List<String> savedInsightNames = indigoRestRequest.getAllInsightNames();
         assertEquals(savedInsightNames.size(), expectedNumberOfInsights);
         assertEquals(savedInsightNames.stream().filter(e -> e.equals(newInsight)).count(), 1,
                 "There is more than 1 insight or no insight named" + newInsight);

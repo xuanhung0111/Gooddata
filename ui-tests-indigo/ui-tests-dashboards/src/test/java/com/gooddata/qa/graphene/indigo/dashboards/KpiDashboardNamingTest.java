@@ -1,9 +1,6 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAnalyticalDashboardUri;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -12,6 +9,9 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import java.io.IOException;
+
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.json.JSONException;
 import org.openqa.selenium.Keys;
 import org.testng.annotations.DataProvider;
@@ -40,15 +40,16 @@ public class KpiDashboardNamingTest extends AbstractDashboardTest {
     private static final String DASHBOARD_DUPLICATE = "Dashboard Duplicate";
 
     private static final String DASHBOARD_CANCEL = "Dashboard Cancel";
+    private IndigoRestRequest indigoRestRequest;
 
     @Override
     protected void customizeProject() throws IOException, JSONException {
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
 
         for (String dashboardName : asList(DASHBOARD_ONE, DASHBOARD_TWO, DASHBOARD_THREE,
                 DASHBOARD_FOUR, DASHBOARD_FIVE, DASHBOARD_SIX, DASHBOARD_ORIGINAL,
                 DASHBOARD_DUPLICATE, DASHBOARD_CANCEL)) {
-            createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(),
-                    singletonList(createAmountKpi()), dashboardName);
+            indigoRestRequest.createAnalyticalDashboard(singletonList(createAmountKpi()), dashboardName);
         }
 
         createInsightWidget(new InsightMDConfiguration(INSIGHT_ACTIVITIES, ReportType.COLUMN_CHART)
@@ -61,8 +62,7 @@ public class KpiDashboardNamingTest extends AbstractDashboardTest {
 
         // remove the dashboard with default title (if exists)
         try {
-            deleteAnalyticalDashboard(getRestApiClient(), getAnalyticalDashboardUri(DEFAULT_TITLE,
-                    getRestApiClient(), testParams.getProjectId()));
+            indigoRestRequest.deleteAnalyticalDashboard(indigoRestRequest.getAnalyticalDashboardUri(DEFAULT_TITLE));
         } catch (Exception e) {
             // ignore, dashboard does not exist, right?
         }
@@ -77,8 +77,7 @@ public class KpiDashboardNamingTest extends AbstractDashboardTest {
             validateInsightDashboard(DEFAULT_TITLE);
         } finally {
             // remove the dashboard with default title
-            deleteAnalyticalDashboard(getRestApiClient(), getAnalyticalDashboardUri(DEFAULT_TITLE,
-                    getRestApiClient(), testParams.getProjectId()));
+            indigoRestRequest.deleteAnalyticalDashboard(indigoRestRequest.getAnalyticalDashboardUri(DEFAULT_TITLE));
         }
 
     }

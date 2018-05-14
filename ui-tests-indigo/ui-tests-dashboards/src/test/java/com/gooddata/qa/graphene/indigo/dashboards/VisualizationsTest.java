@@ -8,13 +8,12 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
-
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createInsight;
 import static java.util.Collections.singletonList;
 
 import java.io.IOException;
@@ -22,16 +21,18 @@ import java.io.IOException;
 public class VisualizationsTest extends AbstractDashboardTest {
 
     private final String VISUALIZATION_TITLE = "last_dummy_viz";
+    private IndigoRestRequest indigoRestRequest;
 
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
-        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        indigoRestRequest.createAnalyticalDashboard(singletonList(createAmountKpi()));
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void setupVisualizations() throws JSONException, IOException {
-        createInsight(getRestApiClient(), testParams.getProjectId(), new InsightMDConfiguration(VISUALIZATION_TITLE, ReportType.BAR_CHART));
+        indigoRestRequest.createInsight(new InsightMDConfiguration(VISUALIZATION_TITLE, ReportType.BAR_CHART));
     }
 
     @Test(dependsOnMethods = {"setupVisualizations"}, groups = {"desktop"})

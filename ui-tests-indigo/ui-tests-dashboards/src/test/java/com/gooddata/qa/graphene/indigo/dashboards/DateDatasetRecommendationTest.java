@@ -9,8 +9,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACT
 import static  com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_OPP_FIRST_SNAPSHOT ;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createInsight;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getInsightUris;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
@@ -22,6 +20,8 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.AfterMethod;
@@ -40,6 +40,7 @@ import com.google.common.collect.Ordering;
 public class DateDatasetRecommendationTest extends AbstractDashboardTest {
 
     private static String INSIGHT_WITHOUT_DATE_FILTER = "Insight-Without-Date-Filter";
+    private IndigoRestRequest indigoRestRequest;
 
     @Override
     public void initProperties() {
@@ -52,6 +53,7 @@ public class DateDatasetRecommendationTest extends AbstractDashboardTest {
         getMetricCreator().createNumberOfActivitiesMetric();
         getMetricCreator().createOppFirstSnapshotMetric();
         getReportCreator().createActiveLevelReport();
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
     }
 
     @AfterMethod
@@ -60,7 +62,7 @@ public class DateDatasetRecommendationTest extends AbstractDashboardTest {
             return;
 
         // unused objects could affect to other tests
-        List<String> workingInsightUris = getInsightUris(getRestApiClient(), testParams.getProjectId());
+        List<String> workingInsightUris = indigoRestRequest.getInsightUris();
 
         if (!workingInsightUris.isEmpty()) {
             deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(),
@@ -70,7 +72,7 @@ public class DateDatasetRecommendationTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void selectMostRelevantDateDimention() throws ParseException, JSONException, IOException {
-        createInsight(getRestApiClient(), testParams.getProjectId(),
+        indigoRestRequest.createInsight(
                 new InsightMDConfiguration(INSIGHT_WITHOUT_DATE_FILTER, ReportType.COLUMN_CHART).setMeasureBucket(
                         singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_NUMBER_OF_ACTIVITIES)))));
 
@@ -92,7 +94,7 @@ public class DateDatasetRecommendationTest extends AbstractDashboardTest {
                 DATE_DATASET_SNAPSHOT);
         createInsightUsingDateFilter("Insight-Using-Date-Filter-Closed", METRIC_OPP_FIRST_SNAPSHOT, DATE_DATASET_CLOSED);
 
-        createInsight(getRestApiClient(), testParams.getProjectId(),
+        indigoRestRequest.createInsight(
                 new InsightMDConfiguration(INSIGHT_WITHOUT_DATE_FILTER, ReportType.COLUMN_CHART).setMeasureBucket(
                         singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_OPP_FIRST_SNAPSHOT)))));
 
@@ -109,7 +111,7 @@ public class DateDatasetRecommendationTest extends AbstractDashboardTest {
     public void testOrderOfOtherDateDimensions() throws ParseException, JSONException, IOException {
         createInsightUsingDateFilter("Insight-Using-Date-Filter-Closed", METRIC_OPP_FIRST_SNAPSHOT, DATE_DATASET_CLOSED);
 
-        createInsight(getRestApiClient(), testParams.getProjectId(),
+        indigoRestRequest.createInsight(
                 new InsightMDConfiguration(INSIGHT_WITHOUT_DATE_FILTER, ReportType.COLUMN_CHART).setMeasureBucket(
                         singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_OPP_FIRST_SNAPSHOT)))));
 
@@ -131,7 +133,7 @@ public class DateDatasetRecommendationTest extends AbstractDashboardTest {
         createInsightUsingDateFilter("Insight-Using-Date-Filter-Closed", METRIC_OPP_FIRST_SNAPSHOT, DATE_DATASET_CLOSED);
         createInsightUsingDateFilter("Insight-Using-Date-Filter-Created", METRIC_OPP_FIRST_SNAPSHOT, DATE_DATASET_CREATED);
 
-        createInsight(getRestApiClient(), testParams.getProjectId(),
+        indigoRestRequest.createInsight(
                 new InsightMDConfiguration(INSIGHT_WITHOUT_DATE_FILTER, ReportType.COLUMN_CHART).setMeasureBucket(
                         singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_OPP_FIRST_SNAPSHOT)))));
 
@@ -149,7 +151,7 @@ public class DateDatasetRecommendationTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testDateDatasetHavingNoGroup() throws ParseException, JSONException, IOException {
-        createInsight(getRestApiClient(), testParams.getProjectId(),
+        indigoRestRequest.createInsight(
                 new InsightMDConfiguration(INSIGHT_WITHOUT_DATE_FILTER, ReportType.COLUMN_CHART).setMeasureBucket(
                         singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_OPP_FIRST_SNAPSHOT)))));
 

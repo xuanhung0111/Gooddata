@@ -6,6 +6,8 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.dialog.SaveInsightDialog;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.json.JSONException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -21,7 +23,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACT
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_STAGE_VELOCITY;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAllInsightNames;
 import static java.util.Arrays.asList;
 import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertEquals;
@@ -43,6 +44,7 @@ public class GoodSalesSaveInsightTest extends AbstractAnalyseTest {
     private static final String CREATED = "Created";
     private static final String DATE_CLOSED_DIMENSION_INSIGHT = "Save-Insight-Containing-Date-Closed-Dimension";
     private static final String DATE_CREATED_DIMENSION_INSIGHT = "Save-Insight-Containing-Date-Created-Dimension";
+    private IndigoRestRequest indigoRestRequest;
 
     @Override
     public void initProperties() {
@@ -54,6 +56,7 @@ public class GoodSalesSaveInsightTest extends AbstractAnalyseTest {
     protected void customizeProject() throws Throwable {
         getMetricCreator().createNumberOfActivitiesMetric();
         getMetricCreator().createStageVelocityMetric();
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
     }
 
     @DataProvider(name = "chartTypeDataProvider")
@@ -143,7 +146,7 @@ public class GoodSalesSaveInsightTest extends AbstractAnalyseTest {
                 .getDataLabels();
         analysisPage.saveInsight(insight);
 
-        assertTrue(getAllInsightNames(getRestApiClient(), testParams.getProjectId()).contains(insight),
+        assertTrue(indigoRestRequest.getAllInsightNames().contains(insight),
                 insight + " does not exist in Saved Insight list");
         assertEquals(
                 analysisPage.openInsight(insight)
@@ -177,7 +180,7 @@ public class GoodSalesSaveInsightTest extends AbstractAnalyseTest {
 
         assertFalse(isElementPresent(className(SaveInsightDialog.ROOT_CLASS), browser),
                 "Save dialog does not exist");
-        assertFalse(getAllInsightNames(getRestApiClient(), testParams.getProjectId()).contains(insight),
+        assertFalse(indigoRestRequest.getAllInsightNames().contains(insight),
                 insight + " exists in Saved Insight list");
     }
 
@@ -187,7 +190,7 @@ public class GoodSalesSaveInsightTest extends AbstractAnalyseTest {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .saveInsight(insight);
-        assertTrue(getAllInsightNames(getRestApiClient(), testParams.getProjectId()).contains(insight),
+        assertTrue(indigoRestRequest.getAllInsightNames().contains(insight),
                 "The Insight is not created");
 
         final List<String> expectedLabels = analysisPage

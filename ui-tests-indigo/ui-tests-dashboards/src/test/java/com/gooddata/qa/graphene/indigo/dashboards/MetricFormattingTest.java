@@ -1,14 +1,12 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.addWidgetToAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteWidgetsUsingCascade;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAnalyticalDashboards;
 import static java.util.Collections.singletonList;
 
 import java.io.IOException;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.ITestContext;
@@ -31,11 +29,13 @@ import static org.testng.Assert.assertTrue;
 public class MetricFormattingTest extends AbstractDashboardTest {
 
     private static final String PERCENT_OF_GOAL = "% of Goal";
+    private IndigoRestRequest indigoRestRequest;
 
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
-        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(createAmountKpi()));
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        indigoRestRequest.createAnalyticalDashboard(singletonList(createAmountKpi()));
     }
 
     @DataProvider(name = "formattingProvider")
@@ -79,7 +79,7 @@ public class MetricFormattingTest extends AbstractDashboardTest {
             }
 
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), customFormatMetric.getUri());
+            indigoRestRequest.deleteWidgetsUsingCascade(customFormatMetric.getUri());
         }
     }
 
@@ -89,8 +89,7 @@ public class MetricFormattingTest extends AbstractDashboardTest {
         String xssMetricName = "<button>" + PERCENT_OF_GOAL + "</button>";
         String xssMetricMaql = "SELECT 1";
         Metric xssMetric = getMdService().createObj(getProject(), new Metric(xssMetricName, xssMetricMaql, "#,##0.00"));
-        final String projectId = testParams.getProjectId();
-        final String dashboardUri = getAnalyticalDashboards(getRestApiClient(), projectId).get(0);
+        final String dashboardUri = indigoRestRequest.getAnalyticalDashboards().get(0);
 
         final String kpiUri = createKpiUsingRest(
                 new KpiMDConfiguration.Builder()
@@ -101,7 +100,7 @@ public class MetricFormattingTest extends AbstractDashboardTest {
                     .comparisonDirection(ComparisonDirection.NONE)
                     .build()
         );
-        addWidgetToAnalyticalDashboard(getRestApiClient(), projectId, dashboardUri, kpiUri);
+        indigoRestRequest.addWidgetToAnalyticalDashboard(dashboardUri, kpiUri);
 
         try {
             Kpi lastKpi = initIndigoDashboardsPageWithWidgets().getLastWidget(Kpi.class);
@@ -121,7 +120,7 @@ public class MetricFormattingTest extends AbstractDashboardTest {
             assertEquals(selectedKpi.getHeadline(), xssHeadline);
 
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), projectId, xssMetric.getUri());
+            indigoRestRequest.deleteWidgetsUsingCascade(xssMetric.getUri());
         }
     }
 
@@ -131,8 +130,7 @@ public class MetricFormattingTest extends AbstractDashboardTest {
         String xssFormatMetricMaql = "SELECT 1";
         Metric xssFormatMetric = getMdService().createObj(getProject(),
                 new Metric(xssFormatMetricName, xssFormatMetricMaql, "<button>#,##0.00</button>"));
-        final String projectId = testParams.getProjectId();
-        final String dashboardUri = getAnalyticalDashboards(getRestApiClient(), projectId).get(0);
+        final String dashboardUri = indigoRestRequest.getAnalyticalDashboards().get(0);
 
         final String kpiUri = createKpiUsingRest(
                 new KpiMDConfiguration.Builder()
@@ -143,7 +141,7 @@ public class MetricFormattingTest extends AbstractDashboardTest {
                     .comparisonDirection(ComparisonDirection.NONE)
                     .build()
         );
-        addWidgetToAnalyticalDashboard(getRestApiClient(), projectId, dashboardUri, kpiUri);
+        indigoRestRequest.addWidgetToAnalyticalDashboard(dashboardUri, kpiUri);
 
         try {
             Kpi lastKpi = initIndigoDashboardsPageWithWidgets().getLastWidget(Kpi.class);
@@ -152,7 +150,7 @@ public class MetricFormattingTest extends AbstractDashboardTest {
             assertEquals(lastKpi.getValue(), "<button>1.00</button>");
 
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), projectId, xssFormatMetric.getUri());
+            indigoRestRequest.deleteWidgetsUsingCascade(xssFormatMetric.getUri());
         }
     }
 
@@ -162,8 +160,7 @@ public class MetricFormattingTest extends AbstractDashboardTest {
         String invalidMetricMaql = "SELECT 1 where 2 = 3";
         Metric invalidMetric = getMdService().createObj(getProject(),
                 new Metric(invalidMetricName, invalidMetricMaql, "#,##0.00"));
-        final String projectId = testParams.getProjectId();
-        final String dashboardUri = getAnalyticalDashboards(getRestApiClient(), projectId).get(0);
+        final String dashboardUri = indigoRestRequest.getAnalyticalDashboards().get(0);
 
         final String kpiUri = createKpiUsingRest(
                 new KpiMDConfiguration.Builder()
@@ -174,7 +171,7 @@ public class MetricFormattingTest extends AbstractDashboardTest {
                     .comparisonDirection(ComparisonDirection.NONE)
                     .build()
         );
-        addWidgetToAnalyticalDashboard(getRestApiClient(), projectId, dashboardUri, kpiUri);
+        indigoRestRequest.addWidgetToAnalyticalDashboard(dashboardUri, kpiUri);
 
         try {
             Kpi lastKpi = initIndigoDashboardsPageWithWidgets().getLastWidget(Kpi.class);
@@ -183,7 +180,7 @@ public class MetricFormattingTest extends AbstractDashboardTest {
             assertTrue(lastKpi.isEmptyValue());
 
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), projectId, invalidMetric.getUri());
+            indigoRestRequest.deleteWidgetsUsingCascade(invalidMetric.getUri());
         }
     }
 }

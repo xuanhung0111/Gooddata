@@ -4,8 +4,6 @@ import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_DROPS_BELOW;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createKpiWidget;
 import static java.lang.String.format;
 import static org.testng.Assert.assertTrue;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -21,6 +19,8 @@ import java.util.UUID;
 import javax.mail.MessagingException;
 
 import com.gooddata.md.AttributeElement;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.jsoup.nodes.Document;
@@ -94,10 +94,12 @@ public class KpiAlertNullValueTest extends AbstractDashboardTest {
 
         List<String> kpiUris = new ArrayList<>();
 
+        IndigoRestRequest indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
+                testParams.getProjectId());
         for (Metric metric : metrics) {
             kpiNames.add(metric.getTitle());
 
-            kpiUris.add(createKpiWidget(getRestApiClient(), testParams.getProjectId(),
+            kpiUris.add(indigoRestRequest.createKpiWidget(
                     new KpiMDConfiguration.Builder()
                     .title(metric.getTitle())
                     .metric(getMdService().createObj(getProject(), metric).getUri())
@@ -107,7 +109,7 @@ public class KpiAlertNullValueTest extends AbstractDashboardTest {
                     .build()));
         }
 
-        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), kpiUris);
+        indigoRestRequest.createAnalyticalDashboard(kpiUris);
     }
 
     @DataProvider(name = "kpiAlertProvider")

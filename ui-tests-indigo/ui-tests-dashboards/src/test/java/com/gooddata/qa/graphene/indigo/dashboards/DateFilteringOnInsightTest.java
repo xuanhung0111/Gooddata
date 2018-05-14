@@ -7,9 +7,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_LOS
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_OPP_FIRST_SNAPSHOT ;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createInsight;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteWidgetsUsingCascade;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getInsightWidgetTitles;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -18,6 +15,8 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
@@ -41,6 +40,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
     private static String DATE_SNAPSHOT = "Date (Snapshot)";
     private static String DATE_SNAPSHOT_RENAMED = "Date (Snapshot)_Renamed";
     private static String TEST_INSIGHT = "Test-Insight";
+    private IndigoRestRequest indigoRestRequest;
 
     @Override
     public void initProperties() {
@@ -56,10 +56,11 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         getMetricCreator().createNumberOfActivitiesMetric();
         getMetricCreator().createNumberOfLostOppsMetric();
         getMetricCreator().createOppFirstSnapshotMetric();
-        createInsight(getRestApiClient(), testParams.getProjectId(),
+        indigoRestRequest.createInsight(
                 new InsightMDConfiguration(TEST_INSIGHT, ReportType.COLUMN_CHART).setMeasureBucket(
                         singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_NUMBER_OF_ACTIVITIES)))));
 
@@ -93,7 +94,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
             assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_DATASET_CREATED);
 
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), anotherInsightUri);
+            indigoRestRequest.deleteWidgetsUsingCascade(anotherInsightUri);
         }
     }
 
@@ -164,7 +165,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
     @Test(dependsOnGroups = {"createProject"})
     public void rememberDisabledDateFilterAfterSaving() throws JSONException, IOException {
         String insight = "Disabled-Date-Filter-Insight";
-        String insightUri = createInsight(getRestApiClient(), testParams.getProjectId(),
+        String insightUri = indigoRestRequest.createInsight(
                 new InsightMDConfiguration(insight, ReportType.COLUMN_CHART).setMeasureBucket(
                         singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_NUMBER_OF_ACTIVITIES)))));
 
@@ -186,7 +187,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
     @Test(dependsOnGroups = {"createProject"})
     public void rememberEnabledDateFilterAfterSaving() throws JSONException, IOException {
         String insight = "Enabled-Date-Filter-Insight";
-        String insightUri = createInsight(getRestApiClient(), testParams.getProjectId(),
+        String insightUri = indigoRestRequest.createInsight(
                 new InsightMDConfiguration(insight, ReportType.COLUMN_CHART).setMeasureBucket(
                         singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_NUMBER_OF_ACTIVITIES)))));
 
@@ -223,7 +224,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
             indigoDashboardsPage.saveEditModeWithWidgets().switchToEditMode().selectLastWidget(Insight.class);
             assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_DATASET_CREATED);
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), widgetUri);
+            indigoRestRequest.deleteWidgetsUsingCascade(widgetUri);
         }
     }
 
@@ -256,7 +257,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
                     "New name is not applied to the insight");
 
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), widgetUri);
+            indigoRestRequest.deleteWidgetsUsingCascade(widgetUri);
         }
     }
 
@@ -283,10 +284,10 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
 
             DatasetDetailPage.getInstance(browser).deleteObject();
 
-            assertFalse(getInsightWidgetTitles(getRestApiClient(), testParams.getProjectId())
+            assertFalse(indigoRestRequest.getInsightWidgetTitles()
                     .contains(insight), "The expected insight has not been deleted");
         } finally {
-            deleteWidgetsUsingCascade(getRestApiClient(), testParams.getProjectId(), widgetUri);
+            indigoRestRequest.deleteWidgetsUsingCascade(widgetUri);
         }
     }
 

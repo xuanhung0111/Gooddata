@@ -2,8 +2,6 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createKpiWidget;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
@@ -16,8 +14,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.UUID;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Dataset;
@@ -58,7 +57,9 @@ public class KpiAlertInMobileTest extends AbstractDashboardTest {
                 .createObj(getProject(), new Metric(UNIQUE_NAME, maqlExpression, "#,##0"))
                 .getUri();
 
-        String kpiUri = createKpiWidget(getRestApiClient(), testParams.getProjectId(),
+        IndigoRestRequest indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
+                testParams.getProjectId());
+        String kpiUri = indigoRestRequest.createKpiWidget(
                 new KpiMDConfiguration.Builder()
                         .title(UNIQUE_NAME)
                         .metric(sumOfNumberMetricUri)
@@ -67,7 +68,7 @@ public class KpiAlertInMobileTest extends AbstractDashboardTest {
                         .comparisonDirection(ComparisonDirection.GOOD)
                         .build());
 
-        createAnalyticalDashboard(getRestApiClient(), testParams.getProjectId(), singletonList(kpiUri));
+        indigoRestRequest.createAnalyticalDashboard(singletonList(kpiUri));
     }
 
     @Test(dependsOnGroups = "createProject", groups = "mobile")

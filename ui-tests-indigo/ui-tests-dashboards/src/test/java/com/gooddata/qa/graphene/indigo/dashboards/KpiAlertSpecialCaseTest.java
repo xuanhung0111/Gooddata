@@ -4,8 +4,6 @@ import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_DROPS_BELOW;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createKpiWidget;
 import static com.gooddata.qa.utils.mail.ImapUtils.areMessagesArrived;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
@@ -22,6 +20,7 @@ import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.fact.FactRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
+import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.jsoup.nodes.Document;
@@ -60,6 +59,7 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
     private String firstNameValueUri;
 
     private String sumOfNumberMetricUri;
+    private IndigoRestRequest indigoRestRequest;
 
     @Override
     public void initProperties() {
@@ -73,6 +73,8 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
+                testParams.getProjectId());
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
@@ -149,8 +151,7 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
         final String kpiName = metric.getTitle();
         final String kpiUri = createKpi(kpiName, metric.getUri());
 
-        final String indigoDashboardUri = createAnalyticalDashboard(
-                getRestApiClient(), testParams.getProjectId(), singletonList(kpiUri));
+        final String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(kpiUri));
 
         try {
             setAlertForKpi(kpiName, TRIGGERED_WHEN_DROPS_BELOW, NUMBER_VALUE);
@@ -186,8 +187,7 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
         String kpiName = generateUniqueName();
         String kpiUri = createKpi(kpiName, sumOfNumberMetricUri);
 
-        String indigoDashboardUri = createAnalyticalDashboard(
-                getRestApiClient(), testParams.getProjectId(), singletonList(kpiUri));
+        String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(kpiUri));
 
         try {
             setAlertForKpi(kpiName, TRIGGERED_WHEN_DROPS_BELOW, NUMBER_VALUE);
@@ -222,8 +222,7 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
         final String kpiUri = createKpi(kpiName, metric.getUri());
 
 
-        String indigoDashboardUri = createAnalyticalDashboard(
-                getRestApiClient(), testParams.getProjectId(), singletonList(kpiUri));
+        String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(kpiUri));
         FactRestRequest request = new FactRestRequest(
                 new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         request.setFactRestricted(numberFactUri);
@@ -251,8 +250,7 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
         String kpiName = generateUniqueName();
         String kpiUri = createKpi(kpiName, sumOfNumberMetricUri);
 
-        String indigoDashboardUri = createAnalyticalDashboard(
-                getRestApiClient(), testParams.getProjectId(), singletonList(kpiUri));
+        String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(kpiUri));
 
         try {
             setAlertForKpi(kpiName, TRIGGERED_WHEN_DROPS_BELOW, NUMBER_VALUE);
@@ -298,8 +296,7 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
         String kpiName = generateUniqueName();
         String kpiUri = createKpi(kpiName, sumOfNumberMetricUri);
 
-        String indigoDashboardUri = createAnalyticalDashboard(
-                getRestApiClient(), testParams.getProjectId(), singletonList(kpiUri));
+        String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(kpiUri));
 
         try {
             setAlertForKpi(kpiName, TRIGGERED_WHEN_DROPS_BELOW, NUMBER_VALUE);
@@ -322,8 +319,7 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
         String kpiName = generateUniqueName();
         String kpiUri = createKpi(kpiName, sumOfNumberMetricUri);
 
-        String indigoDashboardUri = createAnalyticalDashboard(
-                getRestApiClient(), testParams.getProjectId(), singletonList(kpiUri));
+        String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(kpiUri));
 
         try {
             setAlertForKpi(kpiName, TRIGGERED_WHEN_DROPS_BELOW, NUMBER_VALUE);
@@ -354,8 +350,7 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
         String kpiName = generateUniqueName();
         String kpiUri = createKpi(kpiName, sumOfNumberMetricUri);
 
-        String indigoDashboardUri = createAnalyticalDashboard(
-                getRestApiClient(), testParams.getProjectId(), singletonList(kpiUri));
+        String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(kpiUri));
 
         try {
             logoutAndLoginAs(newImapUser, testParams.getPassword());
@@ -392,8 +387,7 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
         String kpiName = generateUniqueName();
         String kpiUri = createKpi(kpiName, sumOfNumberMetricUri);
 
-        String indigoDashboardUri = createAnalyticalDashboard(
-                getRestApiClient(), testParams.getProjectId(), singletonList(kpiUri));
+        String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(kpiUri));
 
         ProjectRestRequest projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)),
                 testParams.getProjectId());
@@ -432,7 +426,7 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
     }
 
     private String createKpi(String title, String metricUri) throws JSONException, IOException {
-        return createKpiWidget(getRestApiClient(), testParams.getProjectId(),
+        return indigoRestRequest.createKpiWidget(
                 new KpiMDConfiguration.Builder()
                         .title(title)
                         .metric(metricUri)
