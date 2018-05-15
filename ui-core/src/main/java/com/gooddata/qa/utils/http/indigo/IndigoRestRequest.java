@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestRequest;
+import com.gooddata.qa.graphene.entity.visualization.TotalsBucket;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.ParseException;
 import org.json.JSONArray;
@@ -220,6 +221,26 @@ public class IndigoRestRequest extends CommonRestRequest{
             throw new RuntimeException("There error while creating Insight", e);
         }
         return jsonObject;
+    }
+
+    /**
+     * Add Total Results to insight
+     *
+     * @param insightTitle
+     * @param totalsBuckets
+     * @throws ParseException
+     * @throws JSONException
+     * @throws IOException
+     */
+    public String addTotalResults(final String insightTitle, List<TotalsBucket> totalsBuckets)
+            throws ParseException, JSONException, IOException {
+        String uri = getInsightUri(insightTitle);
+        JSONObject insight = getJsonObject(uri);
+        insight.getJSONObject("visualizationObject").getJSONObject("content")
+                .getJSONArray("buckets").getJSONObject(1)
+                .put("totals", initTotalsObjects(totalsBuckets));
+        executeRequest(RestRequest.initPutRequest(uri, insight.toString()), HttpStatus.OK);
+        return uri;
     }
 
     /**
@@ -460,7 +481,7 @@ public class IndigoRestRequest extends CommonRestRequest{
                 put("items", initMeasureObjects(measureBuckets));
             }});
             put(new JSONObject() {{
-                put("localIdentifier", "categories");
+                put("localIdentifier", categoryBuckets.isEmpty() ? "categories" : categoryBuckets.get(0).getCollection());
                 put("items", initCategoryObjects(categoryBuckets));
             }});
         }};
@@ -472,7 +493,8 @@ public class IndigoRestRequest extends CommonRestRequest{
                     for (MeasureBucket bucket : measureBuckets) {
                         put(new JSONObject() {{
                             put("measure", new JSONObject() {{
-                                put("localIdentifier", bucket.getType());
+                                put("localIdentifier", bucket.getLocalIdentifier());
+                                put("title", bucket.getTitle());
                                 put("definition", new JSONObject() {{
                                     put("measureDefinition", new JSONObject() {{
                                         put("item", new JSONObject() {{
@@ -489,13 +511,25 @@ public class IndigoRestRequest extends CommonRestRequest{
         }};
     }
 
-    private JSONArray initCategoryObjects(final List<CategoryBucket> categoryBuckets) throws JSONException {
+    private static JSONArray initTotalsObjects(final List<TotalsBucket> totalsBuckets) throws JSONException {
+        return new JSONArray() {{
+            for (TotalsBucket bucket : totalsBuckets) {
+                put(new JSONObject() {{
+                    put("measureIdentifier", bucket.getMeasureIdentifier());
+                    put("attributeIdentifier", bucket.getAttributeIdentifier());
+                    put("type", bucket.getType());
+                }});
+            }
+        }};
+    }
+
+    private static JSONArray initCategoryObjects(final List<CategoryBucket> categoryBuckets) throws JSONException {
         return new JSONArray() {{
                 if (!CollectionUtils.isEmpty(categoryBuckets)) {
                     for (CategoryBucket bucket : categoryBuckets) {
                         put(new JSONObject() {{
                             put("visualizationAttribute", new JSONObject() {{
-                                put("localIdentifier", bucket.getType());
+                                put("localIdentifier", bucket.getLocalIdentifier());
                                 put("displayForm", new JSONObject() {{
                                     put("uri", bucket.getDisplayForm());
                                 }});

@@ -2,8 +2,11 @@ package com.gooddata.qa.graphene.entity.visualization;
 
 import com.gooddata.md.Attribute;
 
+import java.util.UUID;
+
 public class CategoryBucket {
 
+    private final String localIdentifier = generateHashString();
     private String attribute;
     private String displayForm;
     private String collection;
@@ -32,6 +35,10 @@ public class CategoryBucket {
         return type;
     }
 
+    public String getLocalIdentifier() {
+        return localIdentifier;
+    }
+
     public static CategoryBucket createViewByBucket(Attribute attribute) {
         return new CategoryBucket(attribute.getUri(), attribute.getDefaultDisplayForm().getUri(), "view",
                 "attribute");
@@ -40,5 +47,14 @@ public class CategoryBucket {
     public static CategoryBucket createStackByBucket(Attribute attribute) {
         return new CategoryBucket(attribute.getUri(), attribute.getDefaultDisplayForm().getUri(), "stack",
                 "attribute");
+    }
+
+    public static CategoryBucket createAttributeByBucket(Attribute attribute) {
+        return new CategoryBucket(attribute.getUri(), attribute.getDefaultDisplayForm().getUri(), "attribute",
+                "attribute");
+    }
+
+    private String generateHashString() {
+        return UUID.randomUUID().toString().substring(0, 5);
     }
 }

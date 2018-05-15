@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.entity.visualization;
 import java.util.List;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+
 import java.util.ArrayList;
 
 public class InsightMDConfiguration {
@@ -11,6 +12,7 @@ public class InsightMDConfiguration {
     private ReportType type;
     private List<MeasureBucket> measureBuckets = new ArrayList<MeasureBucket>();
     private List<CategoryBucket> categoryBuckets = new ArrayList<CategoryBucket>();
+    private List<TotalsBucket> totalsBuckets = new ArrayList<TotalsBucket>();
 
     public InsightMDConfiguration(String title, ReportType type) {
         this.title = title;
@@ -24,6 +26,11 @@ public class InsightMDConfiguration {
 
     public InsightMDConfiguration setCategoryBucket(List<CategoryBucket> categoryBuckets) {
         this.categoryBuckets = categoryBuckets;
+        return this;
+    }
+
+    public InsightMDConfiguration setTotalsBucket(List<TotalsBucket> totalsBuckets) {
+        this.totalsBuckets = totalsBuckets;
         return this;
     }
 
@@ -41,5 +48,9 @@ public class InsightMDConfiguration {
 
     public List<MeasureBucket> getMeasureBuckets() {
         return measureBuckets;
+    }
+
+    public List<TotalsBucket> getTotalsBuckets() {
+        return totalsBuckets;
     }
 }

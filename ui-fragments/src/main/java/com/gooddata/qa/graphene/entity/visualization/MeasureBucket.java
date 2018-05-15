@@ -2,7 +2,11 @@ package com.gooddata.qa.graphene.entity.visualization;
 
 import com.gooddata.md.Metric;
 
+import java.util.UUID;
+
 public class MeasureBucket {
+
+    private final String localIdentifier = generateHashString();
     private String measureFilters;
     private String title;
     private String type;
@@ -28,6 +32,10 @@ public class MeasureBucket {
         return new MeasureBucket("", metric.getTitle(), false, hasShowInPercent, "metric", metric.getUri());
     }
 
+    public String getLocalIdentifier() {
+        return localIdentifier;
+    }
+
     public String getMeasureFilters() {
         return measureFilters;
     }
@@ -50,5 +58,9 @@ public class MeasureBucket {
 
     public String getObjectUri() {
         return objectUri;
+    }
+
+    private String generateHashString() {
+        return UUID.randomUUID().toString().substring(0, 5);
     }
 }
