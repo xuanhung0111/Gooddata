@@ -8,9 +8,10 @@ import java.util.stream.Stream;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.graphene.utils.WaitUtils;
 
 public class BrowserUtils {
@@ -66,9 +67,18 @@ public class BrowserUtils {
     public static void addMagicElementToDOM(WebDriver browser) {
         String script = "var magic = document.createElement('div'); magic.className='" + MAGIC + "'; "
                 + "document.getElementsByTagName('body')[0].appendChild(magic);";
-        ((JavascriptExecutor) browser).executeScript(script);
 
-        WaitUtils.waitForElementPresent(By.className(MAGIC), browser);
+        // When previous action causes page redirect, magic element can be put to DOM
+        // and be immediately replaced with new DOM. Let's be safe and do silent retries.
+        for (int attempts = 0; attempts < 3; attempts++) {
+            ((JavascriptExecutor) browser).executeScript(script);
+
+            if (ElementUtils.isElementPresent(By.className(MAGIC), browser)) {
+                return;
+            };
+        }
+
+        throw new NoSuchElementException("Cannot find magic element in DOM");
     }
 
     public static boolean isMagicElementPresentInDOM(WebDriver browser) {
