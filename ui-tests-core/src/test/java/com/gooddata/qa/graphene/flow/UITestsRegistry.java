@@ -45,7 +45,6 @@ import com.gooddata.qa.graphene.filters.DashboardFiscalDateFilterTest;
 import com.gooddata.qa.graphene.filters.FiscalDateFilterFromAndToTest;
 import com.gooddata.qa.graphene.filters.FiscalDateFilterNameTest;
 import com.gooddata.qa.graphene.filters.GroupFiltersOnDashboardTest;
-import com.gooddata.qa.graphene.filters.MetricAvailableFilterTest;
 import com.gooddata.qa.graphene.i18n.LocalizationTest;
 import com.gooddata.qa.graphene.manage.AttributeLabelsTest;
 import com.gooddata.qa.graphene.manage.ComputedAttributesTest;
@@ -134,7 +133,6 @@ public class UITestsRegistry {
             DashboardFilterVisualTest.class,
             DashboardFiscalDateFilterTest.class,
             DashboardFiscalDateFilterConfigurationTest.class,
-            MetricAvailableFilterTest.class,
             DashboardSavedFiltersTest.class,
             GoodSalesAdvancedConnectingFilterTest.class,
             GoodSalesDefaultFilterMiscTest.class,
@@ -151,7 +149,9 @@ public class UITestsRegistry {
             "testng-dashboard-default-filter-savedView-multiple-choice.xml",
             "testng-dashboard-default-filter-savedView-single-choice.xml",
             "testng-dashboard-default-filter-muf-multiple-choice.xml",
-            "testng-dashboard-default-filter-muf-single-choice.xml"
+            "testng-dashboard-default-filter-muf-single-choice.xml",
+            "testng-metric-available-attribute-filter.xml",
+            "testng-metric-available-prompt-filter.xml"
         });
 
         suites.put("reports", new Object[] {
@@ -193,7 +193,6 @@ public class UITestsRegistry {
                     DashboardFilterVisualTest.class,
                     DashboardFiscalDateFilterTest.class,
                     DashboardFiscalDateFilterConfigurationTest.class,
-                    MetricAvailableFilterTest.class,
                     GoodSalesDashboardWidgetManipulationTest.class,
                     DashboardSavedFiltersTest.class,
                     GoodSalesKeyMetricTest.class,
@@ -227,7 +226,9 @@ public class UITestsRegistry {
                     "testng-dashboard-default-filter-savedView-multiple-choice.xml",
                     "testng-dashboard-default-filter-savedView-single-choice.xml",
                     "testng-dashboard-default-filter-muf-multiple-choice.xml",
-                    "testng-dashboard-default-filter-muf-single-choice.xml"
+                    "testng-dashboard-default-filter-muf-single-choice.xml",
+                    "testng-metric-available-attribute-filter.xml",
+                    "testng-metric-available-prompt-filter.xml"
             });
             put("phaseCellLimitTest", new Object[] {
                     GoodSalesCellLimitTest.class

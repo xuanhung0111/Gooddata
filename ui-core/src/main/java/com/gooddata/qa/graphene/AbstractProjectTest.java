@@ -64,6 +64,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Collection;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.http.ParseException;
 import org.json.JSONArray;
@@ -401,6 +402,13 @@ public abstract class AbstractProjectTest extends AbstractUITest {
                 .filter(e -> e.getTitle().equals(elementName)).findFirst().get().getUri();
     }
 
+    protected List<String> getAttributeElementUris(String attributeName, List<String> elementNames) {
+        return getMdService().getAttributeElements(getAttributeByTitle(attributeName)).stream()
+                .filter(attrEle -> elementNames.contains(attrEle.getTitle()))
+                .map(AttributeElement::getUri)
+                .collect(Collectors.toList());
+    }
+
     protected Metric getMetricByTitle(String title) {
         return getMdService().getObj(getProject(), Metric.class, title(title));
     }
@@ -460,6 +468,14 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     protected FilterItemContent createSingleValuesFilterBy(String uri) {
         return Builder.of(FilterItemContent::new).with(item -> {
             item.setObjUri(uri);
+            item.setType(FilterType.LIST);
+        }).build();
+    }
+
+    protected FilterItemContent createMultipleValuesFilterBy(String uri) {
+        return Builder.of(FilterItemContent::new).with(item -> {
+            item.setObjUri(uri);
+            item.setMultiple(true);
             item.setType(FilterType.LIST);
         }).build();
     }
