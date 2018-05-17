@@ -178,10 +178,6 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     @AfterClass(alwaysRun = true)
     public void validateProjectTearDown() throws JSONException {
-        //it is necessary to login admin to validate project on afterClass
-        logout();
-        signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
-
         if (validateAfterClass) {
             System.out.println("Going to validate project after tests...");
             // TODO remove when ATP-1520, ATP-1519, ATP-1822 are fixed
