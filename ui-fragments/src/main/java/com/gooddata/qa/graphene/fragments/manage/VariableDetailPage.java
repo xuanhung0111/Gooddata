@@ -31,7 +31,7 @@ import com.gooddata.qa.graphene.utils.Sleeper;
 public class VariableDetailPage extends ObjectPropertiesPage {
 
     private static final By BY_DEFAULT_NUMERIC_VALUE_INPUT = By.cssSelector(".defaultValue input");
-    private static final By BY_EDIT_ATTRIBUTE_VALUES_BUTTON = By.className("s-btn-edit");
+    private static final By BY_EDIT_ATTRIBUTE_VALUES_BUTTON = By.cssSelector(".s-btn-edit:not(.disabled)");
     private static final By BY_SAVE_CHANGES_BUTTON = By.cssSelector(".yui3-c-button-showInline.s-btn-save_changes");
 
     @FindBy(className = UserSpecificTable.CLASS_NAME)
