@@ -86,11 +86,16 @@ public class AttributeFilterPickerPanel extends AbstractPicker {
         waitForFragmentNotVisible(this);
     }
 
-    public void selectItem(String item) {
+    public WebElement getSelectAllButton() {
+        return waitForElementVisible(selectAllButton);
+    }
+
+    public AttributeFilterPickerPanel selectItem(String item) {
         searchForText(item);
         getElement(format("[title='%s']", item))
             .findElement(tagName("input"))
             .click();
+        return this;
     }
 
     public String getId(final String item) {
