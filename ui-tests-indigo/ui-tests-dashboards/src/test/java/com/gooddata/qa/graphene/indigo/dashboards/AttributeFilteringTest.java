@@ -66,9 +66,8 @@ public class AttributeFilteringTest extends AbstractDashboardTest {
         getMetricCreator().createNumberOfWonOppsMetric();
         indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
 
-        String insightWidget = createInsightWidget(new InsightMDConfiguration(TEST_INSIGHT, ReportType.COLUMN_CHART)
-                .setMeasureBucket(singletonList(MeasureBucket.createSimpleMeasureBucket(getMdService().getObj(getProject(),
-                        Metric.class, title(METRIC_NUMBER_OF_ACTIVITIES))))));
+        String insightWidget = createInsightWidget(new InsightMDConfiguration(TEST_INSIGHT, ReportType.COLUMN_CHART).setMeasureBucket(
+                singletonList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES)))));
         indigoRestRequest.createAnalyticalDashboard(asList(createAmountKpi(), insightWidget));
     }
 
@@ -126,21 +125,19 @@ public class AttributeFilteringTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void testMakingNoAffectOnWidgetsWhenUsingUnconnectedFilter() {
-        initIndigoDashboardsPageWithWidgets().switchToEditMode()
-                .addAttributeFilter(ATTR_PRIORITY)
-                .getAttributeFiltersPanel()
-                .getAttributeFilter(ATTR_PRIORITY)
-                .clearAllCheckedValues()
-                .selectByNames("NORMAL");
-
+        initIndigoDashboardsPageWithWidgets().switchToEditMode().addAttributeFilter(ATTR_PRIORITY, "NORMAL")
+                .addAttributeFilter(ATTR_PRODUCT, "CompuSci");
 
         indigoDashboardsPage.waitForWidgetsLoading().selectWidgetByHeadline(Kpi.class, METRIC_AMOUNT);
-        indigoDashboardsPage.getConfigurationPanel().disableDateFilter();
+        ConfigurationPanel configurationPanel = indigoDashboardsPage.getConfigurationPanel();
+        assertEquals(configurationPanel.getErrorMessage(), "The kpi cannot be filtered by Priority. Unselect the check box.");
+        configurationPanel.disableDateFilter();
         assertEquals(indigoDashboardsPage.waitForWidgetsLoading().getWidgetByHeadline(Kpi.class, METRIC_AMOUNT)
-                .getValue(), "$116,625,456.54", "Unconnected filter make impact to kpi");
+                .getValue(), "$27,222,899.64", "Unconnected filter make impact to kpi");
 
         indigoDashboardsPage.selectWidgetByHeadline(Insight.class, TEST_INSIGHT);
-        indigoDashboardsPage.getConfigurationPanel().disableDateFilter();
+        configurationPanel.disableDateFilter();
+        assertEquals(configurationPanel.getErrorMessage(), "The insight cannot be filtered by Product. Unselect the check box.");
         assertEquals(
                 indigoDashboardsPage.getWidgetByHeadline(Insight.class, TEST_INSIGHT)
                         .getChartReport()
@@ -352,18 +349,8 @@ public class AttributeFilteringTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void testEmptyStateWhenFilterOut() {
-        initIndigoDashboardsPageWithWidgets().switchToEditMode()
-                .addAttributeFilter(ATTR_DEPARTMENT)
-                .getAttributeFiltersPanel()
-                .getAttributeFilter(ATTR_DEPARTMENT)
-                .clearAllCheckedValues()
-                .selectByNames("Direct Sales");
-
-        indigoDashboardsPage.addAttributeFilter(ATTR_SALES_REP)
-                .getAttributeFiltersPanel()
-                .getAttributeFilter(ATTR_SALES_REP)
-                .clearAllCheckedValues()
-                .selectByNames("Huey Jonas");
+        initIndigoDashboardsPageWithWidgets().switchToEditMode().addAttributeFilter(ATTR_DEPARTMENT, "Direct Sales")
+                .addAttributeFilter(ATTR_SALES_REP,"Huey Jonas");
 
         indigoDashboardsPage.waitForWidgetsLoading();
         takeScreenshot(browser, "testEmptyStateWhenFilterOut", getClass());

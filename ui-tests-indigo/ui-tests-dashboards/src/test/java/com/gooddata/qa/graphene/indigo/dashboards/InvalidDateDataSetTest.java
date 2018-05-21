@@ -55,7 +55,7 @@ public class InvalidDateDataSetTest extends AbstractDashboardTest {
 
         ConfigurationPanel panel = indigoDashboardsPage.getConfigurationPanel();
         takeScreenshot(browser, "Unrelated-Date-DataSet-Error-Message", getClass());
-        assertEquals(panel.getDateDataSetError(), "\"" + DATE_DATASET_TIMELINE + "\"" + DATE_DIMENSION_ERROR_MESSAGE,
+        assertEquals(panel.getErrorMessage(), "\"" + DATE_DATASET_TIMELINE + "\"" + DATE_DIMENSION_ERROR_MESSAGE,
                 "Error msg is not correct");
 
         DateDimensionSelect dropdown = panel.openDateDataSet();
@@ -71,12 +71,12 @@ public class InvalidDateDataSetTest extends AbstractDashboardTest {
     public void editDateDimensionOnDashboardToRemoveWarning() {
         initIndigoDashboardsPageWithWidgets().switchToEditMode().selectWidgetByHeadline(Insight.class,
                 INSIGHT_USING_DATE_FILTER);
-        assertTrue(indigoDashboardsPage.getConfigurationPanel().isDateDataSetErrorPresent(),
+        assertTrue(indigoDashboardsPage.getConfigurationPanel().isErrorMessagePresent(),
                 "Error does not appear");
 
         indigoDashboardsPage.getConfigurationPanel().openDateDataSet().selectByName(DATE_DATASET_ACTIVITY);
         assertFalse(
-                indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().isDateDataSetErrorPresent(),
+                indigoDashboardsPage.waitForWidgetsLoading().getConfigurationPanel().isErrorMessagePresent(),
                 "Error does not disappear");
 
         indigoDashboardsPage.selectDateFilterByName("All time").waitForWidgetsLoading()
@@ -89,7 +89,7 @@ public class InvalidDateDataSetTest extends AbstractDashboardTest {
     public void editDateDimensiontOnADToRemoveWarning() {
         initIndigoDashboardsPageWithWidgets().switchToEditMode().selectWidgetByHeadline(Insight.class,
                 INSIGHT_USING_DATE_FILTER);
-        assertTrue(indigoDashboardsPage.getConfigurationPanel().isDateDataSetErrorPresent(),
+        assertTrue(indigoDashboardsPage.getConfigurationPanel().isErrorMessagePresent(),
                 "Error does not appear");
 
         AnalysisPage page = initAnalysePage().openInsight(INSIGHT_USING_DATE_FILTER);
@@ -98,7 +98,7 @@ public class InvalidDateDataSetTest extends AbstractDashboardTest {
 
         initIndigoDashboardsPageWithWidgets().switchToEditMode().selectWidgetByHeadline(Insight.class,
                 INSIGHT_USING_DATE_FILTER);
-        assertTrue(indigoDashboardsPage.getConfigurationPanel().isDateDataSetErrorPresent(),
+        assertTrue(indigoDashboardsPage.getConfigurationPanel().isErrorMessagePresent(),
                 "Error does not disappear");
     }
 }

@@ -14,8 +14,6 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
 
-import javax.security.auth.login.Configuration;
-
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
@@ -76,7 +74,7 @@ public class ConfigurationPanel extends AbstractFragment {
         return filterByDateFilter;
     }
 
-    private static final By DATE_DATASET_ERROR_LOCATOR = By.cssSelector(".gd-message.error");
+    private static final By ERROR_MESSAGE_LOCATOR = By.cssSelector(".gd-message.error");
 
     private ConfigurationPanel waitForVisDateDataSetsLoaded() {
         final Function<WebDriver, Boolean> dataSetLoaded =
@@ -187,17 +185,17 @@ public class ConfigurationPanel extends AbstractFragment {
         return !dateDataSetSelect.isDropdownOpen();
     }
 
-    public String getDateDataSetError() {
-        return waitForElementVisible(DATE_DATASET_ERROR_LOCATOR, getRoot()).getText();
+    public String getErrorMessage() {
+        return waitForElementVisible(ERROR_MESSAGE_LOCATOR, getRoot()).getText();
     }
 
     public String getSelectedDataSetColor() {
         return waitForFragmentVisible(dateDataSetSelect).getSelectionColor();
     }
 
-    public boolean isDateDataSetErrorPresent() {
+    public boolean isErrorMessagePresent() {
         waitForVisDateDataSetsLoaded();
-        return isElementPresent(DATE_DATASET_ERROR_LOCATOR, getRoot());
+        return isElementPresent(ERROR_MESSAGE_LOCATOR, getRoot());
     }
 
     public boolean isDrillToSelectVisible() {

@@ -247,6 +247,14 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
+    public IndigoDashboardsPage addAttributeFilter(String attributeTitle, String value) {
+        addAttributeFilter(attributeTitle).getAttributeFiltersPanel()
+            .getAttributeFilter(attributeTitle)
+            .clearAllCheckedValues()
+            .selectByNames(value);
+        return this;
+    }
+
     public IndigoDashboardsPage addKpi(KpiConfiguration config) {
         dragAddKpiPlaceholder();
         configurationPanel
