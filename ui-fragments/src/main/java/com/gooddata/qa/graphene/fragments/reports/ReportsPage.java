@@ -179,12 +179,14 @@ public class ReportsPage extends AbstractFragment {
             fail("Tag cloud is not visible!");
         }
 
+        int reportCountsBefore = getReportsCount();
         waitForElementVisible(BY_TAG_CLOUD, browser).findElements(BY_LINK)
             .stream()
             .filter(tagElement -> tag.toLowerCase().equals(tagElement.getText()))
             .findFirst()
             .orElseThrow(()-> new NoSuchElementException("Cannot find tag: " + tag))
             .click();
+        Graphene.waitGui().until(browser -> getReportsCount() != reportCountsBefore);
         return this;
     }
 
@@ -193,7 +195,9 @@ public class ReportsPage extends AbstractFragment {
             fail("Tag cloud is not visible!");
         }
 
+        int reportCountsBefore = getReportsCount();
         waitForElementVisible(BY_DESELECT_TAGS, browser).click();
+        Graphene.waitGui().until(browser -> getReportsCount() != reportCountsBefore);
         return this;
     }
 
