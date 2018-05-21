@@ -26,7 +26,7 @@ public class SelectTimeRangePanel extends AbstractFragment {
     }
 
     private void setTimeRange(TimeRange timeRange) {
-        new Select(getRoot().findElement(timeRange.getRange().getSelect())).selectByVisibleText(timeRange.getTime().getName());
+        new Select(getRoot().findElement(timeRange.getRange().getSelect())).selectByIndex(timeRange.getTime().getPosition());
         WebElement input = getRoot().findElement(timeRange.getRange().getInput());
         if (timeRange.getNumber() != 0) {
             input.clear();
