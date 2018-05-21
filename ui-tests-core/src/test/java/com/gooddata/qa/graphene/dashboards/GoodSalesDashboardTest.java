@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
-import static com.gooddata.qa.graphene.AbstractTest.Profile.DOMAIN;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DASH_PIPELINE_ANALYSIS;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
@@ -17,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.RestClient.RestProfile;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import org.json.JSONException;
@@ -146,8 +146,9 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
                 .getJSONObject("links")
                 .getString("self")
                 .concat("/settings/defaults");
-
-        new DashboardRestRequest(new RestClient(getProfile(DOMAIN)), testParams.getProjectId())
+        // TODO: temporary fix on master until QA-7449 is merged (domainUser is independent of useDynamic parameter)
+        new DashboardRestRequest(new RestClient(new RestProfile(
+                testParams.getHost(), domainUser, testParams.getPassword(), true)), testParams.getProjectId())
                 .setDefaultDashboardForUser(DASH_PIPELINE_ANALYSIS, TARGET_TAB, defaultUserUri);
 
         logout();
