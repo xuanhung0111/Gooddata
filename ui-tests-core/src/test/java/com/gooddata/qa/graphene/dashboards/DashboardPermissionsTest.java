@@ -15,7 +15,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.ParseException;
 import org.json.JSONArray;
@@ -33,7 +35,6 @@ import com.gooddata.qa.graphene.fragments.dashboards.PermissionsDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
 import com.gooddata.qa.graphene.utils.WaitUtils;
 import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.google.common.collect.Lists;
 
 public class DashboardPermissionsTest extends GoodSalesAbstractTest {
@@ -314,10 +315,10 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         logout();
         signIn(false, UserRoles.ADMIN);
 
-        String userGroup1Uri = UserManagementRestUtils.addUserGroup(getRestApiClient(), testParams.getProjectId(),
-                ALCOHOLICS_ANONYMOUS);
-        String userGroup2Uri = UserManagementRestUtils.addUserGroup(getRestApiClient(), testParams.getProjectId(),
-                XENOFOBES_XYLOPHONES);
+        UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        String userGroup1Uri = userManagementRestRequest.addUserGroup(ALCOHOLICS_ANONYMOUS);
+        String userGroup2Uri = userManagementRestRequest.addUserGroup(XENOFOBES_XYLOPHONES);
         userGroup1Id = getUserGroupID(userGroup1Uri);
         userGroup2Id = getUserGroupID(userGroup2Uri);
     }
@@ -590,12 +591,13 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         logout();
         signIn(false, UserRoles.ADMIN);
 
-        RestApiClient restApiClient = testParams.getDomainUser() == null ? getRestApiClient() : getDomainUserRestApiClient();
-        String editorProfileUri = UserManagementRestUtils.getUserProfileUri(restApiClient, testParams.getUserDomain(), testParams.getEditorUser());
-        String viewerProfileUri = UserManagementRestUtils.getUserProfileUri(restApiClient, testParams.getUserDomain(), testParams.getViewerUser());
+        UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(
+                new RestClient(getProfile(Profile.DOMAIN)), testParams.getProjectId());
+        String editorProfileUri = userManagementRestRequest.getUserProfileUri(testParams.getUserDomain(), testParams.getEditorUser());
+        String viewerProfileUri = userManagementRestRequest.getUserProfileUri(testParams.getUserDomain(), testParams.getViewerUser());
 
-        UserManagementRestUtils.addUsersToUserGroup(restApiClient, userGroup1Id, editorProfileUri);
-        UserManagementRestUtils.addUsersToUserGroup(restApiClient, userGroup2Id, viewerProfileUri);
+        userManagementRestRequest.addUsersToUserGroup(userGroup1Id, editorProfileUri);
+        userManagementRestRequest.addUsersToUserGroup(userGroup2Id, viewerProfileUri);
     }
 
     @Test(dependsOnMethods = {"prepareUsergroupTests"}, groups = {"acl-tests-usergroups", "sanity"})

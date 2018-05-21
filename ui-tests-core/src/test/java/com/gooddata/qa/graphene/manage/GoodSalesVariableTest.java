@@ -15,8 +15,8 @@ import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 import com.gooddata.qa.graphene.fragments.manage.VariableDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.VariablesPage;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
-import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import com.gooddata.qa.utils.http.variable.VariableRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -36,7 +36,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileUri;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -60,6 +59,7 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
     private static final int EDITED_NUMERIC_VALUE = 5678;
 
     private static final String RED_BAR_MESSAGE = "\"%s\" name already in use. Please change the name and try again.";
+    private UserManagementRestRequest userManagementRestRequest;
 
     @Override
     protected void initProperties() {
@@ -69,6 +69,8 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
+        userManagementRestRequest = new UserManagementRestRequest(
+                new RestClient(getProfile(Profile.DOMAIN)), testParams.getProjectId());
         getMetricCreator().createAmountMetric();
     }
 
@@ -86,8 +88,7 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"basic"})
     public void createNumericVariableWithSpecificUser() throws ParseException, JSONException, IOException {
-        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
-        String userProfileUri = getUserProfileUri(restApiClient, testParams.getUserDomain(), testParams.getUser());
+        String userProfileUri = userManagementRestRequest.getUserProfileUri(testParams.getUserDomain(), testParams.getUser());
 
         initVariablePage().createVariable(new NumericVariable(NUMERIC_VARIABLE)
                 .withDefaultNumber(NUMERIC_VALUE)
@@ -113,8 +114,7 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"basic"})
     public void createAttributeVariableWithSpecificUser() throws ParseException, JSONException, IOException {
-        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
-        String userProfileUri = getUserProfileUri(restApiClient, testParams.getUserDomain(), testParams.getUser());
+        String userProfileUri = userManagementRestRequest.getUserProfileUri(testParams.getUserDomain(), testParams.getUser());
 
         initVariablePage().createVariable(new AttributeVariable(ATTRIBUTE_VARIABLE)
                 .withAttribute(ATTR_STAGE_NAME)
@@ -164,8 +164,7 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"basic"})
     public void editAttributeVariableDefaultAndUserSpecificValue() throws ParseException, JSONException, IOException {
-        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
-        String userProfileUri = getUserProfileUri(restApiClient, testParams.getUserDomain(), testParams.getUser());
+        String userProfileUri = userManagementRestRequest.getUserProfileUri(testParams.getUserDomain(), testParams.getUser());
 
         initVariablePage()
                 .openVariableFromList(ATTRIBUTE_VARIABLE)
@@ -190,8 +189,7 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"basic"})
     public void editNumericVariableDefaultAndUserSpecificValue() throws ParseException, JSONException, IOException {
-        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
-        String userProfileUri = getUserProfileUri(restApiClient, testParams.getUserDomain(), testParams.getUser());
+        String userProfileUri = userManagementRestRequest.getUserProfileUri(testParams.getUserDomain(), testParams.getUser());
 
         initVariablePage()
                 .openVariableFromList(NUMERIC_VARIABLE)
@@ -254,8 +252,8 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
     public void updateAttributeVariableInProfilePage() throws ParseException, JSONException, IOException {
         final String variable = generateVariableName();
 
-        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
-        String userProfileUri = getUserProfileUri(restApiClient, testParams.getUserDomain(), testParams.getUser());
+        String userProfileUri = userManagementRestRequest.getUserProfileUri(testParams.getUserDomain(),
+                testParams.getUser());
 
         initVariablePage().createVariable(new AttributeVariable(variable)
                 .withAttribute(ATTR_STAGE_NAME));
@@ -275,8 +273,8 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
     public void updateNumericVariableInProfilePage() throws ParseException, JSONException, IOException {
         final String variable = generateVariableName();
 
-        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
-        String userProfileUri = getUserProfileUri(restApiClient, testParams.getUserDomain(), testParams.getUser());
+        String userProfileUri = userManagementRestRequest.getUserProfileUri(testParams.getUserDomain(),
+                testParams.getUser());
 
         initVariablePage().createVariable(new NumericVariable(variable)
                 .withDefaultNumber(NUMERIC_VALUE));

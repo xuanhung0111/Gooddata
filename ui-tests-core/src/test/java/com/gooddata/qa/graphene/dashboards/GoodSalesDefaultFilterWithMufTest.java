@@ -11,7 +11,9 @@ import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.Das
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
 import com.gooddata.qa.utils.asserts.AssertUtils;
+import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import com.gooddata.qa.utils.http.variable.VariableRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -35,8 +37,6 @@ import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.joining;
 import static org.testng.Assert.assertEquals;
 
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
-
 public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTest {
 
     private static final String DASHBOARD_MUF = "Muf-Dashboard";
@@ -53,6 +53,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
 
     private boolean multipleChoice;
     private DashboardRestRequest dashboardRequest;
+    private UserManagementRestRequest userManagementRestRequest;
 
     @BeforeClass(alwaysRun = true)
     public void setUp(ITestContext context) {
@@ -82,6 +83,8 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
     protected void customizeProject() throws Throwable {
         //prepare Dashboard For Muf User
         dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
+        userManagementRestRequest = new UserManagementRestRequest(
+                new RestClient(getProfile(Profile.DOMAIN)), testParams.getProjectId());
         VariableRestRequest request = new VariableRestRequest(getAdminRestClient(), testParams.getProjectId());
         String promptFilterUri = request.createFilterVariable(MUF_DF_VARIABLE, request.getAttributeByTitle(ATTR_PRODUCT).getUri());
 
@@ -116,8 +119,8 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             description = "Verify muf user default view shows correctly after assigned muf in multiple choice mode")
     public void checkMufUserDefaultViewInMultipleChoiceMode(String user, UserRoles role, String mufObjectUri)
             throws ParseException, IOException, JSONException {
-        String assignedMufUserId = UserManagementRestUtils
-                .getUserProfileUri(getDomainUserRestApiClient(), testParams.getUserDomain(), user);
+        String assignedMufUserId = userManagementRestRequest
+                .getUserProfileUri(testParams.getUserDomain(), user);
 
         dashboardRequest.addMufToUser(assignedMufUserId, mufObjectUri);
 
@@ -163,8 +166,8 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
             description = "Verify muf user default view shows correctly after assigned muf in single choice mode")
     public void checkMufUserDefaultViewInSingleChoiceMode(String user, UserRoles role, String mufObjectUri)
             throws ParseException, IOException, JSONException {
-        String assignedMufUserId = UserManagementRestUtils
-                .getUserProfileUri(getDomainUserRestApiClient(), testParams.getUserDomain(), user);
+        String assignedMufUserId = userManagementRestRequest
+                .getUserProfileUri(testParams.getUserDomain(), user);
 
         dashboardRequest.addMufToUser(assignedMufUserId, mufObjectUri);
 
@@ -197,8 +200,8 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
         final String savedView1 = "SavedView1";
         final String savedView2 = "SavedView2";
 
-        String assignedMufUserId = UserManagementRestUtils
-                .getUserProfileUri(getDomainUserRestApiClient(), testParams.getUserDomain(), user);
+        String assignedMufUserId = userManagementRestRequest
+                .getUserProfileUri(testParams.getUserDomain(), user);
 
         try {
             logoutAndLoginAs(canAccessGreyPage(browser), role);
@@ -243,8 +246,8 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
     public void checkMufUserSavedViewInSingleChoiceMode(String user, UserRoles role, String mufObjectUri)
             throws JSONException, ParseException, IOException {
         final String savedView = "SavedView";
-        String assignedMufUserId = UserManagementRestUtils
-                .getUserProfileUri(getDomainUserRestApiClient(), testParams.getUserDomain(), user);
+        String assignedMufUserId = userManagementRestRequest
+                .getUserProfileUri(testParams.getUserDomain(), user);
 
         try {
             logoutAndLoginAs(canAccessGreyPage(browser), role);

@@ -1,14 +1,12 @@
 package com.gooddata.qa.graphene.reset;
 
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
-import static com.gooddata.qa.graphene.AbstractTest.Profile.DOMAIN;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static com.gooddata.qa.graphene.fragments.account.LostPasswordPage.PASSWORD_HINT;
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.updateUserPassword;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
@@ -16,9 +14,9 @@ import java.io.IOException;
 import javax.mail.MessagingException;
 
 import com.gooddata.project.Project;
-import com.gooddata.project.ProjectService;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
@@ -121,7 +119,8 @@ public class ResetPasswordTest extends AbstractUITest {
             waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
 
         } finally {
-            updateUserPassword(getRestApiClient(), testParams.getUserDomain(), testUser, NEW_PASSWORD, testParams.getPassword());
+            new UserManagementRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
+                    .updateUserPassword(testParams.getUserDomain(), testUser, NEW_PASSWORD, testParams.getPassword());
         }
     }
 
@@ -142,7 +141,9 @@ public class ResetPasswordTest extends AbstractUITest {
     @Test(dependsOnMethods = { "openOneProject" }, enabled = false)
     public void checkSectionManagementVulnerability() throws ParseException, JSONException, IOException {
         initDashboardsPage();
-        updateUserPassword(getRestApiClient(), testParams.getUserDomain(), testUser, testParams.getPassword(), NEW_PASSWORD);
+        UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(
+                new RestClient(getProfile(ADMIN)), testParams.getProjectId());
+        userManagementRestRequest.updateUserPassword(testParams.getUserDomain(), testUser, testParams.getPassword(), NEW_PASSWORD);
 
         try {
             sleepTightInSeconds(600);
@@ -152,7 +153,7 @@ public class ResetPasswordTest extends AbstractUITest {
             takeScreenshot(browser, "Out of section after reset password", this.getClass());
 
         } finally {
-            updateUserPassword(getRestApiClient(), testParams.getUserDomain(), testUser, NEW_PASSWORD, testParams.getPassword());
+            userManagementRestRequest.updateUserPassword(testParams.getUserDomain(), testUser, NEW_PASSWORD, testParams.getPassword());
         }
     }
 

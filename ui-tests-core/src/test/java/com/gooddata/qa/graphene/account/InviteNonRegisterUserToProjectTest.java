@@ -17,6 +17,9 @@ import java.util.Objects;
 import java.util.function.Function;
 import javax.mail.MessagingException;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.RestClient.RestProfile;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -35,8 +38,6 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.account.RegistrationPage;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
-import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
 
@@ -84,7 +85,7 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void confirmInvitationRegistrationForm() throws MessagingException, IOException, JSONException {
-        deleteUserIfExist(testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient(), invitationUser);
+        deleteUserIfExist(invitationUser);
 
         String invitationLink = doActionWithImapClient(imapClient ->
                 initProjectsAndUsersPage().inviteUsersWithBlankMessage(imapClient, projectTitle + " Invitation",
@@ -132,7 +133,7 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
     @Test(dependsOnGroups = {"createProject"})
     public void inviteUnverifiedUserToProject()
             throws ParseException, JSONException, IOException, MessagingException {
-        deleteUserIfExist(testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient(), invitationUser);
+        deleteUserIfExist(invitationUser);
 
         initRegistrationPage()
             .registerNewUserSuccessfully(registrationForm);
@@ -156,33 +157,33 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
         LoginFragment.getInstance(browser).login(invitationUser, testParams.getPassword(), true);
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
 
-        RestApiClient restApiClientInvitedUser = getRestApiClient(invitationUser, testParams.getPassword());
-        UserProfilePage userProfilePage = openUserProfileInProject(restApiClientInvitedUser,
-                testParams.getProjectId());
+        UserProfilePage userProfilePage = openUserProfileInProject(testParams.getProjectId());
         assertEquals(userProfilePage.getUserRole(), UserRoles.EDITOR.getName());
     }
 
     @AfterClass(alwaysRun = true)
     public void tearDown() throws ParseException, JSONException, IOException {
-        deleteUserIfExist(testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient(), invitationUser);
+        deleteUserIfExist(invitationUser);
     }
 
-    private UserProfilePage openUserProfileInProject(RestApiClient restApiClient, String projectId)
+    private UserProfilePage openUserProfileInProject(String projectId)
             throws ParseException, JSONException, IOException {
-        String userProfileUri = UserManagementRestUtils.getCurrentUserProfile(restApiClient)
-                .getJSONObject("links")
-                .getString("self");
+        final UserManagementRestRequest userRestRequest = new UserManagementRestRequest(new RestClient(
+                new RestProfile(testParams.getHost(), invitationUser, testParams.getPassword(), true)),
+                projectId);
+        String userProfileUri = userRestRequest.getCurrentUserProfile().getJSONObject("links").getString("self");
         openUrl(format(USER_PROFILE_PAGE_URL, projectId, userProfileUri));
         return UserProfilePage.getInstance(browser);
     }
 
-    private void deleteUserIfExist(RestApiClient restApiClient, String userEmail)
+    private void deleteUserIfExist(String userEmail)
             throws ParseException, JSONException, IOException {
-        JSONObject userProfile = UserManagementRestUtils.getUserProfileByEmail(restApiClient, testParams.getUserDomain(),
-                userEmail);
+        final UserManagementRestRequest userRestRequest = new UserManagementRestRequest(
+                new RestClient(getProfile(Profile.DOMAIN)), testParams.getProjectId());
+        JSONObject userProfile = userRestRequest.getUserProfileByEmail(testParams.getUserDomain(), userEmail);
         if (Objects.nonNull(userProfile)) {
             String userProfileUri = userProfile.getJSONObject("links").getString("self");
-            UserManagementRestUtils.deleteUserByUri(restApiClient, userProfileUri);
+            userRestRequest.deleteUserByUri(userProfileUri);
         }
     }
 

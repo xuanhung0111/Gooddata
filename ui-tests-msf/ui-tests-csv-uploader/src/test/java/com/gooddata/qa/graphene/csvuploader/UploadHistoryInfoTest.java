@@ -6,6 +6,8 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,8 +19,6 @@ import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
-import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 public class UploadHistoryInfoTest extends AbstractCsvUploaderTest {
 
@@ -99,8 +99,9 @@ public class UploadHistoryInfoTest extends AbstractCsvUploaderTest {
     }
 
     private String getFullNameOf(String userEmail) throws ParseException, IOException, JSONException {
-        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
-        JSONObject userInfo = UserManagementRestUtils.getUserProfileByEmail(restApiClient, testParams.getUserDomain(),
+        UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(
+                new RestClient(getProfile(Profile.DOMAIN)), testParams.getProjectId());
+        JSONObject userInfo = userManagementRestRequest.getUserProfileByEmail(testParams.getUserDomain(),
                 userEmail);
         return userInfo.getString("firstName") + " " + userInfo.getString("lastName");
     }

@@ -31,6 +31,7 @@ import com.gooddata.qa.utils.http.RestClient.RestProfile;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.rolap.RolapRestRequest;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.json.JSONException;
 import org.openqa.selenium.Dimension;
@@ -54,8 +55,6 @@ import com.gooddata.qa.utils.http.RestApiClient;
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static java.util.stream.Collectors.toList;
 import static org.testng.Assert.assertFalse;
-
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -603,7 +602,10 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     }
 
     private boolean isCurrentUserDomainUser() {
-        return UserManagementRestUtils.isDomainUser(getRestApiClient(), testParams.getUserDomain());
+        return new UserManagementRestRequest(new RestClient(
+                new RestProfile(testParams.getHost(), testParams.getUser(), testParams.getPassword(), true)),
+                testParams.getProjectId())
+                .isDomainUser(testParams.getUserDomain());
     }
 
     private void adjustWindowSize(String windowSize) {

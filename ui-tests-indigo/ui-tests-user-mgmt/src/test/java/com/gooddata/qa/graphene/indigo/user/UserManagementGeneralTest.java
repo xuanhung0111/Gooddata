@@ -20,6 +20,7 @@ import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -39,7 +40,6 @@ import com.gooddata.qa.graphene.fragments.indigo.user.DeleteGroupDialog;
 import com.gooddata.qa.graphene.fragments.indigo.user.GroupDialog;
 import com.gooddata.qa.graphene.fragments.indigo.user.UserInvitationDialog;
 import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.google.common.collect.Iterables;
 
@@ -70,6 +70,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
             "Choose a different name for your group. %s already exists.";
 
     private static final String INVITED_EMAIL = "abc@mail.com";
+    private UserManagementRestRequest userManagementRestRequest;
 
     @BeforeClass(alwaysRun = true)
     @Override
@@ -96,7 +97,8 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
     protected void customizeProject() throws Throwable {
         new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
                 .setFeatureFlagInProject(ProjectFeatureFlags.DISPLAY_USER_MANAGEMENT, true);
-
+        userManagementRestRequest = new UserManagementRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         //we need to upload dummy data so we can work with Dashboard page.
         String csvFilePath = new CsvFile("data.csv")
                 .columns(new CsvFile.Column("Att1"), new CsvFile.Column("Fact1"))
@@ -127,7 +129,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
     @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement" })
     public void checkXssInUsername() throws ParseException, JSONException, IOException {
         final String xssUser = "<button>XSS user</button>";
-        String oldUser = UserManagementRestUtils.updateFirstNameOfCurrentAccount(getRestApiClient(), xssUser);
+        String oldUser = userManagementRestRequest.updateFirstNameOfCurrentAccount(xssUser);
 
         try {
             initDashboardsPage();
@@ -137,7 +139,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
                     .stream()
                     .anyMatch(name -> name.startsWith(xssUser)), "Cannot find user with first name: " + xssUser);
         } finally {
-            UserManagementRestUtils.updateFirstNameOfCurrentAccount(getRestApiClient(), oldUser);
+            userManagementRestRequest.updateFirstNameOfCurrentAccount(oldUser);
         }
     }
 
@@ -238,7 +240,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
     @Test(dependsOnMethods = { "verifyUserGroupsList" }, groups = "userManagement")
     public void verifyGroupWithNoMember() throws JSONException, IOException {
         String emptyGroup = "EmptyGroup";
-        String groupUri = UserManagementRestUtils.addUserGroup(restApiClient, testParams.getProjectId(), emptyGroup);
+        String groupUri = userManagementRestRequest.addUserGroup(emptyGroup);
         try {
             initDashboardsPage();
             assertEquals(initUserManagementPage().openSpecificGroupPage(emptyGroup)
@@ -253,14 +255,14 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
                     asList(testParams.getUser(), testParams.getEditorUser(),
                             testParams.getViewerUser(), testParams.getDomainUser())));
         } finally {
-            UserManagementRestUtils.deleteUserGroup(restApiClient, groupUri);
+            userManagementRestRequest.deleteUserGroup(groupUri);
         }
     }
 
     @Test(dependsOnMethods = { "verifyUserGroupsList" }, groups = "userManagement")
     public void updateGroupAfterRemoveMember() throws JSONException, IOException {
         String group = "Test Group";
-        String groupUri = UserManagementRestUtils.addUserGroup(restApiClient, testParams.getProjectId(), group);
+        String groupUri = userManagementRestRequest.addUserGroup(group);
         try {
             initDashboardsPage();
             initUserManagementPage().addUsersToGroup(group, testParams.getUser())
@@ -268,7 +270,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
                 .removeUsersFromGroup(group, testParams.getUser())
                 .waitForEmptyGroup();
         } finally {
-            UserManagementRestUtils.deleteUserGroup(restApiClient, groupUri);
+            userManagementRestRequest.deleteUserGroup(groupUri);
         }
     }
 
@@ -327,7 +329,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
     @Test(dependsOnMethods = { "verifyUserManagementUI" }, groups = { "userManagement", "sanity" })
     public void adminRemoveUserGroup() throws ParseException, JSONException, IOException {
         String groupName = "New Group";
-        UserManagementRestUtils.addUserGroup(restApiClient, testParams.getProjectId(), groupName);
+        userManagementRestRequest.addUserGroup(groupName);
 
         initDashboardsPage();
         UserManagementPage userManagementPage = initUserManagementPage();
@@ -504,7 +506,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
     public void renameUserGroup() throws JSONException, IOException {
         String groupName = "Rename group test";
         String newGroupName = groupName + " renamed";
-        String groupUri = UserManagementRestUtils.addUserGroup(restApiClient, testParams.getProjectId(), groupName);
+        String groupUri = userManagementRestRequest.addUserGroup(groupName);
 
         try {
             initDashboardsPage();
@@ -522,7 +524,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
             assertTrue(userManagementPage.getAllSidebarActiveLinks().contains(newGroupName));
             assertEquals(userManagementPage.getUserPageTitle(), newGroupName);
         } finally {
-            UserManagementRestUtils.deleteUserGroup(restApiClient, groupUri);
+            userManagementRestRequest.deleteUserGroup(groupUri);
         }
     }
 
@@ -678,7 +680,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
 
     private void createUserGroups(String... groupNames) throws JSONException, IOException {
         for (String group : groupNames) {
-            UserManagementRestUtils.addUserGroup(restApiClient, testParams.getProjectId(), group);
+            userManagementRestRequest.addUserGroup(group);
         }
     }
 

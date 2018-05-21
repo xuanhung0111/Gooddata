@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.disc.notification;
 
 import static com.gooddata.qa.graphene.entity.disc.NotificationRule.getVariablesFromMessage;
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileUri;
 import static com.gooddata.qa.utils.mail.ImapUtils.getEmailBody;
 import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 import static java.lang.String.format;
@@ -21,6 +20,8 @@ import java.util.Map;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -315,8 +316,10 @@ public class NotificationEmailTest extends AbstractProcessTest {
     }
 
     private String getUserProfileId() throws ParseException, JSONException, IOException {
-        RestApiClient restApiClient = testParams.getDomainUser() == null ? getRestApiClient() : getDomainUserRestApiClient();
-        String userProfileUri = getUserProfileUri(restApiClient, testParams.getUserDomain(), testParams.getUser());
+        UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(
+                new RestClient(getProfile(Profile.DOMAIN)), testParams.getProjectId());
+        String userProfileUri = userManagementRestRequest.getUserProfileUri(testParams.getUserDomain(),
+                testParams.getUser());
         return userProfileUri.split("/profile/")[1];
     }
 
