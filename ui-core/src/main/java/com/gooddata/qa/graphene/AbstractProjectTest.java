@@ -27,6 +27,7 @@ import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
 import com.gooddata.qa.utils.http.CommonRestRequest;
+import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestClient.RestProfile;
 import com.gooddata.qa.utils.http.RestRequest;
@@ -156,7 +157,6 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         testParams.setUser(dynamicUser);
 
         // update REST clients to the correct user because they can be generated and cached
-        restApiClient = getRestApiClient(testParams.getUser(), testParams.getPassword());
         goodDataClient = getGoodDataClient(testParams.getUser(), testParams.getPassword());
 
         logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
@@ -305,10 +305,11 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         if (Objects.isNull(appliedFixture)) {
             throw new FixtureException("Fixture can't be null");
         }
-
+        final RestApiClient restApiClient = new RestApiClient(
+                testParams.getHost(), user, testParams.getPassword(), true, false);
         return new Fixture(appliedFixture)
                 .setGoodDataClient(getGoodDataClient(user, testParams.getPassword()))
-                .setRestApiClient(getRestApiClient(user, testParams.getPassword()))
+                .setRestApiClient(restApiClient)
                 .deploy(title, testParams.getAuthorizationToken(),
                         testParams.getProjectDriver(), testParams.getProjectEnvironment());
     }

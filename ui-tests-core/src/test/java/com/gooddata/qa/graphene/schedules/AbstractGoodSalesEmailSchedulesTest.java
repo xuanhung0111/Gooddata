@@ -33,7 +33,6 @@ import org.joda.time.format.DateTimeFormatter;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.GDEmails;
-import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;
 
@@ -114,11 +113,11 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
      * Get scheduledMail
      */
     private InputStream getScheduleInputStream(String scheduleUri) throws IOException {
-        RestApiClient apiClient = getRestApiClient();
+        RestClient restClient = new RestClient(getProfile(Profile.ADMIN));
 
         System.out.println("Get scheduledMail: " + scheduleUri);
-        HttpRequestBase getRequest = apiClient.newGetMethod(scheduleUri);
-        HttpResponse getResponse = apiClient.execute(getRequest);
+        HttpRequestBase getRequest = RestRequest.initGetRequest(scheduleUri);
+        HttpResponse getResponse = restClient.execute(getRequest);
         System.out.println(" - status: " + getResponse.getStatusLine().getStatusCode());
         return getResponse.getEntity().getContent();
     }

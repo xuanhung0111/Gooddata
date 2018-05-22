@@ -34,7 +34,6 @@ import com.gooddata.qa.graphene.fragments.dashboards.AddGranteesDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.PermissionsDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
 import com.gooddata.qa.graphene.utils.WaitUtils;
-import com.gooddata.qa.utils.http.RestApiClient;
 import com.google.common.collect.Lists;
 
 public class DashboardPermissionsTest extends GoodSalesAbstractTest {

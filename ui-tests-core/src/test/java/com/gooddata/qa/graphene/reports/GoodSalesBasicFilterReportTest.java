@@ -46,7 +46,6 @@ import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.fragments.reports.filter.AttributeFilterFragment;
 import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter.FilterFragment;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
-import com.gooddata.qa.utils.http.RestApiClient;
 import com.google.common.collect.Lists;
 
 public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {

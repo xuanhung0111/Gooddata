@@ -19,9 +19,6 @@ import com.gooddata.qa.utils.http.RestClient.RestProfile;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.HttpHost;
 import org.apache.http.ParseException;
-import org.apache.http.NoHttpResponseException;
-import org.apache.http.client.HttpRequestRetryHandler;
-import org.apache.http.protocol.HttpContext;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.testng.Arquillian;
 import org.json.JSONException;
@@ -34,7 +31,6 @@ import org.testng.annotations.Listeners;
 import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.common.TestParameters;
-import com.gooddata.qa.graphene.utils.Sleeper;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.testng.listener.AuxiliaryFailureScreenshotListener;
 import com.gooddata.qa.utils.testng.listener.ConsoleStatusListener;
@@ -56,7 +52,6 @@ public abstract class AbstractTest extends Arquillian {
     protected String imapPassword;
 
     protected GoodData goodDataClient = null;
-    protected RestApiClient restApiClient = null;
 
     protected StartPageContext startPageContext = null;
 
@@ -126,36 +121,6 @@ public abstract class AbstractTest extends Arquillian {
 
     public String getRootUrl() {
         return "https://" + testParams.getHost() + "/";
-    }
-
-    public String getBasicRootUrl() {
-        String rootUrl = getRootUrl();
-        return getRootUrl().substring(0, rootUrl.length() - 1);
-    }
-
-    public RestApiClient getDomainUserRestApiClient() {
-        return getRestApiClient(testParams.getDomainUser() == null ? testParams.getUser() : testParams.getDomainUser(), 
-                testParams.getPassword());
-    }
-
-    /**
-     * Create {@link com.gooddata.qa.utils.http.RestApiClient} for admin user and save it to the test context.
-     * @return {@link com.gooddata.qa.utils.http.RestApiClient} client for admin user
-     */
-    public RestApiClient getRestApiClient() {
-        if (restApiClient == null) {
-            restApiClient = getRestApiClient(testParams.getUser(), testParams.getPassword());
-        }
-        return restApiClient;
-    }
-
-    /**
-     * Create {@link com.gooddata.qa.utils.http.RestApiClient} for specific user. It doesn't save it to the context!
-     *
-     * @return {@link com.gooddata.qa.utils.http.RestApiClient} for specific user.
-     */
-    public RestApiClient getRestApiClient(final String userLogin, final String userPassword) {
-        return new RestApiClient(testParams.getHost(), userLogin, userPassword, true, false);
     }
 
     public GoodData getGoodDataClient() {

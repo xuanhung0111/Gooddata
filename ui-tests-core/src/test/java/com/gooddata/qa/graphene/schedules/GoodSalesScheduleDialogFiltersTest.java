@@ -203,9 +203,6 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
     private void deleteEmailScheduleAndExecutionContext() throws JSONException {
         int scheduleId = getScheduleId(customSubject);
         int executionContextId = getExecutionContextId(scheduleId);
-
-        restApiClient = getRestApiClient();
-
         deleteObject(scheduleId);
         deleteObject(executionContextId);
     }
