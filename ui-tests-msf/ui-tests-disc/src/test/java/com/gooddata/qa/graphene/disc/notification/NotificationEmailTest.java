@@ -21,6 +21,7 @@ import javax.mail.MessagingException;
 
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.RestClient.RestProfile;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -29,8 +30,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import com.gooddata.GoodData;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.qa.graphene.common.AbstractProcessTest;
@@ -267,17 +266,17 @@ public class NotificationEmailTest extends AbstractProcessTest {
     public void checkRepeatedDataLoadingFailureNotification()
             throws MessagingException, IOException, ParseException, JSONException {
         addUserToProject(imapUser, UserRoles.ADMIN);
-        GoodData goodData = getGoodDataClient(imapUser, imapPassword);
+        RestClient restClient = new RestClient(new RestProfile(testParams.getHost(), imapUser, imapPassword, true));
 
         logout();
         signInAtGreyPages(imapUser, imapPassword);
 
-        DataloadProcess process = createProcess(goodData, generateProcessName(), PackageFile.BASIC,
+        DataloadProcess process = createProcess(restClient, generateProcessName(), PackageFile.BASIC,
                 ProcessType.CLOUD_CONNECT);
 
         try {
             String cronExpression = parseTimeToCronExpression(LocalTime.now().minusMinutes(1));
-            Schedule schedule = createSchedule(goodData, process, Executable.SHORT_TIME_ERROR_GRAPH, cronExpression);
+            Schedule schedule = createSchedule(restClient, process, Executable.SHORT_TIME_ERROR_GRAPH, cronExpression);
 
             ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
             executeScheduleWithSpecificTimes(scheduleDetail, 5);

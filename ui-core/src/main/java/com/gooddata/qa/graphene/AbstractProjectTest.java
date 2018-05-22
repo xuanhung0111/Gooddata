@@ -23,9 +23,7 @@ import com.gooddata.qa.fixture.FixtureException;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterType;
 import com.gooddata.qa.mdObjects.dashboard.filter.FloatingFilterConstraint;
-import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
-import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestClient;
@@ -35,6 +33,7 @@ import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.rolap.RolapRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import com.gooddata.qa.utils.java.Builder;
+import org.apache.http.HttpHost;
 import org.json.JSONException;
 import org.openqa.selenium.Dimension;
 import org.testng.ITestContext;
@@ -156,9 +155,6 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
         testParams.setUser(dynamicUser);
 
-        // update REST clients to the correct user because they can be generated and cached
-        goodDataClient = getGoodDataClient(testParams.getUser(), testParams.getPassword());
-
         logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
     }
 
@@ -276,11 +272,11 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     }
 
     protected MetadataService getMdService() {
-        return getGoodDataClient().getMetadataService();
+        return new RestClient(getProfile(ADMIN)).getMetadataService();
     }
 
     protected Project getProject() {
-        return getGoodDataClient().getProjectService().getProjectById(testParams.getProjectId());
+        return new RestClient(getProfile(ADMIN)).getProjectService().getProjectById(testParams.getProjectId());
     }
 
     /**
@@ -307,8 +303,10 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         }
         final RestApiClient restApiClient = new RestApiClient(
                 testParams.getHost(), user, testParams.getPassword(), true, false);
+        final HttpHost httpHost = RestApiClient.parseHost(testParams.getHost());
+        GoodData goodData = new GoodData(httpHost.getHostName(), user, testParams.getPassword(), httpHost.getPort());
         return new Fixture(appliedFixture)
-                .setGoodDataClient(getGoodDataClient(user, testParams.getPassword()))
+                .setGoodDataClient(goodData)
                 .setRestApiClient(restApiClient)
                 .deploy(title, testParams.getAuthorizationToken(),
                         testParams.getProjectDriver(), testParams.getProjectEnvironment());
@@ -327,24 +325,24 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     }
 
     protected Report createReportViaRest(ReportDefinition defination) {
-        return createReportViaRest(getGoodDataClient(), defination);
+        return createReportViaRest(new RestClient(getProfile(ADMIN)), defination);
     }
 
-    protected Report createReportViaRest(GoodData gooddata, ReportDefinition definition) {
-        MetadataService metadataService = gooddata.getMetadataService();
+    protected Report createReportViaRest(RestClient restClient, ReportDefinition definition) {
+        MetadataService metadataService = restClient.getMetadataService();
         definition = metadataService.createObj(getProject(), definition);
         return metadataService.createObj(getProject(), new Report(definition.getTitle(), definition));
     }
 
     public void setupMaql(String maql) {
-        getGoodDataClient()
+        new RestClient(getProfile(ADMIN))
                 .getModelService()
                 .updateProjectModel(getProject(), maql)
                 .get();
     }
 
     public void setupDataViaRest(String datasetId, InputStream dataset) {
-        getGoodDataClient()
+        new RestClient(getProfile(ADMIN))
                 .getDatasetService()
                 .loadDataset(getProject(), datasetId, dataset)
                 .get();
@@ -406,10 +404,6 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     protected Metric getMetricByTitle(String title) {
         return getMdService().getObj(getProject(), Metric.class, title(title));
-    }
-
-    protected Metric getMetricByIdentifier(String id) {
-        return getMdService().getObj(getProject(), Metric.class, identifier(id));
     }
 
     protected Fact getFactByTitle(String title) {
@@ -505,17 +499,6 @@ public abstract class AbstractProjectTest extends AbstractUITest {
             }
         }).build();
     }
-
-    protected FilterItem createFilterItem(FilterItemContent item) {
-        return Builder.of(FilterItem::new).with(filterItem -> filterItem.setContentId(item.getId())).build();
-    }
-
-    protected FilterItem createFilterItem(FilterItemContent item, TabItem.ItemPosition itemPosition) {
-        return Builder.of(FilterItem::new).with(filterItem -> {
-            filterItem.setContentId(item.getId());
-            filterItem.setPosition(itemPosition);
-        }).build();
-    }
     //------------------------- DASHBOARD MD OBJECTS - END ------------------------
 
     //------------------------- REPORT, METRIC MD OBJECTS - BEGIN ------------------------
@@ -530,18 +513,18 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     }
 
     protected Metric createMetric(String name, String expression, String format) {
-        return createMetric(getGoodDataClient(), name, expression, format);
+        return createMetric(new RestClient(getProfile(ADMIN)), name, expression, format);
     }
 
-    protected Metric createMetric(GoodData gooddata, String name, String expression, String format) {
-        return gooddata.getMetadataService().createObj(getProject(), new Metric(name, expression, format));
+    protected Metric createMetric(RestClient restClient, String name, String expression, String format) {
+        return restClient.getMetadataService().createObj(getProject(), new Metric(name, expression, format));
     }
 
-    protected Metric createMetricIfNotExist(GoodData gooddata, String name, String expression, String format) {
+    protected Metric createMetricIfNotExist(RestClient restClient, String name, String expression, String format) {
         try {
             return getMetricByTitle(name);
         } catch (ObjNotFoundException e) {
-            return gooddata.getMetadataService().createObj(getProject(), new Metric(name, expression, format));
+            return restClient.getMetadataService().createObj(getProject(), new Metric(name, expression, format));
         }
     }
 

@@ -17,7 +17,6 @@ import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestClient.RestProfile;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
-import org.apache.http.HttpHost;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.testng.Arquillian;
@@ -27,11 +26,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
-
-import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.common.TestParameters;
-import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.testng.listener.AuxiliaryFailureScreenshotListener;
 import com.gooddata.qa.utils.testng.listener.ConsoleStatusListener;
 import com.gooddata.qa.utils.testng.listener.FailureLoggingListener;
@@ -50,8 +46,6 @@ public abstract class AbstractTest extends Arquillian {
     protected String imapHost;
     protected String imapUser;
     protected String imapPassword;
-
-    protected GoodData goodDataClient = null;
 
     protected StartPageContext startPageContext = null;
 
@@ -123,18 +117,6 @@ public abstract class AbstractTest extends Arquillian {
         return "https://" + testParams.getHost() + "/";
     }
 
-    public GoodData getGoodDataClient() {
-        if (goodDataClient == null) {
-            goodDataClient = getGoodDataClient(testParams.getUser(), testParams.getPassword());
-        }
-        return goodDataClient;
-    }
-
-    public GoodData getGoodDataClient(final String userLogin, final String userPassword) {
-        final HttpHost httpHost = RestApiClient.parseHost(testParams.getHost());
-        return new GoodData(httpHost.getHostName(), userLogin, userPassword, httpHost.getPort());
-    }
-
     public String generateEmail(String email) {
         return email.replace("@", "+" + generateHashString() + "@");
     }
@@ -146,7 +128,7 @@ public abstract class AbstractTest extends Arquillian {
     public ProjectValidationResults validateProject() {
         final int timeout = testParams.getProjectDriver() == ProjectDriver.VERTICA ?
                 testParams.getExtendedTimeout() : testParams.getDefaultTimeout();
-        final ProjectService service = getGoodDataClient().getProjectService();
+        final ProjectService service = new RestClient(getProfile(Profile.ADMIN)).getProjectService();
         final Project project = service.getProjectById(testParams.getProjectId());
         final ProjectValidationResults results = service.validateProject(project).get(timeout, TimeUnit.SECONDS);
         System.out.println("Project valid: " + results.isValid());

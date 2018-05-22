@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.reports;
 
-import com.gooddata.GoodData;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.Fact;
 import com.gooddata.md.MetadataService;
@@ -173,13 +172,13 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void initGoodDataClient() {
-        GoodData goodDataClient = getGoodDataClient();
-        project = goodDataClient.getProjectService().getProjectById(testParams.getProjectId());
-        mdService = goodDataClient.getMetadataService();
+    public void initRestClient() {
+        RestClient restClient = new RestClient(getProfile(Profile.ADMIN));
+        project = restClient.getProjectService().getProjectById(testParams.getProjectId());
+        mdService = restClient.getMetadataService();
     }
 
-    @Test(dependsOnMethods = {"initGoodDataClient"})
+    @Test(dependsOnMethods = {"initRestClient"})
     public void createReportNotComputable() throws ParseException, JSONException, IOException {
         String metricName = "test-metric";
         String reportName = "Test Report";

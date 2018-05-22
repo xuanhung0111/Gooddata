@@ -18,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import com.gooddata.qa.graphene.enums.DateRange;
+import com.gooddata.qa.utils.http.RestClient;
 import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.Test;
 
@@ -49,7 +50,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
     @Override
     protected void customizeProject() throws Throwable {
         super.customizeProject();
-        createMetricIfNotExist(getGoodDataClient(), METRIC_NUMBER_OF_PERSONS,
+        createMetricIfNotExist(new RestClient(getProfile(Profile.ADMIN)), METRIC_NUMBER_OF_PERSONS,
                 format("SELECT COUNT([%s], [%s])",
                         getAttributeByTitle(ATTR_PERSON).getUri(),
                         getAttributeByTitle(ATTR_INVOICE_ITEM).getUri()), DEFAULT_METRIC_FORMAT);

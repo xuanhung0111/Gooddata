@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.filters;
 
-import com.gooddata.GoodData;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.AttributeElement;
 import com.gooddata.md.Fact;
@@ -22,6 +21,7 @@ import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.RestClient.RestProfile;
 import com.gooddata.qa.utils.http.RestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
@@ -122,9 +122,11 @@ public class MetricAvailableFilterTest extends AbstractDashboardWidgetTest {
                 attrEleOfStateUris.get(2), attrEleOfStateUris.get(3));
 
         createMetric(METRIC_AVAILABLE, expressionAvailableMetric, DEFAULT_METRIC_FORMAT);
-        createPrivateMetric(getGoodDataClient(testParams.getEditorUser(), testParams.getPassword()),
+        createPrivateMetric(new RestClient(
+                new RestProfile(testParams.getHost(), testParams.getEditorUser(), testParams.getPassword(), true)),
                 PRIVATE_EDITOR_METRIC);
-        createPrivateMetric(getGoodDataClient(testParams.getUser(), testParams.getPassword()),
+        createPrivateMetric(new RestClient(
+                new RestProfile(testParams.getHost(), testParams.getUser(), testParams.getPassword(), true)),
                 PRIVATE_METRIC);
 
         String variableUri = new VariableRestRequest(getAdminRestClient(), testParams.getProjectId())
@@ -400,9 +402,9 @@ public class MetricAvailableFilterTest extends AbstractDashboardWidgetTest {
         }
     }
 
-    private String createPrivateMetric(final GoodData goodData, final String name) {
-        final MetadataService mdService = goodData.getMetadataService();
-        final Metric privateMetric = createMetric(goodData, name, "SELECT 1", "#,##0");
+    private String createPrivateMetric(final RestClient restClient, final String name) {
+        final MetadataService mdService = restClient.getMetadataService();
+        final Metric privateMetric = createMetric(restClient, name, "SELECT 1", "#,##0");
 
         privateMetric.setUnlisted(true);
         mdService.updateObj(privateMetric);

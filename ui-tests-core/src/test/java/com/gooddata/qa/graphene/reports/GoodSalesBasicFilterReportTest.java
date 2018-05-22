@@ -26,7 +26,6 @@ import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
-import com.gooddata.GoodData;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
@@ -211,9 +210,9 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
     }
 
     private void createReport(String reportName) {
-        GoodData goodDataClient = getGoodDataClient();
-        Project project = goodDataClient.getProjectService().getProjectById(testParams.getProjectId());
-        MetadataService mdService = goodDataClient.getMetadataService();
+        RestClient restClient = new RestClient(getProfile(Profile.ADMIN));
+        Project project = restClient.getProjectService().getProjectById(testParams.getProjectId());
+        MetadataService mdService = restClient.getMetadataService();
 
         Metric amountMetric = mdService.getObj(project, Metric.class, title(METRIC_AMOUNT));
         Attribute stageName = mdService.getObj(project, Attribute.class, title(ATTR_STAGE_NAME));

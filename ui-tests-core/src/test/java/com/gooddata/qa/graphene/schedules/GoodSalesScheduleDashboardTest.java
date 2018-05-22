@@ -30,6 +30,7 @@ import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.RestClient.RestProfile;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
@@ -44,7 +45,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
-import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
@@ -111,9 +111,9 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     public void createDashboardSchedule() throws JSONException {
         try {
             loginAs(UserRoles.VIEWER);
-            GoodData goodDataClient = getGoodDataClient(testParams.getViewerUser(),
-                    testParams.getPassword());
-            String userUri = goodDataClient.getAccountService().getCurrent().getUri();
+            RestClient restClient = new RestClient(
+                    new RestProfile(testParams.getHost(), testParams.getViewerUser(), testParams.getPassword(), true));
+            String userUri = restClient.getAccountService().getCurrent().getUri();
             initDashboardsPage();
 
             DashboardScheduleDialog dashboardScheduleDialog = dashboardsPage.showDashboardScheduleDialog();
@@ -266,7 +266,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     @Test(dependsOnMethods = {"preparePublicAndPrivateSchedules"})
     public void createPrivateDashboardSchedules() throws JSONException {
         initEmailSchedulesPage();
-        String userUri = getGoodDataClient().getAccountService().getCurrent().getUri();
+        String userUri = new RestClient(getProfile(Profile.ADMIN)).getAccountService().getCurrent().getUri();
         refreshSchedulesPage();
         assertDashboardScheduleInfo(SCHEDULE_WITHOUT_RECIPIENTS,
                 userUri, Collections.<String>emptyList());
@@ -345,7 +345,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
                 new RestClient(getProfile(Profile.DOMAIN)), testParams.getProjectId());
 
         try {
-            String userUri = getGoodDataClient().getAccountService().getCurrent().getUri();
+            String userUri = new RestClient(getProfile(Profile.ADMIN)).getAccountService().getCurrent().getUri();
             userManagementRestRequest.addUserToProject(userA, UserRoles.EDITOR);
             userManagementRestRequest.addUserToProject(userB, UserRoles.ADMIN);
 
