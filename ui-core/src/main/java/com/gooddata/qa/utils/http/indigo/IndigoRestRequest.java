@@ -1,7 +1,5 @@
 package com.gooddata.qa.utils.http.indigo;
 
-import static com.gooddata.qa.utils.http.RestUtils.CREATE_AND_GET_OBJ_LINK;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,6 +28,7 @@ import static java.lang.String.format;
  * REST request for Indigo task
  */
 public class IndigoRestRequest extends CommonRestRequest{
+    private static final String CREATE_AND_GET_OBJ_LINK = "/gdc/md/%s/obj?createAndGet=true";
 
     public IndigoRestRequest(final RestClient restClient, final String projectId){
         super(restClient, projectId);

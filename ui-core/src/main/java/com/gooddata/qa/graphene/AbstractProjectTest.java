@@ -26,9 +26,10 @@ import com.gooddata.qa.mdObjects.dashboard.filter.FloatingFilterConstraint;
 import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
+import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestClient.RestProfile;
-import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.RestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.rolap.RolapRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
@@ -50,9 +51,7 @@ import com.gooddata.project.Project;
 import com.gooddata.qa.fixture.Fixture;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.utils.http.RestApiClient;
 
-import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static java.util.stream.Collectors.toList;
 import static org.testng.Assert.assertFalse;
 
@@ -352,7 +351,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     public void setupData(String csvPath, String uploadInfoPath) {
         try {
-            String webdavServerUrl = getWebDavServerUrl(getRestApiClient(), getRootUrl());
+            String webdavServerUrl = getWebDavServerUrl(getRootUrl());
 
             String webdavUrl = webdavServerUrl + "/" + UUID.randomUUID().toString();
 
@@ -430,8 +429,9 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     protected List<String> getObjIdentifiers(List<String> uris) {
         try {
-            JSONArray array = RestUtils.getJsonObject(getRestApiClient(),
-                    getRestApiClient().newPostMethod(
+            JSONArray array = new CommonRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
+                    .getJsonObject(
+                    RestRequest.initPostRequest(
                             String.format("/gdc/md/%s/identifiers", testParams.getProjectId()),
                             new JSONObject().put("uriToIdentifier", uris).toString()))
                     .getJSONArray("identifiers");
@@ -573,9 +573,10 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     //------------------------- REPORT, METRIC MD OBJECTS - END ------------------------
 
-    private String getWebDavServerUrl(final RestApiClient restApiClient, final String serverRootUrl)
+    private String getWebDavServerUrl(final String serverRootUrl)
             throws IOException, JSONException {
-        final JSONArray links = getJsonObject(restApiClient, "/gdc", HttpStatus.OK)
+        final JSONArray links = new CommonRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
+                .getJsonObject("/gdc", HttpStatus.OK)
                 .getJSONObject("about")
                 .getJSONArray("links");
 

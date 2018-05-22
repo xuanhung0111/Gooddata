@@ -20,7 +20,9 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.Widget
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel.Tab;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.RestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
@@ -49,8 +51,6 @@ import java.util.stream.Collectors;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
-import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -410,10 +410,12 @@ public class MetricAvailableFilterTest extends AbstractDashboardWidgetTest {
     }
 
     private void editMetricExpression(Metric metric, String expression) throws IOException, JSONException {
-        JSONObject json = getJsonObject(getRestApiClient(), metric.getUri());
+        final CommonRestRequest restRequest = new CommonRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        JSONObject json = restRequest.getJsonObject(metric.getUri());
         json.getJSONObject("metric").getJSONObject("content").put("expression", expression);
-        executeRequest(getRestApiClient(),
-                getRestApiClient().newPostMethod(metric.getUri() + "?mode=edit", json.toString()),
+        restRequest.executeRequest(
+                RestRequest.initPostRequest(metric.getUri() + "?mode=edit", json.toString()),
                 HttpStatus.OK);
     }
 

@@ -28,6 +28,7 @@ import java.util.Set;
 
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
+import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
@@ -51,8 +52,6 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbedDashboardDialog;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.RestUtils;
 import com.google.common.base.Joiner;
 
 public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedulesTest {
@@ -426,7 +425,9 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
 
     private String getScheduleUri(String scheduleTitle) throws JSONException, IOException {
         final String schedulesUri = "/gdc/md/" + testParams.getProjectId() + "/query/scheduledmails";
-        final JSONArray schedules = RestUtils.getJsonObject(getRestApiClient(), schedulesUri)
+        final CommonRestRequest restRequest = new CommonRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        final JSONArray schedules = restRequest.getJsonObject(schedulesUri)
             .getJSONObject("query")
             .getJSONArray("entries");
 

@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.disc.notification;
 
 import static com.gooddata.qa.graphene.entity.disc.NotificationRule.getVariablesFromMessage;
-import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static com.gooddata.qa.utils.mail.ImapUtils.getEmailBody;
 import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 import static java.lang.String.format;
@@ -20,6 +19,7 @@ import java.util.Map;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
+import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
@@ -46,7 +46,6 @@ import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.Package
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 import com.gooddata.qa.graphene.fragments.disc.process.ProcessDetail;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
-import com.gooddata.qa.utils.http.RestApiClient;
 
 public class NotificationEmailTest extends AbstractProcessTest {
 
@@ -98,8 +97,7 @@ public class NotificationEmailTest extends AbstractProcessTest {
 
             processDetail.openSchedule(schedule.getName()).executeSchedule().waitForExecutionFinish();
 
-            JSONObject lastExecutionDetail = getLastExecutionDetail(getRestApiClient(), testParams.getProjectId(),
-                    process.getId());
+            JSONObject lastExecutionDetail = getLastExecutionDetail(process.getId());
             Document emailContent = getNotificationEmailContent(notificationRule.getSubject());
             Map<String, String> variables = getVariablesFromMessage(emailContent.text());
 
@@ -143,8 +141,7 @@ public class NotificationEmailTest extends AbstractProcessTest {
 
             processDetail.openSchedule(schedule.getName()).executeSchedule().waitForExecutionFinish();
 
-            JSONObject lastExecutionDetail = getLastExecutionDetail(getRestApiClient(), testParams.getProjectId(),
-                    process.getId());
+            JSONObject lastExecutionDetail = getLastExecutionDetail(process.getId());
             Document emailContent = getNotificationEmailContent(notificationRule.getSubject());
             Map<String, String> variables = getVariablesFromMessage(emailContent.text());
 
@@ -183,8 +180,7 @@ public class NotificationEmailTest extends AbstractProcessTest {
 
             processDetail.openSchedule(schedule.getName()).executeSchedule().waitForExecutionFinish();
 
-            JSONObject lastExecutionDetail = getLastExecutionDetail(getRestApiClient(), testParams.getProjectId(),
-                    process.getId());
+            JSONObject lastExecutionDetail = getLastExecutionDetail(process.getId());
             Document emailContent = getNotificationEmailContent(notificationRule.getSubject());
             Map<String, String> variables = getVariablesFromMessage(emailContent.text());
 
@@ -222,8 +218,7 @@ public class NotificationEmailTest extends AbstractProcessTest {
 
             processDetail.openSchedule(schedule.getName()).executeSchedule().waitForExecutionFinish();
 
-            JSONObject lastExecutionDetail = getLastExecutionDetail(getRestApiClient(), testParams.getProjectId(),
-                    process.getId());
+            JSONObject lastExecutionDetail = getLastExecutionDetail(process.getId());
             Document emailContent = getNotificationEmailContent(notificationRule.getSubject());
             Map<String, String> variables = getVariablesFromMessage(emailContent.text());
 
@@ -331,10 +326,11 @@ public class NotificationEmailTest extends AbstractProcessTest {
         return LocalDateTime.parse(date, DateTimeFormatter.ofPattern(pattern));
     }
 
-    private JSONObject getLastExecutionDetail(RestApiClient restApiClient, String projectId, String processId)
+    private JSONObject getLastExecutionDetail(String processId)
             throws JSONException, IOException {
-        return getJsonObject(restApiClient,
-                        format("/gdc/projects/%s/dataload/processes/%s/executions", projectId, processId))
+        return new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .getJsonObject(
+                        format("/gdc/projects/%s/dataload/processes/%s/executions", testParams.getProjectId(), processId))
                 .getJSONObject("executions")
                 .getJSONArray("items")
                 .getJSONObject(0)

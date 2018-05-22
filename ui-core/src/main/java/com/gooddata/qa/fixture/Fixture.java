@@ -16,8 +16,13 @@ import com.gooddata.project.Project;
 import com.gooddata.project.ProjectDriver;
 import com.gooddata.qa.utils.http.RestApiClient;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.ParseException;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.entity.ContentType;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,14 +37,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static java.lang.String.format;
+import static java.util.Objects.isNull;
 
 public class Fixture {
 
@@ -254,5 +260,73 @@ public class Fixture {
         project.setEnvironment(environment);
 
         return goodData.getProjectService().createProject(project).get().getId();
+    }
+
+    /**
+     * Get json object from request with expected status code
+     *
+     * @param restApiClient
+     * @param request
+     * @param expectedStatusCode
+     * @return
+     */
+    private JSONObject getJsonObject(final RestApiClient restApiClient, final HttpRequestBase request,
+                                           final HttpStatus expectedStatusCode) throws ParseException, JSONException, IOException {
+        return new JSONObject(getResource(restApiClient, request, expectedStatusCode));
+    }
+
+    /**
+     * Get json object from request, expected status code is OK (200)
+     *
+     * @param restApiClient
+     * @param request
+     * @return
+     */
+    private JSONObject getJsonObject(final RestApiClient restApiClient, final HttpRequestBase request)
+            throws ParseException, JSONException, IOException {
+        return new JSONObject(getResource(restApiClient, request, HttpStatus.OK));
+    }
+
+    /**
+     * Get resource from request with expected status code
+     *
+     * @param restApiClient
+     * @param request
+     * @param setupRequest        setup request before executing like configure header, ...
+     * @param expectedStatusCode
+     * @return entity from response in String form
+     */
+    private String getResource(final RestApiClient restApiClient, final HttpRequestBase request,
+                                     final Consumer<HttpRequestBase> setupRequest, final HttpStatus expectedStatusCode)
+            throws ParseException, IOException {
+        setupRequest.accept(request);
+
+        try {
+            final HttpResponse response = restApiClient.execute(request, expectedStatusCode);
+            final HttpEntity entity = response.getEntity();
+
+            final String ret = isNull(entity) ? "" : EntityUtils.toString(entity);
+            EntityUtils.consumeQuietly(entity);
+            return ret;
+
+        } finally {
+            request.releaseConnection();
+        }
+    }
+
+    /**
+     * Get resource from request with expected status code
+     *
+     * @param restApiClient
+     * @param request
+     * @param expectedStatusCode
+     * @return entity from response in json form
+     */
+    private String getResource(final RestApiClient restApiClient, final HttpRequestBase request,
+                                     final HttpStatus expectedStatusCode) throws ParseException, IOException {
+        return getResource(restApiClient,
+                request,
+                req -> req.setHeader("Accept", ContentType.APPLICATION_JSON.getMimeType()),
+                expectedStatusCode);
     }
 }
