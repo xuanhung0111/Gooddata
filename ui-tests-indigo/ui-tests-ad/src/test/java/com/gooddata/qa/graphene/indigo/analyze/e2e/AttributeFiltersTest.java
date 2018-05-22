@@ -145,7 +145,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
     }
 
     private void beforeEach() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addFilter(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing();
     }

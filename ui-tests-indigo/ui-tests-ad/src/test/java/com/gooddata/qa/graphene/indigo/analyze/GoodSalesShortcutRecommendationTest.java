@@ -41,7 +41,7 @@ public class GoodSalesShortcutRecommendationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testColumnChartShortcut() {
-        WebElement metric = analysisPage.getCataloguePanel()
+        WebElement metric = initAnalysePage().getCataloguePanel()
                 .searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC);
 
         Supplier<WebElement> recommendation = () ->
@@ -67,7 +67,7 @@ public class GoodSalesShortcutRecommendationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testTrendShortcut() {
-        WebElement metric = analysisPage.getCataloguePanel()
+        WebElement metric = initAnalysePage().getCataloguePanel()
                 .searchAndGet(METRIC_SNAPSHOT_BOP, FieldType.METRIC);
 
         Supplier<WebElement> trendRecommendation = () ->
@@ -88,7 +88,7 @@ public class GoodSalesShortcutRecommendationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void displayWhenDraggingFirstMetric() {
-        WebElement metric = analysisPage.getCataloguePanel()
+        WebElement metric = initAnalysePage().getCataloguePanel()
                 .searchAndGet(METRIC_SNAPSHOT_BOP, FieldType.METRIC);
 
         Supplier<WebElement> trendRecommendation = () ->
@@ -106,7 +106,7 @@ public class GoodSalesShortcutRecommendationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void createSimpleMetricFromFactUsingShortcut() {
-        WebElement fact = analysisPage.getCataloguePanel()
+        WebElement fact = initAnalysePage().getCataloguePanel()
                 .searchAndGet(FACT_AMOUNT, FieldType.FACT);
 
         Supplier<WebElement> recommendation = () ->

@@ -59,7 +59,7 @@ public class ColorPaletteTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"})
     public void should_have_correct_series_order_in_bar_and_column_chart_in_stacked_charts() {
         List<String> expectedLegend = asList("Email", "In Person Meeting", "Phone Call", "Web Meeting");
-        assertEquals(analysisPage.addStack(ATTR_ACTIVITY_TYPE)
+        assertEquals(initAnalysePage().addStack(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing()
@@ -79,7 +79,7 @@ public class ColorPaletteTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"})
     public void should_have_correct_series_colors_in_line_chart_which_has_attribute_in_segment_by() {
         List<String> expectedLegend = asList("Email", "In Person Meeting", "Phone Call", "Web Meeting");
-        assertEquals(analysisPage.addStack(ATTR_ACTIVITY_TYPE)
+        assertEquals(initAnalysePage().addStack(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing()
@@ -99,7 +99,7 @@ public class ColorPaletteTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"})
     public void should_have_correct_series_order_in_bar_and_column_chart_in_non_stacked_charts() {
         List<String> expectedLegend = asList("# of Activities", "# of Lost Opps.");
-        assertEquals(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        assertEquals(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addMetric(METRIC_NUMBER_OF_LOST_OPPS)
             .waitForReportComputing()
             .getChartReport()

@@ -30,7 +30,7 @@ public class GoodSalesAttributeBasedMetricTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void createSimpleMetricFromAttribute() {
-        final MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
+        final MetricsBucket metricsBucket = initAnalysePage().getMetricsBucket();
 
         assertTrue(analysisPage.addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
                 .waitForReportComputing()
@@ -59,7 +59,7 @@ public class GoodSalesAttributeBasedMetricTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void showInPercent() {
-        assertTrue(analysisPage.addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
+        assertTrue(initAnalysePage().addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .getChartReport()
@@ -79,7 +79,7 @@ public class GoodSalesAttributeBasedMetricTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void dragSameAttributeBasedMetrics() {
-        assertTrue(analysisPage.addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
+        assertTrue(initAnalysePage().addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
                 .addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
@@ -89,7 +89,7 @@ public class GoodSalesAttributeBasedMetricTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void shouldNotCreateDuplicateMetricFromAttribute() {
-        final String identifier = Stream.of(analysisPage.addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
+        final String identifier = Stream.of(initAnalysePage().addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
             .waitForReportComputing()
             .getMetricsBucket()
             .get(COUNT_OF_ACTIVITY)

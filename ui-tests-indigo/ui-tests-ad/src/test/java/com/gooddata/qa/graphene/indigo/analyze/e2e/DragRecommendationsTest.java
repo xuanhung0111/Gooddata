@@ -28,7 +28,7 @@ public class DragRecommendationsTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"})
     public void should_render_column_chart_after_a_metric_is_dragged_to_main_recommendation() {
         // D&D the first metric to the initial metric recommendation
-        analysisPage.drag(analysisPage.getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC),
+        initAnalysePage().drag(analysisPage.getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC),
                 () -> waitForElementVisible(cssSelector(".s-recommendation-metric-canvas"), browser))
                 .waitForReportComputing();
 
@@ -41,7 +41,7 @@ public class DragRecommendationsTest extends AbstractAdE2ETest {
     public void should_render_date_sliced_metric_column_chart_after_a_metric_is_dragged_to_the_overtime_recommendation() {
         String quarterYearActivityLabel = ".s-id-" + getAttributeDisplayFormIdentifier("Quarter/Year (Activity)", "Short");
         // D&D the first metric to the metric overtime recommendation
-        analysisPage.drag(analysisPage.getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC),
+        initAnalysePage().drag(analysisPage.getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC),
                 () -> waitForElementVisible(cssSelector(".s-recommendation-metric-over-time-canvas"), browser))
                 .waitForReportComputing();
 
@@ -68,7 +68,7 @@ public class DragRecommendationsTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"})
     public void should_render_attribute_elements_table_after_an_attribute_is_dragged_to_main_recommendation() {
         // D&D the first metric to the metric overtime recommendation
-        analysisPage.drag(analysisPage.getCataloguePanel().getDate(),
+        initAnalysePage().drag(analysisPage.getCataloguePanel().getDate(),
                 () -> waitForElementVisible(cssSelector(".s-recommendation-attribute-canvas"), browser))
                 .waitForReportComputing();
 

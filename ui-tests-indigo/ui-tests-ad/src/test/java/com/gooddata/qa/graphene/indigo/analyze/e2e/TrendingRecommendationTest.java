@@ -34,14 +34,14 @@ public class TrendingRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_add_date_item_with_proper_granularity_to_category_bucket() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-recommendation-trending"), browser));
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_apply_month_in_trending_widget_and_hide_it() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing();
         Graphene.createPageFragment(RecommendationContainer.class,
                 waitForElementVisible(RecommendationContainer.LOCATOR, browser))
@@ -53,7 +53,7 @@ public class TrendingRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void ashould_have_quarter_selected_after_resetting_a_widget() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing();
         Graphene.createPageFragment(RecommendationContainer.class,
                 waitForElementVisible(RecommendationContainer.LOCATOR, browser))
@@ -68,7 +68,7 @@ public class TrendingRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_select_last_4_quarters_on_date_filter_when_trending() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing();
         Graphene.createPageFragment(RecommendationContainer.class,
                 waitForElementVisible(RecommendationContainer.LOCATOR, browser))

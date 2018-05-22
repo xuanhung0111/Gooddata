@@ -41,7 +41,7 @@ public class GoodSalesUndoRedoSavedInsightTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = { "createProject" })
     public void prepareSavedInsightsForUndoRedoTest() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .saveInsight(INSIGHT_TEST);
@@ -53,7 +53,7 @@ public class GoodSalesUndoRedoSavedInsightTest extends AbstractAnalyseTest {
     @Test(dependsOnMethods = { "prepareSavedInsightsForUndoRedoTest" })
     public void addMetric() throws JSONException, IOException {
         final String insightName = "Test-Saved-Insight-After-Adding-Metric";
-        analysisPage.openInsight(INSIGHT_TEST)
+        initAnalysePage().openInsight(INSIGHT_TEST)
                 .saveInsightAs(insightName)
                 .addMetric(METRIC_SNAPSHOT_BOP)
                 .waitForReportComputing()
@@ -66,7 +66,7 @@ public class GoodSalesUndoRedoSavedInsightTest extends AbstractAnalyseTest {
     @Test(dependsOnMethods = { "prepareSavedInsightsForUndoRedoTest" })
     public void addAttribute() throws JSONException, IOException {
         final String insightName = "Test-Saved-Insight-After-Adding-Attribute";
-        analysisPage.openInsight(INSIGHT_TEST_WITH_METRIC_ONLY)
+        initAnalysePage().openInsight(INSIGHT_TEST_WITH_METRIC_ONLY)
                 .saveInsightAs(insightName)
                 .addAttribute(ATTR_DEPARTMENT)
                 .waitForReportComputing()
@@ -78,7 +78,7 @@ public class GoodSalesUndoRedoSavedInsightTest extends AbstractAnalyseTest {
     @Test(dependsOnMethods = { "prepareSavedInsightsForUndoRedoTest" })
     public void addFilterToMetric() throws JSONException, IOException {
         final String insightName = "Test-Saved-Insight-After-Adding-Filtered-Metric";
-        analysisPage.openInsight(INSIGHT_TEST)
+        initAnalysePage().openInsight(INSIGHT_TEST)
                 .saveInsightAs(insightName)
                 .getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
@@ -97,7 +97,7 @@ public class GoodSalesUndoRedoSavedInsightTest extends AbstractAnalyseTest {
     @Test(dependsOnMethods = { "prepareSavedInsightsForUndoRedoTest" })
     public void removeAttribute() throws JSONException, IOException {
         final String insightName = "Test-Saved-Insight-After-Removing-Attribute";
-        analysisPage.openInsight(INSIGHT_TEST)
+        initAnalysePage().openInsight(INSIGHT_TEST)
                 .saveInsightAs(insightName)
                 .removeAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
@@ -110,7 +110,7 @@ public class GoodSalesUndoRedoSavedInsightTest extends AbstractAnalyseTest {
     @Test(dependsOnMethods = { "prepareSavedInsightsForUndoRedoTest" })
     public void replaceAttribute() throws JSONException, IOException {
         final String insightName = "Test-Saved-Insight-After-Replacing-Attribute";
-        analysisPage.openInsight(INSIGHT_TEST)
+        initAnalysePage().openInsight(INSIGHT_TEST)
                 .saveInsightAs(insightName)
                 .replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_REGION)
                 .waitForReportComputing()
@@ -123,7 +123,7 @@ public class GoodSalesUndoRedoSavedInsightTest extends AbstractAnalyseTest {
     @Test(dependsOnMethods = { "prepareSavedInsightsForUndoRedoTest" })
     public void changeTimeFilter() throws JSONException, IOException, ParseException {
         final String insightName = "Test-Saved-Insight-After-Changing-Time-Filter";
-        analysisPage.openInsight(INSIGHT_TEST)
+        initAnalysePage().openInsight(INSIGHT_TEST)
                 .saveInsightAs(insightName)
                 .addDateFilter()
                 .getFilterBuckets()
@@ -139,7 +139,7 @@ public class GoodSalesUndoRedoSavedInsightTest extends AbstractAnalyseTest {
     @Test(dependsOnMethods = { "prepareSavedInsightsForUndoRedoTest" })
     public void changeAttributeFilter() throws JSONException, IOException {
         final String insightName = "Test-Saved-Insight-After-Changing-Attribute-Filter";
-        analysisPage.openInsight(INSIGHT_TEST)
+        initAnalysePage().openInsight(INSIGHT_TEST)
                 .saveInsightAs(insightName)
                 .getFilterBuckets()
                 .configAttributeFilter(ATTR_ACTIVITY_TYPE, "Email", "Web Meeting");
@@ -154,7 +154,7 @@ public class GoodSalesUndoRedoSavedInsightTest extends AbstractAnalyseTest {
     @Test(dependsOnMethods = { "prepareSavedInsightsForUndoRedoTest" })
     public void changeChartType() throws JSONException, IOException {
         final String insightName = "Test-Saved-Insight-After-Changing-Chart-Type";
-        analysisPage.openInsight(INSIGHT_TEST)
+        initAnalysePage().openInsight(INSIGHT_TEST)
                 .saveInsightAs(insightName)
                 .changeReportType(ReportType.BAR_CHART)
                 .waitForReportComputing()

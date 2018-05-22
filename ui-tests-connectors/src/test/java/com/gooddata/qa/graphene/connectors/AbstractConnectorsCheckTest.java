@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.connectors;
 
 import com.gooddata.qa.graphene.TemplateAbstractTest;
-import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.enums.Connectors;
 import com.gooddata.qa.graphene.fragments.greypages.connectors.ConnectorFragment;
 import org.jboss.arquillian.graphene.Graphene;
@@ -48,22 +47,6 @@ public abstract class AbstractConnectorsCheckTest extends TemplateAbstractTest {
         projectTitle = connectorType.getName() + "Connector-test";
         System.out.println(String.format("Template %s will be for project creation...", projectTemplate));
         projectCreateCheckIterations = DEFAULT_PROJECT_CHECK_LIMIT;
-    }
-
-    @Override
-    public void configureStartPage() {
-        startPageContext = new StartPageContext() {
-            
-            @Override
-            public void waitForStartPageLoaded() {
-                waitForElementVisible(By.className("param"),browser);
-            }
-            
-            @Override
-            public String getStartPage() {
-                return "gdc";
-            }
-        };
     }
 
     /**

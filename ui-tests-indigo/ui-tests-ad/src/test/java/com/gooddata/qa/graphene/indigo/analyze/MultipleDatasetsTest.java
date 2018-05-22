@@ -67,7 +67,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void analyzeReportOnProductionData() {
-        ChartReport report = analysisPage.addMetric("Close Price", FieldType.FACT)
+        ChartReport report = initAnalysePage().addMetric("Close Price", FieldType.FACT)
                 .addDate()
                 .addStack("Industry")
                 .waitForReportComputing()
@@ -85,7 +85,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void analyzeReportOnPayrollData() {
-        analysisPage.getCataloguePanel().changeDataset(PAYROLL_DATASET);
+        initAnalysePage().getCataloguePanel().changeDataset(PAYROLL_DATASET);
 
         ChartReport report = analysisPage.addMetric(AMOUNT, FieldType.FACT)
             .addDate()
@@ -105,7 +105,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void searchDataAfterSelectDataset() {
-        final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
+        final CataloguePanel cataloguePanel = initAnalysePage().getCataloguePanel();
 
         assertFalse(cataloguePanel.changeDataset(PRODUCTION_DATASET)
             .search(AMOUNT));
@@ -123,7 +123,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"},
             description = "CL-9815: Filter for metric is undefined after switching dataset")
     public void addMetricFilterAfterSwitchingDataset() {
-        analysisPage.addMetric(HIGH_PRICE, FieldType.FACT).addAttribute(MARKET).waitForReportComputing();
+        initAnalysePage().addMetric(HIGH_PRICE, FieldType.FACT).addAttribute(MARKET).waitForReportComputing();
 
         analysisPage.getCataloguePanel().changeDataset(PAYROLL_DATASET);
         analysisPage.removeAttribute(MARKET)

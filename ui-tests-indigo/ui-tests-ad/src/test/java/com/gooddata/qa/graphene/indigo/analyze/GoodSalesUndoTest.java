@@ -46,7 +46,7 @@ public class GoodSalesUndoTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testAfterAddMetric() {
-        ReportState baseState = ReportState.getCurrentState(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES));
+        ReportState baseState = ReportState.getCurrentState(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES));
 
         checkUndoRedoForEmptyState(true);
         checkUndoRedoForReport(baseState, false);
@@ -57,7 +57,7 @@ public class GoodSalesUndoTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testAfterAddAtribute() {
-        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE);
+        initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE);
 
         checkUndoRedoForEmptyState(true);
 
@@ -67,7 +67,7 @@ public class GoodSalesUndoTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testAfterRemoveMetricAndAttribute() {
-        ReportState baseState = ReportState.getCurrentState(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES));
+        ReportState baseState = ReportState.getCurrentState(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES));
 
         analysisPage.removeMetric(METRIC_NUMBER_OF_ACTIVITIES);
         assertFalse(analysisPage.getMetricsBucket().getItemNames().contains(METRIC_NUMBER_OF_ACTIVITIES));
@@ -87,7 +87,7 @@ public class GoodSalesUndoTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testAfterChangeDateDimensionOnBucket() {
-        final AttributesBucket categoriesBucket = analysisPage.getAttributesBucket();
+        final AttributesBucket categoriesBucket = initAnalysePage().getAttributesBucket();
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().undo();
         assertTrue(categoriesBucket.isEmpty());
@@ -104,7 +104,7 @@ public class GoodSalesUndoTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testAfterChangeDateDimensionInFilter() {
-        final FiltersBucket FiltersBucketReact = analysisPage.getFilterBuckets();
+        final FiltersBucket FiltersBucketReact = initAnalysePage().getFilterBuckets();
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDateFilter().undo();
         assertFalse(FiltersBucketReact.isFilterVisible(ACTIVITY));
@@ -130,7 +130,7 @@ public class GoodSalesUndoTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"})
     public void testAfterAddFilter() {
         int actionsCount = 0;
-        final FiltersBucket FiltersBucketReact = analysisPage.getFilterBuckets();
+        final FiltersBucket FiltersBucketReact = initAnalysePage().getFilterBuckets();
 
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE); actionsCount++;
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES); actionsCount++;
@@ -166,7 +166,7 @@ public class GoodSalesUndoTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testAfterChangeReportType() {
-        analysisPage.changeReportType(ReportType.TABLE);
+        initAnalysePage().changeReportType(ReportType.TABLE);
         assertTrue(analysisPage.isReportTypeSelected(ReportType.TABLE));
 
         analysisPage.undo();
@@ -178,7 +178,7 @@ public class GoodSalesUndoTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testAfterReset() {
-        ReportState baseState = ReportState.getCurrentState(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ReportState baseState = ReportState.getCurrentState(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE));
         analysisPage.resetToBlankState();
         checkUndoRedoForReport(baseState, true);
@@ -186,7 +186,7 @@ public class GoodSalesUndoTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testUndoNotApplicableOnNonActiveSession() {
-        ReportState baseState = ReportState.getCurrentState(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES));
+        ReportState baseState = ReportState.getCurrentState(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES));
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE);
 
         final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();

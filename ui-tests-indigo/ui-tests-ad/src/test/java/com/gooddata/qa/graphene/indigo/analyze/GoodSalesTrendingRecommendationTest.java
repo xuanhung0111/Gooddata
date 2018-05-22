@@ -36,7 +36,7 @@ public class GoodSalesTrendingRecommendationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testOverrideDateFilter() {
-        final FiltersBucket FiltersBucketReact = analysisPage.getFilterBuckets();
+        final FiltersBucket FiltersBucketReact = initAnalysePage().getFilterBuckets();
 
         analysisPage.addMetric(METRIC_SNAPSHOT_BOP)
             .addDateFilter();
@@ -57,7 +57,7 @@ public class GoodSalesTrendingRecommendationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void applyParameter() {
-        ChartReport report = analysisPage.addMetric(METRIC_SNAPSHOT_BOP)
+        ChartReport report = initAnalysePage().addMetric(METRIC_SNAPSHOT_BOP)
                 .waitForReportComputing().getChartReport();
         final MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration(METRIC_SNAPSHOT_BOP)
@@ -87,7 +87,7 @@ public class GoodSalesTrendingRecommendationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void displayInColumnChartWithOnlyMetric() {
-        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing().getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =

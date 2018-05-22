@@ -52,7 +52,7 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testFilteringFieldsInCatalog() {
-        final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
+        final CataloguePanel cataloguePanel = initAnalysePage().getCataloguePanel();
 
         cataloguePanel.filterCatalog(CatalogFilterType.MEASURES)
             .search("am");
@@ -77,7 +77,7 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testCreateReportWithFieldsInCatalogFilter() {
-        final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
+        final CataloguePanel cataloguePanel = initAnalysePage().getCataloguePanel();
 
         cataloguePanel.filterCatalog(CatalogFilterType.MEASURES);
         analysisPage.addMetric(METRIC_AMOUNT);
@@ -170,7 +170,7 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testHiddenUnrelatedObjects() {
-        final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
+        final CataloguePanel cataloguePanel = initAnalysePage().getCataloguePanel();
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE);
@@ -198,7 +198,7 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"})
     public void searchNonExistent() {
         Stream.of(CatalogFilterType.values()).forEach(type -> {
-            assertFalse(analysisPage.getCataloguePanel().filterCatalog(type)
+            assertFalse(initAnalysePage().getCataloguePanel().filterCatalog(type)
                     .search("abcxyz"));
         });
 

@@ -42,7 +42,7 @@ public class GoodSalesChartLegendTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkShowPercentAndLegendColor() {
-        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing()
             .getChartReport();
@@ -64,7 +64,7 @@ public class GoodSalesChartLegendTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void dontShowLegendWhenOnlyOneMetric() {
-        ChartReport report = analysisPage.addMetric(METRIC_AMOUNT)
+        ChartReport report = initAnalysePage().addMetric(METRIC_AMOUNT)
                 .addAttribute(ATTR_STAGE_NAME)
                 .waitForReportComputing()
                 .getChartReport();
@@ -80,7 +80,7 @@ public class GoodSalesChartLegendTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testLegendsInChartHasManyMetrics() {
-        ChartReport report = analysisPage.addMetric(METRIC_AMOUNT).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = initAnalysePage().addMetric(METRIC_AMOUNT).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing().getChartReport();
         assertTrue(report.isLegendVisible());
         assertTrue(report.areLegendsHorizontal());
@@ -88,7 +88,7 @@ public class GoodSalesChartLegendTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testLegendsInStackBy() {
-        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE)
+        ChartReport report = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE)
                 .addStack(ATTR_DEPARTMENT).waitForReportComputing().getChartReport();
         assertTrue(report.isLegendVisible());
         assertTrue(report.areLegendsVertical());
@@ -104,7 +104,7 @@ public class GoodSalesChartLegendTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void showLegendForStackedChartWithOneSeries() {
-        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_WON_OPPS)
+        ChartReport report = initAnalysePage().addMetric(METRIC_NUMBER_OF_WON_OPPS)
                 .addStack(ATTR_STAGE_NAME)
                 .waitForReportComputing()
                 .getChartReport();

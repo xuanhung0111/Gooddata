@@ -37,7 +37,7 @@ public class SpecialCasesTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testAttributeLimitationInTableReport() {
-        analysisPage.getCataloguePanel().changeDataset(MANY_CLOUMNS_DATASET)
+        initAnalysePage().getCataloguePanel().changeDataset(MANY_CLOUMNS_DATASET)
             .filterCatalog(CatalogFilterType.ATTRIBUTES);
         analysisPage.changeReportType(ReportType.TABLE);
         Stream.of(ACCOUNT, DEPARTMENT, "Forecast Category", "Is Active", "Is Closed", "Is Won",

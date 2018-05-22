@@ -32,7 +32,7 @@ public class AvailableItemsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_hide_unavailable_attributes_when_metric_is_added() {
-        CataloguePanel panel = analysisPage.getCataloguePanel();
+        CataloguePanel panel = initAnalysePage().getCataloguePanel();
 
         assertTrue(panel.getFieldNamesInViewPort().contains(ATTR_ACTIVITY_TYPE));
         analysisPage.addMetric(METRIC_NUMBER_OF_LOST_OPPS).waitForReportComputing();
@@ -44,7 +44,7 @@ public class AvailableItemsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_hide_unavailable_metrics_when_attribute_is_in_categories() {
-        CataloguePanel panel = analysisPage.getCataloguePanel();
+        CataloguePanel panel = initAnalysePage().getCataloguePanel();
 
         assertTrue(panel.getFieldNamesInViewPort().contains(METRIC_NUMBER_OF_LOST_OPPS));
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE);
@@ -56,7 +56,7 @@ public class AvailableItemsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_hide_unavailable_metrics_when_attribute_is_in_stacks() {
-        CataloguePanel panel = analysisPage.getCataloguePanel();
+        CataloguePanel panel = initAnalysePage().getCataloguePanel();
 
         assertTrue(panel.getFieldNamesInViewPort().contains(METRIC_NUMBER_OF_LOST_OPPS));
         analysisPage.addStack(ATTR_ACTIVITY_TYPE);
@@ -68,7 +68,7 @@ public class AvailableItemsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_hide_unavailable_facts() {
-        CataloguePanel panel = analysisPage.getCataloguePanel();
+        CataloguePanel panel = initAnalysePage().getCataloguePanel();
 
         assertTrue(panel.getFieldNamesInViewPort().contains(METRIC_AMOUNT));
         analysisPage.addStack(ATTR_ACTIVITY_TYPE);
@@ -80,7 +80,7 @@ public class AvailableItemsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_show_all_items_on_reset() {
-        CataloguePanel panel = analysisPage.addStack(ATTR_ACTIVITY_TYPE)
+        CataloguePanel panel = initAnalysePage().addStack(ATTR_ACTIVITY_TYPE)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getCataloguePanel()
             .filterCatalog(CatalogFilterType.ATTRIBUTES);
@@ -101,7 +101,7 @@ public class AvailableItemsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_hide_metric_after_undo() {
-        CataloguePanel panel = analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).getCataloguePanel().clearInputText();
+        CataloguePanel panel = initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE).getCataloguePanel().clearInputText();
         assertFalse(panel.getFieldNamesInViewPort().contains(METRIC_NUMBER_OF_LOST_OPPS));
 
         analysisPage.resetToBlankState();
@@ -113,7 +113,7 @@ public class AvailableItemsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_hide_attribute_after_undo() {
-        CataloguePanel panel = analysisPage.addMetric(METRIC_NUMBER_OF_LOST_OPPS).getCataloguePanel().clearInputText();
+        CataloguePanel panel = initAnalysePage().addMetric(METRIC_NUMBER_OF_LOST_OPPS).getCataloguePanel().clearInputText();
         assertFalse(panel.getFieldNamesInViewPort().contains(ATTR_ACTIVITY_TYPE));
 
         analysisPage.resetToBlankState();
@@ -125,7 +125,7 @@ public class AvailableItemsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_show_special_message_if_only_unavailable_items_matched() {
-        CataloguePanel panel = analysisPage.addMetric(METRIC_NUMBER_OF_LOST_OPPS).getCataloguePanel();
+        CataloguePanel panel = initAnalysePage().addMetric(METRIC_NUMBER_OF_LOST_OPPS).getCataloguePanel();
         assertFalse(panel.search(ATTR_ACTIVITY_TYPE));
         assertEquals(panel.getUnrelatedItemsHiddenCount(), 1);
     }

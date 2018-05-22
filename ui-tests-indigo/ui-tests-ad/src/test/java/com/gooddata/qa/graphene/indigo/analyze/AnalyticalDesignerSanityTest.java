@@ -56,7 +56,7 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testWithAttribute() {
-        assertEquals(analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
+        assertEquals(initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE)
                 .getExplorerMessage(), "NO MEASURE IN YOUR INSIGHT");
 
         assertEquals(analysisPage.changeReportType(ReportType.BAR_CHART)
@@ -76,7 +76,7 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void dragMetricToColumnChartShortcutPanel() {
-        WebElement metric = analysisPage.getCataloguePanel()
+        WebElement metric = initAnalysePage().getCataloguePanel()
                 .searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC);
 
         Supplier<WebElement> recommendation = () ->
@@ -104,7 +104,7 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testSimpleContribution() {
-        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .getChartReport();
@@ -133,7 +133,7 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
     }
     @Test(dependsOnGroups = {"createProject"})
     public void testSimpleComparison() {
-        ChartReport report = analysisPage
+        ChartReport report = initAnalysePage()
                 .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing()
                 .getChartReport();
@@ -162,7 +162,7 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void displayWhenDraggingFirstMetric() {
-        WebElement metric = analysisPage.getCataloguePanel()
+        WebElement metric = initAnalysePage().getCataloguePanel()
                 .searchAndGet(METRIC_SNAPSHOT_BOP, FieldType.METRIC);
 
         Supplier<WebElement> trendRecommendation = () ->
@@ -181,7 +181,7 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void exportCustomDiscovery() {
-        assertTrue(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        assertTrue(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .changeReportType(ReportType.TABLE)
                 .waitForReportComputing()
@@ -218,7 +218,7 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void filterOnDateAttribute() throws ParseException {
-        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
+        final FiltersBucket filtersBucket = initAnalysePage().getFilterBuckets();
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -236,7 +236,7 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testSimplePoP() throws ParseException {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate()
             .getFilterBuckets()
             .configDateFilter("01/01/2012", "12/31/2012");
@@ -268,7 +268,7 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void dropAttributeToReportHaveOneMetric() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE);
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE);
         assertEquals(analysisPage.waitForReportComputing().getChartReport().getTrackersCount(), 4);
 
         analysisPage.addStack(ATTR_DEPARTMENT);

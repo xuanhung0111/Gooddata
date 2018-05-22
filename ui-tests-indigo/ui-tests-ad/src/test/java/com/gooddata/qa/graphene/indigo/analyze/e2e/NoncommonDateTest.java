@@ -29,7 +29,7 @@ public class NoncommonDateTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void date_dimension_in_chart_should_reflect_currently_selected_dimension() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate()
             .getAttributesBucket()
             .changeDateDimension("Created");
@@ -47,7 +47,7 @@ public class NoncommonDateTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void enable_date_dimension_selects_correctly() {
-        WebElement dateFilter = analysisPage.addDateFilter()
+        WebElement dateFilter = initAnalysePage().addDateFilter()
             .getFilterBuckets()
             .getDateFilter();
 
@@ -65,7 +65,7 @@ public class NoncommonDateTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void keeps_date_dimensions_in_categories_in_sync_with_the_filter() {
-        analysisPage.addDateFilter()
+        initAnalysePage().addDateFilter()
             .addDate()
             .getAttributesBucket()
             .changeDateDimension("Created");

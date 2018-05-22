@@ -43,7 +43,7 @@ public class GoodSalesAttributeFilterTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void filterOnAttribute() {
-        final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = initAnalysePage().getFilterBuckets();
 
         ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -66,7 +66,7 @@ public class GoodSalesAttributeFilterTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void addFilterNotHideRecommendation() {
-        assertEquals(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        assertEquals(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .getChartReport()
@@ -87,7 +87,7 @@ public class GoodSalesAttributeFilterTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void addAttributeToFilterBucket() {
-        final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = initAnalysePage().getFilterBuckets();
 
         assertEquals(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -103,7 +103,7 @@ public class GoodSalesAttributeFilterTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void openReportAppliedAttributeFilter() {
-        analysisPage.changeReportType(ReportType.TABLE)
+        initAnalysePage().changeReportType(ReportType.TABLE)
                 .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_DEPARTMENT)
                 .setFilterIsntValues(ATTR_DEPARTMENT, "Direct Sales")
@@ -125,7 +125,7 @@ public class GoodSalesAttributeFilterTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testAttributeReplaceDate() {
-        final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = initAnalysePage().getFilterBuckets();
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
         assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
@@ -138,7 +138,7 @@ public class GoodSalesAttributeFilterTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testReplaceAttribute() {
-        final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = initAnalysePage().getFilterBuckets();
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE);
         assertTrue(filtersBucketReact.isFilterVisible(ATTR_ACTIVITY_TYPE));
@@ -154,7 +154,7 @@ public class GoodSalesAttributeFilterTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkRelatedDateShownCorrectly() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
 
         AttributesBucket attributesBucket = analysisPage.getAttributesBucket();
 

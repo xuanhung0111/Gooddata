@@ -34,7 +34,7 @@ public class StackedChartsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_put_stack_by_attribute_into_color_series() {
-        assertEquals(analysisPage.addStack(ATTR_ACTIVITY_TYPE)
+        assertEquals(initAnalysePage().addStack(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing()
@@ -44,7 +44,7 @@ public class StackedChartsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_show_totals_for_stacked_columns() {
-        analysisPage.addStack(ATTR_ACTIVITY_TYPE)
+        initAnalysePage().addStack(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
@@ -54,7 +54,7 @@ public class StackedChartsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_display_stack_warn_msg_when_there_is_something_in_stack_by_bucket() {
-        assertFalse(analysisPage.addStack(ATTR_ACTIVITY_TYPE)
+        assertFalse(initAnalysePage().addStack(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
@@ -64,7 +64,7 @@ public class StackedChartsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_display_stack_warn_msg_if_there_is_more_than_1_metrics() {
-        assertFalse(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        assertFalse(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addMetric(METRIC_NUMBER_OF_LOST_OPPS)
             .addAttribute(ATTR_ACCOUNT)
             .getStacksBucket()
@@ -74,7 +74,7 @@ public class StackedChartsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_disappear_when_visualization_is_switched_to_table_and_should_be_empty_when_going_back() {
-        analysisPage.addStack(ATTR_ACTIVITY_TYPE)
+        initAnalysePage().addStack(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .changeReportType(ReportType.TABLE);
@@ -90,7 +90,7 @@ public class StackedChartsTest extends AbstractAdE2ETest {
     // Unstable https://jira.intgdc.com/browse/CL-9774
     @Test(dependsOnGroups = {"createProject"}, enabled = false)
     public void should_disappear_when_switched_to_table_via_result_too_large_link() {
-        analysisPage.addStack(ATTR_ACTIVITY_TYPE)
+        initAnalysePage().addStack(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_ACCOUNT)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES);
 

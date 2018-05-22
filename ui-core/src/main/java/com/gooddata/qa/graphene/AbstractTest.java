@@ -1,5 +1,26 @@
 package com.gooddata.qa.graphene;
 
+import com.gooddata.project.Project;
+import com.gooddata.project.ProjectDriver;
+import com.gooddata.project.ProjectService;
+import com.gooddata.project.ProjectValidationResults;
+import com.gooddata.qa.browser.BrowserUtils;
+import com.gooddata.qa.graphene.common.TestParameters;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.RestClient.RestProfile;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
+import com.gooddata.qa.utils.testng.listener.AuxiliaryFailureScreenshotListener;
+import com.gooddata.qa.utils.testng.listener.ConsoleStatusListener;
+import com.gooddata.qa.utils.testng.listener.FailureLoggingListener;
+import org.apache.http.ParseException;
+import org.jboss.arquillian.drone.api.annotation.Drone;
+import org.jboss.arquillian.testng.Arquillian;
+import org.json.JSONException;
+import org.openqa.selenium.WebDriver;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Listeners;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,29 +29,6 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
-
-import com.gooddata.project.Project;
-import com.gooddata.project.ProjectDriver;
-import com.gooddata.project.ProjectService;
-import com.gooddata.project.ProjectValidationResults;
-import com.gooddata.qa.browser.BrowserUtils;
-import com.gooddata.qa.utils.http.RestClient;
-import com.gooddata.qa.utils.http.RestClient.RestProfile;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
-import org.apache.http.ParseException;
-import org.jboss.arquillian.drone.api.annotation.Drone;
-import org.jboss.arquillian.testng.Arquillian;
-import org.json.JSONException;
-import org.openqa.selenium.WebDriver;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Listeners;
-import com.gooddata.qa.graphene.common.StartPageContext;
-import com.gooddata.qa.graphene.common.TestParameters;
-import com.gooddata.qa.utils.testng.listener.AuxiliaryFailureScreenshotListener;
-import com.gooddata.qa.utils.testng.listener.ConsoleStatusListener;
-import com.gooddata.qa.utils.testng.listener.FailureLoggingListener;
 
 @Listeners({ConsoleStatusListener.class, FailureLoggingListener.class, AuxiliaryFailureScreenshotListener.class})
 public abstract class AbstractTest extends Arquillian {
@@ -46,8 +44,6 @@ public abstract class AbstractTest extends Arquillian {
     protected String imapHost;
     protected String imapUser;
     protected String imapPassword;
-
-    protected StartPageContext startPageContext = null;
 
     protected static final Logger log = Logger.getLogger(AbstractTest.class.getName());
 
@@ -70,15 +66,6 @@ public abstract class AbstractTest extends Arquillian {
         }
 
         testParams = new TestParameters(testVariables);
-    }
-
-    @BeforeMethod(alwaysRun = true)
-    public void loadPlatformPageBeforeTestMethod() {
-        if (startPageContext == null) {
-            return;
-        }
-        openUrl(startPageContext.getStartPage());
-        startPageContext.waitForStartPageLoaded();
     }
 
     @AfterClass(alwaysRun = true)

@@ -36,7 +36,7 @@ public class GoodSalesNotRenderedInsightTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = { "createProject" }, dataProvider = "chartTypeDataProvider")
     public void testNotSavableMissingMetricInsight(ReportType type) {
-        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).changeReportType(type);
+        initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE).changeReportType(type);
         //checking empty Measures bucket is not a good way to verify insight containing no metric
         //because user still can add attribute to generate aggregation metric, it's a valid case to save insight
         assertEquals(analysisPage.getExplorerMessage(), "NO MEASURE IN YOUR INSIGHT",
@@ -47,7 +47,7 @@ public class GoodSalesNotRenderedInsightTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = { "createProject" })
     public void saveMissingMetricTableInsight() throws JSONException, IOException {
         final String insight = "Test-Save-Table-Insight-Missing-Metric";
-        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).changeReportType(ReportType.TABLE).waitForReportComputing();
+        initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE).changeReportType(ReportType.TABLE).waitForReportComputing();
         assertEquals(analysisPage.getTableReport().getHeaders(), singletonList(ATTR_ACTIVITY_TYPE),
                 "Table was not displayed sucessfully");
         analysisPage.saveInsight(insight);

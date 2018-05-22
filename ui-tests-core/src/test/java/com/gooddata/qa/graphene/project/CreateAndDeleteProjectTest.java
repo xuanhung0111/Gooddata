@@ -45,7 +45,7 @@ public class CreateAndDeleteProjectTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"createAnotherProject"})
     public void renameProjectByOwner() {
-        ProjectsPage.getInstance(browser).goToProject(firstProjectId);
+        initProjectsPage().goToProject(firstProjectId);
         waitForDashboardPageLoaded(browser);
 
         assertEquals(initProjectsAndUsersPage().renameProject(FIRST_EDITED_PROJECT_NAME).getProjectName(),

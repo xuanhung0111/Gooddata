@@ -26,7 +26,7 @@ public class TrashTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_clear_all_items_by_dragging_them_to_the_trash() {
-        assertTrue(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        assertTrue(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .removeMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
@@ -41,7 +41,7 @@ public class TrashTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_not_be_possible_to_trash_item_by_throwing_it_anyplace_other_than_trash() {
-        assertTrue(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        assertTrue(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing()
             .getPageHeader()

@@ -38,7 +38,7 @@ public class GoodSalesDropAttributeTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void dropAttributeToReportHaveOneMetric() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing();
         ChartReport report = analysisPage.getChartReport();

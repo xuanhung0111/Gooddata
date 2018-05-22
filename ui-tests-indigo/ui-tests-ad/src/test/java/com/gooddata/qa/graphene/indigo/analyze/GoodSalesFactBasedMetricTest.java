@@ -42,7 +42,7 @@ public class GoodSalesFactBasedMetricTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void createSimpleMetricFromFact() {
-        final MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
+        final MetricsBucket metricsBucket = initAnalysePage().getMetricsBucket();
 
         assertEquals(analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT)
                 .getMetricsBucket()
@@ -71,7 +71,7 @@ public class GoodSalesFactBasedMetricTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testMetricAggregations() {
-        MetricConfiguration metricConfiguration = analysisPage.addMetric(FACT_ACTIVITY_DATE, FieldType.FACT)
+        MetricConfiguration metricConfiguration = initAnalysePage().addMetric(FACT_ACTIVITY_DATE, FieldType.FACT)
             .getMetricsBucket()
             .getMetricConfiguration(SUM_OF_ACTIVITY_DATE)
             .expandConfiguration();
@@ -120,7 +120,7 @@ public class GoodSalesFactBasedMetricTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "https://jira.intgdc.com/browse/CL-7777")
     public void testAggregationFunctionList() {
-        analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT);
+        initAnalysePage().addMetric(FACT_AMOUNT, FieldType.FACT);
 
         assertEquals(analysisPage.getMetricsBucket()
                 .getMetricConfiguration("Sum of " + FACT_AMOUNT)
@@ -141,7 +141,7 @@ public class GoodSalesFactBasedMetricTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "factMetricCombination")
     public void shouldNotCreateDuplicateMetricFromFact(boolean pop, boolean percent) {
-        MetricConfiguration configuration = analysisPage.addDate()
+        MetricConfiguration configuration = initAnalysePage().addDate()
             .addMetric(FACT_ACTIVITY_DATE, FieldType.FACT)
             .getMetricsBucket()
             .getMetricConfiguration("Sum of " + FACT_ACTIVITY_DATE)
@@ -189,7 +189,7 @@ public class GoodSalesFactBasedMetricTest extends AbstractAnalyseTest {
         String averageAmount = "Avg " + FACT_AMOUNT;
         String runningSumOfDuration = "Runsum of " + FACT_DURATION;
 
-        analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT);
+        initAnalysePage().addMetric(FACT_AMOUNT, FieldType.FACT);
         MetricConfiguration amountConfiguration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration(sumOfAmount);
         assertTrue(amountConfiguration.isConfigurationCollapsed());

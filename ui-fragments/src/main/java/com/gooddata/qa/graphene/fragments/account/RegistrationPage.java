@@ -140,8 +140,9 @@ public class RegistrationPage extends AbstractFragment {
         return enterCaptcha(CAPTCHA_SECRITY_CODE);
     }
 
-    public void submitForm() {
+    public RegistrationPage submitForm() {
         waitForElementVisible(registerButton).click();
+        return this;
     }
 
     public String getErrorMessage() {
@@ -181,6 +182,12 @@ public class RegistrationPage extends AbstractFragment {
                 .findElement(By.xpath("./ancestor::div[@class='form-item']"))
                 .findElement(By.className("field-hint"))
                 .getText();
+    }
+
+    public RegistrationPage waitForRegistrationNotSuccessfully() {
+        Graphene.waitGui().until(browser -> captchaInput.getAttribute("value").isEmpty()
+                && !registerButton.getAttribute("class").contains("disabled"));
+        return this;
     }
 
     private RegistrationPage selectIndustry(String industry) {

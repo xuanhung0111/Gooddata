@@ -29,7 +29,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_be_possible_to_add_and_remove_date_from_filter_bucket() {
-        assertTrue(analysisPage.addDateFilter()
+        assertTrue(initAnalysePage().addDateFilter()
                 .removeDateFilter()
                 .getFilterBuckets()
                 .isEmpty());
@@ -37,7 +37,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_not_be_possible_to_add_second_date_to_filter_bucket() {
-        assertEquals(analysisPage.addDateFilter()
+        assertEquals(initAnalysePage().addDateFilter()
                 .addDateFilter() // try to drag a second date filter
                 .getFilterBuckets()
                 .getFiltersCount(), 1);
@@ -45,7 +45,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_reflect_changes_in_category_bucket() {
-        analysisPage.addDate()
+        initAnalysePage().addDate()
                 .getAttributesBucket()
                 .changeDateDimension("Created");
 
@@ -59,7 +59,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_display_picker() {
-        analysisPage.addDateFilter()
+        initAnalysePage().addDateFilter()
                 .getFilterBuckets()
                 .getDateFilter()
                 .click();
@@ -68,7 +68,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_keep_selection_if_date_dimensions_reloaded_in_the_background() {
-        analysisPage.addDateFilter()
+        initAnalysePage().addDateFilter()
                 .getFilterBuckets()
                 .changeDateDimension("Activity", "Created");
 
@@ -82,7 +82,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_prefill_interval_filters_when_floating_filter_is_selected() {
-        analysisPage.addDateFilter()
+        initAnalysePage().addDateFilter()
                 .getFilterBuckets()
                 .configDateFilter("Last quarter")
                 .getDateFilter()
@@ -99,7 +99,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_support_date_ranges() throws ParseException {
-        assertTrue(analysisPage.addDateFilter()
+        assertTrue(initAnalysePage().addDateFilter()
                 .getFilterBuckets()
                 .configDateFilter("11/17/2015", "11/19/2015")
                 .getDateFilterText().contains("Nov 17, 2015 - Nov 19, 2015"));
@@ -107,7 +107,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_correct_ranges_when_editing() {
-        analysisPage.addDateFilter()
+        initAnalysePage().addDateFilter()
                 .getFilterBuckets()
                 .getDateFilter()
                 .click();
