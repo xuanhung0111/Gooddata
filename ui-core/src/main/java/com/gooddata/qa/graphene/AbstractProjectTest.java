@@ -10,7 +10,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.gooddata.GoodData;
 import com.gooddata.fixture.ResourceManagement.ResourceTemplate;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.AttributeElement;
@@ -25,7 +24,6 @@ import com.gooddata.qa.mdObjects.dashboard.filter.FilterType;
 import com.gooddata.qa.mdObjects.dashboard.filter.FloatingFilterConstraint;
 import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.utils.http.CommonRestRequest;
-import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestClient.RestProfile;
 import com.gooddata.qa.utils.http.RestRequest;
@@ -33,7 +31,6 @@ import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.rolap.RolapRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import com.gooddata.qa.utils.java.Builder;
-import org.apache.http.HttpHost;
 import org.json.JSONException;
 import org.openqa.selenium.Dimension;
 import org.testng.ITestContext;
@@ -301,13 +298,10 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         if (Objects.isNull(appliedFixture)) {
             throw new FixtureException("Fixture can't be null");
         }
-        final RestApiClient restApiClient = new RestApiClient(
-                testParams.getHost(), user, testParams.getPassword(), true, false);
-        final HttpHost httpHost = RestApiClient.parseHost(testParams.getHost());
-        GoodData goodData = new GoodData(httpHost.getHostName(), user, testParams.getPassword(), httpHost.getPort());
+        final RestClient restClient = new RestClient(
+                new RestProfile(testParams.getHost(), user, testParams.getPassword(), true));
         return new Fixture(appliedFixture)
-                .setGoodDataClient(goodData)
-                .setRestApiClient(restApiClient)
+                .setRestClient(restClient)
                 .deploy(title, testParams.getAuthorizationToken(),
                         testParams.getProjectDriver(), testParams.getProjectEnvironment());
     }
