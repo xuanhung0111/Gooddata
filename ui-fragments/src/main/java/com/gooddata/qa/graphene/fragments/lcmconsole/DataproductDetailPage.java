@@ -8,6 +8,9 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.lang.String.format;
 
@@ -18,7 +21,7 @@ public class DataproductDetailPage extends AbstractFragment {
     @FindBy(className = "segment-list")
     private WebElement segmentList;
 
-    public static final DataproductDetailPage getInstance(SearchContext searchContext) {
+    public static DataproductDetailPage getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(DataproductDetailPage.class, waitForElementVisible(DATA_PRODUCTS_ID, searchContext));
     }
 
@@ -51,8 +54,13 @@ public class DataproductDetailPage extends AbstractFragment {
 
     public int getNumberOfProjectsInDomain(String domainId) {
         final WebElement domainColumn = segmentList.findElement(getXpathSelectorForDomainColumn(domainId));
-        final String numberOfProjectText = domainColumn.findElement(getXpathSelectorForNumberOfProject()).getText();
-        return Integer.parseInt(numberOfProjectText.split(" ")[0]);
+        final WebElement projectsHeader = domainColumn.findElement(getXpathSelectorForNumberOfProject());
+        final Matcher projectsMatcher = Pattern.compile("([0-9]+) projects").matcher(projectsHeader.getText());
+
+        // wait for the number of projects to load, because its value is updated after the fragment is loaded
+        Graphene.waitGui().until(browser -> projectsMatcher.reset(projectsHeader.getText()).matches());
+
+        return Integer.parseInt(projectsMatcher.group(1));
     }
 
     private By getXpathSelectorForNumberOfProject() {
