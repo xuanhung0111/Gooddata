@@ -488,17 +488,17 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     private boolean isObjectDeleted(String object) throws IOException, JSONException {
-        JSONObject json;
         final CommonRestRequest restRequest = new CommonRestRequest(
                 new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        JSONObject json;
         try{
             json = restRequest.getJsonObject(object);
         } catch (InvalidStatusCodeException e) {
             return true;
         }
-        if (!json.has("error") 
-            || !object.endsWith("/obj/" + json.getJSONObject("error").getJSONArray("parameters").getString(0)) 
-            || !OBJECT_ID_NOT_FOUND.equals(json.getJSONObject("error").getString("message")))
+        if (!json.has("error")
+                || !object.endsWith("/obj/" + json.getJSONObject("error").getJSONArray("parameters").getString(0))
+                || !OBJECT_ID_NOT_FOUND.equals(json.getJSONObject("error").getString("message")))
             return false;
         return true;
     }

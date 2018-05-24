@@ -19,6 +19,8 @@ import com.gooddata.notification.NotificationService;
 import com.gooddata.project.ProjectService;
 import com.gooddata.report.ReportService;
 import com.gooddata.warehouse.WarehouseService;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -34,10 +36,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 import static java.lang.String.format;
 
@@ -80,8 +79,8 @@ public class RestClient {
                             request.getURI(), expectedStatusCode, statusCode);
 
                     // get error msg in response if any
-                    JSONObject content = getResponseContent(response);
-                    if (content.has("error")) {
+                    String content = getResponseError(response);
+                    if (StringUtils.isNotEmpty(content)) {
                         errorMsg += "\n" + content;
                     }
                     throw new InvalidStatusCodeException(errorMsg, statusCode);
@@ -191,12 +190,20 @@ public class RestClient {
         }
     }
 
-    private JSONObject getResponseContent(HttpResponse response) {
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(response.getEntity().getContent()))) {
-            return new JSONObject(reader.readLine());
-        } catch (IOException | JSONException e) {
-            throw new RuntimeException("There is an error while reading response", e);
+    private String getResponseError(HttpResponse response) {
+        String content = "";
+        try {
+            content = IOUtils.toString(response.getEntity().getContent(), "UTF-8");
+            JSONObject jsonObject = new JSONObject(content);
+            if (jsonObject.has("error")) {
+                return content;
+            }
+            return "";
+        } catch (IOException ioe) {
+            throw new RuntimeException("There is an error while reading response", ioe);
+        } catch (JSONException je) {
+            // Incase a bad request(400) returned, response content is html not json
+            return content;
         }
     }
 
