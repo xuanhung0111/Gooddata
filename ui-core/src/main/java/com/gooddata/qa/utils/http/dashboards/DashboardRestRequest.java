@@ -223,6 +223,21 @@ public class DashboardRestRequest extends CommonRestRequest {
     }
 
     /**
+     * Set dashboard as locked or unlocked
+     *
+     * @param title
+     * @param isLocked
+     * @throws JSONException
+     * @throws IOException
+     */
+    public void setLockedDashboard(String title, boolean isLocked) throws JSONException, IOException {
+        String dashboardUri = getDashboardUri(title);
+        final JSONObject json = getJsonObject(dashboardUri);
+        json.getJSONObject("projectDashboard").getJSONObject("meta").put("locked", BooleanUtils.toInteger(isLocked));
+        executeRequest(RestRequest.initPutRequest(dashboardUri, json.toString()), HttpStatus.OK);
+    }
+
+    /**
      * Create mandatory user filter object with simple expression '%s IN (%s)'using uri
      *
      * @param mufTitle
@@ -374,7 +389,7 @@ public class DashboardRestRequest extends CommonRestRequest {
         json.getJSONObject("attributeDisplayForm").getJSONObject("content").put("default", requestedFormat);
         executeRequest(initPutRequest(uri, json.toString()), HttpStatus.OK);
     }
-    
+
     private void setDrillReportTarget(final String dashboardID, final String target, final String exportFormat)
             throws IOException {
         final String dashboardEditModeURI = format(DASHBOARD_EDIT_MODE_LINK, projectId, dashboardID);

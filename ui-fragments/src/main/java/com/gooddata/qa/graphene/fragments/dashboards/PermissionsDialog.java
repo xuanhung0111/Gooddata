@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmp
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 
 import java.util.List;
 
@@ -26,6 +27,7 @@ public class PermissionsDialog extends AbstractFragment {
     private static final By LOCK_OPTIONS_SELECTOR = By.cssSelector("input[name=settings-lock-radio]");
     public static final By GRANTEES_PANEL = By.cssSelector(".grantees");
     public static final By ALERT_INFOBOX_CSS_SELECTOR = By.cssSelector(".ss-alert");
+    private static final By BY_STRICT_ACCESS_CHECKBOX = By.cssSelector(".accessControlCheckBox input");
 
     @FindBy(css = ".submit-button")
     private WebElement submitButton;
@@ -45,11 +47,14 @@ public class PermissionsDialog extends AbstractFragment {
     @FindBy(css = ".visibility-options")
     private WebElement visibilityOptionsContainer;
 
-    @FindBy(xpath = "//div[@id='gd-overlays']//div[contains(@class,'s-everyone_can_access')]/div")
+    @FindBy(className = "s-everyone_can_access")
     private WebElement everyOneCanAccessChoose;
-    
-    @FindBy(xpath = "//div[@id='gd-overlays']//div[contains(@class,'s-specific_users_can_access')]/div")
+
+    @FindBy(className = "s-specific_users_can_access")
     private WebElement specificUsersAccessChoose;
+
+    @FindBy(css = ".accessControlCheckBox input")
+    private WebElement strictAccessControlCheckBox;
 
     @FindBy(css = ".permissionDialog-addGranteesButton:not(.disabled)")
     private WebElement addGranteesButton;
@@ -67,7 +72,7 @@ public class PermissionsDialog extends AbstractFragment {
     public WebElement getLockAllRadio() {
         return lockAllRadio;
     }
-    
+
     public boolean isLockOptionDisplayed() {
         return browser.findElements(LOCK_OPTIONS_SELECTOR).size() == 2;
     }
@@ -90,17 +95,16 @@ public class PermissionsDialog extends AbstractFragment {
     }
 
     /**
-     * @param publishType  {@link com.gooddata.qa.graphene.enums.dashboard.PublishType#EVERYONE_CAN_ACCESS} - publish to everyone,
-     * {@link com.gooddata.qa.graphene.enums.dashboard.PublishType#SPECIFIC_USERS_CAN_ACCESS}  -
+     * @param publishType  {@link com.gooddata.qa.graphene.enums.dashboard.PublishType#ALL_USERS_IN_THIS_PROJECT} - publish to everyone,
+     * {@link com.gooddata.qa.graphene.enums.dashboard.PublishType#SELECTED_USERS}  -
      * publish to specific user (by default owner + others can be added in different dialog)
      */
     public void publish(PublishType publishType) {
-        openVisibilityPanel();
         switch (publishType) {
-            case EVERYONE_CAN_ACCESS:
+            case ALL_USERS_IN_THIS_PROJECT:
                 submitEveryOneCanAccess();
                 break;
-            case SPECIFIC_USERS_CAN_ACCESS:
+            case SELECTED_USERS:
                 submitSpecificUsersAccess();
                 break;
             default:
@@ -115,7 +119,7 @@ public class PermissionsDialog extends AbstractFragment {
 
     public void removeUser(final String login) {
         for (WebElement element : getAddedGrantees()) {
-            if (element.findElements(GRANTEE_EMAIL_CSS_SELECTOR).size() != 0 && 
+            if (element.findElements(GRANTEE_EMAIL_CSS_SELECTOR).size() != 0 &&
                     login.equals(element.findElement(GRANTEE_EMAIL_CSS_SELECTOR).getText().trim())) {
                 element.findElement(ADDED_GRANTEE_DELETE_CSS_SELECTOR).click();
                 return;
@@ -143,7 +147,7 @@ public class PermissionsDialog extends AbstractFragment {
 
     public void undoRemoveUser(final String login) {
         for (WebElement element : getAddedGrantees()) {
-            if (element.findElements(GRANTEE_EMAIL_CSS_SELECTOR).size() != 0 && 
+            if (element.findElements(GRANTEE_EMAIL_CSS_SELECTOR).size() != 0 &&
                     login.equals(element.findElement(GRANTEE_EMAIL_CSS_SELECTOR).getText().trim())) {
                 element.findElement(ADDED_GRANTEE_UNDO_CSS_SELECTOR).click();
                 return;
@@ -182,6 +186,10 @@ public class PermissionsDialog extends AbstractFragment {
         waitForElementVisible(specificUsersAccessChoose).click();
     }
 
+    public void toggleStrictAccessDashboard() {
+        waitForElementVisible(strictAccessControlCheckBox).click();
+    }
+
     public void openVisibilityPanel() {
         waitForElementVisible(visibilityButton).click();
     }
@@ -205,5 +213,13 @@ public class PermissionsDialog extends AbstractFragment {
 
     public String getTitleOfSubmitButton() {
         return waitForElementVisible(submitButton).getText();
+    }
+
+    public boolean isStrictAccessControlCheckBoxSelected() {
+        return strictAccessControlCheckBox.isSelected();
+    }
+
+    public boolean isSACOptionDisplayed() {
+        return isElementVisible(BY_STRICT_ACCESS_CHECKBOX, getRoot());
     }
 }
