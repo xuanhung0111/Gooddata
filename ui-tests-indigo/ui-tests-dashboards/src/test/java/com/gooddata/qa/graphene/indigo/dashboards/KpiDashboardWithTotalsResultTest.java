@@ -6,6 +6,7 @@ import com.gooddata.md.Metric;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
+import com.gooddata.qa.graphene.entity.visualization.CategoryBucket.Type;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.entity.visualization.TotalsBucket;
@@ -73,7 +74,7 @@ public class KpiDashboardWithTotalsResultTest extends AbstractDashboardTest {
             METRIC_NUMBER_OF_ACTIVITIES, ATTR_YEAR_ACTIVITY, AggregationItem.MAX);
 
         MeasureBucket measureBucket = MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_NUMBER_OF_ACTIVITIES));
-        CategoryBucket categoryBucket = CategoryBucket.createAttributeByBucket(getAttribute(ATTR_DEPARTMENT));
+        CategoryBucket categoryBucket = CategoryBucket.createCategoryBucket(getAttribute(ATTR_DEPARTMENT), Type.ATTRIBUTE);
         TotalsBucket totalsBucket = TotalsBucket.createTotals(measureBucket, categoryBucket, AggregationItem.MAX);
         String insightWidget = createInsightWidget(new InsightMDConfiguration(INSIGHT_IS_ON_MOBILE, ReportType.TABLE)
             .setMeasureBucket(singletonList(measureBucket))
@@ -192,7 +193,7 @@ public class KpiDashboardWithTotalsResultTest extends AbstractDashboardTest {
 
     private String createSimpleInsight(String title, String metric, String attribute, AggregationItem type) throws IOException {
         MeasureBucket measureBucket = MeasureBucket.createSimpleMeasureBucket(getMetric(metric));
-        CategoryBucket categoryBucket = CategoryBucket.createAttributeByBucket(getAttribute(attribute));
+        CategoryBucket categoryBucket = CategoryBucket.createCategoryBucket(getAttribute(attribute), Type.ATTRIBUTE);
         TotalsBucket totalsBucket = TotalsBucket.createTotals(measureBucket, categoryBucket, type);
         indigoRestRequest.createInsight(new InsightMDConfiguration(title, ReportType.TABLE)
                 .setMeasureBucket(singletonList(measureBucket))

@@ -9,13 +9,11 @@ public class CategoryBucket {
     private final String localIdentifier = generateHashString();
     private String attribute;
     private String displayForm;
-    private String collection;
-    private String type;
+    private Type type;
 
-    private CategoryBucket(String attribute, String displayForm, String collection, String type) {
+    private CategoryBucket(String attribute, String displayForm, Type type) {
         this.attribute = attribute;
         this.displayForm = displayForm;
-        this.collection = collection;
         this.type = type;
     }
 
@@ -27,11 +25,7 @@ public class CategoryBucket {
         return displayForm;
     }
 
-    public String getCollection() {
-        return collection;
-    }
-
-    public String getType() {
+    public Type getType() {
         return type;
     }
 
@@ -39,22 +33,15 @@ public class CategoryBucket {
         return localIdentifier;
     }
 
-    public static CategoryBucket createViewByBucket(Attribute attribute) {
-        return new CategoryBucket(attribute.getUri(), attribute.getDefaultDisplayForm().getUri(), "view",
-                "attribute");
-    }
-
-    public static CategoryBucket createStackByBucket(Attribute attribute) {
-        return new CategoryBucket(attribute.getUri(), attribute.getDefaultDisplayForm().getUri(), "stack",
-                "attribute");
-    }
-
-    public static CategoryBucket createAttributeByBucket(Attribute attribute) {
-        return new CategoryBucket(attribute.getUri(), attribute.getDefaultDisplayForm().getUri(), "attribute",
-                "attribute");
+    public static CategoryBucket createCategoryBucket(Attribute attribute, Type type) {
+        return new CategoryBucket(attribute.getUri(), attribute.getDefaultDisplayForm().getUri(), type);
     }
 
     private String generateHashString() {
         return UUID.randomUUID().toString().substring(0, 5);
+    }
+
+    public enum Type {
+        ATTRIBUTE, VIEW, TREND, STACK, SEGMENT
     }
 }

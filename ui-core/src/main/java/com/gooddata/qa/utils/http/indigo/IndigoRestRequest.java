@@ -6,14 +6,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestRequest;
 import com.gooddata.qa.graphene.entity.visualization.TotalsBucket;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.http.ParseException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,6 +25,7 @@ import org.springframework.http.HttpStatus;
 
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
+import com.gooddata.qa.graphene.entity.visualization.CategoryBucket.Type;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import static java.lang.String.format;
@@ -475,15 +479,27 @@ public class IndigoRestRequest extends CommonRestRequest{
 
     private JSONArray initBuckets(final List<MeasureBucket> measureBuckets, final List<CategoryBucket> categoryBuckets)
             throws JSONException {
+        Map<Type, List<CategoryBucket>> categoryBucketGroup = new HashedMap();
+        for (Type type : Type.values()) {
+            List<CategoryBucket> item = categoryBuckets.stream()
+                    .filter(categoryBucket -> type.equals(categoryBucket.getType()))
+                    .collect(Collectors.toList());
+            if (!item.isEmpty()) {
+                categoryBucketGroup.put(type, item);
+            }
+        }
+
         return new JSONArray() {{
             put(new JSONObject() {{
                 put("localIdentifier", "measures");
                 put("items", initMeasureObjects(measureBuckets));
             }});
-            put(new JSONObject() {{
-                put("localIdentifier", categoryBuckets.isEmpty() ? "categories" : categoryBuckets.get(0).getCollection());
-                put("items", initCategoryObjects(categoryBuckets));
-            }});
+            categoryBucketGroup.forEach((type, categoryBuckets) -> {
+                put(new JSONObject() {{
+                    put("localIdentifier", type.toString().toLowerCase());
+                    put("items", initCategoryObjects(categoryBuckets));
+                }});
+            });
         }};
     }
 

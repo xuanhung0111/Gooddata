@@ -4,6 +4,7 @@ import com.gooddata.md.Attribute;
 import com.gooddata.md.Metric;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
+import com.gooddata.qa.graphene.entity.visualization.CategoryBucket.Type;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
@@ -83,14 +84,15 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
                             MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_NUMBER_OF_ACTIVITIES)),
                             MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_CLOSE_EOP))))
                     .setCategoryBucket(asList(
-                            CategoryBucket.createViewByBucket(getAttribute(ATTR_DEPARTMENT)),
-                            CategoryBucket.createViewByBucket(getAttribute(ATTR_SALES_REP)))));
+                            CategoryBucket.createCategoryBucket(getAttribute(ATTR_DEPARTMENT), Type.ATTRIBUTE),
+                            CategoryBucket.createCategoryBucket(getAttribute(ATTR_SALES_REP), Type.ATTRIBUTE))));
 
         indigoRestRequest.createInsight(
             new InsightMDConfiguration(INSIGHT_SHOW_PERCENT, ReportType.TABLE)
                     .setMeasureBucket(singletonList(MeasureBucket.createMeasureBucketWithShowInPercent(
                             getMetric(METRIC_NUMBER_OF_ACTIVITIES), true)))
-                    .setCategoryBucket(singletonList(CategoryBucket.createViewByBucket(getAttribute(ATTR_YEAR_ACTIVITY)))));
+                    .setCategoryBucket(singletonList(
+                            CategoryBucket.createCategoryBucket(getAttribute(ATTR_YEAR_ACTIVITY), Type.ATTRIBUTE))));
 
         createSimpleInsight(INSIGHT_SHOW_POP, METRIC_NUMBER_OF_ACTIVITIES, ATTR_YEAR_ACTIVITY);
         AnalysisPage analysisPage = initAnalysePage();
@@ -273,6 +275,7 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
         indigoRestRequest.createInsight(
             new InsightMDConfiguration(title, ReportType.TABLE)
                     .setMeasureBucket(singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(metric))))
-                    .setCategoryBucket(singletonList(CategoryBucket.createViewByBucket(getAttribute(attribute)))));
+                    .setCategoryBucket(singletonList(
+                            CategoryBucket.createCategoryBucket(getAttribute(attribute), Type.ATTRIBUTE))));
     }
 }
