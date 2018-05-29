@@ -5,6 +5,7 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributeFilterPickerPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
@@ -23,6 +24,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import java.util.Arrays;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -379,4 +381,21 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
+    public AnalysisPage setFilterIsntValues(String filter, String... values) {
+        AttributeFilterPickerPanel panel = openFilterPanel(filter);
+        panel.getSelectAllButton().click();
+        Arrays.stream(values).forEach(panel::selectItem);  //To uncheck element
+        panel.getApplyButton().click();
+        return this;
+    }
+
+    public AnalysisPage setFilterIsValues(String filter, String... values) {
+        openFilterPanel(filter).select(values);
+        return this;
+    }
+
+    private AttributeFilterPickerPanel openFilterPanel(String filter) {
+        getFilterBuckets().getFilter(filter).click();
+        return AttributeFilterPickerPanel.getInstance(browser);
+    }
 }
