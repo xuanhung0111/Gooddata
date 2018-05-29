@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.gooddata.qa.graphene.indigo.analyze.AggregationResultTest;
+import com.gooddata.qa.graphene.indigo.analyze.AggregationPopupManipulationTest;
 import com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerSanityTest;
 import com.gooddata.qa.graphene.indigo.analyze.CustomDateDimensionsTest;
 import com.gooddata.qa.graphene.indigo.analyze.EmbeddedAdTest;
@@ -116,6 +117,7 @@ public class UITestsRegistry {
             GoodSalesPopComparisonTest.class,
             AggregationResultTest.class,
             TotalsResultWithInsightTest.class,
+            AggregationPopupManipulationTest.class,
             "testng-ad-ChartLabelFormat.xml",
             "testng-ad-MetricNumberFormat.xml"
         });

@@ -23,7 +23,7 @@ public class TotalsBucket {
     }
 
     public String getType() {
-        return type.getShortenedName();
+        return type.getMetadataName();
     }
 
     public static TotalsBucket createTotals(MeasureBucket measureBuckets, CategoryBucket categoryBucket, AggregationItem type) {
