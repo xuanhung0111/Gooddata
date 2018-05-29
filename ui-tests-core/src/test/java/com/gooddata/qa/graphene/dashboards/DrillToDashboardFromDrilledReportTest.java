@@ -54,7 +54,7 @@ public class DrillToDashboardFromDrilledReportTest extends GoodSalesAbstractTest
     private static final String REPORT_DRILLING_GROUP = "Reports";
     private static final String GRAMMAR_PLUS = "Grammar Plus";
     private static final String SHORT_LIST = "Short List";
-    private static final String DATE_DIMENSION_VALUE_2011 = "2011";
+    private static final String DATE_DIMENSION_VALUE_2010 = "2010";
     private static final String DATE_DIMENSION_SNAPSHOT = "Date dimension (Snapshot)";
 
     private static final String ERROR_MSG = "The target dashboard tab has been deleted.";
@@ -102,7 +102,7 @@ public class DrillToDashboardFromDrilledReportTest extends GoodSalesAbstractTest
         List<Pair<String, List<String>>> expectedFilterValues2 = asList(
                 Pair.of(ATTR_STAGE_NAME, singletonList(SHORT_LIST)),
                 Pair.of(ATTR_PRODUCT, singletonList(GRAMMAR_PLUS)),
-                Pair.of(DATE_DIMENSION_SNAPSHOT, singletonList(DATE_DIMENSION_VALUE_2011))
+                Pair.of(DATE_DIMENSION_SNAPSHOT, singletonList(DATE_DIMENSION_VALUE_2010))
         );
 
         return new Object[][]{

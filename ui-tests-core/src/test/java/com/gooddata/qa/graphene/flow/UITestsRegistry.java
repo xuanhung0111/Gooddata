@@ -244,7 +244,8 @@ public class UITestsRegistry {
             DrillToUpdatedDashboardTabTest.class,
             DrillToDashBoardTabApplyingDateFilterTest.class,
             DrillToDashboardFromDrilledReportTest.class,
-            DeleteDashboardHavingDrillToTabTest.class
+            DeleteDashboardHavingDrillToTabTest.class,
+            DrillToDashBoardTabByDateDimensionTest.class
         });
 
         suites.put("manage", new Object[] {
