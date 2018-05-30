@@ -344,8 +344,13 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"basic"})
     public void customAttributeVariableValues() {
-        SelectItemPopupPanel selectItemPopupPanel = initVariablePage()
-                .openVariableFromList(ATTRIBUTE_VARIABLE)
+        initVariablePage().createVariable(new AttributeVariable(generateVariableName())
+                .withAttribute(ATTR_STAGE_NAME)
+                .withAttributeValues(ATTRIBUTE_VALUES));
+
+        VariableDetailPage variableDetailPage = VariableDetailPage.getInstance(browser);
+
+        SelectItemPopupPanel selectItemPopupPanel = variableDetailPage
                 .clickEditAttributeValuesButton()
                 .clearAllItems();
 
@@ -357,11 +362,13 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
         assertTrue(selectItemPopupPanel.areAllItemsSelected(), "All attribute values are not selected");
 
         selectItemPopupPanel.submitPanel();
-        assertEquals(VariableDetailPage.getInstance(browser).getDefaultAttributeValues(), ALL_VALUES);
+        assertEquals(variableDetailPage.getDefaultAttributeValues(), ALL_VALUES);
 
-        changeAttributeFilterOperatorTo("isn't");
+        changeDefaultAttributeValues("isn't", ATTRIBUTE_VALUES);
+        variableDetailPage.saveChange();
         takeScreenshot(browser, "Attribute-filter-operator-changes-to-isn't", getClass());
-        assertEquals(getAttributeFilterOperator(), "isn't");
+        assertEquals(getDefaultAttributeValuesOperator(), "isn't");
+        assertEquals(variableDetailPage.getDefaultAttributeValues(), ATTRIBUTE_VALUES);
     }
 
     @Override
@@ -377,13 +384,13 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
         return waitForElementVisible(By.cssSelector(".box-warning .leftContainer"), browser).getText();
     }
 
-    private void changeAttributeFilterOperatorTo(String operator) {
+    private void changeDefaultAttributeValues(String operator, Collection<String> values) {
         SelectItemPopupPanel popup = VariableDetailPage.getInstance(browser).clickEditAttributeValuesButton();
         new Select(popup.getRoot().findElement(By.cssSelector(".notin select"))).selectByVisibleText(operator);
-        popup.submitPanel();
+        popup.clearAllItems().searchAndSelectItems(values).submitPanel();
     }
 
-    private String getAttributeFilterOperator() {
+    private String getDefaultAttributeValuesOperator() {
         return VariableDetailPage.getInstance(browser)
                 .getRoot().findElement(By.cssSelector(".filterAnswer .answer b")).getText();
     }
