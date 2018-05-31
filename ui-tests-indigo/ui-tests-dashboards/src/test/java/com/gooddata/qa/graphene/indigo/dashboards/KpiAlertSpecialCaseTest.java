@@ -42,7 +42,6 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
-import com.gooddata.qa.utils.http.RestApiClient;
 
 public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
 

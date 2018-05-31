@@ -8,7 +8,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_TIMELIN
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static  com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_OPP_FIRST_SNAPSHOT ;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
@@ -20,6 +19,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.apache.http.ParseException;
@@ -63,10 +63,10 @@ public class DateDatasetRecommendationTest extends AbstractDashboardTest {
 
         // unused objects could affect to other tests
         List<String> workingInsightUris = indigoRestRequest.getInsightUris();
-
+        final CommonRestRequest restRequest = new CommonRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         if (!workingInsightUris.isEmpty()) {
-            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(),
-                    workingInsightUris.toArray(new String[0]));
+            restRequest.deleteObjectsUsingCascade(workingInsightUris.toArray(new String[0]));
         }
     }
 

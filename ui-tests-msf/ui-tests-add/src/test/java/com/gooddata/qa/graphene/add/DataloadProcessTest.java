@@ -9,12 +9,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.RestClient.RestProfile;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
 import com.gooddata.FutureResult;
-import com.gooddata.GoodData;
 import com.gooddata.GoodDataException;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.ProcessExecution;
@@ -90,9 +91,10 @@ public class DataloadProcessTest extends AbstractDataloadProcessTest {
         assertThat(getExecutionLog(executionDetail), containsString("user=" + testParams.getUser()));
 
         final String otherUser = createAndAddUserToProject(UserRoles.ADMIN);
-        final GoodData otherGoodDataClient = getGoodDataClient(otherUser, testParams.getPassword());
+        final RestClient otherRestClient = new RestClient(
+                new RestProfile(testParams.getHost(), otherUser, testParams.getPassword(), true));
 
-        ProcessExecutionDetail otherExecutionDetail = executeProcess(otherGoodDataClient, getDataloadProcess(), "",
+        ProcessExecutionDetail otherExecutionDetail = executeProcess(otherRestClient, getDataloadProcess(), "",
                 Parameters.SYNCHRONIZE_ALL_DATASETS);
         assertThat(getExecutionLog(otherExecutionDetail), containsString("user=" + testParams.getUser()));
     }

@@ -34,7 +34,6 @@ import com.gooddata.qa.graphene.fragments.account.InviteUserDialog;
 import com.gooddata.qa.graphene.fragments.account.RegistrationPage;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
-import com.gooddata.qa.utils.http.RestApiClient;
 
 public class InviteUserTest extends AbstractProjectTest {
 

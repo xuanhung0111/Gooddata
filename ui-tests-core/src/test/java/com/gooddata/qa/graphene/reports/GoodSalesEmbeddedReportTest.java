@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.reports;
 
-import com.gooddata.GoodData;
 import com.gooddata.fixture.ResourceManagement.ResourceTemplate;
 import com.gooddata.md.report.AttributeInGrid;
 import com.gooddata.md.report.GridReportDefinitionContent;
@@ -19,6 +18,7 @@ import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportEmbedDialog;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
+import com.gooddata.qa.utils.http.RestClient;
 import com.google.common.collect.Lists;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
@@ -46,7 +46,6 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Collections.singletonList;
-import static java.util.Objects.isNull;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertEquals;
@@ -61,7 +60,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
     private final static String EMBEDDED_REPORT_TITLE = "Embedded Report";
     private final static String ADDITIONAL_PROJECT_TITLE = "GoodSales-project-to-share-report";
 
-    private GoodData editorGoodDataClient;
+    private RestClient editorRestClient;
 
     private String additionalProjectId = "";
     private String reportUrl;
@@ -81,6 +80,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         getMetricCreator().createAmountMetric();
         getMetricCreator().createLostMetric();
         getVariableCreator().createStatusVariable();
+        editorRestClient = new RestClient(getProfile(Profile.EDITOR));
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -299,7 +299,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
     public void shareEmptyReport() {
         String reportTitle = "Empty report";
 
-        createReportViaRest(getEditorGoodDataClient(), GridReportDefinitionContent.create(reportTitle,
+        createReportViaRest(editorRestClient, GridReportDefinitionContent.create(reportTitle,
                 singletonList(METRIC_GROUP),
                 singletonList(new AttributeInGrid(getAttributeByIdentifier("attr.stage.status"))),
                 singletonList(new MetricElement(getMetricByTitle(METRIC_LOST)))));
@@ -327,7 +327,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createAdditionalProject"})
     public void shareChartReport() {
         String embeddedChartReport = "Embedded Chart Report";
-        createReportViaRest(getEditorGoodDataClient(), GridReportDefinitionContent.create(embeddedChartReport,
+        createReportViaRest(editorRestClient, GridReportDefinitionContent.create(embeddedChartReport,
                 singletonList(METRIC_GROUP),
                 singletonList(new AttributeInGrid(getAttributeByIdentifier("attr.stage.status"))),
                 singletonList(new MetricElement(getMetricByTitle(METRIC_AMOUNT)))));
@@ -500,13 +500,5 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         waitForDashboardPageLoaded(browser);
 
         return dashboardsPage;
-    }
-
-    private GoodData getEditorGoodDataClient() {
-        if (isNull(editorGoodDataClient)) {
-            editorGoodDataClient = getGoodDataClient(testParams.getEditorUser(), testParams.getPassword());
-        }
-
-        return editorGoodDataClient;
     }
 }

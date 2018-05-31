@@ -5,9 +5,8 @@ import static java.lang.String.format;
 
 import java.time.LocalTime;
 
+import com.gooddata.qa.utils.http.RestClient;
 import org.openqa.selenium.support.FindBy;
-
-import com.gooddata.GoodData;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.ProcessExecution;
 import com.gooddata.dataload.processes.ProcessExecutionDetail;
@@ -50,12 +49,12 @@ public class AbstractDataIntegrationTest extends AbstractProjectTest {
 
     protected ProcessExecutionDetail executeProcess(DataloadProcess process, String executable,
             Parameters parameters) {
-        return executeProcess(getGoodDataClient(), process, executable, parameters);
+        return executeProcess(new RestClient(getProfile(Profile.ADMIN)), process, executable, parameters);
     }
 
-    protected ProcessExecutionDetail executeProcess(GoodData goodData, DataloadProcess process, String executable,
-            Parameters parameters) {
-        return goodData.getProcessService()
+    protected ProcessExecutionDetail executeProcess(RestClient restClient, DataloadProcess process, String executable,
+                                                    Parameters parameters) {
+        return restClient.getProcessService()
                 .executeProcess(new ProcessExecution(process, executable,
                         parameters.getParameters(), parameters.getSecureParameters()))
                 .get();
@@ -63,10 +62,6 @@ public class AbstractDataIntegrationTest extends AbstractProjectTest {
 
     protected void deleteScheduleByName(DataloadProcess process, String scheduleName) {
         getProcessService().removeSchedule(getScheduleByName(process, scheduleName));
-    }
-
-    protected String getScheduleId(DataloadProcess process, String scheduleName) {
-        return getScheduleByName(process, scheduleName).getId();
     }
 
     protected String parseTimeToCronExpression(LocalTime time) {
@@ -82,7 +77,7 @@ public class AbstractDataIntegrationTest extends AbstractProjectTest {
     }
 
     protected ProcessService getProcessService() {
-        return getGoodDataClient().getProcessService();
+        return new RestClient(getProfile(Profile.ADMIN)).getProcessService();
     }
 
     private Schedule getScheduleByName(DataloadProcess process, String scheduleName) {

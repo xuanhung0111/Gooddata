@@ -20,6 +20,7 @@ import com.gooddata.qa.graphene.fragments.reports.report.AttributeSndPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import com.gooddata.qa.utils.http.InvalidStatusCodeException;
+import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.report.ReportExportFormat;
 import com.gooddata.report.ReportService;
@@ -717,7 +718,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         Attribute product = getMdService().getObj(getProject(), Attribute.class, Restriction.title(ATTR_PRODUCT));
 
         for (MetricTypes metric : asList(MetricTypes.THIS, MetricTypes.PREVIOUS, MetricTypes.NEXT)) {
-            checkMetricValuesInReport(createMetricByGoodDataClient(metric), product,
+            checkMetricValuesInReport(createMetricByRestClient(metric), product,
                     getMetricValues(metric), PRODUCT_VALUES);
         }
     }
@@ -729,10 +730,10 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         Attribute attributeQuarterYearSnapshot = getMdService()
                 .getObj(getProject(), Attribute.class, Restriction.title(ATTR_QUARTER_YEAR_SNAPSHOT));
 
-        checkMetricValuesInReport(createMetricByGoodDataClient(MetricTypes.BETWEEN),
+        checkMetricValuesInReport(createMetricByRestClient(MetricTypes.BETWEEN),
                 attributeQuarterYearSnapshot, betweenValues, QUARTER_YEAR_VALUES);
 
-        checkMetricValuesInReport(createMetricByGoodDataClient(MetricTypes.NOT_BETWEEN),
+        checkMetricValuesInReport(createMetricByRestClient(MetricTypes.NOT_BETWEEN),
                 attributeQuarterYearSnapshot, notBetweenValues, asList("Q1/2012", "Q2/2012"));
     }
 
@@ -743,7 +744,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         List<String> attributeValues = asList("2010", "2011", "2012");
         Attribute year = getMdService().getObj(getProject(), Attribute.class, Restriction.title(ATTR_YEAR_SNAPSHOT));
 
-        checkMetricValuesInReport(createMetricByGoodDataClient(MetricTypes.WITH_PF_EXCEPT),
+        checkMetricValuesInReport(createMetricByRestClient(MetricTypes.WITH_PF_EXCEPT),
                 year, withPFExceptValues, attributeValues);
         addFilterAndCheckReport(attributeValues, withPFExceptValues,
                 ATTR_PRODUCT, "CompuSci", "Educationly", "Explorer");
@@ -752,7 +753,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         addFilterAndCheckReport(attributeValues, asList(1.7967886E7f, 6.2103956E7f, 8.0406328E7f),
                 ATTR_DEPARTMENT, "Direct Sales");
 
-        checkMetricValuesInReport(createMetricByGoodDataClient(MetricTypes.WITHOUT_PF_EXCEPT),
+        checkMetricValuesInReport(createMetricByRestClient(MetricTypes.WITHOUT_PF_EXCEPT),
                 year, withoutPFExceptValues, attributeValues);
         addFilterAndCheckReport(attributeValues, withoutPFExceptValues, ATTR_DEPARTMENT, "Direct Sales");
         addFilterAndCheckReport(attributeValues, asList(1.3019884E7f, 4.7406964E7f, 6.5819096E7f),
@@ -826,7 +827,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     }
 
     private ByteArrayOutputStream exportReport(ReportDefinition rd) {
-        ReportService reportService = goodDataClient.getReportService();
+        ReportService reportService = new RestClient(getProfile(Profile.ADMIN)).getReportService();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         reportService.exportReport(rd, ReportExportFormat.CSV, output).get();
         return output;
@@ -886,7 +887,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         }
     }
 
-    private Metric createMetricByGoodDataClient(MetricTypes metricType) {
+    private Metric createMetricByRestClient(MetricTypes metricType) {
         String amountUri = 
                 "[" + getMdService().getObjUri(getProject(), Metric.class, Restriction.title(METRIC_AMOUNT)) + "]";
         String numberOfOpenOpps = 

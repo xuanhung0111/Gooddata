@@ -10,7 +10,9 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.RestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.rolap.RolapRestRequest;
 import org.apache.http.ParseException;
@@ -29,8 +31,6 @@ import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
-import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
-import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
@@ -195,11 +195,11 @@ public class FiscalDateFilterNameTest extends AbstractDashboardWidgetTest {
     private void changeDatasetTitleByRest(final String datasetIdentifier, final String newTitle)
             throws IOException, JSONException {
         String datasetUri = getMdService().getObjUri(getProject(), Dataset.class, identifier(datasetIdentifier));
-        JSONObject json = getJsonObject(getRestApiClient(), datasetUri);
+        final CommonRestRequest restRequest = new CommonRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId());
+        JSONObject json = restRequest.getJsonObject(datasetUri);
 
         json.getJSONObject("dataSet").getJSONObject("meta").put("title", newTitle);
-        executeRequest(getRestApiClient(),
-                getRestApiClient().newPostMethod(datasetUri + "?mode=edit", json.toString()),
+        restRequest.executeRequest(RestRequest.initPostRequest(datasetUri + "?mode=edit", json.toString()),
                 HttpStatus.OK);
     }
 }

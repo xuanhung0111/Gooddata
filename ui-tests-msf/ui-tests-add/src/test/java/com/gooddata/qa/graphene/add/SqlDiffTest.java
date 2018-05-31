@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.add;
 
 import static org.testng.Assert.assertEquals;
 import static java.lang.String.format;
-import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 
 import java.io.IOException;
 
@@ -69,7 +68,9 @@ public class SqlDiffTest extends AbstractDataloadProcessTest {
 
     private String getSqlDiffFromOutputStage() throws JSONException, IOException {
         final String uri = format("/gdc/dataload/projects/%s/outputStage/sqlDiff", testParams.getProjectId());
-        final String pollingUri = getJsonObject(getRestApiClient(), uri, HttpStatus.ACCEPTED)
+        final CommonRestRequest restRequest = new CommonRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        final String pollingUri = restRequest.getJsonObject(uri, HttpStatus.ACCEPTED)
                 .getJSONObject("asyncTask")
                 .getJSONObject("link")
                 .getString("poll");

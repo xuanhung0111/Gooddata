@@ -12,7 +12,6 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
 import com.gooddata.qa.utils.asserts.AssertUtils;
-import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import com.gooddata.qa.utils.http.variable.VariableRestRequest;
