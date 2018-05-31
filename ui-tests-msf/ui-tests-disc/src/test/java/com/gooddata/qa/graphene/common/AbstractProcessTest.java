@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.common;
 
 import static java.util.Objects.nonNull;
+
+import com.gooddata.GoodData;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.qa.graphene.AbstractDataIntegrationTest;
@@ -8,18 +10,17 @@ import com.gooddata.qa.graphene.enums.disc.schedule.Executable;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.PackageFile;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
-import com.gooddata.qa.utils.http.RestClient;
 
 public class AbstractProcessTest extends AbstractDataIntegrationTest {
 
     protected DataloadProcess createProcess(String processName, PackageFile packageFile, ProcessType type) {
-        return createProcess(new RestClient(getProfile(Profile.ADMIN)), processName, packageFile, type);
+        return createProcess(getGoodDataClient(), processName, packageFile, type);
     }
 
-    protected DataloadProcess createProcess (RestClient restClient, String processName,
-                                             PackageFile packageFile, ProcessType type) {
+    protected DataloadProcess createProcess (GoodData goodDataClient, String processName,
+            PackageFile packageFile, ProcessType type) {
         log.info("Create process: " + processName);
-        return restClient.getProcessService().createProcess(getProject(),
+        return goodDataClient.getProcessService().createProcess(getProject(),
                 new DataloadProcess(processName, type.getValue()), packageFile.loadFile());
     }
 
@@ -28,12 +29,12 @@ public class AbstractProcessTest extends AbstractDataIntegrationTest {
     }
 
     protected Schedule createSchedule(DataloadProcess process, Executable executable, String crontimeExpression) {
-        return createSchedule(new RestClient(getProfile(Profile.ADMIN)), process, executable, crontimeExpression);
+        return createSchedule(getGoodDataClient(), process, executable, crontimeExpression);
     }
 
-    protected Schedule createSchedule(RestClient restClient, DataloadProcess process, Executable executable,
+    protected Schedule createSchedule(GoodData goodDataClient, DataloadProcess process, Executable executable,
             String crontimeExpression) {
-        return createScheduleWithTriggerType(restClient, process, null, executable, crontimeExpression);
+        return createScheduleWithTriggerType(goodDataClient, process, null, executable, crontimeExpression);
     }
 
     protected Schedule createSchedule(DataloadProcess process, Executable executable, Schedule triggeringSchedule) {
@@ -42,7 +43,7 @@ public class AbstractProcessTest extends AbstractDataIntegrationTest {
 
     protected Schedule createSchedule(DataloadProcess process, String name, Executable executable,
             Schedule triggeringSchedule) {
-        return createScheduleWithTriggerType(new RestClient(getProfile(Profile.ADMIN)), process, name, executable, triggeringSchedule);
+        return createScheduleWithTriggerType(getGoodDataClient(), process, name, executable, triggeringSchedule);
     }
 
     protected ScheduleDetail initScheduleDetail(Schedule schedule) {
@@ -55,7 +56,7 @@ public class AbstractProcessTest extends AbstractDataIntegrationTest {
         }
     }
 
-    private Schedule createScheduleWithTriggerType(RestClient restClient, DataloadProcess process, String name,
+    private Schedule createScheduleWithTriggerType(GoodData goodDataClient, DataloadProcess process, String name,
             Executable executable, Object triggerType) {
         String expectedExecutable = process.getExecutables()
                 .stream().filter(e -> e.contains(executable.getPath())).findFirst().get();
@@ -70,6 +71,6 @@ public class AbstractProcessTest extends AbstractDataIntegrationTest {
 
         if (nonNull(name)) schedule.setName(name);
 
-        return restClient.getProcessService().createSchedule(getProject(), schedule);
+        return goodDataClient.getProcessService().createSchedule(getProject(), schedule);
     }
 }

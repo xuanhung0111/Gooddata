@@ -15,11 +15,12 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import static com.gooddata.qa.utils.http.RestRequest.*;
+import static com.gooddata.qa.utils.http.RestUtils.CREATE_AND_GET_OBJ_LINK;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.joining;
 
 public class DashboardRestRequest extends CommonRestRequest {
-    private static final String CREATE_AND_GET_OBJ_LINK = "/gdc/md/%s/obj?createAndGet=true";
+
     private static final String OBJ_LINK = "/gdc/md/%s/obj/";
     private static final String PROJECT_DASHBOARDS_URI = "/gdc/md/%s/query/projectdashboards";
     private static final String DASHBOARD_EDIT_MODE_LINK = "/gdc/md/%s/obj/%s?mode=edit";

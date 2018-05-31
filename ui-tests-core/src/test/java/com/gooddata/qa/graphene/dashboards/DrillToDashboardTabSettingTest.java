@@ -9,8 +9,6 @@ import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
-import com.gooddata.qa.utils.http.CommonRestRequest;
-import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.apache.commons.lang3.tuple.Pair;
@@ -22,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.*;
+import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.*;
@@ -67,8 +66,7 @@ public class DrillToDashboardTabSettingTest extends GoodSalesAbstractTest {
             assertEquals(drillingConfigPanel.getTooltipFromHelpIcon(DrillingGroup.DASHBOARDS.getName()), toolTipIconHelp);
             assertEquals(drillingConfigPanel.getRightItemGroups(DrillingGroup.DASHBOARDS.getName()), tabs);
         } finally {
-            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                    .deleteObjectsUsingCascade(dashUri);
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashUri);
         }
     }
 
@@ -85,8 +83,7 @@ public class DrillToDashboardTabSettingTest extends GoodSalesAbstractTest {
             widgetConfigPanel.discardConfiguration();
             assertFalse(report.isDrillable("CompuSci", CellType.ATTRIBUTE_VALUE),"Action discard configuration not work");
         } finally {
-            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                    .deleteObjectsUsingCascade(dashUri);
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashUri);
         }
     }
 
@@ -120,8 +117,7 @@ public class DrillToDashboardTabSettingTest extends GoodSalesAbstractTest {
             report.waitForLoaded();
             assertTrue(dashboardsPage.getTabs().getTab(THIRD_TAB).isSelected(),THIRD_TAB + " is not selected after drilling");
         } finally {
-            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                    .deleteObjectsUsingCascade(dashUri);
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashUri);
         }
     }
 
@@ -152,8 +148,7 @@ public class DrillToDashboardTabSettingTest extends GoodSalesAbstractTest {
             drillingConfigPanel.addDrilling(Pair.of(singletonList(ATTR_PRODUCT), SECOND_TAB), DrillingGroup.DASHBOARDS.getName());
             assertEquals(drillingConfigPanel.getSettingsOnLastItemPanel(), Pair.of(ATTR_PRODUCT, SECOND_TAB));
         } finally {
-            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                    .deleteObjectsUsingCascade(dashUri);
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashUri);
         }
     }
 

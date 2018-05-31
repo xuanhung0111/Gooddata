@@ -3,8 +3,6 @@ package com.gooddata.qa.graphene.manage;
 import com.gooddata.md.Attribute;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.models.GraphModel;
-import com.gooddata.qa.utils.http.CommonRestRequest;
-import com.gooddata.qa.utils.http.RestClient;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
@@ -18,6 +16,7 @@ import java.net.URL;
 import java.util.function.Function;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.IMAGES;
+import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
 import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
@@ -68,9 +67,7 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
     }
 
     private File getLDMImageFromGrayPage() throws IOException, ParseException, JSONException {
-        final CommonRestRequest restRequest = new CommonRestRequest(
-                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
-        final URL url = new URL(restRequest.getJsonObject(format(MODEL_URI, testParams.getProjectId()))
+        final URL url = new URL(getJsonObject(getRestApiClient(), format(MODEL_URI, testParams.getProjectId()))
             .getString("uri"));
         final File image = new File(testParams.loadProperty("user.home"), MODEL_IMAGE_FILE);
         FileUtils.copyURLToFile(url, image);

@@ -4,7 +4,6 @@ import static com.gooddata.md.Restriction.title;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.AbstractTest.Profile.DOMAIN;
-import static com.gooddata.qa.graphene.AbstractTest.Profile.EDITOR;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -25,6 +24,7 @@ import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
+import com.gooddata.GoodData;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
@@ -51,6 +51,7 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
 
     private PersonalInfo userInfo;
     private List<String> allVariables;
+    private GoodData editorGoodData;
     private Report adminReport;
     private Report editorReport;
     private Metric avgAmountMetric;
@@ -69,16 +70,16 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
     @Override
     protected void customizeProject() throws Throwable {
         Attribute stageNameAttribute = getMdService().getObj(getProject(), Attribute.class, title(ATTR_STAGE_NAME));
-        avgAmountMetric = createMetric(new RestClient(getProfile(EDITOR)), "Average of Amount",
+        avgAmountMetric = createMetric(getEditorGoodData(), "Average of Amount",
                 format("SELECT AVG([%s])", getMdService().getObjUri(getProject(), Fact.class, title(FACT_AMOUNT))),
                 DEFAULT_METRIC_FORMAT);
-        adminReport = createReportViaRest(new RestClient(getProfile(ADMIN)), GridReportDefinitionContent.create(
+        adminReport = createReportViaRest(getGoodDataClient(), GridReportDefinitionContent.create(
                 "Report" + generateHashString(),
                 singletonList(METRIC_GROUP),
                 singletonList(new AttributeInGrid(stageNameAttribute.getDefaultDisplayForm()
                         .getUri(), stageNameAttribute.getTitle())),
                 singletonList(new MetricElement(avgAmountMetric))));
-        editorReport = createReportViaRest(new RestClient(getProfile(EDITOR)), GridReportDefinitionContent.create(
+        editorReport = createReportViaRest(getEditorGoodData(), GridReportDefinitionContent.create(
                 "Report" + generateHashString(),
                 singletonList(METRIC_GROUP),
                 singletonList(new AttributeInGrid(stageNameAttribute.getDefaultDisplayForm()
@@ -200,5 +201,11 @@ public class UserProfileInformationTest extends GoodSalesAbstractTest {
             userRestRequest.updateUserStatusInProject(testParams.getEditorUser(), UserStatus.ENABLED);
             deleteProject(getProfile(DOMAIN), sameProject);
         }
+    }
+    private GoodData getEditorGoodData() {
+        if (editorGoodData == null) {
+            editorGoodData = getGoodDataClient(testParams.getEditorUser(), testParams.getPassword());
+        }
+        return editorGoodData;
     }
 }

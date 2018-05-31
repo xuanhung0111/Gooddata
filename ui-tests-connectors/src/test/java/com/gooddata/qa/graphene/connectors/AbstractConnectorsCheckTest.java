@@ -4,14 +4,18 @@ import com.gooddata.qa.graphene.TemplateAbstractTest;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.enums.Connectors;
 import com.gooddata.qa.graphene.fragments.greypages.connectors.ConnectorFragment;
+import com.gooddata.qa.utils.http.RestUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
+import org.springframework.http.HttpStatus;
 import org.testng.ITestContext;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
@@ -283,5 +287,13 @@ public abstract class AbstractConnectorsCheckTest extends TemplateAbstractTest {
         assertThat("Integration resource JSON contains correct processes link",
                 links.getString("processes"),
                 is("/" + getProcessesUri()));
+    }
+
+    protected void runConnectorProjectFullLoad() throws JSONException, IOException {
+        final JSONObject json = RestUtils.getJsonObject(getRestApiClient(),
+                getRestApiClient().newPostMethod("/" + getProcessesUri(), PROCESS_FULL_LOAD_JSON),
+                HttpStatus.CREATED);
+        browser.get(getBasicRootUrl() + json.getString("uri"));
+        waitForIntegrationProcessSynchronized(browser, integrationProcessCheckLimit);
     }
 }

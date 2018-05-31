@@ -49,6 +49,11 @@ public class ProjectSwitchTest extends AbstractDashboardTest {
     @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
     public void getMoreProject() {
         currentProjectId = testParams.getProjectId();
+
+//        newProjectId = ProjectRestUtils.createProject(getGoodDataClient(), NEW_PROJECT_NAME,
+//                null, testParams.getAuthorizationToken(), testParams.getProjectDriver(),
+//                testParams.getProjectEnvironment());
+
         newProjectId = createProjectUsingFixture(NEW_PROJECT_NAME, GOODSALES);
     }
 

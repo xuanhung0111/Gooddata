@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.reports;
 
+import com.gooddata.GoodData;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.Fact;
 import com.gooddata.md.MetadataService;
@@ -17,8 +18,7 @@ import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.reports.report.AttributeSndPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.MetricSndPanel;
-import com.gooddata.qa.utils.http.CommonRestRequest;
-import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -172,13 +172,13 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void initRestClient() {
-        RestClient restClient = new RestClient(getProfile(Profile.ADMIN));
-        project = restClient.getProjectService().getProjectById(testParams.getProjectId());
-        mdService = restClient.getMetadataService();
+    public void initGoodDataClient() {
+        GoodData goodDataClient = getGoodDataClient();
+        project = goodDataClient.getProjectService().getProjectById(testParams.getProjectId());
+        mdService = goodDataClient.getMetadataService();
     }
 
-    @Test(dependsOnMethods = {"initRestClient"})
+    @Test(dependsOnMethods = {"initGoodDataClient"})
     public void createReportNotComputable() throws ParseException, JSONException, IOException {
         String metricName = "test-metric";
         String reportName = "Test Report";
@@ -238,10 +238,8 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
             assertThat(getErrorMessage(), startsWith(METRIC_LIMIT_MESSAGE));
 
         } finally {
-            final CommonRestRequest restRequest = new CommonRestRequest(
-                    new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
             for (Metric metric : metrics) {
-                restRequest.deleteObjectsUsingCascade(metric.getUri());
+                RestUtils.deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), metric.getUri());
             }
         }
     }

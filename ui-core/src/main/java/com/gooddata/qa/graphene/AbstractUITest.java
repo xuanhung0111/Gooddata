@@ -398,6 +398,11 @@ public class AbstractUITest extends AbstractGreyPageTest {
         return ProjectsPage.getInstance(browser);
     }
 
+    public void initEmptyDashboardsPage() {
+        openUrl(getDashboardsPageUri());
+        waitForElementVisible(By.id("p-projectDashboardPage"), browser);
+    }
+
     public DashboardsPage initDashboardsPage() {
         openUrl(getDashboardsPageUri());
         return waitForDashboardPage();

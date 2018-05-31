@@ -26,6 +26,7 @@ import com.gooddata.md.AttributeElement;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
+import com.gooddata.qa.utils.http.RestApiClient;
 
 public class GoodSalesMufOnUserProfileTest extends GoodSalesAbstractTest {
 

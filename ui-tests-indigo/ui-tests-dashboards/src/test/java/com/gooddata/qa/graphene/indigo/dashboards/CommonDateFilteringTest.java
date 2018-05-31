@@ -6,6 +6,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_ACTIVIT
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -15,7 +16,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 
-import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.json.JSONException;
@@ -71,8 +71,7 @@ public class CommonDateFilteringTest extends AbstractDashboardTest {
             assertEquals(indigoDashboardsPage.getLastWidget(Insight.class).getChartReport().getDataLabels(),
                     expectedValues);
         } finally {
-            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                    .deleteObjectsUsingCascade(insightUri);
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), insightUri);
         }
     }
 
@@ -107,8 +106,8 @@ public class CommonDateFilteringTest extends AbstractDashboardTest {
             assertEquals(indigoDashboardsPage.getLastWidget(Insight.class).getChartReport().getDataLabels(),
                     singletonList("154,271"), "Common date filter does not override insight's filter");
         } finally {
-            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                    .deleteObjectsUsingCascade(indigoRestRequest.getInsightUri(INSIGHT_USING_DATE_FILTER));
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(),
+                    indigoRestRequest.getInsightUri(INSIGHT_USING_DATE_FILTER));
         }
     }
 
@@ -126,8 +125,8 @@ public class CommonDateFilteringTest extends AbstractDashboardTest {
             assertEquals(indigoDashboardsPage.getLastWidget(Insight.class).getChartReport().getDataLabels(),
                     singletonList("23,673"), "Combination of common & insight date filer is not correct");
         } finally {
-            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                    .deleteObjectsUsingCascade(indigoRestRequest.getInsightUri(INSIGHT_USING_DATE_FILTER));
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(),
+                    indigoRestRequest.getInsightUri(INSIGHT_USING_DATE_FILTER));
         }
     }
 
@@ -156,8 +155,8 @@ public class CommonDateFilteringTest extends AbstractDashboardTest {
             assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedDataSet(), DATE_DATASET_ACTIVITY,
                     "Date dataset is changed");
         } finally {
-            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                    .deleteObjectsUsingCascade(indigoRestRequest.getInsightUri(INSIGHT_USING_DATE_FILTER));
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(),
+                    indigoRestRequest.getInsightUri(INSIGHT_USING_DATE_FILTER));
         }
     }
 
@@ -187,8 +186,8 @@ public class CommonDateFilteringTest extends AbstractDashboardTest {
             assertEquals(initIndigoDashboardsPageWithWidgets().switchToEditMode().getDateFilterSelection(),
                     THIS_MONTH, "Common date filter is changed");
         } finally {
-            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                    .deleteObjectsUsingCascade(indigoRestRequest.getInsightUri(INSIGHT_USING_DATE_FILTER));
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(),
+                    indigoRestRequest.getInsightUri(INSIGHT_USING_DATE_FILTER));
         }
     }
 
@@ -221,8 +220,8 @@ public class CommonDateFilteringTest extends AbstractDashboardTest {
                     "Date dataset on dashboard is affected by changing date filter on AD");
 
         } finally {
-            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                    .deleteObjectsUsingCascade(indigoRestRequest.getInsightUri(INSIGHT_USING_DATE_FILTER));
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(),
+                    indigoRestRequest.getInsightUri(INSIGHT_USING_DATE_FILTER));
         }
     }
 

@@ -18,8 +18,6 @@ import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.CommonRestRequest;
-import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.apache.commons.collections.CollectionUtils;
@@ -44,6 +42,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOP_5_WON_BY_
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
+import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertTrue;
 
@@ -163,8 +162,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
                     "The message in report is not properly.");
             assertTrue(getDashboardTableReport(REPORT_TOP_5_LOST_BY_CASH).hasNoData());
         } finally {
-            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                    .deleteObjectsUsingCascade(workingDashboard);
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), workingDashboard);
         }
     }
 
@@ -205,8 +203,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
                 logoutAndLoginAs(true, UserRoles.ADMIN);
             }
         } finally {
-            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                    .deleteObjectsUsingCascade(workingDashboard);
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), workingDashboard);
         }
     }
 

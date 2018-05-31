@@ -12,8 +12,6 @@ import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.CommonRestRequest;
-import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.apache.commons.lang3.tuple.Pair;
@@ -24,6 +22,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
+import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.*;
 
@@ -77,8 +76,7 @@ public class DrillToUpdatedDashboardTabTest extends GoodSalesAbstractTest {
             assertEquals(statusBar.getMessage(), "The target dashboard tab has been deleted.");
             statusBar.dismiss();
         } finally {
-            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                    .deleteObjectsUsingCascade(dashUri);
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashUri);
         }
     }
 
@@ -119,8 +117,7 @@ public class DrillToUpdatedDashboardTabTest extends GoodSalesAbstractTest {
             assertTrue(dashboardsPage.getTabs().getTab(RENAME_TAB).isSelected(),
                     RENAME_TAB + " is not selected after drill action");
         } finally {
-            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                    .deleteObjectsUsingCascade(dashUri);
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashUri);
         }
     }
 
@@ -144,8 +141,7 @@ public class DrillToUpdatedDashboardTabTest extends GoodSalesAbstractTest {
             assertTrue(dashboardsPage.getTabs().getTab(FOURTH_TAB).isSelected(),
                     FOURTH_TAB + " is not select after drilling action");
         } finally {
-            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                    .deleteObjectsUsingCascade(dashUri);
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashUri);
         }
     }
 

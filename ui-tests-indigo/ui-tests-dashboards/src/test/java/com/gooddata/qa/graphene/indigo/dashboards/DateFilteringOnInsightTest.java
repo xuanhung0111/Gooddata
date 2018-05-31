@@ -6,6 +6,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACT
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_LOST_OPPS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_OPP_FIRST_SNAPSHOT ;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -14,7 +15,6 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 
 import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.apache.http.ParseException;
@@ -180,8 +180,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
             assertFalse(indigoDashboardsPage.getConfigurationPanel().isDateDataSetDropdownVisible(),
                     "Date filter is not disabled");
         } finally {
-            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                    .deleteObjectsUsingCascade(insightUri);
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), insightUri);
         }
     }
 
@@ -203,8 +202,7 @@ public class DateFilteringOnInsightTest extends AbstractDashboardTest {
             assertTrue(indigoDashboardsPage.getConfigurationPanel().isDateDataSetDropdownVisible(),
                     "Date filter is not enabled");
         } finally {
-            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                    .deleteObjectsUsingCascade(insightUri);
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), insightUri);
         }
     }
 

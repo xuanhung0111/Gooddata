@@ -15,7 +15,6 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import com.gooddata.qa.utils.http.RestClient;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.DataProvider;
@@ -324,6 +323,6 @@ public class ProjectsPageTest extends AbstractProcessTest {
     }
 
     private int getTotalProjectNumber() {
-        return new RestClient(getProfile(Profile.ADMIN)).getProjectService().getProjects().size();
+        return getGoodDataClient().getProjectService().getProjects().size();
     }
 }

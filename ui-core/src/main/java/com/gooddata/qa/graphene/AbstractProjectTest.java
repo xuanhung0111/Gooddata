@@ -10,6 +10,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.gooddata.GoodData;
 import com.gooddata.fixture.ResourceManagement.ResourceTemplate;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.AttributeElement;
@@ -22,11 +23,12 @@ import com.gooddata.qa.fixture.FixtureException;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterType;
 import com.gooddata.qa.mdObjects.dashboard.filter.FloatingFilterConstraint;
+import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
-import com.gooddata.qa.utils.http.CommonRestRequest;
+import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestClient.RestProfile;
-import com.gooddata.qa.utils.http.RestRequest;
+import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.rolap.RolapRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
@@ -48,7 +50,9 @@ import com.gooddata.project.Project;
 import com.gooddata.qa.fixture.Fixture;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.utils.http.RestApiClient;
 
+import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static java.util.stream.Collectors.toList;
 import static org.testng.Assert.assertFalse;
 
@@ -151,6 +155,10 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         addUserToProject(dynamicUser, UserRoles.ADMIN);
 
         testParams.setUser(dynamicUser);
+
+        // update REST clients to the correct user because they can be generated and cached
+        restApiClient = getRestApiClient(testParams.getUser(), testParams.getPassword());
+        goodDataClient = getGoodDataClient(testParams.getUser(), testParams.getPassword());
 
         logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
     }
@@ -269,11 +277,11 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     }
 
     protected MetadataService getMdService() {
-        return new RestClient(getProfile(ADMIN)).getMetadataService();
+        return getGoodDataClient().getMetadataService();
     }
 
     protected Project getProject() {
-        return new RestClient(getProfile(ADMIN)).getProjectService().getProjectById(testParams.getProjectId());
+        return getGoodDataClient().getProjectService().getProjectById(testParams.getProjectId());
     }
 
     /**
@@ -298,10 +306,10 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         if (Objects.isNull(appliedFixture)) {
             throw new FixtureException("Fixture can't be null");
         }
-        final RestClient restClient = new RestClient(
-                new RestProfile(testParams.getHost(), user, testParams.getPassword(), true));
+
         return new Fixture(appliedFixture)
-                .setRestClient(restClient)
+                .setGoodDataClient(getGoodDataClient(user, testParams.getPassword()))
+                .setRestApiClient(getRestApiClient(user, testParams.getPassword()))
                 .deploy(title, testParams.getAuthorizationToken(),
                         testParams.getProjectDriver(), testParams.getProjectEnvironment());
     }
@@ -319,24 +327,24 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     }
 
     protected Report createReportViaRest(ReportDefinition defination) {
-        return createReportViaRest(new RestClient(getProfile(ADMIN)), defination);
+        return createReportViaRest(getGoodDataClient(), defination);
     }
 
-    protected Report createReportViaRest(RestClient restClient, ReportDefinition definition) {
-        MetadataService metadataService = restClient.getMetadataService();
+    protected Report createReportViaRest(GoodData gooddata, ReportDefinition definition) {
+        MetadataService metadataService = gooddata.getMetadataService();
         definition = metadataService.createObj(getProject(), definition);
         return metadataService.createObj(getProject(), new Report(definition.getTitle(), definition));
     }
 
     public void setupMaql(String maql) {
-        new RestClient(getProfile(ADMIN))
+        getGoodDataClient()
                 .getModelService()
                 .updateProjectModel(getProject(), maql)
                 .get();
     }
 
     public void setupDataViaRest(String datasetId, InputStream dataset) {
-        new RestClient(getProfile(ADMIN))
+        getGoodDataClient()
                 .getDatasetService()
                 .loadDataset(getProject(), datasetId, dataset)
                 .get();
@@ -344,7 +352,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     public void setupData(String csvPath, String uploadInfoPath) {
         try {
-            String webdavServerUrl = getWebDavServerUrl(getRootUrl());
+            String webdavServerUrl = getWebDavServerUrl(getRestApiClient(), getRootUrl());
 
             String webdavUrl = webdavServerUrl + "/" + UUID.randomUUID().toString();
 
@@ -400,6 +408,10 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         return getMdService().getObj(getProject(), Metric.class, title(title));
     }
 
+    protected Metric getMetricByIdentifier(String id) {
+        return getMdService().getObj(getProject(), Metric.class, identifier(id));
+    }
+
     protected Fact getFactByTitle(String title) {
         return getMdService().getObj(getProject(), Fact.class, title(title));
     }
@@ -418,9 +430,8 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     protected List<String> getObjIdentifiers(List<String> uris) {
         try {
-            JSONArray array = new CommonRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
-                    .getJsonObject(
-                    RestRequest.initPostRequest(
+            JSONArray array = RestUtils.getJsonObject(getRestApiClient(),
+                    getRestApiClient().newPostMethod(
                             String.format("/gdc/md/%s/identifiers", testParams.getProjectId()),
                             new JSONObject().put("uriToIdentifier", uris).toString()))
                     .getJSONArray("identifiers");
@@ -493,6 +504,17 @@ public abstract class AbstractProjectTest extends AbstractUITest {
             }
         }).build();
     }
+
+    protected FilterItem createFilterItem(FilterItemContent item) {
+        return Builder.of(FilterItem::new).with(filterItem -> filterItem.setContentId(item.getId())).build();
+    }
+
+    protected FilterItem createFilterItem(FilterItemContent item, TabItem.ItemPosition itemPosition) {
+        return Builder.of(FilterItem::new).with(filterItem -> {
+            filterItem.setContentId(item.getId());
+            filterItem.setPosition(itemPosition);
+        }).build();
+    }
     //------------------------- DASHBOARD MD OBJECTS - END ------------------------
 
     //------------------------- REPORT, METRIC MD OBJECTS - BEGIN ------------------------
@@ -507,18 +529,18 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     }
 
     protected Metric createMetric(String name, String expression, String format) {
-        return createMetric(new RestClient(getProfile(ADMIN)), name, expression, format);
+        return createMetric(getGoodDataClient(), name, expression, format);
     }
 
-    protected Metric createMetric(RestClient restClient, String name, String expression, String format) {
-        return restClient.getMetadataService().createObj(getProject(), new Metric(name, expression, format));
+    protected Metric createMetric(GoodData gooddata, String name, String expression, String format) {
+        return gooddata.getMetadataService().createObj(getProject(), new Metric(name, expression, format));
     }
 
-    protected Metric createMetricIfNotExist(RestClient restClient, String name, String expression, String format) {
+    protected Metric createMetricIfNotExist(GoodData gooddata, String name, String expression, String format) {
         try {
             return getMetricByTitle(name);
         } catch (ObjNotFoundException e) {
-            return restClient.getMetadataService().createObj(getProject(), new Metric(name, expression, format));
+            return gooddata.getMetadataService().createObj(getProject(), new Metric(name, expression, format));
         }
     }
 
@@ -551,10 +573,9 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     //------------------------- REPORT, METRIC MD OBJECTS - END ------------------------
 
-    private String getWebDavServerUrl(final String serverRootUrl)
+    private String getWebDavServerUrl(final RestApiClient restApiClient, final String serverRootUrl)
             throws IOException, JSONException {
-        final JSONArray links = new CommonRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
-                .getJsonObject("/gdc", HttpStatus.OK)
+        final JSONArray links = getJsonObject(restApiClient, "/gdc", HttpStatus.OK)
                 .getJSONObject("about")
                 .getJSONArray("links");
 

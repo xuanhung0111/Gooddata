@@ -19,8 +19,7 @@ import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
 import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.CommonRestRequest;
-import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.jboss.arquillian.graphene.Graphene;
@@ -292,8 +291,7 @@ public class GoodSalesDashboardMacroTest extends GoodSalesAbstractTest {
     }
 
     private String getVariableIdentifier() throws IOException {
-        JSONObject json = new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                .getJsonObject(statusVariableUri);
+        JSONObject json = RestUtils.getJsonObject(getRestApiClient(), statusVariableUri);
         return json.getJSONObject("prompt").getJSONObject("meta").getString("identifier");
     }
 
