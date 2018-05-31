@@ -1,10 +1,11 @@
 package com.gooddata.qa.graphene;
 
+
+import com.gooddata.GoodData;
 import com.gooddata.project.Environment;
 import com.gooddata.project.Project;
 import com.gooddata.project.ProjectDriver;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.RestClient;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.HashMap;
@@ -51,7 +52,7 @@ public class TemplateAbstractTest extends AbstractProjectTest{
     protected void createNewProject() throws Throwable {
         if (!canAccessGreyPage(browser)) {
             System.out.println("Use REST api to create project.");
-            testParams.setProjectId(createProject(new RestClient(getProfile(Profile.ADMIN)), projectTitle, projectTemplate,
+            testParams.setProjectId(createProject(getGoodDataClient(), projectTitle, projectTemplate,
                     testParams.getAuthorizationToken(), ProjectDriver.POSTGRES, testParams.getProjectEnvironment()));
 
         } else {
@@ -75,7 +76,7 @@ public class TemplateAbstractTest extends AbstractProjectTest{
     /**
      * Create project with specific template
      *
-     * @param restClient
+     * @param goodData
      * @param title
      * @param template
      * @param authorizationToken
@@ -83,7 +84,7 @@ public class TemplateAbstractTest extends AbstractProjectTest{
      * @param environment
      * @return project id
      */
-    private String createProject(final RestClient restClient, final String title, final String template,
+    private String createProject(final GoodData goodData, final String title, final String template,
                                  final String authorizationToken, final ProjectDriver projectDriver,
                                  final Environment environment) {
         final Project project = new Project(title, authorizationToken);
@@ -91,6 +92,6 @@ public class TemplateAbstractTest extends AbstractProjectTest{
         project.setDriver(projectDriver);
         project.setEnvironment(environment);
 
-        return restClient.getProjectService().createProject(project).get().getId();
+        return goodData.getProjectService().createProject(project).get().getId();
     }
 }

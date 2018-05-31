@@ -17,8 +17,6 @@ import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem.*;
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.CommonRestRequest;
-import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.apache.commons.lang3.StringUtils;
@@ -42,6 +40,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoade
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.*;
+import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.*;
@@ -201,8 +200,7 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
                             .waitForLoaded().getAttributeValues().size(),
                     reportRowCountBeforeDrilling, "Target tab items are not back to original values");
         } finally {
-            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                    .deleteObjectsUsingCascade(dashboardUri);
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashboardUri);
         }
     }
 
@@ -227,8 +225,7 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
                     "Report aren't rendered correctly");
             assertTrue(dashboardsPage.isEditDashboardVisible(), "Current mode isn't edit");
         } finally {
-            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                    .deleteObjectsUsingCascade(dashboardUri);
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashboardUri);
         }
     }
 
@@ -263,8 +260,7 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
                     "Report aren't rendered correctly");
             assertTrue(dashboardsPage.isEditDashboardVisible(), "Current mode isn't edit");
         } finally {
-            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                    .deleteObjectsUsingCascade(dashboardUri);
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashboardUri);
         }
     }
 
@@ -301,8 +297,8 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
             assertTrue(dashboardsPage.getTabs().getTab(SOURCE_TAB).isSelected(), "Back to incorrect tab");
             assertTrue(dashboardsPage.isEditDashboardVisible(), "Current mode isn't edit mode");
         } finally {
-            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                    .deleteObjectsUsingCascade(dashboardUri, anotherDashboardUri);
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashboardUri);
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), anotherDashboardUri);
         }
     }
 
@@ -350,8 +346,8 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
             assertTrue(dashboardsPage.getTabs().getTab(SOURCE_TAB).isSelected(), "Back to incorrect tab");
             assertTrue(dashboardsPage.isEditDashboardVisible(), "Current mode isn't edit mode");
         } finally {
-            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                    .deleteObjectsUsingCascade(dashboardUri, anotherDashboardUri);
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashboardUri);
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), anotherDashboardUri);
         }
     }
 
@@ -382,8 +378,7 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
             assertEquals(dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded().getReportTiTle(),
                     REPORT_TOP_5_OPEN_BY_CASH, REPORT_TOP_5_OPEN_BY_CASH + " and " + SECOND_TAB + " are not displayed");
         } finally {
-            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                    .deleteObjectsUsingCascade(dashUri);
+            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashUri);
         }
     }
 

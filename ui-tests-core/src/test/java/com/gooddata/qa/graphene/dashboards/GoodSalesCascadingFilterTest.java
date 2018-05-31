@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.dashboards;
 
+import com.gooddata.GoodData;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
@@ -25,7 +26,6 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.Parent
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.utils.Sleeper;
-import com.gooddata.qa.utils.http.RestClient;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
@@ -79,9 +79,9 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
     public void createReports() {
-        RestClient restClient = new RestClient(getProfile(Profile.ADMIN));
-        Project project = restClient.getProjectService().getProjectById(testParams.getProjectId());
-        MetadataService mdService = restClient.getMetadataService();
+        GoodData goodDataClient = getGoodDataClient();
+        Project project = goodDataClient.getProjectService().getProjectById(testParams.getProjectId());
+        MetadataService mdService = goodDataClient.getMetadataService();
 
         Metric amountMetric = getMetricByTitle(METRIC_AMOUNT);
         Attribute account = getAttributeByTitle(ATTR_ACCOUNT);

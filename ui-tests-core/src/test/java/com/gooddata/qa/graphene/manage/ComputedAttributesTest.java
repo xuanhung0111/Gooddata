@@ -465,6 +465,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             logout();
 
             signIn(false, UserRoles.ADMIN);
+            restApiClient = getRestApiClient();
 
             String mufUri = createStageMuf(Arrays.asList("Won", "Lost"), "Status User Filters");
             UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(

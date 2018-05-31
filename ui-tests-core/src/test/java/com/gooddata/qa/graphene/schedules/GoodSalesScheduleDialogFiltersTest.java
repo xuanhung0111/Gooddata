@@ -17,9 +17,6 @@ import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
-import com.gooddata.qa.utils.http.CommonRestRequest;
-import com.gooddata.qa.utils.http.RestClient;
-import com.gooddata.qa.utils.http.RestRequest;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.scheduleEmail.ScheduleEmailRestRequest;
 import com.gooddata.qa.utils.java.Builder;
@@ -36,6 +33,7 @@ import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectExecutionContex
 import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectScheduledEmailFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.query.scheduledemails.QueryScheduledEmailsFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestUtils;
 
 import java.io.IOException;
 
@@ -203,12 +201,15 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
     private void deleteEmailScheduleAndExecutionContext() throws JSONException {
         int scheduleId = getScheduleId(customSubject);
         int executionContextId = getExecutionContextId(scheduleId);
+
+        restApiClient = getRestApiClient();
+
         deleteObject(scheduleId);
         deleteObject(executionContextId);
     }
 
     private void deleteObject(int objectId) {
-        new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId()).executeRequest(
-                RestRequest.initDeleteRequest(getRootUrl() + mdBaseUri + "/obj/" + Integer.toString(objectId)));
+        RestUtils.executeRequest(restApiClient,
+                restApiClient.newDeleteMethod(getRootUrl() + mdBaseUri + "/obj/" + Integer.toString(objectId)));
     }
 }
