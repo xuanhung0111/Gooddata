@@ -1,21 +1,18 @@
 package com.gooddata.qa.graphene.add.schedule;
 
 import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.utils.http.RestUtils.getResource;
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
 import com.gooddata.dataload.processes.Schedule;

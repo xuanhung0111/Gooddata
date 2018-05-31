@@ -33,6 +33,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.gooddata.qa.utils.http.CommonRestRequest;
+import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.variable.VariableRestRequest;
 import com.gooddata.qa.utils.http.rolap.RolapRestRequest;
@@ -62,7 +64,6 @@ import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.graphene.fragments.manage.VariablesPage;
 import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.utils.http.InvalidStatusCodeException;
-import com.gooddata.qa.utils.http.RestUtils;
 
 public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
 
@@ -480,20 +481,24 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     private String getIdentifierFromObjLink(String link, String type) throws IOException, JSONException {
-        JSONObject json = RestUtils.getJsonObject(getRestApiClient(), link);
+        final CommonRestRequest restRequest = new CommonRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        JSONObject json = restRequest.getJsonObject(link);
         return json.getJSONObject(type).getJSONObject("meta").getString("identifier");
     }
 
     private boolean isObjectDeleted(String object) throws IOException, JSONException {
+        final CommonRestRequest restRequest = new CommonRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         JSONObject json;
         try{
-            json = RestUtils.getJsonObject(getRestApiClient(), object);
+            json = restRequest.getJsonObject(object);
         } catch (InvalidStatusCodeException e) {
             return true;
         }
-        if (!json.has("error") 
-            || !object.endsWith("/obj/" + json.getJSONObject("error").getJSONArray("parameters").getString(0)) 
-            || !OBJECT_ID_NOT_FOUND.equals(json.getJSONObject("error").getString("message")))
+        if (!json.has("error")
+                || !object.endsWith("/obj/" + json.getJSONObject("error").getJSONArray("parameters").getString(0))
+                || !OBJECT_ID_NOT_FOUND.equals(json.getJSONObject("error").getString("message")))
             return false;
         return true;
     }
@@ -514,7 +519,9 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
 
     private String getErrorMessageFromPollingUri(String pollingUri)
             throws ParseException, JSONException, IOException {
-        return RestUtils.getJsonObject(getRestApiClient(), pollingUri)
+        final CommonRestRequest restRequest = new CommonRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        return restRequest.getJsonObject(pollingUri)
                 .getJSONObject("wTaskStatus")
                 .getJSONArray("messages")
                 .getJSONObject(0)

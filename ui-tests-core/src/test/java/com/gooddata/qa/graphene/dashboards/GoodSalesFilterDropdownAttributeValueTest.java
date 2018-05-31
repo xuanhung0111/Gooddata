@@ -18,7 +18,9 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.RestRequest;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import com.google.common.base.Function;
@@ -44,8 +46,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
-import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
-import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.format;
@@ -417,15 +417,19 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
     }
 
     private void editMetricExpression(String expression) throws IOException, JSONException {
-        JSONObject json = getJsonObject(getRestApiClient(), metricAvailable.getUri());
+        final CommonRestRequest restRequest = new CommonRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        JSONObject json = restRequest.getJsonObject(metricAvailable.getUri());
         json.getJSONObject("metric").getJSONObject("content").put("expression", expression);
-        executeRequest(getRestApiClient(),
-                getRestApiClient().newPostMethod(metricAvailable.getUri() + "?mode=edit", json.toString()),
+        restRequest.executeRequest(
+                RestRequest.initPostRequest(metricAvailable.getUri() + "?mode=edit", json.toString()),
                 HttpStatus.OK);
     }
 
     private boolean isUseAvailableStillRemainInDashboard(String dashboardUri) throws IOException, JSONException {
-        JSONObject json = getJsonObject(getRestApiClient(), dashboardUri);
+        final CommonRestRequest restRequest = new CommonRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        JSONObject json = restRequest.getJsonObject(dashboardUri);
         JSONArray filters = json.getJSONObject("projectDashboard").getJSONObject("content")
                 .getJSONArray("filters");
         JSONObject currentObj;

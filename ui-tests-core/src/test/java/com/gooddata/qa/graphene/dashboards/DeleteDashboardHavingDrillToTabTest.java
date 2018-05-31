@@ -13,6 +13,8 @@ import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.CommonRestRequest;
+import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.apache.commons.lang3.tuple.Pair;
@@ -25,7 +27,6 @@ import java.util.List;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_SALES_REP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_AMOUNT_BY_PRODUCT;
-import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -67,7 +68,8 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
             assertFalse(dashboardsPage.getDashboardName().equals(DASHBOARD_HAS_DRILL_SETTINGS),
                     "The dashboard has not been deleted");
         } finally {
-            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashUri);
+            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                    .deleteObjectsUsingCascade(dashUri);
         }
     }
 
@@ -89,7 +91,8 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
             assertFalse(dashboardsPage.getTabs().getAllTabNames().stream().anyMatch(TARGET_TAB::equals),
                     "The dashboard tab has not been deleted");
         } finally {
-            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashUri);
+            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                    .deleteObjectsUsingCascade(dashUri);
         }
     }
 
@@ -119,7 +122,8 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
 
             assertEquals(StatusBar.getInstance(browser).getMessage(), ERROR_MSG);
         } finally {
-            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashUri);
+            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                    .deleteObjectsUsingCascade(dashUri);
         }
     }
 
@@ -147,7 +151,8 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
             assertEquals(drillingSettings.getRight(), SHOW_ME_DEFAULT_VALUE);
             assertEquals(drillingSettings.getLeft(), ATTR_PRODUCT);
         } finally {
-            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashUri);
+            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                    .deleteObjectsUsingCascade(dashUri);
         }
     }
 
@@ -208,7 +213,8 @@ public class DeleteDashboardHavingDrillToTabTest extends GoodSalesAbstractTest {
             assertEquals(drillingSettings.getRight().toLowerCase(), REPORT_AMOUNT_BY_PRODUCT.toLowerCase());
 
         } finally {
-            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashUri);
+            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                    .deleteObjectsUsingCascade(dashUri);
         }
     }
 
