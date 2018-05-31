@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import com.gooddata.GoodData;
 import com.gooddata.md.Metric;
 import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
@@ -21,6 +20,7 @@ import com.gooddata.qa.graphene.fragments.manage.VariableDetailPage;
 import com.gooddata.qa.graphene.fragments.reports.report.AbstractReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.CssUtils;
+import com.gooddata.qa.utils.http.RestClient;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -304,12 +304,12 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
                 .setDefaultNumericValue(2011)
                 .saveChange();
 
-        GoodData goodDataClient = getGoodDataClient();
-        Project project = goodDataClient.getProjectService().getProjectById(testParams.getProjectId());
+        RestClient restClient = new RestClient(getProfile(Profile.ADMIN));
+        Project project = restClient.getProjectService().getProjectById(testParams.getProjectId());
         String metric = "GREATER-NVariable";
         String expression = "SELECT [" + getMetricByTitle(METRIC_AMOUNT).getUri() + "]" +
                 " WHERE [" + getAttributeByTitle(ATTR_YEAR_SNAPSHOT).getUri() + "] > [" + nVariableUri + "]";
-        goodDataClient.getMetadataService().createObj(project, new Metric(metric,
+        restClient.getMetadataService().createObj(project, new Metric(metric,
                 expression.replace("${pid}", testParams.getProjectId()), "#,##0"));
 
         initReportsPage();

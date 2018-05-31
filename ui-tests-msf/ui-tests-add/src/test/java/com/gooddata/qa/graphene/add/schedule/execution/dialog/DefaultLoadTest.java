@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.add.schedule.execution.dialog;
 
 import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.utils.http.RestUtils.getResource;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -16,6 +15,8 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+import com.gooddata.qa.utils.http.CommonRestRequest;
+import com.gooddata.qa.utils.http.RestClient;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.springframework.http.HttpStatus;
@@ -131,7 +132,9 @@ public class DefaultLoadTest extends AbstractDataloadProcessTest {
             assertEquals(dropdown.getLSLTSOf(DATASET_OPPORTUNITY), opportunityLSLTS);
             assertEquals(dropdown.getLSLTSOf(DATASET_PERSON), personLSLTS);
 
-            String executionLog = getResource(getRestApiClient(), scheduleDetail.getLastExecutionLogUri(), HttpStatus.OK);
+            String executionLog = new CommonRestRequest(
+                    new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                    .getResource(scheduleDetail.getLastExecutionLogUri(), HttpStatus.OK);
             assertThat(executionLog, containsString(format(FULL_LOAD, DATASET_OPPORTUNITY)));
             assertThat(executionLog, containsString(format(FULL_LOAD, DATASET_PERSON)));
 
@@ -156,7 +159,9 @@ public class DefaultLoadTest extends AbstractDataloadProcessTest {
             DataloadScheduleDetail scheduleDetail = initScheduleDetail(schedule);
             assertEquals(scheduleDetail.getDatasetDropdown().expand().getLSLTSOf(DATASET_PERSON), personLSLTS);
 
-            String executionLog = getResource(getRestApiClient(), scheduleDetail.getLastExecutionLogUri(), HttpStatus.OK);
+            String executionLog = new CommonRestRequest(
+                    new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                    .getResource(scheduleDetail.getLastExecutionLogUri(), HttpStatus.OK);
             assertThat(executionLog, containsString(format(INCREMENTAL_LOAD, DATASET_PERSON)));
 
         } finally {
@@ -182,7 +187,9 @@ public class DefaultLoadTest extends AbstractDataloadProcessTest {
             Attribute personAttr = getMdService().getObj(getProject(), Attribute.class, title(ATTR_PERSON));
             assertThat(getAttributeValues(personAttr), not(hasItem("P3")));
 
-            String executionLog = getResource(getRestApiClient(), scheduleDetail.getLastExecutionLogUri(), HttpStatus.OK);
+            String executionLog = new CommonRestRequest(
+                    new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                    .getResource(scheduleDetail.getLastExecutionLogUri(), HttpStatus.OK);
             assertThat(executionLog, containsString(format(LOAD_NOTHING, DATASET_PERSON)));
 
         } finally {
@@ -211,7 +218,9 @@ public class DefaultLoadTest extends AbstractDataloadProcessTest {
             assertEquals(dropdown.getLSLTSOf(DATASET_OPPORTUNITY), opportunityLSLTS);
             assertEquals(dropdown.getLSLTSOf(DATASET_PERSON), personLSLTS);
 
-            String executionLog = getResource(getRestApiClient(), scheduleDetail.getLastExecutionLogUri(), HttpStatus.OK);
+            String executionLog = new CommonRestRequest(
+                    new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                    .getResource(scheduleDetail.getLastExecutionLogUri(), HttpStatus.OK);
             assertThat(executionLog, containsString(format(INCREMENTAL_LOAD, DATASET_PERSON)));
             assertThat(executionLog, containsString(format(LOAD_NOTHING, DATASET_OPPORTUNITY)));
 
@@ -240,7 +249,9 @@ public class DefaultLoadTest extends AbstractDataloadProcessTest {
             Attribute personAttr = getMdService().getObj(getProject(), Attribute.class, title(ATTR_PERSON));
             assertThat(getAttributeValues(personAttr), hasItem("P5"));
 
-            String executionLog = getResource(getRestApiClient(), scheduleDetail.getLastExecutionLogUri(), HttpStatus.OK);
+            String executionLog = new CommonRestRequest(
+                    new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                    .getResource(scheduleDetail.getLastExecutionLogUri(), HttpStatus.OK);
             assertThat(executionLog, containsString(format(FULL_LOAD, DATASET_PERSON)));
 
         } finally {
@@ -268,7 +279,9 @@ public class DefaultLoadTest extends AbstractDataloadProcessTest {
             DatasetDropdown dropdown = scheduleDetail.getDatasetDropdown().expand();
             assertEquals(dropdown.getLSLTSOf(DATASET_PERSON), personLSLTS);
 
-            String executionLog = getResource(getRestApiClient(), scheduleDetail.getLastExecutionLogUri(), HttpStatus.OK);
+            String executionLog = new CommonRestRequest(
+                    new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                    .getResource(scheduleDetail.getLastExecutionLogUri(), HttpStatus.OK);
             assertThat(executionLog, containsString(format(INCREMENTAL_LOAD, DATASET_PERSON)));
 
         } finally {

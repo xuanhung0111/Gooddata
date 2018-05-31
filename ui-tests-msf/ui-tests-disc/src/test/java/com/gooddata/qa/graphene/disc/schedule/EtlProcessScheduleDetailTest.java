@@ -5,6 +5,8 @@ import com.gooddata.qa.graphene.enums.disc.schedule.ScheduleStatus;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
 import com.gooddata.qa.graphene.fragments.disc.schedule.CreateScheduleForm;
 import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
+import com.gooddata.qa.utils.http.CommonRestRequest;
+import com.gooddata.qa.utils.http.RestClient;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
@@ -14,7 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.RestUtils.getResource;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
@@ -60,7 +61,9 @@ public class EtlProcessScheduleDetailTest extends AbstractEtlProcessTest {
                     ScheduleStatus.OK.toString());
 
             // Check execution log
-            assertNotNull(getResource(getRestApiClient(), scheduleDetail.getLastExecutionLogUri(), HttpStatus.OK));
+            final CommonRestRequest restRequest = new CommonRestRequest(
+                    new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+            assertNotNull(restRequest.getResource(scheduleDetail.getLastExecutionLogUri(), HttpStatus.OK));
         } catch (IOException e) {
             // Ignore
         } finally {

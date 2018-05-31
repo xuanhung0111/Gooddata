@@ -4,7 +4,6 @@ import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 import com.gooddata.AbstractPollHandler;
-import com.gooddata.GoodData;
 import com.gooddata.GoodDataRestException;
 import com.gooddata.PollResult;
 import com.gooddata.fixture.ResourceManagement;
@@ -14,10 +13,16 @@ import com.gooddata.gdc.TaskStatus;
 import com.gooddata.project.Environment;
 import com.gooddata.project.Project;
 import com.gooddata.project.ProjectDriver;
-import com.gooddata.qa.utils.http.RestApiClient;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.RestRequest;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.ParseException;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.entity.ContentType;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,14 +37,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static java.lang.String.format;
+import static java.util.Objects.isNull;
 
 public class Fixture {
 
@@ -47,8 +53,7 @@ public class Fixture {
     private int version;
 
     private String projectId;
-    private RestApiClient restApiClient;
-    private GoodData goodDataClient;
+    private RestClient restClient;
 
     private static final String PULL_DATA_LINK = "/gdc/md/%s/etl/pull2";
     private static final int FIXTURE_DEFAULT_VERSION = 1;
@@ -61,51 +66,46 @@ public class Fixture {
         version = FIXTURE_DEFAULT_VERSION;
     }
 
-    public Fixture setRestApiClient(RestApiClient restApiClient) {
-        this.restApiClient = restApiClient;
-        return this;
-    }
-
-    public Fixture setGoodDataClient(GoodData goodDataClient) {
-        this.goodDataClient = goodDataClient;
+    public Fixture setRestClient(RestClient restClient) {
+        this.restClient = restClient;
         return this;
     }
 
     public String deploy(String title, String authToken, ProjectDriver driver, Environment environment) {
         log.info("Deploying fixture: " + fixture.getPath().toUpperCase());
 
-        if (Objects.isNull(restApiClient) || Objects.isNull(goodDataClient)) {
+        if (Objects.isNull(restClient)) {
             throw new RuntimeException("Rest api or Goodata client has not been initialized !");
         }
 
-        projectId = createBlankProject(goodDataClient, title, authToken, driver, environment);
+        projectId = createBlankProject(restClient, title, authToken, driver, environment);
         log.info("a blank project has been created " + projectId);
 
-        Project workingProject = goodDataClient.getProjectService().getProjectById(projectId);
+        Project workingProject = restClient.getProjectService().getProjectById(projectId);
 
         try {
             log.info("updating LDM");
             try (InputStream stream = resourceManagement.getModelFileContent(fixture, version)) {
-                goodDataClient.getModelService()
+                restClient.getModelService()
                         .updateProjectModel(workingProject, getInputStreamAsString(stream)).get();
             }
 
             String uploadDir = "fixture_" + RandomStringUtils.randomAlphabetic(6);
             log.info("uploading data files to staging area named " + uploadDir);
             try (InputStream stream = resourceManagement.getUploadInfoFileContent(fixture, version)) {
-                goodDataClient.getDataStoreService().upload(uploadDir + "/upload_info.json", stream);
+                restClient.getDataStoreService().upload(uploadDir + "/upload_info.json", stream);
             }
 
             for (String entry : resourceManagement.getCsvEntryNames(fixture, version)) {
                 try (InputStream stream = resourceManagement.getFileContent(entry)) {
-                    goodDataClient.getDataStoreService().upload(uploadDir + "/" + getFileName(entry), stream);
+                    restClient.getDataStoreService().upload(uploadDir + "/" + getFileName(entry), stream);
                 }
             }
 
             log.info("pulling data to working project");
             pullDataToProject(uploadDir);
 
-            Map<String, String> map = goodDataClient.getMetadataService()
+            Map<String, String> map = restClient.getMetadataService()
                     .identifiersToUris(workingProject, Stream.of(getUsedIdentifiers(), getImportIdentifiers())
                             .flatMap(List::stream)
                             .collect(Collectors.toList()))
@@ -133,8 +133,8 @@ public class Fixture {
     }
 
     private void pullDataToProject(String dirPath) throws JSONException, IOException {
-        String pollingUri = getPollingUri(getJsonObject(restApiClient,
-                restApiClient.newPostMethod(
+        String pollingUri = getPollingUri(getJsonObject(
+                RestRequest.initPostRequest(
                         format(PULL_DATA_LINK, projectId),
                         new JSONObject().put("pullIntegration", dirPath).toString()),
                 HttpStatus.CREATED));
@@ -147,7 +147,7 @@ public class Fixture {
     }
 
     private void doPolling(String pollingUri, String dirPath) {
-        new PollResult<>(goodDataClient.getDatasetService(), new AbstractPollHandler<TaskStatus, Void>(pollingUri,
+        new PollResult<>(restClient.getDatasetService(), new AbstractPollHandler<TaskStatus, Void>(pollingUri,
                 TaskStatus.class, Void.class) {
             @Override
             public void handlePollResult(TaskStatus pollResult) {
@@ -168,14 +168,14 @@ public class Fixture {
 
             @Override
             protected void onFinish() {
-                goodDataClient.getDataStoreService().delete(dirPath);
+                restClient.getDataStoreService().delete(dirPath);
             }
         }).get();
     }
 
     private String createMdObject(String content) throws IOException, JSONException {
-        return getUriFromJSONObjectWithoutSearchKey(getJsonObject(restApiClient,
-                restApiClient.newPostMethod(format("/gdc/md/%s/obj?createAndGet=true", projectId), content)));
+        return getUriFromJSONObjectWithoutSearchKey(getJsonObject(
+                RestRequest.initPostRequest(format("/gdc/md/%s/obj?createAndGet=true", projectId), content)));
     }
 
     private String getUriFromJSONObjectWithoutSearchKey(JSONObject obj) throws JSONException {
@@ -239,20 +239,83 @@ public class Fixture {
     /**
      * Create project with specific template
      *
-     * @param goodData
+     * @param restClient
      * @param title
      * @param authorizationToken
      * @param projectDriver
      * @param environment
      * @return project id
      */
-    private String createBlankProject(final GoodData goodData, final String title,
-                                 final String authorizationToken, final ProjectDriver projectDriver,
-                                 final Environment environment) {
+    private String createBlankProject(final RestClient restClient, final String title, final String authorizationToken,
+                                      final ProjectDriver projectDriver, final Environment environment) {
         final Project project = new Project(title, authorizationToken);
         project.setDriver(projectDriver);
         project.setEnvironment(environment);
 
-        return goodData.getProjectService().createProject(project).get().getId();
+        return restClient.getProjectService().createProject(project).get().getId();
+    }
+
+    /**
+     * Get json object from request with expected status code
+     *
+     * @param request
+     * @param expectedStatusCode
+     * @return
+     */
+    private JSONObject getJsonObject(final HttpRequestBase request, final HttpStatus expectedStatusCode)
+            throws ParseException, JSONException, IOException {
+        return new JSONObject(getResource(request, expectedStatusCode));
+    }
+
+    /**
+     * Get json object from request, expected status code is OK (200)
+     *
+     * @param request
+     * @return
+     */
+    private JSONObject getJsonObject(final HttpRequestBase request)
+            throws ParseException, JSONException, IOException {
+        return new JSONObject(getResource(request, HttpStatus.OK));
+    }
+
+    /**
+     * Get resource from request with expected status code
+     *
+     * @param request
+     * @param setupRequest        setup request before executing like configure header, ...
+     * @param expectedStatusCode
+     * @return entity from response in String form
+     */
+    private String getResource(final HttpRequestBase request, final Consumer<HttpRequestBase> setupRequest,
+                               final HttpStatus expectedStatusCode)
+            throws ParseException, IOException {
+        setupRequest.accept(request);
+
+        try {
+            final HttpResponse response = restClient.execute(request, expectedStatusCode);
+            final HttpEntity entity = response.getEntity();
+
+            final String ret = isNull(entity) ? "" : EntityUtils.toString(entity);
+            EntityUtils.consumeQuietly(entity);
+            return ret;
+
+        } finally {
+            request.releaseConnection();
+        }
+    }
+
+    /**
+     * Get resource from request with expected status code
+     *
+     * @param request
+     * @param expectedStatusCode
+     * @return entity from response in json form
+     */
+    private String getResource(final HttpRequestBase request,
+                               final HttpStatus expectedStatusCode) throws ParseException, IOException {
+        return getResource(
+                request,
+                req -> req.setHeader("Accept", ContentType.APPLICATION_JSON.getMimeType()),
+                expectedStatusCode);
     }
 }
