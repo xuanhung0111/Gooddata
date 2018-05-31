@@ -122,6 +122,32 @@ public class UITestsRegistry {
             "testng-ad-MetricNumberFormat.xml"
         });
 
+        suites.put("crud", new Object[] {
+            GoodSalesAttributeBasedMetricTest.class,
+            GoodSalesAttributeBucketTest.class,
+            GoodSalesCatalogueTest.class,
+            GoodSalesDropAttributeTest.class,
+            GoodSalesFactBasedMetricTest.class,
+            GoodSalesMetricBucketTest.class,
+            GoodSalesMetricFilterTest.class,
+            GoodSalesUndoTest.class,
+            GoodSalesUndoRedoSavedInsightTest.class,
+            GoodSalesInsightTest.class,
+            GoodSalesSaveInsightTest.class
+        });
+
+        suites.put("filters", new Object[] {
+            GoodSalesAttributeFilterTest.class,
+            DateFilterTest.class,
+            GoodSalesMetricFilterTest.class
+        });
+
+        suites.put("total-results", new Object[] {
+            AggregationResultTest.class,
+            TotalsResultWithInsightTest.class,
+            AggregationPopupManipulationTest.class
+        });
+
         TestsRegistry.getInstance()
             .register(args, suites)
             .toTextFile();
