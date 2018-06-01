@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import com.gooddata.qa.graphene.enums.dashboard.TextObject;
+import com.google.common.collect.Iterables;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -46,10 +47,12 @@ import com.gooddata.qa.utils.CssUtils;
 
 public class DashboardsPage extends AbstractFragment {
     protected static final By BY_DASHBOARD_EDIT_BAR = By.className("s-dashboard-edit-bar");
+    protected static final By BY_PRINT_PDF_BUTTON = By.className("s-printButton");
+    protected static final By BY_PRINTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' " +
+            "and text()='Preparing printable PDF for download…']");
 
     private static final By SAVE_AS_DIALOG_LOCATOR = By.className("dashboardSettingsDialogView"); 
     private static final By BY_EXPORTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' and text()='Exporting…']");
-    private static final By BY_PRINTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' and text()='Preparing printable PDF for download…']");
     private static final By BY_TAB_DROPDOWN_MENU = By.xpath("//div[contains(@class, 's-tab-menu')]");
     private static final By BY_TAB_DROPDOWN_DELETE_BUTTON = By.xpath("//li[contains(@class, 's-delete')]//a");
     private static final By BY_TAB_DROPDOWN_RENAME_BUTTON = By.xpath("//li[contains(@class, 's-rename___')]//a");
@@ -57,13 +60,12 @@ public class DashboardsPage extends AbstractFragment {
     private static final By BY_TAB_DROPDOWN_COPY_TO_BUTTON = By.xpath("//li[contains(@class, 's-copy_to')]//a");
     private static final By BY_PERMISSION_DIALOG_LOCATOR = By.className("s-permissionSettingsDialog");
     private static final By BY_HIDDEN_TAB_BAR = By.cssSelector(".yui3-dashboardtabs-content.gdc-hidden");
-    private static final By BY_PRINT_PDF_BUTTON = By.className("s-printButton");
     private static final By BY_SETTING_EXPORT_TO_PDF = By.cssSelector(".s-export_to_pdf");
     private static final By BY_SETTING_EMBED = By.cssSelector(".s-embed");
     private static final By BY_SETTING_SAVES_AS = By.cssSelector(".s-save_as___");
 
     @FindBy(xpath = "//div[contains(@class,'yui3-dashboardtabs-content')]")
-    private DashboardTabs tabs;
+    protected DashboardTabs tabs;
 
     @FindBy(css = ".q-dashboardSwitcher")
     private WebElement dashboardSwitcherButton;
@@ -515,6 +517,12 @@ public class DashboardsPage extends AbstractFragment {
         return this;
     }
 
+    public DashboardsPage addReportToDashboard(String reportName, DashboardWidgetDirection position) {
+        addReportToDashboard(reportName);
+        position.moveElementToRightPlace(getContent().getLastReportElement());
+        return this;
+    }
+
     public DashboardsPage saveDashboard() {
         getDashboardEditBar().saveDashboard();
         return this;
@@ -573,12 +581,16 @@ public class DashboardsPage extends AbstractFragment {
         return addTimeFilterToDashboard(dateDimension, dateGranularity, timeLine, null);
     }
 
+    public DashboardsPage addTimeFilterToDashboard(DateGranularity dateGranularity, String timeLine, DashboardWidgetDirection position) {
+        return addTimeFilterToDashboard(null, dateGranularity, timeLine, position);
+    }
+
     public DashboardsPage addTimeFilterToDashboard(String dateDimension, DateGranularity dateGranularity,
                                                    String timeLine, DashboardWidgetDirection position) {
         editDashboard().addTimeFilterToDashboard(dateDimension, dateGranularity, timeLine);
 
         if (position != null) {
-            position.moveElementToRightPlace(getFilterWidgetByName(dateDimension).getRoot());
+            position.moveElementToRightPlace(Iterables.getLast(getFilters()).getRoot());
         }
         return this;
     }

@@ -62,18 +62,18 @@ public class TimeRange {
     }
 
     public enum Time {
-        YEARS_AGO("years ago"),
-        THIS_YEAR("this year"),
-        YEARS_IN_THE_FUTURE("years in the future");
+        AGO(0),
+        THIS(1),
+        IN_THE_FUTURE(2);
 
-        private String name;
+        private int position;
 
-        Time(String name) {
-            this.name = name;
+        Time(int position) {
+            this.position = position;
         }
 
-        public String getName() {
-            return this.name;
+        public int getPosition() {
+            return this.position;
         }
     }
 }

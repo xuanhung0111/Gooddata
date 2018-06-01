@@ -311,6 +311,41 @@ public class DashboardRestRequest extends CommonRestRequest {
         executeRequest(initPostRequest(dashboardUri + "?mode=edit", dashboarObject.toString()), HttpStatus.OK);
     }
 
+    /**
+     * To set a new format date. Have to change default of element which same request title to 1.
+     * And make sure that no another element's default equal 1.
+     * Example: To change from short label(Aug 1991) with default 1 to long label(August 1991) with default 2
+     * Firstly, change default of long label to 1. Then, change default of short label to 2.
+     * To avoid case as 2 definitions is similar.
+     *
+     * @param attribute
+     * @param requestedFormatLabel
+     * @throws IOException
+     */
+    public void setDefaultFormatDateFilter(String attribute, FormatLabel requestedFormatLabel)
+            throws IOException {
+        final JSONArray jsonArray = getJsonObject(getAttributeByTitle(attribute).getUri())
+                .getJSONObject("attribute").getJSONObject("content").getJSONArray("displayForms");
+        int requestedFormat = 0;
+        for (int i = 0; i < jsonArray.length(); i++) {
+            final JSONObject meta = jsonArray.getJSONObject(i).getJSONObject("meta");
+            if (meta.getString("title").contains(requestedFormatLabel.getValue())) {
+                requestedFormat = jsonArray.getJSONObject(i).getJSONObject("content").getInt("default");
+                final String uri = meta.getString("uri");
+                setDefault(uri, 1);
+                break;
+            }
+        }
+        final String uri = jsonArray.getJSONObject(0).getJSONObject("meta").getString("uri");
+        setDefault(uri, requestedFormat);
+    }
+
+    private void setDefault(String uri, int requestedFormat) throws IOException {
+        JSONObject json = getJsonObject(uri);
+        json.getJSONObject("attributeDisplayForm").getJSONObject("content").put("default", requestedFormat);
+        executeRequest(initPutRequest(uri, json.toString()), HttpStatus.OK);
+    }
+    
     private void setDrillReportTarget(final String dashboardID, final String target, final String exportFormat)
             throws IOException {
         final String dashboardEditModeURI = format(DASHBOARD_EDIT_MODE_LINK, projectId, dashboardID);
@@ -336,5 +371,21 @@ public class DashboardRestRequest extends CommonRestRequest {
         }
 
         executeRequest(initPostRequest(dashboardEditModeURI, json.toString()), HttpStatus.OK);
+    }
+
+    public enum FormatLabel {
+        SHORT_LABEL("Short"),
+        LONG_LABEL("Long"),
+        NUMBER_LABEL("Number");
+
+        private String value;
+
+        FormatLabel(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
     }
 }
