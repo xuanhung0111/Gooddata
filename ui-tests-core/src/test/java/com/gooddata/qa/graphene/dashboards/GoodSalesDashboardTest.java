@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.gooddata.qa.utils.http.RestClient;
-import com.gooddata.qa.utils.http.RestClient.RestProfile;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.json.JSONException;
@@ -148,9 +147,7 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
                 .getJSONObject("links")
                 .getString("self")
                 .concat("/settings/defaults");
-        // TODO: temporary fix on master until QA-7449 is merged (domainUser is independent of useDynamic parameter)
-        new DashboardRestRequest(new RestClient(new RestProfile(
-                testParams.getHost(), domainUser, testParams.getPassword(), true)), testParams.getProjectId())
+        new DashboardRestRequest(new RestClient(getProfile(DOMAIN)), testParams.getProjectId())
                 .setDefaultDashboardForUser(DASH_PIPELINE_ANALYSIS, TARGET_TAB, defaultUserUri);
 
         logout();
