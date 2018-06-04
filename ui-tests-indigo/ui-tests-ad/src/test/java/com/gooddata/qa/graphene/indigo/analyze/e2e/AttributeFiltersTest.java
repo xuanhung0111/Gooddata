@@ -88,7 +88,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"}, groups = {"disabling-Apply-button"}, description = "covered by TestCafe")
     public void should_disable_apply_button_if_nothing_is_selected() {
         AttributeFilterPickerPanel panel = beforeEachDisablingApplyButton();
-        panel.getClearButton().click();
+        panel.uncheckAllCheckbox();
         assertTrue(panel.getApplyButton()
                 .getAttribute("class")
                 .contains("disabled"));
@@ -97,7 +97,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"}, groups = {"disabling-Apply-button"}, description = "covered by TestCafe")
     public void should_disable_apply_button_if_everything_is_unselected() {
         AttributeFilterPickerPanel panel = beforeEachDisablingApplyButton();
-        panel.getClearButton().click();
+        panel.uncheckAllCheckbox();
         assertTrue(panel.getApplyButton()
                 .getAttribute("class")
                 .contains("disabled"));
@@ -109,7 +109,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
         panel.select("Email");
 
         analysisPage.getFilterBuckets().getFilter(ATTR_ACTIVITY_TYPE).click();
-        panel.getClearButton().click();
+        panel.uncheckAllCheckbox();
         panel.searchForText("Email");
         assertTrue(panel.getApplyButton()
                 .getAttribute("class")
@@ -120,14 +120,14 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
     public void should_not_disable_apply_button_if_single_item_is_filtered() {
         AttributeFilterPickerPanel panel = beforeEachDisablingApplyButton();
 
-        panel.getClearButton().click();
+        panel.uncheckAllCheckbox();
         panel.selectItem("Email");
         assertFalse(panel.getApplyButton()
                 .getAttribute("class")
                 .contains("disabled"));
 
         panel.getApplyButton().click();
-        assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": Email");
+        assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ":\nEmail");
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"disabling-Apply-button"}, description = "covered by TestCafe")
@@ -136,7 +136,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
         panel.select("Email", "In Person Meeting");
 
         analysisPage.getFilterBuckets().getFilter(ATTR_ACTIVITY_TYPE).click();
-        panel.getClearButton().click();
+        panel.uncheckAllCheckbox();
         panel.searchForText("Email");
         panel.searchForText("In Person Meeting");
         assertTrue(panel.getApplyButton()
