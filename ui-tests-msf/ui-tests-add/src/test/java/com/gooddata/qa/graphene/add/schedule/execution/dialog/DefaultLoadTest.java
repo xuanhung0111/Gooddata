@@ -1,26 +1,5 @@
 package com.gooddata.qa.graphene.add.schedule.execution.dialog;
 
-import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.utils.http.RestUtils.getResource;
-import static java.lang.String.format;
-import static java.util.Collections.singletonList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.not;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-
-import org.apache.http.ParseException;
-import org.json.JSONException;
-import org.springframework.http.HttpStatus;
-import org.testng.annotations.Test;
-
 import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.md.Attribute;
 import com.gooddata.qa.graphene.common.AbstractDataloadProcessTest;
@@ -34,14 +13,36 @@ import com.gooddata.qa.graphene.fragments.disc.schedule.add.DataloadScheduleDeta
 import com.gooddata.qa.graphene.fragments.disc.schedule.add.DatasetDropdown;
 import com.gooddata.qa.graphene.fragments.disc.schedule.add.RunOneOffDialog;
 import com.gooddata.qa.graphene.fragments.disc.schedule.add.RunOneOffDialog.LoadMode;
+import org.apache.http.ParseException;
+import org.json.JSONException;
+import org.springframework.http.HttpStatus;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
+import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.utils.http.RestUtils.getResource;
+import static java.lang.String.format;
+import static java.util.Collections.singletonList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.not;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 
 public class DefaultLoadTest extends AbstractDataloadProcessTest {
 
     private static final String FULL_LOAD = "Dataset with id: dataset.%s will be loaded in full mode.";
     private static final String INCREMENTAL_LOAD = "Dataset with id: dataset.%s will be loaded in incremental mode.";
 
-    private static final String LOAD_NOTHING = "Dataset with id: dataset.%s won't be loaded since the "
-            + "maximum timestamp is null or it is lower or equal than LSLTS, which is not allowed";
+    private static final String ALL_DATASETS_LOAD_NOTHING = "All dataset won't be loaded in incremental mode. " +
+            "Reason: no output stage record found.";
+    private static final String DATASET_LOAD_NOTHING = "Dataset with id: dataset.%s wont be loaded in" +
+            " incremental mode. Reason: no output stage record found.";
 
     private CsvFile opportunity;
     private CsvFile person;
@@ -50,7 +51,7 @@ public class DefaultLoadTest extends AbstractDataloadProcessTest {
     private String personLSLTS;
 
     @Test(dependsOnGroups = {"initDataload"}, groups = {"precondition"})
-    public void initData() throws JSONException, IOException {
+    public void initData() throws JSONException {
         setupMaql(new LdmModel()
                 .withDataset(new Dataset(DATASET_OPPORTUNITY)
                         .withAttributes(ATTR_OPPORTUNITY)
@@ -183,7 +184,7 @@ public class DefaultLoadTest extends AbstractDataloadProcessTest {
             assertThat(getAttributeValues(personAttr), not(hasItem("P3")));
 
             String executionLog = getResource(getRestApiClient(), scheduleDetail.getLastExecutionLogUri(), HttpStatus.OK);
-            assertThat(executionLog, containsString(format(LOAD_NOTHING, DATASET_PERSON)));
+            assertThat(executionLog, containsString(ALL_DATASETS_LOAD_NOTHING));
 
         } finally {
             getProcessService().removeSchedule(schedule);
@@ -213,7 +214,7 @@ public class DefaultLoadTest extends AbstractDataloadProcessTest {
 
             String executionLog = getResource(getRestApiClient(), scheduleDetail.getLastExecutionLogUri(), HttpStatus.OK);
             assertThat(executionLog, containsString(format(INCREMENTAL_LOAD, DATASET_PERSON)));
-            assertThat(executionLog, containsString(format(LOAD_NOTHING, DATASET_OPPORTUNITY)));
+            assertThat(executionLog, containsString(format(DATASET_LOAD_NOTHING, DATASET_OPPORTUNITY)));
 
         } finally {
             getProcessService().removeSchedule(schedule);

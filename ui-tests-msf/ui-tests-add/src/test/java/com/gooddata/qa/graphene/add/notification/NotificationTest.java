@@ -1,32 +1,5 @@
 package com.gooddata.qa.graphene.add.notification;
 
-import static com.gooddata.qa.graphene.entity.disc.NotificationRule.buildMessage;
-import static com.gooddata.qa.graphene.entity.disc.NotificationRule.getVariablesFromMessage;
-import static com.gooddata.qa.utils.mail.ImapUtils.getEmailBody;
-import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
-import static java.lang.String.format;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.not;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Map;
-
-import javax.mail.Message;
-import javax.mail.MessagingException;
-
-import org.json.JSONException;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
 import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.qa.graphene.common.AbstractDataloadProcessTest;
 import com.gooddata.qa.graphene.entity.add.SyncDatasets;
@@ -40,12 +13,34 @@ import com.gooddata.qa.graphene.enums.disc.notification.Variable;
 import com.gooddata.qa.graphene.enums.process.Parameter;
 import com.gooddata.qa.graphene.fragments.disc.notification.NotificationRuleItem;
 import com.gooddata.qa.graphene.fragments.disc.notification.NotificationRuleItem.NotificationEvent;
+import org.json.JSONException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import javax.mail.Message;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Map;
+
+import static com.gooddata.qa.graphene.entity.disc.NotificationRule.buildMessage;
+import static com.gooddata.qa.graphene.entity.disc.NotificationRule.getVariablesFromMessage;
+import static com.gooddata.qa.utils.mail.ImapUtils.getEmailBody;
+import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
+import static java.lang.String.join;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 public class NotificationTest extends AbstractDataloadProcessTest {
 
     private static final String ATTR_NAME = "name";
-    private static final String ERROR_MESSAGE = "While trying to load project %s, the following datasets had one "
-            + "or more rows with a null timestamp, which is not allowed: %s: 1 row(s).";
+    private static final String ERROR_MESSAGE = "Mapping validation failed, see log for more details.";
 
     private final String SUCCESS_EMAIL_SUBJECT = "Notification for success event " + generateHashString();
     private final String PROCESS_STARTED_EMAIL_SUBJECT = "Notification for process started event " + generateHashString();
@@ -93,7 +88,7 @@ public class NotificationTest extends AbstractDataloadProcessTest {
     }
 
     @Test(dependsOnGroups = {"initDataload"}, groups = {"precondition"})
-    public void initData() throws JSONException, IOException {
+    public void initData() throws JSONException {
         setupMaql(new LdmModel()
                 .withDataset(new Dataset(DATASET_OPPORTUNITY)
                         .withAttributes(ATTR_NAME)
@@ -144,15 +139,15 @@ public class NotificationTest extends AbstractDataloadProcessTest {
     }
 
     @Test(dependsOnGroups = {"precondition"})
-    public void checkNotificationForFullLoadDataset() throws MessagingException, IOException {
+    public void checkNotificationForFullLoadDataset() {
         Date timeReceiveEmail = getTimeReceiveEmail();
 
         executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity, person)));
 
         schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.ALL);
-
         initScheduleDetail(schedule).executeSchedule().waitForExecutionFinish();
+
         Document processStartedNotification = getNotificationEmailContent(PROCESS_STARTED_EMAIL_SUBJECT, timeReceiveEmail);
         assertEquals(processStartedNotification.text(), "PERSON (full load), OPPORTUNITY (full load)");
 
@@ -160,14 +155,15 @@ public class NotificationTest extends AbstractDataloadProcessTest {
         assertEquals(successNotification.text(), "PERSON (full load), OPPORTUNITY (full load)");
     }
 
-    @Test(dependsOnMethods = {"checkNotificationForFullLoadDataset"}, groups = {"successfulLoad"})
-    public void checkNotificationForIncrementalLoadDataset() throws MessagingException, IOException {
+    @Test(dependsOnMethods = {"checkNotificationForFullLoadDataset"})
+    public void checkNotificationForIncrementalLoadDataset() {
         Date timeReceiveEmail = getTimeReceiveEmail();
 
         person.rows("P2", "20", getCurrentDate());
         executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
                 defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person)));
 
+        Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.custom(DATASET_PERSON));
         initScheduleDetail(schedule).executeSchedule().waitForExecutionFinish();
 
         Document processStartedNotification = getNotificationEmailContent(PROCESS_STARTED_EMAIL_SUBJECT, timeReceiveEmail);
@@ -179,41 +175,39 @@ public class NotificationTest extends AbstractDataloadProcessTest {
                 "Dataset notification not show as expected");
     }
 
-    @Test(dependsOnMethods = {"checkNotificationForFullLoadDataset"}, groups = {"successfulLoad"})
-    public void checkNotificationWithoutDatasetLoaded() throws MessagingException, IOException {
-        Date timeReceiveEmail = getTimeReceiveEmail();
-        initScheduleDetail(schedule).executeSchedule().waitForExecutionFinish();
-
-        Document processStartedNotification = getNotificationEmailContent(PROCESS_STARTED_EMAIL_SUBJECT, timeReceiveEmail);
-        assertEquals(processStartedNotification.text(), "No datasets were loaded");
-
-        Document successNotification = getNotificationEmailContent(SUCCESS_EMAIL_SUBJECT, timeReceiveEmail);
-        assertEquals(successNotification.text(), "No datasets were loaded");
-    }
-
-    @Test(dependsOnGroups = {"successfulLoad"})
-    public void checkNotificationForErrorDatasetLoaded() throws IOException, MessagingException {
+    @Test(dependsOnMethods = {"checkNotificationForFullLoadDataset"})
+    public void checkNotificationForErrorDatasetLoaded() {
         Date timeReceiveEmail = getTimeReceiveEmail();
 
-        person.rows("P3", "20");
+        CsvFile personError = new CsvFile("person_error")
+                .columns(new CsvFile.Column(ATTR_NAME), new CsvFile.Column(FACT_AGE),
+                        new CsvFile.Column(X_TIMESTAMP_COLUMN))
+                .rows("P1", "18", getCurrentDate());
+
         executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person)));
+                defaultParameters.get().addParameter(Parameter.SQL_QUERY,
+                        join(";", SqlBuilder.dropTables(DATASET_PERSON, DATASET_OPPORTUNITY), SqlBuilder.build(personError))));
 
-        String errorMessage = initScheduleDetail(schedule)
-                .executeSchedule()
-                .waitForExecutionFinish()
-                .getLastExecutionHistoryItem()
-                .getErrorMessage();
-        assertEquals(errorMessage, format(ERROR_MESSAGE, testParams.getProjectId(), DATASET_PERSON));
+        try {
+            String errorMessage = initScheduleDetail(schedule)
+                    .executeSchedule()
+                    .waitForExecutionFinish()
+                    .getLastExecutionHistoryItem()
+                    .getErrorMessage();
+            assertEquals(errorMessage, ERROR_MESSAGE);
 
-        Document notification = getNotificationEmailContent(FAILURE_EMAIL_SUBJECT, timeReceiveEmail);
-        Map<String, String> variables = getVariablesFromMessage(notification.text());
-        assertEquals(variables.get(Variable.DATASETS.getName()), "");
-        assertEquals(variables.get(Variable.ERROR_MESSAGE.getName()), errorMessage);
+            Document notification = getNotificationEmailContent(FAILURE_EMAIL_SUBJECT, timeReceiveEmail);
+            Map<String, String> variables = getVariablesFromMessage(notification.text());
+            assertEquals(variables.get(Variable.DATASETS.getName()), "");
+            assertEquals(variables.get(Variable.ERROR_MESSAGE.getName()), errorMessage);
+        } finally {
+            executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
+                    defaultParameters.get().addParameter(Parameter.SQL_QUERY,
+                            join(";", SqlBuilder.dropTables("person_error"), SqlBuilder.build(opportunity, person))));
+        }
     }
 
-    private Document getNotificationEmailContent(String emailSubject, Date timeReceiveAfter)
-            throws MessagingException, IOException {
+    private Document getNotificationEmailContent(String emailSubject, Date timeReceiveAfter) {
         return doActionWithImapClient(imapClient -> {
             Message message = waitForMessages(imapClient, GDEmails.NO_REPLY, emailSubject, timeReceiveAfter, 1).get(0);
             return Jsoup.parse(getEmailBody(message));

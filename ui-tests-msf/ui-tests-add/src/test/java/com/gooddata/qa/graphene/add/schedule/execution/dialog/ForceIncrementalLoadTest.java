@@ -1,15 +1,5 @@
 package com.gooddata.qa.graphene.add.schedule.execution.dialog;
 
-import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.graphene.utils.ElementUtils.getBubbleMessage;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.not;
-import static org.testng.Assert.assertEquals;
-import static java.lang.String.format;
-import static java.util.Collections.singletonList;
-
 import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.md.Attribute;
 import com.gooddata.qa.graphene.common.AbstractDataloadProcessTest;
@@ -24,12 +14,19 @@ import com.gooddata.qa.graphene.fragments.disc.schedule.add.DataloadScheduleDeta
 import com.gooddata.qa.graphene.fragments.disc.schedule.add.DatasetDropdown;
 import com.gooddata.qa.graphene.fragments.disc.schedule.add.RunOneOffDialog;
 import com.gooddata.qa.graphene.fragments.disc.schedule.add.RunOneOffDialog.LoadMode;
-
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
+
+import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getBubbleMessage;
+import static java.util.Collections.singletonList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.not;
+import static org.testng.Assert.assertEquals;
 
 public class ForceIncrementalLoadTest extends AbstractDataloadProcessTest {
 
@@ -40,7 +37,7 @@ public class ForceIncrementalLoadTest extends AbstractDataloadProcessTest {
     private String personLSLTS;
 
     @Test(dependsOnGroups = {"initDataload"}, groups = {"precondition"})
-    public void initData() throws JSONException, IOException {
+    public void initData() throws JSONException {
         setupMaql(new LdmModel()
                 .withDataset(new Dataset(DATASET_OPPORTUNITY)
                         .withAttributes(ATTR_OPPORTUNITY)
@@ -316,30 +313,6 @@ public class ForceIncrementalLoadTest extends AbstractDataloadProcessTest {
             assertThat(getAttributeValues(personAttr), not(hasItem("P15")));
 
         } finally {
-            getProcessService().removeSchedule(schedule);
-        }
-    }
-
-    @Test(dependsOnGroups = {"firstIncremental"})
-    public void loadFailWithNullValueInTSColumn() {
-        person.rows("P_ERROR", "20");
-
-        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(person)));
-
-        Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.custom(DATASET_PERSON));
-
-        try {
-            DataloadScheduleDetail scheduleDetail = initScheduleDetail(schedule);
-            scheduleDetail.executeSchedule(IncrementalPeriod.to(LocalDateTime.now()))
-                    .waitForExecutionFinish();
-            assertEquals(scheduleDetail.getLastExecutionHistoryItem().getErrorMessage(),
-                    format("While trying to load project %s, the following datasets had one or more rows with a " +
-                            "null timestamp, which is not allowed: %s: 1 row(s).",
-                            testParams.getProjectId(), DATASET_PERSON));
-
-        } finally {
-            person.removeLastRowData();
             getProcessService().removeSchedule(schedule);
         }
     }
