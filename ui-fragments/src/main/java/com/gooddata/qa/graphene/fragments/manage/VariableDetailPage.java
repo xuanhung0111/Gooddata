@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.manage;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementAttributeContainValue;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
@@ -18,6 +19,7 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -49,7 +51,7 @@ public class VariableDetailPage extends ObjectPropertiesPage {
 
     public String createNumericVariable(NumericVariable variable) {
         changeName(variable.getName());
-
+        waitForLoaded();
         selectVariableType(VariableTypes.NUMERICAL_VARIABLE)
                 .setDefaultNumericValue(variable.getDefaultNumber())
                 .setUserSpecificNumericValue(variable.getUserSpecificNumber())
@@ -60,7 +62,7 @@ public class VariableDetailPage extends ObjectPropertiesPage {
 
     public String createFilterVariable(AttributeVariable variable) {
         changeName(variable.getName());
-
+        waitForLoaded();
         selectVariableType(VariableTypes.FILTERED_VARIABLE)
                 .selectAttribute(variable.getAttribute())
                 .selectDefaultAttributeValues(variable.getAttributeValues())
@@ -163,6 +165,17 @@ public class VariableDetailPage extends ObjectPropertiesPage {
 
     public VariableDetailPage restoreUserSpecificValuesToDefault(String userProfileUri) {
         waitForFragmentVisible(userSpecificTable).restoreUserSpecificValuesToDefault(userProfileUri);
+        return this;
+    }
+
+    private VariableDetailPage waitForLoaded() {
+        By loadingIcon = By.className("loading-icon");
+        try {
+            waitForElementPresent(loadingIcon, getRoot());
+            waitForElementNotPresent(loadingIcon);
+        } catch (TimeoutException e) {
+            // Variable detail already loaded so WebDriver unable to catch the loading indicator
+        }
         return this;
     }
 
