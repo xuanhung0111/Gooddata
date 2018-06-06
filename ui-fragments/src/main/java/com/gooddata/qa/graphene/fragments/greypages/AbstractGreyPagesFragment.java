@@ -6,11 +6,13 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import org.openqa.selenium.WebElement;
 
 public abstract class AbstractGreyPagesFragment extends AbstractFragment {
 
@@ -21,7 +23,9 @@ public abstract class AbstractGreyPagesFragment extends AbstractFragment {
     protected static final By BY_GP_BUTTON_SUBMIT = By.xpath("//div[@class='submit']/input");
 
     protected JSONObject loadJSON() throws JSONException {
-        return new JSONObject(waitForElementPresent(BY_GP_PRE_JSON, browser).getText());
+        WebElement content = waitForElementPresent(BY_GP_PRE_JSON, browser);
+        Graphene.waitGui().until(browser -> content.getText().startsWith("{"));
+        return new JSONObject(content.getText());
     }
 
     protected boolean waitForPollState(String expectedValidState, int maxIterations) throws JSONException {
