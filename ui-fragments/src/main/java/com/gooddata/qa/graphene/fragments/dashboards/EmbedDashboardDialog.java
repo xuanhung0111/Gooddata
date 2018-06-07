@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.testng.Assert.assertTrue;
@@ -55,10 +56,12 @@ public class EmbedDashboardDialog extends AbstractFragment {
         waitForElementVisible(filterContentLabel).click();
     }
 
-    public void selectFilterAttribute(String attributeName, String... attributeValues) {
+    public EmbedDashboardDialog selectFilterAttribute(String attributeName, String... attributeValues) {
         if (attributeName.isEmpty())
-            return;
-        expandFiltersSection();
+            return this;
+        if (!isElementVisible(ADD_FILTER_BUTTON_LOCATOR, getRoot())) {
+            expandFiltersSection();
+        }
         for (String attributeValue : attributeValues) {
             waitForElementPresent(ADD_FILTER_BUTTON_LOCATOR, getRoot()).click();
             waitForElementVisible(SELECT_ATTRIBUTE_BUTTON_LOCATOR, getRoot()).click();
@@ -74,5 +77,6 @@ public class EmbedDashboardDialog extends AbstractFragment {
             attributeValueInput.get().sendKeys(attributeValue);
         }
         getRoot().click();
+        return this;
     }
 }

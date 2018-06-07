@@ -9,8 +9,9 @@ public class FilterItem extends TabItem {
     private String contentId = "empty";
     private String id = generateIdentifier();
 
-    public void setContentId(String contentId) {
+    public FilterItem setContentId(String contentId) {
         this.contentId = contentId;
+        return this;
     }
 
     public String getId() {

@@ -24,8 +24,9 @@ public class Tab implements MdObject {
         return this;
     }
 
-    public void setTitle(String title) {
+    public Tab setTitle(String title) {
         this.title = title;
+        return this;
     }
 
     @Override

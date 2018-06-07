@@ -16,16 +16,19 @@ public class Dashboard implements MdObject {
     private List<JSONObject> tabs = new ArrayList<>();
     private List<JSONObject> filters = new ArrayList<>();
 
-    public void setName(String name) {
+    public Dashboard setName(String name) {
         this.name = name;
+        return this;
     }
 
-    public void addTab(Tab tab) {
+    public Dashboard addTab(Tab tab) {
         tabs.add(tab.getMdObject());
+        return this;
     }
 
-    public void addFilter(FilterItemContent filter) {
+    public Dashboard addFilter(FilterItemContent filter) {
         filters.add(filter.getMdObject());
+        return this;
     }
 
     public String getName() {
