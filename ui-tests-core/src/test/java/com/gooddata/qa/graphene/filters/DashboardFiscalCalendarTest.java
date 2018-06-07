@@ -167,11 +167,13 @@ public class DashboardFiscalCalendarTest extends AbstractDashboardWidgetTest {
                 .addTimeFilterToDashboard(DateGranularity.YEAR, THIS, DashboardWidgetDirection.RIGHT);
         getFilter(DATE_SALARY).changeTimeFilterValueByClickInTimeLine("FY2007");
         takeScreenshot(browser, "exported-dashboard", getClass());
+
+        if (testParams.isClientDemoEnvironment()) {
+            return;
+        }
         String exportedDashboardName = dashboardsPage.saveDashboard().printDashboardTab(0);
         try {
             checkRedBar(browser);
-            if (testParams.isClientDemoEnvironment())
-                return;
             verifyDashboardExport(exportedDashboardName, "First Tab", 45000L);
         } finally {
             deleteIfExists(Paths.get(testParams.getDownloadFolder() + testParams.getFolderSeparator() +
@@ -194,11 +196,13 @@ public class DashboardFiscalCalendarTest extends AbstractDashboardWidgetTest {
         assertEquals(embededDashboard.getContent().getFirstFilter().getCurrentValue(), "FY2007");
         assertEquals(dashboardsPage.getContent().getLatestReport(TableReport.class).getAttributeValues(),
                 asList("FY2007", "1/2007", "2/2007", "3/2007", "4/2007"));
+        
+        if (testParams.isClientDemoEnvironment()) {
+            return;
+        }
         String exportedDashboardName = embededDashboard.printDashboardTab(0);
         try {
             checkRedBar(browser);
-            if (testParams.isClientDemoEnvironment())
-                return;
             verifyDashboardExport(exportedDashboardName, "First Tab", 45000L);
         } finally {
             deleteIfExists(Paths.get(testParams.getDownloadFolder() + testParams.getFolderSeparator() +
