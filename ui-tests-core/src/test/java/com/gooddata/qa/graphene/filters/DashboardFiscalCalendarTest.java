@@ -54,6 +54,7 @@ import static org.testng.Assert.assertTrue;
 
 public class DashboardFiscalCalendarTest extends AbstractDashboardWidgetTest {
 
+    private static final long expectedDashboardExportSize = 30000L;
     private static final String METRIC_NAME = "Sum Of Payments";
     private static final String FISCAL_CALENDAR_REPORT = "Fiscal Calendar Report";
     private static final String THIS = "this";
@@ -172,7 +173,7 @@ public class DashboardFiscalCalendarTest extends AbstractDashboardWidgetTest {
             checkRedBar(browser);
             if (testParams.isClientDemoEnvironment())
                 return;
-            verifyDashboardExport(exportedDashboardName, "First Tab", 45000L);
+            verifyDashboardExport(exportedDashboardName, "First Tab", expectedDashboardExportSize);
         } finally {
             deleteIfExists(Paths.get(testParams.getDownloadFolder() + testParams.getFolderSeparator() +
                     exportedDashboardName + "." + ExportFormat.PDF.getName()));
@@ -199,7 +200,7 @@ public class DashboardFiscalCalendarTest extends AbstractDashboardWidgetTest {
             checkRedBar(browser);
             if (testParams.isClientDemoEnvironment())
                 return;
-            verifyDashboardExport(exportedDashboardName, "First Tab", 45000L);
+            verifyDashboardExport(exportedDashboardName, "First Tab", expectedDashboardExportSize);
         } finally {
             deleteIfExists(Paths.get(testParams.getDownloadFolder() + testParams.getFolderSeparator() +
                     exportedDashboardName + "." + ExportFormat.PDF.getName()));
