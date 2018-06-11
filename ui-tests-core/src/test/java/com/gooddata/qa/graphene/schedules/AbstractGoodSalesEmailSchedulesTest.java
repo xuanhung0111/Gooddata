@@ -17,7 +17,10 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Part;
 
+import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.RestClient.RestProfile;
+import com.gooddata.qa.utils.http.RestRequest;
 import com.gooddata.qa.utils.http.scheduleEmail.ScheduleEmailRestRequest;
 import org.apache.commons.lang.math.IntRange;
 import org.apache.http.HttpResponse;
@@ -30,8 +33,6 @@ import org.joda.time.format.DateTimeFormatter;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.GDEmails;
-import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;
 
@@ -112,11 +113,11 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
      * Get scheduledMail
      */
     private InputStream getScheduleInputStream(String scheduleUri) throws IOException {
-        RestApiClient apiClient = getRestApiClient();
+        RestClient restClient = new RestClient(getProfile(Profile.ADMIN));
 
         System.out.println("Get scheduledMail: " + scheduleUri);
-        HttpRequestBase getRequest = apiClient.newGetMethod(scheduleUri);
-        HttpResponse getResponse = apiClient.execute(getRequest);
+        HttpRequestBase getRequest = RestRequest.initGetRequest(scheduleUri);
+        HttpResponse getResponse = restClient.execute(getRequest);
         System.out.println(" - status: " + getResponse.getStatusLine().getStatusCode());
         return getResponse.getEntity().getContent();
     }
@@ -126,7 +127,10 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
      */
     private void setSchedule(String scheduleUri, String schedule) {
         System.out.println("Update scheduledMail: " + scheduleUri);
-        RestUtils.executeRequest(getRestApiClient(imapUser, imapPassword), restApiClient.newPostMethod(scheduleUri, schedule));
+        final CommonRestRequest restRequest = new CommonRestRequest(new RestClient(
+                new RestProfile(testParams.getHost(), imapUser, imapPassword, true)),
+                testParams.getProjectId());
+        restRequest.executeRequest(RestRequest.initPostRequest(scheduleUri, schedule));
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

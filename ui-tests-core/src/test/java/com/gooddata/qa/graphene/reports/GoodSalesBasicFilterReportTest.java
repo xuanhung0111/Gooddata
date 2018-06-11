@@ -8,7 +8,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileUri;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -21,11 +20,12 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
-import com.gooddata.GoodData;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
@@ -45,7 +45,6 @@ import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.fragments.reports.filter.AttributeFilterFragment;
 import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter.FilterFragment;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
-import com.gooddata.qa.utils.http.RestApiClient;
 import com.google.common.collect.Lists;
 
 public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
@@ -149,13 +148,14 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
         reportPage.saveReport();
         checkRedBar(browser);
 
-        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
+        UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(
+                new RestClient(getProfile(Profile.DOMAIN)), testParams.getProjectId());
         listAttributeValues.add("Closed Won");
 
         initVariablePage()
                 .openVariableFromList(VARIABLE_NAME)
                 .selectUserSpecificAttributeValues(
-                        getUserProfileUri(restApiClient, testParams.getUserDomain(), testParams.getUser()),
+                        userManagementRestRequest.getUserProfileUri(testParams.getUserDomain(), testParams.getUser()),
                         listAttributeValues)
                 .saveChange();
 
@@ -210,9 +210,9 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
     }
 
     private void createReport(String reportName) {
-        GoodData goodDataClient = getGoodDataClient();
-        Project project = goodDataClient.getProjectService().getProjectById(testParams.getProjectId());
-        MetadataService mdService = goodDataClient.getMetadataService();
+        RestClient restClient = new RestClient(getProfile(Profile.ADMIN));
+        Project project = restClient.getProjectService().getProjectById(testParams.getProjectId());
+        MetadataService mdService = restClient.getMetadataService();
 
         Metric amountMetric = mdService.getObj(project, Metric.class, title(METRIC_AMOUNT));
         Attribute stageName = mdService.getObj(project, Attribute.class, title(ATTR_STAGE_NAME));

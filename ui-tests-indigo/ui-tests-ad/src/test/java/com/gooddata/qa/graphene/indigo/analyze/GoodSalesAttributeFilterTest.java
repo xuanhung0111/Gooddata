@@ -2,14 +2,19 @@ package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import com.gooddata.qa.browser.BrowserUtils;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
@@ -94,6 +99,28 @@ public class GoodSalesAttributeFilterTest extends AbstractAnalyseTest {
         analysisPage.addFilter(ATTR_DEPARTMENT);
         assertEquals(filtersBucketReact.getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ":\nAll");
         checkingOpenAsReport("addAttributeToFilterBucket");
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void openReportAppliedAttributeFilter() {
+        analysisPage.changeReportType(ReportType.TABLE)
+                .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addAttribute(ATTR_DEPARTMENT)
+                .setFilterIsntValues(ATTR_DEPARTMENT, "Direct Sales")
+                .addAttribute(ATTR_STATUS)
+                .setFilterIsValues(ATTR_STATUS, "Completed", "Deferred")
+                .waitForReportComputing().exportReport();
+        BrowserUtils.switchToLastTab(browser);
+        try {
+            waitForAnalysisPageLoaded(browser);
+            takeScreenshot(browser, "Insight-open-as-report", getClass());
+            assertEquals(reportPage.waitForReportExecutionProgress().getFilters(),
+                    asList("Department isn't Direct Sales", "Status is Completed, Deferred"));
+            reportPage.finishCreateReport();
+        } finally {
+            browser.close();
+            BrowserUtils.switchToFirstTab(browser);
+        }
     }
 
     @Test(dependsOnGroups = {"createProject"})

@@ -7,11 +7,11 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
+import com.gooddata.qa.utils.http.RestClient;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
-import com.gooddata.GoodData;
 import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
 import com.gooddata.project.Project;
@@ -49,12 +49,12 @@ public class MetricsAccessibilityTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void prepareMetrics() {
-        createPublicMetric(getGoodDataClient(), PUBLIC_METRIC_OF_ADMIN);
-        createPrivateMetric(getGoodDataClient(), PRIVATE_METRIC_OF_ADMIN);
+        createPublicMetric(new RestClient(getProfile(Profile.ADMIN)), PUBLIC_METRIC_OF_ADMIN);
+        createPrivateMetric(new RestClient(getProfile(Profile.ADMIN)), PRIVATE_METRIC_OF_ADMIN);
 
-        final GoodData goodData = getGoodDataClient(testParams.getEditorUser(), testParams.getPassword());
-        createPublicMetric(goodData, PUBLIC_METRIC_OF_EDITOR);
-        createPrivateMetric(goodData, PRIVATE_METRIC_OF_EDITOR);
+        final RestClient editorRestClient = new RestClient(getProfile(Profile.EDITOR));
+        createPublicMetric(editorRestClient, PUBLIC_METRIC_OF_EDITOR);
+        createPrivateMetric(editorRestClient, PRIVATE_METRIC_OF_EDITOR);
     }
 
     @Test(dependsOnMethods = {"prepareMetrics"}, groups = {"desktop"})
@@ -91,14 +91,14 @@ public class MetricsAccessibilityTest extends AbstractDashboardTest {
         createAndAddUserToProject(UserRoles.EDITOR);
     }
 
-    private void createPublicMetric(final GoodData goodData, final String name) {
-        final Project project = goodData.getProjectService().getProjectById(testParams.getProjectId());
-        goodData.getMetadataService().createObj(project, new Metric(name, SIMPLE_METRIC_EXPRESSION, "#,##0"));
+    private void createPublicMetric(final RestClient restClient, final String name) {
+        final Project project = restClient.getProjectService().getProjectById(testParams.getProjectId());
+        restClient.getMetadataService().createObj(project, new Metric(name, SIMPLE_METRIC_EXPRESSION, "#,##0"));
     } 
 
-    private void createPrivateMetric(final GoodData goodData, final String name) {
-        final Project project = goodData.getProjectService().getProjectById(testParams.getProjectId());
-        final MetadataService mdService = goodData.getMetadataService();
+    private void createPrivateMetric(final RestClient restClient, final String name) {
+        final Project project = restClient.getProjectService().getProjectById(testParams.getProjectId());
+        final MetadataService mdService = restClient.getMetadataService();
         final Metric privateMetric = mdService.createObj(project, new Metric(name, SIMPLE_METRIC_EXPRESSION, "#,##0"));
         privateMetric.setUnlisted(true);
         mdService.updateObj(privateMetric);

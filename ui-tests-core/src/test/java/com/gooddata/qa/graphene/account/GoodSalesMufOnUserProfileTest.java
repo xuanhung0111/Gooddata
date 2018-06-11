@@ -7,7 +7,9 @@ import static java.util.Collections.singletonList;
 
 import java.io.IOException;
 
+import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 
@@ -15,7 +17,6 @@ import static com.gooddata.md.Restriction.*;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileUri;
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -25,7 +26,6 @@ import com.gooddata.md.AttributeElement;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
-import com.gooddata.qa.utils.http.RestApiClient;
 
 public class GoodSalesMufOnUserProfileTest extends GoodSalesAbstractTest {
 
@@ -42,6 +42,14 @@ public class GoodSalesMufOnUserProfileTest extends GoodSalesAbstractTest {
     private Attribute stageNameAttribute;
     private AttributeElement stageNameValue;
     private DashboardRestRequest dashboardRequest;
+    private UserManagementRestRequest userManagementRestRequest;
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        super.customizeProject();
+        userManagementRestRequest = new UserManagementRestRequest(
+                new RestClient(getProfile(Profile.DOMAIN)), testParams.getProjectId());
+    }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
     public void addMufForUser() throws ParseException, JSONException, IOException {
@@ -51,7 +59,7 @@ public class GoodSalesMufOnUserProfileTest extends GoodSalesAbstractTest {
 
         final String expression = format(EXPRESSION, stageNameAttribute.getUri(), stageNameValue.getUri());
         dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
-        dashboardRequest.addMufToUser(getUserProfileUri(getDomainUserRestApiClient(), testParams.getUserDomain(),
+        dashboardRequest.addMufToUser(userManagementRestRequest.getUserProfileUri(testParams.getUserDomain(),
                 testParams.getEditorUser()), dashboardRequest.createMufObjectByUri(MUF_NAME, expression));
     }
 
@@ -84,8 +92,8 @@ public class GoodSalesMufOnUserProfileTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"init"})
     public void checkMufIsHiddenForEditor() throws JSONException, ParseException, IOException {
-        RestApiClient restApiClient = testParams.getDomainUser() == null ? getRestApiClient() : getDomainUserRestApiClient();
-        String editorProfileUri = getUserProfileUri(restApiClient, testParams.getUserDomain(), testParams.getEditorUser());
+        String editorProfileUri = userManagementRestRequest.getUserProfileUri(testParams.getUserDomain(),
+                testParams.getEditorUser());
 
         logoutAndLoginAs(true, UserRoles.EDITOR);
 

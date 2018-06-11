@@ -8,7 +8,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileUri;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -18,6 +17,8 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.Keys;
@@ -39,7 +40,6 @@ import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.Sort;
-import com.gooddata.qa.utils.http.RestApiClient;
 
 public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest {
 
@@ -241,12 +241,13 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
 
     @Test(dependsOnGroups = {"createProject"})
     public void createNumericVariableTest() throws ParseException, JSONException, IOException {
-        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
+        UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(
+                new RestClient(getProfile(Profile.DOMAIN)), testParams.getProjectId());
         initVariablePage()
                 .createVariable(new NumericVariable(VARIABLE_NAME)
                 .withDefaultNumber(1234)
-                .withUserSpecificNumber(
-                        getUserProfileUri(restApiClient, testParams.getUserDomain(), testParams.getEditorUser()), 5678));
+                .withUserSpecificNumber(userManagementRestRequest
+                        .getUserProfileUri(testParams.getUserDomain(), testParams.getEditorUser()), 5678));
     }
 
     @Test(dependsOnMethods = {"createNumericVariableTest"})

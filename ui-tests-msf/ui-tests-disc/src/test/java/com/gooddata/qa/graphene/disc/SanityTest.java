@@ -7,10 +7,10 @@ import static org.testng.Assert.assertTrue;
 
 import java.time.LocalTime;
 
+import com.gooddata.qa.utils.http.RestClient;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.gooddata.GoodData;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.qa.graphene.common.AbstractProcessTest;
@@ -106,18 +106,13 @@ public class SanityTest extends AbstractProcessTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkRubyExecution() {
-        GoodData goodData = null;
-        if (testParams.getDomainUser() != null) {
-            goodData = getGoodDataClient(testParams.getDomainUser(), testParams.getPassword());
-        } else {
-            goodData = getGoodDataClient();
-        }
+        RestClient restClient = new RestClient(getProfile(Profile.DOMAIN));
 
-        DataloadProcess process = createProcess(goodData, generateProcessName(), PackageFile.RUBY,
+        DataloadProcess process = createProcess(restClient, generateProcessName(), PackageFile.RUBY,
                 ProcessType.RUBY_SCRIPTS);
 
         try {
-            Schedule schedule = createSchedule(goodData, process, Executable.RUBY_SCRIPT_3,
+            Schedule schedule = createSchedule(restClient, process, Executable.RUBY_SCRIPT_3,
                     ScheduleCronTime.EVERY_30_MINUTES.getExpression());
 
             ScheduleDetail scheduleDetail = initScheduleDetail(schedule);

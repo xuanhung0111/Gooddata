@@ -19,7 +19,7 @@ import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
@@ -58,8 +58,10 @@ public class MobileDropdownNavigationTest extends AbstractDashboardTest {
     public void addUsersToNewProject() throws IOException {
         newProjectId = createProjectUsingFixture(projectTitle, GOODSALES,
                 testParams.getDomainUser() == null ? testParams.getUser() : testParams.getDomainUser());
-        UserManagementRestUtils.addUserToProject(getDomainUserRestApiClient(), newProjectId, testParams.getUser(), UserRoles.ADMIN);
-        UserManagementRestUtils.addUserToProject(getDomainUserRestApiClient(), newProjectId, dynamicUser, UserRoles.EDITOR);
+        UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(
+                new RestClient(getProfile(Profile.DOMAIN)), newProjectId);
+        userManagementRestRequest.addUserToProject(testParams.getUser(), UserRoles.ADMIN);
+        userManagementRestRequest.addUserToProject(dynamicUser, UserRoles.EDITOR);
         testParams.setProjectId(newProjectId);
         IndigoRestRequest indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
                 testParams.getProjectId());

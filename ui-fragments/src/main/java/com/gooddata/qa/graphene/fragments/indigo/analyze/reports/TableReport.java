@@ -4,16 +4,19 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.CssUtils.isShortendTilteDesignByCss;
@@ -154,15 +157,13 @@ public class TableReport extends AbstractFragment {
 
     public List<String> getEnabledAggregations(String metricName) {
         List<String> list = openAggregationPopup(metricName).getEnabledItemList();
-        //click again to close Aggregation Popup
-        waitForElementVisible(ADD_TOTAL_ROW_BUTTON, getRoot()).click();
+        closeAggregationPopup(metricName);
         return list;
     }
 
     public List<String> getAggregations(String metricName) {
         List<String> list = openAggregationPopup(metricName).getItemsList();
-        //click again to close Aggregation Popup
-        waitForElementVisible(ADD_TOTAL_ROW_BUTTON, getRoot()).click();
+        closeAggregationPopup(metricName);
         return list;
     }
 
@@ -175,21 +176,58 @@ public class TableReport extends AbstractFragment {
                 metricName == null ? 0 : getColumn(metricName)))).get(getFooterRow(type.fullName));
     }
 
-    private int getColumn(String columnTilte) {
-        return getHeaders().indexOf(columnTilte);
+    public void hoverOnColumn(String columnName) {
+        final String column = format("col-%d", getColumn(columnName));
+        //Just need to hover on any row of column
+        hoverItem(getRoot().findElements(className(column)).get(0));
+    }
+
+    public boolean isTotalsElementShowed(String columnName) {
+        try {
+            final String script = format("return window.getComputedStyle(document.querySelector(" +
+                            "'.indigo-table-footer-cell.col-%d .indigo-totals-add-row-button:not(.hidden)'),':before')" +
+                            ".getPropertyValue('content')",
+                    columnName == null ? 0 : getColumn(columnName));
+            JavascriptExecutor js = (JavascriptExecutor) browser;
+            String content = (String) js.executeScript(script);
+            return "\"Σ\"".equals(content);
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
+    public boolean isAddAggregationButtonOnCell(AggregationItem type, String columnName) {
+        hoverItem(getTotalsElement(type, columnName));
+        return isAddTotalResultCellButtonVisible();
+    }
+
+    public List<String> getAggregationRows() {
+        return totalsTitleElements.stream().map(e -> e.getText()).collect(toList());
+    }
+
+    private int getColumn(String columnTitle) {
+        return getHeaders().indexOf(columnTitle);
     }
 
     private int getFooterRow(String rowTitle) {
         return totalsTitleElements.stream().map(e-> e.getText()).collect(toList()).indexOf(rowTitle);
     }
 
-    private AggregationPopup openAggregationPopup(String metricName) {
-        String column = format("col-%d", getColumn(metricName));
-        //Just need to hover on any row of column
-        hoverItem(getRoot().findElements(className(column)).get(0));
-        waitForElementVisible(cssSelector(format(".%s .indigo-totals-add-row-button", column)), getRoot()).click();
+    public AggregationPopup openAggregationPopup(String metricName) {
+        hoverOnColumn(metricName);
+        waitForElementVisible(getAddRowButtonSelector(metricName), getRoot()).click();
         return Graphene.createPageFragment(AggregationPopup.class,
-                waitForElementVisible(className("indigo-totals-select-type-list"), browser));
+                waitForElementVisible(AggregationPopup.LOCATOR, browser));
+    }
+
+    public void closeAggregationPopup(String metricName) {
+        waitForElementVisible(getAddRowButtonSelector(metricName), getRoot()).click();
+        waitForElementNotPresent(AggregationPopup.LOCATOR, browser);
+    }
+
+    private By getAddRowButtonSelector(String metricName) {
+        String column = format("col-%d", getColumn(metricName));
+        return cssSelector(format(".%s .indigo-totals-add-row-button", column));
     }
 
     private boolean isHeaderSorted(final String name, final String css) {
@@ -210,7 +248,8 @@ public class TableReport extends AbstractFragment {
             .get();
     }
 
-    private class AggregationPopup extends AbstractFragment {
+    public static class AggregationPopup extends AbstractFragment {
+        public static final By LOCATOR = By.className("indigo-totals-select-type-list");
 
         @FindBy(className = "gd-list-item-shortened")
         private List<WebElement> items;
@@ -218,12 +257,12 @@ public class TableReport extends AbstractFragment {
         @FindBy(css = ".gd-list-item-shortened:not(.indigo-totals-select-type-item-disabled)")
         private List<WebElement> enableItems;
 
-        private List<String> getItemsList() {
+        public List<String> getItemsList() {
             return items.stream().map(e-> e.getText()).collect(toList());
         }
 
-        private void selectItem(AggregationItem item) {
-            waitForElementVisible(className(format("s-totals-select-type-item-%s", item.shortenedName)), getRoot()).click();
+        public void selectItem(AggregationItem item) {
+            waitForElementVisible(className(format("s-totals-select-type-item-%s", item.metadataName)), getRoot()).click();
         }
 
         private List<String> getEnabledItemList() {
@@ -232,27 +271,50 @@ public class TableReport extends AbstractFragment {
     }
 
     public enum AggregationItem {
-        SUM("Sum", "sum"),
-        MAX("Max", "max"),
-        MIN("Min", "min"),
-        AVG("Avg", "avg"),
-        MEDIAN("Median", "med"),
-        ROLLUP("Total", "nat");
+        SUM("Sum", "sum", "Sum"),
+        MAX("Max", "max", "Max"),
+        MIN("Min", "min", "Min"),
+        AVG("Avg", "avg", "Avg"),
+        MEDIAN("Median", "med", "Median"),
+        ROLLUP("Rollup (Total)", "nat", "Total");
 
         private String fullName;
-        private String shortenedName;
+        private String metadataName;
+        private String rowName;
 
-        AggregationItem(String fullName, String shortenedName) {
+        AggregationItem(String fullName, String metadataName, String rowName) {
             this.fullName = fullName;
-            this.shortenedName = shortenedName;
+            this.metadataName = metadataName;
+            this.rowName = rowName;
+        }
+
+        public static AggregationItem fromString(String fullName) {
+            for (AggregationItem aggregation : AggregationItem.values()) {
+                if (aggregation.getFullName().equals(fullName)) {
+                    return aggregation;
+                }
+            }
+            throw new IllegalArgumentException("Displayed name does not match with any AggregationItem");
+        }
+
+        public static List<String> getAllRowNames() {
+            return Arrays.stream(AggregationItem.values()).map(AggregationItem::getRowName).collect(toList());
+        }
+
+        public static List<String> getAllFullNames() {
+            return Arrays.stream(AggregationItem.values()).map(AggregationItem::getFullName).collect(toList());
         }
 
         public String getFullName() {
             return fullName;
         }
 
-        public String getShortenedName() {
-            return shortenedName;
+        public String getMetadataName() {
+            return metadataName;
+        }
+
+        public String getRowName() {
+            return rowName;
         }
     }
 }

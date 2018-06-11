@@ -31,10 +31,10 @@ public class DataproductDetailTest extends AbstractLcmConsoleTest {
     @Test(dependsOnMethods = {"initTest"})
     public void testDomainSegment() throws JSONException {
         final DataproductDetailPage dataproductDetailPage = DataproductDetailPage.getInstance(browser);
-        final DomainSegmentFragment domainSegmentFragment = dataproductDetailPage.getDomainSegment(DOMAIN_ID_2, SEGMENT_ID1);
+        final DomainSegmentFragment domainSegmentFragment = dataproductDetailPage.getDomainSegment(DOMAIN_ID_2, SEGMENT_ID2);
 
         assertTrue("Numbers of clients should be greater than 0", domainSegmentFragment.getClientsCount() > 0);
-        assertEquals("master", domainSegmentFragment.getMasterProjectName());
+        assertEquals(domainSegmentFragment.getMasterProjectName(), "master");
     }
 
     @Test(dependsOnMethods = {"initTest"})

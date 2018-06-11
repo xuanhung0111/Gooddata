@@ -9,7 +9,6 @@ import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.deleteUserByEmail;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -21,6 +20,7 @@ import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.fact.FactRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.jsoup.nodes.Document;
@@ -42,7 +42,6 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
-import com.gooddata.qa.utils.http.RestApiClient;
 
 public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
 
@@ -359,8 +358,9 @@ public class KpiAlertSpecialCaseTest extends AbstractDashboardTest {
 
             logoutAndLoginAs(imapUser, imapPassword);
 
-            RestApiClient restApiClient = testParams.getDomainUser() == null ? getRestApiClient() : getDomainUserRestApiClient();
-            deleteUserByEmail(restApiClient, testParams.getUserDomain(), newImapUser);
+            UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(
+                    new RestClient(getProfile(Profile.DOMAIN)), testParams.getProjectId());
+            userManagementRestRequest.deleteUserByEmail(testParams.getUserDomain(), newImapUser);
 
             updateCsvDataset(DATASET_NAME, otherCsvFilePath);
 

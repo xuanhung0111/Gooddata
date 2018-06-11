@@ -28,9 +28,12 @@ import java.util.Set;
 
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
+import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.RestClient.RestProfile;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
@@ -42,7 +45,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
-import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
@@ -50,9 +52,6 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbedDashboardDialog;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.RestUtils;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.google.common.base.Joiner;
 
 public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedulesTest {
@@ -112,9 +111,9 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     public void createDashboardSchedule() throws JSONException {
         try {
             loginAs(UserRoles.VIEWER);
-            GoodData goodDataClient = getGoodDataClient(testParams.getViewerUser(),
-                    testParams.getPassword());
-            String userUri = goodDataClient.getAccountService().getCurrent().getUri();
+            RestClient restClient = new RestClient(
+                    new RestProfile(testParams.getHost(), testParams.getViewerUser(), testParams.getPassword(), true));
+            String userUri = restClient.getAccountService().getCurrent().getUri();
             initDashboardsPage();
 
             DashboardScheduleDialog dashboardScheduleDialog = dashboardsPage.showDashboardScheduleDialog();
@@ -267,7 +266,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     @Test(dependsOnMethods = {"preparePublicAndPrivateSchedules"})
     public void createPrivateDashboardSchedules() throws JSONException {
         initEmailSchedulesPage();
-        String userUri = getGoodDataClient().getAccountService().getCurrent().getUri();
+        String userUri = new RestClient(getProfile(Profile.ADMIN)).getAccountService().getCurrent().getUri();
         refreshSchedulesPage();
         assertDashboardScheduleInfo(SCHEDULE_WITHOUT_RECIPIENTS,
                 userUri, Collections.<String>emptyList());
@@ -342,17 +341,18 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         String userB = createDynamicUserFrom(scheduleEmail);
         String scheduleUserA = "Schedule with deleted bcc email";
         String scheduleUserB = "Schedule with deleted author";
-        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
+        UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(
+                new RestClient(getProfile(Profile.DOMAIN)), testParams.getProjectId());
 
         try {
-            String userUri = getGoodDataClient().getAccountService().getCurrent().getUri();
-            UserManagementRestUtils.addUserToProject(restApiClient, testParams.getProjectId(), userA, UserRoles.EDITOR);
-            UserManagementRestUtils.addUserToProject(restApiClient, testParams.getProjectId(), userB, UserRoles.ADMIN);
+            String userUri = new RestClient(getProfile(Profile.ADMIN)).getAccountService().getCurrent().getUri();
+            userManagementRestRequest.addUserToProject(userA, UserRoles.EDITOR);
+            userManagementRestRequest.addUserToProject(userB, UserRoles.ADMIN);
 
             initDashboardsPage();
             dashboardsPage.selectDashboard(DASHBOARD_HAVING_MANY_TABS);
             createDashboardSchedule(scheduleUserA, asList(userA));
-            UserManagementRestUtils.deleteUserByEmail(restApiClient, testParams.getUserDomain(), userA);
+            userManagementRestRequest.deleteUserByEmail(testParams.getUserDomain(), userA);
 
             initEmailSchedulesPage();
             assertDashboardScheduleInfo(scheduleUserA, userUri, asList(userA));
@@ -364,7 +364,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
 
             logout();
             signIn(true, UserRoles.ADMIN);
-            UserManagementRestUtils.deleteUserByEmail(restApiClient, testParams.getUserDomain(), userB);
+            userManagementRestRequest.deleteUserByEmail(testParams.getUserDomain(), userB);
 
             assertFalse(initEmailSchedulesPage().isPrivateSchedulePresent(scheduleUserB),
                     "Schedule of deleted user was not hidden.");
@@ -425,7 +425,9 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
 
     private String getScheduleUri(String scheduleTitle) throws JSONException, IOException {
         final String schedulesUri = "/gdc/md/" + testParams.getProjectId() + "/query/scheduledmails";
-        final JSONArray schedules = RestUtils.getJsonObject(getRestApiClient(), schedulesUri)
+        final CommonRestRequest restRequest = new CommonRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        final JSONArray schedules = restRequest.getJsonObject(schedulesUri)
             .getJSONObject("query")
             .getJSONArray("entries");
 

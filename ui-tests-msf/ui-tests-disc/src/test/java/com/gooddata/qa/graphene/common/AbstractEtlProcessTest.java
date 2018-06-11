@@ -4,8 +4,9 @@ import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm;
 import com.gooddata.qa.graphene.fragments.disc.process.DeployProcessForm.ProcessType;
-import com.gooddata.qa.utils.http.RestApiClient;
+import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.RestRequest;
 import com.gooddata.qa.utils.http.disc.EtlProcessRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.json.JSONException;
@@ -15,7 +16,6 @@ import java.io.IOException;
 import java.util.Optional;
 
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
-import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 
 /**
  * Copyright (C) 2007-2017, GoodData(R) Corporation. All rights reserved.
@@ -63,10 +63,11 @@ public class AbstractEtlProcessTest extends AbstractProcessTest {
     protected EtlProcess getEtlProcessByName(String processName, ProcessType processType) {
         DataloadProcess dataloadProcess = getProcessByName(processName);
         if (dataloadProcess != null) {
-            RestApiClient restApiClient = getRestApiClient();
+            final CommonRestRequest restRequest = new CommonRestRequest(
+                    new RestClient(getProfile(ADMIN)), testParams.getProjectId());
             try {
-                final JSONObject json = getJsonObject(restApiClient,
-                        restApiClient.newGetMethod(dataloadProcess.getUri())).getJSONObject("process");
+                final JSONObject json = restRequest.getJsonObject(
+                        RestRequest.initGetRequest(dataloadProcess.getUri())).getJSONObject("process");
                 JSONObject componentObj = json.getJSONObject("component");
                 String s3ConfigurationPath = "";
                 String s3AccessKey = "";

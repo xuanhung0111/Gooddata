@@ -18,6 +18,8 @@ import java.util.Collection;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.By;
@@ -32,8 +34,6 @@ import com.gooddata.qa.graphene.fragments.account.InviteUserDialog;
 import com.gooddata.qa.graphene.fragments.account.RegistrationPage;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
-import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 public class InviteUserTest extends AbstractProjectTest {
 
@@ -146,8 +146,8 @@ public class InviteUserTest extends AbstractProjectTest {
             ++expectedMessageCount;
         } finally {
             signIn(true, UserRoles.ADMIN);
-            RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
-            UserManagementRestUtils.deleteUserByEmail(restApiClient, testParams.getUserDomain(), nonRegistedUser);
+            new UserManagementRestRequest(new RestClient(getProfile(Profile.DOMAIN)), testParams.getProjectId())
+                    .deleteUserByEmail(testParams.getUserDomain(), nonRegistedUser);
         }
     }
 

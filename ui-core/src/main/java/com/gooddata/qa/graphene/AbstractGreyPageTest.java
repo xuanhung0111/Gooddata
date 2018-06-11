@@ -16,8 +16,9 @@ import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.query.attributes.QueryAttributesFragment;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.RestClient.RestProfile;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import com.gooddata.qa.utils.webdav.WebDavClient;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
@@ -41,7 +42,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static java.util.Objects.isNull;
 import static org.testng.Assert.assertTrue;
 
-public class AbstractGreyPageTest extends AbstractTest {
+public abstract class AbstractGreyPageTest extends AbstractTest {
 
     protected static final By BY_GP_FORM = By.tagName("form");
     protected static final By BY_GP_FORM_SECOND = By.xpath("//div[@class='form'][2]/form");
@@ -223,9 +224,11 @@ public class AbstractGreyPageTest extends AbstractTest {
     }
 
     protected void addUserToProject(String email, UserRoles userRole) throws ParseException, IOException, JSONException {
-        UserManagementRestUtils.addUserToProject(
-                testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient(),
-                        testParams.getProjectId(), email, userRole);
+        final String domainUser = testParams.getDomainUser() != null ? testParams.getDomainUser() : testParams.getUser();
+        final UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(new RestClient(
+                new RestProfile(testParams.getHost(), domainUser, testParams.getPassword(), true)),
+                testParams.getProjectId());
+        userManagementRestRequest.addUserToProject(email, userRole);
     }
 
     /**
@@ -240,19 +243,20 @@ public class AbstractGreyPageTest extends AbstractTest {
      * @throws IOException
      */
     protected String createAndAddUserToProject(UserRoles role) throws ParseException, JSONException, IOException {
-        RestApiClient restApiClient;
         String domainUser;
 
         if (isNull(testParams.getDomainUser())) {
-            restApiClient = getRestApiClient();
             domainUser = testParams.getUser();
         } else {
-            restApiClient = getDomainUserRestApiClient();
             domainUser = testParams.getDomainUser();
         }
 
+        UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(new RestClient(
+                new RestProfile(testParams.getHost(), domainUser, testParams.getPassword(), true)),
+                testParams.getProjectId());
+
         String dynamicUser = createDynamicUserFrom(domainUser.replace("@", "+" + role.getName().toLowerCase() + "@"));
-        UserManagementRestUtils.addUserToProject(restApiClient, testParams.getProjectId(), dynamicUser, role);
+        userManagementRestRequest.addUserToProject(dynamicUser, role);
 
         switch (role) {
             case EDITOR:
@@ -271,7 +275,7 @@ public class AbstractGreyPageTest extends AbstractTest {
 
     /**
      * Create a dynamic user and automatically delete it after test.
-     * Note: UserManagementRestUtils.createUser() is not automatically delete it.
+     * Note: UserManagementRestRequest.createUser() is not automatically delete it.
      * @param email
      * @return dynamic user email
      * @throws ParseException
@@ -279,10 +283,13 @@ public class AbstractGreyPageTest extends AbstractTest {
      * @throws IOException
      */
     protected String createDynamicUserFrom(String email) throws ParseException, JSONException, IOException {
-        RestApiClient restApiClient = testParams.getDomainUser() == null ? getRestApiClient() : getDomainUserRestApiClient();
+        final String domainUser = testParams.getDomainUser() != null ? testParams.getDomainUser() : testParams.getUser();
+        final UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(new RestClient(
+                new RestProfile(testParams.getHost(), domainUser, testParams.getPassword(), true)),
+                testParams.getProjectId());
         String dynamicUser = generateEmail(email);
 
-        UserManagementRestUtils.createUser(restApiClient, testParams.getUserDomain(), dynamicUser, testParams.getPassword());
+        userManagementRestRequest.createUser(testParams.getUserDomain(), dynamicUser, testParams.getPassword());
         log.info(String.format("User %s is created successfully", dynamicUser));
         extraUsers.add(dynamicUser);
 

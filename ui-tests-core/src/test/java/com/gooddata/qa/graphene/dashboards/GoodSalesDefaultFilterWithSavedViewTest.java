@@ -12,8 +12,8 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
 import com.gooddata.qa.utils.asserts.AssertUtils;
-import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import com.gooddata.qa.utils.http.variable.VariableRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -29,7 +29,6 @@ import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileUri;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -570,7 +569,8 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
     }
 
     private String getViewerProfileUri() throws ParseException, JSONException, IOException {
-        RestApiClient restApiClient = testParams.getDomainUser() != null ? getDomainUserRestApiClient() : getRestApiClient();
-        return getUserProfileUri(restApiClient, testParams.getUserDomain(), testParams.getViewerUser());
+        UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(
+                new RestClient(getProfile(Profile.DOMAIN)), testParams.getProjectId());
+        return userManagementRestRequest.getUserProfileUri(testParams.getUserDomain(), testParams.getViewerUser());
     }
 }

@@ -84,7 +84,7 @@ public class DashboardFiscalDateFilterConfigurationTest extends AbstractDashboar
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void computeReportCorrectlyWithFiscalDateFilter() {
+    public void computeReportAndKeyMetricCorrectlyWithFiscalDateFilter() {
         initDashboardsPage().addNewDashboard(generateDashboardName())
                 .editDashboard()
                 .addReportToDashboard(REPORT_NAME)

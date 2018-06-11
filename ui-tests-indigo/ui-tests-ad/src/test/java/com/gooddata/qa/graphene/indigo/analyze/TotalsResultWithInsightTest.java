@@ -4,6 +4,7 @@ import com.gooddata.md.Attribute;
 import com.gooddata.md.Metric;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
+import com.gooddata.qa.graphene.entity.visualization.CategoryBucket.Type;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
@@ -17,8 +18,8 @@ import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import org.apache.http.ParseException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -83,14 +84,15 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
                             MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_NUMBER_OF_ACTIVITIES)),
                             MeasureBucket.createSimpleMeasureBucket(getMetric(METRIC_CLOSE_EOP))))
                     .setCategoryBucket(asList(
-                            CategoryBucket.createViewByBucket(getAttribute(ATTR_DEPARTMENT)),
-                            CategoryBucket.createViewByBucket(getAttribute(ATTR_SALES_REP)))));
+                            CategoryBucket.createCategoryBucket(getAttribute(ATTR_DEPARTMENT), Type.ATTRIBUTE),
+                            CategoryBucket.createCategoryBucket(getAttribute(ATTR_SALES_REP), Type.ATTRIBUTE))));
 
         indigoRestRequest.createInsight(
             new InsightMDConfiguration(INSIGHT_SHOW_PERCENT, ReportType.TABLE)
                     .setMeasureBucket(singletonList(MeasureBucket.createMeasureBucketWithShowInPercent(
                             getMetric(METRIC_NUMBER_OF_ACTIVITIES), true)))
-                    .setCategoryBucket(singletonList(CategoryBucket.createViewByBucket(getAttribute(ATTR_YEAR_ACTIVITY)))));
+                    .setCategoryBucket(singletonList(
+                            CategoryBucket.createCategoryBucket(getAttribute(ATTR_YEAR_ACTIVITY), Type.ATTRIBUTE))));
 
         createSimpleInsight(INSIGHT_SHOW_POP, METRIC_NUMBER_OF_ACTIVITIES, ATTR_YEAR_ACTIVITY);
         AnalysisPage analysisPage = initAnalysePage();
@@ -221,8 +223,10 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
         DashboardRestRequest dashboardRestRequest = new DashboardRestRequest(getAdminRestClient(), testParams
                 .getProjectId());
         final String mufUri = dashboardRestRequest.createMufObjectByUri("muf", expression);
-        String assignedMufUserId = UserManagementRestUtils
-            .getUserProfileUri(getDomainUserRestApiClient(), testParams.getUserDomain(), testParams.getEditorUser());
+        final UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(
+                new RestClient(getProfile(Profile.DOMAIN)), testParams.getProjectId());
+        String assignedMufUserId = userManagementRestRequest
+                .getUserProfileUri(testParams.getUserDomain(), testParams.getEditorUser());
 
         dashboardRestRequest.addMufToUser(assignedMufUserId, mufUri);
 
@@ -271,6 +275,7 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
         indigoRestRequest.createInsight(
             new InsightMDConfiguration(title, ReportType.TABLE)
                     .setMeasureBucket(singletonList(MeasureBucket.createSimpleMeasureBucket(getMetric(metric))))
-                    .setCategoryBucket(singletonList(CategoryBucket.createViewByBucket(getAttribute(attribute)))));
+                    .setCategoryBucket(singletonList(
+                            CategoryBucket.createCategoryBucket(getAttribute(attribute), Type.ATTRIBUTE))));
     }
 }

@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.manage;
 
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
+import static com.gooddata.qa.graphene.AbstractTest.Profile.DOMAIN;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
@@ -47,7 +48,7 @@ import com.gooddata.qa.models.GraphModel;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.model.ModelRestRequest;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
@@ -464,11 +465,12 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             logout();
 
             signIn(false, UserRoles.ADMIN);
-            restApiClient = getRestApiClient();
 
             String mufUri = createStageMuf(Arrays.asList("Won", "Lost"), "Status User Filters");
-            dashboardRequest.addMufToUser(UserManagementRestUtils.getUserProfileUri(
-                    getDomainUserRestApiClient(), testParams.getUserDomain(), testParams.getEditorUser()), mufUri);
+            UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(
+                    new RestClient(getProfile(DOMAIN)), testParams.getProjectId());
+            dashboardRequest.addMufToUser(userManagementRestRequest.getUserProfileUri(
+                    testParams.getUserDomain(), testParams.getEditorUser()), mufUri);
             logout();
 
             signInAtUI(testParams.getEditorUser(), testParams.getPassword());

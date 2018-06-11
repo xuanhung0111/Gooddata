@@ -3,10 +3,9 @@ package com.gooddata.qa.graphene.lcmconsole.tests;
 import com.gooddata.qa.graphene.fragments.lcmconsole.CreateDataproductDialog;
 import com.gooddata.qa.graphene.fragments.lcmconsole.DataproductsPage;
 import com.gooddata.qa.graphene.lcmconsole.AbstractLcmConsoleTest;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.json.JSONException;
 import org.testng.annotations.Test;
-
-import java.util.Random;
 
 import static com.gooddata.qa.graphene.lcmconsole.NamingConstants.DOMAIN_ID_1;
 import static java.util.Arrays.asList;
@@ -33,14 +32,14 @@ public class DataproductsTest extends AbstractLcmConsoleTest {
     }
 
     @Test(dependsOnMethods = {"initTest"})
-    public void testDataProductPresent() throws  JSONException {
+    public void testDataProductPresent() throws JSONException {
         assertTrue("Dataproduct BranchConnect should be present", dataproductsPage.isDataproductPresent("BranchConnect"));
-        assertTrue("Dataproduct BranchConnect should have segments Region, State" ,
+        assertTrue("Dataproduct BranchConnect should have segments Region, State",
                 dataproductsPage.isSegmentsPresent("BranchConnect", asList("Region", "State")));
     }
 
     private String generateRandomDataproductId() {
-        return "GrapheneDataproduct" + new Random().nextLong();
+        return "dataProduct-" + RandomStringUtils.randomAlphanumeric(16);
     }
 
 }

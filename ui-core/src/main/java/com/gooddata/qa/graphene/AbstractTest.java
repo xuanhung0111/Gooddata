@@ -1,7 +1,5 @@
 package com.gooddata.qa.graphene;
 
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.deleteUserByEmail;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,12 +14,10 @@ import com.gooddata.project.ProjectDriver;
 import com.gooddata.project.ProjectService;
 import com.gooddata.project.ProjectValidationResults;
 import com.gooddata.qa.browser.BrowserUtils;
+import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestClient.RestProfile;
-import org.apache.http.HttpHost;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
-import org.apache.http.NoHttpResponseException;
-import org.apache.http.client.HttpRequestRetryHandler;
-import org.apache.http.protocol.HttpContext;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.testng.Arquillian;
 import org.json.JSONException;
@@ -30,12 +26,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
-
-import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.common.TestParameters;
-import com.gooddata.qa.graphene.utils.Sleeper;
-import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.testng.listener.AuxiliaryFailureScreenshotListener;
 import com.gooddata.qa.utils.testng.listener.ConsoleStatusListener;
 import com.gooddata.qa.utils.testng.listener.FailureLoggingListener;
@@ -54,9 +46,6 @@ public abstract class AbstractTest extends Arquillian {
     protected String imapHost;
     protected String imapUser;
     protected String imapPassword;
-
-    protected GoodData goodDataClient = null;
-    protected RestApiClient restApiClient = null;
 
     protected StartPageContext startPageContext = null;
 
@@ -94,10 +83,13 @@ public abstract class AbstractTest extends Arquillian {
 
     @AfterClass(alwaysRun = true)
     public void deleteUsers() throws ParseException, IOException, JSONException {
-        RestApiClient restApiClient = testParams.getDomainUser() == null ? getRestApiClient() : getDomainUserRestApiClient();
+        final String domainUser = testParams.getDomainUser() != null ? testParams.getDomainUser() : testParams.getUser();
+        final UserManagementRestRequest userManagementRestRequest = new UserManagementRestRequest(
+                new RestClient(new RestProfile(testParams.getHost(), domainUser, testParams.getPassword(), true)),
+                testParams.getProjectId());
 
         for (String user : extraUsers) {
-            deleteUserByEmail(restApiClient, testParams.getUserDomain(), user);
+            userManagementRestRequest.deleteUserByEmail(testParams.getUserDomain(), user);
         }
     }
 
@@ -125,48 +117,6 @@ public abstract class AbstractTest extends Arquillian {
         return "https://" + testParams.getHost() + "/";
     }
 
-    public String getBasicRootUrl() {
-        String rootUrl = getRootUrl();
-        return getRootUrl().substring(0, rootUrl.length() - 1);
-    }
-
-    public RestApiClient getDomainUserRestApiClient() {
-        return getRestApiClient(testParams.getDomainUser() == null ? testParams.getUser() : testParams.getDomainUser(), 
-                testParams.getPassword());
-    }
-
-    /**
-     * Create {@link com.gooddata.qa.utils.http.RestApiClient} for admin user and save it to the test context.
-     * @return {@link com.gooddata.qa.utils.http.RestApiClient} client for admin user
-     */
-    public RestApiClient getRestApiClient() {
-        if (restApiClient == null) {
-            restApiClient = getRestApiClient(testParams.getUser(), testParams.getPassword());
-        }
-        return restApiClient;
-    }
-
-    /**
-     * Create {@link com.gooddata.qa.utils.http.RestApiClient} for specific user. It doesn't save it to the context!
-     *
-     * @return {@link com.gooddata.qa.utils.http.RestApiClient} for specific user.
-     */
-    public RestApiClient getRestApiClient(final String userLogin, final String userPassword) {
-        return new RestApiClient(testParams.getHost(), userLogin, userPassword, true, false);
-    }
-
-    public GoodData getGoodDataClient() {
-        if (goodDataClient == null) {
-            goodDataClient = getGoodDataClient(testParams.getUser(), testParams.getPassword());
-        }
-        return goodDataClient;
-    }
-
-    public GoodData getGoodDataClient(final String userLogin, final String userPassword) {
-        final HttpHost httpHost = RestApiClient.parseHost(testParams.getHost());
-        return new GoodData(httpHost.getHostName(), userLogin, userPassword, httpHost.getPort());
-    }
-
     public String generateEmail(String email) {
         return email.replace("@", "+" + generateHashString() + "@");
     }
@@ -178,7 +128,7 @@ public abstract class AbstractTest extends Arquillian {
     public ProjectValidationResults validateProject() {
         final int timeout = testParams.getProjectDriver() == ProjectDriver.VERTICA ?
                 testParams.getExtendedTimeout() : testParams.getDefaultTimeout();
-        final ProjectService service = getGoodDataClient().getProjectService();
+        final ProjectService service = new RestClient(getProfile(Profile.ADMIN)).getProjectService();
         final Project project = service.getProjectById(testParams.getProjectId());
         final ProjectValidationResults results = service.validateProject(project).get(timeout, TimeUnit.SECONDS);
         System.out.println("Project valid: " + results.isValid());

@@ -8,7 +8,6 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.deleteUserByEmail;
 import static com.gooddata.qa.graphene.fragments.account.LostPasswordPage.PASSWORD_HINT;
 import static java.lang.String.format;
 
@@ -16,6 +15,8 @@ import java.io.IOException;
 import javax.mail.MessagingException;
 
 import com.gooddata.qa.graphene.utils.CheckUtils;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -108,7 +109,8 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
      */
     @Test
     public void checkWalkme() throws ParseException, JSONException, IOException {
-        deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), registrationUser);
+        new UserManagementRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .deleteUserByEmail(testParams.getUserDomain(), registrationUser);
 
         initRegistrationPage()
             .registerNewUserSuccessfully(registrationForm);
@@ -194,7 +196,8 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     @Test
     public void loginAsUnverifiedUserAfterRegistering()
             throws ParseException, JSONException, IOException, MessagingException {
-        deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), registrationUser);
+        new UserManagementRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .deleteUserByEmail(testParams.getUserDomain(), registrationUser);
 
         activationLink = doActionWithImapClient(
                 imapClient -> initRegistrationPage().registerNewUserSuccessfully(imapClient, registrationForm));
@@ -246,7 +249,8 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
             log.warning("Register New User is not tested on PI or Production environment");
             return;
         }
-        deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), registrationUser);
+        new UserManagementRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .deleteUserByEmail(testParams.getUserDomain(), registrationUser);
 
         activationLink = doActionWithImapClient(
                 imapClient -> initRegistrationPage().registerNewUserSuccessfully(imapClient, registrationForm));
@@ -365,7 +369,8 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     public void tearDown() throws ParseException, JSONException, IOException {
         if (testParams.isPIEnvironment() || testParams.isProductionEnvironment() 
                 || testParams.isPerformanceEnvironment()) return;
-        deleteUserByEmail(getRestApiClient(), testParams.getUserDomain(), registrationUser);
+        new UserManagementRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .deleteUserByEmail(testParams.getUserDomain(), registrationUser);
     }
 
     private void openProject(String projectName) {

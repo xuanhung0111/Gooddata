@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -43,6 +42,7 @@ public class DashboardContent extends AbstractFragment {
 
     @FindBy(css = ".c-collectionWidget:not(.gdc-hidden) .yui3-c-dashboardcollectionwidget-content .yui3-c-dashboardwidget")
     private List<WebElement> widgets;
+
     private static final By REPORT_TITLE_LOCATOR = By.cssSelector(".yui3-c-reportdashboardwidget-reportTitle");
     private static final By REPORT_LOCATOR =
             By.cssSelector(".c-collectionWidget:not(.gdc-hidden) .yui3-c-reportdashboardwidget");
@@ -102,6 +102,10 @@ public class DashboardContent extends AbstractFragment {
         waitForElementPresent(reportLoaded, browser);
         return waitForElementVisible(reportImg, browser);
      }
+
+    public WebElement getLastReportElement() {
+        return Iterables.getLast(getReports());
+    }
 
     public List<FilterWidget> getFilters() {
         return Lists.newArrayList(Collections2.transform(filters, new Function<WebElement, FilterWidget>() {

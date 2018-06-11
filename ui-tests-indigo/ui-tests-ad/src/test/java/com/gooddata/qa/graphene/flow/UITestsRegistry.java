@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.gooddata.qa.graphene.indigo.analyze.AggregationResultTest;
+import com.gooddata.qa.graphene.indigo.analyze.AggregationPopupManipulationTest;
 import com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerSanityTest;
 import com.gooddata.qa.graphene.indigo.analyze.CustomDateDimensionsTest;
 import com.gooddata.qa.graphene.indigo.analyze.EmbeddedAdTest;
@@ -116,8 +117,35 @@ public class UITestsRegistry {
             GoodSalesPopComparisonTest.class,
             AggregationResultTest.class,
             TotalsResultWithInsightTest.class,
+            AggregationPopupManipulationTest.class,
             "testng-ad-ChartLabelFormat.xml",
             "testng-ad-MetricNumberFormat.xml"
+        });
+
+        suites.put("crud", new Object[] {
+            GoodSalesAttributeBasedMetricTest.class,
+            GoodSalesAttributeBucketTest.class,
+            GoodSalesCatalogueTest.class,
+            GoodSalesDropAttributeTest.class,
+            GoodSalesFactBasedMetricTest.class,
+            GoodSalesMetricBucketTest.class,
+            GoodSalesMetricFilterTest.class,
+            GoodSalesUndoTest.class,
+            GoodSalesUndoRedoSavedInsightTest.class,
+            GoodSalesInsightTest.class,
+            GoodSalesSaveInsightTest.class
+        });
+
+        suites.put("filters", new Object[] {
+            GoodSalesAttributeFilterTest.class,
+            DateFilterTest.class,
+            GoodSalesMetricFilterTest.class
+        });
+
+        suites.put("total-results", new Object[] {
+            AggregationResultTest.class,
+            TotalsResultWithInsightTest.class,
+            AggregationPopupManipulationTest.class
         });
 
         TestsRegistry.getInstance()

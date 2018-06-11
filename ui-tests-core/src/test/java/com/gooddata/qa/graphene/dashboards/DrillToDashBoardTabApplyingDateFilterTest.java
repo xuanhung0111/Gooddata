@@ -11,6 +11,8 @@ import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.CommonRestRequest;
+import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.apache.commons.lang3.tuple.Pair;
@@ -28,7 +30,6 @@ import static com.gooddata.qa.graphene.enums.DateRange.ZONE_ID;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_AMOUNT_BY_PRODUCT;
 import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.TOP_RIGHT;
-import static com.gooddata.qa.utils.http.RestUtils.deleteObjectsUsingCascade;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
@@ -126,7 +127,8 @@ public class DrillToDashBoardTabApplyingDateFilterTest extends GoodSalesAbstract
             assertEquals(reportOnTargetTab.getAttributeValues().size(), expectedReportRowCount,
                     "Report is not applied date filter");
         } finally {
-            deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashboardUri);
+            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                    .deleteObjectsUsingCascade(dashboardUri);
         }
     }
 
@@ -181,8 +183,10 @@ public class DrillToDashBoardTabApplyingDateFilterTest extends GoodSalesAbstract
             assertEquals(reportOnSecondDash.waitForLoaded().getAttributeValues().size(), 3);
             checkSelectedFilterValues(DATE_DIMENSION_CLOSED, DATA_FILTERED_BY_YEAR_2014);
         } finally {
+            final CommonRestRequest restRequest = new CommonRestRequest(
+                    new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
             for (String dashboardUri : dashboardUris) {
-                deleteObjectsUsingCascade(getRestApiClient(), testParams.getProjectId(), dashboardUri);
+                restRequest.deleteObjectsUsingCascade(dashboardUri);
             }
         }
     }

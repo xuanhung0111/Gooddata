@@ -7,10 +7,11 @@ import static org.testng.Assert.assertNotNull;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.RestUtils.getResource;
 
 import java.io.IOException;
 
+import com.gooddata.qa.utils.http.CommonRestRequest;
+import com.gooddata.qa.utils.http.RestClient;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.springframework.http.HttpStatus;
@@ -226,7 +227,9 @@ public class ScheduleDetailTest extends AbstractProcessTest {
             ScheduleDetail scheduleDetail = initScheduleDetail(schedule);
 
             scheduleDetail.executeSchedule().waitForExecutionFinish();
-            assertNotNull(getResource(getRestApiClient(), scheduleDetail.getLastExecutionLogUri(), HttpStatus.OK));
+            final CommonRestRequest restRequest = new CommonRestRequest(
+                    new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+            assertNotNull(restRequest.getResource(scheduleDetail.getLastExecutionLogUri(), HttpStatus.OK));
 
         } finally {
             getProcessService().removeProcess(process);
