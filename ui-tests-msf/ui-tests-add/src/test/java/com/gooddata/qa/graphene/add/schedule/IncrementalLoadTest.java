@@ -1,20 +1,5 @@
 package com.gooddata.qa.graphene.add.schedule;
 
-import static com.gooddata.md.Restriction.title;
-import static java.lang.String.format;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasItem;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-
-import java.io.IOException;
-import java.time.LocalDateTime;
-
-import org.apache.http.ParseException;
-import org.json.JSONException;
-import org.testng.annotations.Test;
-
 import com.gooddata.dataload.processes.Schedule;
 import com.gooddata.md.Attribute;
 import com.gooddata.qa.graphene.common.AbstractDataloadProcessTest;
@@ -28,6 +13,19 @@ import com.gooddata.qa.graphene.enums.process.Parameter;
 import com.gooddata.qa.graphene.fragments.disc.schedule.add.DataloadScheduleDetail;
 import com.gooddata.qa.graphene.fragments.disc.schedule.add.DatasetDropdown;
 import com.gooddata.qa.graphene.fragments.disc.schedule.add.RunOneOffDialog.LoadMode;
+import org.apache.http.ParseException;
+import org.json.JSONException;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+
+import static com.gooddata.md.Restriction.title;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasItem;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 
 public class IncrementalLoadTest extends AbstractDataloadProcessTest {
 
@@ -39,7 +37,7 @@ public class IncrementalLoadTest extends AbstractDataloadProcessTest {
     private String lastLSLTS;
 
     @Test(dependsOnGroups = {"initDataload"}, groups = {"precondition"})
-    public void initData() throws JSONException, IOException {
+    public void initData() throws JSONException {
         setupMaql(new LdmModel()
                 .withDataset(new Dataset(DATASET_OPPORTUNITY)
                         .withAttributes(ATTR_OPPORTUNITY)
@@ -125,37 +123,6 @@ public class IncrementalLoadTest extends AbstractDataloadProcessTest {
     }
 
     @Test(dependsOnGroups = {"setFirstLSLTS"})
-    public void showUpErrorWithNullTimestamp() {
-        opportunity.rows("OPP_ERROR", "100");
-        person.rows("P_ERROR", "19");
-
-        executeProcess(updateAdsTableProcess, UPDATE_ADS_TABLE_EXECUTABLE,
-                defaultParameters.get().addParameter(Parameter.SQL_QUERY, SqlBuilder.build(opportunity, person)));
-
-        Schedule schedule = createScheduleForManualTrigger(generateScheduleName(), SyncDatasets.ALL);
-
-        try {
-            DataloadScheduleDetail scheduleDetail = initScheduleDetail(schedule);
-
-            scheduleDetail.executeSchedule().waitForExecutionFinish();
-            assertEquals(scheduleDetail.getLastExecutionHistoryItem().getErrorMessage(),
-                    format("While trying to load project %s, the following datasets had one or more rows with a "
-                    + "null timestamp, which is not allowed: %s: 1 row(s), %s: 1 row(s).",
-                    testParams.getProjectId(), DATASET_PERSON, DATASET_OPPORTUNITY));
-
-            DatasetDropdown dropdown = initScheduleDetail(schedule)
-                    .selectCustomDatasetsOption().getDatasetDropdown().expand();
-            assertEquals(dropdown.getLSLTSOf(DATASET_OPPORTUNITY), "not set");
-            assertEquals(dropdown.getLSLTSOf(DATASET_PERSON), lastLSLTS);
-
-        } finally {
-            getProcessService().removeSchedule(schedule);
-            opportunity.removeLastRowData();
-            person.removeLastRowData();
-        }
-    }
-
-    @Test(dependsOnGroups = {"setFirstLSLTS"})
     public void setLSLTSHasMicroSecond() {
         String datePattern = "yyyy-MM-dd HH:mm:ss.SSSSSS";
         LocalDateTime dateTime = LocalDateTime.now();
@@ -219,7 +186,7 @@ public class IncrementalLoadTest extends AbstractDataloadProcessTest {
     }
 
     @Test(dependsOnGroups = {"setFirstLSLTS"})
-    public void notShowLSLTSAfterDeleteTimestampColumn() throws ParseException, IOException {
+    public void notShowLSLTSAfterDeleteTimestampColumn() throws ParseException {
         CsvFile personWithNoTS = new CsvFile(DATASET_PERSON)
                 .columns(new CsvFile.Column(ATTR_PERSON), new CsvFile.Column(FACT_AGE))
                 .rows("P1_NO_TS", "18")

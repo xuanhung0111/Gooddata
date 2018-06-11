@@ -34,6 +34,10 @@ public class SqlBuilder {
         return getResourceAsString(filePath);
     }
 
+    public static String dropTables(String... tables) {
+        return Stream.of(tables).map(table -> "DROP TABLE IF EXISTS " + table).collect(joining(";"));
+    }
+
     private static AdsTable parseResource(CsvFile csvFile) {
         return new AdsTable(csvFile.getFileName().replace(".csv", ""))
                 .withAttributes(csvFile.getAttributeColumns())
