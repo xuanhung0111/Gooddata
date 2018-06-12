@@ -226,7 +226,7 @@ public class MetricConfiguration extends AbstractFragment {
 
     public static class AttributeFilterPicker extends AbstractPicker {
 
-        @FindBy(xpath = "//label[@class='input-checkbox-label' and input[contains(@class,'gd-checkbox-selection')]]")
+        @FindBy(css = ".s-select-all-checkbox")
         private WebElement selectAllLabel;
 
         @FindBy(css = ".gd-checkbox-selection")
