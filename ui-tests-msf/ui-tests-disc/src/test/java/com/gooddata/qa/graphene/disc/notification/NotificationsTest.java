@@ -6,6 +6,7 @@ import static org.testng.Assert.assertTrue;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getBubbleMessage;
 
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.gooddata.dataload.processes.DataloadProcess;
@@ -21,6 +22,15 @@ public class NotificationsTest extends AbstractProcessTest {
 
     private static final String INVALID_EMAIL_MESSAGE = "Email address is invalid. Please insert an email address "
             + "in this format: email@domain.com. You may insert only one recipient per notification rule.";
+    private static final Integer CONSECUTIVE_FAILURES_VALUE = 2;
+
+    @DataProvider(name = "consecutiveFailuresProvider")
+    public Object[][] getConsecutiveFailues() {
+        return new Object[][] {
+                {true},
+                {false}
+        };
+    }
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkEmptyStateNotificationList() {
@@ -117,14 +127,14 @@ public class NotificationsTest extends AbstractProcessTest {
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void createNotificationRule() {
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "consecutiveFailuresProvider")
+    public void createNotificationRule(boolean hasConsecutiveFailures) {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
             ProcessDetail processDetail = initDiscProjectDetailPage().getProcess(process.getName());
 
-            final NotificationRule notificationRule = getNewRule();
+            final NotificationRule notificationRule = getNewRule(hasConsecutiveFailures);
             processDetail.openNotificationRuleDialog()
                     .createNotificationRule(notificationRule)
                     .closeDialog();
@@ -137,7 +147,9 @@ public class NotificationsTest extends AbstractProcessTest {
             assertEquals(notifyItem.getSelectedEvent(), notificationRule.getEvent());
             assertEquals(notifyItem.getSubject(), notificationRule.getSubject());
             assertEquals(notifyItem.getMessage(), notificationRule.getMessage());
-
+            if (hasConsecutiveFailures) {
+                assertEquals(notifyItem.getConsecutiveFailures(), notificationRule.getConsecutiveFailures());
+            }
         } finally {
             getProcessService().removeProcess(process);
         }
@@ -160,15 +172,16 @@ public class NotificationsTest extends AbstractProcessTest {
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void editNotificationRule() {
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "consecutiveFailuresProvider")
+    public void editNotificationRule(boolean hasConsecutiveFailures) {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
             ProcessDetail processDetail = initDiscProjectDetailPage().getProcess(process.getName());
 
-            final NotificationRule notificationRule = getNewRule();
+            final NotificationRule notificationRule = getNewRule(hasConsecutiveFailures);
             final String editedSubject = "Edited subject " + generateHashString();
+            final Integer editedConsecutiveFailures = CONSECUTIVE_FAILURES_VALUE + 1;
 
             NotificationRuleItem notifyItem = processDetail.openNotificationRuleDialog()
                     .createNotificationRule(notificationRule)
@@ -178,16 +191,22 @@ public class NotificationsTest extends AbstractProcessTest {
             notifyItem.cancel();
             assertEquals(notifyItem.getSubject(), notificationRule.getSubject());
 
+            if (hasConsecutiveFailures) {
+                assertEquals(notifyItem.getConsecutiveFailures(), CONSECUTIVE_FAILURES_VALUE);
+                notifyItem.enterConsecutiveFailures(editedConsecutiveFailures);
+            }
             notifyItem.enterSubject(editedSubject).save();
             assertEquals(notifyItem.getSubject(), editedSubject);
-
+            if (hasConsecutiveFailures) {
+                assertEquals(notifyItem.getConsecutiveFailures(), editedConsecutiveFailures);
+            }
         } finally {
             getProcessService().removeProcess(process);
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void deleteNotificationRule() {
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "consecutiveFailuresProvider")
+    public void deleteNotificationRule(boolean hasConsecutiveFailures) {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
@@ -196,7 +215,7 @@ public class NotificationsTest extends AbstractProcessTest {
                     .openNotificationRuleDialog();
 
             NotificationRuleItem notifyItem = notificationRuleDialog
-                    .createNotificationRule(getNewRule())
+                    .createNotificationRule(getNewRule(hasConsecutiveFailures))
                     .getLastNotificationRuleItem()
                     .tryDeleteButCancel();
             assertEquals(notificationRuleDialog.getNotificationRuleNumber(), 1);
@@ -219,7 +238,7 @@ public class NotificationsTest extends AbstractProcessTest {
             assertEquals(processDetail.getNotificationRuleDescription(), "No notification rules");
 
             processDetail.openNotificationRuleDialog()
-                    .createNotificationRule(getNewRule())
+                    .createNotificationRule(getNewRule(false))
                     .closeDialog();
             assertEquals(processDetail.getNotificationRuleDescription(), "1 notification rule");
 
@@ -228,11 +247,15 @@ public class NotificationsTest extends AbstractProcessTest {
         }
     }
 
-    private NotificationRule getNewRule() {
-        return new NotificationRule()
+    private NotificationRule getNewRule(boolean configConsecutiveFailures) {
+        NotificationRule notificationRule = new NotificationRule()
                 .withEmail(testParams.getUser())
-                .withEvent(NotificationEvent.SUCCESS)
+                .withEvent(configConsecutiveFailures ? NotificationEvent.FAILURE : NotificationEvent.SUCCESS)
                 .withSubject("Subject " + generateHashString())
                 .withMessage("Message " + generateHashString());
+        if (configConsecutiveFailures) {
+            notificationRule.withConsecutiveFailures(CONSECUTIVE_FAILURES_VALUE);
+        }
+        return notificationRule;
     }
 }
