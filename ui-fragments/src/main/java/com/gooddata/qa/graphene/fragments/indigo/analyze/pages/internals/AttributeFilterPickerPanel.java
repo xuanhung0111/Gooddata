@@ -20,7 +20,7 @@ import com.gooddata.qa.graphene.fragments.common.AbstractPicker;
 
 public class AttributeFilterPickerPanel extends AbstractPicker {
 
-    @FindBy(xpath = "//label[@class='input-checkbox-label' and input[contains(@class,'gd-checkbox-selection')]]")
+    @FindBy(css = ".s-select-all-checkbox")
     private WebElement selectAllLabel;
 
     @FindBy(css = ".gd-checkbox-selection")
