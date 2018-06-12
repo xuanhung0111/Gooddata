@@ -50,7 +50,7 @@ public class FiltersBucket extends AbstractBucket {
         if (STATIC_PERIOD_DROPDOWN_ITEM.equals(period)) {
             assertTrue(getFilterTextHelper(filter).matches(DATE_RANGE_REGEX));
         } else {
-            assertTrue(getFilterTextHelper(filter).endsWith(": " + period));
+            assertTrue(getFilterTextHelper(filter).endsWith(":\n" + period));
         }
         return this;
     }

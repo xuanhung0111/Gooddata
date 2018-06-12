@@ -226,11 +226,11 @@ public class MetricConfiguration extends AbstractFragment {
 
     public static class AttributeFilterPicker extends AbstractPicker {
 
-        @FindBy(className = "s-clear")
-        private WebElement clearButton;
+        @FindBy(xpath = "//label[@class='input-checkbox-label' and input[contains(@class,'gd-checkbox-selection')]]")
+        private WebElement selectAllLabel;
 
-        @FindBy(className = "s-select_all")
-        private WebElement selectAllButton;
+        @FindBy(css = ".gd-checkbox-selection")
+        private WebElement selectAllCheckbox;
 
         @FindBy(css = ".s-apply:not(.disabled)")
         private WebElement applyButton;
@@ -272,12 +272,26 @@ public class MetricConfiguration extends AbstractFragment {
         }
 
         public AttributeFilterPicker clear() {
-            waitForElementVisible(clearButton).click();
+            WebElement checkbox = waitForElementPresent(selectAllCheckbox);
+            if (checkbox.getAttribute("class").contains("checkbox-indefinite")) {
+                checkbox.click(); // this will select all
+            }
+
+            if (checkbox.isSelected()) {
+                checkbox.click();
+            }
             return this;
         }
 
         public AttributeFilterPicker selectAll() {
-            waitForElementVisible(selectAllButton).click();
+            waitForElementVisible(selectAllLabel);
+            if (selectAllCheckbox.getAttribute("class").contains("checkbox-indefinite")) {
+                selectAllCheckbox.click(); // this will select all
+            }
+
+            if (!selectAllCheckbox.isSelected()) {
+                selectAllCheckbox.click();
+            }
             return this;
         }
 
@@ -317,7 +331,6 @@ public class MetricConfiguration extends AbstractFragment {
             Stream.of(items).forEach(element -> {
                 searchForText(element);
                 getElement(format("[title='%s']", element))
-                    .findElement(tagName("input"))
                     .click();
             });
             return this;

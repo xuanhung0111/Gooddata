@@ -65,7 +65,7 @@ public class UndoTest extends AbstractAdE2ETest {
 
         assertEquals(analysisPage.undo()
             .getFilterBuckets()
-            .getDateFilterText(), "Activity: Last 4 quarters");
+            .getDateFilterText(), "Activity:\nLast 4 quarters");
     }
 
     @Test(dependsOnGroups = {"createProject"})
