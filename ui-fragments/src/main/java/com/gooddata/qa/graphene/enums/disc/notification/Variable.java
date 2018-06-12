@@ -16,7 +16,8 @@ public enum Variable {
     START_TIME("params.START_TIME", "${params.START_TIME}"),
     FINISH_TIME("params.FINISH_TIME", "${params.FINISH_TIME}"),
     ERROR_MESSAGE("params.ERROR_MESSAGE", "${params.ERROR_MESSAGE}"),
-    DATASETS("params.DATASETS", "${params.DATASETS}");
+    DATASETS("params.DATASETS", "${params.DATASETS}"),
+    CONSECUTIVE_FAILURES("params.CONSECUTIVE_FAILURES", "${params.CONSECUTIVE_FAILURES}");
 
     private String name;
     private String value;

@@ -29,6 +29,7 @@ import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.dataload.processes.Schedule;
@@ -50,6 +51,7 @@ public class NotificationEmailTest extends AbstractProcessTest {
 
     private static final String DATE_FORMAT_PATTERN_1 = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     private static final String DATE_FORMAT_PATTERN_2 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    private static final Integer CONSECUTIVE_FAILURES_VALUE = 2;
 
     private static final String REPEATED_DATA_LOADING_FAILURE_SUBJECT = "Repeated data loading failure: \"%s\" process";
 
@@ -66,6 +68,14 @@ public class NotificationEmailTest extends AbstractProcessTest {
             + "consecutive failure. To resume scheduled uploads from this process: Go to the schedule page "
             + "Click \"Enable\" If you require assistance with troubleshooting data uploading, please visit the "
             + "GoodData Support Portal. At your service, The GoodData Team";
+
+    @DataProvider(name = "consecutiveFailuresProvider")
+    public Object[][] getConsecutiveFailues() {
+        return new Object[][] {
+                {true},
+                {false}
+        };
+    }
 
     @BeforeClass(alwaysRun = true)
     public void initImapUser() {
@@ -194,8 +204,8 @@ public class NotificationEmailTest extends AbstractProcessTest {
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"})
-    public void receiveEmailByFailureEvent() throws JSONException, IOException, MessagingException {
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "consecutiveFailuresProvider")
+    public void receiveEmailByFailureEvent(boolean hasConsecutiveFailures) throws JSONException, IOException, MessagingException {
         DataloadProcess process = createProcessWithBasicPackage(generateProcessName());
 
         try {
@@ -205,9 +215,16 @@ public class NotificationEmailTest extends AbstractProcessTest {
             NotificationRule notificationRule = new NotificationRule()
                     .withEmail(imapUser)
                     .withEvent(NotificationEvent.FAILURE)
-                    .withSubject("Notification for failure event " + generateHashString())
-                    .withMessage(NotificationRule.buildMessage(Variable.PROCESS_ID, Variable.SCHEDULE_ID,
-                            Variable.ERROR_MESSAGE));
+                    .withSubject("Notification for failure event " + generateHashString());
+
+            if (hasConsecutiveFailures) {
+                notificationRule.withMessage(NotificationRule.buildMessage(Variable.PROCESS_ID, Variable.SCHEDULE_ID,
+                        Variable.ERROR_MESSAGE, Variable.CONSECUTIVE_FAILURES));
+                notificationRule.withConsecutiveFailures(CONSECUTIVE_FAILURES_VALUE);
+            } else {
+                notificationRule.withMessage(NotificationRule.buildMessage(Variable.PROCESS_ID, Variable.SCHEDULE_ID,
+                        Variable.ERROR_MESSAGE));
+            }
 
             ProcessDetail processDetail = initDiscProjectDetailPage().getProcess(process.getName());
 
@@ -216,6 +233,10 @@ public class NotificationEmailTest extends AbstractProcessTest {
                     .closeDialog();
 
             processDetail.openSchedule(schedule.getName()).executeSchedule().waitForExecutionFinish();
+            if (hasConsecutiveFailures) {
+                // consecutiveFailures is two so need execute the schedule two times to check failures message
+                processDetail.openSchedule(schedule.getName()).executeSchedule().waitForExecutionFinish();
+            }
 
             JSONObject lastExecutionDetail = getLastExecutionDetail(process.getId());
             Document emailContent = getNotificationEmailContent(notificationRule.getSubject());
@@ -225,6 +246,9 @@ public class NotificationEmailTest extends AbstractProcessTest {
             assertEquals(variables.get(Variable.SCHEDULE_ID.getName()), schedule.getId());
             assertEquals(variables.get(Variable.ERROR_MESSAGE.getName()),
                     lastExecutionDetail.getJSONObject("error").getString("message").replaceAll("\n\\s+", " "));
+            if (hasConsecutiveFailures) {
+                assertEquals(variables.get(Variable.CONSECUTIVE_FAILURES.getName()), String.valueOf(CONSECUTIVE_FAILURES_VALUE));
+            }
 
         } finally {
             getProcessService().removeProcess(process);
