@@ -11,6 +11,7 @@ import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.fragments.reports.filter.RangeFilterFragment;
 import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter.FilterFragment;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
+import com.gooddata.qa.utils.graphene.Screenshots;
 import org.testng.annotations.Test;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
@@ -118,7 +119,36 @@ public class GoodSalesAdvanceRangeFilterReportTest extends GoodSalesAbstractTest
         assertThat(reportPage.getFilters(), hasItem(filterDescription));
     }
 
-    @Test(dependsOnMethods = {"addNewVariable", "addSubFilterByDateRange"})
+    @Test(dependsOnMethods = "addSubFilterByDateRange")
+    public void addSubFilterByMultipleAttributes() {
+        final String rangeFilterDescription = "Opportunity where Amount is greater than or equal to 19000 " +
+                "and Year (Snapshot) isn't last year";
+        initReport()
+                .<RangeFilterFragment> openExistingFilter(rangeFilterDescription, FilterFragment.RANGE_FILTER)
+                .addSubFilterByAttributeValues(ATTR_STAGE_NAME, "Interest", "Discovery", "Short List")
+                .apply();
+        waitForReportLoaded();
+
+        Screenshots.takeScreenshot(browser, "add_sub_filter_by_multiple_attributes", getClass());
+        final String filterDescription = "Opportunity where Amount is greater than or equal to 19000 " +
+                "and Year (Snapshot) isn't last year, Stage Name is Interest, Discovery, Short List";
+        assertThat(reportPage.getFilters(), hasItem(filterDescription));
+
+        reportPage.saveReport();
+        checkRedBar(browser);
+
+        reportPage.<RangeFilterFragment> openExistingFilter(filterDescription, FilterFragment.RANGE_FILTER)
+                .deleteLatestSubFilter()
+                .apply();
+        waitForReportLoaded();
+
+        reportPage.saveReport();
+        checkRedBar(browser);
+
+        assertThat(reportPage.getFilters(), hasItem(rangeFilterDescription));
+    }
+
+    @Test(dependsOnMethods = {"addNewVariable", "addSubFilterByMultipleAttributes"})
     public void addSubFilterByVariable() {
         String filterDescription = RANGE_FILTER_DESCRIPTION + " and Year (Snapshot) isn't last year";
 
