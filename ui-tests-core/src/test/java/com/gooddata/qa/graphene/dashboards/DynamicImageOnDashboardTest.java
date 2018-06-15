@@ -51,9 +51,8 @@ public class DynamicImageOnDashboardTest extends AbstractDashboardWidgetTest {
         getFilter(IMAGE_TITLE).openPanel().changeAttributeFilterValues(IMAGE_SOURCE_1, IMAGE_SOURCE_2);
         assertEquals(dashboardsPage.getLastEmbeddedWidget().getContentBodyAsText(), "No image available for this option");
 
-        //block by ticket CL-12795
-//        getFilter(IMAGE_TITLE).openPanel().changeAttributeFilterValues(IMAGE_SOURCE_3);
-//        assertEquals(dashboardsPage.getLastEmbeddedWidget().getContentBodyAsText(), "We're sorry but something went wrong...");
+        getFilter(IMAGE_TITLE).openPanel().changeAttributeFilterValues(IMAGE_SOURCE_3);
+        assertEquals(dashboardsPage.getLastEmbeddedWidget().getContentBodyAsText(), "We're sorry but something went wrong...");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -70,9 +69,8 @@ public class DynamicImageOnDashboardTest extends AbstractDashboardWidgetTest {
         getFilter(IMAGE_TITLE).openPanel().changeAttributeFilterValues(IMAGE_SOURCE_1, IMAGE_SOURCE_2);
         assertEquals(dashboardsPage.getLastEmbeddedWidget().getContentBodyAsText(), "No image available for this option");
 
-        //block by ticket CL-12795
-//        getFilter(IMAGE_TITLE).openPanel().changeAttributeFilterValues(IMAGE_SOURCE_3);
-//        assertEquals(dashboardsPage.getLastEmbeddedWidget().getContentBodyAsText(), "We're sorry but something went wrong...");
+        getFilter(IMAGE_TITLE).openPanel().changeAttributeFilterValues(IMAGE_SOURCE_3);
+        assertEquals(dashboardsPage.getLastEmbeddedWidget().getContentBodyAsText(), "We're sorry but something went wrong...");
     }
 
     private void createDashboardHasFilter(FilterItemContent filter) throws IOException {
