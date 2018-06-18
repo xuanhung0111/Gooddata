@@ -185,7 +185,7 @@ public class EmbeddedAdTest extends GoodSalesAbstractTest {
 
         assertTrue(getEmbeddedAnalysisPage().waitForReportComputing().getChartReport().getTrackersCount() >= 1,
                 "Chart does not render correctly");
-        assertEquals(getEmbeddedAnalysisPage().getFilterBuckets().getDateFilterText(),"Activity: Last 4 quarters");
+        assertEquals(getEmbeddedAnalysisPage().getFilterBuckets().getDateFilterText(),"Activity:\nLast 4 quarters");
         assertEquals(getEmbeddedAnalysisPage().getAttributesBucket().getSelectedDimensionSwitch(),"Activity");
         assertEquals(getEmbeddedAnalysisPage().getAttributesBucket().getSelectedGranularity(),"Quarter");
     }
