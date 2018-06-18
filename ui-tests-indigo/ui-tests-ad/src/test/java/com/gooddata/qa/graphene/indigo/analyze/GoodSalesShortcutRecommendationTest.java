@@ -78,7 +78,7 @@ public class GoodSalesShortcutRecommendationTest extends AbstractAnalyseTest {
 
         assertTrue(report.getTrackersCount() >= 1);
         assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
-        assertThat(analysisPage.getFilterBuckets().getFilterText("Activity"), equalTo("Activity:\nLast 4 quarters"));
+        assertThat(analysisPage.getFilterBuckets().getFilterText("Activity"), equalTo("Activity: Last 4 quarters"));
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
@@ -99,7 +99,7 @@ public class GoodSalesShortcutRecommendationTest extends AbstractAnalyseTest {
 
         assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
         assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity:\nLast 4 quarters");
+        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity: Last 4 quarters");
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
         checkingOpenAsReport("displayWhenDraggingFirstMetric");
     }
@@ -127,7 +127,7 @@ public class GoodSalesShortcutRecommendationTest extends AbstractAnalyseTest {
 
         analysisPage.drag(fact, recommendation)
             .waitForReportComputing();
-        assertEquals(analysisPage.getFilterBuckets().getDateFilterText(), "Closed:\nLast 4 quarters");
+        assertEquals(analysisPage.getFilterBuckets().getDateFilterText(), "Closed: Last 4 quarters");
         assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
         assertEquals(analysisPage.getAttributesBucket().getSelectedGranularity(), "Quarter");
         checkingOpenAsReport("createSimpleMetricFromFactUsingShortcut");
