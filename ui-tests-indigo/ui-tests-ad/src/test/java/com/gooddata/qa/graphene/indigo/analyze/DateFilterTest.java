@@ -114,7 +114,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
                 .waitForReportComputing()
                 .getChartReport()
                 .getTrackersCount() >= 1);
-        assertEquals(analysisPage.getFilterBuckets().getFilterText(DATE_INVOICE), "templ:DateInvoice: All time");
+        assertEquals(analysisPage.getFilterBuckets().getFilterText(DATE_INVOICE), "templ:DateInvoice:\nAll time");
         assertEquals(analysisPage.getAttributesBucket().getAllGranularities(),
                 Arrays.asList("Day", "Week (Sun-Sat)", "Month", "Quarter", "Year"));
         checkingOpenAsReport("testDateInCategoryAndDateInFilter");
@@ -200,7 +200,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
                     + " After this CL-10156, the metric and attribute combination is changed "
                     + "into # of Persons and attr:Person")
     public void keepDateRelationAfterAddingPercent() {
-        final String expectedDate = "templ:DateInvoice: This quarter";
+        final String expectedDate = "templ:DateInvoice:\nThis quarter";
         initAnalysePage().addMetric(METRIC_NUMBER_OF_PERSONS, FieldType.METRIC).addAttribute(ATTR_PERSON)
                 .waitForReportComputing();
 

@@ -131,7 +131,7 @@ public class GoodSalesMetricFilterTest extends AbstractAnalyseTest {
 
         takeScreenshot(browser, "checkReportWhenFilterContainManyCharacters", getClass());
         ChartReport report = analysisPage.getChartReport();
-        assertThat(report.getYaxisTitle(), not(containsString("14 West")));
+        assertThat(report.getYaxisTitle(), containsString("All except 14 West"));
     }
 
     private void addFilterToMetric() {
@@ -148,6 +148,6 @@ public class GoodSalesMetricFilterTest extends AbstractAnalyseTest {
         assertEquals(report.getYaxisTitle(), format("%s (%s: Email, Phone Call, Web Meeting)",
                 METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE));
         assertEquals(metricConfiguration.getFilterText(),
-                format("%s: Email, Phone Call, Web Meeting (3)", ATTR_ACTIVITY_TYPE));
+                format("%s: Email, Phone Call, Web Meeting(3)", ATTR_ACTIVITY_TYPE));
     }
 }
