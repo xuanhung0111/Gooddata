@@ -148,18 +148,9 @@ public class CataloguePanel extends AbstractFragment {
      * @return true if found something from search input, otherwise return false
      */
     public boolean search(String item) {
-        waitForItemLoaded();
-        clearInputText();
-
-        searchInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
-        waitForItemLoaded();
-        waitForCollectionIsEmpty(items);
-
         clearInputText();
         searchInput.sendKeys(item);
         waitForItemLoaded();
-
-        sleepTightInSeconds(1);
 
         if (!isElementPresent(BY_NO_ITEMS, browser)) {
             waitForCollectionIsNotEmpty(items);
@@ -171,14 +162,10 @@ public class CataloguePanel extends AbstractFragment {
     }
 
     public CataloguePanel clearInputText() {
-        if (isElementPresent(BY_CLEAR_SEARCH_FIELD, getRoot())) {
-            WebElement clearIcon = waitForElementVisible(BY_CLEAR_SEARCH_FIELD, getRoot());
-            clearIcon.click();
-            waitForElementNotPresent(clearIcon);
-        } else {
-            waitForElementVisible(searchInput).clear();
+        if (!searchInput.getAttribute("value").isEmpty()) {
+            waitForElementVisible(BY_CLEAR_SEARCH_FIELD, getRoot()).click();
+            waitForItemLoaded();
         }
-        waitForItemLoaded();
         return this;
     }
 
@@ -223,10 +210,11 @@ public class CataloguePanel extends AbstractFragment {
         return waitForElementVisible(className("data-source-picker"), browser).getText().equals(dataset);
     }
 
-    private void waitForItemLoaded() {
+    public CataloguePanel waitForItemLoaded() {
         Function<WebDriver, Boolean> itemsLoaded = browser -> !isElementPresent(By.cssSelector(".gd-spinner.small"),
                 browser);
         Graphene.waitGui().until(itemsLoaded);
+        return this;
     }
 
     public class DatasourceDropDown extends AbstractFragment {
