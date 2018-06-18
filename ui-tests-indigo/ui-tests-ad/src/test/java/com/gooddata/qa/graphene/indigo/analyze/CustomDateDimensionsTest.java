@@ -12,6 +12,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.List;
 
@@ -46,7 +47,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
     @Override
     protected void customizeProject() throws Throwable {
         URL maqlResource = getClass().getResource("/retail-date/maql.txt");
-        setupMaql(IOUtils.toString(maqlResource));
+        setupMaql(IOUtils.toString(maqlResource, StandardCharsets.UTF_8));
 
         URL retailDateResouce = getClass().getResource("/retail-date/upload.zip");
         String webdavURL = uploadFileToWebDav(retailDateResouce, null);
@@ -65,7 +66,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
         analysisPage.addMetric(NUMBER, FieldType.FACT).addDate().waitForReportComputing();
 
         assertTrue(filtersBucketReact.isDateFilterVisible());
-        assertEquals(filtersBucketReact.getDateFilterText(), RETAIL_DATE + ": All time");
+        assertEquals(filtersBucketReact.getDateFilterText(), RETAIL_DATE + ":\nAll time");
 
         for (String period : Sets.newHashSet(filtersBucketReact.getDateFilterOptions())) {
             System.out.println(format("Try with time period [%s]", period));
@@ -99,7 +100,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();
 
-        assertEquals(analysisPage.getFilterBuckets().getDateFilterText(), RETAIL_DATE + ": Last 4 quarters");
+        assertEquals(analysisPage.getFilterBuckets().getDateFilterText(), RETAIL_DATE + ":\nLast 4 quarters");
         assertThat(analysisPage.getAttributesBucket().getItemNames(), contains(DATE));
         assertThat(analysisPage.waitForReportComputing().getChartReport().getTrackersCount(), lessThanOrEqualTo(4));
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
