@@ -174,7 +174,7 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
         assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
         assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity: Last 4 quarters");
+        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity:\nLast 4 quarters");
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
         checkingOpenAsReport("displayWhenDraggingFirstMetric");
     }
@@ -225,11 +225,11 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
                 .addDateFilter()
                 .waitForReportComputing();
         assertEquals(analysisPage.getChartReport().getTrackersCount(), 4);
-        assertEquals(filtersBucket.getDateFilterText(), "Activity: All time");
+        assertEquals(filtersBucket.getDateFilterText(), "Activity:\nAll time");
 
         filtersBucket.configDateFilter("01/01/2016", "01/01/2017");
         analysisPage.waitForReportComputing();
-        assertEquals(filtersBucket.getFilterText("Activity"), "Activity: Jan 1, 2016 - Jan 1, 2017");
+        assertEquals(filtersBucket.getFilterText("Activity"), "Activity:\nJan 1, 2016 - Jan 1, 2017");
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
         checkingOpenAsReport("filterOnDateAttribute");
     }
@@ -244,7 +244,7 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
         assertTrue(analysisPage.getFilterBuckets()
                 .isFilterVisible(ATTR_ACTIVITY));
         assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY),
-                "Activity: Jan 1, 2012 - Dec 31, 2012");
+                "Activity:\nJan 1, 2012 - Dec 31, 2012");
         ChartReport report = analysisPage.waitForReportComputing().getChartReport();
         assertThat(report.getTrackersCount(), equalTo(1));
         RecommendationContainer recommendationContainer =
