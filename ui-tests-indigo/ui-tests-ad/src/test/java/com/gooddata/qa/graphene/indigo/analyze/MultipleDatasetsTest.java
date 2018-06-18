@@ -80,7 +80,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
         analysisPage.waitForReportComputing();
         assertThat(report.getTrackersCount(), greaterThanOrEqualTo(1));
         takeScreenshot(browser, "analyzeReportOnProductionData - apply attribute filter", getClass());
-        assertEquals(filtersBucketReact.getFilterText("Industry"), "Industry:\nApparel Stores, Consumer Services(2)");
+        assertEquals(filtersBucketReact.getFilterText("Industry"), "Industry: Apparel Stores, Consumer Services\n(2)");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -100,7 +100,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
         analysisPage.waitForReportComputing();
         assertThat(report.getTrackersCount(), greaterThanOrEqualTo(1));
         takeScreenshot(browser, "analyzeReportOnPayrollData - apply attribute filter", getClass());
-        assertEquals(filtersBucketReact.getFilterText("County"), "County:\nAustin, Clover");
+        assertEquals(filtersBucketReact.getFilterText("County"), "County: Austin, Clover");
     }
 
     @Test(dependsOnGroups = {"createProject"})

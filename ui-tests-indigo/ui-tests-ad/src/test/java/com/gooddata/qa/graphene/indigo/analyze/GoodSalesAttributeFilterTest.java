@@ -61,7 +61,7 @@ public class GoodSalesAttributeFilterTest extends AbstractAnalyseTest {
         filtersBucketReact.configAttributeFilter(ATTR_ACTIVITY_TYPE, "Email", "Web Meeting");
         analysisPage.waitForReportComputing();
         assertEquals(report.getTrackersCount(), 2);
-        assertEquals(filtersBucketReact.getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ":\nEmail, Web Meeting");
+        assertEquals(filtersBucketReact.getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ": Email, Web Meeting\n(2)");
     }
 
     @Test(dependsOnGroups = {"createProject"})
