@@ -57,7 +57,7 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select("This month").apply();
-        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity: This month");
+        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity:\nThis month");
         analysisPage.waitForReportComputing();
         if (analysisPage.isExplorerMessageVisible()) {
             log.info("Error message: " + analysisPage.getExplorerMessage());
@@ -124,7 +124,7 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select("This month").apply();
         analysisPage.waitForReportComputing();
-        assertEquals(filtersBucketReact.getDateFilterText(), "Activity: This month");
+        assertEquals(filtersBucketReact.getDateFilterText(), "Activity:\nThis month");
         if (analysisPage.isExplorerMessageVisible()) {
             log.info("Error message: " + analysisPage.getExplorerMessage());
             log.info("Stop testing because of no data in [This month]");
@@ -153,7 +153,7 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
 
         assertTrue(analysisPage.getFilterBuckets().isFilterVisible(ATTR_ACTIVITY));
         assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY),
-                "Activity: Jan 1, 2012 - Dec 31, 2012");
+                "Activity:\nJan 1, 2012 - Dec 31, 2012");
         ChartReport report = analysisPage.waitForReportComputing().getChartReport();
         assertThat(report.getTrackersCount(), equalTo(1));
         RecommendationContainer recommendationContainer =
@@ -190,7 +190,7 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
 
         assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
         assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity: Last 4 quarters");
+        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity:\nLast 4 quarters");
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
         checkingOpenAsReport("testAnotherApproachToShowPoP");
     }

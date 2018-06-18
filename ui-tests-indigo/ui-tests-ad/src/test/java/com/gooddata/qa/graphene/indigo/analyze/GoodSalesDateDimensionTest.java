@@ -47,7 +47,7 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
                 .addMetric(METRIC_SNAPSHOT_BOP)
                 .addDateFilter()
                 .waitForReportComputing();
-        assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ": All time");
+        assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ":\nAll time");
         assertEquals(analysisPage.getChartReport().getTrackersCount(), 2);
 
         WebElement filter = filtersBucketReact.getFilter(ACTIVITY);
@@ -59,7 +59,7 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
         panel.select("This year");
         panel.apply();
         analysisPage.waitForReportComputing();
-        assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ": This year");
+        assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ":\nThis year");
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
         checkingOpenAsReport("applyOnFilter");
     }
@@ -69,7 +69,7 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
         final FiltersBucket filtersBucketReact = initAnalysePage().getFilterBuckets();
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
-        assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ": All time");
+        assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ":\nAll time");
 
         analysisPage.getAttributesBucket().changeGranularity("Month");
         analysisPage.waitForReportComputing();
@@ -89,10 +89,10 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
         final FiltersBucket filtersBucketReact = initAnalysePage().getFilterBuckets();
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDateFilter();
-        assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ": All time");
+        assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ":\nAll time");
 
         filtersBucketReact.changeDateDimension(ACTIVITY, CREATED);
-        assertEquals(filtersBucketReact.getFilterText(CREATED), CREATED + ": All time");
+        assertEquals(filtersBucketReact.getFilterText(CREATED), CREATED + ":\nAll time");
 
         analysisPage.addDate();
         WebElement filter = filtersBucketReact.getFilter(CREATED);
@@ -102,7 +102,7 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
         assertFalse(panel.isDimensionSwitcherEnabled());
 
         analysisPage.getAttributesBucket().changeDateDimension(ACTIVITY);
-        assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ": All time");
+        assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ":\nAll time");
         checkingOpenAsReport("applyOnBothFilterAndBucket");
     }
 

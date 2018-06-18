@@ -20,7 +20,7 @@ import static org.testng.Assert.*;
  */
 public class FiltersBucket extends AbstractBucket {
     
-    private static final String DATE_RANGE_REGEX = ".*: [A-Z][a-z]+ \\d{1,2}, \\d{4} - [A-Z][a-z]+ \\d{1,2}, \\d{4}$";
+    private static final String DATE_RANGE_REGEX = ".*:\n[A-Z][a-z]+ \\d{1,2}, \\d{4} - [A-Z][a-z]+ \\d{1,2}, \\d{4}$";
 
     @FindBy(css = ".adi-bucket-item .button")
     private List<WebElement> filters;
