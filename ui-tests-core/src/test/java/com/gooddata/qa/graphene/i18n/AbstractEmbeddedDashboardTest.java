@@ -26,6 +26,10 @@ public abstract class AbstractEmbeddedDashboardTest extends GoodSalesAbstractTes
     }
 
     protected EmbeddedDashboard initEmbeddedDashboard() {
+        // Using work around to avoid user staying at embedded dashboard and refresh page when there are unsaved tasks.
+        // It makes the embedded dashboard malfunction and reset stage to the normal dashboard.
+        openUrl(PAGE_GDC);
+
         browser.get(embeddedUri);
         EmbeddedDashboard page = Graphene.createPageFragment(EmbeddedDashboard.class,
                 waitForElementVisible(EmbeddedDashboard.LOCATOR, browser));

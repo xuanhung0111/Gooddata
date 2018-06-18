@@ -33,20 +33,20 @@ public class CatalogueFilterTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void shows_all_items_for_all_data_filter() {
-        analysisPage.getCataloguePanel().filterCatalog(CatalogFilterType.ALL);
+        initAnalysePage().getCataloguePanel().filterCatalog(CatalogFilterType.ALL);
         expectVisible(dates, attributes, metrics, facts, header);
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void shows_only_metrics_and_facts_for_metrics_filter() {
-        analysisPage.getCataloguePanel().filterCatalog(CatalogFilterType.MEASURES);
+        initAnalysePage().getCataloguePanel().filterCatalog(CatalogFilterType.MEASURES);
         expectVisible(metrics, facts, header);
         expectHidden(dates, attributes);
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void shows_only_date_and_attributes_for_attributes_filter() {
-        analysisPage.getCataloguePanel().filterCatalog(CatalogFilterType.ATTRIBUTES);
+        initAnalysePage().getCataloguePanel().filterCatalog(CatalogFilterType.ATTRIBUTES);
         expectVisible(dates, attributes, header);
         expectHidden(metrics, facts);
     }

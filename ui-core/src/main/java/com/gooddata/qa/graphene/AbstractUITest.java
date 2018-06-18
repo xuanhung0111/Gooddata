@@ -399,6 +399,14 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public DashboardsPage initDashboardsPage() {
+        // Calling this method when dashboardsPage already initialized and in
+        // edit mode (possibly prepared by previous test) will make dashboard not refresh in
+        // default stage (edit mode instead).
+        // This is expected behavior of browser and we cannot do anything with WebDriver.get() method.
+        // So using this work around for expected purpose.
+        if (browser.getCurrentUrl().matches(".*\\|projectDashboardPage\\|.*\\|edit")) {
+            openUrl(PAGE_GDC);
+        }
         openUrl(getDashboardsPageUri());
         return waitForDashboardPage();
     }

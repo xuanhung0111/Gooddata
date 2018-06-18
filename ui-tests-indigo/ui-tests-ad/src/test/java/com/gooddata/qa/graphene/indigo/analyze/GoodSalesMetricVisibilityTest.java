@@ -43,7 +43,7 @@ public class GoodSalesMetricVisibilityTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"test"})
     public void testPrivateMetric() {
-        assertEquals(analysisPage.addMetric(RATIO_METRIC)
+        assertEquals(initAnalysePage().addMetric(RATIO_METRIC)
                 .addAttribute(ATTR_DEPARTMENT)
                 .waitForReportComputing()
                 .getChartReport()

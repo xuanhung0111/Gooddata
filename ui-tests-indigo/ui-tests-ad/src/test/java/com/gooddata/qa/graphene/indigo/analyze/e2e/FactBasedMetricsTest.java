@@ -26,7 +26,7 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_drop_fact_on_the_metrics_bucket() {
-        analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT)
+        initAnalysePage().addMetric(FACT_AMOUNT, FieldType.FACT)
             .getMetricsBucket()
             .getMetricConfiguration("Sum of " + FACT_AMOUNT)
             .expandConfiguration();
@@ -34,7 +34,7 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_remove_created_metric() {
-        analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT)
+        initAnalysePage().addMetric(FACT_AMOUNT, FieldType.FACT)
             .getMetricsBucket()
             .getMetricConfiguration("Sum of " + FACT_AMOUNT)
             .expandConfiguration();
@@ -46,7 +46,7 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_change_aggregation_function() {
-        MetricConfiguration configuration = analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT)
+        MetricConfiguration configuration = initAnalysePage().addMetric(FACT_AMOUNT, FieldType.FACT)
             .waitForReportComputing()
             .getMetricsBucket()
             .getMetricConfiguration("Sum of " + FACT_AMOUNT)
@@ -68,7 +68,7 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_drop_the_same_fact_multiple_times() {
-        assertEquals(analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT)
+        assertEquals(initAnalysePage().addMetric(FACT_AMOUNT, FieldType.FACT)
             .addMetric(FACT_AMOUNT, FieldType.FACT)
             .addMetric(FACT_AMOUNT, FieldType.FACT)
             .getMetricsBucket()
@@ -78,7 +78,7 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_allow_to_have_two_different_metrics_from_one_fact() {
-        analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT)
+        initAnalysePage().addMetric(FACT_AMOUNT, FieldType.FACT)
             .getMetricsBucket()
             .getMetricConfiguration("Sum of " + FACT_AMOUNT)
             .expandConfiguration()
@@ -97,7 +97,7 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_undo_aggregation_change() {
-        analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT)
+        initAnalysePage().addMetric(FACT_AMOUNT, FieldType.FACT)
             .getMetricsBucket()
             .getMetricConfiguration("Sum of " + FACT_AMOUNT)
             .expandConfiguration()
@@ -122,7 +122,7 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_create_fact_based_metric_via_single_metric_shortcut() {
-        assertEquals(analysisPage.drag(analysisPage.getCataloguePanel().searchAndGet(FACT_AMOUNT, FieldType.FACT),
+        assertEquals(initAnalysePage().drag(analysisPage.getCataloguePanel().searchAndGet(FACT_AMOUNT, FieldType.FACT),
                 () -> waitForElementVisible(cssSelector(".s-recommendation-metric-canvas"), browser))
             .waitForReportComputing()
             .getMetricsBucket()
@@ -132,7 +132,7 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_create_fact_based_metric_via_trending_shortcut() {
-        assertEquals(analysisPage.drag(analysisPage.getCataloguePanel().searchAndGet(FACT_AMOUNT, FieldType.FACT),
+        assertEquals(initAnalysePage().drag(analysisPage.getCataloguePanel().searchAndGet(FACT_AMOUNT, FieldType.FACT),
                 () -> waitForElementVisible(cssSelector(".s-recommendation-metric-over-time-canvas"), browser))
             .waitForReportComputing()
             .getMetricsBucket()

@@ -32,7 +32,7 @@ public class ContributionRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_apply_in_percent_recommendation() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing();
 

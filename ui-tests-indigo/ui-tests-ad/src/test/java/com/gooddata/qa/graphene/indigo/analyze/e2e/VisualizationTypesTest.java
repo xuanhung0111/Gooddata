@@ -27,7 +27,7 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_create_table_visualization() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .changeReportType(ReportType.TABLE)
             .waitForReportComputing();
@@ -36,7 +36,7 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_create_line_chart_visualization() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .changeReportType(ReportType.LINE_CHART)
             .waitForReportComputing();
@@ -45,7 +45,7 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_create_bar_chart_visualization() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .changeReportType(ReportType.BAR_CHART)
             .waitForReportComputing();
@@ -54,7 +54,7 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_create_column_chart_visualization() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .changeReportType(ReportType.COLUMN_CHART)
             .waitForReportComputing();
@@ -63,7 +63,7 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_apply_changing_the_visualization_type() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .changeReportType(ReportType.TABLE)
             .waitForReportComputing();
@@ -88,7 +88,7 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_show_missing_metric_if_one_attribute_is_dragged_in() {
-        analysisPage.changeReportType(ReportType.COLUMN_CHART)
+        initAnalysePage().changeReportType(ReportType.COLUMN_CHART)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(

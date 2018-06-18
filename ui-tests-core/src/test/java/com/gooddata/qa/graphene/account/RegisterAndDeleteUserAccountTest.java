@@ -142,33 +142,35 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     public void registerUserWithInvalidPasswordValidation() throws ParseException, IOException, JSONException {
         final SoftAssert softAssert = new SoftAssert();
 
-        initRegistrationPage();
-        softAssert.assertEquals(RegistrationPage.getInstance(browser).getPasswordHint(), PASSWORD_HINT);
+        RegistrationPage registrationPage = initRegistrationPage();
+        softAssert.assertEquals(registrationPage.getPasswordHint(), PASSWORD_HINT);
 
-        RegistrationPage.getInstance(browser)
+        registrationPage
                 .fillInRegistrationForm(registrationForm)
                 .enterEmail(generateEmail(registrationUser))
                 .enterPassword("aaaaaa")
                 .agreeRegistrationLicense()
                 .submitForm();
         takeScreenshot(browser, "Error-message-for-short-password-shows", getClass());
-        softAssert.assertEquals(RegistrationPage.getInstance(browser).getErrorMessage(),
+        softAssert.assertEquals(registrationPage.getErrorMessage(),
                 SHORT_PASSWORD_ERROR_MESSAGE);
 
-        RegistrationPage.getInstance(browser)
+        registrationPage
                 .enterPassword("12345678")
                 .enterSpecialCaptcha()
-                .submitForm();
+                .submitForm()
+                .waitForRegistrationNotSuccessfully();
         takeScreenshot(browser, "Error-message-for-commonly-password-shows", getClass());
-        softAssert.assertEquals(RegistrationPage.getInstance(browser).getErrorMessage(),
+        softAssert.assertEquals(registrationPage.getErrorMessage(),
                 COMMONLY_PASSWORD_ERROR_MESSAGE);
 
-        RegistrationPage.getInstance(browser)
+        registrationPage
                 .enterPassword("aaaaaaaa")
                 .enterSpecialCaptcha()
-                .submitForm();
+                .submitForm()
+                .waitForRegistrationNotSuccessfully();
         takeScreenshot(browser, "Error-message-for-sequential-password-shows", getClass());
-        softAssert.assertEquals(RegistrationPage.getInstance(browser).getErrorMessage(),
+        softAssert.assertEquals(registrationPage.getErrorMessage(),
                 SEQUENTIAL_PASSWORD_ERROR_MESSAGE);
         softAssert.assertAll();
     }
@@ -346,6 +348,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     @Test(dependsOnMethods = "deleteUserAccount", description = "WA-6433: 500 Internal Error when deleting user twice")
     public void deleteUserWithoutActivationTwice() {
         initRegistrationPage().registerNewUserSuccessfully(registrationForm);
+        waitForDashboardPageLoaded(browser);
 
         testParams.setProjectId(getProjectId(GOODDATA_PRODUCT_TOUR_PROJECT));
         initAccountPage().deleteAccount();

@@ -1,24 +1,21 @@
 package com.gooddata.qa.graphene;
 
-import static com.gooddata.md.Restriction.identifier;
-import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
-import static com.gooddata.qa.browser.BrowserUtils.getCurrentBrowserAgent;
-import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
-
-import java.io.IOException;
-import java.io.InputStream;
-
 import com.gooddata.fixture.ResourceManagement.ResourceTemplate;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.AttributeElement;
 import com.gooddata.md.Dataset;
 import com.gooddata.md.Fact;
+import com.gooddata.md.MetadataService;
+import com.gooddata.md.Metric;
 import com.gooddata.md.ObjNotFoundException;
+import com.gooddata.md.report.Report;
+import com.gooddata.md.report.ReportDefinition;
+import com.gooddata.project.Project;
 import com.gooddata.project.ProjectService;
 import com.gooddata.project.ProjectValidationResults;
+import com.gooddata.qa.fixture.Fixture;
 import com.gooddata.qa.fixture.FixtureException;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterType;
 import com.gooddata.qa.mdObjects.dashboard.filter.FloatingFilterConstraint;
@@ -31,8 +28,12 @@ import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.rolap.RolapRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import com.gooddata.qa.utils.java.Builder;
+import org.apache.http.ParseException;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.openqa.selenium.Dimension;
+import org.springframework.http.HttpStatus;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -40,31 +41,24 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import com.gooddata.md.MetadataService;
-import com.gooddata.md.Metric;
-import com.gooddata.md.report.Report;
-import com.gooddata.md.report.ReportDefinition;
-import com.gooddata.project.Project;
-import com.gooddata.qa.fixture.Fixture;
-import com.gooddata.qa.graphene.common.StartPageContext;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
-
-import static java.util.stream.Collectors.toList;
-import static org.testng.Assert.assertFalse;
-
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.Collection;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.apache.http.ParseException;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.springframework.http.HttpStatus;
+import static com.gooddata.md.Restriction.identifier;
+import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
+import static com.gooddata.qa.browser.BrowserUtils.getCurrentBrowserAgent;
+import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
+import static java.util.stream.Collectors.toList;
+import static org.testng.Assert.assertFalse;
 
 public abstract class AbstractProjectTest extends AbstractUITest {
 
@@ -160,13 +154,6 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         customizeProject();
     }
 
-    @Test(dependsOnMethods = {"prepareProject"}, groups = {"createProject"})
-    public void assignStartPage() {
-        // start page could be any page, e.g.: analyse page, ...
-        // to make it possible, this method should be executed last in createProject group
-        configureStartPage();
-    }
-
     @AfterClass(alwaysRun = true)
     public void validateProjectTearDown() throws JSONException {
         if (validateAfterClass) {
@@ -246,26 +233,6 @@ public abstract class AbstractProjectTest extends AbstractUITest {
      */
     protected void customizeProject() throws Throwable {
         // should be implemented later in abstract test or test classes
-    }
-
-    /**
-     * a hook to createProject group.
-     * start page context which will be loaded after finishing a test should be assigned by using this
-     * project.html is used by default
-     */
-    protected void configureStartPage() {
-        startPageContext = new StartPageContext() {
-
-            @Override
-            public void waitForStartPageLoaded() {
-                waitForProjectsPageLoaded(browser);
-            }
-
-            @Override
-            public String getStartPage() {
-                return PAGE_PROJECTS;
-            }
-        };
     }
 
     protected MetadataService getMdService() {

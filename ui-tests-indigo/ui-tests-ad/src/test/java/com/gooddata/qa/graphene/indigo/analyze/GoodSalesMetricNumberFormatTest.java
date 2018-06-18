@@ -101,7 +101,7 @@ public class GoodSalesMetricNumberFormatTest extends AbstractAnalyseTest {
         dashboardRequest.changeMetricFormat(percentOfGoalUri, format.toString());
 
         try {
-            String dataLabel = analysisPage.addMetric(METRIC_PERCENT_OF_GOAL)
+            String dataLabel = initAnalysePage().addMetric(METRIC_PERCENT_OF_GOAL)
                     .addAttribute(ATTR_IS_WON)
                     .waitForReportComputing()
                     .changeReportType(ReportType.BAR_CHART)
@@ -128,7 +128,7 @@ public class GoodSalesMetricNumberFormatTest extends AbstractAnalyseTest {
     }
 
     private void verifyFormatInAdReport(Formatter format, String expectedValue, boolean compareFormat) {
-        List<List<String>> tooltip = analysisPage.addMetric(METRIC_PERCENT_OF_GOAL)
+        List<List<String>> tooltip = initAnalysePage().addMetric(METRIC_PERCENT_OF_GOAL)
             .addAttribute(ATTR_IS_WON)
             .waitForReportComputing()
             .getChartReport()

@@ -44,7 +44,7 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testOverrideDateFilter() throws ParseException {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addDateFilter()
             .getFilterBuckets()
@@ -73,7 +73,7 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testSimpleComparison() {
-        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 1);
@@ -100,7 +100,7 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testComparisonAndPoPAttribute() {
-        final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = initAnalysePage().getFilterBuckets();
 
         ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing()
@@ -146,7 +146,7 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testSimplePoP() throws ParseException {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addDate()
                 .getFilterBuckets()
                 .configDateFilter("01/01/2012", "12/31/2012");
@@ -177,7 +177,7 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testAnotherApproachToShowPoP() {
-        ChartReport report = analysisPage.addMetric(METRIC_SNAPSHOT_BOP)
+        ChartReport report = initAnalysePage().addMetric(METRIC_SNAPSHOT_BOP)
                 .waitForReportComputing()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 1);
@@ -197,7 +197,7 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testRecommendationDisplayingWithDateFilter() throws ParseException {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().waitForReportComputing();
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().waitForReportComputing();
         takeScreenshot(browser, "No-Recommendation-Displaying-With-All-Time-Filter", getClass());
         assertFalse(isElementPresent(RecommendationContainer.LOCATOR, browser),
                 "Compare Recommendation step is displayed");

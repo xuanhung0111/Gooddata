@@ -78,7 +78,7 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testWithAttribute() {
-        assertEquals(analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
+        assertEquals(initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE)
                 .getExplorerMessage(), "NO MEASURE IN YOUR INSIGHT");
 
         assertEquals(analysisPage.changeReportType(ReportType.BAR_CHART)
@@ -96,7 +96,7 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testResetFunction() {
-        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing().getChartReport();
         assertThat(report.getTrackersCount(), equalTo(1));
         RecommendationContainer recommendationContainer =
@@ -116,7 +116,7 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void disableExportForUnexportableVisualization() {
-        final AnalysisPageHeader pageHeader = analysisPage.getPageHeader();
+        final AnalysisPageHeader pageHeader = initAnalysePage().getPageHeader();
         ChartReport report = analysisPage.addMetric(METRIC_AMOUNT)
                 .waitForReportComputing().getChartReport();
         assertEquals(report.getTrackersCount(), 1);
@@ -134,7 +134,7 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void resetSpecialReports() {
-        analysisPage.resetToBlankState();
+        initAnalysePage().resetToBlankState();
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACCOUNT).waitForReportComputing();
         assertTrue(analysisPage.isExplorerMessageVisible());
@@ -144,7 +144,7 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "https://jira.intgdc.com/browse/CL-6401")
     public void gridlinesShouldBeCheckedWhenExportBarChart() {
-        analysisPage.addMetric(METRIC_AMOUNT)
+        initAnalysePage().addMetric(METRIC_AMOUNT)
                 .addAttribute(ATTR_STAGE_NAME)
                 .changeReportType(ReportType.BAR_CHART)
                 .waitForReportComputing()
@@ -197,7 +197,7 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void exportCustomDiscovery() {
-        assertTrue(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        assertTrue(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .changeReportType(ReportType.TABLE)
                 .waitForReportComputing()
@@ -244,14 +244,14 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void exportVisualizationWithOneAttributeInChart() {
-        assertEquals(analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).getExplorerMessage(),
+        assertEquals(initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE).getExplorerMessage(),
                 "NO MEASURE IN YOUR INSIGHT");
         assertFalse(analysisPage.getPageHeader().isExportButtonEnabled());
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void switchReportHasOneMetricManyAttributes() {
-        analysisPage.changeReportType(ReportType.TABLE)
+        initAnalysePage().changeReportType(ReportType.TABLE)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
@@ -275,7 +275,7 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void switchReportHasManyMetricsManyAttributes() {
-        analysisPage.changeReportType(ReportType.TABLE)
+        initAnalysePage().changeReportType(ReportType.TABLE)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
@@ -299,7 +299,7 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void switchReportWithDateAttributes() {
-        final StacksBucket stacksBucket = analysisPage.getStacksBucket();
+        final StacksBucket stacksBucket = initAnalysePage().getStacksBucket();
         final AttributesBucket categoriesBucket = analysisPage.getAttributesBucket();
 
         analysisPage.changeReportType(ReportType.TABLE)
@@ -361,7 +361,7 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void addStackByIfMoreThanOneMetricInReport() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addMetric(METRIC_BEST_CASE).addAttribute("Region");
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addMetric(METRIC_BEST_CASE).addAttribute("Region");
 
         final StacksBucket stacksBucket = analysisPage.getStacksBucket();
         assertTrue(stacksBucket.isDisabled());
@@ -370,13 +370,13 @@ public class GoodSalesVisualizationTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void addSecondMetricIfAttributeInStackBy() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE).addStack(ATTR_DEPARTMENT);
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE).addStack(ATTR_DEPARTMENT);
         assertEquals(analysisPage.getMetricsBucket().getWarningMessage(), "TO ADD ADDITIONAL MEASURE, REMOVE FROM STACK BY");
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void createChartReportWithMoreThan3Metrics() {
-        List<String> legends = analysisPage.addMetric(METRIC_NUMBER_OF_LOST_OPPS)
+        List<String> legends = initAnalysePage().addMetric(METRIC_NUMBER_OF_LOST_OPPS)
                 .addMetric(METRIC_NUMBER_OF_OPEN_OPPS)
                 .addMetric(METRIC_NUMBER_OF_OPPORTUNITIES)
                 .addMetric(METRIC_NUMBER_OF_WON_OPPS)

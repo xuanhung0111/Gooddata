@@ -51,7 +51,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
     public void testRenameInsight() throws JSONException, IOException {
         final String copyOfInsightTest = "Copy-Of-Insight-Test";
         final String renamedInsight = "Renamed-Insight";
-        analysisPage.openInsight(INSIGHT_TEST)
+        initAnalysePage().openInsight(INSIGHT_TEST)
                 .waitForReportComputing()
                 .saveInsightAs(copyOfInsightTest);
         final int numberOfInsights = indigoRestRequest.getAllInsightNames().size();
@@ -72,7 +72,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
     public void renameInsightUsingSpecicalName(final String name) throws JSONException, IOException {
         final String insight = "Renaming-Saved-Insight-Test-Using-Special-Name"
                 + UUID.randomUUID().toString().substring(0, 3);
-        analysisPage.openInsight(INSIGHT_TEST)
+        initAnalysePage().openInsight(INSIGHT_TEST)
                 .waitForReportComputing()
                 .saveInsightAs(insight);
 
@@ -84,7 +84,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testOpenInsight() {
-        final ChartReport chart = analysisPage
+        final ChartReport chart = initAnalysePage()
                 .openInsight(INSIGHT_TEST)
                 .waitForReportComputing()
                 .getChartReport();
@@ -99,7 +99,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
     public void deleteUnsavedChangesInsight() throws JSONException, IOException {
         final String insight = "Delete-Unsaved-Change-Insight";
         assertTrue(
-                analysisPage.openInsight(INSIGHT_TEST)
+                initAnalysePage().openInsight(INSIGHT_TEST)
                         .saveInsightAs(insight)
                         .removeAttribute(ATTR_ACTIVITY_TYPE)
                         .waitForReportComputing()
@@ -119,7 +119,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"})
     public void deleteCurrentlyOpenedInsight() throws JSONException, IOException {
         final String insight = "Delete-Currently-Opened-Insight";
-        assertFalse(analysisPage.openInsight(INSIGHT_TEST).saveInsightAs(insight).isBlankState(),
+        assertFalse(initAnalysePage().openInsight(INSIGHT_TEST).saveInsightAs(insight).isBlankState(),
                 "Workspace is cleared before deleting insight");
         analysisPage.getPageHeader()
                 .expandInsightSelection()
@@ -133,7 +133,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"})
     public void deleteNotCurrentlyOpenedInsight() throws JSONException, IOException {
         final String insight = "Delete-Currently-Opened-Insight";
-        analysisPage.openInsight(INSIGHT_TEST).saveInsightAs(insight);
+        initAnalysePage().openInsight(INSIGHT_TEST).saveInsightAs(insight);
         assertTrue(indigoRestRequest.getAllInsightNames()
                 .contains(insight), insight + " does not exist");
         analysisPage.openInsight(INSIGHT_TEST)
@@ -158,7 +158,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "chartTypeDataProvider")
     public void openVariousChartTypes(ReportType type) {
         final String insight = "Open-Various-Chart-Types-" + type.toString();
-        final int expectedTrackersCount = analysisPage
+        final int expectedTrackersCount = initAnalysePage()
                 .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .changeReportType(type)
@@ -179,7 +179,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"})
     public void testOpenTableReport() {
         final String insight = "Open-Table-Report";
-        final List<List<String>> expectedContent = analysisPage
+        final List<List<String>> expectedContent = initAnalysePage()
                 .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .changeReportType(ReportType.TABLE)
@@ -203,7 +203,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testDefaultFilterOnInsightList() {
-        assertTrue(analysisPage.getPageHeader().expandInsightSelection().isFilterActive(FilterType.BY_ME),
+        assertTrue(initAnalysePage().getPageHeader().expandInsightSelection().isFilterActive(FilterType.BY_ME),
                 "Default filter is not created by me tab");
     }
 
@@ -225,7 +225,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"})
     public void testInsightListWithCreatedByMeFilter() throws JSONException, IOException {
         final String insight = "Insight-List-Test-With-Filter-Created-By-Me";
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
         assertFalse(indigoRestRequest.getAllInsightNames().contains(insight),
                 insight + " exists before saving");
         analysisPage.saveInsight(insight);
@@ -263,7 +263,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
 
     @Test(dependsOnMethods = {"testInsightListWithCreatedByMeFilter", "createInsightByEditor"})
     public void testInsightListWithAllFilter() {
-        final AnalysisInsightSelectionPanel insightSelectionPanel = analysisPage.getPageHeader()
+        final AnalysisInsightSelectionPanel insightSelectionPanel = initAnalysePage().getPageHeader()
                 .expandInsightSelection();
 
         insightSelectionPanel.switchFilter(FilterType.ALL).searchInsight("Insight-List-Test-With-Filter");
@@ -283,7 +283,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "chartIconDataProvider")
     public void testChartIconOnInsightList(ReportType type) {
         final String insight = "Chart-Icon-On-Insight-List-Test-" + type.getLabel();
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .changeReportType(type)
                 .saveInsight(insight);
 
@@ -297,13 +297,13 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testDefaultInsightTitle() {
-        assertEquals(analysisPage.getPageHeader().getInsightTitle(), "Untitled insight",
+        assertEquals(initAnalysePage().getPageHeader().getInsightTitle(), "Untitled insight",
                 "The default title is not correct");
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testBlankInsightAfterSwitchingToOtherPage() {
-        assertFalse(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing().isBlankState(),
+        assertFalse(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing().isBlankState(),
                 "Workspace is blank before switching page");
         initDashboardsPage();
         assertTrue(initAnalysePage().isBlankState(), "AD does not show blank state after switching page");
@@ -314,7 +314,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
         final String blankProject = "Blank-Project-For-Insight-Test";
         final String blankProjectId = createNewEmptyProject(blankProject);
 
-        assertFalse(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing().isBlankState(),
+        assertFalse(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing().isBlankState(),
                 "Workspace is blank before switching project");
 
         final String mainProjectId = testParams.getProjectId();

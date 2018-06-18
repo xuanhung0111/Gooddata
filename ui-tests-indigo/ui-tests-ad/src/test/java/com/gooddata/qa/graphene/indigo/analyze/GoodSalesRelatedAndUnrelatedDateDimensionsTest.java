@@ -75,7 +75,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
         final String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(kpiUri));
 
         try {
-            analysisPage.addMetric(metric1.getTitle()).addDate();
+            initAnalysePage().addMetric(metric1.getTitle()).addDate();
 
             DateDimensionSelect dateDatasetSelect = analysisPage.getAttributesBucket().getDateDatasetSelect();
             DateDimensionGroup recommended = dateDatasetSelect.getDateDimensionGroup(RECOMMENDED);
@@ -103,7 +103,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
         final String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(singletonList(kpiUri));
 
         try {
-            analysisPage.addMetric(metric1.getTitle()).addDateFilter();
+            initAnalysePage().addMetric(metric1.getTitle()).addDateFilter();
 
             FiltersBucket filterBucket = analysisPage.getFilterBuckets();
             DateDimensionSelect dateDatasetSelect = filterBucket
@@ -132,7 +132,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
     @Test(dependsOnGroups = {"createProject"})
     public void checkRecommendedForInsightMetricInViewBy() throws JSONException, IOException {
         try {
-            analysisPage
+            initAnalysePage()
                     .addMetric(metric1.getTitle())
                     .addDate()
                     .waitForReportComputing()
@@ -159,7 +159,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
     @Test(dependsOnGroups = {"createProject"})
     public void checkRecommendedForInsightMetricInFilterBucket() throws JSONException, IOException {
         try {
-            analysisPage
+            initAnalysePage()
                     .addMetric(metric1.getTitle())
                     .addDate()
                     .waitForReportComputing()
@@ -189,7 +189,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
 
     @Test(dependsOnGroups = {"createProject"})
     public void notShowRecommendedWithMetricNotCombineDate() {
-        analysisPage.addMetric(metric1.getTitle()).addDate();
+        initAnalysePage().addMetric(metric1.getTitle()).addDate();
 
         DateDimensionSelect dateDatasetSelect = analysisPage
                 .getAttributesBucket()
@@ -225,7 +225,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
         final String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(asList(kpiUri1, kpiUri2));
 
         try {
-            analysisPage
+            initAnalysePage()
                     .addMetric(metric1.getTitle())
                     .addMetric(metric2.getTitle())
                     .addDate();
@@ -253,7 +253,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
         final String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(asList(kpiUri1, kpiUri2));
 
         try {
-            analysisPage
+            initAnalysePage()
                     .addMetric(metric1.getTitle())
                     .addMetric(metric2.getTitle())
                     .addDateFilter();
@@ -292,7 +292,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
         final String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(asList(kpiUri1, kpiUri2));
 
         try {
-            analysisPage
+            initAnalysePage()
                     .addMetric(metric1.getTitle())
                     .addMetric(metric2.getTitle())
                     .addDate();
@@ -322,7 +322,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
         final String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(asList(kpiUri1, kpiUri2));
 
         try {
-            analysisPage
+            initAnalysePage()
                     .addMetric(metric1.getTitle())
                     .addMetric(metric2.getTitle())
                     .addDateFilter();
@@ -356,7 +356,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
         final String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(asList(kpiUri1, kpiUri2, kpiUri3));
 
         try {
-            analysisPage.addMetric(metric1.getTitle());
+            initAnalysePage().addMetric(metric1.getTitle());
 
             if (!metric1.equals(metric2)) analysisPage.addMetric(metric2.getTitle());
             analysisPage.addDate();
@@ -392,7 +392,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
         final String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(asList(kpiUri1, kpiUri2, kpiUri3));
 
         try {
-            analysisPage
+            initAnalysePage()
                     .addMetric(metric1.getTitle())
                     .addMetric(metric2.getTitle())
                     .addMetric(metric3.getTitle())
@@ -421,7 +421,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
         final String indigoDashboardUri = indigoRestRequest.createAnalyticalDashboard(asList(kpiUri1, kpiUri2, kpiUri3));
 
         try {
-            analysisPage
+            initAnalysePage()
                     .addMetric(metric1.getTitle())
                     .addMetric(metric2.getTitle())
                     .addMetric(metric3.getTitle())
@@ -446,7 +446,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
     @Test(dependsOnGroups = {"createProject"})
     public void checkUnrelatedDateNotHide() throws JSONException, IOException {
         try {
-            analysisPage
+            initAnalysePage()
                     .addMetric(METRIC_AMOUNT)
                     .addDate()
                     .saveInsight(INSIGHT)
@@ -469,7 +469,7 @@ public class GoodSalesRelatedAndUnrelatedDateDimensionsTest extends AbstractAnal
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkRecommendedAfterSettingShowInPercentForMetric() {
-        analysisPage.addMetric(METRIC_AMOUNT).addDate();
+        initAnalysePage().addMetric(METRIC_AMOUNT).addDate();
 
         DateDimensionSelect dateDatasetSelect = analysisPage.getAttributesBucket().getDateDatasetSelect();
         DateDimensionGroup recommended = dateDatasetSelect.getDateDimensionGroup(RECOMMENDED);

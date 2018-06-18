@@ -33,7 +33,7 @@ public class GoodSalesContributionRecommendationTest extends AbstractAnalyseTest
 
     @Test(dependsOnGroups = {"createProject"})
     public void testSimpleContribution() {
-        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .getChartReport();
@@ -63,7 +63,7 @@ public class GoodSalesContributionRecommendationTest extends AbstractAnalyseTest
 
     @Test(dependsOnGroups = {"createProject"})
     public void testAnotherApproachToShowContribution() {
-        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 1);

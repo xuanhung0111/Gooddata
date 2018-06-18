@@ -55,10 +55,6 @@ public abstract class AbstractDashboardTest extends GoodSalesAbstractTest {
         super.initProperties(); // use GoodSales by default
         validateAfterClass = false;
     }
-    @Override
-    public void configureStartPage() {
-        // remove start page context configuration
-    }
 
     protected String addWidgetToWorkingDashboard(final String widgetUri) throws JSONException, IOException {
         final IndigoRestRequest indigoRestRequest = new IndigoRestRequest(

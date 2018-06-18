@@ -31,7 +31,7 @@ public class ResetButtonTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"})
     public void should_clear_bar_visualization() {
         // Render bar chart
-        analysisPage.changeReportType(ReportType.BAR_CHART)
+        initAnalysePage().changeReportType(ReportType.BAR_CHART)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addStack(ATTR_DEPARTMENT)
@@ -44,7 +44,7 @@ public class ResetButtonTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"})
     public void should_clear_table_visualization_properly() {
         // Render table
-        analysisPage.changeReportType(ReportType.TABLE)
+        initAnalysePage().changeReportType(ReportType.TABLE)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-visualization-table"), browser));
@@ -55,14 +55,14 @@ public class ResetButtonTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"})
     public void should_stay_clear_when_dragged_to_a_non_accepting_bucket() {
         // The category bucket DOES NOT accept a metric
-        assertTrue(analysisPage.drag(analysisPage.getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC),
+        assertTrue(initAnalysePage().drag(analysisPage.getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC),
                 analysisPage.getAttributesBucket().getInvitation())
                 .isBlankState());
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_reset_selected_date_dimension() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate()
             .getAttributesBucket()
             .changeDateDimension("Created");

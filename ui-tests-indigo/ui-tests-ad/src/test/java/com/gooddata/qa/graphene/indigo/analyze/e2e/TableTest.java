@@ -57,7 +57,7 @@ public class TableTest extends AbstractAdE2ETest {
     public void it_should_be_dash_if_null_not_formatted() throws ParseException, JSONException, IOException {
         dashboardRequest.changeMetricFormat(emptyMetricUri, "#,##0");
 
-        analysisPage.addMetric("__EMPTY__")
+        initAnalysePage().addMetric("__EMPTY__")
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .changeReportType(ReportType.TABLE)
             .waitForReportComputing();
@@ -68,7 +68,7 @@ public class TableTest extends AbstractAdE2ETest {
     public void it_should_be_empty_if_formatted() throws ParseException, JSONException, IOException {
         dashboardRequest.changeMetricFormat(emptyMetricUri, "[=null] empty");
 
-        analysisPage.addMetric("__EMPTY__")
+        initAnalysePage().addMetric("__EMPTY__")
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .changeReportType(ReportType.TABLE)
             .waitForReportComputing();
@@ -79,7 +79,7 @@ public class TableTest extends AbstractAdE2ETest {
     public void should_show_zeros_as_usual() throws ParseException, JSONException, IOException {
         dashboardRequest.changeMetricFormat(emptyMetricUri, "[=null] 0.00 $");
 
-        analysisPage.addMetric("__EMPTY__")
+        initAnalysePage().addMetric("__EMPTY__")
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .changeReportType(ReportType.TABLE)
             .waitForReportComputing();
@@ -88,7 +88,7 @@ public class TableTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_show_table_correctly_when_filter_is_removed() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addFilter(ATTR_ACTIVITY_TYPE)
             .getFilterBuckets()
             .configAttributeFilter(ATTR_ACTIVITY_TYPE, "Email");
@@ -205,7 +205,7 @@ public class TableTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_drag_more_than_one_attribute_to_category() {
-        assertEquals(analysisPage.changeReportType(ReportType.TABLE)
+        assertEquals(initAnalysePage().changeReportType(ReportType.TABLE)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_ACCOUNT)
             .addAttribute("Activity")
@@ -216,7 +216,7 @@ public class TableTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_not_be_possible_to_drag_more_than_one_attribute_to_bar__view_by() {
-        assertEquals(analysisPage.changeReportType(ReportType.BAR_CHART)
+        assertEquals(initAnalysePage().changeReportType(ReportType.BAR_CHART)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .drag(analysisPage.getCataloguePanel().searchAndGet(ATTR_ACCOUNT, FieldType.ATTRIBUTE),
                     analysisPage.getAttributesBucket().getRoot())
@@ -227,7 +227,7 @@ public class TableTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_move_stacks_to_categories_when_switching_to_table() {
-        assertEquals(analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
+        assertEquals(initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE)
             .addStack(ATTR_ACCOUNT)
             .changeReportType(ReportType.TABLE)
             .getAttributesBucket()
@@ -237,7 +237,7 @@ public class TableTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_move_second_category_to_stacks_and_remove_to_rest_when_switching_to_chart() {
-        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
+        initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE)
             .addStack(ATTR_ACCOUNT)
             .changeReportType(ReportType.TABLE)
             .changeReportType(ReportType.BAR_CHART);
@@ -247,7 +247,7 @@ public class TableTest extends AbstractAdE2ETest {
     }
 
     private void beforeOrderingTable() {
-        analysisPage.changeReportType(ReportType.TABLE)
+        initAnalysePage().changeReportType(ReportType.TABLE)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();

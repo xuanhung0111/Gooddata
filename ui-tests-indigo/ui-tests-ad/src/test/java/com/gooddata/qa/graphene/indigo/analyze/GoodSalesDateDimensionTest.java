@@ -41,7 +41,7 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void applyOnFilter() {
-        final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = initAnalysePage().getFilterBuckets();
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addMetric(METRIC_SNAPSHOT_BOP)
@@ -66,7 +66,7 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void applyOnBucket() {
-        final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = initAnalysePage().getFilterBuckets();
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
         assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ": All time");
@@ -86,7 +86,7 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void applyOnBothFilterAndBucket() {
-        final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = initAnalysePage().getFilterBuckets();
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDateFilter();
         assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ": All time");
@@ -111,7 +111,7 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
                     "covered by TestCafe")
     public void keepDateDimensionAfterApplyingSeeTrendRecommendation() {
         final String newDateDimension = CREATED;
-        analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT).addDateFilter().getFilterBuckets()
+        initAnalysePage().addMetric(FACT_AMOUNT, FieldType.FACT).addDateFilter().getFilterBuckets()
                 .changeDateDimension("Closed", newDateDimension);
 
         assertTrue(analysisPage.waitForReportComputing().getFilterBuckets().getDateFilterText()

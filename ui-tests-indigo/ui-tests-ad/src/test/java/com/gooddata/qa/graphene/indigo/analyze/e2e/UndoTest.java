@@ -35,7 +35,7 @@ public class UndoTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"})
     public void should_create_one_version_per_user_action() {
         // 1st version
-        MetricConfiguration configuration = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        MetricConfiguration configuration = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
@@ -57,7 +57,7 @@ public class UndoTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_undo_metric_over_time_shortcut_followed_by_filter_change() {
         // D&D the first metric to the metric overtime recommendation
-        analysisPage.drag(analysisPage.getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC),
+        initAnalysePage().drag(analysisPage.getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC),
                 () -> waitForElementVisible(cssSelector(".s-recommendation-metric-over-time-canvas"), browser))
                 .waitForReportComputing()
                 .getFilterBuckets()
@@ -70,7 +70,7 @@ public class UndoTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_redo_single_visualization_type_change() {
-        assertTrue(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        assertTrue(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .changeReportType(ReportType.LINE_CHART)
             .undo()
             .isReportTypeSelected(ReportType.COLUMN_CHART));
@@ -81,7 +81,7 @@ public class UndoTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_undo_visualization_type_change_for_complex_configuration() {
-        assertEquals(analysisPage.changeReportType(ReportType.TABLE)
+        assertEquals(initAnalysePage().changeReportType(ReportType.TABLE)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
@@ -93,7 +93,7 @@ public class UndoTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_properly_deserialize_auto_generated_filters() {
-        assertTrue(analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
+        assertTrue(initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE)
             .resetToBlankState()
             .undo()
             .removeAttribute(ATTR_ACTIVITY_TYPE)
@@ -103,7 +103,7 @@ public class UndoTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_properly_deserialize_modified_filters() {
-        analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
+        initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE)
             .getFilterBuckets()
             .configAttributeFilter(ATTR_ACTIVITY_TYPE, "Email");
 

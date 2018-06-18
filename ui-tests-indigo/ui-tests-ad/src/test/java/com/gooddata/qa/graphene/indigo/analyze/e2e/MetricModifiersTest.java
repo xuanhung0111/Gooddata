@@ -31,7 +31,7 @@ public class MetricModifiersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_be_turned_off_when_second_metric_is_added() throws ParseException {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate()
             .waitForReportComputing();
 

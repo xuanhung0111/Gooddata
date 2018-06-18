@@ -38,7 +38,7 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_filter_metric_by_attribute() {
-        assertEquals(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        assertEquals(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
@@ -50,7 +50,7 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
             enabled = false,
             description = "https://jira.intgdc.com/browse/AQE-1233?focusedCommentId=642059&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-642059")
     public void should_not_be_possible_to_filter_metric_by_unavailable_attribute() {
-        List<String> attributes = analysisPage.addMetric(METRIC_NUMBER_OF_LOST_OPPS)
+        List<String> attributes = initAnalysePage().addMetric(METRIC_NUMBER_OF_LOST_OPPS)
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_LOST_OPPS)
             .expandConfiguration()
@@ -63,7 +63,7 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_remove_filter() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
@@ -74,7 +74,7 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_show_tooltip() {
-        String description = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        String description = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
@@ -90,7 +90,7 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_restore_filter_creation() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
@@ -113,7 +113,7 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_restore_attribute_elements_settings() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
@@ -138,7 +138,7 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
     public void should_show_total_count_in_attribute_filter_label_correctly() {
         String labelCount = ".s-attribute-filter-label .s-total-count";
 
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration()

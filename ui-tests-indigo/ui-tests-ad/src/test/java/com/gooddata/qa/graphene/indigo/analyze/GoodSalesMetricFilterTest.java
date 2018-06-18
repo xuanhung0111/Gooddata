@@ -38,7 +38,7 @@ public class GoodSalesMetricFilterTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"},
             description = "CL-10362 Attribute filter didn't connect with measure")
     public void makeSureAttributeFilterConnectWithMeasure() {
-        assertTrue(analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        assertTrue(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
@@ -82,7 +82,7 @@ public class GoodSalesMetricFilterTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void addAttributeFilterForMultipleMetrics() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
@@ -106,7 +106,7 @@ public class GoodSalesMetricFilterTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void searchOnlyAttributeElement() {
-        MetricConfiguration metricConfiguration = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        MetricConfiguration metricConfiguration = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
@@ -122,7 +122,7 @@ public class GoodSalesMetricFilterTest extends AbstractAnalyseTest {
     public void checkReportWhenFilterContainManyCharacters() {
         String unselectedValue = "14 West";
 
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
@@ -135,7 +135,7 @@ public class GoodSalesMetricFilterTest extends AbstractAnalyseTest {
     }
 
     private void addFilterToMetric() {
-        MetricConfiguration metricConfiguration = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        MetricConfiguration metricConfiguration = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();

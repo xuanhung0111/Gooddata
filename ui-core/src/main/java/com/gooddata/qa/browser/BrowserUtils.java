@@ -65,6 +65,9 @@ public class BrowserUtils {
     }
 
     public static void addMagicElementToDOM(WebDriver browser) {
+        // Use to avoid MAGIC element added in an embedded iframe and Selenium cannot identify it in default content
+        switchToMainWindow(browser);
+
         String script = "var magic = document.createElement('div'); magic.className='" + MAGIC + "'; "
                 + "document.getElementsByTagName('body')[0].appendChild(magic);";
 
@@ -75,7 +78,7 @@ public class BrowserUtils {
 
             if (ElementUtils.isElementPresent(By.className(MAGIC), browser)) {
                 return;
-            };
+            }
         }
 
         throw new NoSuchElementException("Cannot find magic element in DOM");

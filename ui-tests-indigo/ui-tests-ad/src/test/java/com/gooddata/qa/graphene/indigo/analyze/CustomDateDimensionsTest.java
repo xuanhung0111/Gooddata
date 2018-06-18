@@ -60,7 +60,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void datePresetsAppliedInReport() {
-        final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = initAnalysePage().getFilterBuckets();
 
         analysisPage.addMetric(NUMBER, FieldType.FACT).addDate().waitForReportComputing();
 
@@ -81,7 +81,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void dateRangeAppliedInReport() throws ParseException {
-        analysisPage.addMetric(NUMBER, FieldType.FACT)
+        initAnalysePage().addMetric(NUMBER, FieldType.FACT)
                 .addDate()
                 .getFilterBuckets()
                 .configDateFilter("07/13/2014", "08/11/2014");
@@ -91,7 +91,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void applyRecommendation() {
-        analysisPage.addMetric(NUMBER, FieldType.FACT).waitForReportComputing();
+        initAnalysePage().addMetric(NUMBER, FieldType.FACT).waitForReportComputing();
 
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -108,7 +108,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testGranularityOfDate() {
-        analysisPage.addMetric(NUMBER, FieldType.FACT)
+        initAnalysePage().addMetric(NUMBER, FieldType.FACT)
                 .addDate()
                 .getAttributesBucket()
                 .changeGranularity("Month");
@@ -126,7 +126,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testPopAndPercentOnCustomDate() {
-        ChartReport report = analysisPage.addMetric(NUMBER, FieldType.FACT)
+        ChartReport report = initAnalysePage().addMetric(NUMBER, FieldType.FACT)
                 .addDate()
                 .waitForReportComputing()
                 .getChartReport();

@@ -59,7 +59,7 @@ public class GoodSalesTableReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void createTableReportWithMoreThan3Metrics() {
-        List<String> headers = analysisPage.changeReportType(ReportType.TABLE)
+        List<String> headers = initAnalysePage().changeReportType(ReportType.TABLE)
             .addMetric(METRIC_NUMBER_OF_LOST_OPPS)
             .addMetric(METRIC_NUMBER_OF_OPEN_OPPS)
             .addMetric(METRIC_NUMBER_OF_OPPORTUNITIES)
@@ -89,7 +89,7 @@ public class GoodSalesTableReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkReportContentWhenAdd3Metrics1Attribute() {
-        TableReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        TableReport report = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addMetric(METRIC_QUOTA)
                 .addMetric(METRIC_SNAPSHOT_BOP)
                 .addAttribute(ATTR_ACTIVITY_TYPE)
@@ -114,7 +114,7 @@ public class GoodSalesTableReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void createReportWithManyAttributes() {
-        List<List<String>> adReportContent = analysisPage.changeReportType(ReportType.TABLE)
+        List<List<String>> adReportContent = initAnalysePage().changeReportType(ReportType.TABLE)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
@@ -127,7 +127,7 @@ public class GoodSalesTableReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void filterReportIncludeManyAttributes() {
-        analysisPage.changeReportType(ReportType.TABLE)
+        initAnalysePage().changeReportType(ReportType.TABLE)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .addAttribute(ATTR_DEPARTMENT)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES);
@@ -144,7 +144,7 @@ public class GoodSalesTableReportTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"})
     public void orderDataInTableReport() {
         List<List<String>> content = sortReportBaseOnHeader(
-                analysisPage.changeReportType(ReportType.TABLE)
+                initAnalysePage().changeReportType(ReportType.TABLE)
                     .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                     .waitForReportComputing()
                     .getTableReport(),
@@ -219,7 +219,7 @@ public class GoodSalesTableReportTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void makeSureReportRenderWhenSortingTabular() {
-        analysisPage.addMetric(FACT_AMOUNT, FieldType.FACT)
+        initAnalysePage().addMetric(FACT_AMOUNT, FieldType.FACT)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing()
             .changeReportType(ReportType.TABLE)

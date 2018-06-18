@@ -59,7 +59,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void checkDefaultValueInDateRange() {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-        analysisPage.addDateFilter()
+        initAnalysePage().addDateFilter()
                 .getFilterBuckets()
                 .getFilter(DATE_INVOICE).click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
@@ -72,7 +72,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void allowFilterByRange() throws ParseException {
-        final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
+        final FiltersBucket filtersBucketReact = initAnalysePage().getFilterBuckets();
 
         ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_PERSONS)
                 .addAttribute(ATTR_PERSON)
@@ -109,7 +109,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void testDateInCategoryAndDateInFilter() {
-        assertTrue(analysisPage.addMetric(METRIC_NUMBER_OF_PERSONS)
+        assertTrue(initAnalysePage().addMetric(METRIC_NUMBER_OF_PERSONS)
                 .addDate()
                 .waitForReportComputing()
                 .getChartReport()
@@ -122,7 +122,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void showPercentAfterConfigDate() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_PERSONS)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_PERSONS)
                 .addDate()
                 .getFilterBuckets()
                 .configDateFilter(DateRange.LAST_90_DAYS.toString());
@@ -151,7 +151,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void popAfterConfigDate() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_PERSONS)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_PERSONS)
                 .addDate()
                 .getFilterBuckets()
                 .configDateFilter(DateRange.LAST_90_DAYS.toString());
@@ -177,7 +177,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"}, description = "CL-9807: Problems with export of date filters")
     public void exportDateFilter() {
         final String dateFilterValue = DateRange.LAST_4_QUARTERS.toString();
-        analysisPage.addDateFilter()
+        initAnalysePage().addDateFilter()
                 .getFilterBuckets()
                 .configDateFilter(dateFilterValue);
         analysisPage.exportReport();
@@ -201,7 +201,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
                     + "into # of Persons and attr:Person")
     public void keepDateRelationAfterAddingPercent() {
         final String expectedDate = "templ:DateInvoice: This quarter";
-        analysisPage.addMetric(METRIC_NUMBER_OF_PERSONS, FieldType.METRIC).addAttribute(ATTR_PERSON)
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_PERSONS, FieldType.METRIC).addAttribute(ATTR_PERSON)
                 .waitForReportComputing();
 
         RecommendationContainer recommendationContainer =

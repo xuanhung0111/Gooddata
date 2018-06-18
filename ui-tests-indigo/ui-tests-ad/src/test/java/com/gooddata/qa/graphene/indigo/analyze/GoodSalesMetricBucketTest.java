@@ -43,7 +43,7 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void checkSeriesStateTransitions() {
-        ChartReport report = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        ChartReport report = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .addDate()
                 .waitForReportComputing()
                 .getChartReport();
@@ -71,7 +71,7 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testBuiltInMetric() {
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES);
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES);
         MetricConfiguration activitiesConfiguration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES);
         assertTrue(activitiesConfiguration.isConfigurationCollapsed());
@@ -93,7 +93,7 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testMetricFromAttribute() {
-        analysisPage.addMetric(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE);
+        initAnalysePage().addMetric(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE);
 
         MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
             .getMetricConfiguration("Count of " + ATTR_ACTIVITY_TYPE);
@@ -106,7 +106,7 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void showInPercentAndPop() {
-        MetricConfiguration metricConfiguration = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        MetricConfiguration metricConfiguration = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate()
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
@@ -157,7 +157,7 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void disablePopCheckboxOnDroppingNonDateAttribute() {
-        MetricConfiguration metricConfiguration = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        MetricConfiguration metricConfiguration = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing()
             .getMetricsBucket()
@@ -175,7 +175,7 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void uncheckSelectedPopWhenReplaceAttribute() {
-        MetricConfiguration metricConfiguration = analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+        MetricConfiguration metricConfiguration = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate()
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)

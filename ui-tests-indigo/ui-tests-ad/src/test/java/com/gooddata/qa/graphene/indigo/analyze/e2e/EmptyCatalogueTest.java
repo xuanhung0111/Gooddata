@@ -16,6 +16,7 @@ public class EmptyCatalogueTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_finish_loading_when_there_are_no_metrics_attributes_or_facts() {
+        initAnalysePage();
         waitForElementPresent(cssSelector(".s-catalogue-loaded"), browser);
     }
 }
