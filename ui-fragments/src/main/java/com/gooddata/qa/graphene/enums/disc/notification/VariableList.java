@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.enums.disc.notification;
 import static java.util.stream.Collectors.toList;
 import static java.util.Arrays.asList;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 
@@ -20,7 +21,10 @@ public enum VariableList {
     FAILURE {
         @Override
         public Collection<Variable> getVariables() {
-            return Stream.concat(SUCCESS.getVariables().stream(), Stream.of(Variable.ERROR_MESSAGE)).collect(toList());
+            Collection<Variable> result = new ArrayList<>(SUCCESS.getVariables());
+            result.add(Variable.CONSECUTIVE_FAILURES);
+            result.add(Variable.ERROR_MESSAGE);
+            return result;
         }
     },
     PROCESS_SCHEDULED {
