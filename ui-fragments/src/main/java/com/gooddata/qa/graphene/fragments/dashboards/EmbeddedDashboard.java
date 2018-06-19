@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.fragments.dashboards;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
@@ -66,15 +65,12 @@ public class EmbeddedDashboard extends DashboardsPage {
 
     @Override
     public String printDashboardTab(int tabIndex) {
-        editDashboard();
-        waitForFragmentVisible(tabs).openTab(tabIndex);
-        String label = tabs.getTabLabel(tabIndex);
-        saveDashboard();
-
+        if (isElementVisible(tabs.getRoot())) {
+            waitForFragmentVisible(tabs).openTab(tabIndex);
+        }
         waitForElementVisible(BY_PRINT_PDF_BUTTON, browser).click();
         waitForElementVisible(BY_PRINTING_PANEL, browser);
         waitForElementNotPresent(BY_PRINTING_PANEL);
-
-        return label;
+        return tabs.getTabLabel(tabIndex);
     }
 }

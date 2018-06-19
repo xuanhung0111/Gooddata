@@ -307,6 +307,15 @@ public class AbstractUITest extends AbstractGreyPageTest {
                 + fileSize + ", but minimum " + minimalSize + " was expected");
     }
 
+    public String getContentFrom(String pdfFile) {
+        File pdfExport = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator() + pdfFile + ".pdf");
+        if (!pdfExport.exists()) {
+            log.info("PDF file doesn't exist");
+            return null;
+        }
+        return PdfUtils.getTextContentFrom(pdfExport);
+    }
+
     public void verifyReportExport(ExportFormat format, String reportName, long minimalSize) {
         String fileURL = testParams.getDownloadFolder() + testParams.getFolderSeparator() + reportName + "."
                 + format.getName();

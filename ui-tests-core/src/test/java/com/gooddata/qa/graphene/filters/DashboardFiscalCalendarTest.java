@@ -184,6 +184,7 @@ public class DashboardFiscalCalendarTest extends AbstractDashboardWidgetTest {
 
     @Test(dependsOnMethods = {"initData"})
     public void embedDashboardHasFiscalDateFilter() throws IOException {
+        final String firstTab = "First Tab";
         initDashboardsPage().addNewDashboard(generateDashboardName())
                 .addReportToDashboard(SUM_OF_PAYMENTS_REPORT, DashboardWidgetDirection.LEFT)
                 .addTimeFilterToDashboard(DateGranularity.YEAR, THIS, DashboardWidgetDirection.RIGHT);
@@ -201,13 +202,13 @@ public class DashboardFiscalCalendarTest extends AbstractDashboardWidgetTest {
         if (testParams.isClientDemoEnvironment()) {
             return;
         }
-        String exportedDashboardName = embededDashboard.printDashboardTab(0);
+        embededDashboard.printDashboardTab(0);
         try {
             checkRedBar(browser);
-            verifyDashboardExport(exportedDashboardName, "First Tab", expectedDashboardExportSize);
+            verifyDashboardExport(firstTab, firstTab, expectedDashboardExportSize);
         } finally {
             deleteIfExists(Paths.get(testParams.getDownloadFolder() + testParams.getFolderSeparator() +
-                    exportedDashboardName + "." + ExportFormat.PDF.getName()));
+                    firstTab + "." + ExportFormat.PDF.getName()));
         }
     }
 

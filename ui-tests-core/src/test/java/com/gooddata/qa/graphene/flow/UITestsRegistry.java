@@ -38,6 +38,7 @@ import com.gooddata.qa.graphene.dashboards.GoodSalesSavedViewWithAllValuesTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardMacroTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesPublicDashboardTest;
 import com.gooddata.qa.graphene.dashboards.ControlExecutionContextTest;
+import com.gooddata.qa.graphene.dashboards.GoodSalesUriParameterEmbeddedDashboardTest;
 import com.gooddata.qa.graphene.filters.DashboardDateFilterSelectRangeTest;
 import com.gooddata.qa.graphene.filters.DashboardFilterVisualTest;
 import com.gooddata.qa.graphene.filters.DashboardFiscalCalendarTest;
@@ -223,6 +224,7 @@ public class UITestsRegistry {
                     GoodSalesPublicDashboardTest.class,
                     DynamicImageOnDashboardTest.class,
                     ControlExecutionContextTest.class,
+                    GoodSalesUriParameterEmbeddedDashboardTest.class,
                     "testng-dashboard-default-filter-multiple-choice.xml",
                     "testng-dashboard-default-filter-single-choice.xml",
                     "testng-dashboard-default-filter-savedView-multiple-choice.xml",
