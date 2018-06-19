@@ -13,6 +13,7 @@ public class NotificationRule {
 
     private String email;
     private NotificationEvent event;
+    private Integer consecutiveFailures;
     private String customEventName;
     private String subject;
     private String message;
@@ -46,6 +47,11 @@ public class NotificationRule {
         return this;
     }
 
+    public NotificationRule withConsecutiveFailures(Integer consecutiveFailures) {
+        this.consecutiveFailures = consecutiveFailures;
+        return this;
+    }
+
     public NotificationRule withCustomEventName(String customEventName) {
         this.customEventName = customEventName;
         return this;
@@ -67,6 +73,10 @@ public class NotificationRule {
 
     public NotificationEvent getEvent() {
         return event;
+    }
+
+    public Integer getConsecutiveFailures() {
+        return consecutiveFailures;
     }
 
     public String getCustomEventName() {

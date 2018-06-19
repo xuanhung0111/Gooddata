@@ -31,6 +31,9 @@ public class NotificationRuleItem extends AbstractFragment {
     @FindBy(css = ".event-field input")
     private WebElement eventNameInput;
 
+    @FindBy(css = ".consecutive-failures-field input")
+    private WebElement consecutiveFailuresInput;
+
     @FindBy(css = ".subject-field input")
     private WebElement subjectInput;
 
@@ -72,6 +75,10 @@ public class NotificationRuleItem extends AbstractFragment {
         return enterData(eventNameInput, name);
     }
 
+    public NotificationRuleItem enterConsecutiveFailures(Integer consecutiveFailures) {
+        return enterData(consecutiveFailuresInput, String.valueOf(consecutiveFailures));
+    }
+
     public NotificationRuleItem selectEvent(NotificationEvent event) {
         waitForElementVisible(eventSelect).selectByVisibleText(event.toString());
         return this;
@@ -87,6 +94,9 @@ public class NotificationRuleItem extends AbstractFragment {
             enterCustomEventName(notificationRule.getCustomEventName());
         }
 
+        if (notificationRule.getConsecutiveFailures() != null) {
+            enterConsecutiveFailures(notificationRule.getConsecutiveFailures());
+        }
         return this;
     }
 
@@ -108,6 +118,11 @@ public class NotificationRuleItem extends AbstractFragment {
 
     public String getEmail() {
         return waitForElementVisible(emailInput).getAttribute("value");
+    }
+
+    public Integer getConsecutiveFailures() {
+        String value = waitForElementVisible(consecutiveFailuresInput).getAttribute("value");
+        return value.isEmpty() ? null : new Integer(value);
     }
 
     public NotificationEvent getSelectedEvent() {
