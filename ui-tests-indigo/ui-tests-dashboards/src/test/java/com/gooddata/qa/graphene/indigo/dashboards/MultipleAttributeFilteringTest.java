@@ -55,7 +55,7 @@ public class MultipleAttributeFilteringTest extends AbstractDashboardTest {
     public void checkAddAttributeFilterButtonTest() {
         analysisPage = initAnalysePage();
         addMetricWithTwoAttributeFilter();
-        assertEquals(metricConfiguration.getAllFilterText(), asList(ATTR_ACCOUNT + ": All"), ATTR_ACTIVITY_TYPE + ": All");
+        assertEquals(metricConfiguration.getAllFilterText(), asList(ATTR_ACCOUNT + ":All"));
         assertTrue(metricConfiguration.canAddAnotherFilter(), "Add attribute filter button is not displayed");
 
         metricConfiguration = analysisPage
@@ -66,7 +66,7 @@ public class MultipleAttributeFilteringTest extends AbstractDashboardTest {
             .addFilterWithAllValue(ATTR_ACCOUNT);
 
         takeScreenshot(browser, "check-add-attribute-filter-button-test", getClass());
-        assertEquals(metricConfiguration.getFilterText(), ATTR_ACCOUNT + ": All");
+        assertEquals(metricConfiguration.getFilterText(), ATTR_ACCOUNT + ":All");
         assertTrue(metricConfiguration.canAddAnotherFilter(), "Add attribute filter button is not displayed");
     }
 
@@ -78,13 +78,13 @@ public class MultipleAttributeFilteringTest extends AbstractDashboardTest {
         //Undo
         metricConfiguration = analysisPage.undo().getMetricsBucket().getMetricConfiguration(METRIC_TIMELINE_BOP).expandConfiguration();
         takeScreenshot(browser, "check-add-attribute-filter-button-after-undo-test", getClass());
-        assertEquals(metricConfiguration.getAllFilterText(), asList(ATTR_ACCOUNT + ": All"));
+        assertEquals(metricConfiguration.getAllFilterText(), asList(ATTR_ACCOUNT + ":All"));
         assertTrue(metricConfiguration.canAddAnotherFilter(), "Add attribute filter button is not displayed");
 
         //Redo
         metricConfiguration = analysisPage.redo().getMetricsBucket().getMetricConfiguration(METRIC_TIMELINE_BOP).expandConfiguration();
         takeScreenshot(browser, "check-add-attribute-filter-button-after-redo-test", getClass());
-        assertEquals(metricConfiguration.getAllFilterText(), asList(ATTR_ACCOUNT + ": All"), ATTR_ACTIVITY_TYPE + ": All");
+        assertEquals(metricConfiguration.getAllFilterText(), asList(ATTR_ACCOUNT + ":All"));
         assertTrue(metricConfiguration.canAddAnotherFilter(), "Add attribute filter button is not displayed");
     }
 
@@ -131,7 +131,7 @@ public class MultipleAttributeFilteringTest extends AbstractDashboardTest {
             .expandConfiguration()
             .addFilterWithAllValue(ATTR_ACCOUNT);
 
-        assertEquals(metricConfiguration.getFilterText(), ATTR_ACCOUNT + ": All");
+        assertEquals(metricConfiguration.getFilterText(), ATTR_ACCOUNT + ":All");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -139,7 +139,7 @@ public class MultipleAttributeFilteringTest extends AbstractDashboardTest {
         analysisPage = initAnalysePage();
         addMetricWithTwoAttributeFilter();
 
-        assertFalse(metricConfiguration.removeAttributeFilter(ATTR_ACTIVITY_TYPE + ": All").isDisabledAttribute(ATTR_ACTIVITY_TYPE),
+        assertFalse(metricConfiguration.removeAttributeFilter(ATTR_ACTIVITY_TYPE + ":All").isDisabledAttribute(ATTR_ACTIVITY_TYPE),
             ATTR_ACTIVITY_TYPE + " can add after removed");
     }
 
