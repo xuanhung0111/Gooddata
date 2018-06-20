@@ -302,7 +302,7 @@ public class AnalysisPage extends AbstractFragment {
     }
 
     public CataloguePanel getCataloguePanel() {
-        return waitForFragmentVisible(cataloguePanel);
+        return waitForFragmentVisible(cataloguePanel).waitForItemLoaded();
     }
 
     public MetricsBucket getMetricsBucket() {
