@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.login;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.testng.Assert.assertTrue;
 
@@ -57,10 +56,7 @@ public class LoginPageTest extends AbstractUITest {
             signIn(false, UserRoles.ADMIN);
 
             openUrl(PAGE_LOGIN);
-
-            waitForElementNotPresent(BY_LOGGED_USER_BUTTON);
             waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
-
         } finally {
             logout();
         }
