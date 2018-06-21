@@ -50,7 +50,7 @@ public class EmbeddedDashboard extends DashboardsPage {
     @Override
     public DashboardEditBar editDashboard() {
         if (!isElementPresent(BY_DASHBOARD_EDIT_BAR, browser)) {
-            waitForElementVisible(BY_EDIT_BUTTON, browser).click();
+            openEditExportEmbedMenu().select("Edit");
         }
 
         return getDashboardEditBar();
