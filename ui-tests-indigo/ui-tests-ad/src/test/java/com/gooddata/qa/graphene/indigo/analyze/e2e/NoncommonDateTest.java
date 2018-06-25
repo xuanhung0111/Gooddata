@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertTrue;
@@ -13,6 +14,8 @@ import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
+
+import java.util.Arrays;
 
 public class NoncommonDateTest extends AbstractAdE2ETest {
 
@@ -69,22 +72,21 @@ public class NoncommonDateTest extends AbstractAdE2ETest {
             .addDate()
             .getAttributesBucket()
             .changeDateDimension("Created");
-
-        assertThat(waitForElementVisible(cssSelector(".s-filter-button span"), browser).getText(),
-                containsString("Created:\nAll time"));
+        String[] createdAllTexts = waitForElementVisible(cssSelector(".s-filter-button span"), browser).getText().split(":");
+        assertThat(Arrays.asList(createdAllTexts[0].trim(), createdAllTexts[1].trim()), contains("Created", "All time"));
 
         // update filter to last quarter
         analysisPage.getFilterBuckets()
             .configDateFilter("Last quarter");
-        assertThat(waitForElementVisible(cssSelector(".s-filter-button span"), browser).getText(),
-                containsString("Created:\nLast quarter"));
+        String[] createdLastQuarterTexts = waitForElementVisible(cssSelector(".s-filter-button span"), browser).getText().split(":");
+        assertThat(Arrays.asList(createdLastQuarterTexts[0].trim(), createdLastQuarterTexts[1].trim()), contains("Created", "Last quarter"));
 
         // switch date dimension to Foundation Date
         analysisPage.getAttributesBucket()
             .changeDateDimension("Activity");
 
         // check that filter is kept switched to last quarter, but in switched date dimension
-        assertThat(waitForElementVisible(cssSelector(".s-filter-button span"), browser).getText(),
-                containsString("Activity:\nLast quarter"));
+        String[] activityLastQuarterTexts = waitForElementVisible(cssSelector(".s-filter-button span"), browser).getText().split(":");
+        assertThat(Arrays.asList(activityLastQuarterTexts[0].trim(), activityLastQuarterTexts[1].trim()), contains("Activity", "Last quarter"));
     }
 }
