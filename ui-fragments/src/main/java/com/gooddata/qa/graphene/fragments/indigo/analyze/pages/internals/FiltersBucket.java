@@ -100,7 +100,7 @@ public class FiltersBucket extends AbstractBucket {
 
     public WebElement getFilter(final String dateOrAttribute) {
         return waitForCollectionIsNotEmpty(filters).stream()
-            .filter(e -> waitForFilterLoaded(e).findElement(BY_FILTER_TEXT).getText().startsWith(dateOrAttribute + ":"))
+            .filter(e -> waitForFilterLoaded(e).findElement(BY_FILTER_TEXT).getText().contains(dateOrAttribute))
             .findFirst()
             .get();
     }
