@@ -4,8 +4,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -131,8 +129,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
                 .contains("disabled"));
 
         panel.getApplyButton().click();
-        String[] filterTexts = analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY_TYPE).split(":");
-        assertThat(Arrays.asList(filterTexts[0].trim(), filterTexts[1].trim()), contains(ATTR_ACTIVITY_TYPE, "Email"));
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY_TYPE)), Arrays.asList(ATTR_ACTIVITY_TYPE, "Email"));
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"disabling-Apply-button"}, description = "covered by TestCafe")

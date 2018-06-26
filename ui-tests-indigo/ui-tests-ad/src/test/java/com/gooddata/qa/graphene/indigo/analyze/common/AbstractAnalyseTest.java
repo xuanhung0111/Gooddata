@@ -12,6 +12,10 @@ import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public abstract class AbstractAnalyseTest extends GoodSalesAbstractTest {
 
     protected static final String DATE = "Date";
@@ -60,5 +64,13 @@ public abstract class AbstractAnalyseTest extends GoodSalesAbstractTest {
             browser.close();
             BrowserUtils.switchToFirstTab(browser);
         }
+    }
+
+    protected List<String> parseFilterText(String filterTitle) {
+        final List<String> filterTexts = new ArrayList<>();
+        Arrays.stream(filterTitle.trim().split(":")).forEach(filterText -> {
+            filterTexts.add(filterText.trim());
+        });
+        return filterTexts;
     }
 }

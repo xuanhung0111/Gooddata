@@ -72,21 +72,22 @@ public class NoncommonDateTest extends AbstractAdE2ETest {
             .addDate()
             .getAttributesBucket()
             .changeDateDimension("Created");
-        String[] createdAllTexts = waitForElementVisible(cssSelector(".s-filter-button span"), browser).getText().split(":");
-        assertThat(Arrays.asList(createdAllTexts[0].trim(), createdAllTexts[1].trim()), contains("Created", "All time"));
+
+        assertThat(parseFilterText(waitForElementVisible(cssSelector(".s-filter-button span"), browser).getText()),
+                contains(Arrays.asList("Created", "All time")));
 
         // update filter to last quarter
         analysisPage.getFilterBuckets()
             .configDateFilter("Last quarter");
-        String[] createdLastQuarterTexts = waitForElementVisible(cssSelector(".s-filter-button span"), browser).getText().split(":");
-        assertThat(Arrays.asList(createdLastQuarterTexts[0].trim(), createdLastQuarterTexts[1].trim()), contains("Created", "Last quarter"));
+        assertThat(parseFilterText(waitForElementVisible(cssSelector(".s-filter-button span"), browser).getText()),
+                contains(Arrays.asList("Created", "Last quarter")));
 
         // switch date dimension to Foundation Date
         analysisPage.getAttributesBucket()
             .changeDateDimension("Activity");
 
         // check that filter is kept switched to last quarter, but in switched date dimension
-        String[] activityLastQuarterTexts = waitForElementVisible(cssSelector(".s-filter-button span"), browser).getText().split(":");
-        assertThat(Arrays.asList(activityLastQuarterTexts[0].trim(), activityLastQuarterTexts[1].trim()), contains("Activity", "Last quarter"));
+        assertThat(parseFilterText(waitForElementVisible(cssSelector(".s-filter-button span"), browser).getText()),
+                contains(Arrays.asList("Activity", "Last quarter")));
     }
 }

@@ -24,6 +24,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.Catalog
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 public class MultipleDatasetsTest extends AbstractAnalyseTest {
 
@@ -80,7 +81,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
         analysisPage.waitForReportComputing();
         assertThat(report.getTrackersCount(), greaterThanOrEqualTo(1));
         takeScreenshot(browser, "analyzeReportOnProductionData - apply attribute filter", getClass());
-        assertEquals(filtersBucketReact.getFilterText("Industry"), "Industry:\nApparel Stores, Consumer Services(2)");
+        assertEquals(parseFilterText(filtersBucketReact.getFilterText("Industry")), Arrays.asList("Industry", "Apparel Stores, Consumer Services(2)"));
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -100,7 +101,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
         analysisPage.waitForReportComputing();
         assertThat(report.getTrackersCount(), greaterThanOrEqualTo(1));
         takeScreenshot(browser, "analyzeReportOnPayrollData - apply attribute filter", getClass());
-        assertEquals(filtersBucketReact.getFilterText("County"), "County:\nAustin, Clover");
+        assertEquals(parseFilterText(filtersBucketReact.getFilterText("County")), Arrays.asList("County", "Austin, Clover"));
     }
 
     @Test(dependsOnGroups = {"createProject"})

@@ -22,6 +22,8 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFil
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 
+import java.util.Arrays;
+
 public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
 
     private static final String ACTIVITY = "Activity";
@@ -47,7 +49,7 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
                 .addMetric(METRIC_SNAPSHOT_BOP)
                 .addDateFilter()
                 .waitForReportComputing();
-        assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ":\nAll time");
+        assertEquals(parseFilterText(filtersBucketReact.getFilterText(ACTIVITY)), Arrays.asList(ACTIVITY, "All time"));
         assertEquals(analysisPage.getChartReport().getTrackersCount(), 2);
 
         WebElement filter = filtersBucketReact.getFilter(ACTIVITY);
@@ -59,7 +61,7 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
         panel.select("This year");
         panel.apply();
         analysisPage.waitForReportComputing();
-        assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ":\nThis year");
+        assertEquals(parseFilterText(filtersBucketReact.getFilterText(ACTIVITY)), Arrays.asList(ACTIVITY, "This year"));
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
         checkingOpenAsReport("applyOnFilter");
     }
@@ -69,7 +71,7 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
         final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
-        assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ":\nAll time");
+        assertEquals(parseFilterText(filtersBucketReact.getFilterText(ACTIVITY)), Arrays.asList(ACTIVITY, "All time"));
 
         analysisPage.getAttributesBucket().changeGranularity("Month");
         analysisPage.waitForReportComputing();
@@ -89,10 +91,10 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
         final FiltersBucket filtersBucketReact = analysisPage.getFilterBuckets();
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDateFilter();
-        assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ":\nAll time");
+        assertEquals(parseFilterText(filtersBucketReact.getFilterText(ACTIVITY)), Arrays.asList(ACTIVITY, "All time"));
 
         filtersBucketReact.changeDateDimension(ACTIVITY, CREATED);
-        assertEquals(filtersBucketReact.getFilterText(CREATED), CREATED + ":\nAll time");
+        assertEquals(parseFilterText(filtersBucketReact.getFilterText(CREATED)), Arrays.asList(CREATED, "All time"));
 
         analysisPage.addDate();
         WebElement filter = filtersBucketReact.getFilter(CREATED);
@@ -102,7 +104,7 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
         assertFalse(panel.isDimensionSwitcherEnabled());
 
         analysisPage.getAttributesBucket().changeDateDimension(ACTIVITY);
-        assertEquals(filtersBucketReact.getFilterText(ACTIVITY), ACTIVITY + ":\nAll time");
+        assertEquals(parseFilterText(filtersBucketReact.getFilterText(ACTIVITY)), Arrays.asList(ACTIVITY, "All time"));
         checkingOpenAsReport("applyOnBothFilterAndBucket");
     }
 
