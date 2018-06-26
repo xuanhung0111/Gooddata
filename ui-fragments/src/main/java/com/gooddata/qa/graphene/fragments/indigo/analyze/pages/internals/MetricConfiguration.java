@@ -123,6 +123,10 @@ public class MetricConfiguration extends AbstractFragment {
     }
 
     private void clickMetricHeader() {
+        // Header element is not scrolled automatically into view (last check with Geckodriver 0.21 / Firefox 60.0.2).
+        // All works as expected with Chrome. Workaround - explicitly scroll metric header into view.
+        ElementUtils.scrollElementIntoView(header, browser);
+
         // now click with offset because clicking in the middle (default by graphene/selenium)
         // causes activating editableLabel renaming instead of toggling measure configuration
         ElementUtils.moveToElementActions(header, 2, 2).click().perform();
