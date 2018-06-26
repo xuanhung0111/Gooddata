@@ -11,17 +11,14 @@ import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.lang.String.format;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
-import static org.openqa.selenium.By.tagName;
 import static org.testng.Assert.assertTrue;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.AbstractPicker;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.description.DescriptionPanel;
 import com.gooddata.qa.graphene.utils.ElementUtils;
-import com.gooddata.qa.utils.browser.BrowserUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;

@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
-import static com.gooddata.qa.browser.DragAndDropUtils.dragAndDropWithCustomBackend;
+import static com.gooddata.qa.browser.BrowserUtils.dragAndDropWithCustomBackend;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;

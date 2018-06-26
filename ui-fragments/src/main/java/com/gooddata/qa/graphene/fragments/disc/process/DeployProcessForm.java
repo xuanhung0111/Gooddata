@@ -11,13 +11,12 @@ import java.io.File;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
-import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.utils.browser.BrowserUtils;
+import com.gooddata.qa.browser.BrowserUtils;
 
 public class DeployProcessForm extends AbstractFragment {
 

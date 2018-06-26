@@ -2,12 +2,12 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 
+import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
-import com.gooddata.qa.browser.DragAndDropUtils;
 
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
@@ -103,7 +103,7 @@ public class DragWidgetsTest extends AbstractDashboardTest {
         String drop = format(WIDGET_SELECTOR_FORMATTER, toIndex) + ' ' +
                 format(WIDGET_DROPZONE_FORMATTER, dropzoneType);
 
-        DragAndDropUtils.dragAndDropWithCustomBackend(browser, from, to, drop);
+        BrowserUtils.dragAndDropWithCustomBackend(browser, from, to, drop);
     }
 
     private int getSourceKpiIndexAfterDragDropTo(int index, String dropzone) {

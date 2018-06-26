@@ -27,7 +27,7 @@ import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.fragments.manage.MetricDetailsPage;
 import com.gooddata.qa.graphene.fragments.manage.MetricEditorDialog;
 import com.gooddata.qa.graphene.fragments.manage.MetricEditorDialog.ElementType;
-import com.gooddata.qa.utils.browser.BrowserUtils;
+import com.gooddata.qa.browser.BrowserUtils;
 
 public class GoodSalesMetricEditorTest extends GoodSalesAbstractTest {
 
