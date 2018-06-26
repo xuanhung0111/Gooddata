@@ -114,7 +114,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
                 .waitForReportComputing()
                 .getChartReport()
                 .getTrackersCount() >= 1);
-        assertEquals(analysisPage.getFilterBuckets().getFilterText(DATE_INVOICE), "templ:DateInvoice:\nAll time");
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText(DATE_INVOICE)), Arrays.asList("templ:DateInvoice", "All time"));
         assertEquals(analysisPage.getAttributesBucket().getAllGranularities(),
                 Arrays.asList("Day", "Week (Sun-Sat)", "Month", "Quarter", "Year"));
         checkingOpenAsReport("testDateInCategoryAndDateInFilter");
@@ -200,7 +200,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
                     + " After this CL-10156, the metric and attribute combination is changed "
                     + "into # of Persons and attr:Person")
     public void keepDateRelationAfterAddingPercent() {
-        final String expectedDate = "templ:DateInvoice:\nThis quarter";
+        final List<String> expectedDateFilterTexts = Arrays.asList("templ:DateInvoice", "This quarter");
         initAnalysePage().addMetric(METRIC_NUMBER_OF_PERSONS, FieldType.METRIC).addAttribute(ATTR_PERSON)
                 .waitForReportComputing();
 
@@ -209,7 +209,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         recommendationContainer.getRecommendation(RecommendationStep.COMPARE).apply();
         analysisPage.waitForReportComputing();
-        assertEquals(analysisPage.getFilterBuckets().getDateFilterText(), expectedDate,
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getDateFilterText()), expectedDateFilterTexts,
                 "Date was not displayed after applying compare recommendation");
 
         recommendationContainer.getRecommendation(RecommendationStep.SEE_PERCENTS).apply();
@@ -221,7 +221,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
                 "Percent was not added after using see percent recommendation");
 
         takeScreenshot(browser, "keep-date-relation-after-adding-percent", getClass());
-        assertEquals(analysisPage.getFilterBuckets().getDateFilterText(), expectedDate,
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getDateFilterText()), expectedDateFilterTexts,
                 "Date has been changed after adding percent");
     }
 }

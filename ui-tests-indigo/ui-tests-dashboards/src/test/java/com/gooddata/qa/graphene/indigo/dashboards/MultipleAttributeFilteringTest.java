@@ -66,7 +66,7 @@ public class MultipleAttributeFilteringTest extends AbstractDashboardTest {
             .addFilterWithAllValue(ATTR_ACCOUNT);
 
         takeScreenshot(browser, "check-add-attribute-filter-button-test", getClass());
-        assertEquals(metricConfiguration.getFilterText(), ATTR_ACCOUNT + ":All");
+        assertEquals(metricConfiguration.getFilterText(), ATTR_ACCOUNT + ": All");
         assertTrue(metricConfiguration.canAddAnotherFilter(), "Add attribute filter button is not displayed");
     }
 
@@ -131,7 +131,7 @@ public class MultipleAttributeFilteringTest extends AbstractDashboardTest {
             .expandConfiguration()
             .addFilterWithAllValue(ATTR_ACCOUNT);
 
-        assertEquals(metricConfiguration.getFilterText(), ATTR_ACCOUNT + ":All");
+        assertEquals(metricConfiguration.getFilterText(), ATTR_ACCOUNT + ": All");
     }
 
     @Test(dependsOnGroups = {"createProject"})

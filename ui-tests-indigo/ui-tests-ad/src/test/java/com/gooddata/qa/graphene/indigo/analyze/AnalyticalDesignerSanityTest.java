@@ -13,12 +13,11 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
 import java.text.ParseException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
@@ -29,7 +28,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -148,13 +146,13 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
         comparisonRecommendation.select(ATTR_ACTIVITY_TYPE).apply();
         assertTrue(analysisPage.waitForReportComputing().getAttributesBucket().getItemNames()
                 .contains(ATTR_ACTIVITY_TYPE));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ":\nAll");
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY_TYPE)), Arrays.asList(ATTR_ACTIVITY_TYPE, "All"));
         assertEquals(report.getTrackersCount(), 4);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
         analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing();
         assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ATTR_DEPARTMENT));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ":\nAll");
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText(ATTR_DEPARTMENT)), Arrays.asList(ATTR_DEPARTMENT, "All"));
         assertEquals(report.getTrackersCount(), 2);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
         checkingOpenAsReport("testSimpleComparison");
@@ -174,7 +172,7 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
         assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
         assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity:\nLast 4 quarters");
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText("Activity")), Arrays.asList("Activity", "Last 4 quarters"));
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
         checkingOpenAsReport("displayWhenDraggingFirstMetric");
     }
@@ -225,11 +223,11 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
                 .addDateFilter()
                 .waitForReportComputing();
         assertEquals(analysisPage.getChartReport().getTrackersCount(), 4);
-        assertEquals(filtersBucket.getDateFilterText(), "Activity:\nAll time");
+        assertEquals(parseFilterText(filtersBucket.getDateFilterText()), Arrays.asList("Activity", "All time"));
 
         filtersBucket.configDateFilter("01/01/2016", "01/01/2017");
         analysisPage.waitForReportComputing();
-        assertEquals(filtersBucket.getFilterText("Activity"), "Activity:\nJan 1, 2016 - Jan 1, 2017");
+        assertEquals(parseFilterText(filtersBucket.getFilterText("Activity")), Arrays.asList("Activity", "Jan 1, 2016 - Jan 1, 2017"));
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
         checkingOpenAsReport("filterOnDateAttribute");
     }
@@ -243,8 +241,8 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
         assertTrue(analysisPage.getFilterBuckets()
                 .isFilterVisible(ATTR_ACTIVITY));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY),
-                "Activity:\nJan 1, 2012 - Dec 31, 2012");
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY)),
+                Arrays.asList("Activity", "Jan 1, 2012 - Dec 31, 2012"));
         ChartReport report = analysisPage.waitForReportComputing().getChartReport();
         assertThat(report.getTrackersCount(), equalTo(1));
         RecommendationContainer recommendationContainer =

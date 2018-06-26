@@ -16,6 +16,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -57,7 +58,7 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select("This month").apply();
-        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity:\nThis month");
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText("Activity")), Arrays.asList("Activity", "This month"));
         analysisPage.waitForReportComputing();
         if (analysisPage.isExplorerMessageVisible()) {
             log.info("Error message: " + analysisPage.getExplorerMessage());
@@ -86,13 +87,13 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select(ATTR_ACTIVITY_TYPE).apply();
         assertTrue(analysisPage.waitForReportComputing().getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ":\nAll");
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY_TYPE)), Arrays.asList(ATTR_ACTIVITY_TYPE, "All"));
         assertEquals(report.getTrackersCount(), 4);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
         analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing();
         assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ATTR_DEPARTMENT));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ":\nAll");
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText(ATTR_DEPARTMENT)), Arrays.asList(ATTR_DEPARTMENT, "All"));
         assertEquals(report.getTrackersCount(), 2);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
         checkingOpenAsReport("testSimpleComparison");
@@ -116,7 +117,7 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
         comparisonRecommendation.select(ATTR_ACTIVITY_TYPE).apply();
         analysisPage.waitForReportComputing();
         assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
-        assertEquals(filtersBucketReact.getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ":\nAll");
+        assertEquals(parseFilterText(filtersBucketReact.getFilterText(ATTR_ACTIVITY_TYPE)), Arrays.asList(ATTR_ACTIVITY_TYPE, "All"));
         assertEquals(report.getTrackersCount(), 4);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
@@ -124,7 +125,7 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select("This month").apply();
         analysisPage.waitForReportComputing();
-        assertEquals(filtersBucketReact.getDateFilterText(), "Activity:\nThis month");
+        assertEquals(parseFilterText(filtersBucketReact.getDateFilterText()), Arrays.asList("Activity", "This month"));
         if (analysisPage.isExplorerMessageVisible()) {
             log.info("Error message: " + analysisPage.getExplorerMessage());
             log.info("Stop testing because of no data in [This month]");
@@ -136,7 +137,7 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
         assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES + " - previous year", METRIC_NUMBER_OF_ACTIVITIES));
 
         analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing();
-        assertEquals(filtersBucketReact.getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ":\nAll");
+        assertEquals(parseFilterText(filtersBucketReact.getFilterText(ATTR_DEPARTMENT)), Arrays.asList(ATTR_DEPARTMENT, "All"));
         assertTrue(report.getTrackersCount() >= 1);
         legends = report.getLegends();
         assertEquals(legends.size(), 2);
@@ -152,8 +153,8 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
                 .configDateFilter("01/01/2012", "12/31/2012");
 
         assertTrue(analysisPage.getFilterBuckets().isFilterVisible(ATTR_ACTIVITY));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY),
-                "Activity:\nJan 1, 2012 - Dec 31, 2012");
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY)),
+                Arrays.asList("Activity", "Jan 1, 2012 - Dec 31, 2012"));
         ChartReport report = analysisPage.waitForReportComputing().getChartReport();
         assertThat(report.getTrackersCount(), equalTo(1));
         RecommendationContainer recommendationContainer =
@@ -190,7 +191,7 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
 
         assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
         assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity:\nLast 4 quarters");
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText("Activity")), Arrays.asList("Activity", "Last 4 quarters"));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
         checkingOpenAsReport("testAnotherApproachToShowPoP");
     }

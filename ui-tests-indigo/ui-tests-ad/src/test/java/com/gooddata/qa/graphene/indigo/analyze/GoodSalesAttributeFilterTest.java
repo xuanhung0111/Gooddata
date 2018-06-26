@@ -27,6 +27,8 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.Recommen
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
+import java.util.Arrays;
+
 public class GoodSalesAttributeFilterTest extends AbstractAnalyseTest {
 
     @Override
@@ -50,7 +52,7 @@ public class GoodSalesAttributeFilterTest extends AbstractAnalyseTest {
                 .waitForReportComputing()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 4);
-        assertEquals(filtersBucketReact.getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ":\nAll");
+        assertEquals(parseFilterText(filtersBucketReact.getFilterText(ATTR_ACTIVITY_TYPE)), Arrays.asList(ATTR_ACTIVITY_TYPE, "All"));
 
         WebElement filter = filtersBucketReact.getFilter(ATTR_ACTIVITY_TYPE);
         filter.click();
@@ -61,7 +63,7 @@ public class GoodSalesAttributeFilterTest extends AbstractAnalyseTest {
         filtersBucketReact.configAttributeFilter(ATTR_ACTIVITY_TYPE, "Email", "Web Meeting");
         analysisPage.waitForReportComputing();
         assertEquals(report.getTrackersCount(), 2);
-        assertEquals(filtersBucketReact.getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ":\nEmail, Web Meeting");
+        assertEquals(parseFilterText(filtersBucketReact.getFilterText(ATTR_ACTIVITY_TYPE)), Arrays.asList(ATTR_ACTIVITY_TYPE, "Email, Web Meeting"));
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -94,10 +96,10 @@ public class GoodSalesAttributeFilterTest extends AbstractAnalyseTest {
                 .waitForReportComputing()
                 .getChartReport()
                 .getTrackersCount(), 4);
-        assertEquals(filtersBucketReact.getFilterText(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + ":\nAll");
+        assertEquals(parseFilterText(filtersBucketReact.getFilterText(ATTR_ACTIVITY_TYPE)), Arrays.asList(ATTR_ACTIVITY_TYPE, "All"));
 
         analysisPage.addFilter(ATTR_DEPARTMENT);
-        assertEquals(filtersBucketReact.getFilterText(ATTR_DEPARTMENT), ATTR_DEPARTMENT + ":\nAll");
+        assertEquals(parseFilterText(filtersBucketReact.getFilterText(ATTR_DEPARTMENT)), Arrays.asList(ATTR_DEPARTMENT, "All"));
         checkingOpenAsReport("addAttributeToFilterBucket");
     }
 

@@ -20,6 +20,8 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.Trending
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
+import java.util.Arrays;
+
 public class GoodSalesTrendingRecommendationTest extends AbstractAnalyseTest {
 
     @Override
@@ -40,7 +42,7 @@ public class GoodSalesTrendingRecommendationTest extends AbstractAnalyseTest {
 
         analysisPage.addMetric(METRIC_SNAPSHOT_BOP)
             .addDateFilter();
-        assertEquals(FiltersBucketReact.getFilterText("Activity"), "Activity:\nAll time");
+        assertEquals(parseFilterText(FiltersBucketReact.getFilterText("Activity")), Arrays.asList("Activity", "All time"));
         FiltersBucketReact.configDateFilter("Last 12 months");
         ChartReport report = analysisPage.waitForReportComputing().getChartReport();
         assertEquals(report.getTrackersCount(), 1);
@@ -50,7 +52,7 @@ public class GoodSalesTrendingRecommendationTest extends AbstractAnalyseTest {
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();
         analysisPage.waitForReportComputing();
-        assertEquals(FiltersBucketReact.getFilterText("Activity"), "Activity:\nLast 4 quarters");
+        assertEquals(parseFilterText(FiltersBucketReact.getFilterText("Activity")), Arrays.asList("Activity", "Last 4 quarters"));
         assertTrue(report.getTrackersCount() >= 1);
         checkingOpenAsReport("testOverrideDateFilter");
     }
@@ -76,7 +78,7 @@ public class GoodSalesTrendingRecommendationTest extends AbstractAnalyseTest {
         analysisPage.waitForReportComputing();
         assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
         assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity:\nLast 4 quarters");
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText("Activity")), Arrays.asList("Activity", "Last 4 quarters"));
         assertTrue(metricConfiguration.isShowPercentEnabled());
         assertTrue(metricConfiguration.isPopEnabled());
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));

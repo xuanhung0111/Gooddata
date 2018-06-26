@@ -9,6 +9,10 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public abstract class AbstractAnalyseTest extends GoodSalesAbstractTest {
 
     protected static final String DATE = "Date";
@@ -40,5 +44,13 @@ public abstract class AbstractAnalyseTest extends GoodSalesAbstractTest {
             browser.close();
             BrowserUtils.switchToFirstTab(browser);
         }
+    }
+
+    protected List<String> parseFilterText(String filterTitle) {
+        final List<String> filterTexts = new ArrayList<>();
+        Arrays.stream(filterTitle.trim().split(":")).forEach(filterText -> {
+            filterTexts.add(filterText.trim());
+        });
+        return filterTexts;
     }
 }
