@@ -1,29 +1,32 @@
 package com.gooddata.qa.graphene.manage;
 
-import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
+import com.gooddata.qa.browser.BrowserUtils;
+import com.gooddata.qa.graphene.AbstractProjectTest;
+import com.gooddata.qa.graphene.enums.AttributeLabelTypes;
+import com.gooddata.qa.graphene.fragments.csvuploader.DataTypeSelect.ColumnType;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardGeoChart;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import com.gooddata.md.Fact;
-import com.gooddata.qa.graphene.AbstractProjectTest;
-import com.gooddata.qa.graphene.enums.AttributeLabelTypes;
-import com.gooddata.qa.graphene.fragments.csvuploader.DataTypeSelect.ColumnType;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
-import com.gooddata.qa.browser.BrowserUtils;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.testng.Assert.assertEquals;
 
 public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
+
+    private static final String METRIC_SATISFACTION = "Satisfaction[Sum]";
 
     private List<String> attributesList;
 
@@ -48,9 +51,10 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
         Map<String, ColumnType> columnIndexAndType = new HashMap();
         columnIndexAndType.put("Cz District Knok", ColumnType.ATTRIBUTE);
         uploadCSV(getFilePathFromResource("/" + PAYROLL_CSV + "/attribute_geo_labels.csv"), columnIndexAndType);
-        createMetric("Sum of Amount",
-                format("SELECT SUM([%s])", getMdService().getObjUri(getProject(), Fact.class, title("Amount"))),
-                "#,##0.00");
+        createMetric("Sum of Amount", format("SELECT SUM([%s])", getFactByTitle("Amount").getUri()), "#,##0.00");
+
+        uploadCSV(getFilePathFromResource("/" + PAYROLL_CSV + "/satisfaction.csv"));
+        createMetric(METRIC_SATISFACTION, format("SELECT SUM([%s])", getFactByTitle("Satisfaction Rating").getUri()), "#,##0.00");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -91,7 +95,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
             dashboardsPage.addNewTab("tab");
             dashboardEditBar.addGeoChart(attributeLayer.metricName, attributeLayer.name);
             dashboardEditBar.saveDashboard();
-            
+
             // refresh the page to fix possible differences in SVG values, e.g. AUS_STATE_NAME (M-39 instead of M-40)
             BrowserUtils.refreshCurrentPage(browser);
             waitForDashboardPageLoaded(browser);
@@ -105,6 +109,24 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
                             attributeLayer.attrValues);
             dashboardsPage.deleteDashboardTab(1);
         }
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void showChartProperlyWhenHaveNullValueInData() {
+        final String countryAttribute = "Country";
+
+        initAttributePage().configureAttributeLabel(countryAttribute, AttributeLabelTypes.WORLD_COUNTRIES_NAME);
+        initDashboardsPage().addNewDashboard("Dashboard-" + generateHashString())
+                .addGeoChart(METRIC_SATISFACTION, countryAttribute).saveDashboard();
+
+        DashboardGeoChart geoChart = dashboardsPage.getContent().getGeoChart(0);
+
+        String colorRange = geoChart.getRegionsColorRange();
+        assertThat(colorRange, containsString("rgb(230, 230, 230)"));
+        assertThat(colorRange, containsString("rgb(43, 107, 174)"));
+
+        assertEquals(geoChart.getTooltipFromRegion(0), "Satisfaction[Sum]: 0.83\nCountry: Afghanistan");
+        assertEquals(geoChart.getTooltipFromRegion(1), "Satisfaction[Sum]: 0.55\nCountry: Argentina");
     }
 
     private List<AttributeLabelTypes> getGeoLabels() {

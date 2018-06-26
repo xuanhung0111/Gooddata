@@ -8,6 +8,7 @@ import static org.testng.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -77,6 +78,15 @@ public class DashboardGeoChart extends AbstractFragment {
             assertEquals(actualTooltipValues, expectedTooltipValues, "Tooltip values on GEO is not properly.");
             j++;
         }
+    }
+
+    public String getRegionsColorRange() {
+        return waitForElementVisible(colorGradientView).getAttribute("style");
+    }
+
+    public String getTooltipFromRegion(int regionIndex) {
+        getActions().moveToElement(svgPathList.get(regionIndex)).perform();
+        return waitForElementVisible(By.cssSelector(".yui3-bubble-content .content"), browser).getText();
     }
 
     public boolean isMetricNameDisplayed() {

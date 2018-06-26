@@ -632,6 +632,11 @@ public class DashboardsPage extends AbstractFragment {
         return SimpleMenu.getInstance(browser);
     }
 
+    public DashboardsPage addGeoChart(String metricLabel, String attributeLayer) {
+        editDashboard().addGeoChart(metricLabel, attributeLayer);
+        return this;
+    }
+
     private DashboardMenu openDashboardMenu() {
         waitForElementVisible(dashboardSwitcherButton);
         if (dashboardSwitcherButton.getAttribute("class").contains("disabled")) {
