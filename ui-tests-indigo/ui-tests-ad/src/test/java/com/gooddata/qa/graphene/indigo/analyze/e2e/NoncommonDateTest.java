@@ -74,13 +74,13 @@ public class NoncommonDateTest extends AbstractAdE2ETest {
             .changeDateDimension("Created");
 
         assertThat(parseFilterText(waitForElementVisible(cssSelector(".s-filter-button span"), browser).getText()),
-                contains(Arrays.asList("Created", "All time")));
+                contains("Created", "All time"));
 
         // update filter to last quarter
         analysisPage.getFilterBuckets()
             .configDateFilter("Last quarter");
         assertThat(parseFilterText(waitForElementVisible(cssSelector(".s-filter-button span"), browser).getText()),
-                contains(Arrays.asList("Created", "Last quarter")));
+                contains("Created", "Last quarter"));
 
         // switch date dimension to Foundation Date
         analysisPage.getAttributesBucket()
@@ -88,6 +88,6 @@ public class NoncommonDateTest extends AbstractAdE2ETest {
 
         // check that filter is kept switched to last quarter, but in switched date dimension
         assertThat(parseFilterText(waitForElementVisible(cssSelector(".s-filter-button span"), browser).getText()),
-                contains(Arrays.asList("Activity", "Last quarter")));
+                contains("Activity", "Last quarter"));
     }
 }
