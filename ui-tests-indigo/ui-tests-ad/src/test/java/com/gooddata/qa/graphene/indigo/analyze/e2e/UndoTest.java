@@ -5,8 +5,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -66,8 +64,9 @@ public class UndoTest extends AbstractAdE2ETest {
                 .getFilterBuckets()
                 .configDateFilter("Last 12 months");
 
-        String[] dateFilterTexts = analysisPage.undo().getFilterBuckets().getDateFilterText().split(":");
-        assertThat(Arrays.asList(dateFilterTexts[0].trim(), dateFilterTexts[1].trim()), contains("Activity", "Last 4 quarters"));
+        assertEquals(parseFilterText(analysisPage.undo()
+            .getFilterBuckets()
+            .getDateFilterText()), Arrays.asList("Activity", "Last 4 quarters"));
     }
 
     @Test(dependsOnGroups = {"createProject"})

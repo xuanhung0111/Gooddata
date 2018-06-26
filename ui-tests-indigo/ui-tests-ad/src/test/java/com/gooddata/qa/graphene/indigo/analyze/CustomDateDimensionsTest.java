@@ -14,6 +14,7 @@ import static org.testng.Assert.assertTrue;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.List;
 
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
@@ -66,7 +67,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
         analysisPage.addMetric(NUMBER, FieldType.FACT).addDate().waitForReportComputing();
 
         assertTrue(filtersBucketReact.isDateFilterVisible());
-        assertEquals(filtersBucketReact.getDateFilterText(), RETAIL_DATE + ":\nAll time");
+        assertEquals(parseFilterText(filtersBucketReact.getDateFilterText()), Arrays.asList(RETAIL_DATE, "All time"));
 
         for (String period : Sets.newHashSet(filtersBucketReact.getDateFilterOptions())) {
             System.out.println(format("Try with time period [%s]", period));
@@ -100,7 +101,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();
 
-        assertEquals(analysisPage.getFilterBuckets().getDateFilterText(), RETAIL_DATE + ":\nLast 4 quarters");
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getDateFilterText()), Arrays.asList(RETAIL_DATE, "Last 4 quarters"));
         assertThat(analysisPage.getAttributesBucket().getItemNames(), contains(DATE));
         assertThat(analysisPage.waitForReportComputing().getChartReport().getTrackersCount(), lessThanOrEqualTo(4));
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));

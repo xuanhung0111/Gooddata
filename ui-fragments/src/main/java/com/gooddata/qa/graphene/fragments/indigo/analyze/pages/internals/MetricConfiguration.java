@@ -183,13 +183,13 @@ public class MetricConfiguration extends AbstractFragment {
 
     public List<String> getAllFilterText() {
         return Stream.of(waitForElementVisible(BY_ATTRIBUTE_FILTER_BUTTON, getRoot()))
-                .map(filter -> filter.getText().replaceAll("[\\r\\n]+", " "))
+                .map(filter -> filter.getText().replaceAll("[\\r\\n]+", ""))
                 .collect(Collectors.toList());
     }
 
     public MetricConfiguration removeAttributeFilter(String attribute) {
         getRoot().findElements(By.className("metric-filter-wrapper")).stream()
-                .filter(filter -> filter.getText().replaceAll("[\\r\\n]+", " ").equals(attribute))
+                .filter(filter -> filter.getText().replaceAll("[\\r\\n]+", "").equals(attribute))
                 .forEach(filter -> filter.findElement(BY_REMOVE_ATTRIBUTE_FILTER).click());
 
         return this;
