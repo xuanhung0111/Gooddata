@@ -6,6 +6,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.className;
@@ -150,6 +151,11 @@ public class AnalysisPageHeader extends AbstractFragment {
         return waitForElementVisible(insightTitle).getText();
     }
 
+    public boolean isInsightTitleEditable() {
+        waitForElementVisible(insightTitle).click();
+        return isElementPresent(tagName("textarea"), insightTitle);
+    }
+
     public void saveInsight() {
         waitForElementEnabled(saveButton).click();
     }
@@ -185,6 +191,11 @@ public class AnalysisPageHeader extends AbstractFragment {
 
     public void waitForOpenEnabled() {
         waitForElementEnabled(openButton);
+    }
+
+    public boolean hasLockedIcon() {
+        waitForElementVisible(insightTitle);
+        return isElementVisible(cssSelector(".report-title-wrapper .icon-lock"), browser);
     }
 
     private void saveWorkingInsight(final String insight) {

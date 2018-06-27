@@ -452,6 +452,29 @@ public class IndigoRestRequest extends CommonRestRequest{
         executeRequest(RestRequest.initPutRequest(targetUri, filterContext.toString()), HttpStatus.OK);
     }
 
+    /**
+     * Get locked attribute of dashboard, this attribute generated from lcm workflow
+     *
+     * @param dashboardTitle title of dashboard
+     * @return locked value 1|0
+     */
+    public int getLockedAttribute(final String dashboardTitle) {
+        return getMdObjectValue("analyticaldashboard",
+                jsonObj -> dashboardTitle.equals(jsonObj.getString("title")), jsonObj -> jsonObj.getInt("locked"));
+    }
+
+    /**
+     * @param dashboardTitle title of dashboard
+     * @param value          locked value want to set to dashboard
+     * @throws IOException
+     */
+    public void setLockedAttribute(final String dashboardTitle, int value) throws IOException {
+        final String uri = getAnalyticalDashboardUri(dashboardTitle);
+        JSONObject dashboard = getJsonObject(uri);
+        dashboard.getJSONObject("analyticalDashboard").getJSONObject("meta").put("locked", value);
+        executeRequest(RestRequest.initPostRequest(uri + "?mode=edit", dashboard.toString()), HttpStatus.OK);
+    }
+
     private int getDashboardWidgetCount(final String dashboardUri)
             throws JSONException, IOException {
         return getJsonObject(dashboardUri).getJSONObject("analyticalDashboard")

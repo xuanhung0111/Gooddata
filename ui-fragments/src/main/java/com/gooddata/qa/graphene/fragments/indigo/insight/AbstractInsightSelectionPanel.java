@@ -189,5 +189,13 @@ public abstract class AbstractInsightSelectionPanel extends AbstractFragment {
                     .trim();
         }
 
+        public boolean hasLockedIcon() {
+            return isElementVisible(By.className("icon-lock"), getRoot());
+        }
+
+        public boolean hasVisibleDeleteButton() {
+            return isElementVisible(By.className("gd-visualizations-list-item-action-delete"), getRoot());
+        }
+
     }
 }
