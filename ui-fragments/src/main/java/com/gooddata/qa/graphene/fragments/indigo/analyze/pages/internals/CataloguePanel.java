@@ -15,12 +15,13 @@ import org.openqa.selenium.support.FindBy;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
+
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static com.gooddata.qa.graphene.utils.WaitUtils.*;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static java.util.Arrays.asList;
 import static org.openqa.selenium.By.className;
-import static org.testng.Assert.assertEquals;
 
 /**
  * search() method needs to sleep tight for 1 sec in order to work.
@@ -142,23 +143,33 @@ public class CataloguePanel extends AbstractFragment {
         return getElementTexts(items);
     }
 
+    public boolean hasItem(String item) {
+        return hasItems(item);
+    }
+
+    public boolean hasItems(String... items) {
+        return getFieldNamesInViewPort().containsAll(asList(items));
+    }
+
+    public boolean isEmpty() {
+        return getFieldNamesInViewPort().isEmpty();
+    }
+
+    public String getEmptyMessage() {
+        return waitForElementVisible(BY_NO_ITEMS, getRoot())
+                .findElement(By.className("s-not-matching-message")).getText().trim();
+    }
+
     /**
      * Search metric/attribute/fact ... in catalogue panel (The panel in the left of Analysis Page)
      * @param item
      * @return true if found something from search input, otherwise return false
      */
-    public boolean search(String item) {
+    public CataloguePanel search(String item) {
         clearInputText();
         searchInput.sendKeys(item);
         waitForItemLoaded();
-
-        if (!isElementPresent(BY_NO_ITEMS, browser)) {
-            waitForCollectionIsNotEmpty(items);
-            return true;
-        }
-        WebElement noItem = browser.findElement(BY_NO_ITEMS).findElement(By.cssSelector(".s-not-matching-message"));
-        assertEquals(noItem.getText().trim(), "No data matching\n\"" + item + "\"");
-        return false;
+        return this;
     }
 
     public CataloguePanel clearInputText() {

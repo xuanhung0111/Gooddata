@@ -107,17 +107,25 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
     public void searchDataAfterSelectDataset() {
         final CataloguePanel cataloguePanel = initAnalysePage().getCataloguePanel();
 
-        assertFalse(cataloguePanel.changeDataset(PRODUCTION_DATASET)
-            .search(AMOUNT));
+        cataloguePanel.changeDataset(PRODUCTION_DATASET).search(AMOUNT);
         takeScreenshot(browser, "searchDataAfterSelectDataset - search in production data", getClass());
-        assertFalse(cataloguePanel.search("County"));
-        assertTrue(cataloguePanel.search("Id"));
+        assertFalse(cataloguePanel.hasItem(AMOUNT));
 
-        assertTrue(cataloguePanel.changeDataset(PAYROLL_DATASET)
-                .search(AMOUNT));
+        cataloguePanel.search("County");
+        assertFalse(cataloguePanel.hasItem("County"));
+
+        cataloguePanel.search("Id");
+        assertTrue(cataloguePanel.hasItem("Id"));
+
+        cataloguePanel.changeDataset(PAYROLL_DATASET).search(AMOUNT);
         takeScreenshot(browser, "searchDataAfterSelectDataset - search in payroll data", getClass());
-        assertTrue(cataloguePanel.search("County"));
-        assertFalse(cataloguePanel.search("Id"));
+        assertTrue(cataloguePanel.hasItem(AMOUNT));
+
+        cataloguePanel.search("County");
+        assertTrue(cataloguePanel.hasItem("County"));
+
+        cataloguePanel.search("Id");
+        assertFalse(cataloguePanel.hasItem("Id"));
     }
 
     @Test(dependsOnGroups = {"createProject"},

@@ -83,6 +83,7 @@ public class AvailableItemsTest extends AbstractAdE2ETest {
         CataloguePanel panel = initAnalysePage().addStack(ATTR_ACTIVITY_TYPE)
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getCataloguePanel()
+            .clearInputText()
             .filterCatalog(CatalogFilterType.ATTRIBUTES);
 
         assertFalse(panel.getFieldNamesInViewPort().contains(ATTR_PRODUCT));
@@ -126,7 +127,6 @@ public class AvailableItemsTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"})
     public void should_show_special_message_if_only_unavailable_items_matched() {
         CataloguePanel panel = initAnalysePage().addMetric(METRIC_NUMBER_OF_LOST_OPPS).getCataloguePanel();
-        assertFalse(panel.search(ATTR_ACTIVITY_TYPE));
-        assertEquals(panel.getUnrelatedItemsHiddenCount(), 1);
+        assertEquals(panel.search(ATTR_ACTIVITY_TYPE).getUnrelatedItemsHiddenCount(), 1);
     }
 }

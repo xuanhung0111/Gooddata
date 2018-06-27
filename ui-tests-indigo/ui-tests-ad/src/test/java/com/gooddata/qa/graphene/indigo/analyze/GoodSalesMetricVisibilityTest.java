@@ -9,6 +9,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
@@ -58,8 +59,9 @@ public class GoodSalesMetricVisibilityTest extends AbstractAnalyseTest {
             logout();
             signIn(false, UserRoles.EDITOR);
 
-            initAnalysePage();
-            assertFalse(analysisPage.getCataloguePanel().search(RATIO_METRIC));
+            CataloguePanel cataloguePanel = initAnalysePage().getCataloguePanel().search(RATIO_METRIC);
+            assertFalse(cataloguePanel.hasItem(RATIO_METRIC));
+
         } finally {
             logout();
             signIn(false, UserRoles.ADMIN);
