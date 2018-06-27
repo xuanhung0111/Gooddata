@@ -90,7 +90,6 @@ public class UITestsRegistry {
             KpiDashboardsParamsTest.class,
             MultipleAttributeFilteringTest.class,
             MultipleAttributeFilterManipulationTest.class,
-            DashboardsDistributedByLcmTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-EditMode.xml",
