@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.utils;
 
-import com.gooddata.qa.utils.browser.BrowserUtils;
-import com.google.common.base.Predicate;
+import com.gooddata.qa.browser.BrowserUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;

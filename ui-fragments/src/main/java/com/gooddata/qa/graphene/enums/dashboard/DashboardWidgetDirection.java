@@ -1,9 +1,6 @@
 package com.gooddata.qa.graphene.enums.dashboard;
 
-import com.gooddata.qa.utils.browser.BrowserUtils;
-import org.jboss.arquillian.drone.api.annotation.Default;
-import org.jboss.arquillian.graphene.context.GrapheneContext;
-import org.openqa.selenium.WebDriver;
+import com.gooddata.qa.browser.BrowserUtils;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 

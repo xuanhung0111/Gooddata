@@ -1,18 +1,24 @@
 package com.gooddata.qa.browser;
 
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
+import com.gooddata.qa.graphene.utils.ElementUtils;
+import com.gooddata.qa.graphene.utils.WaitUtils;
+import org.jboss.arquillian.drone.api.annotation.Default;
+import org.jboss.arquillian.graphene.context.GrapheneContext;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import com.gooddata.qa.graphene.utils.ElementUtils;
-import com.gooddata.qa.graphene.utils.WaitUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 public class BrowserUtils {
     private static final String MAGIC = "MagicElementClassForPageReload";
@@ -101,5 +107,61 @@ public class BrowserUtils {
         // 2) Refresh and wait until magic element disappears
         browser.navigate().refresh();
         WaitUtils.waitForElementNotPresent(By.className(MAGIC), browser);
+    }
+
+    /**
+     * Drag and drop for custom touch backend
+     * Covers the scenario when dragging fromSelector to toSelector, then waiting
+     * until the dropSelector element appears and then dropping.
+     *
+     * (If the element on which we should drop is already present,
+     *  use the same dropSelector as toSelector)
+     *
+     * @param driver WebDriver instance
+     * @param fromSelector css selector of an element to be dragged
+     * @param toSelector css selector of an element to which we should drag
+     * @param dropSelector css selector of an element onto which we should drop
+     */
+    public static void dragAndDropWithCustomBackend(WebDriver driver, String fromSelector, String toSelector, String dropSelector) {
+        WebElement source = waitForElementVisible(By.cssSelector(fromSelector), driver);
+        Actions driverActions = new Actions(driver);
+
+        driverActions.clickAndHold(source).perform();
+
+        try {
+            WebElement target = waitForElementVisible(By.cssSelector(toSelector), driver);
+            driverActions.moveToElement(target).perform();
+
+            WebElement drop = waitForElementVisible(By.cssSelector(dropSelector), driver);
+            driverActions.moveToElement(drop).perform();
+        } finally {
+            driverActions.release().perform();
+        }
+    }
+
+    public static void dragAndDropWithCustomBackend(WebDriver driver, WebElement from, WebElement dropZone) {
+        waitForElementVisible(from);
+        Actions driverActions = new Actions(driver);
+        driverActions.clickAndHold(from).perform();
+
+        try {
+
+            waitForElementVisible(dropZone);
+            driverActions.moveToElement(dropZone).perform();
+        } finally {
+            driverActions.release().perform();
+        }
+    }
+
+    public static WebDriver getBrowserContext() {
+        return GrapheneContext.getContextFor(Default.class).getWebDriver(WebDriver.class);
+    }
+
+    public static Object runScript(WebDriver driver, String script, Object... args) {
+        if (driver instanceof JavascriptExecutor) {
+            return ((JavascriptExecutor) driver).executeScript(script, args);
+        } else {
+            throw new IllegalStateException("This driver does not support JavaScript!");
+        }
     }
 }

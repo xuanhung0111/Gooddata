@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.gooddata.qa.graphene.utils.Sleeper;
-import com.gooddata.qa.utils.browser.BrowserUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 

@@ -11,7 +11,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.openqa.selenium.By.cssSelector;
-import static com.gooddata.qa.browser.DragAndDropUtils.dragAndDropWithCustomBackend;
+import static com.gooddata.qa.browser.BrowserUtils.dragAndDropWithCustomBackend;
 
 import java.util.ArrayList;
 import java.util.List;
