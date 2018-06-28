@@ -81,7 +81,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
         analysisPage.waitForReportComputing();
         assertThat(report.getTrackersCount(), greaterThanOrEqualTo(1));
         takeScreenshot(browser, "analyzeReportOnProductionData - apply attribute filter", getClass());
-        assertEquals(parseFilterText(filtersBucketReact.getFilterText("Industry")), Arrays.asList("Industry", "Apparel Stores, Consumer Services(2)"));
+        assertEquals(parseFilterText(filtersBucketReact.getFilterText("Industry")), Arrays.asList("Industry", "Apparel Stores, Consumer Services\n(2)"));
     }
 
     @Test(dependsOnGroups = {"createProject"})
