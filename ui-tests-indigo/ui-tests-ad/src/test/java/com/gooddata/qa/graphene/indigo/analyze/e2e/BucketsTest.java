@@ -212,10 +212,8 @@ public class BucketsTest extends AbstractAdE2ETest {
         assertEquals(analysisPage.getAttributesBucket().getItemNames().size(), 1);
 
         assertTrue(configuration.showPop().isPopSelected());
-
-        analysisPage.addStack(ATTR_ACTIVITY_TYPE);
-        assertFalse(configuration.isPopEnabled());
-        assertFalse(configuration.isShowPercentEnabled());
+        assertTrue(analysisPage.getStacksBucket().isDisabled(), "Stack by bucket should be greyed out and disabled for adding measures");
+        assertEquals(analysisPage.getStacksBucket().getWarningMessage(), "TO STACK BY, AN INSIGHT CAN HAVE ONLY ONE MEASURE");
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
