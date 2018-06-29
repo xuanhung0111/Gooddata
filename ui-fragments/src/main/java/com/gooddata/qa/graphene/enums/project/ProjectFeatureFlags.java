@@ -14,7 +14,8 @@ public enum ProjectFeatureFlags {
     HIDE_KPI_ALERT_LINK("hideKPIAlertLinks"),
     FISCAL_CALENDAR_ENABLED("fiscalCalendarEnabled"),
     USE_AVAILABLE_ENABLED("useAvailableEnabled"),
-    ENABLE_ETL_COMPONENT("enableEtlComponent");
+    ENABLE_ETL_COMPONENT("enableEtlComponent"),
+    CONTROL_EXECUTION_CONTEXT_ENABLED("controlExecutionContextEnabled");
 
     private final String featureFlag;
 

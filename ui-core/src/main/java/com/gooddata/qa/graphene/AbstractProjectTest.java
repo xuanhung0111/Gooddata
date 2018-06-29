@@ -19,6 +19,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterType;
 import com.gooddata.qa.mdObjects.dashboard.filter.FloatingFilterConstraint;
+import com.gooddata.qa.mdObjects.dashboard.filter.ListFilterConstraint;
 import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
@@ -51,6 +52,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.md.Restriction.title;
@@ -431,11 +433,16 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         }).build();
     }
 
-    protected FilterItemContent createMultipleValuesFilter(Attribute attribute) {
+    protected FilterItemContent createMultipleValuesFilter(Attribute attribute, String... elementValues) {
+        List<String> elementUris = Stream.of(elementValues)
+                .map(e -> getAttributeElementUri(attribute.getTitle(), e)).collect(toList());
         return Builder.of(FilterItemContent::new).with(item -> {
             item.setObjUri(attribute.getDefaultDisplayForm().getUri());
             item.setMultiple(true);
             item.setType(FilterType.LIST);
+            if (elementUris != null) {
+                item.setFilterConstraint(new ListFilterConstraint(elementUris));
+            }
         }).build();
     }
 
