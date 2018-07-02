@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_LOS
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPEN_OPPS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON_OPPS;
 import static java.util.Arrays.asList;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -34,7 +35,9 @@ public class CatalogueSearchTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void should_show_empty_catalogue_if_no_catalogue_item_is_matched() {
-        assertFalse(initAnalysePage().getCataloguePanel().search("xyz"));
+        CataloguePanel cataloguePanel = initAnalysePage().getCataloguePanel().search("xyz");
+        assertTrue(cataloguePanel.isEmpty());
+        assertEquals(cataloguePanel.getEmptyMessage(), "No data matching\n\"xyz\"");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -42,10 +45,10 @@ public class CatalogueSearchTest extends AbstractAdE2ETest {
         CataloguePanel panel = initAnalysePage().getCataloguePanel();
 
         panel.search("Opps.");
-        assertTrue(panel.getFieldNamesInViewPort()
-                .containsAll(asList(METRIC_NUMBER_OF_LOST_OPPS, METRIC_NUMBER_OF_OPEN_OPPS, METRIC_NUMBER_OF_WON_OPPS)));
+        assertTrue(panel.hasItems(METRIC_NUMBER_OF_LOST_OPPS, METRIC_NUMBER_OF_OPEN_OPPS, METRIC_NUMBER_OF_WON_OPPS));
 
-        assertFalse(panel.search("Dada"));
+        panel.search("Dada");
+        assertTrue(panel.isEmpty());
     }
 
     @Test(dependsOnGroups = {"createProject"})

@@ -130,10 +130,12 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
             initAnalysePage();
             final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
 
-            assertFalse(cataloguePanel.search("<button> test XSS </button>"));
-            assertFalse(cataloguePanel.search("<script> alert('test'); </script>"));
-            assertTrue(cataloguePanel.search("<button>"));
-            assertEquals(cataloguePanel.getFieldNamesInViewPort(), asList(xssMetric, xssAttribute));
+            cataloguePanel.search("<button> test XSS </button>");
+            assertTrue(cataloguePanel.isEmpty());
+            cataloguePanel.search("<script> alert('test'); </script>");
+            assertTrue(cataloguePanel.isEmpty());
+            cataloguePanel.search("<button>");
+            assertTrue(cataloguePanel.hasItems(xssMetric, xssAttribute));
 
             StringBuilder expected = new StringBuilder(xssMetric).append("\n")
                     .append("Field Type\n")
@@ -170,11 +172,11 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testHiddenUnrelatedObjects() {
-        final CataloguePanel cataloguePanel = initAnalysePage().getCataloguePanel();
-
-        analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-            .addAttribute(ATTR_ACTIVITY_TYPE);
-        assertTrue(cataloguePanel.search(""));
+        final CataloguePanel cataloguePanel = initAnalysePage()
+                .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+                .addAttribute(ATTR_ACTIVITY_TYPE)
+                .getCataloguePanel()
+                .clearInputText();
         assertThat(cataloguePanel.getUnrelatedItemsHiddenCount(), equalTo(21));
 
         assertThat(cataloguePanel.filterCatalog(CatalogFilterType.MEASURES)
@@ -182,30 +184,31 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
         assertThat(cataloguePanel.filterCatalog(CatalogFilterType.ATTRIBUTES)
                 .getUnrelatedItemsHiddenCount(), equalTo(9));
 
-        assertFalse(cataloguePanel.filterCatalog(CatalogFilterType.ALL)
-                .search("Amo"));
+        cataloguePanel.filterCatalog(CatalogFilterType.ALL).search("Amo");
         assertThat(cataloguePanel.getUnrelatedItemsHiddenCount(), equalTo(2));
 
-        assertFalse(cataloguePanel.filterCatalog(CatalogFilterType.MEASURES)
-                .search("Amo"));
+        cataloguePanel.filterCatalog(CatalogFilterType.MEASURES).search("Amo");
         assertThat(cataloguePanel.getUnrelatedItemsHiddenCount(), equalTo(2));
 
-        assertFalse(cataloguePanel.filterCatalog(CatalogFilterType.ATTRIBUTES)
-                .search("Amo"));
+        cataloguePanel.filterCatalog(CatalogFilterType.ATTRIBUTES).search("Amo");
         assertThat(cataloguePanel.getUnrelatedItemsHiddenCount(), equalTo(0));
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void searchNonExistent() {
+        CataloguePanel cataloguePanel = initAnalysePage().getCataloguePanel();
+
         Stream.of(CatalogFilterType.values()).forEach(type -> {
-            assertFalse(initAnalysePage().getCataloguePanel().filterCatalog(type)
-                    .search("abcxyz"));
+            cataloguePanel.filterCatalog(type).search("abcxyz");
+            assertTrue(cataloguePanel.isEmpty());
+            assertEquals(cataloguePanel.getEmptyMessage(), "No data matching\n\"abcxyz\"");
         });
 
-        analysisPage.getCataloguePanel().filterCatalog(CatalogFilterType.ALL);
+        cataloguePanel.filterCatalog(CatalogFilterType.ALL);
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE);
         Stream.of(CatalogFilterType.values()).forEach(type -> {
-            assertFalse(analysisPage.getCataloguePanel().filterCatalog(type).search("Am"));
+            cataloguePanel.filterCatalog(type).search("Am");
+            assertTrue(cataloguePanel.isEmpty());
 
             assertTrue(waitForElementVisible(className("s-unavailable-items-matched"), browser)
                     .getText().matches("^\\d unrelated data item[s]? hidden$"));
