@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import com.gooddata.md.Metric;
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.enums.dashboard.TextObject;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
@@ -14,6 +13,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.Select
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel.Tab;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
+import com.gooddata.qa.graphene.i18n.AbstractEmbeddedDashboardTest;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
 import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
@@ -23,7 +23,6 @@ import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.java.Builder;
-import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
@@ -34,7 +33,6 @@ import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.lang.String.format;
 import static java.time.DayOfWeek.MONDAY;
 import static java.time.DayOfWeek.SUNDAY;
@@ -42,7 +40,7 @@ import static java.time.temporal.TemporalAdjusters.nextOrSame;
 import static java.time.temporal.TemporalAdjusters.previousOrSame;
 import static org.testng.Assert.assertEquals;
 
-public class GoodSalesDashboardMacroTest extends GoodSalesAbstractTest {
+public class GoodSalesDashboardMacroTest extends AbstractEmbeddedDashboardTest {
 
     private static final String ALL = "all";
     private static final String NONE = "None";
@@ -279,16 +277,12 @@ public class GoodSalesDashboardMacroTest extends GoodSalesAbstractTest {
         dashboardsPage.saveDashboard();
         EmbedDashboardDialog embedDashboardDialog = dashboardsPage.openEmbedDashboardDialog();
         embedDashboardDialog.selectFilterAttribute(ATTR_DEPARTMENT, DIRECT_SALES);
-        EmbeddedDashboard embeddedDashboard = initEmbeddedDashboardWithUri(embedDashboardDialog.getPreviewURI());
+        embeddedUri = embedDashboardDialog.getPreviewURI();
+        EmbeddedDashboard embeddedDashboard = initEmbeddedDashboard();
 
         Screenshots.takeScreenshot(browser, "Create_Url_Parameter_Filter_Macro", getClass());
         assertEquals(embeddedDashboard.getLastEmbeddedWidget().getContentBodyAsText(), DIRECT_SALES);
         assertEquals(embeddedDashboard.getContent().getLastTextWidgetValue(), DIRECT_SALES);
-    }
-
-    private EmbeddedDashboard initEmbeddedDashboardWithUri(String uri) {
-        browser.get(uri);
-        return Graphene.createPageFragment(EmbeddedDashboard.class, waitForElementVisible(EmbeddedDashboard.LOCATOR, browser));
     }
 
     private String getVariableIdentifier() throws IOException {
