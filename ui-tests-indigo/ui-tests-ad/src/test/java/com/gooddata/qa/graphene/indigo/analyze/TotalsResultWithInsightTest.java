@@ -171,7 +171,9 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
     @Test(dependsOnMethods = "prepareInsights")
     public void emptyTotalsResultOnKD() {
         AnalysisPage analysisPage = initAnalysePage();
-        analysisPage.openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE).getTableReport()
+        analysisPage.openInsight(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE)
+            .waitForReportComputing()
+            .getTableReport()
             .addNewTotals(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES)
             .deleteTotalsResultRow(AggregationItem.MAX);
         analysisPage.saveInsightAs("empty totals result");
