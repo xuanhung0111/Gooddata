@@ -129,6 +129,7 @@ public class GoodSalesUriParameterEmbeddedDashboardTest extends AbstractEmbedded
 
     @Test(dependsOnGroups = "createProject")
     public void exportEmbeddedDashboard() throws IOException {
+        final String discovery = "Discovery";
         String dashboard = createDashboardWithReportAndFilter(REPORT_AMOUNT_BY_STAGE_NAME,
                 Pair.of(createMultipleValuesFilter(getAttributeByTitle(ATTR_STAGE_NAME)), RIGHT));
         initDashboardsPage().selectDashboard(dashboard);
@@ -146,10 +147,10 @@ public class GoodSalesUriParameterEmbeddedDashboardTest extends AbstractEmbedded
         embeddedDashboard.printDashboardTab(0);
         verifyTabExport(FIRST_TAB, INTEREST);
 
-        embeddedDashboard.getFirstFilter().changeAttributeFilterValues("Discovery");
+        embeddedDashboard.getFirstFilter().changeAttributeFilterValues(discovery);
         Screenshots.takeScreenshot(browser, "export_dashboard", getClass());
         embeddedDashboard.printDashboardTab(0);
-        verifyTabExport(FIRST_TAB, INTEREST);
+        verifyTabExport(FIRST_TAB, discovery);
     }
 
     @Test(dependsOnGroups = "createProject")
