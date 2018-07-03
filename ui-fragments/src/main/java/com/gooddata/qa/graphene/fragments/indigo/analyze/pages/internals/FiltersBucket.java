@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
-import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel.STATIC_PERIOD_DROPDOWN_ITEM;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -11,16 +10,22 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
+
+import static com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel.STATIC_PERIOD_DROPDOWN_ITEM;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.*;
-import static org.testng.Assert.*;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Locator for filters differs in React app.
  */
 public class FiltersBucket extends AbstractBucket {
     
-    private static final String DATE_RANGE_REGEX = ".*:\n[A-Z][a-z]+ \\d{1,2}, \\d{4} - [A-Z][a-z]+ \\d{1,2}, \\d{4}$";
+    private static final String DATE_RANGE_REGEX = ".*\n:\n[A-Z][a-z]+ \\d{1,2}, \\d{4} - [A-Z][a-z]+ \\d{1,2}, \\d{4}$";
 
     @FindBy(css = ".adi-bucket-item .button")
     private List<WebElement> filters;
@@ -100,7 +105,7 @@ public class FiltersBucket extends AbstractBucket {
 
     public WebElement getFilter(final String dateOrAttribute) {
         return waitForCollectionIsNotEmpty(filters).stream()
-            .filter(e -> waitForFilterLoaded(e).findElement(BY_FILTER_TEXT).getText().split(":")[0].trim().equals(dateOrAttribute))
+            .filter(e -> waitForFilterLoaded(e).findElement(By.cssSelector(".adi-filter-title span")).getText().equals(dateOrAttribute))
             .findFirst()
             .get();
     }

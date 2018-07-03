@@ -48,9 +48,10 @@ public abstract class AbstractAnalyseTest extends GoodSalesAbstractTest {
 
     protected List<String> parseFilterText(String filterTitle) {
         final List<String> filterTexts = new ArrayList<>();
-        Arrays.stream(filterTitle.trim().split(":")).forEach(filterText -> {
-            filterTexts.add(filterText.trim());
-        });
+        final int splitIndex = filterTitle.lastIndexOf(":");
+
+        filterTexts.add(filterTitle.substring(0, splitIndex).trim());
+        filterTexts.add(filterTitle.substring(splitIndex + 1).trim());
         return filterTexts;
     }
 }

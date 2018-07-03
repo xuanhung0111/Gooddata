@@ -148,6 +148,6 @@ public class GoodSalesMetricFilterTest extends AbstractAnalyseTest {
         assertEquals(report.getYaxisTitle(), format("%s (%s: Email, Phone Call, Web Meeting)",
                 METRIC_NUMBER_OF_ACTIVITIES, ATTR_ACTIVITY_TYPE));
         assertEquals(metricConfiguration.getFilterText(),
-                format("%s: Email, Phone Call, Web Meeting(3)", ATTR_ACTIVITY_TYPE));
+                format("%s: Email, Phone Call, Web Meeting (3)", ATTR_ACTIVITY_TYPE));
     }
 }
