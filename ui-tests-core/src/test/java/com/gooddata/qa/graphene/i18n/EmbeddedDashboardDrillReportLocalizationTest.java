@@ -16,7 +16,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
-public class EmbeddedDashboardDrillReportLocalizationTest extends AbstractEmbeddedDashboardTest {
+public class EmbeddedDashboardDrillReportLocalizationTest extends AbstractEmbeddedModeTest {
 
     private static final String REPORT_NAME = "Drill report";
 

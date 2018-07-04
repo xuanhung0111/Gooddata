@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 
@@ -35,6 +36,9 @@ public class ReportInfoViewPanel extends AbstractFragment {
     @FindBy(css = ".s-btn-download_as___")
     private WebElement downloadAsButton;
 
+    @FindBy(className = "button")
+    private List<WebElement> buttons;
+
     private static final By REPORT_TITLE_LOCATOR = By.cssSelector(".reportTitle");
 
     public String getReportTitle() {
@@ -54,6 +58,10 @@ public class ReportInfoViewPanel extends AbstractFragment {
 
     public List<String> getAllFilterNames() {
         return getAllFilterOrMetricNames(filters);
+    }
+
+    public List<String> getTitlesOfActionButtons() {
+        return buttons.stream().filter(WebElement::isDisplayed).map(button -> button.getText()).collect(toList());
     }
 
     public void clickViewReportButton() {

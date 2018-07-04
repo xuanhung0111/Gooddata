@@ -10,7 +10,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.Das
 import com.gooddata.qa.graphene.fragments.dashboards.EmbedDashboardDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
-import com.gooddata.qa.graphene.i18n.AbstractEmbeddedDashboardTest;
+import com.gooddata.qa.graphene.i18n.AbstractEmbeddedModeTest;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
 import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
@@ -47,7 +47,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
 
-public class GoodSalesUriParameterEmbeddedDashboardTest extends AbstractEmbeddedDashboardTest {
+public class GoodSalesUriParameterEmbeddedDashboardTest extends AbstractEmbeddedModeTest {
 
     private static final String REPORT_AMOUNT_BY_YEAR_SNAP_SHOT = "report amount by year snapshot";
     private static final String FIRST_TAB = "First Tab";

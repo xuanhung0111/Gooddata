@@ -4,7 +4,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.checkLocalization;
 
 import org.testng.annotations.Test;
 
-public class EmbeddedDashboardLocalizationTest extends AbstractEmbeddedDashboardTest {
+public class EmbeddedDashboardLocalizationTest extends AbstractEmbeddedModeTest {
 
     @Override
     protected void initProperties() {

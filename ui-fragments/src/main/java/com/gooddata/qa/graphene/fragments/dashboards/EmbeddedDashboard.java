@@ -20,6 +20,10 @@ public class EmbeddedDashboard extends DashboardsPage {
     private static final By BY_DASHBOARD_LOADED = By.cssSelector("#p-projectDashboardPage.s-displayed, .s-dashboardLoaded");
     private static final By BY_EDIT_BUTTON = By.className("s-editButton");
 
+    public static final EmbeddedDashboard getInstance(SearchContext context) {
+        return Graphene.createPageFragment(EmbeddedDashboard.class, waitForElementVisible(LOCATOR, context));
+    }
+
     public boolean isEditButtonVisible() {
         return isElementVisible(BY_EDIT_BUTTON, getRoot());
     }
