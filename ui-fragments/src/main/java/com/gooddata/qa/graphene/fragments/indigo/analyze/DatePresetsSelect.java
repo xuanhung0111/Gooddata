@@ -30,7 +30,7 @@ public class DatePresetsSelect extends AbstractReactDropDown {
     
     @Override
     protected WebElement getElementByName(final String name) {
-        String selector = ".s-filter-" + simplifyText(name);
+        String selector = ".s-" + simplifyText(name);
         return getElement(selector);
     }
 }
