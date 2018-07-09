@@ -39,6 +39,7 @@ public final class GoodSalesUtils {
     public static final String METRIC_PERCENT_OF_GOAL = "% of Goal";
     public static final String METRIC_QUOTA = "Quota";
     public static final String METRIC_AMOUNT = "Amount";
+    public static final String METRIC_SUM_OF_AMOUNT = "Sum of Amount";
     public static final String METRIC_LOST = "Lost";
     public static final String METRIC_PROBABILITY = "Probability";
     public static final String METRIC_PROBABILITY_BOP = "Probability [BOP]";

@@ -12,11 +12,4 @@
             <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.MetricFiltersTest" />
         </classes>
     </test>
-
-    <test name="metric-modifiers" enabled="true">
-        <classes>
-            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.MetricModifiersTest" />
-        </classes>
-    </test>
-
 </suite>
