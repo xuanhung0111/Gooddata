@@ -439,7 +439,7 @@ public class DashboardsPage extends AbstractFragment {
         }
     }
 
-    public void lockDashboard(boolean lock) {
+    public DashboardsPage lockDashboard(boolean lock) {
         PermissionsDialog dialog = openPermissionsDialog();
 
         if (lock) {
@@ -449,6 +449,8 @@ public class DashboardsPage extends AbstractFragment {
         }
 
         dialog.submit();
+        waitForFragmentNotVisible(dialog);
+        return this;
     }
 
     public PermissionsDialog lockIconClick() {
@@ -479,6 +481,11 @@ public class DashboardsPage extends AbstractFragment {
 
     public FilterWidget getFirstFilter() {
         return content.getFirstFilter();
+    }
+
+    public String getTooltipFromLockIcon() {
+        new Actions(browser).moveToElement(lockIcon).moveByOffset(1, 1).perform();
+        return waitForElementVisible(cssSelector(".bubble-overlay .content"), browser).getText();
     }
 
     public boolean isLocked() {

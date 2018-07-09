@@ -4,9 +4,12 @@ import static com.gooddata.qa.browser.BrowserUtils.switchToMainWindow;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPP_SNAPSHOT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_STAGE_DURATION;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_STAGE_VELOCITY;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -14,20 +17,25 @@ import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 
+import java.io.IOException;
 import java.util.List;
 
-import com.gooddata.qa.graphene.fragments.reports.report.MetricSndPanel;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
+import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.common.PermissionSettingDialog.PermissionType;
 import com.gooddata.qa.graphene.fragments.manage.MetricDetailsPage;
 import com.gooddata.qa.graphene.fragments.manage.MetricEditorDialog;
 import com.gooddata.qa.graphene.fragments.manage.MetricEditorDialog.ElementType;
-import com.gooddata.qa.browser.BrowserUtils;
+import com.gooddata.qa.graphene.fragments.manage.MetricPage;
+import com.gooddata.qa.graphene.fragments.reports.report.MetricSndPanel;
+import com.gooddata.qa.utils.http.CommonRestRequest;
+import com.gooddata.qa.utils.http.RestClient;
+import org.apache.http.ParseException;
+import org.json.JSONException;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 public class GoodSalesMetricEditorTest extends GoodSalesAbstractTest {
 
@@ -38,6 +46,11 @@ public class GoodSalesMetricEditorTest extends GoodSalesAbstractTest {
     protected void initProperties() {
         super.initProperties();
         projectTitle += "Metric-Editor-Improvement-Test";
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
     }
 
     @Override
@@ -178,5 +191,55 @@ public class GoodSalesMetricEditorTest extends GoodSalesAbstractTest {
                 dialog.getElementValues().size() > 2
                         && dialog.getElementListTitle().equals(ElementType.ATTRIBUTES.toString()),
                 "The Attribute list is not loaded");
+    }
+
+    @Test(dependsOnGroups = "createProject")
+    public void checkPermissionOnLockedMetric() {
+        getMetricCreator().createAmountMetric();
+        MetricPage metricPage = initMetricPage();
+        assertEquals(metricPage.getMoveObjectsButton().getText(), "Move...");
+        assertFalse(metricPage.isPermissionButtonEnabled(), "Permission button should be disabled");
+
+        metricPage.setEditingPermission(METRIC_AMOUNT, PermissionType.ADMIN);
+        assertEquals(metricPage.getTooltipFromLockIcon(METRIC_AMOUNT), "Only Admins can modify this object.");
+        assertTrue(metricPage.isMetricEditable(METRIC_AMOUNT), "Metric can be edited");
+        assertTrue(metricPage.isMetricLocked(METRIC_AMOUNT), "Should be show a lock icon beside metric");
+        logoutAndLoginAs(true, UserRoles.EDITOR);
+        try {
+            initMetricPage();
+            assertTrue(metricPage.isMetricLocked(METRIC_AMOUNT), "Should be show a lock icon beside metric");
+            assertEquals(metricPage.getTooltipFromLockIcon(METRIC_AMOUNT),
+                    "View only. You don't have permission to edit this object.");
+            assertFalse(metricPage.isMetricEditable(METRIC_AMOUNT), "Metric cannot be edited");
+        } finally {
+            logoutAndLoginAs(true, UserRoles.ADMIN);
+            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                    .deleteObjectsUsingCascade(getMetricByTitle(METRIC_AMOUNT).getUri());
+        }
+    }
+
+    @Test(dependsOnGroups = "createProject")
+    public void lockMetric() {
+        getMetricCreator().createAmountMetric();
+        MetricDetailsPage metricDetailsPage = initMetricPage().openMetricDetailPage(METRIC_AMOUNT)
+                .setEditingPermission(PermissionType.ADMIN);
+        assertTrue(metricDetailsPage.isLockedMetric(), "Lock Icon should display");
+        assertEquals(metricDetailsPage.getTooltipFromLockIcon(), "Only Admins can modify this metric.");
+        assertEquals(metricDetailsPage.getTitlesOfButtonsOnEditPanel(), asList("Edit", "Duplicate", "Sharing & Permissions"));
+        metricDetailsPage.clickLockIcon();
+        logoutAndLoginAs(true, UserRoles.EDITOR);
+        try {
+            metricDetailsPage = initMetricPage().openMetricDetailPage(METRIC_AMOUNT);
+            assertTrue(metricDetailsPage.isLockedMetric(), "Lock Icon should display");
+            assertEquals(metricDetailsPage.getTooltipFromLockIcon(),
+                    "View only. You don't have permission to edit this metric.");
+            assertEquals(metricDetailsPage.getTitlesOfButtonsOnEditPanel(), singletonList("Duplicate"));
+            assertFalse(metricDetailsPage.canOpenSettingDialogByClickLockIcon(),
+                    "Editor can't open setting dialog by clicking on lock icon.");
+        } finally {
+            logoutAndLoginAs(true, UserRoles.ADMIN);
+            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                    .deleteObjectsUsingCascade(getMetricByTitle(METRIC_AMOUNT).getUri());
+        }
     }
 }
