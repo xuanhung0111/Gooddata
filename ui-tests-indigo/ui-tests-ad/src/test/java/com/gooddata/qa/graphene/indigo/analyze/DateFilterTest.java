@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.fixture.ResourceManagement.ResourceTemplate.SINGLE_INVOICE;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.SP_YEAR_AGO;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -18,7 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import com.gooddata.qa.graphene.enums.DateRange;
-import com.gooddata.qa.graphene.enums.indigo.CompareType;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import com.gooddata.qa.utils.http.RestClient;
 import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.Test;
@@ -37,9 +38,9 @@ import com.google.common.collect.Iterables;
 
 public class DateFilterTest extends AbstractAnalyseTest {
 
-    private static final String SP_YEAR_AGO = " - SP year ago";
     private static final String DATE_INVOICE = "templ:DateInvoice";
     private static final String METRIC_NUMBER_OF_PERSONS = "# Of attr:Persons";
+    private static final String METRIC_NUMBER_OF_PERSONS_YEAR_AGO = METRIC_NUMBER_OF_PERSONS + SP_YEAR_AGO;
     private static final String ATTR_PERSON = "attr:Person";
     private static final String ATTR_INVOICE_ITEM = "attr:Invoice Item";
 
@@ -158,9 +159,12 @@ public class DateFilterTest extends AbstractAnalyseTest {
                 .getFilterBuckets()
                 .configDateFilter(DateRange.LAST_90_DAYS.toString());
 
-        analysisPage.applyCompareType(CompareType.SAME_PERIOD_LAST_YEAR);
+        analysisPage.getFilterBuckets()
+                .openDateFilterPickerPanel()
+                .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
 
         analysisPage.waitForReportComputing();
+
         if (analysisPage.isExplorerMessageVisible()) {
             log.info("Visual cannot be rendered! Message: " + analysisPage.getExplorerMessage());
             return;
@@ -169,7 +173,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
         ChartReport report = analysisPage.getChartReport();
 
         assertTrue(isEqualCollection(report.getLegends(),
-                asList(METRIC_NUMBER_OF_PERSONS + SP_YEAR_AGO, METRIC_NUMBER_OF_PERSONS)));
+                asList(METRIC_NUMBER_OF_PERSONS_YEAR_AGO, METRIC_NUMBER_OF_PERSONS)));
         checkingOpenAsReport("applySamePeriodComparisonAfterConfigDate");
     }
 

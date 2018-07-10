@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
-import com.gooddata.qa.graphene.enums.indigo.CompareType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport.AggregationItem;
@@ -14,6 +14,7 @@ import java.text.ParseException;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_CLOSE_EOP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_TIMELINE_EOP;
 import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
@@ -21,8 +22,6 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 public class AggregationResultTest extends AbstractAnalyseTest {
-
-    private static final String SP_YEAR_AGO = " - SP year ago";
 
     @Override
     public void initProperties() {
@@ -210,17 +209,22 @@ public class AggregationResultTest extends AbstractAnalyseTest {
         TableReport tableReport = analysisPage.getTableReport();
         tableReport.addNewTotals(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES);
 
-        analysisPage.applyCompareType(CompareType.SAME_PERIOD_LAST_YEAR);
+        analysisPage.getFilterBuckets()
+                .openDateFilterPickerPanel()
+                .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
 
-        assertTrue(tableReport.getTotalsElement(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES + SP_YEAR_AGO).isDisplayed(),
+        analysisPage.waitForReportComputing();
+
+        assertTrue(tableReport.getTotalsElement(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO).isDisplayed(),
                 format("Total cell of metric %s should be displayed", METRIC_NUMBER_OF_ACTIVITIES));
 
-        tableReport.deleteTotalsResultCell(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES + SP_YEAR_AGO);
+        tableReport.deleteTotalsResultCell(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO);
 
-        analysisPage.applyCompareType(CompareType.NOTHING);
+        analysisPage.getFilterBuckets().openDateFilterPickerPanel().applyCompareType(CompareTypeDropdown.CompareType.NOTHING);
+        analysisPage.waitForReportComputing();
 
-        assertFalse(tableReport.getHeaders().contains(METRIC_NUMBER_OF_ACTIVITIES + SP_YEAR_AGO),
-                format("Metric %s should be hidden", METRIC_NUMBER_OF_ACTIVITIES + SP_YEAR_AGO));
+        assertFalse(tableReport.getHeaders().contains(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO),
+                format("Metric %s should be hidden", METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO));
         assertEquals(tableReport.getTotalsValue(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES), cellValue);
     }
 }

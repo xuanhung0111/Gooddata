@@ -5,9 +5,11 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_QUOTA;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SUM_OF_AMOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SUM_OF_AMOUNT_YEAR_AGO;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -17,7 +19,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
-import com.gooddata.qa.graphene.enums.indigo.CompareType;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
@@ -26,8 +28,6 @@ import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
 public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
-
-    private static final String SP_YEAR_AGO = " - SP year ago";
 
     @Override
     public void initProperties() {
@@ -116,15 +116,21 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
         assertTrue(metricConfiguration.isShowPercentEnabled());
 
         metricConfiguration.showPercents();
-        analysisPage.applyCompareType(CompareType.SAME_PERIOD_LAST_YEAR);
+
+        analysisPage.getFilterBuckets()
+                .openDateFilterPickerPanel()
+                .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
+
+        analysisPage.waitForReportComputing();
+
         analysisPage.getAttributesBucket().changeDateDimension("Created");
         analysisPage.waitForReportComputing()
             .addMetric(METRIC_AMOUNT, FieldType.FACT);
 
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(
-                METRIC_NUMBER_OF_ACTIVITIES + SP_YEAR_AGO,
+                METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO,
                 METRIC_NUMBER_OF_ACTIVITIES,
-                METRIC_SUM_OF_AMOUNT + SP_YEAR_AGO,
+                METRIC_SUM_OF_AMOUNT_YEAR_AGO,
                 METRIC_SUM_OF_AMOUNT
         ));
 
@@ -134,7 +140,7 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
         analysisPage.undo();
         metricConfiguration.expandConfiguration();
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(
-                "% " + METRIC_NUMBER_OF_ACTIVITIES + SP_YEAR_AGO,
+                "% " + METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO,
                 "% " + METRIC_NUMBER_OF_ACTIVITIES));
 
         assertTrue(metricConfiguration.isShowPercentEnabled());
@@ -189,16 +195,21 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
             .addDate();
         assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
 
-        analysisPage.applyCompareType(CompareType.SAME_PERIOD_LAST_YEAR);
+        analysisPage.getFilterBuckets()
+                .openDateFilterPickerPanel()
+                .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
+
+        analysisPage.waitForReportComputing();
+
         assertEquals(analysisPage.getMetricsBucket().getItemNames(),
-                asList(METRIC_NUMBER_OF_ACTIVITIES + SP_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
+                asList(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
 
         assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
 
         analysisPage.replaceAttribute(DATE, ATTR_ACTIVITY_TYPE);
         assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
         assertEquals(analysisPage.getMetricsBucket().getItemNames(),
-                asList(METRIC_NUMBER_OF_ACTIVITIES + SP_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
+                asList(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
         assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_ACTIVITY_TYPE));
         checkingOpenAsReport("compareIsStillActiveWhenReplaceAttribute");
     }

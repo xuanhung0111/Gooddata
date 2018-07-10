@@ -12,7 +12,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import com.gooddata.qa.graphene.enums.indigo.CompareType;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
@@ -208,7 +208,10 @@ public class BucketsTest extends AbstractAdE2ETest {
         assertTrue(configuration.showPercents().isShowPercentSelected());
         assertEquals(analysisPage.getAttributesBucket().getItemNames().size(), 1);
 
-        analysisPage.applyCompareType(CompareType.SAME_PERIOD_LAST_YEAR);
+        analysisPage.getFilterBuckets()
+                .openDateFilterPickerPanel()
+                .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
+        analysisPage.waitForReportComputing();
 
         assertTrue(analysisPage.getStacksBucket().isDisabled(), "Stack by bucket should be greyed out and disabled for adding measures");
         assertEquals(analysisPage.getStacksBucket().getWarningMessage(), "TO STACK BY, AN INSIGHT CAN HAVE ONLY ONE MEASURE");

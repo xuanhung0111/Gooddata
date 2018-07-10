@@ -181,6 +181,18 @@ public class FiltersBucket extends AbstractBucket {
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
     }
 
+    /**
+     * opens date filter picker panel
+     * @return opened date filter picker panel
+     */
+    public DateFilterPickerPanel openDateFilterPickerPanel() {
+        getDateFilter()
+                .click();
+
+        return Graphene.createPageFragment(DateFilterPickerPanel.class,
+                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+    }
+
     private String getFilterTextHelper(WebElement filter) {
         return filter.findElement(BY_FILTER_TEXT).getText();
     }
