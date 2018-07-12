@@ -10,9 +10,11 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForReportsPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForUserProfilePageLoaded;
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.id;
+import static org.openqa.selenium.By.xpath;
 import static org.testng.Assert.fail;
 
 import java.util.Collection;
@@ -94,7 +96,7 @@ public class ReportsPage extends AbstractFragment {
         getReport(reportName).getOwner().click();
     }
 
-    public boolean isLockedReport(String reportName) {
+    public boolean isReportLocked(String reportName) {
         return getReport(reportName).isLocked();
     }
 
@@ -306,10 +308,8 @@ public class ReportsPage extends AbstractFragment {
     }
 
     private ReportEntry getReport(String reportName) {
-        return reports.stream()
-                .filter(entry -> reportName.equals(entry.getLabel()))
-                .findFirst()
-                .get();
+        return Graphene.createPageFragment(ReportEntry.class,
+                waitForElementVisible(xpath(format("//a[@title= '%s']/../..", reportName)), getRoot()));
     }
 
     private void waitForReportUpdatedFrom(String folder, String oldReportNumber) {

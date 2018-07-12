@@ -2,7 +2,9 @@ package com.gooddata.qa.utils.http.dashboards;
 
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.RestRequest;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang.BooleanUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -191,6 +193,18 @@ public class DashboardRestRequest extends CommonRestRequest {
         final JSONObject content = json.getJSONObject("metric").getJSONObject("content");
         content.put("expression", newExpression);
         executeRequest(initPutRequest(metricUri, json.toString()), HttpStatus.OK);
+    }
+
+    /**
+     * Lock/unlock metric
+     * note: if there are dashboards or reports contain this metric
+     * metric cannot unlock
+     */
+    public void setLockedMetric(String metricTitle, boolean isLocked) throws JSONException, IOException {
+        String metricUri = getMetricByTitle(metricTitle).getUri();
+        final JSONObject json = getJsonObject(metricUri);
+        json.getJSONObject("metric").getJSONObject("meta").put("locked", BooleanUtils.toInteger(isLocked));
+        executeRequest(RestRequest.initPutRequest(metricUri, json.toString()), HttpStatus.OK);
     }
 
     /**

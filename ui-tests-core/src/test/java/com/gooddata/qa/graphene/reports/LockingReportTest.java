@@ -174,7 +174,7 @@ public class LockingReportTest extends AbstractEmbeddedModeTest {
     public void viewLockedReportInDomainPageByAdmin() {
         ReportsPage reportsPage = initReportsPage();
         assertEquals(reportsPage.getTitlesOfActionButtons(), asList("Move...", "Delete...", "Permissions..."));
-        assertTrue(reportsPage.isLockedReport(REPORT_AMOUNT_BY_STAGE_NAME), "Should display lock icon");
+        assertTrue(reportsPage.isReportLocked(REPORT_AMOUNT_BY_STAGE_NAME), "Should display lock icon");
         assertTrue(reportsPage.isEdiTableReport(REPORT_AMOUNT_BY_STAGE_NAME), "Admin can edit report");
         reportsPage.selectReportsAndOpenPermissionDialog(REPORT_AMOUNT_BY_STAGE_NAME)
                 .setEditingPermission(PermissionType.ADMIN)
@@ -188,7 +188,7 @@ public class LockingReportTest extends AbstractEmbeddedModeTest {
         try {
             ReportsPage reportsPage = initReportsPage();
             assertEquals(reportsPage.getTitlesOfActionButtons(), asList("Move...", "Delete...", "Permissions..."));
-            assertTrue(reportsPage.isLockedReport(REPORT_AMOUNT_BY_STAGE_NAME), "Should display lock icon");
+            assertTrue(reportsPage.isReportLocked(REPORT_AMOUNT_BY_STAGE_NAME), "Should display lock icon");
             assertFalse(reportsPage.isEdiTableReport(REPORT_AMOUNT_BY_STAGE_NAME), "Editor can't edit report");
             assertFalse(reportsPage.openReport(REPORT_AMOUNT_BY_STAGE_NAME).isVisibleSaveButton(),
                     "Editor can't edit report");
@@ -202,7 +202,7 @@ public class LockingReportTest extends AbstractEmbeddedModeTest {
         embeddedUri = initDashboardsPage().addNewDashboard(generateHashString()).openEmbedDashboardDialog().getPreviewURI();
         ReportsPage reportsPage = initEmbeddedDashboard().openEmbeddedReportsPage();
         assertEquals(reportsPage.getTitlesOfActionButtons(), asList("Move...", "Delete...", "Permissions..."));
-        assertTrue(reportsPage.isLockedReport(REPORT_AMOUNT_BY_STAGE_NAME), "Should display lock icon");
+        assertTrue(reportsPage.isReportLocked(REPORT_AMOUNT_BY_STAGE_NAME), "Should display lock icon");
         assertTrue(reportsPage.isEdiTableReport(REPORT_AMOUNT_BY_STAGE_NAME), "Admin can edit report");
 
         reportsPage.selectReportsAndOpenPermissionDialog(REPORT_AMOUNT_BY_STAGE_NAME)
@@ -220,7 +220,7 @@ public class LockingReportTest extends AbstractEmbeddedModeTest {
         try {
             ReportsPage reportsPage = initEmbeddedDashboard().openEmbeddedReportsPage();
             assertEquals(reportsPage.getTitlesOfActionButtons(), asList("Move...", "Delete...", "Permissions..."));
-            assertTrue(reportsPage.isLockedReport(REPORT_AMOUNT_BY_STAGE_NAME), "Should display lock icon");
+            assertTrue(reportsPage.isReportLocked(REPORT_AMOUNT_BY_STAGE_NAME), "Should display lock icon");
             assertFalse(reportsPage.isEdiTableReport(REPORT_AMOUNT_BY_STAGE_NAME), "Editor can't edit report");
 
             String numberReport = reportsPage.getNumberOfReportsInFolder(favoritesFolder);
