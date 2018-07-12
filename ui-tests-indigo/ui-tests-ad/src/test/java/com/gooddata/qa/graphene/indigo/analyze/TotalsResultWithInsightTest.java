@@ -9,6 +9,7 @@ import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport.AggregationItem;
@@ -48,7 +49,7 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
     private static final String INSIGHT_HAS_ATTRIBUTE_AND_MEASURE = "Insight has attribute and measure";
     private static final String INSIGHT_HAS_ATTRIBUTES_AND_MEASURES = "Insight has attributes and measures";
     private static final String INSIGHT_HAS_DATE_ATTRIBUTE_AND_MEASURE = "Insight has date attribute and measure";
-    private static final String INSIGHT_SHOW_POP = "Insight show POP";
+    private static final String INSIGHT_SHOW_SAME_PERIOD_COMPARISON = "Insight show same period comparison";
     private static final String INSIGHT_SHOW_PERCENT = "Insight show percent";
     private IndigoRestRequest indigoRestRequest;
 
@@ -94,9 +95,18 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
                     .setCategoryBucket(singletonList(
                             CategoryBucket.createCategoryBucket(getAttribute(ATTR_YEAR_ACTIVITY), Type.ATTRIBUTE))));
 
-        createSimpleInsight(INSIGHT_SHOW_POP, METRIC_NUMBER_OF_ACTIVITIES, ATTR_YEAR_ACTIVITY);
+        createSimpleInsight(INSIGHT_SHOW_SAME_PERIOD_COMPARISON, METRIC_NUMBER_OF_ACTIVITIES, ATTR_YEAR_ACTIVITY);
         AnalysisPage analysisPage = initAnalysePage();
-        analysisPage.openInsight(INSIGHT_SHOW_POP).getMetricsBucket().getLastMetricConfiguration().expandConfiguration().showPop();
+
+        analysisPage.openInsight(INSIGHT_SHOW_SAME_PERIOD_COMPARISON);
+        analysisPage.addDateFilter();
+
+        analysisPage.getFilterBuckets()
+                .openDateFilterPickerPanel()
+                .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
+        
+        analysisPage.waitForReportComputing();
+
         analysisPage.saveInsight();
     }
 
@@ -105,7 +115,7 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
         return new Object[][] {
                 {INSIGHT_HAS_ATTRIBUTE_AND_MEASURE, "101,054"},
                 {INSIGHT_HAS_DATE_ATTRIBUTE_AND_MEASURE, "73,073"},
-                {INSIGHT_SHOW_POP, "73,073"},
+                {INSIGHT_SHOW_SAME_PERIOD_COMPARISON, "73,073"},
                 {INSIGHT_SHOW_PERCENT, "47.37%"}
         };
     }
@@ -140,7 +150,7 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
         return new Object[][] {
                 {INSIGHT_HAS_ATTRIBUTE_AND_MEASURE},
                 {INSIGHT_HAS_ATTRIBUTES_AND_MEASURES},
-                {INSIGHT_SHOW_POP}
+                {INSIGHT_SHOW_SAME_PERIOD_COMPARISON}
         };
     }
 

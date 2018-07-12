@@ -14,7 +14,7 @@ public enum RecommendationStep {
     private String text;
     private Class<? extends Recommendation> clazz;
 
-    private RecommendationStep(String text, Class<? extends Recommendation> clazz) {
+    RecommendationStep(String text, Class<? extends Recommendation> clazz) {
         this.text = text;
         this.clazz = clazz;
     }

@@ -12,6 +12,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
@@ -48,7 +49,6 @@ public class BucketsTest extends AbstractAdE2ETest {
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
 
-        assertFalse(metricConfiguration.isPopEnabled());
         assertFalse(metricConfiguration.isShowPercentEnabled());
 
         Graphene.createPageFragment(RecommendationContainer.class,
@@ -56,8 +56,8 @@ public class BucketsTest extends AbstractAdE2ETest {
                 .getRecommendation(RecommendationStep.SEE_TREND).apply();
 
         analysisPage.waitForReportComputing();
+
         assertTrue(metricConfiguration.showPercents().isShowPercentSelected());
-        assertTrue(metricConfiguration.showPop().isPopSelected());
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
@@ -169,14 +169,12 @@ public class BucketsTest extends AbstractAdE2ETest {
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
 
-        assertFalse(configuration.isPopEnabled());
         assertFalse(configuration.isShowPercentEnabled());
 
         configuration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
 
-        assertFalse(configuration.isPopEnabled());
         assertFalse(configuration.isShowPercentEnabled());
     }
 
@@ -190,17 +188,16 @@ public class BucketsTest extends AbstractAdE2ETest {
             .expandConfiguration();
 
         assertEquals(analysisPage.getAttributesBucket().getItemNames().size(), 1);
-        assertFalse(configuration.isPopEnabled());
         assertFalse(configuration.isShowPercentEnabled());
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
-    public void should_disable_metric_properties_when_trending_recommendation_and_stacking_are_applied() {
+    public void should_disable_stack_bucket_when_trending_recommendation_and_compare_are_applied() {
         MetricConfiguration configuration = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
-        assertFalse(configuration.isPopEnabled());
+
         assertFalse(configuration.isShowPercentEnabled());
 
         Graphene.createPageFragment(RecommendationContainer.class,
@@ -211,7 +208,11 @@ public class BucketsTest extends AbstractAdE2ETest {
         assertTrue(configuration.showPercents().isShowPercentSelected());
         assertEquals(analysisPage.getAttributesBucket().getItemNames().size(), 1);
 
-        assertTrue(configuration.showPop().isPopSelected());
+        analysisPage.getFilterBuckets()
+                .openDateFilterPickerPanel()
+                .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
+        analysisPage.waitForReportComputing();
+
         assertTrue(analysisPage.getStacksBucket().isDisabled(), "Stack by bucket should be greyed out and disabled for adding measures");
         assertEquals(analysisPage.getStacksBucket().getWarningMessage(), "TO STACK BY, AN INSIGHT CAN HAVE ONLY ONE MEASURE");
     }

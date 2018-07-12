@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.DatePresetsSelect;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -121,9 +122,36 @@ public class DateFilterPickerPanel extends AbstractFragment {
                 waitForElementVisible(By.className("adi-date-preset-select-dropdown"), browser));
     }
 
+    public CompareTypeDropdown getCompareTypeDropdown() {
+        return Graphene.createPageFragment(CompareTypeDropdown.class,
+                waitForElementVisible(By.className("adi-compare-apply-select"), browser));
+    }
+
     public void apply() {
         waitForElementVisible(applyButton).click();
         waitForFragmentNotVisible(this);
+    }
+
+    /**
+     * applies given compareType on insight
+     * @param compareType compare type to be applied
+     * @return DateFilterPickerPanel object
+     */
+    public DateFilterPickerPanel applyCompareType(CompareTypeDropdown.CompareType compareType) {
+
+        getCompareTypeDropdown().selectCompareType(compareType.getCompareTypeName());
+        apply();
+
+        return this;
+    }
+
+    /**
+     * check whether comparison type is enabled
+     * @param compareType compare type to check whether it is enabled
+     * @return true whether it is enabled
+     */
+    public boolean isCompareTypeEnabled(final CompareTypeDropdown.CompareType compareType) {
+        return getCompareTypeDropdown().isCompareTypeEnabled(compareType);
     }
 
     private void configTimeFilterByRangeHelper(String from, String to, boolean apply) {
