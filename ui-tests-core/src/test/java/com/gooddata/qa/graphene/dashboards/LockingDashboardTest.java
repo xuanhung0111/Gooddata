@@ -64,7 +64,7 @@ public class LockingDashboardTest extends AbstractEmbeddedModeTest {
             MetricPage metricPage = initMetricPage();
             assertTrue(metricPage.isMetricLocked(METRIC_WON), "metric should be locked");
             assertTrue(metricPage.isMetricLocked(METRIC_LOST), "metric should be locked");
-            PermissionSettingDialog permissionSettingDialog = metricPage.openEditingPermission(METRIC_WON);
+            PermissionSettingDialog permissionSettingDialog = metricPage.openPermissionSettingDialogFor(METRIC_WON);
             assertEquals(permissionSettingDialog.getRowInfoEditPermission(),
                     "because it belongs to these objects with edit restrictions.");
             assertEquals(permissionSettingDialog.getLockedAncestors(), singletonList(REPORT_TOP_SALES_REPS_BY_WON_AND_LOST));

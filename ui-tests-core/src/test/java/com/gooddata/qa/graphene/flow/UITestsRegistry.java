@@ -60,6 +60,7 @@ import com.gooddata.qa.graphene.manage.GoodSalesMetricNumberFormatterTest;
 import com.gooddata.qa.graphene.manage.GoodSalesVariableTest;
 import com.gooddata.qa.graphene.manage.GoodSalesViewModelVisualizationTest;
 import com.gooddata.qa.graphene.manage.MetricEditorTest;
+import com.gooddata.qa.graphene.manage.MetricVisibilityTest;
 import com.gooddata.qa.graphene.manage.SimpleProjectGeoLabelTest;
 import com.gooddata.qa.graphene.project.CreateAndDeleteProjectTest;
 import com.gooddata.qa.graphene.project.ExportAndImportProjectTest;
@@ -269,6 +270,7 @@ public class UITestsRegistry {
             MetricEditorTest.class,
             GoodSalesMetricEditorTest.class,
             GoodSalesAttributeLabelsTest.class,
+            MetricVisibilityTest.class,
             "testng-manage-aggregation-metric-test.xml",
             "testng-manage-different-granularity-logical-metric-test.xml",
             "testng-manage-filter-share-ratio-metric-test.xml",

@@ -4,9 +4,12 @@ import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
+import com.gooddata.qa.graphene.fragments.reports.report.CreatedReportDialog;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
+import com.gooddata.qa.utils.http.CommonRestRequest;
+import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.jboss.arquillian.graphene.Graphene;
@@ -25,6 +28,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACT
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_ACTIVITIES_BY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_AMOUNT_BY_DATE_CLOSED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_AMOUNT_BY_PRODUCT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_AMOUNT_BY_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOP_SALES_REPS_BY_WON_AND_LOST;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
@@ -36,6 +40,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.id;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
@@ -58,6 +64,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
     private String amountByProductReport;
     private String amountByDateClosedReport;
     private String topSalesRepsByWonAndLostReport;
+    private CommonRestRequest commonRestRequest;
 
     @Override
     public void initProperties() {
@@ -79,6 +86,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         // to check some validations.
         new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId())
                 .createDashboard(initDashboardHavingReport(DASHBOARD_HAS_ONE_REPORT).getMdObject());
+        commonRestRequest = new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -300,6 +308,31 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
             .done();
         waitForReportLoading();
         reportPage.clickSaveReport().cancelSaveReport();
+    }
+
+    @Test(dependsOnGroups = "createProject")
+    public void setVisibilityReportTest() {
+        getReportCreator().createAmountByStageNameReport();
+        try {
+            initReportsPage().openReport(REPORT_AMOUNT_BY_STAGE_NAME);
+            CreatedReportDialog createdReportDialog = reportPage.saveAs();
+            assertTrue(createdReportDialog.isEditPermissionSectionVisible(), "Editor Permission should display");
+            assertEquals(createdReportDialog.setReportVisibleSettings(true).getRowInfoVisibility(),
+                    "Everyone can find this report and use all metrics it contains");
+            assertEquals(createdReportDialog.getToolTipFromVisibilityQuestionIcon(),
+                    "If you decide to hide this report again, its metrics will remain public unless hidden individually.");
+
+            createdReportDialog.setReportVisibleSettings(false).saveReport();
+            assertTrue(reportPage.isVisibleEyeIcon(), "Eye icon should display");
+            assertEquals(reportPage.closeUnlistedBubble().getTooltipFromEyeIcon(),
+                    "Only people who have a link can see this report.");
+
+            reportPage.clickEyeIcon().setReportVisibleSettings(true).saveReport();
+            assertFalse(reportPage.isVisibleEyeIcon(), "Eye icon should display");
+            assertTrue(initReportsPage().isReportVisible(REPORT_AMOUNT_BY_STAGE_NAME), "Report should display");
+        } finally {
+            commonRestRequest.deleteObjectsUsingCascade(getReportByTitle(REPORT_AMOUNT_BY_STAGE_NAME).getUri());
+        }
     }
 
     private void moveToAnotherPage() {

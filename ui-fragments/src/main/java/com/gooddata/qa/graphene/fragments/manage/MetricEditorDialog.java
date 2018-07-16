@@ -268,6 +268,11 @@ public class MetricEditorDialog extends AbstractFragment {
         return getElementTexts(By.cssSelector(ELEMENT_VALUES_LOCATOR), getRoot());
     }
 
+    public List<String> getPrivateElementValues() {
+        waitForElementsLoading();
+        return getElementTexts(By.cssSelector(ELEMENT_VALUES_LOCATOR + ".is-unlisted"), getRoot());
+    }
+
     public MetricEditorDialog selectElement(String element) {
         SelectItemPopupPanel
                 .getInstance(By.cssSelector(".s-metricEditor > [style='display: block;'] .listContainer"), browser)

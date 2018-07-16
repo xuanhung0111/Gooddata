@@ -6,15 +6,16 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
-import static java.lang.String.format;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 
@@ -42,6 +43,9 @@ public class CreatedReportDialog extends AbstractFragment {
 
     @FindBy(css = ".separated-top .value .value-part .row-info")
     private WebElement infoEditorPermission;
+
+    @FindBy(css = ".value.value-part .row-info")
+    private WebElement infoVisibility;
 
     public static CreatedReportDialog getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(CreatedReportDialog.class,
@@ -91,6 +95,10 @@ public class CreatedReportDialog extends AbstractFragment {
         return waitForElementVisible(infoEditorPermission).getText();
     }
 
+    public String getRowInfoVisibility() {
+        return waitForElementVisible(infoVisibility).getText();
+    }
+
     public List<String> getLockedAncestors() {
         //There is an element ".scrollableArea-shadow" overlap object which will be clicked
         //so that it is clicked at top-central instead of central.
@@ -113,5 +121,16 @@ public class CreatedReportDialog extends AbstractFragment {
 
     public String getTextOnSaveButton() {
         return waitForElementVisible(createButton).getText();
+    }
+
+    public String getToolTipFromVisibilityQuestionIcon() {
+        new Actions(browser).moveToElement(waitForElementVisible(
+                cssSelector(".value.value-part .mouseoverTrigger.inlineBubbleHelp"), browser))
+                .moveByOffset(1, 1).perform();
+        return waitForElementVisible(cssSelector(".arrow-cl .content"), browser).getText();
+    }
+
+    public boolean isEditPermissionSectionVisible() {
+        return isElementVisible(cssSelector(".scrollableArea-content > .separated-top"), getRoot());
     }
 }
