@@ -92,6 +92,7 @@ import com.gooddata.qa.graphene.reports.GoodsalesMufReportTest;
 import com.gooddata.qa.graphene.reports.ReportWithEmptyValuesInTimeDimensionTest;
 import com.gooddata.qa.graphene.reports.SimpleCompAttributesTest;
 import com.gooddata.qa.graphene.reports.TimeFormattingTest;
+import com.gooddata.qa.graphene.reports.LockingReportTest;
 import com.gooddata.qa.graphene.schedules.GoodSalesScheduleDashboardTest;
 import com.gooddata.qa.graphene.schedules.GoodSalesScheduleDialogFiltersTest;
 import com.gooddata.qa.graphene.schedules.GoodSalesScheduleDialogRecurrenceTest;
@@ -177,7 +178,8 @@ public class UITestsRegistry {
             ReportWithEmptyValuesInTimeDimensionTest.class,
             DynamicImageTest.class,
             TimeFormattingTest.class,
-            GoodSalesEmbeddedReportTest.class
+            GoodSalesEmbeddedReportTest.class,
+            LockingReportTest.class
         });
 
         suites.put("dashboards", new HashMap<String, Object[]>() {{

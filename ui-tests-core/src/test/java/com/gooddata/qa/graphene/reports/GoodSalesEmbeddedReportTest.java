@@ -4,7 +4,6 @@ import com.gooddata.fixture.ResourceManagement.ResourceTemplate;
 import com.gooddata.md.report.AttributeInGrid;
 import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.MetricElement;
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.report.WhatItem;
@@ -18,10 +17,10 @@ import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportEmbedDialog;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
+import com.gooddata.qa.graphene.i18n.AbstractEmbeddedModeTest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.google.common.collect.Lists;
 import org.apache.http.ParseException;
-import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.AfterClass;
@@ -38,9 +37,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_ACTIVE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.google.common.collect.Lists.newArrayList;
@@ -51,7 +48,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
+public class GoodSalesEmbeddedReportTest extends AbstractEmbeddedModeTest {
 
     private static final long MINIMUM_EMBEDDED_REPORT_PDF_SIZE = 20000L;
     private static final long MINIMUM_EMBEDDED_REPORT_CSV_SIZE = 60L;
@@ -133,13 +130,14 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createAdditionalProject"}, dataProvider = "embeddedReport")
     public void shareTableReportToOtherProjectDashboard(boolean withIframe) {
-        EmbeddedReportContainer embeddedReportContainer = null;
+        EmbeddedReportContainer embeddedReportContainer;
 
         if (withIframe) {
             embeddedReportContainer =
                     embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Share table report");
         } else {
-            embeddedReportContainer = initEmbeddedReportWithUri(embedUri);
+            embeddedReportUri = embedUri;
+            embeddedReportContainer = initEmbeddedReport();
         }
 
         assertEquals(embeddedReportContainer.getInfo(), EMBEDDED_REPORT_TITLE);
@@ -155,13 +153,14 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createAdditionalProject"}, dataProvider = "embeddedReport")
     public void viewEmbeddedReportOnReportPage(boolean withIframe) {
-        EmbeddedReportContainer embeddedReportContainer = null;
+        EmbeddedReportContainer embeddedReportContainer;
 
         if (withIframe) {
             embeddedReportContainer = embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId,
                     "View embedded report on report page");
         } else {
-            embeddedReportContainer = initEmbeddedReportWithUri(embedUri);
+            embeddedReportUri = embedUri;
+            embeddedReportContainer = initEmbeddedReport();
         }
 
         embeddedReportContainer.openReportInfoViewPanel().clickViewReportButton();
@@ -178,13 +177,14 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createAdditionalProject"}, dataProvider = "embeddedReport")
     public void downloadEmbeddedReport(boolean withIframe) {
-        EmbeddedReportContainer embeddedReportContainer = null;
+        EmbeddedReportContainer embeddedReportContainer;
 
         if (withIframe) {
             embeddedReportContainer =
                     embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Download embedded report");
         } else {
-            embeddedReportContainer = initEmbeddedReportWithUri(embedUri);
+            embeddedReportUri = embedUri;
+            embeddedReportContainer = initEmbeddedReport();
         }
 
         embeddedReportContainer.openReportInfoViewPanel().downloadReportAsFormat(ExportFormat.CSV);
@@ -207,7 +207,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
         ReportEmbedDialog embedDialog = reportPage.openReportEmbedDialog();
         String htmlEmbedCode = embedDialog.getHtmlCode();
-        String embedUri = embedDialog.getEmbedUri();
+        embeddedReportUri = embedDialog.getEmbedUri();
         embedDialog.closeEmbedDialog();
 
         // Check headline report with iframe
@@ -219,7 +219,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         assertEquals(embeddedHeadlineReport.getValue(), headlineReportNumber);
 
         // Check headline report without iframe
-        embeddedHeadlineReport = initEmbeddedReportWithUri(embedUri).getHeadlineReport();
+        embeddedHeadlineReport = initEmbeddedReport().getHeadlineReport();
 
         assertEquals(embeddedHeadlineReport.getDescription(), headlineReportDescription);
         assertEquals(embeddedHeadlineReport.getValue(), headlineReportNumber);
@@ -235,7 +235,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
         ReportEmbedDialog embedDialog = reportPage.openReportEmbedDialog();
         String htmlEmbedCode = embedDialog.getHtmlCode();
-        String embedUri = embedDialog.getEmbedUri();
+        embeddedReportUri = embedDialog.getEmbedUri();
         embedDialog.closeEmbedDialog();
 
         embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, reportTitle);
@@ -252,7 +252,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
                 .getTableReport();
         assertThat(embeddedTableReport.getAttributeValues(), is(newArrayList(filteredValues)));
 
-        embeddedTableReport = initEmbeddedReportWithUri(embedUri).getTableReport();
+        embeddedTableReport = initEmbeddedReport().getTableReport();
         assertThat(embeddedTableReport.getAttributeValues(), is(newArrayList(filteredValues)));
     }
 
@@ -276,7 +276,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
         ReportEmbedDialog embedDialog = reportPage.openReportEmbedDialog();
         String htmlEmbedCode = embedDialog.getHtmlCode();
-        String embedUri = embedDialog.getEmbedUri();
+        embeddedReportUri = embedDialog.getEmbedUri();
         embedDialog.closeEmbedDialog();
 
         EmbeddedReportContainer embeddedReportContainer =
@@ -287,7 +287,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         assertThat(tableReport.getAttributeValues(), is(attributeElement));
         assertThat(tableReport.getMetricValues(), is(metricElement));
 
-        embeddedReportContainer = initEmbeddedReportWithUri(embedUri);
+        embeddedReportContainer = initEmbeddedReport();
         assertEquals(embeddedReportContainer.getInfo(), reportTitle);
 
         tableReport = embeddedReportContainer.getTableReport();
@@ -313,14 +313,14 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
         ReportEmbedDialog embedDialog = reportPage.openReportEmbedDialog();
         String htmlEmbedCode = embedDialog.getHtmlCode();
-        String embedUri = embedDialog.getEmbedUri();
+        embeddedReportUri = embedDialog.getEmbedUri();
         embedDialog.closeEmbedDialog();
 
         EmbeddedReportContainer embeddedReportContainer =
                 embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Embed empty report");
         assertTrue(embeddedReportContainer.getTableReport().hasNoData(), "Embedded Empty Report is not empty!");
 
-        embeddedReportContainer = initEmbeddedReportWithUri(embedUri);
+        embeddedReportContainer = initEmbeddedReport();
         assertTrue(embeddedReportContainer.getTableReport().hasNoData(), "Embedded Empty Report is not empty!");
     }
 
@@ -339,7 +339,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
         ReportEmbedDialog embedDialog = reportPage.openReportEmbedDialog();
         String htmlEmbedCode = embedDialog.getHtmlCode();
-        String embedUri = embedDialog.getEmbedUri();
+        embeddedReportUri = embedDialog.getEmbedUri();
         embedDialog.closeEmbedDialog();
 
         EmbeddedReportContainer embeddedReportContainer =
@@ -352,7 +352,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         embeddedReportContainer.openReportInfoViewPanel().downloadReportAsFormat(ExportFormat.PDF);
         verifyReportExport(ExportFormat.PDF, embeddedChartReport, MINIMUM_EMBEDDED_CHART_REPORT_PDF_SIZE);
 
-        embeddedReportContainer = initEmbeddedReportWithUri(embedUri);
+        embeddedReportContainer = initEmbeddedReport();
 
         embeddedReportContainer.openReportInfoViewPanel().downloadReportAsFormat(ExportFormat.CSV);
         verifyReportExport(ExportFormat.CSV, embeddedChartReport, MINIMUM_EMBEDDED_CHART_REPORT_CSV_SIZE);
@@ -372,14 +372,14 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         String[] filteredAttributeValues = {"Interest", "Closed Won"};
         embedDialog.selectFilterAttribute("Stage Name", filteredAttributeValues);
         String htmlEmbedCode = embedDialog.getHtmlCode();
-        String embedUri = embedDialog.getEmbedUri();
+        embeddedReportUri = embedDialog.getEmbedUri();
 
         EmbeddedReportContainer embeddedReportContainer =
                 embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Share report with url parameter");
         assertThat(embeddedReportContainer.getTableReport().getAttributeValues(),
                 is(newArrayList(filteredAttributeValues)));
 
-        embeddedReportContainer = initEmbeddedReportWithUri(embedUri);
+        embeddedReportContainer = initEmbeddedReport();
         assertThat(embeddedReportContainer.getTableReport().getAttributeValues(),
                 is(newArrayList(filteredAttributeValues)));
     }
@@ -393,7 +393,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
         ReportEmbedDialog embedDialog = reportPage.openReportEmbedDialog();
         String htmlEmbedCode = embedDialog.getHtmlCode();
-        String embedUri = embedDialog.getEmbedUri();
+        embeddedReportUri = embedDialog.getEmbedUri();
         embedDialog.closeEmbedDialog();
 
         String attributeValueToDrill = "2009";
@@ -425,7 +425,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         assertThat(tableReport.getAttributeValues(), is(drilledInReportAttributeValues));
         assertThat(tableReport.getMetricValues(), is(drilledInReportMetricValues));
 
-        embeddedReportContainer = initEmbeddedReportWithUri(embedUri);
+        embeddedReportContainer = initEmbeddedReport();
 
         tableReport = embeddedReportContainer.getTableReport().drillOn(attributeValueToDrill, CellType.ATTRIBUTE_VALUE);
 
@@ -456,14 +456,6 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         waitForFragmentVisible(reportPage).initPage();
     }
 
-    private void switchToPopUpWindow(String reportTitle) {
-        for (String window : browser.getWindowHandles()) {
-            String windowTitle = browser.switchTo().window(window).getTitle();
-            if (windowTitle.contains(reportTitle))
-                return;
-        }
-    }
-
     private EmbeddedReportContainer embedReportToOtherProjectDashboard(String embedCode,
             String projectToShare, String dashboardName) {
         EmbeddedWidget embeddedWidget = initDashboardsPage(projectToShare)
@@ -475,17 +467,6 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
         dashboardsPage.saveDashboard();
         return embeddedWidget.getEmbeddedReportContainer();
-    }
-
-    private EmbeddedReportContainer initEmbeddedReportWithUri(String embedUri) {
-        browser.get(embedUri);
-
-        //the previous page is using the same widget so should sleep in two seconds before getting widget
-        //otherwise, it could get the old widget
-        sleepTightInSeconds(2);
-
-        return Graphene.createPageFragment(EmbeddedReportContainer.class,
-                waitForElementVisible(EmbeddedReportContainer.LOCATOR, browser));
     }
 
     private DashboardsPage initDashboardsPage(String projectId) {

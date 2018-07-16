@@ -9,7 +9,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.Das
 import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
 
-public class EmbeddedDashboardSavedViewLocalizationTest extends AbstractEmbeddedDashboardTest {
+public class EmbeddedDashboardSavedViewLocalizationTest extends AbstractEmbeddedModeTest {
 
     private static final String DASHBOARD_NAME = "Saved view";
 

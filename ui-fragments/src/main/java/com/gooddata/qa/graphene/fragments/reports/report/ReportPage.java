@@ -6,6 +6,7 @@ import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.common.PermissionSettingDialog.PermissionType;
 import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
@@ -33,6 +34,7 @@ import static com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter.REP
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_BLUE_BAR;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementAttributeNotContainValue;
@@ -40,6 +42,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.lang.String.format;
@@ -52,6 +55,8 @@ import static org.openqa.selenium.By.xpath;
 import static org.testng.Assert.assertEquals;
 
 public class ReportPage extends AbstractFragment {
+
+    private static final String CSS_CREATE_BUTTON = ".s-btn-create,.s-btn-save:not(.gdc-hidden),.s-btn-saved";
 
     @FindBy(id = "analysisReportTitle")
     private WebElement reportName;
@@ -68,7 +73,7 @@ public class ReportPage extends AbstractFragment {
     @FindBy(className = "s-btn-hide_filters")
     private WebElement hideFilterButton;
 
-    @FindBy(css = ".s-btn-create,.s-btn-save:not(.gdc-hidden),.s-btn-saved")
+    @FindBy(css = CSS_CREATE_BUTTON)
     private WebElement createReportButton;
 
     @FindBy(xpath = "//button[contains(@class, 'exportButton')]")
@@ -76,6 +81,9 @@ public class ReportPage extends AbstractFragment {
 
     @FindBy(css = ".s-btn-options")
     private WebElement optionsButton;
+
+    @FindBy(className = "s-lockIcon")
+    private WebElement lockIcon;
 
     public static final By LOCATOR = By.id("p-analysisPage");
 
@@ -90,12 +98,6 @@ public class ReportPage extends AbstractFragment {
 
     private static final String XPATH_REPORT_VISUALIZATION_TYPE =
             "//div[contains(@class, 's-enabled') and contains(@class, 'yui3-c-charttype') and .//span[@title='${type}']]";
-
-    private static final By VISIBILITY_CHECKBOX_LOCATOR = id("settings-visibility");
-
-    private static final By REPORT_SETTINGS_SAVE_BUTTON_LOCATOR = cssSelector(".s-btn-save:not(.gdc-hidden)");
-
-    private static final By ADD_TAGS_BUTTON_LOCATOR = className("s-btn-add_tags");
 
     private static final By EMBED_BUTTON_LOCATOR = cssSelector(".s-btn-embed:not(.disabled)");
 
@@ -186,20 +188,12 @@ public class ReportPage extends AbstractFragment {
     }
 
     public ReportPage confirmCreateReportInDialog() {
-        WebElement confirmDialogCreateButton = waitForElementVisible(cssSelector(
-                ".s-saveReportDialog.s-is-loaded .s-btn-create"), browser);
-        waitForElementVisible(confirmDialogCreateButton).click();
-        waitForElementNotVisible(confirmDialogCreateButton);
-
+        getCreateReportDialog(browser).saveReport();
         return this;
     }
 
     public ReportPage cancelCreateReportInDialog() {
-        WebElement cancelDialogCreateButton = waitForElementVisible(cssSelector(
-                ".s-saveReportDialog .s-btn-cancel"), browser);
-        waitForElementVisible(cancelDialogCreateButton).click();
-        waitForElementNotVisible(cancelDialogCreateButton);
-
+        getCreateReportDialog(browser).cancelCreateReport();
         return this;
     }
 
@@ -343,8 +337,14 @@ public class ReportPage extends AbstractFragment {
     }
 
     public ReportPage saveAsReport() {
+        return saveAsReport(null);
+    }
+
+    public ReportPage saveAsReport(String name) {
         openOptionsMenu().select("Save as...");
-        waitForElementVisible(className("s-btn-save_as"), browser).click();
+        if (name != null) {
+            getCreateReportDialog(browser).setReportName(name).saveReport();
+        }
         return this;
     }
 
@@ -361,24 +361,21 @@ public class ReportPage extends AbstractFragment {
     }
 
     public ReportPage setReportVisible() {
-        setReportVisibleSettings(true);
+        openOptionsMenu().select("Settings");
+        getCreateReportDialog(browser).setReportVisibleSettings(true).saveReport();
         return this;
     }
 
     public ReportPage addTag(String tag) {
         openOptionsMenu().select("Settings");
+        getCreateReportDialog(browser).addTag(tag).saveReport();
+        return this;
+    }
 
-        WebElement addTagButton = waitForElementVisible(ADD_TAGS_BUTTON_LOCATOR, browser);
-        addTagButton.click();
-        waitForElementNotVisible(addTagButton);
+    public ReportPage setPermission(PermissionType permission) {
+        openOptionsMenu().select("Settings");
+        getCreateReportDialog(browser).setPermissionSetting(permission).saveReport();
 
-        WebElement input = waitForElementVisible(cssSelector(".c-ipeEditorIn input"), browser);
-        input.clear();
-        input.sendKeys(tag);
-        waitForElementVisible(cssSelector(".c-ipeEditorControls .s-btn-add"), browser).click();
-        waitForElementVisible(addTagButton);
-
-        waitForElementVisible(REPORT_SETTINGS_SAVE_BUTTON_LOCATOR, browser).click();
         return this;
     }
 
@@ -421,10 +418,34 @@ public class ReportPage extends AbstractFragment {
         return isElementPresent(cssSelector("#tooBigReportHelp:not([style*='display: none'])"), browser);
     }
 
+    public boolean isVisibleLockIcon() {
+        return isElementVisible(lockIcon);
+    }
+
+    public boolean isVisibleSaveButton() {
+        //In embedded mode, save button is outside report page
+        return isElementVisible(cssSelector(CSS_CREATE_BUTTON), browser);
+    }
+
+    public String getTooltipFromLockIcon() {
+        new Actions(browser).moveToElement(lockIcon).moveByOffset(1, 1).perform();
+        return waitForElementVisible(cssSelector(".bubble-overlay .content"), browser).getText();
+    }
+
+    public CreateReportDialog clickLockIcon() {
+        waitForElementVisible(lockIcon).click();
+        return getCreateReportDialog(browser);
+    }
+
     public ReportPage openVersion(int version) {
         openOptionsMenu().openSubMenu("Versions");
         getVersionsMenu().select(e -> e.findElement(BY_LINK).getText().trim().startsWith("Version #" + version));
         return this;
+    }
+
+    public CreateReportDialog saveAs() {
+        openOptionsMenu().select("Save as...");
+        return getCreateReportDialog(browser);
     }
 
     public ReportPage revertToCurrentVersion() {
@@ -642,16 +663,6 @@ public class ReportPage extends AbstractFragment {
         return this;
     }
 
-    private void setReportVisibleSettings(boolean isVisible) {
-        openOptionsMenu().select("Settings");
-        WebElement visibleCheckbox = waitForElementVisible(VISIBILITY_CHECKBOX_LOCATOR, browser);
-        if (isVisible != visibleCheckbox.isSelected()) {
-            visibleCheckbox.click();
-        }
-        waitForElementVisible(REPORT_SETTINGS_SAVE_BUTTON_LOCATOR, browser).click();
-        waitForElementNotVisible(visibleCheckbox);
-    }
-
     private SimpleMenu getVersionsMenu() {
         return Graphene.createPageFragment(SimpleMenu.class, waitForElementVisible(id("undefined"), browser));
     }
@@ -681,5 +692,76 @@ public class ReportPage extends AbstractFragment {
     private List<WebElement> getCustomFormatElements() {
         return waitForElementVisible(className("customMetricFormatContainer"), browser)
                 .findElements(By.className("customMetricFormatItem"));
+    }
+
+    private CreateReportDialog getCreateReportDialog(SearchContext searchContext) {
+        return Graphene.createPageFragment(CreateReportDialog.class,
+                waitForElementVisible(className("s-saveReportDialog"), searchContext));
+    }
+
+    public class CreateReportDialog extends AbstractFragment {
+
+        @FindBy(className = "ember-text-field")
+        private WebElement reportName;
+
+        @FindBy(className = "s-btn-add_tags")
+        private WebElement addTagButton;
+
+        @FindBy(id = "settings-visibility")
+        private WebElement visibility;
+
+        @FindBy(css = ".s-btn-create, .s-btn-save, .s-btn-save_as")
+        private WebElement createButton;
+
+        @FindBy(className = "s-btn-cancel")
+        private WebElement cancelButton;
+
+        public CreateReportDialog setReportName(String name) {
+            waitForElementVisible(reportName).clear();
+            reportName.sendKeys(name);
+            return this;
+        }
+
+        public CreateReportDialog addTag(String tag) {
+            waitForElementVisible(addTagButton).click();
+            waitForElementNotVisible(addTagButton);
+
+            WebElement input = waitForElementVisible(cssSelector(".c-ipeEditorIn input"), browser);
+            input.clear();
+            input.sendKeys(tag);
+            waitForElementVisible(cssSelector(".c-ipeEditorControls .s-btn-add"), browser).click();
+            waitForElementVisible(addTagButton);
+            return this;
+        }
+
+        public CreateReportDialog setReportVisibleSettings(boolean isVisible) {
+            if (isVisible != waitForElementVisible(visibility).isSelected()) {
+                visibility.click();
+            }
+            return this;
+        }
+
+        public CreateReportDialog setPermissionSetting(PermissionType permission) {
+            getRoot().findElements(className("input-radio")).stream()
+                    .filter(element -> element.getAttribute("value").equals(permission.getPermission()))
+                    .findFirst()
+                    .get()
+                    .click();
+            return this;
+        }
+
+        public void saveReport() {
+            waitForElementVisible(createButton).click();
+            waitForFragmentNotVisible(this);
+        }
+
+        public void cancelCreateReport() {
+            waitForElementVisible(cancelButton).click();
+            waitForFragmentNotVisible(this);
+        }
+
+        public String getTextOnSaveButton() {
+            return waitForElementVisible(createButton).getText();
+        }
     }
 }

@@ -139,9 +139,7 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
         openTableReport(reportName)
                 .openContextMenuFrom(ATTR_MONTH_YEAR_SNAPSHOT, CellType.ATTRIBUTE_HEADER)
                 .selectItem("Number (1/2010) (Snapshot)");
-        reportPage.waitForReportExecutionProgress()
-            .clickSaveReport()
-            .waitForReportSaved();
+        reportPage.waitForReportExecutionProgress().saveReport();
 
         initDashboardsPage();
         dashboardsPage.addNewDashboard(reportName);

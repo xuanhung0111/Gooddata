@@ -21,7 +21,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.ChartReport;
 
-public class EmbeddedDashboardWidgetSettingLocalizationTest extends AbstractEmbeddedDashboardTest {
+public class EmbeddedDashboardWidgetSettingLocalizationTest extends AbstractEmbeddedModeTest {
 
     private static final String DASHBOARD_NAME = "Widget setting";
 

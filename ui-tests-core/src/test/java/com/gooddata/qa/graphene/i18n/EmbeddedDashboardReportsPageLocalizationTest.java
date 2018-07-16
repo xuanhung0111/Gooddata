@@ -13,7 +13,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_ACTIVITIES_BY
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.cssSelector;
 
-public class EmbeddedDashboardReportsPageLocalizationTest extends AbstractEmbeddedDashboardTest {
+public class EmbeddedDashboardReportsPageLocalizationTest extends AbstractEmbeddedModeTest {
 
     @Override
     protected void initProperties() {

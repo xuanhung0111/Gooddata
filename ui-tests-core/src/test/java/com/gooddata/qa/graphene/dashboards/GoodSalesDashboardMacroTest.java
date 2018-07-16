@@ -13,7 +13,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.Select
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel.Tab;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
-import com.gooddata.qa.graphene.i18n.AbstractEmbeddedDashboardTest;
+import com.gooddata.qa.graphene.i18n.AbstractEmbeddedModeTest;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
 import com.gooddata.qa.mdObjects.dashboard.tab.FilterItem;
@@ -40,7 +40,7 @@ import static java.time.temporal.TemporalAdjusters.nextOrSame;
 import static java.time.temporal.TemporalAdjusters.previousOrSame;
 import static org.testng.Assert.assertEquals;
 
-public class GoodSalesDashboardMacroTest extends AbstractEmbeddedDashboardTest {
+public class GoodSalesDashboardMacroTest extends AbstractEmbeddedModeTest {
 
     private static final String ALL = "all";
     private static final String NONE = "None";

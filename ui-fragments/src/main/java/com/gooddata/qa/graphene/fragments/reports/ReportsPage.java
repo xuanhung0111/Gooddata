@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.fragments.reports;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkGreenBar;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
@@ -17,6 +18,7 @@ import static org.testng.Assert.fail;
 import java.util.Collection;
 import java.util.List;
 
+import com.gooddata.qa.graphene.fragments.common.PermissionSettingDialog;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -66,6 +68,9 @@ public class ReportsPage extends AbstractFragment {
     @FindBy(className = "s-btn-permissions___")
     private WebElement permissionButton;
 
+    @FindBy(css = ".grayBg .simpleBtnCyan")
+    private List<WebElement> actionButtons;
+
     @FindBy(className = "s-group_by")
     private Select groupBy;
 
@@ -89,12 +94,24 @@ public class ReportsPage extends AbstractFragment {
         getReport(reportName).getOwner().click();
     }
 
+    public boolean isLockedReport(String reportName) {
+        return getReport(reportName).isLocked();
+    }
+
+    public boolean isEdiTableReport(String reportName) {
+        return getReport(reportName).isEditable();
+    }
+
     public ReportsPage addNewFolder(String folderName) {
         waitForElementVisible(addFolderButton).click();
         IpeEditor.getInstance(browser).setText(folderName);
         sleepTightInSeconds(2);
 
         return this;
+    }
+
+    public List<String> getTitlesOfActionButtons() {
+        return actionButtons.stream().map(actionButton -> actionButton.getText()).collect(toList());
     }
 
     public String getSelectedFolderName() {
@@ -129,9 +146,10 @@ public class ReportsPage extends AbstractFragment {
         checkGreenBar(browser);
     }
 
-    public void selectReportsAndOpenPermissionDialog(String... reports) {
+    public PermissionSettingDialog selectReportsAndOpenPermissionDialog(String... reports) {
         selectReports(reports);
         waitForElementVisible(permissionButton).click();
+        return PermissionSettingDialog.getInstance(browser);
     }
 
     public void selectReportsAndOpenMoveDialog(String... reports) {
@@ -140,7 +158,7 @@ public class ReportsPage extends AbstractFragment {
     }
 
     public ReportsPage moveReportsToFolder(String folder, String... reports) {
-        String reportNumber = getReportNumberFrom(folder);
+        String reportNumber = getNumberOfReportsInFolder(folder);
         selectReportsAndOpenMoveDialog(reports);
 
         waitForElementVisible(By.cssSelector(".c-ipeEditor:not([style*='display: none']) input"), browser).sendKeys(folder);
@@ -153,16 +171,21 @@ public class ReportsPage extends AbstractFragment {
     }
 
     public ReportsPage moveReportsToFolderByDragDrop(String folderName, String reportName) {
-        String reportNumber = getReportNumberFrom(folderName);
+        String reportNumber = getNumberOfReportsInFolder(folderName);
+        tryToMoveReportsToFolderByDragDrop(folderName, reportName);
+        waitForReportUpdatedFrom(folderName, reportNumber);
+        return this;
+    }
+
+    public ReportsPage tryToMoveReportsToFolderByDragDrop(String folderName, String reportName) {
         WebElement report = reports.stream()
-            .filter(entry -> reportName.equals(entry.getLabel()))
-            .findFirst()
-            .orElseThrow(() -> new NoSuchElementException("Cannot find report: " + reportName))
-            .getRoot();
+                .filter(entry -> reportName.equals(entry.getLabel()))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Cannot find report: " + reportName))
+                .getRoot();
 
         getActions().clickAndHold(report).moveToElement(getFolder(folderName))
                 .moveByOffset(1, 1).release().perform();
-        waitForReportUpdatedFrom(folderName, reportNumber);
         return this;
     }
 
@@ -261,6 +284,10 @@ public class ReportsPage extends AbstractFragment {
         return reports.size();
     }
 
+    public String getNumberOfReportsInFolder(String folder) {
+        return getFolder(folder).findElement(By.className("rate")).getText();
+    }
+
     private void selectReports(String... reports) {
         List<String> reportNames = asList(reports);
 
@@ -287,11 +314,7 @@ public class ReportsPage extends AbstractFragment {
 
     private void waitForReportUpdatedFrom(String folder, String oldReportNumber) {
         Graphene.waitGui().ignoring(NoSuchElementException.class)
-                .until(browser -> !getReportNumberFrom(folder).equals(oldReportNumber));
-    }
-
-    private String getReportNumberFrom(String folder) {
-        return getFolder(folder).findElement(By.className("rate")).getText();
+                .until(browser -> !getNumberOfReportsInFolder(folder).equals(oldReportNumber));
     }
 
     public static class ReportEntry extends AbstractFragment {
@@ -322,6 +345,14 @@ public class ReportsPage extends AbstractFragment {
 
         public WebElement getOwner() {
             return waitForElementVisible(user);
+        }
+
+        public boolean isLocked() {
+            return isElementVisible(By.className("s-lockIcon"), getRoot());
+        }
+
+        public boolean isEditable() {
+            return isElementVisible(By.tagName("input"), getRoot());
         }
 
         public void openReport() {
