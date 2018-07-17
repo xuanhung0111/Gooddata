@@ -7,24 +7,26 @@ import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbedDashboardDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.DashboardEditWidgetToolbarPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
-import com.gooddata.qa.graphene.fragments.manage.MetricEditorDialog;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.EmbeddedReportPage;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.graphene.i18n.AbstractEmbeddedModeTest;
 import com.gooddata.qa.utils.asserts.AssertUtils;
 import org.jboss.arquillian.graphene.Graphene;
+import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -38,11 +40,11 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CLOSE
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_ACTIVITIES_BY_TYPE;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForReportsPageLoaded;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -51,7 +53,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
+public class GoodSalesEditEmbeddedDashboardTest extends AbstractEmbeddedModeTest {
 
     private static final String EMBEDDED_DASHBOARD = "embedded-dashboard";
     private static final String THIS_YEAR = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
@@ -62,6 +64,11 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
     private String embeddedCode;
     private String embedUri;
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws org.apache.http.ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
+    }
 
     @Override
     protected void customizeProject() throws Throwable {
@@ -317,6 +324,36 @@ public class GoodSalesEditEmbeddedDashboardTest extends GoodSalesAbstractTest {
         savedViewWidget.openSavedViewMenu().selectSavedView("Other_View");
         assertEquals(embeddedDashboard.getFirstFilter().getCurrentValue(), LAST_YEAR);
         assertEquals(embeddedDashboard.openTab(2).getFirstFilter().getCurrentValue(), LAST_YEAR);
+    }
+
+    @DataProvider(name = "userRole")
+    public Object[][] getUserRole() {
+        return new Object[][] {
+                {UserRoles.ADMIN, "Only Admins can modify this dashboard."},
+                {UserRoles.EDITOR, "View only. You don't have permission to edit this dashboard."}
+        };
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "userRole")
+    public void verifyPermissionInEmbeddedDashboard(UserRoles userRoles, String tooltip) {
+        embeddedUri = initDashboardsPage().addNewDashboard(generateHashString())
+                .addReportToDashboard(REPORT_ACTIVITIES_BY_TYPE).saveDashboard().lockDashboard(true)
+                .openEmbedDashboardDialog().getPreviewURI();
+
+        logoutAndLoginAs(true, userRoles);
+        try {
+            EmbeddedDashboard embeddedDashboard = initEmbeddedDashboard();
+            assertTrue(embeddedDashboard.isLocked(), "Dashboard should be locked");
+            assertEquals(embeddedDashboard.getTooltipFromLockIcon(), tooltip);
+
+            openReportDetailFromEmbeddedDashboard(embeddedDashboard, REPORT_ACTIVITIES_BY_TYPE).cancel();
+            EmbeddedDashboard.waitForDashboardLoaded(browser);
+            assertEquals(embeddedDashboard.getReport(REPORT_ACTIVITIES_BY_TYPE, TableReport.class).waitForLoaded()
+                    .openReportInfoViewPanel().getTitlesOfReportInfoButtons(), asList("View This Report", "Download As..."));
+            EmbeddedDashboard.waitForDashboardLoaded(browser);
+        } finally {
+            logoutAndLoginAs(true, UserRoles.ADMIN);
+        }
     }
 
     private EmbeddedDashboard initEmbeddedDashboard(String dashboardName) {

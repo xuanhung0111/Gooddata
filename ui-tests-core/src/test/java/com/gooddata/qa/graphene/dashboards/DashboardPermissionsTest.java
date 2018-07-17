@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
@@ -27,7 +28,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.dashboard.PublishType;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.AddGranteesDialog;
@@ -81,6 +81,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         createTestDashboard("Locked dashboard");
         lockDashboard(true);
         assertEquals(dashboardsPage.isLocked(), true);
+        assertEquals(dashboardsPage.getTooltipFromLockIcon(), "Only Admins can modify this dashboard.");
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests", "sanity"})
@@ -272,6 +273,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     public void shouldShowLockIconToEditor() {
         selectDashboard("Locked and published for viewer");
         assertTrue(dashboardsPage.isLocked());
+        assertEquals(dashboardsPage.getTooltipFromLockIcon(), "View only. You don't have permission to edit this dashboard.");
 
         selectDashboard("Unlocked and published for viewer");
         assertFalse(dashboardsPage.isLocked());

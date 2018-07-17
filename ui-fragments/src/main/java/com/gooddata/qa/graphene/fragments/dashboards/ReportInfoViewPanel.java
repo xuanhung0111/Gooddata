@@ -68,6 +68,10 @@ public class ReportInfoViewPanel extends AbstractFragment {
         waitForElementVisible(viewReportButton).click();
     }
 
+    public List<String> getTitlesOfReportInfoButtons() {
+        return buttons.stream().filter(WebElement::isDisplayed).map(button -> button.getText()).collect(toList());
+    }
+
     public void downloadReportAsFormat(ExportFormat format) {
         waitForElementVisible(downloadAsButton).click();
 
