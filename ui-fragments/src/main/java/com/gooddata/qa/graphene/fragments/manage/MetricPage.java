@@ -10,17 +10,18 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForObjectPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForUserProfilePageLoaded;
+import static java.lang.String.format;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.tagName;
-
-import java.util.List;
+import static org.openqa.selenium.By.xpath;
 
 import com.gooddata.qa.graphene.entity.metric.CustomMetricUI;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.fragments.common.PermissionSettingDialog;
 import com.gooddata.qa.graphene.fragments.common.PermissionSettingDialog.PermissionType;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -37,9 +38,6 @@ public class MetricPage extends DataPage {
 
     @FindBy(xpath = "//a[@class='interpolateProject']")
     private WebElement dataLink;
-
-    @FindBy(className = "dataPage-listRow")
-    private List<WebElement> metrics;
 
     @FindBy(className = "s-btn-permissions___")
     private WebElement permissionButton;
@@ -115,15 +113,11 @@ public class MetricPage extends DataPage {
     }
 
     public boolean isMetricLocked(String metricName) {
-        return metrics.stream()
-                .filter(metric -> metric.findElement(TITLE_METRIC).getText().equals(metricName))
-                .anyMatch(metric -> isElementVisible(className("s-lockIcon"), metric));
+        return isElementVisible(className("s-lockIcon"), getMetricEntry(metricName));
     }
 
     public boolean isMetricEditable(String metricName) {
-        return metrics.stream()
-                .filter(metric -> metric.findElement(TITLE_METRIC).getText().equals(metricName))
-                .anyMatch(metric -> isElementVisible(tagName("input"), metric));
+        return isElementVisible(tagName("input"), getMetricEntry(metricName));
     }
 
     public boolean isEmpty() {
@@ -135,31 +129,24 @@ public class MetricPage extends DataPage {
     }
 
     public MetricPage setEditingPermission(String metricName, PermissionType permissionType) {
-        metrics.stream()
-                .filter(metric -> metric.findElement(TITLE_METRIC).getText().equals(metricName))
-                .map(metric -> metric.findElement(tagName("input")))
-                .findFirst()
-                .get()
-                .click();
-        waitForElementEnabled(permissionButton).click();
-        PermissionSettingDialog.getInstance(browser).setEditingPermission(permissionType).save();
+        openEditingPermission(metricName).setEditingPermission(permissionType).save();
         Graphene.waitGui().until(browser -> permissionButton.getAttribute("class").contains("disabled"));
         return this;
     }
 
+    public PermissionSettingDialog openEditingPermission(String metricName) {
+        getMetricEntry(metricName).findElement(tagName("input")).click();
+        waitForElementEnabled(permissionButton).click();
+        return PermissionSettingDialog.getInstance(browser);
+    }
+
     public MetricEditorDialog openMetricEditor() {
         waitForElementVisible(createMetricButton).click();
-
         return MetricEditorDialog.getInstance(browser);
     }
 
     public void clickMetricOwner(String metricName) {
-        metrics.stream()
-                .filter(metric -> metric.findElement(TITLE_METRIC).getText().equals(metricName))
-                .map(metric -> metric.findElement(cssSelector(".author a")))
-                .findFirst()
-                .get()
-                .click();
+        getMetricEntry(metricName).findElement(cssSelector(".author a")).click();
     }
 
     public UserProfilePage openMetricOwnerProfilePage(String metricName) {
@@ -169,12 +156,12 @@ public class MetricPage extends DataPage {
     }
 
     public String getTooltipFromLockIcon(String metricName) {
-        WebElement lockIcon = metrics.stream()
-                .filter(metric -> metric.findElement(TITLE_METRIC).getText().equals(metricName))
-                .map(metric -> metric.findElement(className("s-lockIcon")))
-                .findAny()
-                .get();
+        WebElement lockIcon = getMetricEntry(metricName).findElement(className("s-lockIcon"));
         return waitForElementVisible(lockIcon).getAttribute("title");
+    }
+
+    private WebElement getMetricEntry(String metricName) {
+        return waitForElementVisible(xpath(format("//span[@title = '%s']/../../..", metricName)), getRoot());
     }
 
     private MetricPage backToMetricsTable() {

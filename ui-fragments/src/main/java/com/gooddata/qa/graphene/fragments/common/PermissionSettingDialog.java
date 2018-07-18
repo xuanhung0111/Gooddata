@@ -7,15 +7,17 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static org.openqa.selenium.By.className;
-import static org.openqa.selenium.By.id;
+import static org.openqa.selenium.By.cssSelector;
 
 public class PermissionSettingDialog extends AbstractFragment {
 
     private static final By LOCATOR = className("s-permissionSettingsDialog");
-    private static final By VISIBILITY_CHECKBOX_LOCATOR = id("settings-visibility");
 
     @FindBy(className = "submit-button")
     private WebElement saveButton;
@@ -25,6 +27,9 @@ public class PermissionSettingDialog extends AbstractFragment {
 
     @FindBy(id = "settings-visibility")
     private WebElement visibilityCheckBox;
+
+    @FindBy(css = ".separated-top .value .value-part .row-info")
+    private WebElement infoEditorPermission;
 
     public static PermissionSettingDialog getInstance(SearchContext searchContext) {
         return Graphene.createPageFragment(PermissionSettingDialog.class, waitForElementVisible(LOCATOR, searchContext));
@@ -39,12 +44,22 @@ public class PermissionSettingDialog extends AbstractFragment {
     }
 
     public PermissionSettingDialog setEditingPermission(PermissionType permissionType) {
-        getRoot().findElements(className("input-radio")).stream()
-                .filter(element -> element.getAttribute("value").equals(permissionType.getPermission()))
-                .findFirst()
-                .get()
-                .click();
+        waitForElementVisible(cssSelector(permissionType.getCssSelector()), getRoot()).click();
         return this;
+    }
+
+    public String getRowInfoEditPermission() {
+        return waitForElementVisible(infoEditorPermission).getText();
+    }
+
+    public List<String> getLockedAncestors() {
+        //There is an element ".scrollableArea-shadow" overlap object which will be clicked
+        //so that it is clicked at top-central instead of central.
+        getActions().moveToElement(waitForElementVisible(infoEditorPermission)
+                .findElement(cssSelector("a:not(.inlineBubbleHelp)")), 0, 2).click().perform();
+        return waitForElementVisible(className("lockedAncestors-list"), browser)
+                .findElements(className("lockedAncestor-link"))
+                .stream().map(WebElement::getText).collect(Collectors.toList());
     }
 
     public void save() {
@@ -58,17 +73,17 @@ public class PermissionSettingDialog extends AbstractFragment {
     }
 
     public enum PermissionType {
-        ALL("all"),
-        ADMIN("admin");
+        ALL("input[value='all']"),
+        ADMIN("input[value='admin']");
 
-        private String permission;
+        private String cssSelector;
 
-        PermissionType(String permission) {
-            this.permission = permission;
+        PermissionType(String cssSelector) {
+            this.cssSelector = cssSelector;
         }
 
-        public String getPermission() {
-            return this.permission;
+        public String getCssSelector() {
+            return this.cssSelector;
         }
     }
 }
