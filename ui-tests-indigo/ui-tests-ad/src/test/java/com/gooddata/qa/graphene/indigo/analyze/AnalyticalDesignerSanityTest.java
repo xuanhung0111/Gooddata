@@ -40,6 +40,8 @@ import static org.testng.Assert.assertTrue;
 
 public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
+    private static final String SP_YEAR_AGO = " - SP year ago";
+
     @Override
     public void initProperties() {
         super.initProperties();
@@ -233,7 +235,7 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void testSimplePoP() throws ParseException {
+    public void testSimpleSamePeriodComparison() throws ParseException {
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate()
             .getFilterBuckets()
@@ -254,14 +256,14 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
         assertTrue(report.getTrackersCount() >= 1);
         List<String> legends = report.getLegends();
         assertEquals(legends.size(), 2);
-        assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES + " - previous year", METRIC_NUMBER_OF_ACTIVITIES));
+        assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES + SP_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
 
         analysisPage.addMetric(METRIC_SNAPSHOT_BOP).waitForReportComputing();
         assertTrue(report.getTrackersCount() >= 1);
         legends = report.getLegends();
-        assertEquals(legends.size(), 2);
-        assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_SNAPSHOT_BOP));
-        checkingOpenAsReport("testSimplePoP");
+        assertEquals(legends.size(), 4);
+        assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES + SP_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES, METRIC_SNAPSHOT_BOP + SP_YEAR_AGO, METRIC_SNAPSHOT_BOP));
+        checkingOpenAsReport("testSimplePreviousComparison");
     }
 
     @Test(dependsOnGroups = {"createProject"})

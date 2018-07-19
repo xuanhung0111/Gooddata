@@ -23,7 +23,9 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.Recommen
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.TrendingRecommendation;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
-public class PopRecommendationTest extends AbstractAdE2ETest {
+public class OverTimeComparisonRecommendationTest extends AbstractAdE2ETest {
+
+    private static final String SP_YEAR_AGO = " - SP year ago";
 
     @Override
     public void initProperties() {
@@ -88,23 +90,9 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
 
         analysisPage.waitForReportComputing();
         assertThat(waitForElementVisible(cssSelector(LEGEND_ITEM_NAME), browser).getText(),
-                containsString(METRIC_SNAPSHOT_BOP + " - previous year"));
+                containsString(METRIC_SNAPSHOT_BOP + SP_YEAR_AGO));
 
         assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-with-period"), browser));
-    }
-
-    @Test(dependsOnGroups = {"createProject"})
-    public void should_disable_pop_checkbox_if_date_and_attribute_are_moved_to_bucket() {
-        MetricConfiguration configuration = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-                .addDate()
-                .getMetricsBucket()
-                .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
-                .expandConfiguration();
-        assertTrue(configuration.isPopEnabled());
-
-        analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE);
-
-        assertFalse(configuration.isPopEnabled());
     }
 
     @Test(dependsOnGroups = {"createProject"})

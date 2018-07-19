@@ -17,6 +17,7 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 
+import com.gooddata.qa.graphene.enums.indigo.CompareType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
@@ -127,20 +128,21 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void testPopAndPercentOnCustomDate() {
+    public void testSamePeriodComparisonAndPercentOnCustomDate() {
         ChartReport report = initAnalysePage().addMetric(NUMBER, FieldType.FACT)
                 .addDate()
                 .waitForReportComputing()
                 .getChartReport();
 
+        analysisPage.applyCompareType(CompareType.SAME_PERIOD_LAST_YEAR);
+
         analysisPage.getMetricsBucket()
                 .getMetricConfiguration("Sum of " + NUMBER)
                 .expandConfiguration()
-                .showPercents()
-                .showPop();
+                .showPercents();
 
         analysisPage.waitForReportComputing();
-        assertThat(report.getLegends(), equalTo(asList("% Sum of Number - previous year", "% Sum of Number")));
-        checkingOpenAsReport("testPopAndPercentOnCustomDate");
+        assertThat(report.getLegends(), equalTo(asList("% Sum of Number - SP year ago", "% Sum of Number")));
+        checkingOpenAsReport("testSamePeriodComparisonAndPercentOnCustomDate");
     }
 }
