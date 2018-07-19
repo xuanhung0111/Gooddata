@@ -54,6 +54,11 @@ public class DateFilterPickerPanel extends AbstractFragment {
         getDatePresetSelect().ensureDropdownClosed();
     }
 
+    public void selectCompareType(final String compareType) {
+        getCompareTypeDropdown().selectByName(compareType);
+        getCompareTypeDropdown().ensureDropdownClosed();
+    }
+
     public List<String> getPeriods() {
         return getDatePresetSelect()
                 .getValues()
@@ -130,28 +135,6 @@ public class DateFilterPickerPanel extends AbstractFragment {
     public void apply() {
         waitForElementVisible(applyButton).click();
         waitForFragmentNotVisible(this);
-    }
-
-    /**
-     * applies given compareType on insight
-     * @param compareType compare type to be applied
-     * @return DateFilterPickerPanel object
-     */
-    public DateFilterPickerPanel applyCompareType(CompareTypeDropdown.CompareType compareType) {
-
-        getCompareTypeDropdown().selectCompareType(compareType.getCompareTypeName());
-        apply();
-
-        return this;
-    }
-
-    /**
-     * check whether comparison type is enabled
-     * @param compareType compare type to check whether it is enabled
-     * @return true whether it is enabled
-     */
-    public boolean isCompareTypeEnabled(final CompareTypeDropdown.CompareType compareType) {
-        return getCompareTypeDropdown().isCompareTypeEnabled(compareType);
     }
 
     private void configTimeFilterByRangeHelper(String from, String to, boolean apply) {

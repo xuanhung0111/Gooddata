@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages;
 
+import com.gooddata.qa.graphene.enums.indigo.CompareType;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
@@ -8,6 +9,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.Analysi
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributeFilterPickerPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MainEditor;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
@@ -392,6 +394,41 @@ public class AnalysisPage extends AbstractFragment {
     public AnalysisPage setFilterIsValues(String filter, String... values) {
         openFilterPanel(filter).select(values);
         return this;
+    }
+
+    /**
+     * applies given compareType on insight
+     * @param compareType compare type to be applied
+     * @return AnalysisPage object
+     */
+    public AnalysisPage applyCompareType(CompareType compareType) {
+        this.getFilterBuckets()
+            .getDateFilter()
+            .click();
+
+        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
+                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+        panel.selectCompareType(compareType.getCompareTypeName());
+        panel.apply();
+
+        this.waitForReportComputing();
+
+        return this;
+    }
+
+    /**
+     * check whether comparison type is enabled
+     * @param compareType compare type to check whether it is enabled
+     * @return true whether it is enabled
+     */
+    public boolean isCompareTypeEnabled(final CompareType compareType) {
+        this.getFilterBuckets()
+                .getDateFilter()
+                .click();
+
+        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
+                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+        return panel.getCompareTypeDropdown().isCompareTypeEnabled(compareType);
     }
 
     private AttributeFilterPickerPanel openFilterPanel(String filter) {

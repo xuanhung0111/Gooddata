@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import com.gooddata.qa.graphene.enums.indigo.CompareType;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
@@ -17,7 +17,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-public class GoodSalesOvertimeComparisonTest extends AbstractAnalyseTest {
+public class GoodSalesOvertimeComparisonTest extends AbstractAnalyseTest { //TODO 1051 rename class
 
     private static final String WEEK_GRANULARITY = "Week (Sun-Sat)";
     private static final String MONTH_GRANULARITY = "Month";
@@ -39,16 +39,14 @@ public class GoodSalesOvertimeComparisonTest extends AbstractAnalyseTest {
         metricsBucket.getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES).expandConfiguration();
         Screenshots.takeScreenshot(browser, "applyWeekGranularityToHidePopComparison-apply-week-granularity", getClass());
 
-        assertFalse(analysisPage.getFilterBuckets().openDateFilterPickerPanel().isCompareTypeEnabled(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR),
-                "same period last year comparison should be disabled");
+        assertFalse(analysisPage.isCompareTypeEnabled(CompareType.SAME_PERIOD_LAST_YEAR), "same period last year comparison should be disabled");
 
         attributeBucket.changeGranularity(MONTH_GRANULARITY);
 
         analysisPage.waitForReportComputing();
         Screenshots.takeScreenshot(browser, "applyWeekGranularityToHidePopComparison-apply-month-granularity", getClass());
 
-        assertTrue(analysisPage.getFilterBuckets().openDateFilterPickerPanel().isCompareTypeEnabled(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR),
-                "same period comparison state is not enabled after removing week granularity");
+        assertTrue(analysisPage.isCompareTypeEnabled(CompareType.SAME_PERIOD_LAST_YEAR), "same period comparison state is not enabled after removing week granularity");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -82,21 +80,12 @@ public class GoodSalesOvertimeComparisonTest extends AbstractAnalyseTest {
     public void enableSamePeriodComparisonToHideWeekGranularity() {
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().waitForReportComputing();
 
-        analysisPage.getFilterBuckets()
-                .openDateFilterPickerPanel()
-                .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
-
-        analysisPage.waitForReportComputing();
+        analysisPage.applyCompareType(CompareType.SAME_PERIOD_LAST_YEAR);
 
         assertFalse(analysisPage.waitForReportComputing().getAttributesBucket().getAllGranularities()
                 .stream().anyMatch(WEEK_GRANULARITY::equals), "week granularity is not hidden");
 
-        analysisPage.getFilterBuckets()
-                .openDateFilterPickerPanel()
-                .applyCompareType(CompareTypeDropdown.CompareType.NOTHING);
-
-        analysisPage.waitForReportComputing();
-
+        analysisPage.applyCompareType(CompareType.NOTHING);
         assertTrue(analysisPage.waitForReportComputing().getAttributesBucket().getAllGranularities()
                 .stream().anyMatch(WEEK_GRANULARITY::equals), "week granularity is not displayed");
     }

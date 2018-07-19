@@ -17,8 +17,8 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 
+import com.gooddata.qa.graphene.enums.indigo.CompareType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.rolap.RolapRestRequest;
@@ -134,11 +134,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
                 .waitForReportComputing()
                 .getChartReport();
 
-        analysisPage.getFilterBuckets()
-                .openDateFilterPickerPanel()
-                .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
-
-        analysisPage.waitForReportComputing();
+        analysisPage.applyCompareType(CompareType.SAME_PERIOD_LAST_YEAR);
 
         analysisPage.getMetricsBucket()
                 .getMetricConfiguration("Sum of " + NUMBER)

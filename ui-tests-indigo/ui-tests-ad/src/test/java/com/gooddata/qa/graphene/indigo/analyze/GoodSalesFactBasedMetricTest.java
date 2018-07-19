@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
+import com.gooddata.qa.graphene.enums.indigo.CompareType;
 import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -145,13 +145,7 @@ public class GoodSalesFactBasedMetricTest extends AbstractAnalyseTest {
         initAnalysePage().addDate()
             .addMetric(FACT_ACTIVITY_DATE, FieldType.FACT);
 
-        if (samePeriodComparison) {
-            analysisPage.getFilterBuckets()
-                    .openDateFilterPickerPanel()
-                    .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
-
-            analysisPage.waitForReportComputing();
-        }
+        if (samePeriodComparison) analysisPage.applyCompareType(CompareType.SAME_PERIOD_LAST_YEAR);
 
         MetricConfiguration configuration = expandMetricConfiguration(SUM_OF_ACTIVITY_DATE);
 
@@ -175,13 +169,7 @@ public class GoodSalesFactBasedMetricTest extends AbstractAnalyseTest {
             .addMetric(FACT_ACTIVITY_DATE, FieldType.FACT);
 
 
-        if (samePeriodComparison) {
-            analysisPage.getFilterBuckets()
-                    .openDateFilterPickerPanel()
-                    .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
-
-            analysisPage.waitForReportComputing();
-        }
+        if (samePeriodComparison) analysisPage.applyCompareType(CompareType.SAME_PERIOD_LAST_YEAR);
 
         configuration = expandMetricConfiguration(SUM_OF_ACTIVITY_DATE);
 

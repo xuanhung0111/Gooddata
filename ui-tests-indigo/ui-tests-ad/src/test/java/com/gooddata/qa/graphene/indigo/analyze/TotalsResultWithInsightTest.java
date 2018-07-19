@@ -7,9 +7,9 @@ import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket.Type;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
+import com.gooddata.qa.graphene.enums.indigo.CompareType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport.AggregationItem;
@@ -100,13 +100,7 @@ public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
 
         analysisPage.openInsight(INSIGHT_SHOW_SAME_PERIOD_COMPARISON);
         analysisPage.addDateFilter();
-
-        analysisPage.getFilterBuckets()
-                .openDateFilterPickerPanel()
-                .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
-        
-        analysisPage.waitForReportComputing();
-
+        analysisPage.applyCompareType(CompareType.SAME_PERIOD_LAST_YEAR);
         analysisPage.saveInsight();
     }
 

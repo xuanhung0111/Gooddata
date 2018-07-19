@@ -2,8 +2,8 @@ package com.gooddata.qa.graphene.indigo.analyze;
 
 import com.gooddata.md.Fact;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
+import com.gooddata.qa.graphene.enums.indigo.CompareType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport.AggregationItem;
@@ -286,8 +286,7 @@ public class AggregationPopupManipulationTest extends AbstractAnalyseTest {
             analysisPage.changeReportType(ReportType.TABLE);
             analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().waitForReportComputing();
 
-            analysisPage.getFilterBuckets().openDateFilterPickerPanel().applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
-            analysisPage.waitForReportComputing();
+            analysisPage.applyCompareType(CompareType.SAME_PERIOD_LAST_YEAR);
 
             TableReport tableReport = analysisPage.getTableReport();
             tableReport.hoverOnColumn(METRIC_NUMBER_OF_ACTIVITIES);
@@ -311,8 +310,7 @@ public class AggregationPopupManipulationTest extends AbstractAnalyseTest {
                     .getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011")
                     .getRoot().click();
 
-            analysisPage.getFilterBuckets().openDateFilterPickerPanel().applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
-            analysisPage.waitForReportComputing();
+            analysisPage.applyCompareType(CompareType.SAME_PERIOD_LAST_YEAR);
 
             TableReport tableReport = analysisPage.getTableReport();
             tableReport.hoverOnColumn(METRIC_NUMBER_OF_ACTIVITIES);

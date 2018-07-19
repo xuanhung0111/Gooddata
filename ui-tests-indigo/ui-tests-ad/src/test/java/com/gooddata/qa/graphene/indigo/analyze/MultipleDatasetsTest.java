@@ -68,9 +68,7 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void analyzeReportOnProductionData() {
-        initAnalysePage().getCataloguePanel().changeDataset(PRODUCTION_DATASET);
-
-        ChartReport report = analysisPage.addMetric("Close Price", FieldType.FACT)
+        ChartReport report = initAnalysePage().addMetric("Close Price", FieldType.FACT)
                 .addDate()
                 .addStack("Industry")
                 .waitForReportComputing()

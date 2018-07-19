@@ -5,14 +5,13 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP_YEAR_AGO;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -33,6 +32,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
 public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
 
+    private static final String SP_YEAR_AGO = " - SP year ago";
 
     @Override
     public void initProperties() {
@@ -72,7 +72,7 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
         assertTrue(report.getTrackersCount() >= 1);
         List<String> legends = report.getLegends();
         assertEquals(legends.size(), 2);
-        assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
+        assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES + SP_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
         checkingOpenAsReport("testOverrideDateFilter");
     }
 
@@ -116,14 +116,14 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
         assertTrue(report.getTrackersCount() >= 1);
         List<String> legends = report.getLegends();
         assertEquals(legends.size(), 2);
-        assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
+        assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES + SP_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
 
         analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing();
         assertEquals(parseFilterText(filtersBucketReact.getFilterText(ATTR_DEPARTMENT)), Arrays.asList(ATTR_DEPARTMENT, "All"));
         assertTrue(report.getTrackersCount() >= 1);
         legends = report.getLegends();
         assertEquals(legends.size(), 2);
-        assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
+        assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES + SP_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
         checkingOpenAsReport("testComparisonAndAttribute");
     }
 
@@ -148,16 +148,16 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
         assertTrue(report.getTrackersCount() >= 1);
         List<String> legends = report.getLegends();
         assertEquals(legends.size(), 2);
-        assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
+        assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES + SP_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
 
         analysisPage.addMetric(METRIC_SNAPSHOT_BOP).waitForReportComputing();
         assertTrue(report.getTrackersCount() >= 1);
         legends = report.getLegends();
         assertEquals(legends.size(), 4);
         assertEquals(legends, asList(
-                METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO,
+                METRIC_NUMBER_OF_ACTIVITIES + SP_YEAR_AGO,
                 METRIC_NUMBER_OF_ACTIVITIES,
-                METRIC_SNAPSHOT_BOP_YEAR_AGO,
+                METRIC_SNAPSHOT_BOP + SP_YEAR_AGO,
                 METRIC_SNAPSHOT_BOP
         ));
         checkingOpenAsReport("testSimpleSamePeriodComparison");

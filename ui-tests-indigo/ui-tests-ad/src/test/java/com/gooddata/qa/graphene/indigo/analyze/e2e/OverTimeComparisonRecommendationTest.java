@@ -6,7 +6,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP_YEAR_AGO;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -18,12 +17,15 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.TrendingRecommendation;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
 public class OverTimeComparisonRecommendationTest extends AbstractAdE2ETest {
+
+    private static final String SP_YEAR_AGO = " - SP year ago";
 
     @Override
     public void initProperties() {
@@ -88,7 +90,7 @@ public class OverTimeComparisonRecommendationTest extends AbstractAdE2ETest {
 
         analysisPage.waitForReportComputing();
         assertThat(waitForElementVisible(cssSelector(LEGEND_ITEM_NAME), browser).getText(),
-                containsString(METRIC_SNAPSHOT_BOP_YEAR_AGO));
+                containsString(METRIC_SNAPSHOT_BOP + SP_YEAR_AGO));
 
         assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-with-period"), browser));
     }
