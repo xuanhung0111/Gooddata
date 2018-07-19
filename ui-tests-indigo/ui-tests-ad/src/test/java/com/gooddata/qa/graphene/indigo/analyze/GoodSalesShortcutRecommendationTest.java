@@ -8,6 +8,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -56,6 +57,8 @@ public class GoodSalesShortcutRecommendationTest extends AbstractAnalyseTest {
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
+
+        waitForElementVisible(className("s-recommendation-comparison"), browser);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
         analysisPage.changeReportType(ReportType.BAR_CHART).waitForReportComputing();
@@ -95,6 +98,7 @@ public class GoodSalesShortcutRecommendationTest extends AbstractAnalyseTest {
         Supplier<WebElement> trendRecommendation = () ->
             waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
 
+        // TODO: Flaky test: Missing drag waiting as before showing Trend Recommendation there is loading recommendation
         analysisPage.drag(metric, trendRecommendation)
             .waitForReportComputing();
 
