@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.fixture.ResourceManagement.ResourceTemplate.SINGLE_INVOICE;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.SP_YEAR_AGO;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -19,7 +18,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import com.gooddata.qa.graphene.enums.DateRange;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import com.gooddata.qa.utils.http.RestClient;
 import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.Test;
@@ -38,11 +36,10 @@ import com.google.common.collect.Iterables;
 
 public class DateFilterTest extends AbstractAnalyseTest {
 
-    private static final String DATE_INVOICE = "templ:DateInvoice";
-    private static final String METRIC_NUMBER_OF_PERSONS = "# Of attr:Persons";
-    private static final String METRIC_NUMBER_OF_PERSONS_YEAR_AGO = METRIC_NUMBER_OF_PERSONS + SP_YEAR_AGO;
-    private static final String ATTR_PERSON = "attr:Person";
-    private static final String ATTR_INVOICE_ITEM = "attr:Invoice Item";
+    public static final String DATE_INVOICE = "templ:DateInvoice";
+    public static final String METRIC_NUMBER_OF_PERSONS = "# Of attr:Persons";
+    public static final String ATTR_PERSON = "attr:Person";
+    public static final String ATTR_INVOICE_ITEM = "attr:Invoice Item";
 
     @Override
     public void initProperties() {
@@ -153,18 +150,18 @@ public class DateFilterTest extends AbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void applySamePeriodComparisonAfterConfigDate() {
+    public void popAfterConfigDate() {
         initAnalysePage().addMetric(METRIC_NUMBER_OF_PERSONS)
                 .addDate()
                 .getFilterBuckets()
                 .configDateFilter(DateRange.LAST_90_DAYS.toString());
 
-        analysisPage.getFilterBuckets()
-                .openDateFilterPickerPanel()
-                .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
+        analysisPage.getMetricsBucket()
+                .getMetricConfiguration(METRIC_NUMBER_OF_PERSONS)
+                .expandConfiguration()
+                .showPop();
 
         analysisPage.waitForReportComputing();
-
         if (analysisPage.isExplorerMessageVisible()) {
             log.info("Visual cannot be rendered! Message: " + analysisPage.getExplorerMessage());
             return;
@@ -173,8 +170,8 @@ public class DateFilterTest extends AbstractAnalyseTest {
         ChartReport report = analysisPage.getChartReport();
 
         assertTrue(isEqualCollection(report.getLegends(),
-                asList(METRIC_NUMBER_OF_PERSONS_YEAR_AGO, METRIC_NUMBER_OF_PERSONS)));
-        checkingOpenAsReport("applySamePeriodComparisonAfterConfigDate");
+                asList(METRIC_NUMBER_OF_PERSONS + " - previous year", METRIC_NUMBER_OF_PERSONS)));
+        checkingOpenAsReport("popAfterConfigDate");
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "CL-9807: Problems with export of date filters")
@@ -203,7 +200,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
                     + " After this CL-10156, the metric and attribute combination is changed "
                     + "into # of Persons and attr:Person")
     public void keepDateRelationAfterAddingPercent() {
-
+        final List<String> expectedDateFilterTexts = Arrays.asList("templ:DateInvoice", "This quarter");
         initAnalysePage().addMetric(METRIC_NUMBER_OF_PERSONS, FieldType.METRIC).addAttribute(ATTR_PERSON)
                 .waitForReportComputing();
 
@@ -212,11 +209,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         recommendationContainer.getRecommendation(RecommendationStep.COMPARE).apply();
         analysisPage.waitForReportComputing();
-
-        final List<String> dateFilterTexts = parseFilterText(analysisPage.getFilterBuckets().getDateFilterText());
-        final List<String> expectedDateFilterTexts = Arrays.asList(
-                "templ:DateInvoice\n:\nThis quarter; Compare (all) to", "Same period (SP) last year");
-        assertEquals(dateFilterTexts, expectedDateFilterTexts,
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getDateFilterText()), expectedDateFilterTexts,
                 "Date was not displayed after applying compare recommendation");
 
         recommendationContainer.getRecommendation(RecommendationStep.SEE_PERCENTS).apply();

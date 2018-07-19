@@ -80,6 +80,7 @@ public class GoodSalesTrendingRecommendationTest extends AbstractAnalyseTest {
         assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
         assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText("Activity")), Arrays.asList("Activity", "Last 4 quarters"));
         assertTrue(metricConfiguration.isShowPercentEnabled());
+        assertTrue(metricConfiguration.isPopEnabled());
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
         assertTrue(report.getTrackersCount() >= 1);
