@@ -80,20 +80,17 @@ public class GoodSalesDropAttributeTest extends AbstractAnalyseTest {
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
         assertFalse(metricConfiguration.isShowPercentEnabled());
-        assertFalse(metricConfiguration.isPopEnabled());
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
 
         analysisPage.resetToBlankState();
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
         metricConfiguration.expandConfiguration();
         assertFalse(metricConfiguration.isShowPercentEnabled());
-        assertFalse(metricConfiguration.isPopEnabled());
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() > 0);
 
         analysisPage.addStack(ATTR_DEPARTMENT);
         analysisPage.waitForReportComputing();
         assertFalse(metricConfiguration.isShowPercentEnabled());
-        assertFalse(metricConfiguration.isPopEnabled());
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() > 0);
         checkingOpenAsReport("recommendNextStep");
     }

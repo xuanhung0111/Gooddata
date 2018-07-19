@@ -5,6 +5,9 @@ public final class GoodSalesUtils {
     private GoodSalesUtils() {
     }
 
+    // Same period year ago suffix
+    public static final String SP_YEAR_AGO = " - SP year ago";
+
     //@TODO GOODSALES TEMPLATE, will removed when QA-6396 completes
     public static final String GOODSALES_TEMPLATE = "/projectTemplates/GoodSalesDemo/2";
 
@@ -39,6 +42,7 @@ public final class GoodSalesUtils {
     public static final String METRIC_PERCENT_OF_GOAL = "% of Goal";
     public static final String METRIC_QUOTA = "Quota";
     public static final String METRIC_AMOUNT = "Amount";
+    public static final String METRIC_SUM_OF_AMOUNT = "Sum of Amount";
     public static final String METRIC_LOST = "Lost";
     public static final String METRIC_PROBABILITY = "Probability";
     public static final String METRIC_PROBABILITY_BOP = "Probability [BOP]";
@@ -59,6 +63,9 @@ public final class GoodSalesUtils {
     public static final String METRIC_EXPECTED_WON_VS_QUOTA = "Expected + Won vs. Quota";
     public static final String METRIC_AMOUNT_BOP = "Amount [BOP]";
     public static final String METRIC_CLOSE_EOP = "_Close [EOP]";
+    public static final String METRIC_SNAPSHOT_BOP_YEAR_AGO = METRIC_SNAPSHOT_BOP + SP_YEAR_AGO;
+    public static final String METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO = METRIC_NUMBER_OF_ACTIVITIES + SP_YEAR_AGO;
+    public static final String METRIC_SUM_OF_AMOUNT_YEAR_AGO = METRIC_SUM_OF_AMOUNT + SP_YEAR_AGO;
 
     // private metrics
     public static final String METRIC_NUMBER_OF_OPPS_WON_IN_PERIOD = "# Opps. [won] in Period";

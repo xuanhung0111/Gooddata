@@ -45,12 +45,10 @@ public class UndoTest extends AbstractAdE2ETest {
         analysisPage.addDate();
 
         // 3rd version
-        configuration.showPop();
+        configuration.showPercents();
 
         // 4th version -- switch category and turn off pop
         analysisPage.replaceAttribute(DATE, ATTR_ACTIVITY_TYPE);
-
-        assertFalse(configuration.isPopSelected());
 
         IntStream.rangeClosed(0, 3).forEach(i -> analysisPage.undo());
     }

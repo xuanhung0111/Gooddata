@@ -25,7 +25,7 @@ import com.gooddata.qa.graphene.indigo.analyze.GoodSalesMetricBucketTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesMetricFilterTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesMetricVisibilityTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesNotRenderedInsightTest;
-import com.gooddata.qa.graphene.indigo.analyze.GoodSalesPopComparisonTest;
+import com.gooddata.qa.graphene.indigo.analyze.GoodSalesOvertimeComparisonTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesProjectNavigationTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesRelatedAndUnrelatedDateDimensionsTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesSaveInsightTest;
@@ -114,7 +114,7 @@ public class UITestsRegistry {
             GoodSalesSaveInsightTest.class,
             GoodSalesMetricVisibilityTest.class,
             GoodSalesProjectNavigationTest.class,
-            GoodSalesPopComparisonTest.class,
+            GoodSalesOvertimeComparisonTest.class,
             AggregationResultTest.class,
             TotalsResultWithInsightTest.class,
             AggregationPopupManipulationTest.class,

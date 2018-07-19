@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport.AggregationItem;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
@@ -14,6 +14,7 @@ import java.text.ParseException;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_CLOSE_EOP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_TIMELINE_EOP;
 import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
@@ -78,7 +79,7 @@ public class AggregationResultTest extends AbstractAnalyseTest {
                 .addDate()
                 .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing();
-        checkTableTotalWithPOP("73,073");
+        checkTableTotalWithSamePeriodComparison("73,073");
     }
 
     @Test(dependsOnGroups = "createProject")
@@ -89,7 +90,7 @@ public class AggregationResultTest extends AbstractAnalyseTest {
                 .addAttribute(ATTR_DEPARTMENT)
                 .addDateFilter().getFilterBuckets().configDateFilter("01/01/2015", "12/31/2015");
         analysisPage.waitForReportComputing();
-        checkTableTotalWithPOP("3");
+        checkTableTotalWithSamePeriodComparison("3");
     }
 
     @Test(dependsOnGroups = "createProject")
@@ -204,18 +205,26 @@ public class AggregationResultTest extends AbstractAnalyseTest {
         assertTrue(tableReport.hasTotalsResult(), "The hidden total rows should be restored");
     }
 
-    private void checkTableTotalWithPOP(String cellValue) {
+    private void checkTableTotalWithSamePeriodComparison(String cellValue) {
         TableReport tableReport = analysisPage.getTableReport();
         tableReport.addNewTotals(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES);
-        MetricConfiguration metricConfiguration =
-                analysisPage.getMetricsBucket().getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES).expandConfiguration().showPop();
-        assertTrue(tableReport.getTotalsElement(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES + " - previous year").isDisplayed(),
+
+        analysisPage.getFilterBuckets()
+                .openDateFilterPickerPanel()
+                .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
+
+        analysisPage.waitForReportComputing();
+
+        assertTrue(tableReport.getTotalsElement(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO).isDisplayed(),
                 format("Total cell of metric %s should be displayed", METRIC_NUMBER_OF_ACTIVITIES));
 
-        tableReport.deleteTotalsResultCell(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES + " - previous year");
-        metricConfiguration.hidePop();
-        assertFalse(tableReport.getHeaders().contains(METRIC_NUMBER_OF_ACTIVITIES + " - previous year"),
-                format("Metric %s should be hidden", METRIC_NUMBER_OF_ACTIVITIES + " - previous year"));
+        tableReport.deleteTotalsResultCell(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO);
+
+        analysisPage.getFilterBuckets().openDateFilterPickerPanel().applyCompareType(CompareTypeDropdown.CompareType.NOTHING);
+        analysisPage.waitForReportComputing();
+
+        assertFalse(tableReport.getHeaders().contains(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO),
+                format("Metric %s should be hidden", METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO));
         assertEquals(tableReport.getTotalsValue(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES), cellValue);
     }
 }
