@@ -27,4 +27,10 @@ public class DatePresetsSelect extends AbstractReactDropDown {
     protected String getListItemsCssSelector() {
         return ".gd-list-item:not([class*='item-header'])";
     }
+    
+    @Override
+    protected WebElement getElementByName(final String name) {
+        String selector = ".s-" + simplifyText(name);
+        return getElement(selector);
+    }
 }

@@ -7,17 +7,16 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_QUOTA;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SUM_OF_AMOUNT;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.util.Arrays;
+
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
-import com.gooddata.qa.graphene.enums.indigo.CompareType;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
@@ -26,8 +25,6 @@ import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
 public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
-
-    private static final String SP_YEAR_AGO = " - SP year ago";
 
     @Override
     public void initProperties() {
@@ -55,11 +52,13 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
         MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
+        assertTrue(metricConfiguration.isPopEnabled());
         assertTrue(metricConfiguration.isShowPercentEnabled());
 
         analysisPage.addMetric(METRIC_QUOTA).waitForReportComputing();
         sleepTight(3000);
         assertTrue(report.getTrackersCount() >= 1);
+        assertFalse(metricConfiguration.isPopEnabled());
         assertFalse(metricConfiguration.isShowPercentEnabled());
         assertEquals(report.getLegends(), asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_QUOTA));
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_QUOTA));
@@ -106,38 +105,29 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void showInPercentAndCompare() {
+    public void showInPercentAndPop() {
         MetricConfiguration metricConfiguration = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate()
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
 
+        assertTrue(metricConfiguration.isPopEnabled());
         assertTrue(metricConfiguration.isShowPercentEnabled());
 
-        metricConfiguration.showPercents();
-        analysisPage.applyCompareType(CompareType.SAME_PERIOD_LAST_YEAR);
+        metricConfiguration.showPercents().showPop();
         analysisPage.getAttributesBucket().changeDateDimension("Created");
         analysisPage.waitForReportComputing()
             .addMetric(METRIC_AMOUNT, FieldType.FACT);
 
-        assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(
-                METRIC_NUMBER_OF_ACTIVITIES + SP_YEAR_AGO,
-                METRIC_NUMBER_OF_ACTIVITIES,
-                METRIC_SUM_OF_AMOUNT + SP_YEAR_AGO,
-                METRIC_SUM_OF_AMOUNT
-        ));
-
-        metricConfiguration = analysisPage.getMetricsBucket().getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES);
+        assertFalse(metricConfiguration.isPopEnabled());
         assertFalse(metricConfiguration.isShowPercentEnabled());
 
         analysisPage.undo();
         metricConfiguration.expandConfiguration();
-        assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(
-                "% " + METRIC_NUMBER_OF_ACTIVITIES + SP_YEAR_AGO,
-                "% " + METRIC_NUMBER_OF_ACTIVITIES));
-
+        assertTrue(metricConfiguration.isPopEnabled());
         assertTrue(metricConfiguration.isShowPercentEnabled());
+        assertTrue(metricConfiguration.isPopSelected());
         assertTrue(metricConfiguration.isShowPercentSelected());
 
         metricConfiguration = analysisPage
@@ -146,9 +136,9 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
                 .getMetricsBucket()
                 .getMetricConfiguration(METRIC_AMOUNT)
                 .expandConfiguration();
-
-        assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_AMOUNT));
+        assertTrue(metricConfiguration.isPopEnabled());
         assertTrue(metricConfiguration.isShowPercentEnabled());
+        assertFalse(metricConfiguration.isPopSelected());
         assertFalse(metricConfiguration.isShowPercentSelected());
 
         metricConfiguration.collapseConfiguration();
@@ -158,11 +148,11 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
-
-        assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_NUMBER_OF_ACTIVITIES));
+        assertTrue(metricConfiguration.isPopEnabled());
         assertTrue(metricConfiguration.isShowPercentEnabled());
+        assertFalse(metricConfiguration.isPopSelected());
         assertFalse(metricConfiguration.isShowPercentSelected());
-        checkingOpenAsReport("showInPercentAndCompare");
+        checkingOpenAsReport("showInPercentAndPop");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -184,22 +174,23 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void compareIsStillActiveWhenReplaceAttribute() {
-        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
-            .addDate();
+    public void uncheckSelectedPopWhenReplaceAttribute() {
+        MetricConfiguration metricConfiguration = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .addDate()
+            .getMetricsBucket()
+            .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
+            .expandConfiguration();
         assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
+        assertTrue(metricConfiguration.isPopEnabled());
 
-        analysisPage.applyCompareType(CompareType.SAME_PERIOD_LAST_YEAR);
-        assertEquals(analysisPage.getMetricsBucket().getItemNames(),
-                asList(METRIC_NUMBER_OF_ACTIVITIES + SP_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
-
+        metricConfiguration.showPop();
         assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
 
         analysisPage.replaceAttribute(DATE, ATTR_ACTIVITY_TYPE);
         assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
-        assertEquals(analysisPage.getMetricsBucket().getItemNames(),
-                asList(METRIC_NUMBER_OF_ACTIVITIES + SP_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
-        assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_ACTIVITY_TYPE));
-        checkingOpenAsReport("compareIsStillActiveWhenReplaceAttribute");
+        assertFalse(metricConfiguration.isPopEnabled());
+        assertFalse(metricConfiguration.isPopSelected());
+        assertEquals(analysisPage.getAttributesBucket().getItemNames(), Arrays.asList(ATTR_ACTIVITY_TYPE));
+        checkingOpenAsReport("uncheckSelectedPopWhenReplaceAttribute");
     }
 }

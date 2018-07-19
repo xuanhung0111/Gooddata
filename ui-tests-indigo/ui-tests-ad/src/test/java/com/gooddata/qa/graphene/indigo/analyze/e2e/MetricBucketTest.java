@@ -112,6 +112,42 @@ public class MetricBucketTest extends AbstractAdE2ETest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
+    public void should_disable_show_PoP_correctly() {
+        MetricConfiguration configuration = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .getMetricsBucket()
+            .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
+            .expandConfiguration();
+        assertFalse(configuration.isPopEnabled());
+
+        analysisPage.addDate();
+        assertTrue(configuration.isPopEnabled());
+
+        assertFalse(analysisPage.addMetric(METRIC_QUOTA)
+            .getMetricsBucket()
+            .getMetricConfiguration(METRIC_QUOTA)
+            .expandConfiguration()
+            .isPopEnabled());
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void should_remove_PoP_after_second_metric_is_added() {
+        initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
+            .addDate()
+            .getMetricsBucket()
+            .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
+            .expandConfiguration()
+            .showPop();
+        assertEquals(analysisPage.waitForReportComputing()
+            .getChartReport()
+            .getLegends(), asList(METRIC_NUMBER_OF_ACTIVITIES + " - previous year", METRIC_NUMBER_OF_ACTIVITIES));
+
+        assertEquals(analysisPage.addMetric(METRIC_QUOTA)
+            .waitForReportComputing()
+            .getChartReport()
+            .getLegends(), asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_QUOTA));
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
     public void should_remove_percent_if_2_metric_is_added() {
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addAttribute(ATTR_ACTIVITY_TYPE)

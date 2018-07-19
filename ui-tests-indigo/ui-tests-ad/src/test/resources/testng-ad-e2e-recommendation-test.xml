@@ -14,9 +14,9 @@
         </classes>
     </test>
 
-    <test name="over-time-comparison-recommendation" enabled="true">
+    <test name="pop-recommendation" enabled="true">
         <classes>
-            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.OverTimeComparisonRecommendationTest" />
+            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.PopRecommendationTest" />
         </classes>
     </test>
 

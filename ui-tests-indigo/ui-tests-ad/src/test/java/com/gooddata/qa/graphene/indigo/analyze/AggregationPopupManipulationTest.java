@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.indigo.analyze;
 
 import com.gooddata.md.Fact;
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
-import com.gooddata.qa.graphene.enums.indigo.CompareType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
@@ -285,9 +284,11 @@ public class AggregationPopupManipulationTest extends AbstractAnalyseTest {
         try {
             analysisPage.changeReportType(ReportType.TABLE);
             analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().waitForReportComputing();
-
-            analysisPage.applyCompareType(CompareType.SAME_PERIOD_LAST_YEAR);
-
+            analysisPage.getMetricsBucket()
+                    .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
+                    .expandConfiguration()
+                    .showPop();
+            analysisPage.waitForReportComputing();
             TableReport tableReport = analysisPage.getTableReport();
             tableReport.hoverOnColumn(METRIC_NUMBER_OF_ACTIVITIES);
             assertTrue(tableReport.isTotalsElementShowed(METRIC_NUMBER_OF_ACTIVITIES),
@@ -309,9 +310,12 @@ public class AggregationPopupManipulationTest extends AbstractAnalyseTest {
             analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDateFilter()
                     .getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011")
                     .getRoot().click();
+            analysisPage.getMetricsBucket()
+                    .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
+                    .expandConfiguration()
+                    .showPop();
 
-            analysisPage.applyCompareType(CompareType.SAME_PERIOD_LAST_YEAR);
-
+            analysisPage.waitForReportComputing();
             TableReport tableReport = analysisPage.getTableReport();
             tableReport.hoverOnColumn(METRIC_NUMBER_OF_ACTIVITIES);
             assertFalse(tableReport.isTotalsElementShowed(METRIC_NUMBER_OF_ACTIVITIES),

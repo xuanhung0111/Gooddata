@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import com.gooddata.qa.graphene.enums.indigo.CompareType;
 import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -89,7 +88,7 @@ public class GoodSalesFactBasedMetricTest extends AbstractAnalyseTest {
         aggregations.put("Average", "Avg ");
         aggregations.put("Running sum", "Runsum of ");
         aggregations.put("Median", "Median ");
-        String metricFromAmountTitle;
+        String metricFromAmountTitle = SUM_OF_ACTIVITY_DATE;
 
         for (Map.Entry<String, String> entry: aggregations.entrySet()) {
             metricConfiguration.changeAggregation(entry.getKey());
@@ -113,6 +112,7 @@ public class GoodSalesFactBasedMetricTest extends AbstractAnalyseTest {
         analysisPage.waitForReportComputing();
         assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
 
+        metricConfiguration.showPop();
         analysisPage.waitForReportComputing();
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
         checkingOpenAsReport("testMetricAggregations");
@@ -140,24 +140,21 @@ public class GoodSalesFactBasedMetricTest extends AbstractAnalyseTest {
     }
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "factMetricCombination")
-    public void shouldNotCreateDuplicateMetricFromFact(boolean samePeriodComparison, boolean percent) {
+    public void shouldNotCreateDuplicateMetricFromFact(boolean pop, boolean percent) {
+        MetricConfiguration configuration = initAnalysePage().addDate()
+            .addMetric(FACT_ACTIVITY_DATE, FieldType.FACT)
+            .getMetricsBucket()
+            .getMetricConfiguration("Sum of " + FACT_ACTIVITY_DATE)
+            .expandConfiguration();
 
-        initAnalysePage().addDate()
-            .addMetric(FACT_ACTIVITY_DATE, FieldType.FACT);
-
-        if (samePeriodComparison) analysisPage.applyCompareType(CompareType.SAME_PERIOD_LAST_YEAR);
-
-        MetricConfiguration configuration = expandMetricConfiguration(SUM_OF_ACTIVITY_DATE);
-
-        if (percent) {
-            configuration.showPercents();
-        }
+        if (pop) configuration.showPop();
+        if (percent) configuration.showPercents();
 
         // css class of metric from fact will be somehow like this:
         // class="s-bucket-item s-id-dt_activity_activity_generated_sum_9b39e371f6bc8e93b15843c6794f6968 ..."
         // and identifier will be dt_activity_activity_generated_sum_9b39e371f6bc8e93b15843c6794f6968
         final String identifier = Stream.of(analysisPage.getMetricsBucket()
-            .get((percent ? "% " : "") + SUM_OF_ACTIVITY_DATE)
+            .get((percent ? "% " : "") + "Sum of " + FACT_ACTIVITY_DATE)
             .getAttribute("class")
             .split(" "))
             .filter(e -> e.startsWith("s-id-"))
@@ -165,22 +162,21 @@ public class GoodSalesFactBasedMetricTest extends AbstractAnalyseTest {
             .get()
             .split("-")[2];
 
-        analysisPage.removeMetric((percent ? "% " : "") + SUM_OF_ACTIVITY_DATE)
-            .addMetric(FACT_ACTIVITY_DATE, FieldType.FACT);
+        configuration = analysisPage.removeMetric((percent ? "% " : "") + "Sum of " + FACT_ACTIVITY_DATE)
+            .addMetric(FACT_ACTIVITY_DATE, FieldType.FACT)
+            .getMetricsBucket()
+            .getMetricConfiguration("Sum of " + FACT_ACTIVITY_DATE)
+            .expandConfiguration();
 
-
-        if (samePeriodComparison) analysisPage.applyCompareType(CompareType.SAME_PERIOD_LAST_YEAR);
-
-        configuration = expandMetricConfiguration(SUM_OF_ACTIVITY_DATE);
-
+        if (pop) configuration.showPop();
         if (percent) configuration.showPercents();
 
         assertTrue(analysisPage.getMetricsBucket()
-            .get((percent ? "% " : "") + SUM_OF_ACTIVITY_DATE)
+            .get((percent ? "% " : "") + "Sum of " + FACT_ACTIVITY_DATE)
             .getAttribute("class")
             .contains(identifier));
 
-        if (!samePeriodComparison && !percent) {
+        if (!pop && !percent) {
             analysisPage.addMetric(FACT_ACTIVITY_DATE, FieldType.FACT);
             assertEquals(browser.findElements(className("s-id-" + identifier)).size(), 2);
         }
@@ -213,9 +209,5 @@ public class GoodSalesFactBasedMetricTest extends AbstractAnalyseTest {
         assertTrue(amountConfiguration.isConfigurationCollapsed());
         assertFalse(durationConfiguration.isConfigurationCollapsed());
         checkingOpenAsReport("testMetricFromFact");
-    }
-
-    private MetricConfiguration expandMetricConfiguration(String metricId) {
-        return analysisPage.getMetricsBucket().getMetricConfiguration(metricId).expandConfiguration();
     }
 }

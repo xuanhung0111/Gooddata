@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.DatePresetsSelect;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -52,11 +51,6 @@ public class DateFilterPickerPanel extends AbstractFragment {
     public void select(final String period) {
         getDatePresetSelect().selectByName(period);
         getDatePresetSelect().ensureDropdownClosed();
-    }
-
-    public void selectCompareType(final String compareType) {
-        getCompareTypeDropdown().selectByName(compareType);
-        getCompareTypeDropdown().ensureDropdownClosed();
     }
 
     public List<String> getPeriods() {
@@ -125,11 +119,6 @@ public class DateFilterPickerPanel extends AbstractFragment {
     public AbstractReactDropDown getDatePresetSelect() {
         return Graphene.createPageFragment(DatePresetsSelect.class,
                 waitForElementVisible(By.className("adi-date-preset-select-dropdown"), browser));
-    }
-
-    public CompareTypeDropdown getCompareTypeDropdown() {
-        return Graphene.createPageFragment(CompareTypeDropdown.class,
-                waitForElementVisible(By.className("adi-compare-apply-select"), browser));
     }
 
     public void apply() {
