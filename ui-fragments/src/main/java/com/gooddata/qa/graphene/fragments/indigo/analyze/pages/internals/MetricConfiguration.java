@@ -48,7 +48,6 @@ public class MetricConfiguration extends AbstractFragment {
 
     private static final By BY_REMOVE_ATTRIBUTE_FILTER = By.className("s-remove-attribute-filter");
     public static final By BY_ATTRIBUTE_FILTER_PICKER = By.className("adi-attr-filter-picker");
-    public static final By BY_SELECT_ALL_CHECKBOX = By.cssSelector(".adi-attr-filter-picker .s-select-all-checkbox");
     private static final By BY_ATTRIBUTE_FILTER_BUTTON = By.className("adi-attr-filter-button");
     private static final By BY_FACT_AGGREGATION = By.className("s-fact-aggregation-switch");
     private static final By BY_BUBBLE_CONTENT = By.className("bubble-content");
@@ -156,8 +155,6 @@ public class MetricConfiguration extends AbstractFragment {
 
     public MetricConfiguration addFilter(String attribute, String... values) {
         clickAddAttributeFilter().selectAttribute(attribute);
-
-        waitForElementVisible(BY_SELECT_ALL_CHECKBOX, browser);
 
         Graphene.createPageFragment(AttributeFilterPicker.class,
                 waitForElementVisible(BY_ATTRIBUTE_FILTER_PICKER, browser))
