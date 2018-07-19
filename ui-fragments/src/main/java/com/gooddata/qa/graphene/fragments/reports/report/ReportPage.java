@@ -42,7 +42,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.lang.String.format;
@@ -342,9 +341,11 @@ public class ReportPage extends AbstractFragment {
 
     public ReportPage saveAsReport(String name) {
         openOptionsMenu().select("Save as...");
+        CreatedReportDialog createdReportDialog = CreatedReportDialog.getInstance(browser);
         if (name != null) {
-            CreatedReportDialog.getInstance(browser).setReportName(name).saveReport();
+            createdReportDialog.setReportName(name);
         }
+        createdReportDialog.saveReport();
         return this;
     }
 
