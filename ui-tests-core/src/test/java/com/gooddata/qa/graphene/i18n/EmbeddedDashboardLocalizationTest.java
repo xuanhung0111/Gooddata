@@ -15,6 +15,7 @@ public class EmbeddedDashboardLocalizationTest extends AbstractEmbeddedModeTest 
     @Test(dependsOnGroups = {"createProject"}, groups = {"precondition"})
     public void initEmbeddedDashboardUri() {
         embeddedUri = initDashboardsPage()
+            .addSampleTextToDashboard()
             .openEmbedDashboardDialog()
             .getPreviewURI()
             .replace("dashboard.html", "embedded.html");
