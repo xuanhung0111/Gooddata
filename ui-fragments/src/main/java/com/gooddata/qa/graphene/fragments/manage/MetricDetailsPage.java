@@ -93,6 +93,9 @@ public class MetricDetailsPage extends ObjectPropertiesPage {
         PermissionSettingDialog permissionSettingDialog = PermissionSettingDialog.getInstance(browser);
         permissionSettingDialog.setEditingPermission(permissionType).save();
         waitForFragmentNotVisible(permissionSettingDialog);
+        if (permissionType == PermissionType.ADMIN) {
+            waitForElementVisible(lockIcon);
+        }
         return this;
     }
 
