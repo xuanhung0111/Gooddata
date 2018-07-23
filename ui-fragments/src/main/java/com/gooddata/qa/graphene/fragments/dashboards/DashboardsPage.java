@@ -264,6 +264,10 @@ public class DashboardsPage extends AbstractFragment {
         return waitForElementVisible(BY_PRINT_PDF_BUTTON, getRoot()).getAttribute("class").contains("disabled");
     }
 
+    public boolean isScheduleButtonDisabled() {
+        return waitForElementVisible(scheduleButton).getAttribute("class").contains("disabled");
+    }
+
     public boolean isSettingExportToPdfButtonVisible() {
         return !waitForElementPresent(SimpleMenu.getInstance(browser).getRoot().findElement(BY_SETTING_EXPORT_TO_PDF))
                 .getAttribute("class").contains("disabledItem");
@@ -681,5 +685,13 @@ public class DashboardsPage extends AbstractFragment {
         SimpleMenu menu = SimpleMenu.getInstance(browser);
         editExportEmbedButton.click();
         waitForFragmentNotVisible(menu);
+    }
+
+    /**
+     * add sample text to current dashboard tab to prevent it empty
+     * @return DashboardsPage
+     */
+    public DashboardsPage addSampleTextToDashboard() {
+        return this.addTextToDashboard(TextObject.HEADLINE, "GoodData", "gooddata.com").saveDashboard();
     }
 }

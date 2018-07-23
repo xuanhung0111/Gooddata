@@ -93,6 +93,7 @@ public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmai
         logout();
         signIn(true, UserRoles.ADMIN); // login with gray pages to reload application and have feature flag set
         initDashboardsPage();
+        dashboardsPage.addSampleTextToDashboard();
         dashboardScheduleDialog = dashboardsPage.showDashboardScheduleDialog();
 
         for (AbstractRecurrenceTestCase testCase : CASES) {

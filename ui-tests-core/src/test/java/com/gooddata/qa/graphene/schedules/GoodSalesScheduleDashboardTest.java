@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.utils.http.CommonRestRequest;
@@ -103,7 +104,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
                 .createDashboard(dashboard.getMdObject());
 
         initDashboardsPage();
-        dashboardsPage.publishDashboard(true);
+        dashboardsPage.addSampleTextToDashboard().publishDashboard(true);
     }
 
     // prepare viewer user and login
@@ -165,6 +166,12 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         logRedBarMessageInfo(browser);
         waitForElementVisible(By.cssSelector("div#status .s-btn-dismiss"), browser).click();
         editBar.cancelDashboard();
+    }
+
+    @Test(dependsOnGroups = {"schedules"})
+    public void disableScheduleOnEmptyDashboardTab() {
+        initDashboardsPage();
+        checkScheduleButtonStatusThroughTabs();
     }
 
     @Test(dependsOnGroups = {"schedules"}, alwaysRun = true)
@@ -231,6 +238,8 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
             // wait for embedded dashboard to be fully loaded before checking
             waitForElementPresent(By.cssSelector(".embedded.s-dashboardLoaded"), this.browser);
             assertTrue(dashboardsPage.isScheduleButtonVisible());
+
+            checkScheduleButtonStatusThroughTabs();
 
             // re-login as admin for successfull project wipe; get to non-embedded to logout first
             initDashboardsPage();
@@ -318,7 +327,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
 
         initDashboardsPage();
         dashboardsPage.addNewDashboard(privateDashboard);
-        dashboardsPage.publishDashboard(false);
+        dashboardsPage.addSampleTextToDashboard().publishDashboard(false);
         createDefaultDashboardSchedule();
 
         try {
@@ -485,5 +494,17 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     private void loginAs(UserRoles userRole) throws JSONException {
         logout();
         signIn(true, userRole); // login with gray pages to reload application and have feature flag set
+    }
+
+    private void checkScheduleButtonStatusThroughTabs() {
+        DashboardTabs tabs = dashboardsPage.getTabs();
+        int size = tabs.getNumberOfTabs();
+
+        assertFalse(dashboardsPage.isScheduleButtonDisabled());
+
+        for (int i = 1; i < size; i++) {
+            tabs.getTab(i).open();
+            assertTrue(dashboardsPage.isScheduleButtonDisabled());
+        }
     }
 }
