@@ -101,6 +101,29 @@ public class GoodSalesDashboardMacroTest extends AbstractEmbeddedModeTest {
     }
 
     @Test(dependsOnGroups = "createProject")
+    public void createMultipleDashboardMacros() throws IOException {
+        final String TEST_DASHBOARD = "Test dashboard";
+
+        initDashboardsPage().addNewDashboard(TEST_DASHBOARD);
+        dashboardsPage.addWebContentToDashboard(format(WEB_CONTENT,
+                "%CURRENT_PROJECT_HASH%%CURRENT_DASHBOARD_URI%%CURRENT_DASHBOARD_TAB_URI%%CURRENT_USER_EMAIL_MD5%"));
+        EmbeddedWidget embeddedWidget = dashboardsPage.getLastEmbeddedWidget();
+        DashboardWidgetDirection.LEFT.moveElementToRightPlace(embeddedWidget.getRoot());
+        assertEquals(embeddedWidget.getContentBodyAsText(), testParams.getProjectId() +
+                dashboardRequest.getDashboardUri(TEST_DASHBOARD) +
+                dashboardRequest.getTabId(TEST_DASHBOARD, "First Tab") +
+                convertStringToMD5(testParams.getUser()));
+
+        //To cover bug CL-13000
+        //Dashboard macro applied only once
+        dashboardsPage.addWebContentToDashboard(format(WEB_CONTENT, "%CURRENT_PROJECT_HASH%%CURRENT_PROJECT_HASH%"));
+        embeddedWidget = dashboardsPage.getLastEmbeddedWidget();
+        DashboardWidgetDirection.RIGHT.moveElementToRightPlace(embeddedWidget.getRoot());
+        Screenshots.takeScreenshot(browser, "Create_Multiple_Dashboard_Marco", getClass());
+        assertEquals(embeddedWidget.getContentBodyAsText(), testParams.getProjectId() + testParams.getProjectId());
+    }
+
+    @Test(dependsOnGroups = "createProject")
     public void createFilterTitleAndFilterValueMacro() throws IOException {
         String dashboardName = createDashboardHasFilter(createSingleValueFilter(getAttributeByTitle(ATTR_DEPARTMENT)));
         initDashboardsPage().selectDashboard(dashboardName);
