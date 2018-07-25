@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.qa.graphene.AbstractTest.Profile.EDITOR;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPPORTUNITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_ACTIVITIES_BY_TYPE;
@@ -19,7 +20,9 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.common.PermissionSettingDialog;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
-import org.apache.http.ParseException;
+import com.gooddata.md.report.Report;
+import com.gooddata.md.report.ReportDefinition;
+import com.gooddata.qa.utils.http.report.ReportRestRequest;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
@@ -34,6 +37,7 @@ import java.io.IOException;
 public class GoodSalesReportsPageTest extends GoodSalesAbstractTest {
 
     private static final String TAG_REPORT = "New Lost [Drill-In]";
+    private static final String EDITOR_REPORT = "Report of Editor";
     private static final String TAG_NAME = "GDC";
     private static final String CURRENT_SALES_FOLDER = "Current Sales";
     private static final String FAVORITES_FOLDER = "Favorites";
@@ -42,7 +46,7 @@ public class GoodSalesReportsPageTest extends GoodSalesAbstractTest {
     private CommonRestRequest commonRestRequest;
 
     @Override
-    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+    protected void addUsersWithOtherRolesToProject() throws JSONException, IOException {
         createAndAddUserToProject(UserRoles.EDITOR);
     }
 
@@ -63,6 +67,17 @@ public class GoodSalesReportsPageTest extends GoodSalesAbstractTest {
 
         initReportsPage().openFolder(ALL_FOLDER).moveReportsToFolder(CURRENT_SALES_FOLDER, REPORT_ACTIVITIES_BY_TYPE);
         commonRestRequest = new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+
+        //Create a private report by Editor
+        RestClient restEditorClient = new RestClient(getProfile(EDITOR));
+        ReportDefinition definition = restEditorClient.getMetadataService()
+                .createObj(getProject(), GridReportDefinitionContent.create(EDITOR_REPORT,
+                        singletonList(METRIC_GROUP),
+                        singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_OPPORTUNITY))),
+                        singletonList(new MetricElement(getMetricByTitle(METRIC_LOST)))));
+        restEditorClient.getMetadataService()
+                .createObj(getProject(), new Report(definition.getTitle(), definition)).getUri();
+        new ReportRestRequest(restEditorClient, testParams.getProjectId()).setPrivateReport(EDITOR_REPORT, true);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -164,5 +179,13 @@ public class GoodSalesReportsPageTest extends GoodSalesAbstractTest {
             commonRestRequest.deleteObjectsUsingCascade(getReportByTitle(REPORT_AMOUNT_BY_PRODUCT).getUri());
             logoutAndLoginAs(true, UserRoles.ADMIN);
         }
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void showingPrivateReportToAdmins() {
+        ReportsPage reportsPage = initReportsPage().openFolder(ALL_FOLDER);
+        assertTrue(reportsPage.showHiddenReport().isReportVisible(EDITOR_REPORT), "Hidden report should display");
+        assertFalse(reportsPage.notShowHiddenReport().isReportVisible(EDITOR_REPORT),
+                "Hidden report shouldn't display");
     }
 }

@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.manage;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static org.openqa.selenium.By.className;
@@ -39,6 +40,7 @@ public class MetricDetailsPage extends ObjectPropertiesPage {
     private static final By VISIBILITY_CHECKBOX = By.id("settings-visibility");
     private static final By SAVE_PERMISSION_SETTING_BUTTON =
             By.cssSelector(".s-permissionSettingsDialog .s-btn-save_permissions");
+    private static final By BY_BUBBLE_CONTENT = By.className("bubble-content");
 
     public static final MetricDetailsPage getInstance(SearchContext context) {
         return Graphene.createPageFragment(MetricDetailsPage.class, waitForElementVisible(LOCATOR, context));
@@ -153,5 +155,16 @@ public class MetricDetailsPage extends ObjectPropertiesPage {
     public List<String> getTitlesOfButtonsOnEditPanel() {
         return getRoot().findElements(cssSelector(".editPanel .btn:not(.gdc-hidden)")).stream()
                 .map(button -> button.getText()).collect(Collectors.toList());
+    }
+
+    public boolean isBlueBubbleTooltipDisplayed() {
+        return isElementVisible(BY_BUBBLE_CONTENT, browser);
+    }
+
+    public MetricDetailsPage closeBubbleBlueTooltip() {
+        final By deleteButtonLocator = cssSelector(".bubble-content .ss-delete");
+        waitForElementVisible(deleteButtonLocator, browser).click();
+        waitForElementNotVisible(deleteButtonLocator, browser);
+        return this;
     }
 }

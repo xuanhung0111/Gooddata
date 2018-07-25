@@ -6,6 +6,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForReportsPageLoaded;
@@ -72,6 +73,12 @@ public class ReportsPage extends AbstractFragment {
 
     @FindBy(className = "none")
     private WebElement noneButton;
+
+    @FindBy(className = "s-btn-show_hidden_reports")
+    private WebElement showHiddenReportsButton;
+
+    @FindBy(className = "s-btn-don__x27_t_show_hidden_reports")
+    private WebElement notShowHiddenReportsButton;
 
     @FindBy(css = ".grayBg .simpleBtnCyan")
     private List<WebElement> actionButtons;
@@ -301,6 +308,18 @@ public class ReportsPage extends AbstractFragment {
 
     public String getNumberOfReportsInFolder(String folder) {
         return getFolder(folder).findElement(By.className("rate")).getText();
+    }
+
+    public ReportsPage showHiddenReport(){
+        waitForElementVisible(showHiddenReportsButton).click();
+        waitForElementNotVisible(showHiddenReportsButton);
+        return this;
+    }
+
+    public ReportsPage notShowHiddenReport(){
+        waitForElementVisible(notShowHiddenReportsButton).click();
+        waitForElementNotVisible(notShowHiddenReportsButton);
+        return this;
     }
 
     private void selectReports(String... reports) {

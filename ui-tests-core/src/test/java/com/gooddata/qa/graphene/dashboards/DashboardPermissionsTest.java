@@ -180,6 +180,8 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         permissionsDialog.publish(PublishType.EVERYONE_CAN_ACCESS);
         permissionsDialog.submit();
         assertFalse(dashboardsPage.isUnlisted());
+        assertEquals(dashboardsPage.getListedConfirmationBubble(),
+                "Dashboard is now visible to all. To hide it again, see Permissions.\nOk, got it");
     }
 
     /**

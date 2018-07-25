@@ -10,6 +10,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static com.gooddata.qa.browser.BrowserUtils.dragAndDropWithCustomBackend;
 
@@ -63,6 +64,7 @@ public class DashboardsPage extends AbstractFragment {
     private static final By BY_SETTING_EXPORT_TO_PDF = By.cssSelector(".s-export_to_pdf");
     private static final By BY_SETTING_EMBED = By.cssSelector(".s-embed");
     private static final By BY_SETTING_SAVES_AS = By.cssSelector(".s-save_as___");
+    private static final By BY_BUBBLE_CONTENT = By.className("bubble-content");
 
     @FindBy(xpath = "//div[contains(@class,'yui3-dashboardtabs-content')]")
     protected DashboardTabs tabs;
@@ -100,7 +102,7 @@ public class DashboardsPage extends AbstractFragment {
     @FindBy(className = "yui3-c-projectdashboard-content")
     private DashboardContent content;
 
-    @FindBy(css = ".s-unlistedIcon:not(.disabled)")
+    @FindBy(css = ".s-unlistedIcon")
     private WebElement unlistedIcon;
 
     @FindBy(css = ".s-lockIcon")
@@ -463,7 +465,7 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     public PermissionsDialog unlistedIconClick() {
-        waitForElementVisible(unlistedIcon).click();
+        waitForElementVisible(By.cssSelector(".s-unlistedIcon:not(.disabled)"), getRoot()).click();
         return getPermissionsDialog();
     }
 
@@ -488,8 +490,35 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     public String getTooltipFromLockIcon() {
-        new Actions(browser).moveToElement(lockIcon).moveByOffset(1, 1).perform();
-        return waitForElementVisible(cssSelector(".bubble-overlay .content"), browser).getText();
+        return getToolTipFromElement(lockIcon);
+    }
+
+    public String getTooltipFromEyeIcon() {
+        return getToolTipFromElement(unlistedIcon);
+    }
+
+    /**
+     * If this tooltip was closed over 5 times it will never display again
+     * Must be clear cache to reset
+     * Related TC: Limit how many times is bubble explaining personal objects shown
+     */
+    public String getBubbleBlueTooltip() {
+        return waitForElementVisible(BY_BUBBLE_CONTENT, browser).getText();
+    }
+
+    public String getListedConfirmationBubble() {
+        return waitForElementVisible(className("listedConfirmationBubble"), browser).getText();
+    }
+
+    public boolean isBlueBubbleTooltipDisplayed() {
+        return isElementVisible(BY_BUBBLE_CONTENT, browser);
+    }
+
+    public DashboardsPage closeBubbleBlueTooltip() {
+        By deleteButtonLocator = cssSelector(".bubble-content .ss-delete");
+        waitForElementVisible(deleteButtonLocator, browser).click();
+        waitForElementNotVisible(deleteButtonLocator, browser);
+        return this;
     }
 
     public boolean isLocked() {
@@ -648,6 +677,24 @@ public class DashboardsPage extends AbstractFragment {
         return this;
     }
 
+    public void closeEditExportEmbedMenu() {
+        if (waitForElementPresent(editExportEmbedButton).getAttribute("class").contains("gdc-hidden")) {
+            throw new RuntimeException("Embed menu is not visible");
+        }
+
+        SimpleMenu menu = SimpleMenu.getInstance(browser);
+        editExportEmbedButton.click();
+        waitForFragmentNotVisible(menu);
+    }
+
+    /**
+     * add sample text to current dashboard tab to prevent it empty
+     * @return DashboardsPage
+     */
+    public DashboardsPage addSampleTextToDashboard() {
+        return this.addTextToDashboard(TextObject.HEADLINE, "GoodData", "gooddata.com").saveDashboard();
+    }
+
     private DashboardMenu openDashboardMenu() {
         waitForElementVisible(dashboardSwitcherButton);
         if (dashboardSwitcherButton.getAttribute("class").contains("disabled")) {
@@ -677,21 +724,8 @@ public class DashboardsPage extends AbstractFragment {
                 waitForElementVisible(SAVE_AS_DIALOG_LOCATOR, browser));
     }
 
-    public void closeEditExportEmbedMenu() {
-        if (waitForElementPresent(editExportEmbedButton).getAttribute("class").contains("gdc-hidden")) {
-            throw new RuntimeException("Embed menu is not visible");
-        }
-
-        SimpleMenu menu = SimpleMenu.getInstance(browser);
-        editExportEmbedButton.click();
-        waitForFragmentNotVisible(menu);
-    }
-
-    /**
-     * add sample text to current dashboard tab to prevent it empty
-     * @return DashboardsPage
-     */
-    public DashboardsPage addSampleTextToDashboard() {
-        return this.addTextToDashboard(TextObject.HEADLINE, "GoodData", "gooddata.com").saveDashboard();
+    private String getToolTipFromElement(WebElement element) {
+        new Actions(browser).moveToElement(element).moveByOffset(1, 1).perform();
+        return waitForElementVisible(cssSelector(".bubble-overlay .content"), browser).getText();
     }
 }
