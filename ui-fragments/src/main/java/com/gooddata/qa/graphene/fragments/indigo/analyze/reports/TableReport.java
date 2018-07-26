@@ -72,6 +72,23 @@ public class TableReport extends AbstractFragment {
             .collect(toList());
     }
 
+    public WebElement getCellElement(String columnTitle, int cellIndex) {
+        List<List<WebElement>> elements = waitForCollectionIsNotEmpty(rows).stream()
+                .map(e -> e.findElements(className(CELL_CONTENT)))
+                .map(es -> es.stream()
+                        .map(webElement -> webElement.findElement(By.className("s-table-cell"))).collect(toList()))
+                .collect(toList());
+        int columnIndex = getHeaders().indexOf(columnTitle);
+        WebElement cell = elements.get(cellIndex).get(columnIndex);
+        return cell;
+    }
+
+    public boolean isCellUnderlined(String columnTitle, int cellIndex) {
+        WebElement cell = getCellElement(columnTitle, cellIndex);
+        hoverItem(cell);
+        return cell.getCssValue("text-decoration").contains("underline");
+    }
+
     public String getFormatFromValue() {
         return waitForCollectionIsNotEmpty(rows).stream()
             .map(e -> e.findElements(className(CELL_CONTENT)))
