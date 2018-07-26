@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.apache.commons.io.IOUtils;
 
@@ -56,5 +58,13 @@ public class ResourceUtils {
 
     public static String getFilePathFromResource(final String resourceName) {
         return getResourceAsFile(resourceName).getAbsolutePath();
+    }
+
+    public static String createTempFileFromString(final String content) throws IOException {
+        Path path = Files.createTempFile(String.valueOf(content.hashCode()), ".html");
+        File file = path.toFile();
+        file.deleteOnExit();
+        Files.write(path, content.getBytes());
+        return file.getAbsolutePath();
     }
 }

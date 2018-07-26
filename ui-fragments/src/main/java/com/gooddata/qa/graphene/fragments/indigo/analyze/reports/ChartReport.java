@@ -12,8 +12,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -50,6 +53,35 @@ public class ChartReport extends AbstractFragment {
     private List<WebElement> axisLabels;
 
     private static final By BY_Y_AXIS_TITLE = By.className("highcharts-yaxis-title");
+
+    public boolean isColumnHighlighted(Pair<Integer, Integer> position) {
+        WebElement element = getColumnElement(position);
+        final String fillBeforeHover = element.getAttribute("fill");
+        getActions().moveToElement(element).moveByOffset(1, 1).perform();
+        final String fillAfterHover = element.getAttribute("fill");
+        return !Objects.equals(fillAfterHover, fillBeforeHover);
+    }
+
+    public WebElement getColumnElement(Pair<Integer, Integer> position) {
+        List<WebElement> list = waitForCollectionIsNotEmpty(getRoot()
+                .findElements(By.cssSelector(String.format(".highcharts-series-%s rect", position.getLeft()))));
+        return list.get(position.getRight());
+    }
+
+    public void clickOnElement(Pair<Integer, Integer> position) {
+        WebElement element = getColumnElement(position);
+        getActions().moveToElement(element).moveByOffset(1, 1).click().perform();
+    }
+
+    public int getLegendIndex(String legendName) {
+        List<WebElement> elements = getRoot()
+                .findElements(By.className("series-item"));
+        if(elements.isEmpty()) {
+            return 0;
+        }
+        List<String> texts = elements.stream().map(element -> element.getText()).collect(Collectors.toList());
+        return texts.indexOf(legendName);
+    }
 
     public String getYaxisTitle() {
         List<WebElement> yAxisTitle = getRoot().findElements(BY_Y_AXIS_TITLE);

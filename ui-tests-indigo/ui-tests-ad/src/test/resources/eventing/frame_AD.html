@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EMBEDDED</title>
+    <script>
+        window.addEventListener("message", function(e){
+            logInfo(e.data.gdc.event);
+            if(e.data.gdc.event.name == 'listeningForDrillableItems') {
+                //ad loaded
+                updateDrillItems();
+            }
+        }, false);
+    </script>
+    <style type="text/css">
+        body {
+            overflow:hidden;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <iframe id="iframe" src="https://{host}/analyze/embedded/#/{project}/{reportId}" width="100%" height="600px" frameborder="0"></iframe>
+        <p id="status"></p>
+    </div>
+
+    <div>
+        <textarea id="logger" style="width: 100%"></textarea>
+        <input id="loggerBtn" type="button" class="loggerBtn" onclick="clearText()" name="clearText" value="ClearTex"/>
+    </div>
+
+    <script>
+
+        function updateDrillItems () {
+
+            var postMessageStructure = {
+                gdc: {
+                    product: "analyticalDesigner",
+                    event: {
+                        name: "drillableItems",
+                        data: {
+                            identifiers: {identifiers},
+                            uris: {uris}
+                        }
+                    }
+                }
+            };
+
+            var origin = "*";
+            var iframe = document.getElementById('iframe').contentWindow;
+            var postMessageBody = Object.assign({}, postMessageStructure);
+            iframe.postMessage(postMessageBody, origin);
+        }
+
+        function clearText () {
+            var logger = document.getElementById('logger');
+            logger.innerHTML = '';
+        }
+
+        function logInfo (message) {
+            var logger = document.getElementById('logger');
+            if (typeof message == 'object') {
+                logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : String(message)) + '\n';
+            } else {
+                logger.innerHTML += message + '\n';
+            }
+        }
+    </script>
+</body>
+</html>
