@@ -3,11 +3,15 @@ package com.gooddata.qa.graphene.reports;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
+import com.gooddata.qa.graphene.fragments.reports.report.ExportXLSXDialog;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.openqa.selenium.By;
@@ -20,9 +24,11 @@ import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
@@ -37,6 +43,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     private static final long expectedTabularReportExportXLSXSize = 6600L;
     private static final long expectedTabularReportExportCSVSize = 1650L;
 
+    private static final String SIMPLE_TABULAR_REPORT = "Simple tabular report";
     private static final String SIMPLE_CA_REPORT = "Simple CA report";
     private static final String FOLDER_UNSORTED = "Unsorted";
     private String regionLocator = "//div[@*[local-name() = 'gdc:region']='0,0,0,0']/span";
@@ -107,12 +114,32 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
         how.add("Priority");
         how.add("Sales Rep");
         how.add("Department");
-        prepareReport("Simple tabular report", ReportTypes.TABLE, what, how);
+        prepareReport(SIMPLE_TABULAR_REPORT, ReportTypes.TABLE, what, how);
     }
 
     @Test(dependsOnMethods = {"createTabularReport"}, groups = {"tabular-report-exports"})
     public void exportTabularReportToPDF() {
-        exportReport("Simple tabular report", ExportFormat.PDF_PORTRAIT);
+        exportReport(SIMPLE_TABULAR_REPORT, ExportFormat.PDF_PORTRAIT);
+    }
+
+    @Test(dependsOnMethods = {"createTabularReport"}, groups = {"tabular-report-exports"})
+    public void verifyExportXLSXDialog() {
+        enableExportXLSXFlag();
+        initReportPage(SIMPLE_TABULAR_REPORT).doExporting(ExportFormat.EXCEL_XLSX);
+        ExportXLSXDialog dialog = reportPage.getExportXLSXDialog();
+
+        assertTrue(dialog.isCellMergedChecked(), "Cells merged checkbox is not selected by default");
+        assertTrue(dialog.isActiveFiltersChecked(), "Active Filters checkbox is not selected by default");
+
+        setCellMergedFlag(false);
+        setActiveFiltersFlag(false);
+        sleepTightInSeconds(3);
+        browser.navigate().refresh();
+        waitForAnalysisPageLoaded(browser);
+        reportPage.doExporting(ExportFormat.EXCEL_XLSX);
+
+        assertFalse(dialog.isCellMergedChecked(), "Cells merged checkbox is checked when cell merged flag is not set");
+        assertFalse(dialog.isActiveFiltersChecked(), "Active filters checkbox is checked when active filters flag is not set");
     }
 
     @Test(dependsOnMethods = {"exportTabularReportToPDF"}, groups = {"tabular-report-exports"})
@@ -298,6 +325,21 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
         initReportPage(reportName)
             .exportReport(format);
         checkRedBar(browser);
+    }
+
+    private void enableExportXLSXFlag() throws JSONException {
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .setFeatureFlagInProject(ProjectFeatureFlags.EXPORT_TO_XLSX_ENABLED, true);
+    }
+
+    private void setCellMergedFlag(Boolean value) throws JSONException {
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .setFeatureFlagInProject(ProjectFeatureFlags.CELL_MERGED_BY_DEFAULT, value);
+    }
+
+    private void setActiveFiltersFlag(Boolean value) throws JSONException {
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .setFeatureFlagInProject(ProjectFeatureFlags.ACTIVE_FILTERS_BY_DEFAULT, value);
     }
 
 }
