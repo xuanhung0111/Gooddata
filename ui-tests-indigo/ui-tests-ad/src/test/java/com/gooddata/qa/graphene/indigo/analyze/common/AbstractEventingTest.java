@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze.common;
 
+import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket.Type;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
@@ -24,12 +25,29 @@ import static java.util.Collections.singletonList;
 import static org.openqa.selenium.By.tagName;
 
 public class AbstractEventingTest extends AbstractAnalyseTest {
+    protected IndigoRestRequest indigoRestRequest;
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        Metrics metrics = getMetricCreator();
+        metrics.createNumberOfActivitiesMetric();
+        metrics.createAmountMetric();
+        metrics.createNumberOfOpportunitiesMetric();
+
+        indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
+                testParams.getProjectId());
+    }
 
     protected Pair<Integer, Integer> getColumnPosition(ChartReport chartReport, String legend, String attributeValue) {
         int row = chartReport.getLegendIndex(legend);
         List<String> labels = chartReport.getAxisLabels();
         int col = labels.indexOf(attributeValue);
         return Pair.of(row, col);
+    }
+
+    protected Pair<Integer, Integer> getColumnPosition(ChartReport chartReport, String legend) {
+        int row = chartReport.getLegendIndex(legend);
+        return Pair.of(row, 0);
     }
 
     protected String createTemplateHtmlFile(String insightObjectId, String uris, String identifiers) throws IOException {
@@ -80,8 +98,6 @@ public class AbstractEventingTest extends AbstractAnalyseTest {
 
     protected String createInsight(String title, ReportType reportType,
                                    List<String> metrics, List<String> attributes, String stack) {
-        IndigoRestRequest indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
-                testParams.getProjectId());
         InsightMDConfiguration insightMDConfiguration = new InsightMDConfiguration(title, reportType);
         List<MeasureBucket> measureBuckets = metrics.stream()
                 .map(metric -> MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(metric)))
@@ -105,14 +121,24 @@ public class AbstractEventingTest extends AbstractAnalyseTest {
 
     protected String createSimpleInsight(String title, ReportType reportType, String metric, String attribute,
                                          String stack) {
-        IndigoRestRequest indigoRestRequest = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)),
-                testParams.getProjectId());
         return indigoRestRequest.createInsight(
                 new InsightMDConfiguration(title, reportType)
-                        .setMeasureBucket(singletonList(MeasureBucket.createSimpleMeasureBucket(getMetricByTitle(metric))))
+                        .setMeasureBucket(singletonList(MeasureBucket
+                                .createSimpleMeasureBucket(getMetricByTitle(metric))))
                         .setCategoryBucket(Arrays.asList(
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(attribute), Type.ATTRIBUTE),
                                 CategoryBucket.createCategoryBucket(getAttributeByTitle(stack), Type.STACK))));
+    }
+
+    protected String createSimpleInsightWithPercentation(String title, ReportType reportType,
+                                                         String metric, String attribute) {
+        return indigoRestRequest.createInsight(
+                new InsightMDConfiguration(title, reportType)
+                        .setMeasureBucket(singletonList(MeasureBucket.createMeasureBucketWithShowInPercent(
+                                getMetricByTitle(metric), true)))
+                        .setCategoryBucket(singletonList(
+                                CategoryBucket.createCategoryBucket(getAttributeByTitle(attribute),
+                                        Type.VIEW))));
     }
 
     protected JSONObject getLatestPostMessageObj() {

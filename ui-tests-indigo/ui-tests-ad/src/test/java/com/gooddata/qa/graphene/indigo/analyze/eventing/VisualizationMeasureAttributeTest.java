@@ -22,14 +22,8 @@ public class VisualizationMeasureAttributeTest extends AbstractEventingTest {
     private String insightObjectId;
 
     @Override
-    public void initProperties() {
-        super.initProperties();
-        this.projectTitle = "Test_eventing_ad";
-    }
-
-    @Override
     protected void customizeProject() throws Throwable {
-        getMetricCreator().createNumberOfActivitiesMetric();
+        super.customizeProject();
 
         insightUri = createSimpleInsight("Simple_Drillable_Insight", ReportType.TABLE, METRIC_NUMBER_OF_ACTIVITIES,
                 ATTR_ACTIVITY_TYPE, ATTR_REGION);

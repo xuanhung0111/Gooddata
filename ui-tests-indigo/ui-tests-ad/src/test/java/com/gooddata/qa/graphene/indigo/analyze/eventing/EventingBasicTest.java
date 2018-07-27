@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.indigo.analyze.eventing;
 
-import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.EmbeddedAnalysisPage;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractEventingTest;
@@ -27,14 +26,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
 public class EventingBasicTest extends AbstractEventingTest {
-
-    @Override
-    protected void customizeProject() throws Throwable {
-        Metrics metrics = getMetricCreator();
-        metrics.createNumberOfActivitiesMetric();
-        metrics.createAmountMetric();
-        metrics.createNumberOfOpportunitiesMetric();
-    }
 
     @Test(dependsOnGroups = {"createProject"})
     public void eventingTableReportSingleMetric() throws IOException {
