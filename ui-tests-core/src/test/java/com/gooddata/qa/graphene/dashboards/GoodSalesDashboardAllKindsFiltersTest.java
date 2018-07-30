@@ -111,11 +111,10 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             addAttributeFilterToDashboard(ATTR_STAGE_NAME, DashAttributeFilterTypes.ATTRIBUTE);
 
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            assertTrue(isEqualCollection(report.openReportInfoViewPanel().getAllFilterNames(),
-                    singleton(ATTR_STAGE_NAME)));
+            assertEquals(report.openReportInfoViewPanel().getAllFilterNames(), singleton(ATTR_STAGE_NAME));
 
             DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
-            assertTrue(isEqualCollection(report.getAllFilterNames(), singleton(ATTR_STAGE_NAME)));
+            assertEquals(report.getAllFilterNames(), singleton(ATTR_STAGE_NAME));
             dashboardEditBar.saveDashboard();
             assertTrue(getRowElementsFrom(report).size() > 1);
 
@@ -123,7 +122,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
 
             // reload table report unless will get ArrayIndexOutOfBoundException: Index 1: Size 1
             report = dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
-            assertTrue(getRowElementsFrom(report).size() == 1);
+            assertEquals(getRowElementsFrom(report).size(), 1);
 
             dashboardsPage.editDashboard();
             report.removeFilters(ATTR_STAGE_NAME);
@@ -151,8 +150,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
                     .saveDashboard();
 
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            assertTrue(isEqualCollection(report.openReportInfoViewPanel().getAllFilterNames(),
-                    singleton(DATE_DIMENSION_SNAPSHOT)));
+            assertEquals(report.openReportInfoViewPanel().getAllFilterNames(), singleton(DATE_DIMENSION_SNAPSHOT));
             assertTrue(report.getRoot().findElement(By.cssSelector("div[title='2012']")).isDisplayed());
             assertTrue(report.getRoot().findElements(By.cssSelector("div[title='2011']")).isEmpty());
             report.closeReportInfoViewPanel();
@@ -260,13 +258,12 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
 
             dashboardsPage.editDashboard();
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            assertTrue(isEqualCollection(report.getAllFilterNames(), asList("FQuarter/Year", "FStageName")));
+            assertEquals(report.getAllFilterNames(), asList("FQuarter/Year", "FStageName"));
             dashboardsPage.saveDashboard();
-            assertTrue(isEqualCollection(report.openReportInfoViewPanel().getAllFilterNames(),
-                    asList("FQuarter/Year", "FStageName")));
+            assertEquals(report.openReportInfoViewPanel().getAllFilterNames(), asList("FQuarter/Year", "FStageName"));
 
             getFilterWidget("fstagename").changeAttributeFilterValues("Short List");
-            assertTrue(getRowElementsFrom(getReport(REPORT_1, TableReport.class)).size() == 1);
+            assertEquals(getRowElementsFrom(getReport(REPORT_1, TableReport.class)).size(), 1);
             assertTrue(getRowElementsFrom(getReport(REPORT_2, TableReport.class)).size() > 1);
         } finally {
             dashboardsPage.deleteDashboard();
@@ -290,7 +287,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             dashboardsPage.saveDashboard();
 
             assertEquals(filter.getCurrentValue(), "Interest");
-            assertTrue(getRowElementsFrom(getReport(REPORT_1, TableReport.class)).size() == 1);
+            assertEquals(getRowElementsFrom(getReport(REPORT_1, TableReport.class)).size(), 1);
             assertTrue(getRowElementsFrom(getReport(REPORT_2, TableReport.class)).size() > 1);
         } finally {
             dashboardsPage.deleteDashboard();
@@ -350,7 +347,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         try {
             addReportToDashboard("Report 3", DashboardWidgetDirection.LEFT);
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            assertTrue(getRowElementsFrom(report).size() == 1);
+            assertEquals(getRowElementsFrom(report).size(), 1);
             addAttributeFilterToDashboard(ATTR_STAGE_NAME, DashAttributeFilterTypes.ATTRIBUTE);
             assertTrue(getRowElementsFrom(report).size() > 1);
         } finally {
