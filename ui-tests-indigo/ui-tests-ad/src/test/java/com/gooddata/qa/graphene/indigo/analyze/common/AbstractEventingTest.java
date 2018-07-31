@@ -40,7 +40,7 @@ public class AbstractEventingTest extends AbstractAnalyseTest {
 
     protected Pair<Integer, Integer> getColumnPosition(ChartReport chartReport, String legend, String attributeValue) {
         int row = chartReport.getLegendIndex(legend);
-        List<String> labels = chartReport.getAxisLabels();
+        List<String> labels = chartReport.getXaxisLabels();
         int col = labels.indexOf(attributeValue);
         return Pair.of(row, col);
     }
