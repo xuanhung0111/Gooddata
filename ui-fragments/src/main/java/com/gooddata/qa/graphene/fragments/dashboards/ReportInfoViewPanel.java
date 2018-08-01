@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.stream.Collectors.toList;
 
@@ -87,6 +88,7 @@ public class ReportInfoViewPanel extends AbstractFragment {
             waitForElementVisible(reportFiltersAndMetricsAdditionalInfo);
         }
 
+        waitForElementPresent(By.className("s-open"), getRoot());
         return Lists.newArrayList(Collections2.transform(filtersOrMetrics, new Function<WebElement, String>() {
             @Override
             public String apply(WebElement input) {
