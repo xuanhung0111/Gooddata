@@ -84,6 +84,9 @@ public class ReportPage extends AbstractFragment {
     @FindBy(className = "s-lockIcon")
     private WebElement lockIcon;
 
+    @FindBy(className = "s-unlistedIcon")
+    private WebElement eyeIcon;
+
     public static final By LOCATOR = By.id("p-analysisPage");
 
     private static final By SHOW_CONFIGURATION_LOCATOR =
@@ -373,10 +376,15 @@ public class ReportPage extends AbstractFragment {
         return this;
     }
 
-    public ReportPage setPermission(PermissionType permission) {
+    public ReportPage setPermission(PermissionType permissionType) {
         openOptionsMenu().select("Settings");
-        CreatedReportDialog.getInstance(browser).setPermissionSetting(permission).saveReport();
+        CreatedReportDialog.getInstance(browser).setPermissionSetting(permissionType).saveReport();
+        return this;
+    }
 
+    public ReportPage setVisibilityPermission(boolean visible) {
+        openOptionsMenu().select("Settings");
+        CreatedReportDialog.getInstance(browser).setReportVisibleSettings(visible).saveReport();
         return this;
     }
 
@@ -423,6 +431,10 @@ public class ReportPage extends AbstractFragment {
         return isElementVisible(lockIcon);
     }
 
+    public boolean isVisibleEyeIcon() {
+        return isElementVisible(eyeIcon);
+    }
+
     public boolean isVisibleSaveButton() {
         //In embedded mode, save button is outside report page
         return isElementVisible(cssSelector(CSS_CREATE_BUTTON), browser);
@@ -433,8 +445,18 @@ public class ReportPage extends AbstractFragment {
         return waitForElementVisible(cssSelector(".bubble-overlay .content"), browser).getText();
     }
 
+    public String getTooltipFromEyeIcon() {
+        new Actions(browser).moveToElement(eyeIcon).moveByOffset(1, 1).perform();
+        return waitForElementVisible(cssSelector(".bubble-overlay .content"), browser).getText();
+    }
+
     public CreatedReportDialog clickLockIcon() {
         waitForElementVisible(lockIcon).click();
+        return CreatedReportDialog.getInstance(browser);
+    }
+
+    public CreatedReportDialog clickEyeIcon() {
+        waitForElementVisible(eyeIcon).click();
         return CreatedReportDialog.getInstance(browser);
     }
 
@@ -659,6 +681,12 @@ public class ReportPage extends AbstractFragment {
         return SimpleMenu.getInstance(browser);
     }
 
+    public ReportPage closeUnlistedBubble() {
+        By closeBubbleButton = cssSelector(".unlistedBubble button");
+        waitForElementVisible(closeBubbleButton, browser).click();
+        waitForElementNotVisible(closeBubbleButton);
+        return this;
+    }
     private ReportPage addFilters(Collection<FilterItem> filters) {
         filters.stream().forEach(this::addFilter);
         return this;

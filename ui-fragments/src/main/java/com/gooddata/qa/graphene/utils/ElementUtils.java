@@ -88,7 +88,11 @@ public final class ElementUtils {
     }
 
     public static String getBubbleMessage(WebDriver browser) {
-        return waitForElementVisible(BY_BUBBLE_CONTENT, browser).getText();
+        return browser.findElements(BY_BUBBLE_CONTENT).stream()
+                .filter(element -> isElementVisible(element))
+                .findFirst()
+                .get()
+                .getText();
     }
 
     public static void clickElementByVisibleLocator(SearchContext searchContext, By... bySelectors) {

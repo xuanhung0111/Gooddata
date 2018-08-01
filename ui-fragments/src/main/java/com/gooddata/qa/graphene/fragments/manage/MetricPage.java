@@ -42,8 +42,10 @@ public class MetricPage extends DataPage {
     @FindBy(className = "s-btn-permissions___")
     private WebElement permissionButton;
 
+    @FindBy(className = "none")
+    private WebElement noneButton;
+
     private static final By METRIC_EDITOR_LOCATOR = className("metricEditorFrame");
-    private static final By TITLE_METRIC = cssSelector(".title span:not(.s-lockIcon)");
 
     public static MetricPage getInstance(SearchContext context) {
         return Graphene.createPageFragment(MetricPage.class, waitForElementVisible(ROOT_LOCATOR, context));
@@ -116,6 +118,10 @@ public class MetricPage extends DataPage {
         return isElementVisible(className("s-lockIcon"), getMetricEntry(metricName));
     }
 
+    public boolean isPrivateMetric(String metricName) {
+        return isElementVisible(className("s-unlistedIcon"), getMetricEntry(metricName));
+    }
+
     public boolean isMetricEditable(String metricName) {
         return isElementVisible(tagName("input"), getMetricEntry(metricName));
     }
@@ -129,13 +135,23 @@ public class MetricPage extends DataPage {
     }
 
     public MetricPage setEditingPermission(String metricName, PermissionType permissionType) {
-        openEditingPermission(metricName).setEditingPermission(permissionType).save();
+        openPermissionSettingDialogFor(metricName).setEditingPermission(permissionType).save();
         Graphene.waitGui().until(browser -> permissionButton.getAttribute("class").contains("disabled"));
         return this;
     }
 
-    public PermissionSettingDialog openEditingPermission(String metricName) {
-        getMetricEntry(metricName).findElement(tagName("input")).click();
+    public MetricPage setVisibility(boolean visible, String... metricNames) {
+        openPermissionSettingDialogFor(metricNames).setVisibility(visible).save();
+        Graphene.waitGui().until(browser -> permissionButton.getAttribute("class").contains("disabled"));
+        return this;
+    }
+
+    public PermissionSettingDialog openPermissionSettingDialogFor(String... metricNames) {
+        waitForElementVisible(noneButton).click();
+        Graphene.waitGui().until(browser -> permissionButton.getAttribute("class").contains("disabled"));
+        for (String metricName: metricNames) {
+            getMetricEntry(metricName).findElement(tagName("input")).click();
+        }
         waitForElementEnabled(permissionButton).click();
         return PermissionSettingDialog.getInstance(browser);
     }

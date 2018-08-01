@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.fragments.manage;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static org.openqa.selenium.By.className;
@@ -33,6 +32,9 @@ public class MetricDetailsPage extends ObjectPropertiesPage {
 
     @FindBy(className = "s-lockIcon")
     private WebElement lockIcon;
+
+    @FindBy(className = "s-unlistedIcon")
+    private WebElement eyeIcon;
 
     private static final By VISIBILITY_CHECKBOX = By.id("settings-visibility");
     private static final By SAVE_PERMISSION_SETTING_BUTTON =
@@ -78,14 +80,9 @@ public class MetricDetailsPage extends ObjectPropertiesPage {
         return this;
     }
 
-    public void setMetricVisibleToAllUser() {
-        waitForElementVisible(sharingAndPermissionsButton).click();
-        final WebElement checkbox = waitForElementVisible(VISIBILITY_CHECKBOX, browser);
-        if (!checkbox.isSelected())
-            checkbox.click();
-        Graphene.waitGui().until().element(checkbox).is().selected();
-        waitForElementVisible(SAVE_PERMISSION_SETTING_BUTTON, browser).click();
-        waitForElementNotVisible(checkbox);
+    public MetricDetailsPage setMetricVisibleToAllUser() {
+        openPermissionSettingDialog().setVisibility(true).save();
+        return this;
     }
 
     public MetricDetailsPage setEditingPermission(PermissionType permissionType) {
@@ -99,8 +96,28 @@ public class MetricDetailsPage extends ObjectPropertiesPage {
         return this;
     }
 
+    public MetricDetailsPage setVisibility(boolean visible) {
+        PermissionSettingDialog permissionSettingDialog = openPermissionSettingDialog();
+        permissionSettingDialog.setVisibility(visible).save();
+        waitForFragmentNotVisible(permissionSettingDialog);
+        if (visible == false) {
+            waitForElementVisible(eyeIcon);
+        }
+        return this;
+    }
+
     public PermissionSettingDialog clickLockIcon() {
         waitForElementVisible(lockIcon).click();
+        return PermissionSettingDialog.getInstance(browser);
+    }
+
+    public PermissionSettingDialog clickEyeIcon() {
+        waitForElementVisible(eyeIcon).click();
+        return PermissionSettingDialog.getInstance(browser);
+    }
+
+    public PermissionSettingDialog openPermissionSettingDialog() {
+        waitForElementVisible(sharingAndPermissionsButton).click();
         return PermissionSettingDialog.getInstance(browser);
     }
 
@@ -110,11 +127,20 @@ public class MetricDetailsPage extends ObjectPropertiesPage {
     }
 
     public boolean isLockedMetric() {
-        return isElementVisible(className("s-lockIcon"), browser);
+        return isElementVisible(lockIcon);
+    }
+
+    public boolean isPrivateMetric() {
+        return isElementVisible(eyeIcon);
     }
 
     public String getTooltipFromLockIcon() {
         new Actions(browser).moveToElement(lockIcon).moveByOffset(1, 1).perform();
+        return waitForElementVisible(cssSelector(".bubble-overlay .content"), browser).getText();
+    }
+
+    public String getTooltipFromEyeIcon() {
+        new Actions(browser).moveToElement(eyeIcon).moveByOffset(1, 1).perform();
         return waitForElementVisible(cssSelector(".bubble-overlay .content"), browser).getText();
     }
 

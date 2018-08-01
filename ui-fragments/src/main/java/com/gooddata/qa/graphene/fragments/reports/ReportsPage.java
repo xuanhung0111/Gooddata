@@ -70,6 +70,9 @@ public class ReportsPage extends AbstractFragment {
     @FindBy(className = "s-btn-permissions___")
     private WebElement permissionButton;
 
+    @FindBy(className = "none")
+    private WebElement noneButton;
+
     @FindBy(css = ".grayBg .simpleBtnCyan")
     private List<WebElement> actionButtons;
 
@@ -100,6 +103,10 @@ public class ReportsPage extends AbstractFragment {
         return getReport(reportName).isLocked();
     }
 
+    public boolean isPrivateReport(String reportName) {
+        return getReport(reportName).isPrivate();
+    }
+
     public boolean isEdiTableReport(String reportName) {
         return getReport(reportName).isEditable();
     }
@@ -109,6 +116,12 @@ public class ReportsPage extends AbstractFragment {
         IpeEditor.getInstance(browser).setText(folderName);
         sleepTightInSeconds(2);
 
+        return this;
+    }
+
+    public ReportsPage setVisibility(boolean visible, String... reportNames) {
+        selectReportsAndOpenPermissionDialog(reportNames).setVisibility(visible).save();
+        Graphene.waitGui().until(browser -> permissionButton.getAttribute("class").contains("disabled"));
         return this;
     }
 
@@ -291,6 +304,8 @@ public class ReportsPage extends AbstractFragment {
     }
 
     private void selectReports(String... reports) {
+        waitForElementVisible(noneButton).click();
+        Graphene.waitGui().until(browser -> permissionButton.getAttribute("class").contains("disabled"));
         List<String> reportNames = asList(reports);
 
         for (ReportEntry entry: this.reports) {
@@ -349,6 +364,10 @@ public class ReportsPage extends AbstractFragment {
 
         public boolean isLocked() {
             return isElementVisible(By.className("s-lockIcon"), getRoot());
+        }
+
+        public boolean isPrivate() {
+            return isElementVisible(By.className("s-unlistedIcon"), getRoot());
         }
 
         public boolean isEditable() {
