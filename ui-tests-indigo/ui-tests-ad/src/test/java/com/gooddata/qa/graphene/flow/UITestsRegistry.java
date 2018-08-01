@@ -50,6 +50,7 @@ import com.gooddata.qa.graphene.indigo.analyze.e2e.ResetButtonTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.StackedChartsTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.TableTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.UndoTest;
+import com.gooddata.qa.graphene.indigo.analyze.eventing.ContributionAndComparisionTest;
 import com.gooddata.qa.graphene.indigo.analyze.eventing.EventingBasicTest;
 import com.gooddata.qa.graphene.indigo.analyze.eventing.VisualizationMeasureAttributeTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
@@ -122,6 +123,7 @@ public class UITestsRegistry {
             AggregationPopupManipulationTest.class,
             VisualizationMeasureAttributeTest.class,
             EventingBasicTest.class,
+            ContributionAndComparisionTest.class,
             "testng-ad-ChartLabelFormat.xml",
             "testng-ad-MetricNumberFormat.xml"
         });
