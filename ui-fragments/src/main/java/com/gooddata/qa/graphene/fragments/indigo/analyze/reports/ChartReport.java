@@ -76,6 +76,13 @@ public class ChartReport extends AbstractFragment {
         getActions().moveToElement(element).moveByOffset(1, 1).click().perform();
     }
 
+    public void clickOnDataLabel(Pair<Integer, Integer> position) {
+        List<WebElement> list = waitForCollectionIsNotEmpty(getRoot().findElements(
+                By.cssSelector(String.format(".highcharts-data-labels.highcharts-series-%s g", position.getLeft()))));
+        WebElement element = list.get(position.getRight());
+        getActions().moveToElement(element).moveByOffset(1, 1).click().perform();
+    }
+
     public int getLegendIndex(String legendName) {
         List<WebElement> elements = getRoot()
                 .findElements(By.className("series-item"));
@@ -160,9 +167,9 @@ public class ChartReport extends AbstractFragment {
 
     public List<String> getXaxisLabels() {
         // Axis labels will be empty in case report has no attribute.
-        if (xAxisLabels.isEmpty())
+        if (xAxisLabels.isEmpty()) {
             return Collections.emptyList();
-
+        }
         return getLabels(xAxisLabels);
     }
 

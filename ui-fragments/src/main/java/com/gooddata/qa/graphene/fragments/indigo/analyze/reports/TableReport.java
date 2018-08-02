@@ -74,13 +74,22 @@ public class TableReport extends AbstractFragment {
 
     public WebElement getCellElement(String columnTitle, int cellIndex) {
         List<List<WebElement>> elements = waitForCollectionIsNotEmpty(rows).stream()
-                .map(e -> e.findElements(className(CELL_CONTENT)))
-                .map(es -> es.stream()
+                .map(tableRow -> tableRow.findElements(className(CELL_CONTENT)))
+                .map(cells -> cells.stream()
                         .map(webElement -> webElement.findElement(By.className("s-table-cell"))).collect(toList()))
                 .collect(toList());
         int columnIndex = getHeaders().indexOf(columnTitle);
         WebElement cell = elements.get(cellIndex).get(columnIndex);
         return cell;
+    }
+
+    public WebElement getCellElement(int columnIndex, int cellIndex) {
+        List<List<WebElement>> elements = waitForCollectionIsNotEmpty(rows).stream()
+                .map(tableRow -> tableRow.findElements(className(CELL_CONTENT)))
+                .map(cells -> cells.stream()
+                        .map(webElement -> webElement.findElement(By.className("s-table-cell"))).collect(toList()))
+                .collect(toList());
+        return elements.get(cellIndex).get(columnIndex);
     }
 
     public boolean isCellUnderlined(String columnTitle, int cellIndex) {

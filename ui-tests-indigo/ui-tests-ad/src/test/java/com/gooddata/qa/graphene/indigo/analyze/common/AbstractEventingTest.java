@@ -13,12 +13,18 @@ import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import com.gooddata.qa.utils.io.ResourceUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Collections.singletonList;
@@ -78,6 +84,21 @@ public class AbstractEventingTest extends AbstractAnalyseTest {
     protected void cleanUpLogger() {
         browser.switchTo().defaultContent();
         waitForElementVisible(By.id("loggerBtn"), browser).click();
+        browser.switchTo().frame("iframe");
+    }
+
+    protected void setDrillableItems(String... uris) {
+        browser.switchTo().defaultContent();
+        WebElement urisElement = waitForElementVisible(By.id("uris"), browser);
+        urisElement.sendKeys(String.join(";", uris));
+        waitForElementVisible(By.id("setDrillItemsBtn"), browser).click();
+        try {
+            //wait for the role text is updated
+            Function<WebDriver, Boolean> waitUntil = browser -> urisElement.getText().trim().isEmpty();
+            Graphene.waitGui(browser).withTimeout(10, TimeUnit.SECONDS).until(waitUntil);
+        } catch (TimeoutException e) {
+            //ignore TimeoutException
+        }
         browser.switchTo().frame("iframe");
     }
 

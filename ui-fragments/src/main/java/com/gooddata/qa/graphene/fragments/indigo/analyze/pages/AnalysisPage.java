@@ -193,6 +193,18 @@ public class AnalysisPage extends AbstractFragment {
         return drag(source, target);
     }
 
+    public AnalysisPage reorderMetric(String sourceMetric, String targetMetric) {
+        WebElement source = getMetricsBucket().get(sourceMetric);
+        WebElement target = getMetricsBucket().get(targetMetric);
+        return drag(source, target);
+    }
+
+    public AnalysisPage reorderAttribute(String sourceAttribute, String targetAttribute) {
+        WebElement source = getAttributesBucket().get(sourceAttribute);
+        WebElement target = getAttributesBucket().get(targetAttribute);
+        return drag(source, target);
+    }
+
     public AnalysisPage replaceAttributeWithDate(String oldAttr) {
         WebElement source = getCataloguePanel().getDate();
         WebElement target = getAttributesBucket().get(oldAttr);

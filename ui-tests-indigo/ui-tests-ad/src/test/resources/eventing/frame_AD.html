@@ -19,52 +19,90 @@
     </style>
 </head>
 <body>
-    <div>
-        <iframe id="iframe" src="https://{host}/analyze/embedded/#/{project}/{reportId}" width="100%" height="600px" frameborder="0"></iframe>
-        <p id="status"></p>
-    </div>
+<div>
+    <iframe id="iframe" src="https://{host}/analyze/embedded/#/{project}/{reportId}" width="100%" height="600px" frameborder="0"></iframe>
+    <p id="status"></p>
+</div>
 
-    <div>
-        <textarea id="logger" style="width: 100%"></textarea>
-        <input id="loggerBtn" type="button" class="loggerBtn" onclick="clearText()" name="clearText" value="ClearTex"/>
-    </div>
+<div>
+    <textarea id="logger" style="width: 100%"></textarea>
+    <input id="loggerBtn" type="button" class="loggerBtn" onclick="clearText()" name="clearText" value="ClearTex"/>
+</div>
 
-    <script>
+<div>
+    <input id="uris" rows="2" style="width: 100%"/>
+    <input id="setDrillItemsBtn" type="button" class="loggerBtn" name="setDrillItems" value="SetDrillItems"/>
+</div>
 
-        function updateDrillItems () {
+<script>
 
-            var postMessageStructure = {
-                gdc: {
-                    product: "analyticalDesigner",
-                    event: {
-                        name: "drillableItems",
-                        data: {
-                            identifiers: {identifiers},
-                            uris: {uris}
-                        }
+    function updateDrillItems () {
+
+        var postMessageStructure = {
+            gdc: {
+                product: "analyticalDesigner",
+                event: {
+                    name: "drillableItems",
+                    data: {
+                        identifiers: {identifiers},
+                        uris: {uris}
                     }
                 }
-            };
+            }
+        };
 
+        var origin = "*";
+        var iframe = document.getElementById('iframe').contentWindow;
+        var postMessageBody = Object.assign({}, postMessageStructure);
+        iframe.postMessage(postMessageBody, origin);
+    }
+
+    var setDrillItemsBtn = document.getElementById('setDrillItemsBtn');
+
+    setDrillItemsBtn.onclick = function() {
+        var postMessageStructure = {
+            gdc: {
+                product: "analyticalDesigner",
+                event: {
+                    name: "drillableItems",
+                    data: {
+                        identifiers: [],
+                        uris: []
+                    }
+                }
+            }
+        };
+
+        var urisEl = document.getElementById('uris');
+        if (urisEl.value != '') {
+            var uris = urisEl.value.split(';');
+            var postMessageBody = Object.assign({}, postMessageStructure);
+            postMessageBody.gdc.event.data.uris = uris;
             var origin = "*";
             var iframe = document.getElementById('iframe').contentWindow;
-            var postMessageBody = Object.assign({}, postMessageStructure);
             iframe.postMessage(postMessageBody, origin);
+            clearUris();
         }
+    }
 
-        function clearText () {
-            var logger = document.getElementById('logger');
-            logger.innerHTML = '';
-        }
+    function clearText () {
+        var logger = document.getElementById('logger');
+        logger.innerHTML = '';
+    }
 
-        function logInfo (message) {
-            var logger = document.getElementById('logger');
-            if (typeof message == 'object') {
-                logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : String(message)) + '\n';
-            } else {
-                logger.innerHTML += message + '\n';
-            }
+    function clearUris () {
+        var uris = document.getElementById('uris');
+        uris.value = '';
+    }
+
+    function logInfo (message) {
+        var logger = document.getElementById('logger');
+        if (typeof message == 'object') {
+            logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : String(message)) + '\n';
+        } else {
+            logger.innerHTML += message + '\n';
         }
-    </script>
+    }
+</script>
 </body>
 </html>
