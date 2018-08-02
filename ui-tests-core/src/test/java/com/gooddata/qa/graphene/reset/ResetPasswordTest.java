@@ -45,6 +45,11 @@ public class ResetPasswordTest extends AbstractUITest {
     private static final String SEQUENTIAL_PASSWORD_ERROR_MESSAGE = "Sequential and repeated characters are "
             + "not allowed in passwords.";
 
+    private static final String PASSWORD_MATCHES_OLD_PASSWORD = "Password is exactly the same as the old one. "
+            + "Choose different one.";
+
+    private static final String PASSWORD_CONTAINS_LOGIN = "Password contains login which is forbidden.";
+
     private static final String INVALID_EMAIL_MESSAGE = "This is not a valid email address.";
 
     private static final String PASSWORD_PAGE_LOCAL_MESSAGE = "Check your email"
@@ -109,6 +114,13 @@ public class ResetPasswordTest extends AbstractUITest {
 
         resetPasswordPage.setNewPassword("aaaaaaaa");
         softAssert.assertEquals(resetPasswordPage.getErrorMessage(), SEQUENTIAL_PASSWORD_ERROR_MESSAGE);
+
+        resetPasswordPage.setNewPassword(testParams.getPassword());
+        softAssert.assertEquals(resetPasswordPage.getErrorMessage(), PASSWORD_MATCHES_OLD_PASSWORD);
+
+        resetPasswordPage.setNewPassword(testUser);
+        softAssert.assertEquals(resetPasswordPage.getErrorMessage(), PASSWORD_CONTAINS_LOGIN);
+
         softAssert.assertAll();
 
         try {

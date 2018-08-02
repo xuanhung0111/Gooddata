@@ -52,6 +52,8 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
     private static final String SEQUENTIAL_PASSWORD_ERROR_MESSAGE = "Sequential and repeated characters are "
             + "not allowed in passwords.";
 
+    private static final String PASSWORD_CONTAINS_LOGIN = "Password contains login which is forbidden.";
+
     private static final String USER_PROFILE_PAGE_URL = PAGE_UI_PROJECT_PREFIX + "%s|profilePage|%s";
 
     private static final String INVITATION_SUCCESS_MESSAGE = "Invitation was successfully sent.";
@@ -121,6 +123,13 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
                 .submitForm();
         takeScreenshot(browser, "Error-message-for-sequential-password-shows", getClass());
         softAssert.assertEquals(invitationPage.getErrorMessage(), SEQUENTIAL_PASSWORD_ERROR_MESSAGE);
+
+        invitationPage
+                .enterPassword(registrationForm.getEmail())
+                .submitForm();
+        takeScreenshot(browser, "Error-message-for-login-password-shows", getClass());
+        softAssert.assertEquals(invitationPage.getErrorMessage(), PASSWORD_CONTAINS_LOGIN);
+
         softAssert.assertAll();
 
         invitationPage

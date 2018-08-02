@@ -44,11 +44,10 @@ public class UserAccountSettingTest extends AbstractUITest {
     private static final String NUMBER_FORMAT_SUCCESS_MESSAGE = "Your regional number formatting "
             + "settings were saved successfully.";
 
-    private static final String SHORT_PASSWORD_ERROR_MESSAGE = "Password too short. "
-            + "Minimum length is 7 characters.";
+    private static final String SHORT_PASSWORD_ERROR_MESSAGE = "Password too short. Minimum length is 7 characters."
+            + "\nSequential and repeated characters are not allowed in passwords.";
 
-    private static final String FIELD_REQUIRED_ERROR_MESSAGE = "Field is required."
-            + "\nPassword too short. Minimum length is 7 characters.";
+    private static final String FIELD_REQUIRED_ERROR_MESSAGE = "Field is required.";
 
     private static final String COMMONLY_PASSWORD_ERROR_MESSAGE = "You selected a commonly used password. "
             + "Choose something unique.\nSequential and repeated characters "
@@ -56,6 +55,11 @@ public class UserAccountSettingTest extends AbstractUITest {
 
     private static final String SEQUENTIAL_PASSWORD_ERROR_MESSAGE = "Sequential and repeated characters are "
             + "not allowed in passwords.";
+
+    private static final String PASSWORD_MATCHES_OLD_PASSWORD = "Password is exactly the same as the old one. "
+            + "Choose different one.";
+
+    private static final String PASSWORD_CONTAINS_LOGIN = "Password contains login which is forbidden.";
 
     private static final String WRONG_PASSWORD_ERROR_MESSAGE = "You typed in wrong password.";
 
@@ -160,21 +164,30 @@ public class UserAccountSettingTest extends AbstractUITest {
         ChangePasswordDialog changePasswordDialog = initAccountPage().openChangePasswordDialog();
         changePasswordDialog.enterOldPassword(SHORT_PASSWORD)
                 .saveChange();
-        softAssert.assertEquals(changePasswordDialog.getErrorMessage(), SHORT_PASSWORD_ERROR_MESSAGE);
+        softAssert.assertEquals(changePasswordDialog.getErrorMessage(), FIELD_REQUIRED_ERROR_MESSAGE);
 
         changePasswordDialog.enterOldPassword(testParams.getPassword())
                 .enterNewPassword(SHORT_PASSWORD)
                 .saveChange();
-        softAssert.assertEquals(changePasswordDialog.getErrorMessage(), SHORT_PASSWORD_ERROR_MESSAGE);
+        softAssert.assertEquals(changePasswordDialog.getErrorMessage(), PASSWORD_NOT_RELATED_ERROR_MESSAGE);
 
         changePasswordDialog.changePassword("", "");
         softAssert.assertEquals(changePasswordDialog.getErrorMessage(), FIELD_REQUIRED_ERROR_MESSAGE);
+
+        changePasswordDialog.changePassword(testParams.getPassword(), SHORT_PASSWORD);
+        softAssert.assertEquals(changePasswordDialog.getErrorMessage(), SHORT_PASSWORD_ERROR_MESSAGE);
 
         changePasswordDialog.changePassword(testParams.getPassword(), "12345678");
         softAssert.assertEquals(changePasswordDialog.getErrorMessage(), COMMONLY_PASSWORD_ERROR_MESSAGE);
 
         changePasswordDialog.changePassword(testParams.getPassword(), "aaaaaaaa");
         softAssert.assertEquals(changePasswordDialog.getErrorMessage(), SEQUENTIAL_PASSWORD_ERROR_MESSAGE);
+
+        changePasswordDialog.changePassword(testParams.getPassword(), testParams.getPassword());
+        softAssert.assertEquals(changePasswordDialog.getErrorMessage(), PASSWORD_MATCHES_OLD_PASSWORD);
+
+        changePasswordDialog.changePassword(testParams.getPassword(), accountSettingUser);
+        softAssert.assertEquals(changePasswordDialog.getErrorMessage(), PASSWORD_CONTAINS_LOGIN);
 
         changePasswordDialog.changePassword(WRONG_PASSWORD, NEW_PASSWORD);
         softAssert.assertEquals(changePasswordDialog.getErrorMessage(), WRONG_PASSWORD_ERROR_MESSAGE);

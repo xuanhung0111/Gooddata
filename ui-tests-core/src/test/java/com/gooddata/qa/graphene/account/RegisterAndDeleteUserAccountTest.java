@@ -54,6 +54,8 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     private static final String SEQUENTIAL_PASSWORD_ERROR_MESSAGE = "Sequential and repeated characters are "
             + "not allowed in passwords.";
 
+    private static final String PASSWORD_CONTAINS_LOGIN = "Password contains login which is forbidden.";
+
     private static final String INVALID_EMAIL = "johndoe@yahoocom";
     private static final String INVALID_PHONE_NUMBER = "12345678901234567890";
 
@@ -145,9 +147,11 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         RegistrationPage registrationPage = initRegistrationPage();
         softAssert.assertEquals(registrationPage.getPasswordHint(), PASSWORD_HINT);
 
+        String registrationEmail = generateEmail(registrationUser);
+
         registrationPage
                 .fillInRegistrationForm(registrationForm)
-                .enterEmail(generateEmail(registrationUser))
+                .enterEmail(registrationEmail)
                 .enterPassword("aaaaaa")
                 .agreeRegistrationLicense()
                 .submitForm();
@@ -172,6 +176,14 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         takeScreenshot(browser, "Error-message-for-sequential-password-shows", getClass());
         softAssert.assertEquals(registrationPage.getErrorMessage(),
                 SEQUENTIAL_PASSWORD_ERROR_MESSAGE);
+
+        registrationPage.enterPassword(registrationEmail)
+                .enterSpecialCaptcha()
+                .submitForm()
+                .waitForRegistrationNotSuccessfully();
+        takeScreenshot(browser, "Error-message-for-login-password-shows", getClass());
+        softAssert.assertEquals(registrationPage.getErrorMessage(), PASSWORD_CONTAINS_LOGIN);
+
         softAssert.assertAll();
     }
 
