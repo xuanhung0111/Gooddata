@@ -4,6 +4,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
 import com.gooddata.qa.graphene.fragments.reports.filter.ContextMenu;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.browser.BrowserUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -26,6 +27,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.google.common.collect.Iterables.getLast;
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -142,6 +144,16 @@ public class TableReport extends AbstractDashboardReport {
         return ContextMenu.getInstance(browser);
     }
 
+    public TableReport selectContentArea(Pair<Integer, Integer> beginningCoordinates, Pair<Integer, Integer> endingCoordinates) {
+        int startPoint = getCellElements(CellType.METRIC_VALUE)
+                .lastIndexOf(getCellElementBy(beginningCoordinates.getLeft(), beginningCoordinates.getRight()));
+        int endPoint = getCellElements(CellType.METRIC_VALUE)
+                .lastIndexOf(getCellElementBy(endingCoordinates.getLeft(), endingCoordinates.getRight()));
+        getActions().clickAndHold(getCellElements(CellType.METRIC_VALUE).get(startPoint))
+                .moveToElement(getCellElements(CellType.METRIC_VALUE).get(endPoint)).release().perform();
+        return this;
+    }
+
     public void copyMetricValue(String value) {
         WebElement metricValue = getCellElement(value, CellType.METRIC_VALUE);
         metricValue.click();
@@ -151,7 +163,12 @@ public class TableReport extends AbstractDashboardReport {
 
         getActions().keyDown(Keys.CONTROL).sendKeys("c").keyUp(Keys.CONTROL).perform();
     }
-    
+
+    public TableReport clickOnCellElement(String value , CellType cellType) {
+        getCellElement(value, cellType).click();
+        return this;
+    }
+
     public TableReport waitForLoaded() {
         WebElement loadingElement = findLoadingElement();
 
@@ -163,6 +180,16 @@ public class TableReport extends AbstractDashboardReport {
             // Report already loaded so WebDriver unable to catch the loading indicator
         }
         return this;
+    }
+
+    private WebElement getCellElementBy(int row, int column) {
+        row = row -1;
+        column = column -1;
+        String region = format("%d,%d,%d,%d", row, column, row, column);
+        return getCellElements(CellType.METRIC_VALUE).stream()
+                .filter(element -> element.getAttribute("gdc:region").equals(region))
+                .findFirst()
+                .get();
     }
 
     private WebElement findLoadingElement() {

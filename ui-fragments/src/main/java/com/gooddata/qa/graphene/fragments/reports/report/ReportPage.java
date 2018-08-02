@@ -448,6 +448,10 @@ public class ReportPage extends AbstractFragment {
         return isElementVisible(cssSelector(CSS_CREATE_BUTTON), browser);
     }
 
+    public boolean isSelectionQuickInfoDisplay() {
+        return isElementVisible(className("selectionQuickInfo"), browser);
+    }
+
     public String getTooltipFromLockIcon() {
         new Actions(browser).moveToElement(lockIcon).moveByOffset(1, 1).perform();
         return waitForElementVisible(cssSelector(".bubble-overlay .content"), browser).getText();
