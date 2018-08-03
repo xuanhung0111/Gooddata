@@ -15,8 +15,14 @@ public class ExportXLSXDialog extends AbstractDialog {
 
     private static final By ROOT_LOCATOR = By.className("reportExportToXLSXDialog");
 
-    @FindBy(className= "submit-button")
+    @FindBy(className = "submit-button")
     private WebElement exportButton;
+
+    @FindBy(css = ".cell-merged input.input-checkbox")
+    private WebElement cellMergedCheckbox;
+
+    @FindBy(css = ".active-filters input.input-checkbox")
+    private WebElement activeFiltersCheckbox;
 
     public static final ExportXLSXDialog getInstance(SearchContext context) {
         return Graphene.createPageFragment(ExportXLSXDialog.class,
@@ -25,5 +31,13 @@ public class ExportXLSXDialog extends AbstractDialog {
 
     public void confirmExport() {
         waitForElementVisible(exportButton).click();
+    }
+
+    public boolean isCellMergedChecked() {
+        return waitForElementVisible(cellMergedCheckbox).isSelected();
+    }
+
+    public boolean isActiveFiltersChecked() {
+        return waitForElementVisible(activeFiltersCheckbox).isSelected();
     }
 }

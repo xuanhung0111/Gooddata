@@ -15,7 +15,11 @@ public enum ProjectFeatureFlags {
     FISCAL_CALENDAR_ENABLED("fiscalCalendarEnabled"),
     USE_AVAILABLE_ENABLED("useAvailableEnabled"),
     ENABLE_ETL_COMPONENT("enableEtlComponent"),
-    CONTROL_EXECUTION_CONTEXT_ENABLED("controlExecutionContextEnabled");
+    CONTROL_EXECUTION_CONTEXT_ENABLED("controlExecutionContextEnabled"),
+    EXPORT_TO_XLSX_ENABLED("exportToXLSXEnabled"),
+    CELL_MERGED_BY_DEFAULT("cellMergedByDefault"),
+    ACTIVE_FILTERS_BY_DEFAULT("activeFiltersByDefault");
+
 
     private final String featureFlag;
 

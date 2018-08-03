@@ -241,11 +241,31 @@ public class ReportPage extends AbstractFragment {
     }
 
     public String exportReport(ExportFormat format) {
+        doExporting(format);
+
+        if (format == ExportFormat.EXCEL_XLSX) {
+            getExportXLSXDialog().confirmExport();
+        }
+
+        sleepTightInSeconds(5);
+        final int reportExportingTimeoutInSeconds = 300;
+        waitForElementVisible(exportButton, reportExportingTimeoutInSeconds);
+
+        sleepTightInSeconds(3);
+        String reportName = getReportName();
+
+        System.out.println("Report " + reportName + " exported to " + format.getName());
+        return reportName;
+    }
+
+    public ExportXLSXDialog getExportXLSXDialog() {
+        return ExportXLSXDialog.getInstance(browser);
+    }
+
+    public void doExporting(ExportFormat format) {
         // Wait to avoid red bar randomly
         // Red bar message: An error occurred while performing this operation.
         sleepTightInSeconds(3);
-
-        String reportName = getReportName();
         waitForElementVisible(exportButton).click();
 
         String exportXpath = "//div[contains(@class, 'yui3-m-export')]//li[contains(@class, 's-%s')]//a";
@@ -275,18 +295,6 @@ public class ReportPage extends AbstractFragment {
                 break;
         }
         waitForElementVisible(xpath(exportXpath), browser).click();
-
-        if (format == ExportFormat.EXCEL_XLSX) {
-            ExportXLSXDialog.getInstance(browser).confirmExport();
-        }
-
-        sleepTightInSeconds(5);
-        final int reportExportingTimeoutInSeconds = 300;
-        waitForElementVisible(exportButton, reportExportingTimeoutInSeconds);
-
-        sleepTightInSeconds(3);
-        System.out.println("Report " + reportName + " exported to " + format.getName());
-        return reportName;
     }
 
     public ReportPage addFilter(FilterItem filterItem) {
@@ -722,4 +730,5 @@ public class ReportPage extends AbstractFragment {
         return waitForElementVisible(className("customMetricFormatContainer"), browser)
                 .findElements(By.className("customMetricFormatItem"));
     }
+
 }
