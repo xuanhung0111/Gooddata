@@ -52,6 +52,9 @@ public class ChartReport extends AbstractFragment {
     @FindBy(css = ".highcharts-axis-labels text[text-anchor = 'middle']")
     private List<WebElement> axisLabels;
 
+    @FindBy(css = ".highcharts-xaxis-labels text[text-anchor = 'middle'], .highcharts-xaxis-labels text[text-anchor = 'end']")
+    private List<WebElement> xAxisLabels;
+
     private static final By BY_Y_AXIS_TITLE = By.className("highcharts-yaxis-title");
 
     public boolean isColumnHighlighted(Pair<Integer, Integer> position) {
@@ -153,6 +156,14 @@ public class ChartReport extends AbstractFragment {
             return Collections.emptyList();
 
         return getLabels(axisLabels);
+    }
+
+    public List<String> getXaxisLabels() {
+        // Axis labels will be empty in case report has no attribute.
+        if (xAxisLabels.isEmpty())
+            return Collections.emptyList();
+
+        return getLabels(xAxisLabels);
     }
 
     public String getChartType() {
