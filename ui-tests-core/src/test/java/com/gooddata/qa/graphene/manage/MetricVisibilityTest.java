@@ -8,18 +8,22 @@ import com.gooddata.qa.graphene.fragments.manage.MetricDetailsPage;
 import com.gooddata.qa.graphene.fragments.manage.MetricPage;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 
+import static com.gooddata.qa.graphene.AbstractTest.Profile.DOMAIN;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_LOST;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPEN_OPPS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_AMOUNT_BY_STAGE_NAME;
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -42,11 +46,16 @@ public class MetricVisibilityTest extends GoodSalesAbstractTest {
     }
 
     @DataProvider(name = "userRole")
-    public Object[][] getUserRole() {
+    public Object[][] getUserRole() throws IOException {
+        final JSONObject userProfile = new UserManagementRestRequest(
+                new RestClient(getProfile(DOMAIN)), testParams.getProjectId())
+                .getUserProfileByEmail(testParams.getUserDomain(), testParams.getUser());
+        String fullName = userProfile.getString("firstName") + " " + userProfile.getString("lastName");
         return new Object[][] {
-                {UserRoles.ADMIN, "Only the owner (FirstName LastName) and people with the link can navigate to this metric."},
-                {UserRoles.EDITOR, "Only the owner (FirstName LastName) and people with the link can navigate to this metric.\n" +
-                        "Admins and Editors can edit."}
+                {UserRoles.ADMIN, format("Only the owner (%s) and people with the link can navigate to this metric.",
+                        fullName)},
+                {UserRoles.EDITOR, format("Only the owner (%s) and people with the link can navigate to this metric.\n" +
+                        "Admins and Editors can edit.", fullName)}
         };
     }
 
