@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
@@ -7,11 +8,11 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static org.openqa.selenium.By.className;
 
 import java.util.List;
 
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.DayTimeFilterPanel.DayAgo;
-import com.google.common.collect.Iterables;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -113,8 +114,7 @@ public class DashboardEditBar extends AbstractFragment {
 
     public DashboardEditBar addReportToDashboard(String reportName) {
         int widgetCountBefore = listDashboardWidgets.size();
-        clickReportMenuButton();
-        DropDown.getInstance(By.className("reportPicker"), browser).searchAndSelectItem(reportName);
+        expandReportMenu().searchAndSelectItem(reportName);
         Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1,
                 "Widget wasn't added");
 
@@ -144,7 +144,7 @@ public class DashboardEditBar extends AbstractFragment {
 
     public DashboardEditBar addWebContentToDashboard(String urlOrEmbedCode) {
         waitForElementVisible(webContentButton).click();
-        waitForElementVisible(By.className("addUrl"), browser).sendKeys(urlOrEmbedCode);
+        waitForElementVisible(className("addUrl"), browser).sendKeys(urlOrEmbedCode);
 
         WebElement saveButton = waitForElementVisible(By.cssSelector(".c-addLinkDialog .s-btn-save"), browser);
         saveButton.click();
@@ -278,7 +278,7 @@ public class DashboardEditBar extends AbstractFragment {
         waitForElementVisible(saveAsButton).click();
 
         return Graphene.createPageFragment(SaveAsDialog.class,
-                waitForElementVisible(By.className("dashboardSettingsDialogView"), browser));
+                waitForElementVisible(className("dashboardSettingsDialogView"), browser));
 
     }
 
@@ -298,9 +298,11 @@ public class DashboardEditBar extends AbstractFragment {
         waitForElementVisible(deleteDashboardDialogButton).click();
     }
 
-    public DashboardEditBar clickReportMenuButton() {
-        waitForElementVisible(reportMenuButton).click();
-        return this;
+    public DropDown expandReportMenu() {
+        if (!isReportMenuOpen()) {
+            waitForElementVisible(reportMenuButton).click();
+        }
+        return DropDown.getInstance(className("reportPicker"), browser);
     }
 
     /**
@@ -344,5 +346,9 @@ public class DashboardEditBar extends AbstractFragment {
         waitForElementVisible(addFilterMenu).click();
         waitForElementNotPresent(FILTER_MENU_ITEM_LOADING);
         return SimpleMenu.getInstance(browser);
+    }
+
+    private boolean isReportMenuOpen() {
+        return isElementPresent(className("menuPlugin-menuOpened"), reportMenuButton);
     }
 }

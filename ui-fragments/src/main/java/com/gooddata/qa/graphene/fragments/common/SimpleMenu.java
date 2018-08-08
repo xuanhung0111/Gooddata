@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.common;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -27,7 +28,11 @@ public class SimpleMenu extends AbstractFragment {
     protected List<WebElement> items;
 
     public static SimpleMenu getInstance(SearchContext searchContext) {
-        return Graphene.createPageFragment(SimpleMenu.class, waitForElementVisible(LOCATOR, searchContext))
+        return getInstance(LOCATOR, searchContext);
+    }
+
+    public static SimpleMenu getInstance(By locator, SearchContext searchContext) {
+        return Graphene.createPageFragment(SimpleMenu.class, waitForElementVisible(locator, searchContext))
                 .waitItemsLoaded();
     }
 
@@ -35,8 +40,12 @@ public class SimpleMenu extends AbstractFragment {
         return items.size();
     }
 
+    public List<String> listTitlesOfItems() {
+        return getElementTexts(items);
+    }
+
     public boolean contains(String label) {
-        assertTrue(StringUtils.isNotBlank(label));
+        assertTrue(StringUtils.isNotBlank(label), "Label must be not empty");
 
         for (WebElement e : items) {
             if (label.equals(e.findElement(BY_LINK).getText().trim()))
@@ -46,7 +55,7 @@ public class SimpleMenu extends AbstractFragment {
     }
 
     public void select(String label) {
-        assertTrue(StringUtils.isNotBlank(label));
+        assertTrue(StringUtils.isNotBlank(label), "Label must be not empty");
         select(e -> label.equals(e.findElement(BY_LINK).getText().trim()));
         waitForElementNotVisible(this.getRoot());
     }
@@ -61,13 +70,22 @@ public class SimpleMenu extends AbstractFragment {
     }
 
     public void openSubMenu(String label) {
-        assertTrue(StringUtils.isNotBlank(label));
+        assertTrue(StringUtils.isNotBlank(label), "Label must be not empty");
         WebElement menu = items.stream()
             .filter(e -> label.equals(e.findElement(BY_LINK).getText().trim()))
             .findFirst()
             .orElseThrow(() -> new NoSuchElementException("Cannot find: " + label));
 
         new Actions(browser).moveToElement(menu).perform();
+    }
+
+    public boolean isPrivateItem(String label) {
+        assertTrue(StringUtils.isNotBlank(label), "Label must be not empty");
+        WebElement item = items.stream()
+                .filter(e -> label.equals(e.findElement(BY_LINK).getText().trim()))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Cannot find: " + label));
+        return item.getAttribute("class").contains("is-unlisted");
     }
 
     private SimpleMenu waitItemsLoaded() {

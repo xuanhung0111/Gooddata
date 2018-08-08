@@ -6,6 +6,9 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+
+import com.gooddata.qa.graphene.fragments.common.DropDown;
+import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -126,17 +129,23 @@ public class DashboardTabs extends AbstractFragment {
         return tabNames;
     }
 
-    public void selectDropDownMenu(int i) {
+    public SimpleMenu selectDropDownMenu(int i) {
         WebElement button = getTabWebElement(i).findElement(BY_TAB_DROP_DOWN_BUTTON);
         waitForElementPresent(button);
         while (!button.isDisplayed()) {
             waitForElementVisible(scrollRightButton).click();
         }
         button.click();
+        return SimpleMenu.getInstance(browser);
     }
 
     public DashboardTab getTab(int i) {
         return tabs.get(i);
+    }
+
+    public SimpleMenu expandCopyToDropDown(int i) {
+        selectDropDownMenu(i).openSubMenu("Copy To");
+        return SimpleMenu.getInstance(By.cssSelector(".s-tab-menu:not(.overlayPlugin-plugged)"), browser);
     }
 
     private WebElement getTabWebElement(int i) {

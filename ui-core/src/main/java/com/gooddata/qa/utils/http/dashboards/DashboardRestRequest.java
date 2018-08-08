@@ -208,6 +208,21 @@ public class DashboardRestRequest extends CommonRestRequest {
     }
 
     /**
+     * Set dashboard as private or public
+     *
+     * @param title
+     * @param isPrivate
+     * @throws JSONException
+     * @throws IOException
+     */
+    public void setPrivateDashboard(String title, boolean isPrivate) throws JSONException, IOException {
+        String dashboardUri = getDashboardUri(title);
+        final JSONObject json = getJsonObject(dashboardUri);
+        json.getJSONObject("projectDashboard").getJSONObject("meta").put("unlisted", BooleanUtils.toInteger(isPrivate));
+        executeRequest(RestRequest.initPutRequest(dashboardUri, json.toString()), HttpStatus.OK);
+    }
+
+    /**
      * Create mandatory user filter object with simple expression '%s IN (%s)'using uri
      *
      * @param mufTitle

@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.fragments.common;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
@@ -27,6 +29,9 @@ public class DropDown extends AbstractFragment {
     @FindBy(css = ".gd-list-view-item span")
     private List<WebElement> items;
 
+    @FindBy(className = "gd-list-view-item")
+    private List<WebElement> entries;
+
     public static final DropDown getInstance(By locator, SearchContext searchContext) {
         WebElement root = waitForElementVisible(locator, searchContext);
         waitForElementNotPresent(By.cssSelector("[class*='loadingWheel'],.gd-spinner"), root);
@@ -51,6 +56,15 @@ public class DropDown extends AbstractFragment {
                 .click();
 
         waitForElementNotVisible(this.getRoot());
+    }
+
+    public List<String> listTitlesOfItems() {
+        return getElementTexts(items);
+    }
+
+    public boolean isPrivateItem(String name) {
+        searchItem(name);
+        return isElementVisible(By.className("is-unlisted"), waitForCollectionIsNotEmpty(entries).get(0));
     }
 
     private DropDown searchItem(String name) {

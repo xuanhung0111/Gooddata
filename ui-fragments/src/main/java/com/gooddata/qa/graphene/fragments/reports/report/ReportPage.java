@@ -108,6 +108,8 @@ public class ReportPage extends AbstractFragment {
     private static final By METRIC_AXIS_CONFIGURATION_CONTENT_LOCATOR = By
             .cssSelector("div.yui3-c-metricaxisconfiguration-content:not(.gdc-hidden)");
 
+    private static final By BY_BUBBLE_CONTENT = By.className("bubble-content");
+
     public static final ReportPage getInstance(SearchContext context) {
         return Graphene.createPageFragment(ReportPage.class, waitForElementVisible(id("p-analysisPage"), context));
     }
@@ -695,6 +697,11 @@ public class ReportPage extends AbstractFragment {
         waitForElementNotVisible(closeBubbleButton);
         return this;
     }
+
+    public boolean isBlueBubbleTooltipDisplayed() {
+        return isElementVisible(BY_BUBBLE_CONTENT, browser);
+    }
+
     private ReportPage addFilters(Collection<FilterItem> filters) {
         filters.stream().forEach(this::addFilter);
         return this;

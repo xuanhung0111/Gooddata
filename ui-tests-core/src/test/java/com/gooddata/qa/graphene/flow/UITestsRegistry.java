@@ -12,6 +12,7 @@ import com.gooddata.qa.graphene.account.UserAccountSettingTest;
 import com.gooddata.qa.graphene.account.UserProfileInformationTest;
 import com.gooddata.qa.graphene.dashboards.DashboardSavedFiltersTest;
 import com.gooddata.qa.graphene.dashboards.DeleteDashboardHavingDrillToTabTest;
+import com.gooddata.qa.graphene.dashboards.DefaultPermissionDashboardTest;
 import com.gooddata.qa.graphene.dashboards.DrillToDashBoardTabApplyingDateFilterTest;
 import com.gooddata.qa.graphene.dashboards.DrillToDashboardTabTest;
 import com.gooddata.qa.graphene.dashboards.DrillToDashboardTabSettingTest;
@@ -39,7 +40,7 @@ import com.gooddata.qa.graphene.dashboards.GoodSalesDashboardMacroTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesPublicDashboardTest;
 import com.gooddata.qa.graphene.dashboards.ControlExecutionContextTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesUriParameterEmbeddedDashboardTest;
-import com.gooddata.qa.graphene.dashboards.LockingDashboardTest;
+import com.gooddata.qa.graphene.dashboards.LockingAndVisibilityDashboardTest;
 import com.gooddata.qa.graphene.filters.DashboardDateFilterSelectRangeTest;
 import com.gooddata.qa.graphene.filters.DashboardFilterVisualTest;
 import com.gooddata.qa.graphene.filters.DashboardFiscalCalendarTest;
@@ -229,7 +230,8 @@ public class UITestsRegistry {
                     DynamicImageOnDashboardTest.class,
                     ControlExecutionContextTest.class,
                     GoodSalesUriParameterEmbeddedDashboardTest.class,
-                    LockingDashboardTest.class,
+                    LockingAndVisibilityDashboardTest.class,
+                    DefaultPermissionDashboardTest.class,
                     "testng-dashboard-default-filter-multiple-choice.xml",
                     "testng-dashboard-default-filter-single-choice.xml",
                     "testng-dashboard-default-filter-savedView-multiple-choice.xml",

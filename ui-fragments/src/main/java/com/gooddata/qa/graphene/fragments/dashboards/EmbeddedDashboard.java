@@ -33,7 +33,7 @@ public class EmbeddedDashboard extends DashboardsPage {
     }
 
     public EmbeddedReportPage openEmbeddedReportPage() {
-        editDashboard().clickReportMenuButton();
+        editDashboard().expandReportMenu();
 
         waitForElementVisible(By.className("s-btn-new_report"), browser).click();
 
@@ -44,7 +44,7 @@ public class EmbeddedDashboard extends DashboardsPage {
     }
 
     public ReportsPage openEmbeddedReportsPage() {
-        editDashboard().clickReportMenuButton();
+        editDashboard().expandReportMenu();
 
         waitForElementVisible(By.className("s-btn-manage"), browser).click();
         return ReportsPage.getInstance(browser);

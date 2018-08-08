@@ -34,6 +34,19 @@ public class ReportRestRequest extends CommonRestRequest {
         executeRequest(RestRequest.initPutRequest(reportUri, json.toString()), HttpStatus.OK);
     }
 
+    /**
+     * Set public / private report
+     *
+     * @param reportTitle title of report
+     * @param isPrivate private(true) / public(false)
+     */
+    public void setPrivateReport(String reportTitle, boolean isPrivate) throws JSONException, IOException {
+        String reportUri = getReportByTitle(reportTitle).getUri();
+        final JSONObject json = getJsonObject(reportUri);
+        json.getJSONObject("report").getJSONObject("meta").put("unlisted", BooleanUtils.toInteger(isPrivate));
+        executeRequest(RestRequest.initPutRequest(reportUri, json.toString()), HttpStatus.OK);
+    }
+
     public Report getReportByTitle(String title) {
         return getMdService().getObj(getProject(), Report.class, title(title));
     }
