@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
@@ -25,6 +26,7 @@ import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -135,18 +137,18 @@ public class MetricPage extends DataPage {
     }
 
     public MetricPage setEditingPermission(String metricName, PermissionType permissionType) {
-        openPermissionSettingDialogFor(metricName).setEditingPermission(permissionType).save();
+        selectMetricsAndOpenPermissionDialog(metricName).setEditingPermission(permissionType).save();
         Graphene.waitGui().until(browser -> permissionButton.getAttribute("class").contains("disabled"));
         return this;
     }
 
     public MetricPage setVisibility(boolean visible, String... metricNames) {
-        openPermissionSettingDialogFor(metricNames).setVisibility(visible).save();
+        selectMetricsAndOpenPermissionDialog(metricNames).setVisibility(visible).save();
         Graphene.waitGui().until(browser -> permissionButton.getAttribute("class").contains("disabled"));
         return this;
     }
 
-    public PermissionSettingDialog openPermissionSettingDialogFor(String... metricNames) {
+    public PermissionSettingDialog selectMetricsAndOpenPermissionDialog(String... metricNames) {
         waitForElementVisible(noneButton).click();
         Graphene.waitGui().until(browser -> permissionButton.getAttribute("class").contains("disabled"));
         for (String metricName: metricNames) {
@@ -154,6 +156,17 @@ public class MetricPage extends DataPage {
         }
         waitForElementEnabled(permissionButton).click();
         return PermissionSettingDialog.getInstance(browser);
+    }
+
+    public MetricPage waitForListMetricLoading() {
+        By loadingElementLocator = cssSelector("#metricsTable .loadingWheel");
+        try {
+            waitForElementVisible(loadingElementLocator, getRoot(), 3);
+            waitForElementNotVisible(loadingElementLocator);
+        } catch (TimeoutException e) {
+            log.info("List metric already loaded so WebDriver unable to catch the loading indicator");
+        }
+        return this;
     }
 
     public MetricEditorDialog openMetricEditor() {

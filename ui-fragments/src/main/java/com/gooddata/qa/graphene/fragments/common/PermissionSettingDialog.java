@@ -8,10 +8,13 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static org.openqa.selenium.By.className;
@@ -36,6 +39,15 @@ public class PermissionSettingDialog extends AbstractFragment {
     @FindBy(css = "div > .row .row-info")
     private WebElement infoVisibility;
 
+    @FindBy(css = ".value.value-part")
+    private WebElement visibilityDescription;
+
+    @FindBy(className = "toggler-label")
+    private List<WebElement> editDescriptions;
+
+    @FindBy(css = "a.s-visibilityLink")
+    private WebElement visibilityLink;
+
     @FindBy(css = "header > h4")
     private WebElement header;
 
@@ -56,8 +68,34 @@ public class PermissionSettingDialog extends AbstractFragment {
         return this;
     }
 
+    public PermissionType getSelectedEditSection() {
+        return Arrays.stream(PermissionType.values())
+                .filter(permissionType ->
+                        waitForElementVisible(cssSelector(permissionType.getCssSelector()), getRoot()).isSelected())
+                .findFirst()
+                .get();
+    }
+
+    public PermissionSettingDialog clickVisibilityLink() {
+        waitForElementVisible(visibilityLink).click();
+        waitForElementNotVisible(visibilityLink);
+        return this;
+    }
+
     public String getRowInfoEditPermission() {
         return waitForElementVisible(infoEditorPermission).getText();
+    }
+
+    public String getVisibilityDescription() {
+        return waitForElementVisible(visibilityDescription).getText();
+    }
+
+    public List<String> getEditDescriptions() {
+        return getElementTexts(editDescriptions);
+    }
+
+    public String getVisibilityLinkText() {
+        return waitForElementVisible(visibilityLink).getText();
     }
 
     public List<String> getLockedAncestors() {
@@ -109,7 +147,8 @@ public class PermissionSettingDialog extends AbstractFragment {
 
     public enum PermissionType {
         ALL("input[value='all']"),
-        ADMIN("input[value='admin']");
+        ADMIN("input[value='admin']"),
+        MIXED("input[value='mixed']");
 
         private String cssSelector;
 

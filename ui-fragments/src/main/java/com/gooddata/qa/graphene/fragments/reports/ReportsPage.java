@@ -14,6 +14,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForUserProfilePageLoa
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
+import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.id;
 import static org.openqa.selenium.By.xpath;
 import static org.testng.Assert.fail;
@@ -27,6 +28,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -177,6 +179,17 @@ public class ReportsPage extends AbstractFragment {
     public void selectReportsAndOpenMoveDialog(String... reports) {
         selectReports(reports);
         waitForElementVisible(moveReportButton).click();
+    }
+
+    public ReportsPage waitForListReportLoading() {
+        WebElement loadingElement = waitForElementPresent(className("loadingWheel"), getRoot());
+        try {
+            waitForElementVisible(loadingElement, 1);
+            waitForElementNotVisible(loadingElement);
+        } catch (TimeoutException e) {
+            log.info("Report already loaded so WebDriver unable to catch the loading indicator");
+        }
+        return this;
     }
 
     public ReportsPage moveReportsToFolder(String folder, String... reports) {
