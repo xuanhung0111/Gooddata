@@ -28,7 +28,7 @@ import com.gooddata.qa.graphene.AbstractProjectTest;
 
 public class SimpleProjectEtlTest extends AbstractProjectTest {
 
-    protected int statusPollingCheckIterations = 60; // (60*5s)
+    protected int statusPollingCheckIterations = 120; // (120*5s)
     private static final boolean exportUsers = true;
     private static final boolean exportData = true;
 
