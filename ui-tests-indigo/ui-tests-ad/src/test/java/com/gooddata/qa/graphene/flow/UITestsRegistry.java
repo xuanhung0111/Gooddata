@@ -54,6 +54,7 @@ import com.gooddata.qa.graphene.indigo.analyze.eventing.ContributionAndComparisi
 import com.gooddata.qa.graphene.indigo.analyze.eventing.EventingBasicFiltersTest;
 import com.gooddata.qa.graphene.indigo.analyze.eventing.EventingBasicTest;
 import com.gooddata.qa.graphene.indigo.analyze.eventing.EventingFiltersUnderMetric;
+import com.gooddata.qa.graphene.indigo.analyze.eventing.EventingSpecialCaseTest;
 import com.gooddata.qa.graphene.indigo.analyze.eventing.VisualizationMeasureAttributeTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
@@ -128,6 +129,7 @@ public class UITestsRegistry {
             ContributionAndComparisionTest.class,
             EventingBasicFiltersTest.class,
             EventingFiltersUnderMetric.class,
+            EventingSpecialCaseTest.class,
             "testng-ad-ChartLabelFormat.xml",
             "testng-ad-MetricNumberFormat.xml"
         });
