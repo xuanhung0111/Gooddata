@@ -86,8 +86,7 @@ public class ScheduleDetailTest extends AbstractDataloadProcessTest {
 
         try {
             DataloadProcessDetail processDetail = initDiscProjectDetailPage().getDataloadProcess();
-            processDetail.openSchedule(schedule1.getName()).executeSchedule()
-                    .waitForStatus(ScheduleStatus.RUNNING).close();
+            processDetail.openSchedule(schedule1.getName()).executeSchedule().close();
             processDetail.openSchedule(schedule2.getName()).executeSchedule().waitForExecutionFinish();
 
             ExecutionHistoryItem executionItem = DataloadScheduleDetail.getInstance(browser)
