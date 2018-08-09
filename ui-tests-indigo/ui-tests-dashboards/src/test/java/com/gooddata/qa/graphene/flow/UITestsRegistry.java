@@ -28,6 +28,10 @@ import com.gooddata.qa.graphene.indigo.dashboards.VisualizationsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.AttributeFilterManipulationTest;
 import com.gooddata.qa.graphene.indigo.dashboards.AttributeFilterMiscTest;
 import com.gooddata.qa.graphene.indigo.dashboards.KpiPermissionsTest;
+import com.gooddata.qa.graphene.indigo.dashboards.eventing.ContributionAndComparisionTest;
+import com.gooddata.qa.graphene.indigo.dashboards.eventing.EventingBasicInsightTest;
+import com.gooddata.qa.graphene.indigo.dashboards.eventing.EventingInEditMode;
+import com.gooddata.qa.graphene.indigo.dashboards.eventing.VisualizationMeasureAttributeTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 import java.util.HashMap;
@@ -91,6 +95,10 @@ public class UITestsRegistry {
             MultipleAttributeFilteringTest.class,
             MultipleAttributeFilterManipulationTest.class,
             DashboardsDistributedByLcmTest.class,
+            EventingBasicInsightTest.class,
+            VisualizationMeasureAttributeTest.class,
+            ContributionAndComparisionTest.class,
+            EventingInEditMode.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-EditMode.xml",
