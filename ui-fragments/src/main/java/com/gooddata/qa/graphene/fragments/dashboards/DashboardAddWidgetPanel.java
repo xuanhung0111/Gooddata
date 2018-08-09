@@ -82,7 +82,8 @@ public class DashboardAddWidgetPanel extends AbstractFragment {
 
         if (layersList.isEmpty()) {
             WebElement noLayerElement = waitForElementVisible(cssSelector(".geo-list .no-attrs"), browser);
-            assertTrue(noLayerElement.getText().startsWith("No layers available for selected metric."));
+            assertTrue(noLayerElement.getText().startsWith("No layers available for selected metric."),
+                    "Be wrong format of no layers");
             assertEquals(noLayerElement.findElement(cssSelector("a[href]")).getAttribute("href"),
                     "https://help.gooddata.com/display/doc/Setting+up+Data+for+Geo+Charts");
             return;

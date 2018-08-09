@@ -72,9 +72,9 @@ public class GroupDialog extends AbstractFragment {
     }
 
     public GroupDialog verifyStateOfDialog(State state) {
-        assertTrue(state.title.equals(waitForElementVisible(title).getText()));
-        assertTrue(state.submitButtonName.equals(waitForElementVisible(submitButton).getText()));
-        assertFalse(isSubmitButtonVisible());
+        assertEquals(state.title, waitForElementVisible(title).getText());
+        assertEquals(state.submitButtonName, waitForElementVisible(submitButton).getText());
+        assertFalse(isSubmitButtonVisible(), "Submit button shouldn't display");
         assertEquals(waitForElementVisible(nameInput).getAttribute("value").trim().isEmpty(),
                 state.isGroupNameEmpty);
         return this;

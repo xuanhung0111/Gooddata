@@ -70,7 +70,7 @@ public class FiltersConfigPanel extends AbstractFragment {
         for (WebElement e : affectedElements) {
             if (!filterInputs.contains(e.findElement(BY_LABEL).getText()))
                 continue;
-            assertTrue(e.getAttribute("class").contains(SELECTED));
+            assertTrue(e.getAttribute("class").contains(SELECTED), "Affected element isn't selected");
             e.findElement(BY_CHECKBOX).click();
         }
     }
@@ -88,7 +88,7 @@ public class FiltersConfigPanel extends AbstractFragment {
         for (WebElement e : unaffectedElements) {
             if (!filterInputs.contains(e.findElement(BY_LABEL).getText()))
                 continue;
-            assertFalse(e.getAttribute("class").contains(SELECTED));
+            assertFalse(e.getAttribute("class").contains(SELECTED), "unaffected element is already selected");
             e.findElement(BY_CHECKBOX).click();
         }
     }
@@ -105,7 +105,7 @@ public class FiltersConfigPanel extends AbstractFragment {
         for (WebElement e : affectedElements) {
             if (!filterInputs.contains(e.findElement(BY_LABEL).getText()))
                 continue;
-            assertTrue(e.getAttribute("class").contains(SELECTED));
+            assertTrue(e.getAttribute("class").contains(SELECTED), "Affected element isn't selected");
             e.findElement(BY_CHECKBOX).click();
         }
     }

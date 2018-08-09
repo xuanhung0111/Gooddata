@@ -32,7 +32,7 @@ public class UsersTable extends AbstractFragment {
                 if (!checkbox.isSelected()) {
                     checkbox.click();
                 }
-                assertTrue(checkbox.isSelected());
+                assertTrue(checkbox.isSelected(), "Check box isn't selected");
                 continue outer;
             }
             System.out.println(String.format("Email %s is not found! Skip it!", email));

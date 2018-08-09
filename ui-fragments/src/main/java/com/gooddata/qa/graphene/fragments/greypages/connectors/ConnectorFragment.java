@@ -31,7 +31,7 @@ public class ConnectorFragment extends AbstractGreyPagesFragment {
         Graphene.guardHttp(submitIntegrationButton).click();
         assertTrue(browser.getCurrentUrl().endsWith("integration"), "Integration was created");
         JSONObject json = loadJSON();
-        assertTrue(json.getJSONObject("integration").getBoolean("active"));
+        assertTrue(json.getJSONObject("integration").getBoolean("active"), "Integration isn't created");
         System.out.println("Integration created...");
     }
 
@@ -51,7 +51,7 @@ public class ConnectorFragment extends AbstractGreyPagesFragment {
 
         assertFalse(browser.getCurrentUrl().contains("integration"), "Integration wasn't deleted");
         JSONObject json = loadJSON();
-        assertTrue(json.getJSONObject("connector").has("connectorId"));
+        assertTrue(json.getJSONObject("connector").has("connectorId"), "There isn't a connector ID");
 
         System.out.println("Integration deleted...");
     }
