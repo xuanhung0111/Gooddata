@@ -52,6 +52,7 @@ public class ContributionRecommendationTest extends AbstractAdE2ETest {
             .findFirst()
             .get();
 
-        assertFalse(isElementPresent(cssSelector(".s-recommendation-contribution"), browser));
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-contribution"), browser),
+                "Recommendation comparision shouldn't be present");
     }
 }

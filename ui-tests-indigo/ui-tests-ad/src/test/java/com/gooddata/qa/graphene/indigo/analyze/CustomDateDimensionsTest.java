@@ -67,7 +67,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
 
         analysisPage.addMetric(NUMBER, FieldType.FACT).addDate().waitForReportComputing();
 
-        assertTrue(filtersBucketReact.isDateFilterVisible());
+        assertTrue(filtersBucketReact.isDateFilterVisible(), "Date filter should be visible");
         assertEquals(parseFilterText(filtersBucketReact.getDateFilterText()), Arrays.asList(RETAIL_DATE, "All time"));
 
         for (String period : Sets.newHashSet(filtersBucketReact.getDateFilterOptions())) {
@@ -99,13 +99,16 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND),
+                "Recommendation should be visible");
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();
 
-        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getDateFilterText()), Arrays.asList(RETAIL_DATE, "Last 4 quarters"));
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getDateFilterText()),
+                Arrays.asList(RETAIL_DATE, "Last 4 quarters"));
         assertThat(analysisPage.getAttributesBucket().getItemNames(), contains(DATE));
         assertThat(analysisPage.waitForReportComputing().getChartReport().getTrackersCount(), lessThanOrEqualTo(4));
-        assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
+        assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND),
+                "Recommendation shouldn't be visible");
         checkingOpenAsReport("applyRecommendation");
     }
 

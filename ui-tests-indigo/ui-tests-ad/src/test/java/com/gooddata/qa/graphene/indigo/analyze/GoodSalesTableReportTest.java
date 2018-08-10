@@ -81,8 +81,8 @@ public class GoodSalesTableReportTest extends AbstractAnalyseTest {
                 analysisPage.changeReportType(type);
                 takeScreenshot(browser, "createReportWithMoreThan3Metrics-switchFromTableTo-" + type.name(),
                         getClass());
-                assertFalse(analysisPage.waitForReportComputing()
-                    .isExplorerMessageVisible());
+                assertFalse(analysisPage.waitForReportComputing().isExplorerMessageVisible(),
+                        "Explorer message shouldn't be visible");
                 analysisPage.undo();
             });
     }
@@ -227,8 +227,8 @@ public class GoodSalesTableReportTest extends AbstractAnalyseTest {
             .getTableReport()
             .sortBaseOnHeader(METRIC_NUMBER_OF_ACTIVITIES);
 
-        assertFalse(analysisPage.waitForReportComputing()
-            .isExplorerMessageVisible());
+        assertFalse(analysisPage.waitForReportComputing().isExplorerMessageVisible(),
+                "Explorer message shouldn't be visible");
     }
 
     private List<List<String>> getTableContentFromReportPage(

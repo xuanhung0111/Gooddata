@@ -7,7 +7,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACT
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON_OPPS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_QUOTA;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -52,11 +51,11 @@ public class GoodSalesChartLegendTest extends AbstractAnalyseTest {
                 .expandConfiguration()
                 .showPercents();
         analysisPage.waitForReportComputing();
-        assertTrue(report.getDataLabels().get(0).endsWith("%"));
+        assertTrue(report.getDataLabels().get(0).endsWith("%"), "Be wrong data labels");
 
         analysisPage.addMetric(METRIC_QUOTA).waitForReportComputing();
-        assertFalse(metricConfiguration.isShowPercentEnabled());
-        assertFalse(metricConfiguration.isShowPercentSelected());
+        assertFalse(metricConfiguration.isShowPercentEnabled(), "Show percent shouldn't be enabled");
+        assertFalse(metricConfiguration.isShowPercentSelected(), "Show percent shouldn't be selected");
 
         assertEquals(report.getLegendColors(), asList("rgb(20,178,226)", "rgb(0,193,141)"));
         checkingOpenAsReport("checkShowPercentAndLegendColor");
@@ -69,37 +68,37 @@ public class GoodSalesChartLegendTest extends AbstractAnalyseTest {
                 .waitForReportComputing()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 8);
-        assertFalse(report.isLegendVisible());
+        assertFalse(report.isLegendVisible(), "Legend shouldn't be visible");
 
         analysisPage.changeReportType(ReportType.BAR_CHART).waitForReportComputing();
-        assertFalse(report.isLegendVisible());
+        assertFalse(report.isLegendVisible(), "Legend shouldn't be visible");
 
         analysisPage.changeReportType(ReportType.LINE_CHART).waitForReportComputing();
-        assertFalse(report.isLegendVisible());
+        assertFalse(report.isLegendVisible(), "Legend shouldn't be visible");
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testLegendsInChartHasManyMetrics() {
         ChartReport report = initAnalysePage().addMetric(METRIC_AMOUNT).addMetric(METRIC_NUMBER_OF_ACTIVITIES)
                 .waitForReportComputing().getChartReport();
-        assertTrue(report.isLegendVisible());
-        assertTrue(report.areLegendsHorizontal());
+        assertTrue(report.isLegendVisible(), "Legend should display");
+        assertTrue(report.areLegendsHorizontal(), "Legends should be in horizontal line");
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void testLegendsInStackBy() {
         ChartReport report = initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE)
                 .addStack(ATTR_DEPARTMENT).waitForReportComputing().getChartReport();
-        assertTrue(report.isLegendVisible());
-        assertTrue(report.areLegendsVertical());
+        assertTrue(report.isLegendVisible(),"Legend should display");
+        assertTrue(report.areLegendsVertical(), "Legends should be in vertical line");
 
         analysisPage.changeReportType(ReportType.BAR_CHART).waitForReportComputing();
-        assertTrue(report.isLegendVisible());
-        assertTrue(report.areLegendsVertical());
+        assertTrue(report.isLegendVisible(), "Legend should display");
+        assertTrue(report.areLegendsVertical(), "Legends should be in vertical line");
 
         analysisPage.changeReportType(ReportType.LINE_CHART).waitForReportComputing();
-        assertTrue(report.isLegendVisible());
-        assertTrue(report.areLegendsVertical());
+        assertTrue(report.isLegendVisible(), "Legend should display");
+        assertTrue(report.areLegendsVertical(), "Legends should be in vertical line");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -108,14 +107,14 @@ public class GoodSalesChartLegendTest extends AbstractAnalyseTest {
                 .addStack(ATTR_STAGE_NAME)
                 .waitForReportComputing()
                 .getChartReport();
-        assertTrue(report.isLegendVisible());
+        assertTrue(report.isLegendVisible(), "Legend should display");
         List<String> legends = report.getLegends();
         assertEquals(legends.size(), 1);
         assertEquals(legends.get(0), "Closed Won");
 
         analysisPage.changeReportType(ReportType.BAR_CHART).waitForReportComputing();
         report = analysisPage.getChartReport();
-        assertTrue(report.isLegendVisible());
+        assertTrue(report.isLegendVisible(), "Legend should display");
         legends = report.getLegends();
         assertEquals(legends.size(), 1);
         assertEquals(legends.get(0), "Closed Won");

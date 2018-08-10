@@ -27,7 +27,6 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 public class GoodSalesMetricNumberFormatTest extends AbstractAnalyseTest {
 
@@ -137,7 +136,7 @@ public class GoodSalesMetricNumberFormatTest extends AbstractAnalyseTest {
         assertEquals(tooltip.get(0), asList(ATTR_IS_WON, "true"));
         assertEquals(tooltip.get(1).get(0), METRIC_PERCENT_OF_GOAL);
         if (compareFormat) {
-            assertTrue(format.toString().contains(tooltip.get(1).get(1)));
+            assertThat(format.toString(), containsString(tooltip.get(1).get(1)));
         } else {
             assertEquals(tooltip.get(1).get(1), expectedValue);
         }
@@ -148,7 +147,7 @@ public class GoodSalesMetricNumberFormatTest extends AbstractAnalyseTest {
         waitForAnalysisPageLoaded(browser);
         String actualValue = reportPage.getTableReport().getRawMetricValues().get(0);
         if (compareFormat) {
-            assertTrue(format.toString().contains(actualValue));
+            assertThat(format.toString(), containsString(actualValue));
         } else {
             assertEquals(actualValue, expectedValue);
         }
@@ -169,7 +168,7 @@ public class GoodSalesMetricNumberFormatTest extends AbstractAnalyseTest {
                 String actualValue = dashboardsPage.getContent()
                         .getLatestReport(TableReport.class).getRawMetricValues().get(0);
                 if (compareFormat) {
-                    assertTrue(format.toString().contains(actualValue));
+                    assertThat(format.toString(), containsString(actualValue));
                 } else {
                     assertEquals(actualValue, expectedValue);
                 }

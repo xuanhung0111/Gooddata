@@ -11,8 +11,10 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP_
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -54,7 +56,7 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
             .getFilterBuckets()
             .configDateFilter("01/01/2016", "01/01/2017");
         ChartReport report = analysisPage.waitForReportComputing().getChartReport();
-        assertTrue(report.getTrackersCount() >= 1);
+        assertTrue(report.getTrackersCount() >= 1, "Tracker should display");
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
@@ -69,7 +71,7 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
             log.info("Stop testing because of no data in [This month]");
             return;
         }
-        assertTrue(report.getTrackersCount() >= 1);
+        assertTrue(report.getTrackersCount() >= 1, "Tracker should display");
         List<String> legends = report.getLegends();
         assertEquals(legends.size(), 2);
         assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
@@ -87,18 +89,20 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE),
+                "Compare recommendation should display");
 
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select(ATTR_ACTIVITY_TYPE).apply();
         analysisPage.waitForReportComputing();
-        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
+        assertThat(analysisPage.getAttributesBucket().getItemNames(), hasItem(ATTR_ACTIVITY_TYPE));
 
         List<String> parsedFilterTexts = parseFilterText(filtersBucketReact.getFilterText(ATTR_ACTIVITY_TYPE));
         assertEquals(parsedFilterTexts, Arrays.asList(ATTR_ACTIVITY_TYPE, "All"));
         assertEquals(report.getTrackersCount(), 4);
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE),
+                "Compare recommendation should display");
 
         comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
@@ -113,14 +117,14 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
             log.info("Stop testing because of no data in [This month]");
             return;
         }
-        assertTrue(report.getTrackersCount() >= 1);
+        assertTrue(report.getTrackersCount() >= 1, "Tracker should display");
         List<String> legends = report.getLegends();
         assertEquals(legends.size(), 2);
         assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
 
         analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing();
         assertEquals(parseFilterText(filtersBucketReact.getFilterText(ATTR_DEPARTMENT)), Arrays.asList(ATTR_DEPARTMENT, "All"));
-        assertTrue(report.getTrackersCount() >= 1);
+        assertTrue(report.getTrackersCount() >= 1, "Tracker should display");
         legends = report.getLegends();
         assertEquals(legends.size(), 2);
         assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
@@ -134,7 +138,7 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
                 .getFilterBuckets()
                 .configDateFilter("01/01/2012", "12/31/2012");
 
-        assertTrue(analysisPage.getFilterBuckets().isFilterVisible(ATTR_ACTIVITY));
+        assertTrue(analysisPage.getFilterBuckets().isFilterVisible(ATTR_ACTIVITY), ATTR_ACTIVITY + " filter should display");
         assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY)),
                 Arrays.asList("Activity", "Jan 1, 2012 - Dec 31, 2012"));
         ChartReport report = analysisPage.waitForReportComputing().getChartReport();
@@ -142,16 +146,17 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE),
+                "Compare recommendation should display");
         recommendationContainer.getRecommendation(RecommendationStep.COMPARE).apply();
         analysisPage.waitForReportComputing();
-        assertTrue(report.getTrackersCount() >= 1);
+        assertTrue(report.getTrackersCount() >= 1, "Tracker should display");
         List<String> legends = report.getLegends();
         assertEquals(legends.size(), 2);
         assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
 
         analysisPage.addMetric(METRIC_SNAPSHOT_BOP).waitForReportComputing();
-        assertTrue(report.getTrackersCount() >= 1);
+        assertTrue(report.getTrackersCount() >= 1, "Tracker should display");
         legends = report.getLegends();
         assertEquals(legends.size(), 4);
         assertEquals(legends, asList(
@@ -172,15 +177,17 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND),
+                "See trend recommendation should display");
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();
         analysisPage.waitForReportComputing();
 
-        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
-        assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
+        assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(DATE));
+        assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"), "Filter should displays");
         assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText("Activity")), Arrays.asList("Activity", "Last 4 quarters"));
 
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE),
+                "Compare recommendation should display");
         checkingOpenAsReport("testAnotherApproachToShowCompare");
     }
 

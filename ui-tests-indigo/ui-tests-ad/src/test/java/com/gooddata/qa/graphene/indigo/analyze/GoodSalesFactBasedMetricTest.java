@@ -7,7 +7,9 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
-import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItems;
 import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -55,14 +57,16 @@ public class GoodSalesFactBasedMetricTest extends AbstractAnalyseTest {
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND),
+                "See trend recommendation should dislpay");
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE),
+                "Compare recommendation should dislpay");
 
         analysisPage.undo();
-        assertTrue(metricsBucket.isEmpty());
+        assertTrue(metricsBucket.isEmpty(), "Metrics bucket should be empty");
 
         analysisPage.redo();
-        assertFalse(metricsBucket.isEmpty());
+        assertFalse(metricsBucket.isEmpty(), "Metrics bucket shouldn't be empty");
 
         analysisPage.addAttribute(ATTR_STAGE_NAME).waitForReportComputing();
         ChartReport report = analysisPage.getChartReport();
@@ -80,8 +84,8 @@ public class GoodSalesFactBasedMetricTest extends AbstractAnalyseTest {
         ChartReport report = analysisPage.waitForReportComputing().getChartReport();
         assertEquals(report.getYaxisTitle(), SUM_OF_ACTIVITY_DATE);
 
-        assertTrue(isEqualCollection(metricConfiguration.getAllAggregations(),
-                asList("Sum", "Minimum", "Maximum", "Average", "Running sum", "Median")));
+        assertThat(metricConfiguration.getAllAggregations(),
+                hasItems("Sum", "Minimum", "Maximum", "Average", "Running sum", "Median"));
 
         Map<String, String> aggregations = new HashMap<String, String>();
         aggregations.put("Maximum", "Max ");
@@ -103,7 +107,8 @@ public class GoodSalesFactBasedMetricTest extends AbstractAnalyseTest {
                 .getMetricConfiguration(SUM_OF_ACTIVITY_DATE)
                 .expandConfiguration()
                 .getAggregation(), "Sum");
-        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
+        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1,
+                "Tracker should display");
 
         analysisPage.undo()
             .addDate()
@@ -111,10 +116,11 @@ public class GoodSalesFactBasedMetricTest extends AbstractAnalyseTest {
 
         metricConfiguration.expandConfiguration().showPercents();
         analysisPage.waitForReportComputing();
-        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
+        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1,
+                "Tracker should display");
 
         analysisPage.waitForReportComputing();
-        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
+        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1, "Tracker should display");
         checkingOpenAsReport("testMetricAggregations");
     }
 
@@ -187,10 +193,8 @@ public class GoodSalesFactBasedMetricTest extends AbstractAnalyseTest {
 
         if (percent) configuration.showPercents();
 
-        assertTrue(analysisPage.getMetricsBucket()
-            .get((percent ? "% " : "") + SUM_OF_ACTIVITY_DATE)
-            .getAttribute("class")
-            .contains(identifier));
+        assertThat(analysisPage.getMetricsBucket().get((percent ? "% " : "") + SUM_OF_ACTIVITY_DATE)
+                .getAttribute("class"), containsString(identifier));
 
         if (!samePeriodComparison && !percent) {
             analysisPage.addMetric(FACT_ACTIVITY_DATE, FieldType.FACT);
@@ -208,22 +212,22 @@ public class GoodSalesFactBasedMetricTest extends AbstractAnalyseTest {
         initAnalysePage().addMetric(FACT_AMOUNT, FieldType.FACT);
         MetricConfiguration amountConfiguration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration(sumOfAmount);
-        assertTrue(amountConfiguration.isConfigurationCollapsed());
+        assertTrue(amountConfiguration.isConfigurationCollapsed(), "Amount configuration should collapse");
 
         amountConfiguration.expandConfiguration().changeAggregation("Average");
-        assertTrue(isEqualCollection(analysisPage.getMetricsBucket().getItemNames(), singleton(averageAmount)));
+        assertEquals(analysisPage.getMetricsBucket().getItemNames(), singleton(averageAmount));
 
         analysisPage.addMetric(FACT_DURATION, FieldType.FACT);
         MetricConfiguration durationConfiguration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration(sumOfDuration);
-        assertTrue(durationConfiguration.isConfigurationCollapsed());
+        assertTrue(durationConfiguration.isConfigurationCollapsed(), "Duration configuration should collapse");
 
         durationConfiguration.expandConfiguration().changeAggregation("Running sum");
-        assertTrue(isEqualCollection(analysisPage.getMetricsBucket().getItemNames(),
-                asList(averageAmount, runningSumOfDuration)));
+        assertEquals(analysisPage.getMetricsBucket().getItemNames(),
+                asList(averageAmount, runningSumOfDuration));
 
-        assertTrue(amountConfiguration.isConfigurationCollapsed());
-        assertFalse(durationConfiguration.isConfigurationCollapsed());
+        assertTrue(amountConfiguration.isConfigurationCollapsed(), "Amount configuration should collapse");
+        assertFalse(durationConfiguration.isConfigurationCollapsed(), "Configuration should expand");
         checkingOpenAsReport("testMetricFromFact");
     }
 

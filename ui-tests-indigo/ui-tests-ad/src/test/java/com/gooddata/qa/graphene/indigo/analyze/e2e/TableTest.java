@@ -97,7 +97,8 @@ public class TableTest extends AbstractAdE2ETest {
             .getFilterBuckets()
             .configAttributeFilter(ATTR_ACTIVITY_TYPE, "All");
         analysisPage.waitForReportComputing();
-        assertFalse(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim().isEmpty());
+        assertFalse(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim().isEmpty(),
+                "Cell shouldn't be empty");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -243,7 +244,7 @@ public class TableTest extends AbstractAdE2ETest {
             .changeReportType(ReportType.BAR_CHART);
 
         assertEquals(analysisPage.getAttributesBucket().getItemNames().size(), 1);
-        assertFalse(analysisPage.getStacksBucket().isEmpty());
+        assertFalse(analysisPage.getStacksBucket().isEmpty(), "Stacks bucket shouldn't be empty");
     }
 
     private void beforeOrderingTable() {

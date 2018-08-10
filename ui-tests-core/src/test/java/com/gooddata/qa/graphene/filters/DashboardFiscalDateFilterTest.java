@@ -204,14 +204,14 @@ public class DashboardFiscalDateFilterTest extends AbstractDashboardWidgetTest {
         assertTrue(selectionConfigPanel.isHideCalendarOptionEnabled(), "Wrong default configuration");
 
         selectionConfigPanel.setHideFromToOption(true);
-        assertFalse(selectionConfigPanel.isHideCalendarOptionEnabled(), "Hidden date picker should be disable");
+        assertFalse(selectionConfigPanel.isHideCalendarOptionEnabled(), "Hidden date picker should be disabled");
 
         selectionConfigPanel.setHideFromToOption(false);
         selectionConfigPanel.setHideCalendarOption(true);
-        assertTrue(selectionConfigPanel.isHideFromToOptionEnabled(), "Hidden date range should be enable");
+        assertTrue(selectionConfigPanel.isHideFromToOptionEnabled(), "Hidden date range should be enabled");
 
         selectionConfigPanel.setHideFromToOption(true);
-        assertFalse(selectionConfigPanel.isHideCalendarOptionEnabled(), "Hidden date picker should be disable");
+        assertFalse(selectionConfigPanel.isHideCalendarOptionEnabled(), "Hidden date picker should be disabled");
     }
 
     @Test(dependsOnGroups = {"createProject"})

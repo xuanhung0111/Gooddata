@@ -4,9 +4,11 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_LOST_OPPS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPEN_OPPS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON_OPPS;
-import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.not;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
@@ -36,7 +38,7 @@ public class CatalogueSearchTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"})
     public void should_show_empty_catalogue_if_no_catalogue_item_is_matched() {
         CataloguePanel cataloguePanel = initAnalysePage().getCataloguePanel().search("xyz");
-        assertTrue(cataloguePanel.isEmpty());
+        assertTrue(cataloguePanel.isEmpty(), "Catalogue panel should be empty");
         assertEquals(cataloguePanel.getEmptyMessage(), "No data matching\n\"xyz\"");
     }
 
@@ -45,10 +47,11 @@ public class CatalogueSearchTest extends AbstractAdE2ETest {
         CataloguePanel panel = initAnalysePage().getCataloguePanel();
 
         panel.search("Opps.");
-        assertTrue(panel.hasItems(METRIC_NUMBER_OF_LOST_OPPS, METRIC_NUMBER_OF_OPEN_OPPS, METRIC_NUMBER_OF_WON_OPPS));
+        assertThat(panel.getFieldNamesInViewPort() ,
+                hasItems(METRIC_NUMBER_OF_LOST_OPPS, METRIC_NUMBER_OF_OPEN_OPPS, METRIC_NUMBER_OF_WON_OPPS));
 
         panel.search("Dada");
-        assertTrue(panel.isEmpty());
+        assertTrue(panel.isEmpty(), "Catalogue panel should be empty");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -56,8 +59,8 @@ public class CatalogueSearchTest extends AbstractAdE2ETest {
         CataloguePanel panel = initAnalysePage().getCataloguePanel();
 
         panel.search("opps.");
-        assertTrue(panel.getFieldNamesInViewPort()
-                .containsAll(asList(METRIC_NUMBER_OF_LOST_OPPS, METRIC_NUMBER_OF_OPEN_OPPS, METRIC_NUMBER_OF_WON_OPPS)));
+        assertThat(panel.getFieldNamesInViewPort(),
+                hasItems(METRIC_NUMBER_OF_LOST_OPPS, METRIC_NUMBER_OF_OPEN_OPPS, METRIC_NUMBER_OF_WON_OPPS));
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -65,11 +68,11 @@ public class CatalogueSearchTest extends AbstractAdE2ETest {
         CataloguePanel panel = initAnalysePage().getCataloguePanel();
 
         panel.search(METRIC_NUMBER_OF_LOST_OPPS);
-        assertFalse(panel.getFieldNamesInViewPort().contains(ATTR_ACTIVITY_TYPE));
+        assertThat(panel.getFieldNamesInViewPort(), not(hasItem(ATTR_ACTIVITY_TYPE)));
 
         panel.clearInputText();
 
         // catalog contains all items again, including activity type
-        assertTrue(panel.getFieldNamesInViewPort().contains(ATTR_ACTIVITY_TYPE));
+        assertThat(panel.getFieldNamesInViewPort(), hasItem(ATTR_ACTIVITY_TYPE));
     }
 }

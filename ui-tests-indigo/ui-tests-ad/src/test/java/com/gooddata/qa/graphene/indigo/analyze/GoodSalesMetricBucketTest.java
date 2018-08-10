@@ -50,22 +50,22 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
                 .addDate()
                 .waitForReportComputing()
                 .getChartReport();
-        assertTrue(report.getTrackersCount() >= 1);
+        assertTrue(report.getTrackersCount() >= 1, "Tracker should display");
 
         MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
-        assertTrue(metricConfiguration.isShowPercentEnabled());
+        assertTrue(metricConfiguration.isShowPercentEnabled(), "Show percent should be enabled");
 
         analysisPage.addMetric(METRIC_QUOTA).waitForReportComputing();
         sleepTight(3000);
-        assertTrue(report.getTrackersCount() >= 1);
-        assertFalse(metricConfiguration.isShowPercentEnabled());
+        assertTrue(report.getTrackersCount() >= 1, "Tracker should display");
+        assertFalse(metricConfiguration.isShowPercentEnabled(), "Show percent shouldn't be enabled");
         assertEquals(report.getLegends(), asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_QUOTA));
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_QUOTA));
 
         analysisPage.addMetric(METRIC_SNAPSHOT_BOP).waitForReportComputing();
-        assertTrue(report.getTrackersCount() >= 1);
+        assertTrue(report.getTrackersCount() >= 1, "Tracker should display");
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_QUOTA, METRIC_SNAPSHOT_BOP));
         checkingOpenAsReport("checkSeriesStateTransitions");
     }
@@ -75,20 +75,20 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES);
         MetricConfiguration activitiesConfiguration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES);
-        assertTrue(activitiesConfiguration.isConfigurationCollapsed());
+        assertTrue(activitiesConfiguration.isConfigurationCollapsed(), "Configuration should collapse");
 
         activitiesConfiguration.expandConfiguration();
         analysisPage.addMetric(METRIC_AMOUNT);
-        assertFalse(activitiesConfiguration.isConfigurationCollapsed());
+        assertFalse(activitiesConfiguration.isConfigurationCollapsed(), "Configuration should expand");
 
         MetricConfiguration amountConfiguration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration(METRIC_AMOUNT);
-        assertTrue(amountConfiguration.isConfigurationCollapsed());
+        assertTrue(amountConfiguration.isConfigurationCollapsed(), "Configuration should collapse");
 
         amountConfiguration.expandConfiguration();
         analysisPage.addMetric(METRIC_AMOUNT);
-        assertFalse(amountConfiguration.isConfigurationCollapsed());
-        assertTrue(activitiesConfiguration.isConfigurationCollapsed());
+        assertFalse(amountConfiguration.isConfigurationCollapsed(), "Configuration should expand");
+        assertTrue(activitiesConfiguration.isConfigurationCollapsed(), "Configuration should collapse");
         checkingOpenAsReport("testBuiltInMetric");
     }
 
@@ -98,10 +98,11 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
 
         MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
             .getMetricConfiguration("Count of " + ATTR_ACTIVITY_TYPE);
-        assertTrue(metricConfiguration.isConfigurationCollapsed());
+        assertTrue(metricConfiguration.isConfigurationCollapsed(), "Configuration should collapse");
 
         metricConfiguration.expandConfiguration();
-        assertFalse(isElementPresent(className("s-fact-aggregation-switch"), browser));
+        assertFalse(isElementPresent(className("s-fact-aggregation-switch"), browser),
+                "Aggregation switcher shouldn't present");
         checkingOpenAsReport("testMetricFromAttribute");
     }
 
@@ -113,7 +114,7 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
 
-        assertTrue(metricConfiguration.isShowPercentEnabled());
+        assertTrue(metricConfiguration.isShowPercentEnabled(), "Show percent should be enabled");
 
         metricConfiguration.showPercents();
 
@@ -135,7 +136,7 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
         ));
 
         metricConfiguration = analysisPage.getMetricsBucket().getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES);
-        assertFalse(metricConfiguration.isShowPercentEnabled());
+        assertFalse(metricConfiguration.isShowPercentEnabled(), "Show percent should be disabled");
 
         analysisPage.undo();
         metricConfiguration.expandConfiguration();
@@ -143,8 +144,8 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
                 "% " + METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO,
                 "% " + METRIC_NUMBER_OF_ACTIVITIES));
 
-        assertTrue(metricConfiguration.isShowPercentEnabled());
-        assertTrue(metricConfiguration.isShowPercentSelected());
+        assertTrue(metricConfiguration.isShowPercentEnabled(), "Show percent should be enabled");
+        assertTrue(metricConfiguration.isShowPercentSelected(), "Show percent should be selected");
 
         metricConfiguration = analysisPage
                 .removeMetric("% " + METRIC_NUMBER_OF_ACTIVITIES)
@@ -154,8 +155,8 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
                 .expandConfiguration();
 
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_AMOUNT));
-        assertTrue(metricConfiguration.isShowPercentEnabled());
-        assertFalse(metricConfiguration.isShowPercentSelected());
+        assertTrue(metricConfiguration.isShowPercentEnabled(), "Show percent should be enabled");
+        assertFalse(metricConfiguration.isShowPercentSelected(), "Show percent shouldn't be selected");
 
         metricConfiguration.collapseConfiguration();
         metricConfiguration = analysisPage
@@ -166,8 +167,8 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
             .expandConfiguration();
 
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_NUMBER_OF_ACTIVITIES));
-        assertTrue(metricConfiguration.isShowPercentEnabled());
-        assertFalse(metricConfiguration.isShowPercentSelected());
+        assertTrue(metricConfiguration.isShowPercentEnabled(), "Show percent should be enabled");
+        assertFalse(metricConfiguration.isShowPercentSelected(), "Show percent shouldn't be selected");
         checkingOpenAsReport("showInPercentAndCompare");
     }
 
@@ -181,11 +182,11 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
             .expandConfiguration();
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 4);
-        assertTrue(metricConfiguration.isShowPercentEnabled());
+        assertTrue(metricConfiguration.isShowPercentEnabled(), "Show percent should be enabled");
 
         analysisPage.addStack(ATTR_DEPARTMENT);
         analysisPage.waitForReportComputing();
-        assertFalse(metricConfiguration.isShowPercentEnabled());
+        assertFalse(metricConfiguration.isShowPercentEnabled(), "Show percent should be disabled");
         checkingOpenAsReport("disablePopCheckboxOnDroppingNonDateAttribute");
     }
 
@@ -193,7 +194,8 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
     public void compareIsStillActiveWhenReplaceAttribute() {
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .addDate();
-        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
+        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1,
+                "Tracker should display");
 
         analysisPage.getFilterBuckets()
                 .openDateFilterPickerPanel()
@@ -204,10 +206,12 @@ public class GoodSalesMetricBucketTest extends AbstractAnalyseTest {
         assertEquals(analysisPage.getMetricsBucket().getItemNames(),
                 asList(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
 
-        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
+        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1,
+                "Tracker should display");
 
         analysisPage.replaceAttribute(DATE, ATTR_ACTIVITY_TYPE);
-        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
+        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1,
+                "Tracker should display");
         assertEquals(analysisPage.getMetricsBucket().getItemNames(),
                 asList(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
         assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(ATTR_ACTIVITY_TYPE));

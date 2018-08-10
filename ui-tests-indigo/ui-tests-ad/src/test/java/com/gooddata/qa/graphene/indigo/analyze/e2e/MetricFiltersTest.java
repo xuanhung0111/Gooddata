@@ -57,8 +57,8 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
             .clickAddAttributeFilter()
             .getAllAttributesInViewPort();
 
-        assertTrue(attributes.contains(ATTR_DEPARTMENT));
-        assertFalse(attributes.contains(ATTR_ACTIVITY_TYPE));
+        assertTrue(attributes.contains(ATTR_DEPARTMENT), ATTR_DEPARTMENT + "should be in view port");
+        assertFalse(attributes.contains(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + "shouldn't be in view port");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -69,7 +69,7 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
             .expandConfiguration()
             .addFilter(ATTR_ACTIVITY_TYPE, "Email")
             .removeFilter();
-        assertFalse(isElementPresent(cssSelector(".s-filter-button"), browser));
+        assertFalse(isElementPresent(cssSelector(".s-filter-button"), browser), "Filter button should be present");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -102,7 +102,7 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
 
-        assertFalse(isElementPresent(cssSelector(".s-filter-button"), browser));
+        assertFalse(isElementPresent(cssSelector(".s-filter-button"), browser), "Filter button shouldn't be present");
 
         assertTrue(analysisPage.redo()
             .getMetricsBucket()

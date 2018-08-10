@@ -59,7 +59,7 @@ public class StackedChartsTest extends AbstractAdE2ETest {
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getWarningMessage()
-            .isEmpty());
+            .isEmpty(), "Warning message should display");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -69,7 +69,7 @@ public class StackedChartsTest extends AbstractAdE2ETest {
             .addAttribute(ATTR_ACCOUNT)
             .getStacksBucket()
             .getWarningMessage()
-            .isEmpty());
+            .isEmpty(), "Warning message should display");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -79,12 +79,12 @@ public class StackedChartsTest extends AbstractAdE2ETest {
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .changeReportType(ReportType.TABLE);
 
-        assertFalse(isElementPresent(cssSelector(StacksBucket.CSS_SELECTOR), browser));
+        assertFalse(isElementPresent(cssSelector(StacksBucket.CSS_SELECTOR), browser), "Stacks bucket shouldn't be present");
 
         analysisPage.changeReportType(ReportType.BAR_CHART);
-        assertFalse(analysisPage.getMetricsBucket().isEmpty());
-        assertFalse(analysisPage.getStacksBucket().isEmpty());
-        assertFalse(analysisPage.getAttributesBucket().isEmpty());
+        assertFalse(analysisPage.getMetricsBucket().isEmpty(), "Metrics bucket shouldn't be empty");
+        assertFalse(analysisPage.getStacksBucket().isEmpty(), "Stacks bucket shouldn't be empty");
+        assertFalse(analysisPage.getAttributesBucket().isEmpty(), "Attributes bucket shouldn't be empty");
     }
 
     // Unstable https://jira.intgdc.com/browse/CL-9774
@@ -97,8 +97,8 @@ public class StackedChartsTest extends AbstractAdE2ETest {
         waitForElementVisible(cssSelector(".s-error-too-many-data-points .s-switch-to-table"), browser).click();
 
         analysisPage.changeReportType(ReportType.BAR_CHART);
-        assertFalse(analysisPage.getMetricsBucket().isEmpty());
-        assertFalse(analysisPage.getStacksBucket().isEmpty());
-        assertFalse(analysisPage.getAttributesBucket().isEmpty());
+        assertFalse(analysisPage.getMetricsBucket().isEmpty(), "Metrics bucket shouldn't be empty");
+        assertFalse(analysisPage.getStacksBucket().isEmpty(), "Stacks bucket shouldn't be empty");
+        assertFalse(analysisPage.getAttributesBucket().isEmpty(), "Attributes bucket shouldn't be empty");
     }
 }

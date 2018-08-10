@@ -25,7 +25,7 @@ public class AttributeBasedMetricsTest extends AbstractAdE2ETest {
         initAnalysePage().addMetric(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE)
             .waitForReportComputing();
 
-        assertFalse(analysisPage.getMetricsBucket().isEmpty());
+        assertFalse(analysisPage.getMetricsBucket().isEmpty(), "Metric bucket shouldn't be empty");
     }
 
     @Test(dependsOnGroups = {"createProject"})

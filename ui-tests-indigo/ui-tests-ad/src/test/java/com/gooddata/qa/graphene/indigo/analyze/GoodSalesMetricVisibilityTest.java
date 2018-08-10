@@ -39,7 +39,7 @@ public class GoodSalesMetricVisibilityTest extends AbstractAnalyseTest {
         String expectedMaql = "SELECT " + METRIC_NUMBER_OF_WON_OPPS + " / " + METRIC_NUMBER_OF_OPEN_OPPS;
         assertTrue(initMetricPage()
             .createRatioMetric(RATIO_METRIC, METRIC_NUMBER_OF_WON_OPPS, METRIC_NUMBER_OF_OPEN_OPPS)
-            .isMetricCreatedSuccessfully(RATIO_METRIC, expectedMaql, "#,##0.00"));
+            .isMetricCreatedSuccessfully(RATIO_METRIC, expectedMaql, "#,##0.00"), "Metric should be created");
     }
 
     @Test(dependsOnGroups = {"precondition"}, groups = {"test"})
@@ -60,8 +60,7 @@ public class GoodSalesMetricVisibilityTest extends AbstractAnalyseTest {
             signIn(false, UserRoles.EDITOR);
 
             CataloguePanel cataloguePanel = initAnalysePage().getCataloguePanel().search(RATIO_METRIC);
-            assertFalse(cataloguePanel.hasItem(RATIO_METRIC));
-
+            assertFalse(cataloguePanel.getFieldNamesInViewPort().contains(RATIO_METRIC), "Private metric shouldn't display");
         } finally {
             logout();
             signIn(false, UserRoles.ADMIN);

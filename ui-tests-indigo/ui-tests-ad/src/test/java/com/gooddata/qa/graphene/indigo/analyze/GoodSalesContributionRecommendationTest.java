@@ -41,23 +41,24 @@ public class GoodSalesContributionRecommendationTest extends AbstractAnalyseTest
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
-        assertTrue(recommendationContainer
-                .isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_PERCENTS),
+                "See trend recommendation should display");
         recommendationContainer.getRecommendation(RecommendationStep.SEE_PERCENTS).apply();
-        assertTrue(analysisPage.waitForReportComputing().isReportTypeSelected(ReportType.BAR_CHART));
+        assertTrue(analysisPage.waitForReportComputing().isReportTypeSelected(ReportType.BAR_CHART),
+                "Report type should be bar chart");
         assertEquals(report.getTrackersCount(), 4);
 
         MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration("% " + METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
-        assertTrue(metricConfiguration.isShowPercentEnabled());
-        assertTrue(metricConfiguration.isShowPercentSelected());
+        assertTrue(metricConfiguration.isShowPercentEnabled(), "Show percent should be enabled");
+        assertTrue(metricConfiguration.isShowPercentSelected(), "Show percent should be selected");
 
         analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing();
-        assertTrue(analysisPage.isReportTypeSelected(ReportType.BAR_CHART));
+        assertTrue(analysisPage.isReportTypeSelected(ReportType.BAR_CHART), "Should be bar chart");
         assertEquals(report.getTrackersCount(), 2);
-        assertTrue(metricConfiguration.isShowPercentEnabled());
-        assertTrue(metricConfiguration.isShowPercentSelected());
+        assertTrue(metricConfiguration.isShowPercentEnabled(), "Show percent should be enabled");
+        assertTrue(metricConfiguration.isShowPercentSelected(), "Show percent should be selected");
         checkingOpenAsReport("testSimpleContribution");
     }
 
@@ -70,14 +71,16 @@ public class GoodSalesContributionRecommendationTest extends AbstractAnalyseTest
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND),
+                "See trend recommendation should display");
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE),
+                "Compare recommendation should display");
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select(ATTR_ACTIVITY_TYPE).apply();
         analysisPage.waitForReportComputing();
-        assertTrue(recommendationContainer
-                .isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_PERCENTS),
+                "See trend recommendation should display");
         checkingOpenAsReport("testAnotherApproachToShowContribution");
     }
 }

@@ -44,7 +44,7 @@ public class GoodSalesMetricFilterTest extends AbstractAnalyseTest {
             .expandConfiguration()
             .clickAddAttributeFilter()
             .getAllAttributesInViewPort()
-            .size() > 0);
+            .size() > 0, "Should have attributes in view port");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -59,7 +59,7 @@ public class GoodSalesMetricFilterTest extends AbstractAnalyseTest {
         final MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES);
 
-        assertTrue(metricConfiguration.removeFilter().canAddAnotherFilter());
+        assertTrue(metricConfiguration.removeFilter().canAddAnotherFilter(), "Can't add another filter");
 
         metricConfiguration.addFilter(ATTR_DEPARTMENT, "Inside Sales");
         ChartReport report = analysisPage.waitForReportComputing().getChartReport();
@@ -98,9 +98,9 @@ public class GoodSalesMetricFilterTest extends AbstractAnalyseTest {
             .getChartReport();
 
         assertEquals(report.getTrackersCount(), 2);
-        assertTrue(isEqualCollection(report.getLegends(),
+        assertEquals(report.getLegends(),
                 asList(format("%s (%s: Direct Sales)", METRIC_NUMBER_OF_ACTIVITIES, ATTR_DEPARTMENT),
-                        format("%s (%s: Inside Sales)", METRIC_AMOUNT, ATTR_DEPARTMENT))));
+                        format("%s (%s: Inside Sales)", METRIC_AMOUNT, ATTR_DEPARTMENT)));
         checkingOpenAsReport("addAttributeFilterForMultipleMetrics");
     }
 
@@ -140,7 +140,7 @@ public class GoodSalesMetricFilterTest extends AbstractAnalyseTest {
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
 
-        assertTrue(metricConfiguration.canAddAnotherFilter());
+        assertTrue(metricConfiguration.canAddAnotherFilter(), "Can't add another filer");
 
         metricConfiguration.addFilter(ATTR_ACTIVITY_TYPE, "Email", "Phone Call", "Web Meeting");
         ChartReport report = analysisPage.waitForReportComputing().getChartReport();

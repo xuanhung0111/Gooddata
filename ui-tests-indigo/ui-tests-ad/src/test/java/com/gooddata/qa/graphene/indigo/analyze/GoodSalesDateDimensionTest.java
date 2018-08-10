@@ -6,7 +6,6 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Arrays.asList;
-import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -56,13 +55,13 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
         filter.click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
-        assertTrue(isEqualCollection(panel.getDimensionSwitchs(), asList(ACTIVITY, CREATED)));
+        assertEquals(panel.getDimensionSwitchs(), asList(ACTIVITY, CREATED));
 
         panel.select("This year");
         panel.apply();
         analysisPage.waitForReportComputing();
         assertEquals(parseFilterText(filtersBucketReact.getFilterText(ACTIVITY)), Arrays.asList(ACTIVITY, "This year"));
-        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
+        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1, "Tracker should display");
         checkingOpenAsReport("applyOnFilter");
     }
 
@@ -82,7 +81,7 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
             log.info("Visual cannot be rendered! Message: " + analysisPage.getExplorerMessage());
             return;
         }
-        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
+        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1, "Tracker should display");
         checkingOpenAsReport("applyOnBucket");
     }
 
@@ -101,7 +100,7 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
         filter.click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
-        assertFalse(panel.isDimensionSwitcherEnabled());
+        assertFalse(panel.isDimensionSwitcherEnabled(), "Dimension switcher shouldn't be enabled");
 
         analysisPage.getAttributesBucket().changeDateDimension(ACTIVITY);
         assertEquals(parseFilterText(filtersBucketReact.getFilterText(ACTIVITY)), Arrays.asList(ACTIVITY, "All time"));

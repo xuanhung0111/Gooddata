@@ -49,7 +49,7 @@ public class BucketsTest extends AbstractAdE2ETest {
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
 
-        assertFalse(metricConfiguration.isShowPercentEnabled());
+        assertFalse(metricConfiguration.isShowPercentEnabled(), "Show percent should be disabled");
 
         Graphene.createPageFragment(RecommendationContainer.class,
                 waitForElementVisible(RecommendationContainer.LOCATOR, browser))
@@ -57,50 +57,52 @@ public class BucketsTest extends AbstractAdE2ETest {
 
         analysisPage.waitForReportComputing();
 
-        assertTrue(metricConfiguration.showPercents().isShowPercentSelected());
+        assertTrue(metricConfiguration.showPercents().isShowPercentSelected(), "Show percent should be selected");
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void test_stack_bucket_is_visible_for_line_colunm_and_bar_charts() {
         initAnalysePage().changeReportType(ReportType.COLUMN_CHART);
-        assertTrue(isElementPresent(cssSelector(StacksBucket.CSS_SELECTOR), browser));
+        assertTrue(isElementPresent(cssSelector(StacksBucket.CSS_SELECTOR), browser), "Stacks bucket should display");
 
         analysisPage.changeReportType(ReportType.BAR_CHART);
-        assertTrue(isElementPresent(cssSelector(StacksBucket.CSS_SELECTOR), browser));
+        assertTrue(isElementPresent(cssSelector(StacksBucket.CSS_SELECTOR), browser), "Stacks bucket should display");
 
         analysisPage.changeReportType(ReportType.LINE_CHART);
-        assertTrue(isElementPresent(cssSelector(StacksBucket.CSS_SELECTOR), browser));
+        assertTrue(isElementPresent(cssSelector(StacksBucket.CSS_SELECTOR), browser), "Stacks bucket should display");
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void test_stack_bucket_is_hidden_for_table_visualization() {
         initAnalysePage().changeReportType(ReportType.TABLE);
-        assertFalse(isElementPresent(cssSelector(StacksBucket.CSS_SELECTOR), browser));
+        assertFalse(isElementPresent(cssSelector(StacksBucket.CSS_SELECTOR), browser), "Stacks bucket shouldn't display");
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void test_stack_bucket_should_accept_only_attributes() {
         WebElement metric = initAnalysePage().getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC);
         analysisPage.drag(metric, analysisPage.getStacksBucket().getInvitation());
-        assertTrue(analysisPage.getStacksBucket().isEmpty());
+        assertTrue(analysisPage.getStacksBucket().isEmpty(), "Stacks bucket should be empty");
 
         WebElement date = analysisPage.getCataloguePanel().getDate();
         analysisPage.drag(date, analysisPage.getStacksBucket().getInvitation());
-        assertTrue(analysisPage.getStacksBucket().isEmpty());
+        assertTrue(analysisPage.getStacksBucket().isEmpty(), "Stacks bucket should be empty");
 
-        assertFalse(analysisPage.addStack(ATTR_ACTIVITY_TYPE).getStacksBucket().isEmpty());
+        assertFalse(analysisPage.addStack(ATTR_ACTIVITY_TYPE).getStacksBucket().isEmpty(),
+                "Stacks bucket shouldn't be empty");
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void test_stack_bucket_automatically_adds_new_attribute_filter() {
-        assertFalse(initAnalysePage().addStack(ATTR_ACTIVITY_TYPE).getFilterBuckets().isEmpty());
+        assertFalse(initAnalysePage().addStack(ATTR_ACTIVITY_TYPE).getFilterBuckets().isEmpty(),
+                "Filter buckets shouldn't be empty");
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void test_stack_bucket_should_accept_only_one_attribute_at_the_time() {
         WebElement invitation = initAnalysePage().getStacksBucket().getInvitation();
         analysisPage.addStack(ATTR_ACTIVITY_TYPE);
-        assertFalse(invitation.isDisplayed());
+        assertFalse(invitation.isDisplayed(), "Invitation shouldn't display");
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
@@ -109,7 +111,7 @@ public class BucketsTest extends AbstractAdE2ETest {
             .addMetric(METRIC_NUMBER_OF_LOST_OPPS)
             .waitForReportComputing()
             .getStacksBucket();
-        assertFalse(stacksBucket.getWarningMessage().isEmpty());
+        assertFalse(stacksBucket.getWarningMessage().isEmpty(), "Warning message should display");
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
@@ -117,9 +119,9 @@ public class BucketsTest extends AbstractAdE2ETest {
         initAnalysePage().addStack(ATTR_ACTIVITY_TYPE)
             .drag(analysisPage.getStacksBucket().get(), analysisPage.getAttributesBucket().getInvitation());
 
-        assertTrue(analysisPage.getStacksBucket().isEmpty());
+        assertTrue(analysisPage.getStacksBucket().isEmpty(), "Stacks bucket should be empty");
 
-        assertFalse(analysisPage.getAttributesBucket().isEmpty());
+        assertFalse(analysisPage.getAttributesBucket().isEmpty(), "Attributes bucket shouldn't be empty");
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
@@ -127,8 +129,8 @@ public class BucketsTest extends AbstractAdE2ETest {
         initAnalysePage().addAttribute(ATTR_ACTIVITY_TYPE)
             .drag(analysisPage.getAttributesBucket().getFirst(), analysisPage.getStacksBucket().getInvitation());
 
-        assertFalse(analysisPage.getStacksBucket().isEmpty());
-        assertTrue(analysisPage.getAttributesBucket().isEmpty());
+        assertFalse(analysisPage.getStacksBucket().isEmpty(), "Stacks bucket shouldn't be empty");
+        assertTrue(analysisPage.getAttributesBucket().isEmpty(), "Attributes bucket should be empty");
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
@@ -140,8 +142,10 @@ public class BucketsTest extends AbstractAdE2ETest {
         assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACCOUNT));
         assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_ACTIVITY_TYPE);
 
-        assertTrue(analysisPage.getFilterBuckets().isFilterVisible(ATTR_ACCOUNT));
-        assertTrue(analysisPage.getFilterBuckets().isFilterVisible(ATTR_ACTIVITY_TYPE));
+        assertTrue(analysisPage.getFilterBuckets().isFilterVisible(ATTR_ACCOUNT),
+                ATTR_ACCOUNT + " filter should display");
+        assertTrue(analysisPage.getFilterBuckets().isFilterVisible(ATTR_ACTIVITY_TYPE),
+                ATTR_ACTIVITY_TYPE + " filter should display");
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
@@ -157,7 +161,7 @@ public class BucketsTest extends AbstractAdE2ETest {
         // Drag stacking attribute to x-axis category
         analysisPage.drag(analysisPage.getStacksBucket().get(), analysisPage.getAttributesBucket().getFirst());
 
-        assertTrue(analysisPage.getStacksBucket().isEmpty());
+        assertTrue(analysisPage.getStacksBucket().isEmpty(), "Stacks bucket should be empty");
         assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ATTR_ACTIVITY_TYPE));
     }
 
@@ -169,13 +173,13 @@ public class BucketsTest extends AbstractAdE2ETest {
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
 
-        assertFalse(configuration.isShowPercentEnabled());
+        assertFalse(configuration.isShowPercentEnabled(), "Show percent should be disabled");
 
         configuration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
 
-        assertFalse(configuration.isShowPercentEnabled());
+        assertFalse(configuration.isShowPercentEnabled(), "Show percent should be disabled");
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
@@ -188,7 +192,7 @@ public class BucketsTest extends AbstractAdE2ETest {
             .expandConfiguration();
 
         assertEquals(analysisPage.getAttributesBucket().getItemNames().size(), 1);
-        assertFalse(configuration.isShowPercentEnabled());
+        assertFalse(configuration.isShowPercentEnabled(), "Show percent should be disabled");
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
@@ -198,7 +202,7 @@ public class BucketsTest extends AbstractAdE2ETest {
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
 
-        assertFalse(configuration.isShowPercentEnabled());
+        assertFalse(configuration.isShowPercentEnabled(), "Show percent should be disabled");
 
         Graphene.createPageFragment(RecommendationContainer.class,
                 waitForElementVisible(RecommendationContainer.LOCATOR, browser))

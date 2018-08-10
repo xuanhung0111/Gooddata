@@ -9,9 +9,9 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 import org.json.JSONException;
 import org.testng.annotations.BeforeMethod;
@@ -112,23 +112,23 @@ public class MultipleDatasetsTest extends AbstractAnalyseTest {
 
         cataloguePanel.changeDataset(PRODUCTION_DATASET).search(AMOUNT);
         takeScreenshot(browser, "searchDataAfterSelectDataset - search in production data", getClass());
-        assertFalse(cataloguePanel.hasItem(AMOUNT));
+        assertFalse(cataloguePanel.getFieldNamesInViewPort().contains(AMOUNT), "Amount shouldn't be in view port");
 
         cataloguePanel.search("County");
-        assertFalse(cataloguePanel.hasItem("County"));
+        assertFalse(cataloguePanel.getFieldNamesInViewPort().contains("County"), "County shouldn't be in view port");
 
         cataloguePanel.search("Id");
-        assertTrue(cataloguePanel.hasItem("Id"));
+        assertThat(cataloguePanel.getFieldNamesInViewPort(), hasItem("Id"));
 
         cataloguePanel.changeDataset(PAYROLL_DATASET).search(AMOUNT);
         takeScreenshot(browser, "searchDataAfterSelectDataset - search in payroll data", getClass());
-        assertTrue(cataloguePanel.hasItem(AMOUNT));
+        assertThat(cataloguePanel.getFieldNamesInViewPort(), hasItem(AMOUNT));
 
         cataloguePanel.search("County");
-        assertTrue(cataloguePanel.hasItem("County"));
+        assertThat(cataloguePanel.getFieldNamesInViewPort(), hasItem("County"));
 
         cataloguePanel.search("Id");
-        assertFalse(cataloguePanel.hasItem("Id"));
+        assertFalse(cataloguePanel.getFieldNamesInViewPort().contains("Id"), "ID shouldn't be in view port");
     }
 
     @Test(dependsOnGroups = {"createProject"},

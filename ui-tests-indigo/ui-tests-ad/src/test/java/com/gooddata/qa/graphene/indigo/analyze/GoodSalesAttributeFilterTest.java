@@ -78,13 +78,15 @@ public class GoodSalesAttributeFilterTest extends AbstractAnalyseTest {
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         assertTrue(recommendationContainer
-                .isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+                .isRecommendationVisible(RecommendationStep.SEE_PERCENTS), "Percents recommendation should display");
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE),
+                "Compare recommendation should display");
 
         analysisPage.addFilter(ATTR_DEPARTMENT).waitForReportComputing();
         assertTrue(recommendationContainer
-                .isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+                .isRecommendationVisible(RecommendationStep.SEE_PERCENTS), "Percents recommendation should display");
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE),
+                "Compare recommendation should display");
         checkingOpenAsReport("addFilterNotHideRecommendation");
     }
 
@@ -131,12 +133,13 @@ public class GoodSalesAttributeFilterTest extends AbstractAnalyseTest {
         final FiltersBucket filtersBucketReact = initAnalysePage().getFilterBuckets();
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
-        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
-        assertTrue(filtersBucketReact.isDateFilterVisible());
+        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1,
+                "Number of Trackers should be greater or equal 1");
+        assertTrue(filtersBucketReact.isDateFilterVisible(), "Date filter should display");
 
         analysisPage.replaceAttribute(DATE, ATTR_ACTIVITY_TYPE);
-        assertFalse(filtersBucketReact.isDateFilterVisible());
-        assertTrue(filtersBucketReact.isFilterVisible(ATTR_ACTIVITY_TYPE));
+        assertFalse(filtersBucketReact.isDateFilterVisible(), "Date filter shouldn't display");
+        assertTrue(filtersBucketReact.isFilterVisible(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + " filter should display");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -144,14 +147,15 @@ public class GoodSalesAttributeFilterTest extends AbstractAnalyseTest {
         final FiltersBucket filtersBucketReact = initAnalysePage().getFilterBuckets();
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE);
-        assertTrue(filtersBucketReact.isFilterVisible(ATTR_ACTIVITY_TYPE));
+        assertTrue(filtersBucketReact.isFilterVisible(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE + " filter should display");
 
         analysisPage.addStack(ATTR_DEPARTMENT);
-        assertTrue(filtersBucketReact.isFilterVisible(ATTR_DEPARTMENT));
+        assertTrue(filtersBucketReact.isFilterVisible(ATTR_DEPARTMENT), ATTR_DEPARTMENT + " filter should display");
 
         analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, "Region");
-        assertFalse(filtersBucketReact.isFilterVisible(ATTR_ACTIVITY_TYPE));
-        assertTrue(filtersBucketReact.isFilterVisible("Region"));
+        assertFalse(filtersBucketReact.isFilterVisible(ATTR_ACTIVITY_TYPE),
+                ATTR_ACTIVITY_TYPE + " filter shouldn't display");
+        assertTrue(filtersBucketReact.isFilterVisible("Region"), "Region filter should display");
         checkingOpenAsReport("testReplaceAttribute");
     }
 

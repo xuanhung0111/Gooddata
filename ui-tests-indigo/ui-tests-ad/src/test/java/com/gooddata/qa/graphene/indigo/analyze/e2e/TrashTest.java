@@ -36,7 +36,7 @@ public class TrashTest extends AbstractAdE2ETest {
             .getAttributesBucket()
             .isEmpty());
 
-        assertFalse(analysisPage.getPageHeader().isResetButtonEnabled());
+        assertFalse(analysisPage.getPageHeader().isResetButtonEnabled(), "Reset button should be disabled");
     }
 
     @Test(dependsOnGroups = {"createProject"})

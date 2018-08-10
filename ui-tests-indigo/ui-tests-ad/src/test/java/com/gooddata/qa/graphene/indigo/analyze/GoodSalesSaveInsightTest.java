@@ -93,7 +93,7 @@ public class GoodSalesSaveInsightTest extends AbstractAnalyseTest {
     @Test(dependsOnGroups = {"createProject"})
     public void testSaveInsightWithBlankName () throws JSONException, IOException {
         initAnalysePage().setInsightTitle(INSIGHT_TEST_NULL);
-        assertFalse(analysisPage.isSaveInsightEnabled());
+        assertFalse(analysisPage.isSaveInsightEnabled(), "Save button shouldn't be enabled");
     }
 
     @Test(dependsOnMethods = {"testSaveInsight"})
@@ -165,7 +165,7 @@ public class GoodSalesSaveInsightTest extends AbstractAnalyseTest {
         pageheader.saveWithoutSubmitting(insight).cancel();
         pageheader.saveInsight();
         //After cancel and save again, the Save Dialog is not cached the old information.
-        assertTrue(SaveInsightDialog.getInstance(browser).isSubmitButtonDisabled());
+        assertTrue(SaveInsightDialog.getInstance(browser).isSubmitButtonDisabled(), "Submit button should be disabled");
         assertEquals(SaveInsightDialog.getInstance(browser).getName(), "");
     }
 
@@ -202,7 +202,7 @@ public class GoodSalesSaveInsightTest extends AbstractAnalyseTest {
         takeScreenshot(browser, "Edit-Insight-Test", getClass());
 
         //make sure data is cleared before open insight
-        assertTrue(analysisPage.resetToBlankState().isBlankState());
+        assertTrue(analysisPage.resetToBlankState().isBlankState(), "State should be blank");
         assertEquals(analysisPage.openInsight(insight).waitForReportComputing().getChartReport()
                 .getDataLabels(), expectedLabels);
     }
@@ -270,7 +270,7 @@ public class GoodSalesSaveInsightTest extends AbstractAnalyseTest {
             description = "CL-9969: Date is remembered from previous viz")
     public void testDateDimensionOnSavedInsights() {
         //make sure data is cleared before opening first insight
-        assertTrue(initAnalysePage().resetToBlankState().isBlankState());
+        assertTrue(initAnalysePage().resetToBlankState().isBlankState(), "State should be blank");
         analysisPage.openInsight(DATE_CLOSED_DIMENSION_INSIGHT).waitForReportComputing();
         assertEquals(analysisPage.getAttributesBucket().getSelectedDimensionSwitch(), CLOSED,
                 "Selected date dimension of " + DATE_CLOSED_DIMENSION_INSIGHT + "was not correct");

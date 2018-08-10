@@ -37,6 +37,7 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -91,11 +92,13 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND),
+                "Recommendation should be visible");
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE),
+                "Recommendation should be visible");
 
         analysisPage.changeReportType(ReportType.BAR_CHART);
-        assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
+        assertEquals(browser.findElements(RecommendationContainer.LOCATOR).size(), 0);
 
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing();
         assertThat(report.getTrackersCount(), equalTo(4));
@@ -113,22 +116,23 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         assertTrue(recommendationContainer
-                .isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
+                .isRecommendationVisible(RecommendationStep.SEE_PERCENTS), "Recommendation should be visible");
         recommendationContainer.getRecommendation(RecommendationStep.SEE_PERCENTS).apply();
-        assertTrue(analysisPage.waitForReportComputing().isReportTypeSelected(ReportType.BAR_CHART));
+        assertTrue(analysisPage.waitForReportComputing().isReportTypeSelected(ReportType.BAR_CHART),
+                "Report type should be " + ReportType.BAR_CHART);
         assertEquals(report.getTrackersCount(), 4);
 
         MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration("% " + METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
-        assertTrue(metricConfiguration.isShowPercentEnabled());
-        assertTrue(metricConfiguration.isShowPercentSelected());
+        assertTrue(metricConfiguration.isShowPercentEnabled(), "Show percent is disabled");
+        assertTrue(metricConfiguration.isShowPercentSelected(), "Show percent isn't selected");
 
         assertTrue(analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing()
-                .isReportTypeSelected(ReportType.BAR_CHART));
+                .isReportTypeSelected(ReportType.BAR_CHART), "Report type should be " + ReportType.BAR_CHART);
         assertEquals(report.getTrackersCount(), 2);
-        assertTrue(metricConfiguration.isShowPercentEnabled());
-        assertTrue(metricConfiguration.isShowPercentSelected());
+        assertTrue(metricConfiguration.isShowPercentEnabled(), "Show percent is disabled");
+        assertTrue(metricConfiguration.isShowPercentSelected(), "Show percent isn't selected");
         checkingOpenAsReport("testSimpleContribution");
     }
     @Test(dependsOnGroups = {"createProject"})
@@ -141,22 +145,27 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE),
+                "Recommendation should be visible");
 
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select(ATTR_ACTIVITY_TYPE).apply();
-        assertTrue(analysisPage.waitForReportComputing().getAttributesBucket().getItemNames()
-                .contains(ATTR_ACTIVITY_TYPE));
-        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY_TYPE)), Arrays.asList(ATTR_ACTIVITY_TYPE, "All"));
+        assertThat(analysisPage.waitForReportComputing().getAttributesBucket().getItemNames(),
+                hasItem(ATTR_ACTIVITY_TYPE));
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets()
+                .getFilterText(ATTR_ACTIVITY_TYPE)), Arrays.asList(ATTR_ACTIVITY_TYPE, "All"));
         assertEquals(report.getTrackersCount(), 4);
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE),
+                "Recommendation should be visible");
 
         analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, ATTR_DEPARTMENT).waitForReportComputing();
-        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ATTR_DEPARTMENT));
-        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText(ATTR_DEPARTMENT)), Arrays.asList(ATTR_DEPARTMENT, "All"));
+        assertThat(analysisPage.getAttributesBucket().getItemNames(), hasItem(ATTR_DEPARTMENT));
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets()
+                .getFilterText(ATTR_DEPARTMENT)), Arrays.asList(ATTR_DEPARTMENT, "All"));
         assertEquals(report.getTrackersCount(), 2);
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE),
+                "Recommendation should be visible");
         checkingOpenAsReport("testSimpleComparison");
     }
 
@@ -172,10 +181,11 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
             .waitForNonEmptyBuckets()
             .waitForReportComputing();
 
-        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
-        assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
+        assertThat(analysisPage.getAttributesBucket().getItemNames(), hasItem(DATE));
+        assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"),
+                "Filter by activity should display");
         assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText("Activity")), Arrays.asList("Activity", "Last 4 quarters"));
-        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
+        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1, "Trackers should display");
         checkingOpenAsReport("displayWhenDraggingFirstMetric");
     }
 
@@ -186,7 +196,7 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
                 .changeReportType(ReportType.TABLE)
                 .waitForReportComputing()
                 .getPageHeader()
-                .isExportButtonEnabled());
+                .isExportButtonEnabled(), "Export button should be enabled");
         TableReport analysisReport = analysisPage.getTableReport();
         List<List<String>> analysisContent = analysisReport.getContent();
         Iterator<String> analysisHeaders = analysisReport.getHeaders().iterator();
@@ -204,10 +214,10 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
 
             List<String> headers = tableReport.getAttributeHeaders();
             headers.addAll(tableReport.getMetricHeaders());
-            Iterator<String> reportheaders = headers.iterator();
+            Iterator<String> reportHeaders = headers.iterator();
 
-            while (analysisHeaders.hasNext() && reportheaders.hasNext()) {
-                assertThat(reportheaders.next().toLowerCase(), equalTo(analysisHeaders.next().toLowerCase()));
+            while (analysisHeaders.hasNext() && reportHeaders.hasNext()) {
+                assertThat(reportHeaders.next().toLowerCase(), equalTo(analysisHeaders.next().toLowerCase()));
             }
             checkRedBar(browser);
         } finally {
@@ -225,12 +235,12 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
                 .addDateFilter()
                 .waitForReportComputing();
         assertEquals(analysisPage.getChartReport().getTrackersCount(), 4);
-        assertEquals(parseFilterText(filtersBucket.getDateFilterText()), Arrays.asList("Activity", "All time"));
+        assertEquals(parseFilterText(filtersBucket.getDateFilterText()), asList("Activity", "All time"));
 
         filtersBucket.configDateFilter("01/01/2016", "01/01/2017");
         analysisPage.waitForReportComputing();
-        assertEquals(parseFilterText(filtersBucket.getFilterText("Activity")), Arrays.asList("Activity", "Jan 1, 2016 - Jan 1, 2017"));
-        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
+        assertEquals(parseFilterText(filtersBucket.getFilterText("Activity")), asList("Activity", "Jan 1, 2016 - Jan 1, 2017"));
+        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1, "Trackers should display");
         checkingOpenAsReport("filterOnDateAttribute");
     }
 
@@ -242,24 +252,25 @@ public class AnalyticalDesignerSanityTest extends AbstractAnalyseTest {
             .configDateFilter("01/01/2012", "12/31/2012");
 
         assertTrue(analysisPage.getFilterBuckets()
-                .isFilterVisible(ATTR_ACTIVITY));
+                .isFilterVisible(ATTR_ACTIVITY), "Filter by attribute activity should display");
         assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY)),
-                Arrays.asList("Activity", "Jan 1, 2012 - Dec 31, 2012"));
+                asList("Activity", "Jan 1, 2012 - Dec 31, 2012"));
         ChartReport report = analysisPage.waitForReportComputing().getChartReport();
         assertThat(report.getTrackersCount(), equalTo(1));
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE),
+                "Recommendation should visible");
         recommendationContainer.getRecommendation(RecommendationStep.COMPARE).apply();
         analysisPage.waitForReportComputing();
-        assertTrue(report.getTrackersCount() >= 1);
+        assertTrue(report.getTrackersCount() >= 1, "Trackers should display");
         List<String> legends = report.getLegends();
         assertEquals(legends.size(), 2);
         assertEquals(legends, asList(METRIC_NUMBER_OF_ACTIVITIES_YEAR_AGO, METRIC_NUMBER_OF_ACTIVITIES));
 
         analysisPage.addMetric(METRIC_SNAPSHOT_BOP).waitForReportComputing();
-        assertTrue(report.getTrackersCount() >= 1);
+        assertTrue(report.getTrackersCount() >= 1, "Trackers should display");
         legends = report.getLegends();
         assertEquals(legends.size(), 4);
         assertEquals(legends,
