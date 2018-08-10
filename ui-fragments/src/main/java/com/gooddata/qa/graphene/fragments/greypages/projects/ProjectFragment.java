@@ -76,7 +76,7 @@ public class ProjectFragment extends AbstractGreyPagesFragment {
         String projectUrl = browser.getCurrentUrl();
         logProjectUrl(projectUrl);
         System.out.println("Waiting for project enabled: " + projectUrl);
-        waitForPollState("ENABLED", checkIterations);
+        waitForPollState(State.ENABLED, checkIterations);
         return projectUrl.substring(projectUrl.lastIndexOf("/") + 1);
     }
 
@@ -85,8 +85,12 @@ public class ProjectFragment extends AbstractGreyPagesFragment {
     }
 
     @Override
-    protected String getPollState() throws JSONException {
-        return loadJSON().getJSONObject("project").getJSONObject("content").getString("state");
+    protected State getPollState() throws JSONException {
+        return Stream.of(State.values())
+                .filter(state -> state.toString()
+                        .equals(loadJSON().getJSONObject("project").getJSONObject("content").getString("state")))
+                .findFirst()
+                .get();
     }
 
     private void logProjectUrl(String projectUrl) {

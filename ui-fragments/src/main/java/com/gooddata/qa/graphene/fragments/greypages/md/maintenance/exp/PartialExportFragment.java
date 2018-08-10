@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.fragments.greypages.md.maintenance.exp;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static org.testng.Assert.assertTrue;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -9,6 +8,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
+
+import java.util.stream.Stream;
 
 public class PartialExportFragment extends AbstractGreyPagesFragment {
 
@@ -26,13 +27,16 @@ public class PartialExportFragment extends AbstractGreyPagesFragment {
 
         waitForElementVisible(BY_GP_LINK, browser);
         Graphene.guardHttp(browser.findElement(BY_GP_LINK)).click();
-        assertTrue(waitForPollState("OK", checkIterations));
+        waitForPollState(State.OK, checkIterations);
         return exportToken;
     }
 
     @Override
-    protected String getPollState() throws JSONException {
-        return loadJSON().getJSONObject("wTaskStatus").getString("status");
+    protected State getPollState() throws JSONException {
+        return Stream.of(State.values())
+                .filter(state -> state.toString().equals(loadJSON().getJSONObject("wTaskStatus").getString("status")))
+                .findFirst()
+                .get();
     }
 
     protected String getExportToken() throws JSONException {

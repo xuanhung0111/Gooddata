@@ -2,9 +2,6 @@ package com.gooddata.qa.graphene.fragments.greypages;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotEquals;
-import static org.testng.Assert.assertTrue;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -12,6 +9,7 @@ import org.json.JSONObject;
 import org.openqa.selenium.By;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 public abstract class AbstractGreyPagesFragment extends AbstractFragment {
@@ -28,25 +26,26 @@ public abstract class AbstractGreyPagesFragment extends AbstractFragment {
         return new JSONObject(content.getText());
     }
 
-    protected boolean waitForPollState(String expectedValidState, int maxIterations) throws JSONException {
+    protected void waitForPollState(State expectedValidState, int maxIterations) throws JSONException {
         int i = 0;
-        String state = "";
-        while (!expectedValidState.equals(state = getPollState())) {
+        State state;
+        while (getPollState() == State.RUNNING && !expectedValidState.equals(state = getPollState())) {
             System.out.println("Current polling state is: " + state);
-            assertTrue(i < maxIterations, "Maximum attempts to get " + expectedValidState + " status reached. Exiting.");
-            assertNotEquals(state, "ERROR", "Error state appeared");
-            assertNotEquals(state, "DELETED", "Deleted status appeared");
-            assertNotEquals(state, "CANCELED", "Canceled status appeared");
+            if (i >= maxIterations) {
+                throw new TimeoutException("Maximum attempts to get " + expectedValidState + " status reached. Exiting.");
+            }
             sleepTightInSeconds(5);
             browser.navigate().refresh();
             i++;
         }
-        assertEquals(state, expectedValidState, "Have expected state");
         System.out.println("Succeed at +- " + (i * 5) + "seconds");
-        return true;
     }
 
-    protected String getPollState() throws JSONException {
+    protected State getPollState() throws JSONException {
         throw new JSONException("Override this to set proper JSON path");
+    }
+
+    public enum State {
+        OK, ENABLED, ERROR, DELETED, CANCELED, RUNNING
     }
 }
