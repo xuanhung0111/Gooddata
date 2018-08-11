@@ -38,7 +38,7 @@ public class NavigationErrorTest extends AbstractCsvUploaderTest {
         assertThat(errorMessage, containsString("The dataset you are looking for no longer exists."));
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = "csv")
+    @Test(dependsOnMethods = {"showErrorOnUploadsPageWhenInvalidDatasetId"}, groups = "csv")
     public void redirectToErrorPageWhenInsufficientAccessRights() throws ParseException, IOException, JSONException {
         try {
             logoutAndLoginAs(true, UserRoles.VIEWER);
