@@ -24,7 +24,7 @@ public class NavigationErrorTest extends AbstractCsvUploaderTest {
     @FindBy(className = "s-insufficient-access-rights")
     private InsufficientAccessRightsPage insufficientAccessRightsPage;
 
-    @Test
+    @Test(dependsOnMethods = {"redirectToErrorPageWhenInsufficientAccessRights"}, groups = "csv")
     public void navigateToProjectsPageWhenInvalidProjectId() {
         openUrl(format(DATA_UPLOAD_PAGE_URI_TEMPLATE, "nonExistingProjectIdL123321"));
         waitForStringInUrl("/projects.html#status=notAuthorized");
