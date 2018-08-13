@@ -46,7 +46,7 @@ public class NotificationTest extends AbstractCsvUploaderTest {
         signInAtGreyPages(imapUser, imapPassword);
     }
 
-    @Test(dependsOnGroups = "precondition", groups = "csv")
+    @Test(dependsOnGroups = "precondition", groups = "csv", enabled = false)
     public void checkNotificationForSuccessfulUpload() {
         final String datasetName = uploadCsv(PAYROLL).getName();
 
@@ -55,7 +55,7 @@ public class NotificationTest extends AbstractCsvUploaderTest {
         checkSuccessfulNotification(getSuccessfulNotification(1), datasetName);
     }
 
-    @Test(dependsOnMethods = {"checkNotificationForSuccessfulUpload"}, groups = "csv")
+    @Test(dependsOnMethods = {"checkNotificationForSuccessfulUpload"}, groups = "csv", enabled = false)
     public void checkNotificationForSuccessfulUpdate() {
         final String datasetName = PAYROLL.getDatasetNameOfFirstUpload();
 
