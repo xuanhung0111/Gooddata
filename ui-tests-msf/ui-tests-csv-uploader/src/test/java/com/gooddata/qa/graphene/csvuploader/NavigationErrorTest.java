@@ -24,13 +24,13 @@ public class NavigationErrorTest extends AbstractCsvUploaderTest {
     @FindBy(className = "s-insufficient-access-rights")
     private InsufficientAccessRightsPage insufficientAccessRightsPage;
 
-    @Test(dependsOnMethods = {"redirectToErrorPageWhenInsufficientAccessRights"}, groups = "csv")
+    @Test(dependsOnMethods = {"redirectToErrorPageWhenInsufficientAccessRights"}, groups = "csv", enabled = false)
     public void navigateToProjectsPageWhenInvalidProjectId() {
         openUrl(format(DATA_UPLOAD_PAGE_URI_TEMPLATE, "nonExistingProjectIdL123321"));
         waitForStringInUrl("/projects.html#status=notAuthorized");
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = "csv")
+    @Test(dependsOnGroups = {"createProject"}, groups = "csv", enabled = false)
     public void showErrorOnUploadsPageWhenInvalidDatasetId() {
         openUrl(format(CSV_DATASET_DETAIL_PAGE_URI_TEMPLATE, testParams.getProjectId(), "nonExistingDataset"));
         final String errorMessage = DatasetMessageBar.getInstance(browser).waitForErrorMessageBar().getText();
@@ -38,7 +38,7 @@ public class NavigationErrorTest extends AbstractCsvUploaderTest {
         assertThat(errorMessage, containsString("The dataset you are looking for no longer exists."));
     }
 
-    @Test(dependsOnMethods = {"showErrorOnUploadsPageWhenInvalidDatasetId"}, groups = "csv")
+    @Test(dependsOnMethods = {"showErrorOnUploadsPageWhenInvalidDatasetId"}, groups = "csv", enabled = false)
     public void redirectToErrorPageWhenInsufficientAccessRights() throws ParseException, IOException, JSONException {
         try {
             logoutAndLoginAs(true, UserRoles.VIEWER);
