@@ -91,7 +91,7 @@ public class Dataset extends AbstractFragment {
     }
 
     public static void waitForDatasetLoaded(SearchContext searchContext) {
-        final int uploadTimeout = 5 * 60; // 5 minutes
+        final int uploadTimeout = 10 * 60; // 10 minutes
         final By itemInProgress = className("item-in-progress");
 
         if (isElementPresent(itemInProgress, searchContext)) {
