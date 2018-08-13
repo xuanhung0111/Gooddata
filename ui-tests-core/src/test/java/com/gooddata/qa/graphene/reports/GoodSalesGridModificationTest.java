@@ -11,27 +11,37 @@ import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
+import com.gooddata.qa.graphene.entity.report.HowItem;
+import com.gooddata.qa.graphene.entity.report.HowItem.Position;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.report.WhatItem;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
 import com.gooddata.qa.graphene.fragments.reports.report.AttributeSndPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
 import com.gooddata.qa.graphene.utils.WaitUtils;
+import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.util.function.Function;
+
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPPORTUNITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
@@ -64,9 +74,11 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
 
     private final static String REPORT_NOT_COMPUTABLE_MESSAGE = "Report not computable due to improper metric definition";
     private final static String DISPLAY_LABEL = "http://www.google.com";
+    private ProjectRestRequest projectRestRequest;
 
     @Override
     protected void customizeProject() throws Throwable {
+        projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         getMetricCreator().createAmountMetric();
         getMetricCreator().createProbabilityMetric();
         final Attribute stageName = getMdService().getObj(getProject(), Attribute.class, title(ATTR_STAGE_NAME));
@@ -172,6 +184,48 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
                 "Totals group is displayed");
     }
 
+    @DataProvider(name = "position")
+    public Object[][] getPosition() {
+        return new Object[][] {
+                {true, Position.LEFT, Position.TOP},
+                {true, Position.LEFT, Position.LEFT},
+                {true, Position.TOP, Position.TOP},
+                {false, Position.LEFT, Position.TOP},
+                {false, Position.LEFT, Position.LEFT},
+                {false, Position.TOP, Position.TOP}
+        };
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "position")
+    public void manipulateWithOnlyAttributesReport(boolean isFeatureFlagEnable, Position stageNamePosition,
+                                                 Position departmentPosition) {
+        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.REPORT_HEADER_PAGING_ENABLED, isFeatureFlagEnable);
+        try {
+            initReportCreation().createReport(new UiReportDefinition()
+                    .withName(REPORT_WITHOUT_METRIC)
+                    .withHows(
+                            new HowItem(ATTR_STAGE_NAME, stageNamePosition),
+                            new HowItem(ATTR_DEPARTMENT, departmentPosition)));
+            assertFalse(
+                    initReportsPage().openReport(REPORT_WITHOUT_METRIC).getTableReport()
+                            .openContextMenuFrom(ATTR_STAGE_NAME, CellType.ATTRIBUTE_HEADER)
+                            .getGroupNames().contains("Totals"),
+                    "Totals group is displayed");
+
+            TableReport tableReport = initReportsPage().openReport(REPORT_WITHOUT_METRIC)
+                    .getTableReport().waitForLoaded().selectContentArea(Pair.of(3,3),
+                            stageNamePosition == Position.TOP ? Pair.of(3, 4) : Pair.of(4, 3));
+            Screenshots.takeScreenshot(browser, format("Report has two attributes on %s and %s with feature set %s",
+                    stageNamePosition, departmentPosition, isFeatureFlagEnable), getClass());
+            assertTrue(reportPage.isSelectionQuickInfoDisplay(), "Selection Quick Info should display");
+
+            tableReport.clickOnCellElement(INTEREST, CellType.ATTRIBUTE_VALUE).waitForLoaded();
+            assertFalse(reportPage.isSelectionQuickInfoDisplay(), "Selection Quick Info shouldn't display");
+        } finally {
+            projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.REPORT_HEADER_PAGING_ENABLED, false);
+        }
+    }
+
     @Test(dependsOnGroups = {"createProject"})
     public void drillAttributeToHyperlinkLabel() {
         final String hyperlinkReport = "Hyperlink-report";
@@ -192,10 +246,8 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
 
         assertTrue(table.isDrillableToExternalPage(CellType.ATTRIBUTE_VALUE), "cannot drill report to external page");
 
-        final String currentWindow = browser.getWindowHandle();
-
         table.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
-        checkExternalPageUrl(currentWindow);
+        checkExternalPageUrl();
 
         reportPage.openHowPanel().openAttributeDetail(ATTR_OPPORTUNITY).changeDisplayLabel(SFDC_URL).done();
         reportPage.waitForReportExecutionProgress();
@@ -203,7 +255,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
                 "The label has not been applied");
 
         table.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
-        checkExternalPageUrl(currentWindow);
+        checkExternalPageUrl();
         reportPage.saveReport();
 
         initAttributePage().initAttribute(ATTR_OPPORTUNITY).clearDrillingSetting().setDrillToAttribute(ATTR_ACCOUNT);
@@ -257,7 +309,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
                 equalTo(REPORT_NOT_COMPUTABLE_MESSAGE));
     }
 
-    private void checkExternalPageUrl(final String currentWindow) {
+    private void checkExternalPageUrl() {
         try {
             final Function<WebDriver, Boolean> predicate = browser -> browser.getWindowHandles().size() == 2;
             Graphene.waitGui().until(predicate);
@@ -271,5 +323,4 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
             BrowserUtils.switchToFirstTab(browser);
         }
     }
-
 }

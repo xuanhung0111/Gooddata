@@ -18,8 +18,8 @@ public enum ProjectFeatureFlags {
     CONTROL_EXECUTION_CONTEXT_ENABLED("controlExecutionContextEnabled"),
     EXPORT_TO_XLSX_ENABLED("exportToXLSXEnabled"),
     CELL_MERGED_BY_DEFAULT("cellMergedByDefault"),
-    ACTIVE_FILTERS_BY_DEFAULT("activeFiltersByDefault");
-
+    ACTIVE_FILTERS_BY_DEFAULT("activeFiltersByDefault"),
+    REPORT_HEADER_PAGING_ENABLED("reportHeaderPagingEnabled");
 
     private final String featureFlag;
 
