@@ -92,7 +92,7 @@ public class NotificationTest extends AbstractCsvUploaderTest {
     private Document getNotification(String subject, int expectedMessageCount) {
         try (ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword)) {
             List<Message> notifications = 
-                    waitForMessages(imapClient, GDEmails.NO_REPLY, subject, expectedMessageCount);
+                    waitForMessages(imapClient, GDEmails.NOREPLY, subject, expectedMessageCount);
 
             return Jsoup.parse(ImapUtils.getEmailBody(Iterables.getLast(notifications)));
 
