@@ -13,6 +13,7 @@ import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertTrue;
 
+import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.AbstractPicker;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.description.DescriptionPanel;
@@ -211,10 +212,10 @@ public class MetricConfiguration extends AbstractFragment {
         @FindBy(css = ".gd-checkbox-selection")
         private WebElement selectAllCheckbox;
 
-        @FindBy(css = ".s-apply:not(.disabled)")
+        @FindBy(css = ".button-small.s-apply:not(.disabled)")
         private WebElement applyButton;
 
-        @FindBy(css = ".s-cancel")
+        @FindBy(css = ".button-small.s-cancel:not(.disabled)")
         private WebElement cancelButton;
 
         private static final By CLEAR_SEARCH_TEXT_SHORTCUT = className("gd-input-icon-clear");
@@ -316,12 +317,14 @@ public class MetricConfiguration extends AbstractFragment {
         }
 
         public void apply() {
-            waitForElementVisible(applyButton).click();
+            //Click action on element does not affect sometimes, so switch to use java script executor.
+            BrowserUtils.runScript(browser, "arguments[0].click();", waitForElementVisible(applyButton));
             waitForElementNotVisible(getRoot());
         }
 
         public void cancel() {
-            waitForElementVisible(cancelButton).click();
+            //Click action on element does not affect sometimes, so switch to use java script executor.
+            BrowserUtils.runScript(browser, "arguments[0].click();", waitForElementVisible(cancelButton));
             waitForElementNotVisible(getRoot());
         }
     }
