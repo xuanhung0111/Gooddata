@@ -52,7 +52,7 @@ public class DashboardsPage extends AbstractFragment {
     protected static final By BY_PRINTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' " +
             "and text()='Preparing printable PDF for download…']");
 
-    private static final By SAVE_AS_DIALOG_LOCATOR = By.className("dashboardSettingsDialogView"); 
+    private static final By SAVE_AS_DIALOG_LOCATOR = By.className("dashboardSettingsDialogView");
     private static final By BY_EXPORTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' and text()='Exporting…']");
     private static final By BY_TAB_DROPDOWN_MENU = By.xpath("//div[contains(@class, 's-tab-menu')]");
     private static final By BY_TAB_DROPDOWN_DELETE_BUTTON = By.xpath("//li[contains(@class, 's-delete')]//a");
@@ -139,7 +139,7 @@ public class DashboardsPage extends AbstractFragment {
     public DashboardContent getContent() {
         return content;
     }
-    
+
     public boolean isEmptyDashboard() {
         return getContent().isEmpty();
     }
@@ -427,7 +427,7 @@ public class DashboardsPage extends AbstractFragment {
     public void publishDashboard(boolean listed) {
         PermissionsDialog dialog = openPermissionsDialog();
 
-        dialog.publish(listed ? PublishType.EVERYONE_CAN_ACCESS : PublishType.SPECIFIC_USERS_CAN_ACCESS);
+        dialog.publish(listed ? PublishType.ALL_USERS_IN_THIS_PROJECT : PublishType.SELECTED_USERS);
         dialog.submit();
 
         if (listed) {
@@ -472,7 +472,7 @@ public class DashboardsPage extends AbstractFragment {
     public void saveAsDashboard(String dashboardName, PermissionType permissionType) {
         saveAsDashboard(dashboardName, false, permissionType);
     }
-    
+
     public void saveAsDashboardAndEnableSavedViews(String dashboardName, PermissionType permissionType) {
         saveAsDashboard(dashboardName, true, permissionType);
     }
@@ -720,7 +720,7 @@ public class DashboardsPage extends AbstractFragment {
     private SaveAsDialog openSaveAsDialog() {
         waitForDashboardPageLoaded(browser);
         openEditExportEmbedMenu().select("Save as...");
-        return Graphene.createPageFragment(SaveAsDialog.class, 
+        return Graphene.createPageFragment(SaveAsDialog.class,
                 waitForElementVisible(SAVE_AS_DIALOG_LOCATOR, browser));
     }
 

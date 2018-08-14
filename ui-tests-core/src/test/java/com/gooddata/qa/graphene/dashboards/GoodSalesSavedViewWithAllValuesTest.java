@@ -15,6 +15,9 @@ import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.Das
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
 import com.gooddata.qa.utils.asserts.AssertUtils;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
+import com.gooddata.qa.utils.http.RestClient;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.WebElement;
@@ -59,6 +62,8 @@ public class GoodSalesSavedViewWithAllValuesTest extends AbstractDashboardWidget
     protected void customizeProject() throws Throwable {
         getMetricCreator().createAmountMetric();
         getMetricCreator().createNumberOfActivitiesMetric();
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .setFeatureFlagInProject(ProjectFeatureFlags.DASHBOARD_ACCESS_CONTROL, true);
         List<Attribute> attributes = Stream.of("attr.activity.status", "attr.activity.priority")
                 .map(e -> getMdService().getObj(getProject(), Attribute.class, Restriction.identifier(e)))
                 .collect(Collectors.toList());

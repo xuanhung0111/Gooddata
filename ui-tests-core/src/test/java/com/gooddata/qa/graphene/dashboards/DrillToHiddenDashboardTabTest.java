@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.function.Function;
 
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOP_SALES_REPS_BY_WON_AND_LOST;
 import static java.util.Arrays.asList;
@@ -48,6 +50,8 @@ public class DrillToHiddenDashboardTabTest extends GoodSalesAbstractTest {
     @Override
     protected void customizeProject() throws Throwable {
         dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
+        new ProjectRestRequest(getAdminRestClient(), testParams.getProjectId())
+                .setFeatureFlagInProject(ProjectFeatureFlags.DASHBOARD_ACCESS_CONTROL, true);
     }
 
     @Test(dependsOnGroups = {"createProject"})

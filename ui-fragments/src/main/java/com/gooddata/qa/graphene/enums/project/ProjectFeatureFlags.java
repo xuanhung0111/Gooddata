@@ -13,6 +13,7 @@ public enum ProjectFeatureFlags {
     ENABLE_CHANGE_LANGUAGE("enableChangeLanguage"),
     HIDE_KPI_ALERT_LINK("hideKPIAlertLinks"),
     FISCAL_CALENDAR_ENABLED("fiscalCalendarEnabled"),
+    DASHBOARD_ACCESS_CONTROL("dashboardAccessControlEnabled"),
     USE_AVAILABLE_ENABLED("useAvailableEnabled"),
     ENABLE_ETL_COMPONENT("enableEtlComponent"),
     CONTROL_EXECUTION_CONTEXT_ENABLED("controlExecutionContextEnabled"),

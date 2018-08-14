@@ -23,6 +23,8 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
@@ -73,6 +75,8 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
 
         VariableRestRequest request = new VariableRestRequest(
                 new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .setFeatureFlagInProject(ProjectFeatureFlags.DASHBOARD_ACCESS_CONTROL, true);
 
         String promptFilterUri = request.createFilterVariable(DF_VARIABLE, stageNameAttribute.getUri(),
                 asList(INTEREST, DISCOVERY, SHORT_LIST, RISK_ASSESSMENT));
@@ -553,7 +557,7 @@ public class GoodSalesDefaultFilterWithSavedViewTest extends AbstractDashboardWi
         createAndAddUserToProject(UserRoles.VIEWER);
     }
 
-    private void selectViewerSpecificValuesFrom(String variable, String... values) 
+    private void selectViewerSpecificValuesFrom(String variable, String... values)
             throws ParseException, JSONException, IOException {
         initVariablePage()
                 .openVariableFromList(variable)

@@ -3,6 +3,9 @@ package com.gooddata.qa.graphene.dashboards;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_ACTIVITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CLOSED;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
+import com.gooddata.qa.utils.http.RestClient;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -38,6 +41,8 @@ public class GoodSalesHideDateRangeSelectionTest extends GoodSalesAbstractTest {
 
     @Override
     protected void customizeProject() throws Throwable {
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .setFeatureFlagInProject(ProjectFeatureFlags.DASHBOARD_ACCESS_CONTROL, true);
         initDashboardsPage().addNewDashboard(TEST_DASHBOARD).publishDashboard(true);
 
         dashboardsPage.editDashboard()

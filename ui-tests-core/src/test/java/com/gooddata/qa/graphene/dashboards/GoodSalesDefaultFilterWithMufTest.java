@@ -15,6 +15,8 @@ import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import com.gooddata.qa.utils.http.variable.VariableRestRequest;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.ITestContext;
@@ -85,12 +87,14 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
         dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
         userManagementRestRequest = new UserManagementRestRequest(
                 new RestClient(getProfile(Profile.DOMAIN)), testParams.getProjectId());
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .setFeatureFlagInProject(ProjectFeatureFlags.DASHBOARD_ACCESS_CONTROL, true);
         VariableRestRequest request = new VariableRestRequest(getAdminRestClient(), testParams.getProjectId());
         String promptFilterUri = request.createFilterVariable(MUF_DF_VARIABLE, request.getAttributeByTitle(ATTR_PRODUCT).getUri());
 
         createReportViaRest(GridReportDefinitionContent.create(REPORT_MUF,
                 singletonList(METRIC_GROUP),
-                singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_PRODUCT).getDefaultDisplayForm().getUri(), 
+                singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_PRODUCT).getDefaultDisplayForm().getUri(),
                         ATTR_PRODUCT)),
                 singletonList(new MetricElement(getMetricCreator().createAmountMetric())),
                 singletonList(new Filter(format("[%s]", promptFilterUri)))));
@@ -162,7 +166,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, dataProvider = "mufProvider", groups = {"df-single"}, 
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "mufProvider", groups = {"df-single"},
             description = "Verify muf user default view shows correctly after assigned muf in single choice mode")
     public void checkMufUserDefaultViewInSingleChoiceMode(String user, UserRoles role, String mufObjectUri)
             throws ParseException, IOException, JSONException {
@@ -241,7 +245,7 @@ public class GoodSalesDefaultFilterWithMufTest extends AbstractDashboardWidgetTe
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, dataProvider = "mufProvider", groups = {"df-single"}, 
+    @Test(dependsOnGroups = {"createProject"}, dataProvider = "mufProvider", groups = {"df-single"},
             description = "Verify muf user saved view shows correctly after assigned muf in single choice mode")
     public void checkMufUserSavedViewInSingleChoiceMode(String user, UserRoles role, String mufObjectUri)
             throws JSONException, ParseException, IOException {
