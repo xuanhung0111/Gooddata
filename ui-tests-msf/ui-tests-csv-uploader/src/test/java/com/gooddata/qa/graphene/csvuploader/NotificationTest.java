@@ -43,10 +43,10 @@ public class NotificationTest extends AbstractCsvUploaderTest {
         addUserToProject(imapUser, UserRoles.ADMIN);
 
         logout();
-        signInAtGreyPages(imapUser, imapPassword);
+        signInAtUI(imapUser, imapPassword);
     }
 
-    @Test(dependsOnGroups = "precondition", groups = "csv", enabled = false)
+    @Test(dependsOnGroups = "precondition", groups = "csv")
     public void checkNotificationForSuccessfulUpload() {
         final String datasetName = uploadCsv(PAYROLL).getName();
 
@@ -55,7 +55,7 @@ public class NotificationTest extends AbstractCsvUploaderTest {
         checkSuccessfulNotification(getSuccessfulNotification(1), datasetName);
     }
 
-    @Test(dependsOnMethods = {"checkNotificationForSuccessfulUpload"}, groups = "csv", enabled = false)
+    @Test(dependsOnMethods = {"checkNotificationForSuccessfulUpload"}, groups = "csv")
     public void checkNotificationForSuccessfulUpdate() {
         final String datasetName = PAYROLL.getDatasetNameOfFirstUpload();
 
@@ -92,7 +92,7 @@ public class NotificationTest extends AbstractCsvUploaderTest {
     private Document getNotification(String subject, int expectedMessageCount) {
         try (ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword)) {
             List<Message> notifications = 
-                    waitForMessages(imapClient, GDEmails.NOREPLY, subject, expectedMessageCount);
+                    waitForMessages(imapClient, GDEmails.NO_REPLY, subject, expectedMessageCount);
 
             return Jsoup.parse(ImapUtils.getEmailBody(Iterables.getLast(notifications)));
 
