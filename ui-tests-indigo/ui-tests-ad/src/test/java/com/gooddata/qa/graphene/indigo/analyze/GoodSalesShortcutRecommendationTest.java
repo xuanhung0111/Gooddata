@@ -8,6 +8,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -56,13 +57,15 @@ public class GoodSalesShortcutRecommendationTest extends AbstractAnalyseTest {
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND),
+                "See trend recommendation should display");
 
         waitForElementVisible(className("s-recommendation-comparison"), browser);
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE),
+                "Compare recommendation should display");
 
         analysisPage.changeReportType(ReportType.BAR_CHART).waitForReportComputing();
-        assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
+        assertThat(browser.findElements(RecommendationContainer.LOCATOR).size(), equalTo(0));
 
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing();
         assertThat(report.getTrackersCount(), equalTo(4));
@@ -80,13 +83,16 @@ public class GoodSalesShortcutRecommendationTest extends AbstractAnalyseTest {
         ChartReport report = analysisPage.drag(metric, trendRecommendation)
                 .waitForReportComputing().getChartReport();
 
-        assertTrue(report.getTrackersCount() >= 1);
-        assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
-        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText("Activity")), Arrays.asList("Activity", "Last 4 quarters"));
+        assertTrue(report.getTrackersCount() >= 1, "Number of Trackers should be greater or equal 1");
+        assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"),
+                "Attribute filter should display");
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText("Activity")),
+                Arrays.asList("Activity", "Last 4 quarters"));
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE),
+                "Compare recommendation should display");
         checkingOpenAsReport("dragMetricToTrendShortcutPanel");
     }
 
@@ -102,10 +108,13 @@ public class GoodSalesShortcutRecommendationTest extends AbstractAnalyseTest {
         analysisPage.drag(metric, trendRecommendation)
             .waitForReportComputing();
 
-        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
-        assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
-        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText("Activity")), Arrays.asList("Activity", "Last 4 quarters"));
-        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
+        assertThat(analysisPage.getAttributesBucket().getItemNames(), hasItem(DATE));
+        assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"),
+                "Attribute filter should display");
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText("Activity")),
+                Arrays.asList("Activity", "Last 4 quarters"));
+        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1,
+                "Number of Trackers should be greater or equal 1");
         checkingOpenAsReport("displayWhenDraggingFirstMetric");
     }
 
@@ -133,7 +142,7 @@ public class GoodSalesShortcutRecommendationTest extends AbstractAnalyseTest {
         analysisPage.drag(fact, recommendation)
             .waitForReportComputing();
         assertEquals(parseFilterText(analysisPage.getFilterBuckets().getDateFilterText()), Arrays.asList("Closed", "Last 4 quarters"));
-        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
+        assertThat(analysisPage.getAttributesBucket().getItemNames(), hasItem(DATE));
         assertEquals(analysisPage.getAttributesBucket().getSelectedGranularity(), "Quarter");
         checkingOpenAsReport("createSimpleMetricFromFactUsingShortcut");
     }
