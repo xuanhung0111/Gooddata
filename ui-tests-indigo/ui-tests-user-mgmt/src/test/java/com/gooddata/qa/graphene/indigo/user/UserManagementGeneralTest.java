@@ -95,8 +95,10 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                .setFeatureFlagInProject(ProjectFeatureFlags.DISPLAY_USER_MANAGEMENT, true);
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.DISPLAY_USER_MANAGEMENT, true);
+        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.DASHBOARD_ACCESS_CONTROL, true);
+
         userManagementRestRequest = new UserManagementRestRequest(
                 new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         //we need to upload dummy data so we can work with Dashboard page.
