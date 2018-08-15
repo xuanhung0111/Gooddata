@@ -25,6 +25,7 @@ import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
+import com.gooddata.qa.graphene.fragments.reports.report.ExportXLSXDialog;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.google.common.collect.Lists;
@@ -38,8 +39,8 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.io.File;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -58,6 +59,8 @@ import static java.lang.String.valueOf;
 import static java.nio.file.Files.deleteIfExists;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -74,6 +77,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     private static final String EMBEDDED_DASHBOARD_NAME = "Embedded Dashboard";
 
     private static final long EXPECTED_EXPORT_DASHBOARD_SIZE = 62000L;
+    private static final long EXPECTED_EXPORT_DASHBOARD_TO_XLSX_SIZE = 5700L;
     private static final long EXPECTED_EXPORT_CHART_SIZE = 28000L;
 
     private UiReportDefinition tabularReportDef;
@@ -150,7 +154,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
         dashboardsPage.editDashboard();
         TableReport report = dashboardsPage.openTab(4).getReport(drillingReportDef.getName(), TableReport.class);
-        report.addDrilling(Pair.of(Collections.singletonList(ATTR_ACTIVITY_TYPE), tabularReportDef.getName()), 
+        report.addDrilling(Pair.of(Collections.singletonList(ATTR_ACTIVITY_TYPE), tabularReportDef.getName()),
                 "Reports");
         dashboardsPage.saveDashboard();
 
@@ -183,7 +187,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         if (useDashboardUriWithIdentifier) {
             embeddedDashboard = initEmbeddedDashboardWithUri(getEmbeddedUriWithIdentifier());
         } else if (withIframe) {
-            embeddedDashboard = embedDashboardToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, 
+            embeddedDashboard = embedDashboardToOtherProjectDashboard(htmlEmbedCode, additionalProjectId,
                     EMBEDDED_DASHBOARD_NAME);
         } else {
             embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
@@ -219,7 +223,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
         if (testParams.isClientDemoEnvironment()) {
             log.info("Client-demo does not support dashboard export");
-            return; 
+            return;
         }
 
         String exportedDashboardName = embeddedDashboard.printDashboardTab(OTHER_WIDGETS_TAB_INDEX);
@@ -232,6 +236,92 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         }
 
         checkRedBar(browser);
+    }
+
+    @Test(dependsOnMethods = "createAdditionalProject")
+    public void viewerExportToXLSXOnEmbeddedDashboard() throws IOException {
+        logoutAndLoginAs(false, UserRoles.VIEWER);
+        EmbeddedDashboard embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
+        String fileName = dashboardsPage.printDashboardTabToXLSX(EMBEDDED_DASHBOARD_NAME);
+        try {
+            List<List<String>> xlsxContent = verifyDashboardExportToXLSX(fileName, EXPECTED_EXPORT_DASHBOARD_TO_XLSX_SIZE);
+            checkXlsxContent(xlsxContent);
+        } finally {
+            deleteIfExists(Paths.get(getExportFilePath(fileName, ExportFormat.DASHBOARD_XLSX)));
+            logoutAndLoginAs(false, UserRoles.ADMIN);
+        }
+    }
+
+    @Test(dependsOnMethods = "createAdditionalProject")
+    public void dashboardOnlyToXLSXExportOnEmbeddedDashboard() throws IOException {
+        logoutAndLoginAs(false, UserRoles.DASHBOARD_ONLY);
+        EmbeddedDashboard embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
+        String fileName = dashboardsPage.printDashboardTabToXLSX(EMBEDDED_DASHBOARD_NAME);
+        try {
+            List<List<String>> xlsxContent = verifyDashboardExportToXLSX(fileName, EXPECTED_EXPORT_DASHBOARD_TO_XLSX_SIZE);
+            checkXlsxContent(xlsxContent);
+        } finally {
+            deleteIfExists(Paths.get(getExportFilePath(fileName, ExportFormat.DASHBOARD_XLSX)));
+            logoutAndLoginAs(false, UserRoles.ADMIN);
+        }
+    }
+
+    @Test(dependsOnMethods = "createAdditionalProject")
+    public void adminExportToXLSXOnEmbeddedDashboard() throws IOException {
+        EmbeddedDashboard embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
+        String fileName = dashboardsPage.printDashboardTabToXLSX(EMBEDDED_DASHBOARD_NAME);
+        try {
+            List<List<String>> xlsxContent = verifyDashboardExportToXLSX(fileName, EXPECTED_EXPORT_DASHBOARD_TO_XLSX_SIZE);
+            checkXlsxContent(xlsxContent);
+        } finally {
+            deleteIfExists(Paths.get(getExportFilePath(fileName, ExportFormat.DASHBOARD_XLSX)));
+        }
+    }
+
+    @Test(dependsOnMethods = "createAdditionalProject")
+    public void editorExportToXLSXOnEmbeddedDashboard() throws IOException {
+        logoutAndLoginAs(false, UserRoles.EDITOR);
+        EmbeddedDashboard embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
+        String fileName = dashboardsPage.printDashboardTabToXLSX(EMBEDDED_DASHBOARD_NAME);
+        try {
+            List<List<String>> xlsxContent = verifyDashboardExportToXLSX(fileName, EXPECTED_EXPORT_DASHBOARD_TO_XLSX_SIZE);
+            checkXlsxContent(xlsxContent);
+        } finally {
+            deleteIfExists(Paths.get(getExportFilePath(fileName, ExportFormat.DASHBOARD_XLSX)));
+            logoutAndLoginAs(false, UserRoles.ADMIN);
+        }
+    }
+
+    @Test(dependsOnMethods = "createAdditionalProject")
+    public void exportToXLSXOnEmbeddedDashboardWithUrlParameter() throws IOException {
+        openUrl(sharedDashboardUrl);
+        long EXPORT_TO_XLSX_SIZE = 5600L;
+        EmbedDashboardDialog embedDialog = dashboardsPage.openEmbedDashboardDialog();
+        String[] filteredAttributeValues = {"2009", "2011"};
+        List<Float> filteredMetricValues = asList(8656468.20F, 60270072.20F);
+
+        embedDialog.selectFilterAttribute(ATTR_YEAR_CREATED, filteredAttributeValues);
+        String embedUri = embedDialog.getPreviewURI();
+
+        EmbeddedDashboard embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
+        String fileName = dashboardsPage.printDashboardTabToXLSX(EMBEDDED_DASHBOARD_NAME);
+
+        try {
+            List<List<String>> xlsxContent = verifyDashboardExportToXLSX(fileName, EXPORT_TO_XLSX_SIZE);
+            //verify header title
+            assertThat(xlsxContent, hasItem(asList("Year (Created)", "Amount")));
+            //verify content
+            assertThat(xlsxContent, hasItem(asList("2009", "8656468.2")));
+            assertThat(xlsxContent, hasItem(asList("2011", "6.02700722E7")));
+            //verify attribute filter
+            assertThat(xlsxContent, hasItem(asList("Applied filters:", "Year (Created) IN (2009,2011)")));
+
+            TableReport tableReport = embeddedDashboard.getReport(tabularReportDef.getName(), TableReport.class);
+            assertThat(tableReport.getAttributeValues(), is(newArrayList(filteredAttributeValues)));
+            assertThat(tableReport.getMetricValues(), is(filteredMetricValues));
+        } finally {
+            deleteIfExists(Paths.get(getExportFilePath(fileName, ExportFormat.DASHBOARD_XLSX)));
+        }
     }
 
     @Test(dependsOnMethods = "createAdditionalProject", dataProvider = "embeddedDashboard")
@@ -535,6 +625,8 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     @Override
     protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
         createAndAddUserToProject(UserRoles.VIEWER);
+        createAndAddUserToProject(UserRoles.EDITOR);
+        createAndAddUserToProject(UserRoles.DASHBOARD_ONLY);
     }
 
     private EmbeddedDashboard embedDashboardToOtherProjectDashboard(String embedCode, String projectToShare,
@@ -589,12 +681,23 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
             if (embeddedParams[i].startsWith("dashboard=")) {
                 String dashboardUri = embeddedParams[i].split("=")[1];
-                String dashboardIdentifier = getObjIdentifiers(Arrays.asList(dashboardUri)).get(0);
+                String dashboardIdentifier = getObjIdentifiers(asList(dashboardUri)).get(0);
                 embeddedParams[i] = embeddedParams[i].replace(
                         embeddedParams[i].split("/obj/")[1], "identifier:" + dashboardIdentifier);
             }
             embeddedUriWithIdentifier += embeddedParams[i];
         }
         return embeddedUriWithIdentifier;
+    }
+
+    private void checkXlsxContent(List<List<String>> xlsxContent) {
+        //verify header title
+        assertThat(xlsxContent, hasItem(asList("Year (Created)", "Amount")));
+        //verify content
+        assertThat(xlsxContent, hasItem(asList("2008", "2773426.95")));
+        assertThat(xlsxContent, hasItem(asList("2009", "8656468.2")));
+        assertThat(xlsxContent, hasItem(asList("2010", "2.914040909E7")));
+        assertThat(xlsxContent, hasItem(asList("2011", "6.02700722E7")));
+        assertThat(xlsxContent, hasItem(asList("2012", "1.57850801E7")));
     }
 }

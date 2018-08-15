@@ -70,7 +70,7 @@ public class ExportDashboardTest extends AbstractDashboardWidgetTest {
         }
         initDashboardsPage().selectDashboard(DASHBOARD_TEST);
         waitForDashboardPageLoaded(browser);
-        exportedDashboardName = dashboardsPage.exportDashboardTab(0);
+        exportedDashboardName = dashboardsPage.exportDashboardTab(0, ExportFormat.DASHBOARD_PDF);
         try {
             checkRedBar(browser);
             verifyDashboardExport(exportedDashboardName, FIRST_TAB, expectedDashboardExportSize);
@@ -100,7 +100,7 @@ public class ExportDashboardTest extends AbstractDashboardWidgetTest {
         initDashboardsPage().selectDashboard(DASHBOARD_TEST)
                 .editDashboard()
                 .saveAsDashboard(copiedDashboard, false, PermissionType.USE_EXISTING_PERMISSIONS);
-        exportedDashboardName = dashboardsPage.exportDashboardTab(0);
+        exportedDashboardName = dashboardsPage.exportDashboardTab(0, ExportFormat.DASHBOARD_PDF);
         try {
             checkRedBar(browser);
             verifyDashboardExport(exportedDashboardName, FIRST_TAB, expectedDashboardExportSize);

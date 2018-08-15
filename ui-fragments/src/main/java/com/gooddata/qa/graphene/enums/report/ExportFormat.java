@@ -10,6 +10,8 @@ public enum ExportFormat {
     RAW_CSV("csv", "CSV (raw data)"),
     SCHEDULES_EMAIL_CSV("csv", "CSV"),
     EXCEL_XLSX("xlsx", "XLSX..."),
+    DASHBOARD_PDF("pdf", "Export to PDF"),
+    DASHBOARD_XLSX("xlsx", "Export to XLSX..."),
     SCHEDULES_EMAIL_EXCEL_XLSX("xlsx", "Excel (XLSX)"),
     ALL("all", "Used for schedules...");
 

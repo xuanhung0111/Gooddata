@@ -1,5 +1,9 @@
 package com.gooddata.qa.graphene.fragments.reports.report;
 
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
+import java.util.Date;
+
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.className;
 
@@ -39,5 +43,12 @@ public class ExportXLSXDialog extends AbstractDialog {
 
     public boolean isActiveFiltersChecked() {
         return waitForElementVisible(activeFiltersCheckbox).isSelected();
+    }
+
+    public String getExportDashboardFormat() {
+        SimpleDateFormat formatter = new SimpleDateFormat("M-d-yyyy hhmma" );
+        formatter.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+
+        return formatter.format(new Date()).toLowerCase();
     }
 }

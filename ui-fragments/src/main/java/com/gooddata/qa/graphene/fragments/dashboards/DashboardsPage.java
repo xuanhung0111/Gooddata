@@ -34,6 +34,7 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.enums.dashboard.PublishType;
 import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
@@ -44,6 +45,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.EmbeddedWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel.DateGranularity;
 import com.gooddata.qa.graphene.fragments.reports.report.AbstractReport;
+import com.gooddata.qa.graphene.fragments.reports.report.ExportXLSXDialog;
 import com.gooddata.qa.utils.CssUtils;
 
 public class DashboardsPage extends AbstractFragment {
@@ -231,19 +233,26 @@ public class DashboardsPage extends AbstractFragment {
         return Graphene.createPageFragment(DashboardEditBar.class, waitForElementVisible(BY_DASHBOARD_EDIT_BAR, browser));
     }
 
-    public String exportDashboardTab(int tabIndex) {
+    public String exportDashboardTab(int tabIndex, ExportFormat format) {
         //wait for exporting dashboard tab in maximum 10 minutes
         int exportingTextDisplayedTimeoutInSeconds = 600;
 
         tabs.openTab(tabIndex);
         waitForDashboardPageLoaded(browser);
         String tabName = tabs.getTabLabel(0);
-        openEditExportEmbedMenu().select("Export to PDF");
+        openEditExportEmbedMenu().select(format.getLabel());
+
+        if (format == ExportFormat.DASHBOARD_XLSX) {
+            ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
+            exportXLSXDialog.confirmExport();
+        }
+
         waitForElementVisible(BY_EXPORTING_PANEL, browser);
         sleepTightInSeconds(3);
         waitForElementNotPresent(BY_EXPORTING_PANEL, exportingTextDisplayedTimeoutInSeconds);
         sleepTightInSeconds(3);
-        System.out.println("Dashboard " + tabName + " exported to PDF...");
+        System.out.println("Dashboard " + tabName + " exported to " + format.getName() + "...");
+
         return tabName;
     }
 
@@ -256,6 +265,21 @@ public class DashboardsPage extends AbstractFragment {
         waitForElementNotPresent(BY_PRINTING_PANEL);
 
         return tabs.getTabLabel(tabIndex);
+    }
+
+    public String printDashboardTabToXLSX(String dashboardName) {
+        int exportingTextDisplayedTimeoutInSeconds = 600;
+        openEditExportEmbedMenu().select(ExportFormat.DASHBOARD_XLSX.getLabel());
+        ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
+        exportXLSXDialog.confirmExport();
+
+        waitForElementVisible(BY_EXPORTING_PANEL, browser);
+        String fileName = dashboardName + " " + exportXLSXDialog.getExportDashboardFormat();
+        sleepTightInSeconds(3);
+        waitForElementNotPresent(BY_EXPORTING_PANEL, exportingTextDisplayedTimeoutInSeconds);
+        sleepTightInSeconds(3);
+
+        return fileName;
     }
 
     public boolean isPrintButtonVisible() {
