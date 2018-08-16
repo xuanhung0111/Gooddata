@@ -34,7 +34,7 @@ public class CompareTypeDropdown extends AbstractReactDropDown {
     public enum CompareType {
 
         NOTHING("nothing"),
-        SAME_PERIOD_LAST_YEAR("same_period_last_year");
+        SAME_PERIOD_PREVIOUS_YEAR("same_period_previous_year");
 
         private String compareTypeName;
 

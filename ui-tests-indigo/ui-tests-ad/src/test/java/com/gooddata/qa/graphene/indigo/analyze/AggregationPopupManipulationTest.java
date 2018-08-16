@@ -286,7 +286,7 @@ public class AggregationPopupManipulationTest extends AbstractAnalyseTest {
             analysisPage.changeReportType(ReportType.TABLE);
             analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().waitForReportComputing();
 
-            analysisPage.getFilterBuckets().openDateFilterPickerPanel().applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
+            analysisPage.getFilterBuckets().openDateFilterPickerPanel().applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
             analysisPage.waitForReportComputing();
 
             TableReport tableReport = analysisPage.getTableReport();
@@ -311,7 +311,7 @@ public class AggregationPopupManipulationTest extends AbstractAnalyseTest {
                     .getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011")
                     .getRoot().click();
 
-            analysisPage.getFilterBuckets().openDateFilterPickerPanel().applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
+            analysisPage.getFilterBuckets().openDateFilterPickerPanel().applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
             analysisPage.waitForReportComputing();
 
             TableReport tableReport = analysisPage.getTableReport();
