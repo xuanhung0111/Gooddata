@@ -122,7 +122,7 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().waitForReportComputing();
 
         analysisPage.getFilterBuckets().openDateFilterPickerPanel()
-                .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
+                .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
 
         analysisPage.saveInsight("eventing_table_report_pop_date_attribute");
 
@@ -153,7 +153,7 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate().waitForReportComputing();
 
         analysisPage.getFilterBuckets().openDateFilterPickerPanel()
-                .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
+                .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
 
         analysisPage.saveInsight("eventing_column_report_pop_date_attribute");
 
@@ -184,7 +184,7 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
                 .getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011")
                 .getRoot().click();
         analysisPage.getFilterBuckets().openDateFilterPickerPanel().
-                applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
+                applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
 
         analysisPage.waitForReportComputing();
         analysisPage.saveInsight("eventing_pop_date_filter_no_attr");
@@ -215,7 +215,7 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE).addDateFilter()
                 .getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011");
         analysisPage.getFilterBuckets().openDateFilterPickerPanel().
-                applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
+                applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
 
         analysisPage.waitForReportComputing();
         analysisPage.saveInsight("eventing_table_report_pop_date_filter");
@@ -252,7 +252,7 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addAttribute(ATTR_ACTIVITY_TYPE).addDateFilter()
                 .getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011");
         analysisPage.getFilterBuckets().openDateFilterPickerPanel().
-                applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
+                applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
 
         analysisPage.waitForReportComputing();
         analysisPage.saveInsight("eventing_table_report_pop_date_filter");
@@ -286,7 +286,7 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
         analysisPage.getMetricsBucket().getLastMetricConfiguration().expandConfiguration().showPercents();
 
         analysisPage.getFilterBuckets().openDateFilterPickerPanel().
-                applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
+                applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
         analysisPage.saveInsight("eventing_table_combination_pop_contribution");
 
         String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
@@ -316,7 +316,7 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
         analysisPage.getMetricsBucket().getLastMetricConfiguration().expandConfiguration().showPercents();
 
         analysisPage.getFilterBuckets().openDateFilterPickerPanel().
-                applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
+                applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
         analysisPage.saveInsight("eventing_column_combination_pop_contribution");
 
         String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
@@ -347,7 +347,7 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
                 .getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011");
         analysisPage.getMetricsBucket().getLastMetricConfiguration().expandConfiguration().showPercents();
         analysisPage.getFilterBuckets().openDateFilterPickerPanel().
-                applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
+                applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
 
         analysisPage.waitForReportComputing();
         analysisPage.saveInsight("eventing_table_pop_contribution_date_filter");
@@ -382,7 +382,7 @@ public class ContributionAndComparisionTest extends AbstractEventingTest {
                 .getFilterBuckets().configDateFilter("1/1/2011", "12/31/2011");
         analysisPage.getMetricsBucket().getLastMetricConfiguration().expandConfiguration().showPercents();
         analysisPage.getFilterBuckets().openDateFilterPickerPanel().
-                applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
+                applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
 
         analysisPage.waitForReportComputing();
         analysisPage.saveInsight("eventing_table_pop_contribution_date_filter");

@@ -148,7 +148,7 @@ public class GoodSalesFactBasedMetricTest extends AbstractAnalyseTest {
         if (samePeriodComparison) {
             analysisPage.getFilterBuckets()
                     .openDateFilterPickerPanel()
-                    .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
+                    .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
 
             analysisPage.waitForReportComputing();
         }
@@ -178,7 +178,7 @@ public class GoodSalesFactBasedMetricTest extends AbstractAnalyseTest {
         if (samePeriodComparison) {
             analysisPage.getFilterBuckets()
                     .openDateFilterPickerPanel()
-                    .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
+                    .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
 
             analysisPage.waitForReportComputing();
         }

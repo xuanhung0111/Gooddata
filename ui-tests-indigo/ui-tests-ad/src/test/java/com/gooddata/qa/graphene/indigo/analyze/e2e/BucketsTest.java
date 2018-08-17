@@ -210,7 +210,7 @@ public class BucketsTest extends AbstractAdE2ETest {
 
         analysisPage.getFilterBuckets()
                 .openDateFilterPickerPanel()
-                .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_LAST_YEAR);
+                .applyCompareType(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR);
         analysisPage.waitForReportComputing();
 
         assertTrue(analysisPage.getStacksBucket().isDisabled(), "Stack by bucket should be greyed out and disabled for adding measures");
