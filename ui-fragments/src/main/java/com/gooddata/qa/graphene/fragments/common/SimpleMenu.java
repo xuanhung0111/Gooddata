@@ -4,12 +4,11 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static org.testng.Assert.assertTrue;
 
 import java.util.List;
 import java.util.function.Predicate;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -45,7 +44,7 @@ public class SimpleMenu extends AbstractFragment {
     }
 
     public boolean contains(String label) {
-        assertTrue(StringUtils.isNotBlank(label), "Label must be not empty");
+        Validate.notBlank(label);
 
         for (WebElement e : items) {
             if (label.equals(e.findElement(BY_LINK).getText().trim()))
@@ -55,7 +54,7 @@ public class SimpleMenu extends AbstractFragment {
     }
 
     public void select(String label) {
-        assertTrue(StringUtils.isNotBlank(label), "Label must be not empty");
+        Validate.notBlank(label);
         select(e -> label.equals(e.findElement(BY_LINK).getText().trim()));
         waitForElementNotVisible(this.getRoot());
     }
@@ -70,17 +69,17 @@ public class SimpleMenu extends AbstractFragment {
     }
 
     public void openSubMenu(String label) {
-        assertTrue(StringUtils.isNotBlank(label), "Label must be not empty");
+        Validate.notBlank(label);
         WebElement menu = items.stream()
             .filter(e -> label.equals(e.findElement(BY_LINK).getText().trim()))
             .findFirst()
             .orElseThrow(() -> new NoSuchElementException("Cannot find: " + label));
 
-        new Actions(browser).moveToElement(menu).perform();
+        new Actions(browser).moveToElement(menu).moveByOffset(1,1).perform();
     }
 
     public boolean isPrivateItem(String label) {
-        assertTrue(StringUtils.isNotBlank(label), "Label must be not empty");
+        Validate.notBlank(label);
         WebElement item = items.stream()
                 .filter(e -> label.equals(e.findElement(BY_LINK).getText().trim()))
                 .findFirst()
