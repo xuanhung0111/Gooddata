@@ -3,8 +3,8 @@ package com.gooddata.qa.utils.http.indigo;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -14,7 +14,6 @@ import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestRequest;
 import com.gooddata.qa.graphene.entity.visualization.TotalsBucket;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.http.ParseException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -501,15 +500,8 @@ public class IndigoRestRequest extends CommonRestRequest{
 
     private JSONArray initBuckets(final List<MeasureBucket> measureBuckets, final List<CategoryBucket> categoryBuckets)
             throws JSONException {
-        Map<Type, List<CategoryBucket>> categoryBucketGroup = new HashedMap();
-        for (Type type : Type.values()) {
-            List<CategoryBucket> item = categoryBuckets.stream()
-                    .filter(categoryBucket -> type.equals(categoryBucket.getType()))
-                    .collect(Collectors.toList());
-            if (!item.isEmpty()) {
-                categoryBucketGroup.put(type, item);
-            }
-        }
+        final LinkedHashMap<Type, List<CategoryBucket>> categoryBucketGroup = categoryBuckets.stream()
+                .collect(Collectors.groupingBy(CategoryBucket::getType, LinkedHashMap::new, Collectors.toList()));
 
         return new JSONArray() {{
             put(new JSONObject() {{
