@@ -26,6 +26,10 @@ public class KpiPopSection extends AbstractFragment {
         return waitForElementVisible(periodTitle).getText();
     }
 
+    public void clickPeriodTilte() {
+        waitForElementVisible(periodTitle).click();
+    }
+
     public String getChangeValue() {
         return waitForElementVisible(changeValue).getText();
     }
