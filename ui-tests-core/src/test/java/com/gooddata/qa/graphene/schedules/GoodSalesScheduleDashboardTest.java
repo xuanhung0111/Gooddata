@@ -58,7 +58,7 @@ import com.google.common.base.Joiner;
 public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedulesTest {
 
     private static final String SCHEDULE_WITHOUT_RECIPIENTS = "Schedule without recipient";
-    private static final String SCHEDULE_WITH_INTERNAL_RECIPIENTS = 
+    private static final String SCHEDULE_WITH_INTERNAL_RECIPIENTS =
             "Schedule with recipents are member of project";
     private static final String SCHEDULE_WITH_EXTERNAL_RECIPIENTS = "Schedule with recipents are external";
     private static final String SCHEDULE_WITH_INVALID_RECIPIENTS = "Schedule with invalid recipient";
@@ -102,6 +102,8 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
 
         new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId())
                 .createDashboard(dashboard.getMdObject());
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.DASHBOARD_ACCESS_CONTROL, true);
 
         initDashboardsPage();
         dashboardsPage.addSampleTextToDashboard().publishDashboard(true);
