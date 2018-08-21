@@ -10,7 +10,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public abstract class AbstractAnalyseTest extends GoodSalesAbstractTest {
