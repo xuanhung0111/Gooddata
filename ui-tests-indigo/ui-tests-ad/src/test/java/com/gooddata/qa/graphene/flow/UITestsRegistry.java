@@ -6,6 +6,7 @@ import java.util.Map;
 import com.gooddata.qa.graphene.indigo.analyze.AggregationResultTest;
 import com.gooddata.qa.graphene.indigo.analyze.AggregationPopupManipulationTest;
 import com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerSanityTest;
+import com.gooddata.qa.graphene.indigo.analyze.BackwardCompatibilityTest;
 import com.gooddata.qa.graphene.indigo.analyze.CustomDateDimensionsTest;
 import com.gooddata.qa.graphene.indigo.analyze.EmbeddedAdTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesAttributeBasedMetricTest;
@@ -78,7 +79,8 @@ public class UITestsRegistry {
         });
 
         suites.put("sanity", new Object[] {
-            AnalyticalDesignerSanityTest.class
+            AnalyticalDesignerSanityTest.class,
+            BackwardCompatibilityTest.class
         });
 
         suites.put("all", new Object[] {
