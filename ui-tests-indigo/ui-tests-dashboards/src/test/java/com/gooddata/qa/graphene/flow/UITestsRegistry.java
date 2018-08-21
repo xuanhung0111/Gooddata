@@ -31,6 +31,14 @@ import com.gooddata.qa.graphene.indigo.dashboards.KpiPermissionsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.eventing.ContributionAndComparisionTest;
 import com.gooddata.qa.graphene.indigo.dashboards.eventing.EventingBasicInsightTest;
 import com.gooddata.qa.graphene.indigo.dashboards.eventing.EventingInEditMode;
+import com.gooddata.qa.graphene.indigo.dashboards.eventing.EventingMultipleWidgetsTest;
+import com.gooddata.qa.graphene.indigo.dashboards.eventing.EventingWidgetDrillToDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.eventing.EventingWidgetDrillToPreventDefaultDashboardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.eventing.EventingWidgetEditModeTest;
+import com.gooddata.qa.graphene.indigo.dashboards.eventing.EventingWidgetWithPoPTest;
+import com.gooddata.qa.graphene.indigo.dashboards.eventing.EventingWidgetWithoutDrillToDashBoardTest;
+import com.gooddata.qa.graphene.indigo.dashboards.eventing.VisualizationDrillableWidgetTest;
+import com.gooddata.qa.graphene.indigo.dashboards.eventing.VisualizationInvalidDrillConfigTest;
 import com.gooddata.qa.graphene.indigo.dashboards.eventing.VisualizationMeasureAttributeTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
@@ -44,6 +52,9 @@ public class UITestsRegistry {
 
         suites.put("sanity", new Object[] {
             ManipulateWidgetsTest.class,
+            EventingBasicInsightTest.class,
+            VisualizationDrillableWidgetTest.class,
+            EventingWidgetDrillToDashboardTest.class,
             "testng-desktop-EditMode.xml",
             "testng-desktop-imap-KpiAlertEvaluate.xml",
             "testng-desktop-SplashScreen.xml"
@@ -99,6 +110,14 @@ public class UITestsRegistry {
             VisualizationMeasureAttributeTest.class,
             ContributionAndComparisionTest.class,
             EventingInEditMode.class,
+            VisualizationDrillableWidgetTest.class,
+            VisualizationInvalidDrillConfigTest.class,
+            EventingWidgetWithPoPTest.class,
+            EventingWidgetWithoutDrillToDashBoardTest.class,
+            EventingWidgetEditModeTest.class,
+            EventingWidgetDrillToPreventDefaultDashboardTest.class,
+            EventingWidgetDrillToDashboardTest.class,
+            EventingMultipleWidgetsTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-EditMode.xml",
@@ -183,6 +202,21 @@ public class UITestsRegistry {
 
         suites.put("lcm", new Object[] {
             DashboardsDistributedByLcmTest.class
+        });
+
+        suites.put("drill-eventing", new Object[] {
+            ContributionAndComparisionTest.class,
+            EventingBasicInsightTest.class,
+            EventingInEditMode.class,
+            EventingMultipleWidgetsTest.class,
+            EventingWidgetDrillToDashboardTest.class,
+            EventingWidgetDrillToPreventDefaultDashboardTest.class,
+            EventingWidgetEditModeTest.class,
+            EventingWidgetWithoutDrillToDashBoardTest.class,
+            EventingWidgetWithPoPTest.class,
+            VisualizationDrillableWidgetTest.class,
+            VisualizationInvalidDrillConfigTest.class,
+            VisualizationMeasureAttributeTest.class
         });
 
         TestsRegistry.getInstance()

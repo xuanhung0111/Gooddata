@@ -69,8 +69,9 @@ public class FiscalDateFilterFromAndToTest extends AbstractDashboardWidgetTest {
 
         new RolapRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
                 .postEtlPullIntegration(webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()));
-        new ProjectRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId())
-                .setFeatureFlagInProject(ProjectFeatureFlags.FISCAL_CALENDAR_ENABLED, true);
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.FISCAL_CALENDAR_ENABLED, true);
+        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.DASHBOARD_ACCESS_CONTROL, true);
         currentFiscalYear = getCurrentFiscalYear();
     }
 

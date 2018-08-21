@@ -2,6 +2,11 @@ package com.gooddata.qa.graphene.dashboards;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
+import com.gooddata.qa.graphene.fragments.common.StatusBar;
+import org.apache.http.ParseException;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.enums.dashboard.PublishType;
+import com.gooddata.qa.graphene.fragments.dashboards.PermissionsDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAndContinueDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.DrillingConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
@@ -37,6 +42,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.*;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -53,6 +60,7 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
     private final String DASHBOARD_HAVING_NO_FILTER_ON_SOURCE_TAB = "Dashboard having no filter on source tab";
     private final String DASHBOARD_HAVING_NO_FILTER_ON_TARGET_TAB = "Dashboard having no filter on target tab";
     private final String DASHBOARD_FOR_DRILL_FURTHER_TEST = "Report for drill further test";
+    private final String ERROR_SAC_MSG = "You do not have permission to access the dashboard. Please contact your administrator to grant you access.";
     private final String SOURCE_TAB = "Source Tab";
     private final String TARGET_TAB = "Target Tab";
     private final String FIRST_TAB = "First Tab";
@@ -93,6 +101,8 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
         salesSeasonalityReportUri = getReportCreator().createSalesSeasonalityReport();
         getReportCreator().createTop5OpenByCashReport();
         dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .setFeatureFlagInProject(ProjectFeatureFlags.DASHBOARD_ACCESS_CONTROL, true);
 
         //init Dashboard Filter Objects
         stageNameAsSingleFilter = createSingleValueFilter(getAttributeByTitle(ATTR_STAGE_NAME));
@@ -303,6 +313,57 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
         } finally {
             new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
                     .deleteObjectsUsingCascade(dashboardUri, anotherDashboardUri);
+        }
+    }
+
+    @Override
+    protected void addUsersWithOtherRolesToProject() throws ParseException, JSONException, IOException {
+        createAndAddUserToProject(UserRoles.EDITOR);
+    }
+
+    /**
+     * senario 11
+     * https://docs.google.com/document/d/1FtJ-Q2Q-SfbUh5Cp7dD75tVVKdgDEbPeBqdkgj9Rfh8
+     */
+    @Test(dependsOnGroups = {"createProject"})
+    public void testDrillToStrictAccessDashboardTab() throws JSONException, IOException {
+        Dashboard dashboard = initDashboardHavingNoFilterInSourceTab();
+        String dashboardUri = dashboardRequest.createDashboard(dashboard.getMdObject());
+        String sacDashboardUri = dashboardRequest.createDashboard(initDashboardHavingOneTab().getMdObject());
+        try {
+            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + DASHBOARD_PAGE_SUFFIX + "|" + sacDashboardUri);
+            waitForDashboardPageLoaded(browser);
+
+            final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
+            permissionsDialog.publish(PublishType.SELECTED_USERS);
+            permissionsDialog.toggleStrictAccessDashboard();
+            permissionsDialog.submit();
+
+            initDashboardsPage().selectDashboard(dashboard.getName());
+            dashboardsPage.getTabs().getTab(SOURCE_TAB).open();
+            dashboardsPage.editDashboard();
+
+            TableReport tableReport = dashboardsPage.getReport(REPORT_AMOUNT_BY_PRODUCT, TableReport.class);
+            tableReport.addDrilling(Pair.of(singletonList(ATTR_PRODUCT), TAB_ANOTHER_DASHBOARD), DASHBOARD_DRILLING_GROUP);
+
+            dashboardsPage.saveDashboard();
+
+            logoutAndLoginAs(false, UserRoles.EDITOR);
+
+            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + DASHBOARD_PAGE_SUFFIX + "|" + dashboardUri);
+            waitForDashboardPageLoaded(browser);
+            tableReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
+
+            dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
+            StatusBar statusBar = StatusBar.getInstance(browser);
+            assertEquals(statusBar.getMessage(), ERROR_SAC_MSG);
+            statusBar.dismiss();
+
+            assertEquals(dashboardsPage.getDashboardName(), dashboard.getName());
+        } finally {
+            logoutAndLoginAs(false, UserRoles.ADMIN);
+            new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                    .deleteObjectsUsingCascade(dashboardUri, sacDashboardUri);
         }
     }
 

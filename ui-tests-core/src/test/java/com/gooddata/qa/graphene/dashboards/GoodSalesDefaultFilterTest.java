@@ -15,6 +15,8 @@ import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
 import com.gooddata.qa.utils.asserts.AssertUtils;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.variable.VariableRestRequest;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.ITestContext;
@@ -66,6 +68,8 @@ public class GoodSalesDefaultFilterTest extends AbstractDashboardWidgetTest {
         Metric amountMetric = getMetricCreator().createAmountMetric();
         VariableRestRequest request = new VariableRestRequest(
                 new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .setFeatureFlagInProject(ProjectFeatureFlags.DASHBOARD_ACCESS_CONTROL, true);
         String promptFilterUri = request.createFilterVariable(DF_VARIABLE,
                 request.getAttributeByTitle(ATTR_STAGE_NAME).getUri(),
                 asList(INTEREST, DISCOVERY, SHORT_LIST, RISK_ASSESSMENT, DIRECT_SALES));

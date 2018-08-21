@@ -37,7 +37,9 @@ import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
+import com.gooddata.qa.utils.http.RestClient;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static java.lang.String.format;
@@ -83,6 +85,8 @@ public class DashboardAndTabManipulationTest extends AbstractProjectTest {
         takeScreenshot(browser, "uploaded-payroll", getClass());
 
         dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .setFeatureFlagInProject(ProjectFeatureFlags.DASHBOARD_ACCESS_CONTROL, true);
         final String amountUri = getMdService()
                 .getObj(getProject(), Fact.class, title(AMOUNT))
                 .getUri();
@@ -311,7 +315,7 @@ public class DashboardAndTabManipulationTest extends AbstractProjectTest {
         initDashboardsPage();
         try {
             prepareSomeDashboards();
-            
+
             assertEquals(dashboardsPage.getDashboardsCount(), 2);
 
             dashboardsPage.selectDashboard(DASHBOARD_NAME_2);
@@ -414,12 +418,12 @@ public class DashboardAndTabManipulationTest extends AbstractProjectTest {
         try {
             dashboardsPage.addNewDashboard(DASHBOARD_NAME_1);
             PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
-            permissionsDialog.publish(PublishType.EVERYONE_CAN_ACCESS);
+            permissionsDialog.publish(PublishType.ALL_USERS_IN_THIS_PROJECT);
             permissionsDialog.submit();
 
             dashboardsPage.addNewDashboard(DASHBOARD_NAME_2);
             permissionsDialog = dashboardsPage.openPermissionsDialog();
-            permissionsDialog.publish(PublishType.EVERYONE_CAN_ACCESS);
+            permissionsDialog.publish(PublishType.ALL_USERS_IN_THIS_PROJECT);
             permissionsDialog.submit();
 
             logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.VIEWER);

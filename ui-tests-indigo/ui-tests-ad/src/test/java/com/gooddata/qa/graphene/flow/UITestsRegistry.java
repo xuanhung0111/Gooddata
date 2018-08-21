@@ -84,6 +84,8 @@ public class UITestsRegistry {
 
         suites.put("sanity", new Object[] {
             AnalyticalDesignerSanityTest.class,
+            VisualizationMeasureAttributeTest.class,
+            EventingBasicTest.class,
             BackwardCompatibilityTest.class
         });
 
@@ -160,6 +162,15 @@ public class UITestsRegistry {
             AggregationResultTest.class,
             TotalsResultWithInsightTest.class,
             AggregationPopupManipulationTest.class
+        });
+
+        suites.put("drill-eventing", new Object[] {
+            VisualizationMeasureAttributeTest.class,
+            EventingBasicTest.class,
+            EventingBasicFiltersTest.class,
+            EventingFiltersUnderMetric.class,
+            ContributionAndComparisionTest.class,
+            EventingSpecialCaseTest.class
         });
 
         TestsRegistry.getInstance()

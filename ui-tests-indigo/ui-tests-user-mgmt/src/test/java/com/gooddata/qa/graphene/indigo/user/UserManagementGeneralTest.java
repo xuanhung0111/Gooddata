@@ -66,7 +66,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
     private static final String EMPTY_GROUP_STATE_MESSAGE = "This group is empty";
     private static final String NO_ACTIVE_INVITATIONS_MESSAGE = "No active invitations";
     private static final String NO_DEACTIVATED_USER_MESSAGE = "There are no deactivated users";
-    private static final String EXISTING_USER_GROUP_MESSAGE = 
+    private static final String EXISTING_USER_GROUP_MESSAGE =
             "Choose a different name for your group. %s already exists.";
 
     private static final String INVITED_EMAIL = "abc@mail.com";
@@ -95,8 +95,10 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                .setFeatureFlagInProject(ProjectFeatureFlags.DISPLAY_USER_MANAGEMENT, true);
+        ProjectRestRequest projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.DISPLAY_USER_MANAGEMENT, true);
+        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.DASHBOARD_ACCESS_CONTROL, true);
+
         userManagementRestRequest = new UserManagementRestRequest(
                 new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
         //we need to upload dummy data so we can work with Dashboard page.
@@ -109,7 +111,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = { "initialize", "sanity" })
-    public void prepareUserManagementAdminAndDashboard() throws 
+    public void prepareUserManagementAdminAndDashboard() throws
             ParseException, IOException, JSONException {
         initDashboardsPage();
         dashboardsPage.addNewDashboard(DASHBOARD_TEST);
@@ -251,7 +253,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
             // Check "Active" and "All active users" links of sidebar are selected
             assertEquals(UserManagementPage.getInstance(browser).startAddingUser().getAllSidebarActiveLinks(),
                     asList("Active", "All active users"));
-            assertTrue(compareCollections(UserManagementPage.getInstance(browser).getAllUserEmails(), 
+            assertTrue(compareCollections(UserManagementPage.getInstance(browser).getAllUserEmails(),
                     asList(testParams.getUser(), testParams.getEditorUser(),
                             testParams.getViewerUser(), testParams.getDomainUser())));
         } finally {
@@ -348,7 +350,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
 
             initUserManagementPage()
                     .changeRoleOfUsers(UserRoles.ADMIN, testParams.getEditorUser(), testParams.getViewerUser());
-            Function<WebDriver, Boolean> changeRoleSuccessfully = 
+            Function<WebDriver, Boolean> changeRoleSuccessfully =
                     browser -> String.format(CHANGE_ROLE_SUCCESSFUL_MESSAGE, adminText)
                         .equals(UserManagementPage.getInstance(browser).getMessageText());
             Graphene.waitGui().until(changeRoleSuccessfully);
@@ -367,7 +369,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
         initDashboardsPage();
         initUserManagementPage().changeRoleOfUsers(UserRoles.EDITOR, testParams.getUser());
 
-        Function<WebDriver, Boolean> changeRoleFailed = 
+        Function<WebDriver, Boolean> changeRoleFailed =
                 browser -> String.format(CHANGE_ROLE_FAILED_MESSAGE, UserRoles.EDITOR.getName())
                     .equals(UserManagementPage.getInstance(browser).getMessageText());
         Graphene.waitGui().until(changeRoleFailed);
@@ -576,7 +578,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
         initDashboardsPage();
 
         UserManagementPage userManagementPage = initUserManagementPage();
-        int customGroupCount = userManagementPage.getUserGroupsCount(); 
+        int customGroupCount = userManagementPage.getUserGroupsCount();
         userManagementPage.openSpecificGroupPage(GROUP1);
 
         assertTrue(UserManagementPage.getInstance(browser).isDeleteGroupLinkPresent(), "Delete group link does not show");
@@ -632,7 +634,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
     }
 
     private void checkEditorCannotAccessUserGroupsLinkInDashboardPage(PermissionsDialog permissionsDialog) {
-        permissionsDialog.publish(PublishType.SPECIFIC_USERS_CAN_ACCESS);
+        permissionsDialog.publish(PublishType.SELECTED_USERS);
         AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
         assertFalse(addGranteesDialog.isUserGroupLinkShown(), "Editor user could see user group link");
     }
