@@ -9,6 +9,8 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 
+import java.util.stream.Stream;
+
 public class Manage2Fragment extends AbstractGreyPagesFragment {
 
     @FindBy(name = "maql")
@@ -22,11 +24,15 @@ public class Manage2Fragment extends AbstractGreyPagesFragment {
         Graphene.guardHttp(submit).click();
         waitForElementVisible(BY_GP_LINK, browser);
         Graphene.guardHttp(browser.findElement(BY_GP_LINK)).click();
-        return waitForPollState("OK", checkIterations);
+        waitForPollState(State.OK, checkIterations);
+        return getPollState() == State.OK;
     }
 
     @Override
-    protected String getPollState() throws JSONException {
-        return loadJSON().getJSONObject("wTaskStatus").getString("status");
+    protected State getPollState() throws JSONException {
+        return Stream.of(State.values())
+                .filter(state -> state.toString().equals(loadJSON().getJSONObject("wTaskStatus").getString("status")))
+                .findFirst()
+                .get();
     }
 }
