@@ -52,6 +52,9 @@ public class UITestsRegistry {
 
         suites.put("sanity", new Object[] {
             ManipulateWidgetsTest.class,
+            EventingBasicInsightTest.class,
+            VisualizationDrillableWidgetTest.class,
+            EventingWidgetDrillToDashboardTest.class,
             "testng-desktop-EditMode.xml",
             "testng-desktop-imap-KpiAlertEvaluate.xml",
             "testng-desktop-SplashScreen.xml"
@@ -199,6 +202,21 @@ public class UITestsRegistry {
 
         suites.put("lcm", new Object[] {
             DashboardsDistributedByLcmTest.class
+        });
+
+        suites.put("drill-eventing", new Object[] {
+            ContributionAndComparisionTest.class,
+            EventingBasicInsightTest.class,
+            EventingInEditMode.class,
+            EventingMultipleWidgetsTest.class,
+            EventingWidgetDrillToDashboardTest.class,
+            EventingWidgetDrillToPreventDefaultDashboardTest.class,
+            EventingWidgetEditModeTest.class,
+            EventingWidgetWithoutDrillToDashBoardTest.class,
+            EventingWidgetWithPoPTest.class,
+            VisualizationDrillableWidgetTest.class,
+            VisualizationInvalidDrillConfigTest.class,
+            VisualizationMeasureAttributeTest.class
         });
 
         TestsRegistry.getInstance()
