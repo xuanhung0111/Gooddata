@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
@@ -170,5 +171,25 @@ public class GoodSalesAttributeFilterTest extends AbstractAnalyseTest {
         takeScreenshot(browser, "Relate-date-shows-correctly-with-metric-amount", getClass());
         assertEquals(attributesBucket.getSelectedDimensionSwitch(), "Closed");
         assertEquals(attributesBucket.getSelectedGranularity(), "Year");
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void checkAllValueInSearchPanel() {
+        initAnalysePage().addFilter(ATTR_ACTIVITY);
+        analysisPage.getFilterBuckets().getFilter(ATTR_ACTIVITY).click();
+
+        AttributeFilterPickerPanel attributeFilterPickerPanel = AttributeFilterPickerPanel.getInstance(browser);
+        attributeFilterPickerPanel.searchForText("Email");
+        assertFalse(attributeFilterPickerPanel.isUncheckAll(), "Should check All");
+        attributeFilterPickerPanel
+                .scrollElementIntoView("Email with 3dCart Shopping Cart Software on Jul-04-09")
+                .uncheckAllCheckbox();
+        assertEquals(attributeFilterPickerPanel.getLimitedWarningText(), "Sorry, you have exceeded the limit (500).");
+        assertTrue(attributeFilterPickerPanel.isUncheckAll(), "Should uncheck All");
+
+        attributeFilterPickerPanel
+                .scrollElementIntoView("Email with 1 Source Consulting on Feb-03-10")
+                .checkAllCheckbox();
+        assertFalse(attributeFilterPickerPanel.isUncheckAll(), "Should check All");
     }
 }
