@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
+import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -86,6 +87,8 @@ public class ProjectFragment extends AbstractGreyPagesFragment {
 
     @Override
     protected State getPollState() throws JSONException {
+        Graphene.waitGui().until(browser ->
+                !loadJSON().getJSONObject("project").getJSONObject("content").getString("state").isEmpty());
         return Stream.of(State.values())
                 .filter(state -> state.toString()
                         .equals(loadJSON().getJSONObject("project").getJSONObject("content").getString("state")))

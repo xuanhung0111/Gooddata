@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.indigo.analyze;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 import static java.lang.String.format;
@@ -39,7 +40,7 @@ public class BackwardCompatibilityTest extends AbstractProjectTest {
     @Test(dependsOnGroups = "createProject")
     public void testWithPoP() {
         if (!isOnStagingCluster()) {
-            return;
+            throw new SkipException("Test just runs on Staging, Staging2 and Staging3");
         }
         final String insightUri = format("analyze/#/%s/80514/edit", testParams.getProjectId());
         final String avgAmount = "Amount Tr [Avg]";
@@ -56,7 +57,7 @@ public class BackwardCompatibilityTest extends AbstractProjectTest {
                 testParams.getHost().equals(STAGING)) {
             return true;
         }
-        System.out.println("Test just runs on Staging, Staging2 and Staging3. Skip and mark as passed test");
+        System.out.println("Test just runs on Staging, Staging2 and Staging3");
         return false;
     }
 }
