@@ -31,6 +31,7 @@ public class ImportFragment extends AbstractGreyPagesFragment {
 
     @Override
     protected State getPollState() throws JSONException {
+        Graphene.waitGui().until(browser -> !loadJSON().getJSONObject("taskState").getString("status").isEmpty());
         return Stream.of(State.values())
                 .filter(state -> state.toString().equals(loadJSON().getJSONObject("taskState").getString("status")))
                 .findFirst()
