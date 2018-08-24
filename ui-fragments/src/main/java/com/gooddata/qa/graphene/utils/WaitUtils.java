@@ -36,11 +36,11 @@ public final class WaitUtils {
             waitForElementVisible(By.cssSelector(".s-dashboardLoaded"), searchContext, TIMEOUT_WAIT_OLD_CLIENT_LOADED);
         } else {
             waitForElementVisible(By.id("p-projectDashboardPage"), searchContext, TIMEOUT_WAIT_OLD_CLIENT_LOADED);
-        }
-        if (!isElementPresent(By.className("s-btn-consumer_insights"), searchContext)) { //default dashboard of WalkThrough project
-            waitForElementVisible(
-                    By.xpath("//div[@id='p-projectDashboardPage' and contains(@class,'s-displayed')]"),
-                    searchContext, TIMEOUT_WAIT_OLD_CLIENT_LOADED);
+            if (!isElementPresent(By.className("s-btn-consumer_insights"), searchContext)) { //default dashboard of WalkThrough project
+                waitForElementVisible(
+                        By.xpath("//div[@id='p-projectDashboardPage' and contains(@class,'s-displayed')]"),
+                        searchContext, TIMEOUT_WAIT_OLD_CLIENT_LOADED);
+            }
         }
         if (searchContext.findElements(BY_RED_BAR).size() != 0) {
             if ("Dashboard no longer exists".equals(searchContext.findElement(BY_RED_BAR).getText())) {
