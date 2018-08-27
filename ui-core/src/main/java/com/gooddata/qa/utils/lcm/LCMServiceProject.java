@@ -87,13 +87,13 @@ public final class LCMServiceProject {
     /**
      * Delete devs/masters project, clientIds, segments which have involved in this lcm model
      */
-    public void cleanUp() {
+    public void cleanUp(final String domain) {
         try {
             log.info("---Removing ads instance");
             AdsHelper adsHelper = new AdsHelper(restClient, this.projectId);
             adsHelper.removeAds(ads);
             log.info("---Deleting associated segments");
-            LcmRestUtils.deleteSegments(this.restClient, this.associatedSegments);
+            LcmRestUtils.deleteSegments(this.restClient, domain, this.associatedSegments);
             log.info("---Deleting service project");
             deleteProject(this.projectId);
         } catch (Exception ex) {

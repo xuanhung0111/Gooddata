@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.flow;
 
 import com.gooddata.qa.graphene.indigo.dashboards.CommonDateFilteringTest;
-import com.gooddata.qa.graphene.indigo.dashboards.DashboardsDistributedByLcmTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DataSetTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DateDatasetRecommendationTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DateFilterOnCategoryBucketTest;
@@ -105,7 +104,6 @@ public class UITestsRegistry {
             KpiDashboardsParamsTest.class,
             MultipleAttributeFilteringTest.class,
             MultipleAttributeFilterManipulationTest.class,
-            DashboardsDistributedByLcmTest.class,
             EventingBasicInsightTest.class,
             VisualizationMeasureAttributeTest.class,
             ContributionAndComparisionTest.class,
@@ -198,10 +196,6 @@ public class UITestsRegistry {
         suites.put("total-results", new Object[] {
             "testng-desktop-KpiDashboardWithTotalsResult.xml",
             "testng-mobile-KpiDashboardWithTotalsResult.xml"
-        });
-
-        suites.put("lcm", new Object[] {
-            DashboardsDistributedByLcmTest.class
         });
 
         suites.put("drill-eventing", new Object[] {
