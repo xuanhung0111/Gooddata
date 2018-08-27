@@ -67,6 +67,7 @@ public class FactDetailPage extends ObjectPropertiesPage {
         waitForElementVisible(metricLink, browser).click();
         String expectedMaql = String.format("SELECT %s(%s)", metricType, factName);
         String expectedFormat = "#,##0.00";
-        assertTrue(MetricDetailsPage.getInstance(browser).isMetricCreatedSuccessfully(expectedMaql, expectedFormat));
+        assertTrue(MetricDetailsPage.getInstance(browser).isMetricCreatedSuccessfully(expectedMaql, expectedFormat),
+                "Metric is created unsuccessfully");
     }
 }

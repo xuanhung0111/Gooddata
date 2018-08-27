@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -73,7 +75,7 @@ public class ObjectsTable extends AbstractTable {
     public ObjectsTable assertCheckboxes(boolean checkSelection, boolean expectedSelection) {
         List<WebElement> tableRows = getRows();
         for (WebElement tableRow : tableRows) {
-            assertTrue(tableRow.findElement(BY_ROW_CHECKBOX).isDisplayed());
+            assertTrue(tableRow.findElement(BY_ROW_CHECKBOX).isDisplayed(), "Checkbox should display");
             if (checkSelection) {
                 assertEquals(tableRow.findElement(ObjectsTable.BY_ROW_CHECKBOX).isSelected(),
                         expectedSelection);
@@ -91,7 +93,7 @@ public class ObjectsTable extends AbstractTable {
                     waitForElementVisible(tableRows.get(i).findElement(
                             ObjectsTable.BY_ROW_CHECKBOX_IS_CHECKED));
                     assertTrue(tableRows.get(i).findElement(ObjectsTable.BY_ROW_CHECKBOX)
-                            .isSelected());
+                            .isSelected(), "Check box isn't selected");
                     continue;
                 }
             }
@@ -100,9 +102,9 @@ public class ObjectsTable extends AbstractTable {
     }
 
     public ObjectsTable assertTableHeader() {
-        assertTrue(tableHeaderTitle.isDisplayed());
-        assertTrue(tableHeaderTime.isDisplayed());
-        assertTrue(tableHeaderAuthor.isDisplayed());
+        assertTrue(tableHeaderTitle.isDisplayed(), "Header title doesn't display");
+        assertTrue(tableHeaderTime.isDisplayed(), "Header time doesn't display");
+        assertTrue(tableHeaderAuthor.isDisplayed(), "Header author doesn't display");
         return this;
     }
 
@@ -119,7 +121,7 @@ public class ObjectsTable extends AbstractTable {
         waitForElementVisible(getRoot());
         int index = getNumberOfRows() - 1;
         for (WebElement row : getRows()) {
-            assertTrue(row.getText().contains(sortedObjectsList.get(index)));
+            assertThat(row.getText(), containsString(sortedObjectsList.get(index)));
             index--;
         }
         return this;

@@ -302,7 +302,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
         long fileSize = pdfExport.length();
         System.out.println("File size: " + fileSize);
 
-        assertTrue(PdfUtils.getTextContentFrom(pdfExport).contains(tabName));
+        assertTrue(PdfUtils.getTextContentFrom(pdfExport).contains(tabName), "Content of exported PDF is wrong");
         assertTrue(fileSize > minimalSize, "Export is probably invalid, check the PDF manually! Current size is "
                 + fileSize + ", but minimum " + minimalSize + " was expected");
     }

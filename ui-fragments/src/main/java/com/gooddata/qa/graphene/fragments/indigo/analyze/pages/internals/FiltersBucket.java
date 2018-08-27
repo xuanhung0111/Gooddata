@@ -53,9 +53,9 @@ public class FiltersBucket extends AbstractBucket {
         panel.apply();
 
         if (STATIC_PERIOD_DROPDOWN_ITEM.equals(period)) {
-            assertTrue(getFilterTextHelper(filter).matches(DATE_RANGE_REGEX));
+            assertTrue(getFilterTextHelper(filter).matches(DATE_RANGE_REGEX), "The format of filter help text is wrong");
         } else {
-            assertTrue(getFilterTextHelper(filter).endsWith(":\n" + period));
+            assertTrue(getFilterTextHelper(filter).endsWith(":\n" + period), "The format of filter help text is wrong");
         }
         return this;
     }

@@ -260,7 +260,7 @@ public class AnalysisPage extends AbstractFragment {
 
     public AnalysisPage resetToBlankState() {
         getPageHeader().resetToBlankState();
-        assertTrue(isBlankState());
+        assertTrue(isBlankState(), "Should be blank state");
         return this;
     }
 

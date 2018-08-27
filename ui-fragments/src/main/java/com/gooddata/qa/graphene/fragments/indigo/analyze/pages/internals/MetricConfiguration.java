@@ -70,7 +70,7 @@ public class MetricConfiguration extends AbstractFragment {
 
     public MetricConfiguration showPercents() {
         waitForElementVisible(showInPercents).click();
-        assertTrue(showInPercents.isSelected());
+        assertTrue(showInPercents.isSelected(), "Show in percents isn't checked");
         return this;
     }
 
