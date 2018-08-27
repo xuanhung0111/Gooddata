@@ -208,6 +208,16 @@ public class DashboardRestRequest extends CommonRestRequest {
     }
 
     /**
+     * Set metric as private or public
+     */
+    public void setPrivateMetric(String metricTitle, boolean isPrivate) throws JSONException, IOException {
+        String metricUri = getMetricByTitle(metricTitle).getUri();
+        final JSONObject json = getJsonObject(metricUri);
+        json.getJSONObject("metric").getJSONObject("meta").put("unlisted", BooleanUtils.toInteger(isPrivate));
+        executeRequest(RestRequest.initPutRequest(metricUri, json.toString()), HttpStatus.OK);
+    }
+
+    /**
      * Set dashboard as private or public
      *
      * @param title

@@ -65,7 +65,8 @@ public class MetricVisibilityTest extends GoodSalesAbstractTest {
         logoutAndLoginAs(true, userRoles);
         try {
             MetricDetailsPage metricDetailsPage = initMetricPage().openMetricDetailPage(METRIC_AMOUNT);
-            PermissionSettingDialog permissionSettingDialog = metricDetailsPage.openPermissionSettingDialog().setVisibility(true);
+            PermissionSettingDialog permissionSettingDialog =
+                    metricDetailsPage.openPermissionSettingDialog().setVisibility(true);
             assertEquals(permissionSettingDialog.getRowInfoVisibility(),
                     "Everyone can find this metric and use all metrics it contains");
             assertEquals(permissionSettingDialog.getToolTipFromVisibilityQuestionIcon(),
@@ -111,7 +112,8 @@ public class MetricVisibilityTest extends GoodSalesAbstractTest {
         getMetricCreator().createAmountMetric();
         try {
             MetricPage metricPage = initMetricPage();
-            PermissionSettingDialog permissionSettingDialog = metricPage.openPermissionSettingDialogFor(METRIC_AMOUNT);
+            PermissionSettingDialog permissionSettingDialog =
+                    metricPage.selectMetricsAndOpenPermissionDialog(METRIC_AMOUNT);
             assertTrue(permissionSettingDialog.isEditPermissionSectionVisible(), "Edit permission section should display");
             permissionSettingDialog.cancel();
 
@@ -131,7 +133,8 @@ public class MetricVisibilityTest extends GoodSalesAbstractTest {
         getMetricCreator().createLostMetric();
         try {
             MetricPage metricPage = initMetricPage();
-            PermissionSettingDialog permissionSettingDialog = metricPage.openPermissionSettingDialogFor(METRIC_AMOUNT, METRIC_LOST);
+            PermissionSettingDialog permissionSettingDialog =
+                    metricPage.selectMetricsAndOpenPermissionDialog(METRIC_AMOUNT, METRIC_LOST);
             assertTrue(permissionSettingDialog.isEditPermissionSectionVisible(),
                     "Edit permission section should display");
             assertEquals(permissionSettingDialog.getHeaderTitle(), "Change permissions for 2 selected metrics");
@@ -147,8 +150,8 @@ public class MetricVisibilityTest extends GoodSalesAbstractTest {
             assertFalse(metricPage.isPrivateMetric(METRIC_LOST), "Eye icon shouldn't display beside user name");
 
             logoutAndLoginAs(true, UserRoles.EDITOR);
-            assertFalse(initMetricPage().openPermissionSettingDialogFor(METRIC_AMOUNT).isEditPermissionSectionVisible(),
-                    "Edit permission section shouldn't display");
+            assertFalse(initMetricPage().selectMetricsAndOpenPermissionDialog(METRIC_AMOUNT)
+                            .isEditPermissionSectionVisible(), "Edit permission section shouldn't display");
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
             commonRestRequest.deleteObjectsUsingCascade(getMetricByTitle(METRIC_LOST).getUri());

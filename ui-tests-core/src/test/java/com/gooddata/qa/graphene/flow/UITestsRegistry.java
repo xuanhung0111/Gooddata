@@ -51,6 +51,7 @@ import com.gooddata.qa.graphene.filters.FiscalDateFilterNameTest;
 import com.gooddata.qa.graphene.filters.GroupFiltersOnDashboardTest;
 import com.gooddata.qa.graphene.i18n.LocalizationTest;
 import com.gooddata.qa.graphene.manage.AttributeLabelsTest;
+import com.gooddata.qa.graphene.manage.BulkPermissionMetricSetting;
 import com.gooddata.qa.graphene.manage.ComputedAttributesTest;
 import com.gooddata.qa.graphene.manage.GoodSalesAttributeLabelsTest;
 import com.gooddata.qa.graphene.manage.GoodSalesFactTest;
@@ -70,6 +71,7 @@ import com.gooddata.qa.graphene.project.ProjectSwitchingTest;
 import com.gooddata.qa.graphene.project.SimpleProjectEtlTest;
 import com.gooddata.qa.graphene.project.ValidateProjectTest;
 import com.gooddata.qa.graphene.project.LeaveProjectTest;
+import com.gooddata.qa.graphene.reports.BulkPermissionReportSetting;
 import com.gooddata.qa.graphene.reports.CopyReportTableTest;
 import com.gooddata.qa.graphene.reports.DynamicImageTest;
 import com.gooddata.qa.graphene.reports.GoodSalesAddingFilterFromReportContextMenuTest;
@@ -182,7 +184,8 @@ public class UITestsRegistry {
             DynamicImageTest.class,
             TimeFormattingTest.class,
             GoodSalesEmbeddedReportTest.class,
-            LockingReportTest.class
+            LockingReportTest.class,
+            BulkPermissionReportSetting.class
         });
 
         suites.put("dashboards", new HashMap<String, Object[]>() {{
@@ -273,6 +276,7 @@ public class UITestsRegistry {
             GoodSalesMetricEditorTest.class,
             GoodSalesAttributeLabelsTest.class,
             MetricVisibilityTest.class,
+            BulkPermissionMetricSetting.class,
             "testng-manage-aggregation-metric-test.xml",
             "testng-manage-different-granularity-logical-metric-test.xml",
             "testng-manage-filter-share-ratio-metric-test.xml",
