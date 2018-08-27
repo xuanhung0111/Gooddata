@@ -20,6 +20,7 @@ import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
 import org.json.JSONException;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
@@ -74,7 +75,9 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"exportFirstDashboard"}, groups = {"dashboards-verification"})
     public void verifyExportedDashboardPDF() {
-        if (testParams.isClientDemoEnvironment()) return;
+        if (testParams.isClientDemoEnvironment()) {
+            throw new SkipException("There isn't exported feature in client demo enviroment");
+        }
         verifyDashboardExport(exportedDashboardName, SOURCE_TAB, expectedDashboardExportSize);
     }
 
