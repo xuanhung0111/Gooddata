@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
@@ -11,8 +12,10 @@ import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.tagName;
 import java.util.List;
 import java.util.stream.Stream;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -31,6 +34,12 @@ public class AttributeFilterPickerPanel extends AbstractPicker {
 
     @FindBy(className = "s-apply")
     private WebElement applyButton;
+
+    @FindBy(className = "ScrollbarLayout_faceVertical")
+    private WebElement scrollbar;
+
+    @FindBy(className = "gd-list-limitExceeded")
+    private WebElement limitedWarning;
 
     private static final By CLEAR_SEARCH_TEXT_SHORTCUT = className("gd-input-icon-clear");
 
@@ -85,7 +94,7 @@ public class AttributeFilterPickerPanel extends AbstractPicker {
 
     public void checkAllCheckbox() {
         waitForElementVisible(selectAllLabel);
-        if (selectAllCheckbox.getAttribute("class").contains("checkbox-indefinite")) {
+        if (isUncheckAll()) {
             selectAllCheckbox.click(); // this will select all
         }
 
@@ -96,7 +105,7 @@ public class AttributeFilterPickerPanel extends AbstractPicker {
 
     public void uncheckAllCheckbox() {
         waitForElementVisible(selectAllLabel);
-        if (selectAllCheckbox.getAttribute("class").contains("checkbox-indefinite")) {
+        if (isUncheckAll()) {
             selectAllCheckbox.click(); // this will select all
         }
 
@@ -105,10 +114,25 @@ public class AttributeFilterPickerPanel extends AbstractPicker {
         }
     }
 
+    public boolean isUncheckAll() {
+        return selectAllCheckbox.getAttribute("class").contains("checkbox-indefinite");
+    }
+
     public AttributeFilterPickerPanel selectItem(String item) {
         searchForText(item);
         getElement(format("[title='%s']", item))
             .click();
+        return this;
+    }
+
+    public AttributeFilterPickerPanel scrollElementIntoView(String item) {
+        waitForElementVisible(scrollbar).click();
+        getActions().sendKeys(Keys.HOME).perform(); //Move to header list
+        waitForPickerLoaded();
+        while (!isElementVisible(cssSelector(getListItemsCssSelector() + format("[title='%s']", item)), getPanelRoot())) {
+            getActions().sendKeys(Keys.PAGE_DOWN).perform();
+            waitForPickerLoaded();
+        }
         return this;
     }
 
@@ -120,6 +144,10 @@ public class AttributeFilterPickerPanel extends AbstractPicker {
             .findFirst()
             .get()
             .split("-")[2];
+    }
+
+    public String getLimitedWarningText() {
+        return waitForElementVisible(limitedWarning).getText();
     }
 
     public void discard() {
