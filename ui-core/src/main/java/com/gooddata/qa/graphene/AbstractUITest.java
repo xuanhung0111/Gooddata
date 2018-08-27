@@ -25,7 +25,6 @@ import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.utils.PdfUtils;
-import com.gooddata.qa.utils.XlsxUtils;
 import com.gooddata.qa.utils.mail.ImapClientAction;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -37,9 +36,6 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -318,11 +314,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
             return null;
         }
         return PdfUtils.getTextContentFrom(pdfExport);
-    }
-
-    public List<List<String>> excelFileToRead(String fileName, int sheetNumber) throws IOException {
-        return XlsxUtils.excelFileToRead(testParams.getDownloadFolder() +
-                testParams.getFolderSeparator() + fileName + ".xlsx", sheetNumber);
     }
 
     public void verifyReportExport(ExportFormat format, String reportName, long minimalSize) {

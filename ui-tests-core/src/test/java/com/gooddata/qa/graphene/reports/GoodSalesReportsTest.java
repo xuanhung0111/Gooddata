@@ -10,6 +10,7 @@ import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.ExportXLSXDialog;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
+import com.gooddata.qa.utils.XlsxUtils;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
@@ -21,7 +22,6 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
@@ -224,7 +224,8 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
             List<List<String>> xlsxContent;
             verifyReportExport(ExportFormat.EXCEL_XLSX, "Simple tabular report - 4",
                     expectedTabularReportExportXLSXSize);
-            xlsxContent = excelFileToRead("Simple tabular report - 4", 0);
+            xlsxContent = XlsxUtils.excelFileToRead(testParams.getDownloadFolder() +
+                    testParams.getFolderSeparator() + "Simple tabular report - 4.xlsx", 0);
             //verify header title
             assertThat(xlsxContent, hasItem(asList("Region", "Product", "Sales Rep", "Department", "# of Opportunities")));
             //verify content
@@ -341,19 +342,16 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
                                List<String> how, List<FilterItem> filterItems) {
         UiReportDefinition reportDefinition = new UiReportDefinition().withName(reportName).withType(reportType);
 
-        if (!what.isEmpty()) {
-            for (String metric : what)
-                reportDefinition.withWhats(metric);
+        for (String metric : what) {
+            reportDefinition.withWhats(metric);
         }
 
-        if (!how.isEmpty()) {
-            for (String attribute : how)
-                reportDefinition.withHows(attribute);
+        for (String attribute : how) {
+            reportDefinition.withHows(attribute);
         }
 
-        if (!filterItems.isEmpty()) {
-            for (FilterItem filter : filterItems)
-                reportDefinition.withFilters(filter);
+        for (FilterItem filter : filterItems) {
+            reportDefinition.withFilters(filter);
         }
 
         createReport(reportDefinition, "GoodSales");

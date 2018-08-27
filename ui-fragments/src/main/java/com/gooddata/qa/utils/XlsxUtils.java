@@ -5,9 +5,7 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -18,8 +16,7 @@ public class XlsxUtils {
     }
 
     public static List<List<String>> excelFileToRead(String name, int sheetNumber) throws IOException {
-        InputStream excelFileToRead = new FileInputStream(name);
-        XSSFWorkbook wb = new XSSFWorkbook(excelFileToRead);
+        XSSFWorkbook wb = new XSSFWorkbook(name);
 
         XSSFSheet sheet = wb.getSheetAt(sheetNumber);
         XSSFRow row;
@@ -36,9 +33,7 @@ public class XlsxUtils {
                 cell = (XSSFCell) cells.next();
                 if (cell.getCellType() == XSSFCell.CELL_TYPE_STRING) {
                     rowContent.add(cell.getStringCellValue());
-                }
-
-                if (cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC) {
+                } else if (cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC) {
                     rowContent.add(String.valueOf(cell.getNumericCellValue()));
                 }
             }
