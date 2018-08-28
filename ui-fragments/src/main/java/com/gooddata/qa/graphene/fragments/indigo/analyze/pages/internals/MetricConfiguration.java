@@ -232,7 +232,7 @@ public class MetricConfiguration extends AbstractFragment {
 
         @Override
         protected void waitForPickerLoaded() {
-            waitForElementNotPresent(cssSelector(".filter-items-loading"));
+            waitForElementNotPresent(cssSelector(".s-dropdown-loading"));
         }
 
         @Override

@@ -60,7 +60,7 @@ public class AttributeFilterPickerPanel extends AbstractPicker {
 
     @Override
     protected void waitForPickerLoaded() {
-        waitForElementNotPresent(cssSelector(".filter-items-loading"));
+        waitForElementNotPresent(cssSelector(".s-dropdown-loading"));
     }
 
     @Override

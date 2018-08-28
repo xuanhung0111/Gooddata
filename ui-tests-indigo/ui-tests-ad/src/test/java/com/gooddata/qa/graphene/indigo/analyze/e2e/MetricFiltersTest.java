@@ -130,7 +130,7 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
         // Check the attribute filter dropdown status
         // is revived correctly. i.e check 2nd attribute element
         // is not selected.
-        waitForElementNotPresent(className("filter-items-loading"));
+        waitForElementNotPresent(className("s-dropdown-loading"));
         assertTrue(isElementPresent(cssSelector(".s-filter-item[title='In Person Meeting']:not(.is-selected)"), browser));
     }
 
