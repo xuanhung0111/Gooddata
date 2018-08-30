@@ -29,7 +29,7 @@ public abstract class AbstractGreyPagesFragment extends AbstractFragment {
     protected void waitForPollState(State expectedValidState, int maxIterations) throws JSONException {
         int i = 0;
         State state = getPollState();
-        while ((state == State.RUNNING || state == State.PREPARING) &&
+        while ((state == State.RUNNING || state == State.PREPARING || state == State.LOADING) &&
                 !expectedValidState.equals(state = getPollState())) {
             System.out.println("Current polling state is: " + state);
             if (i >= maxIterations) {
@@ -47,6 +47,6 @@ public abstract class AbstractGreyPagesFragment extends AbstractFragment {
     }
 
     public enum State {
-        OK, ENABLED, ERROR, DELETED, CANCELED, RUNNING, PREPARING
+        OK, ENABLED, ERROR, DELETED, CANCELED, RUNNING, PREPARING, LOADING
     }
 }
