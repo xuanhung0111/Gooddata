@@ -89,11 +89,7 @@ public class ProjectFragment extends AbstractGreyPagesFragment {
     protected State getPollState() throws JSONException {
         Graphene.waitGui().until(browser ->
                 !loadJSON().getJSONObject("project").getJSONObject("content").getString("state").isEmpty());
-        return Stream.of(State.values())
-                .filter(state -> state.toString()
-                        .equals(loadJSON().getJSONObject("project").getJSONObject("content").getString("state")))
-                .findFirst()
-                .get();
+        return State.valueOf(loadJSON().getJSONObject("project").getJSONObject("content").getString("state"));
     }
 
     private void logProjectUrl(String projectUrl) {
