@@ -12,8 +12,6 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import java.text.ParseException;
 import java.util.Calendar;
 
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
@@ -118,15 +116,15 @@ public class DateFiltersTest extends AbstractAdE2ETest {
         panel.selectStaticPeriod();
 
         String nextYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR) + 1);
-        fillInDateRange(".s-interval-from input", "01/01/" + nextYear);
+        panel.fillInDateRange(waitForElementVisible(cssSelector(".s-interval-from input"), browser), "01/01/" + nextYear);
         assertEquals(waitForElementVisible(cssSelector(".s-interval-to input"), browser).getAttribute("value"),
                 "01/01/" + nextYear);
 
-        fillInDateRange(".s-interval-to input", "01/01/2003");
+        panel.fillInDateRange(waitForElementVisible(cssSelector(".s-interval-to input"), browser), "01/01/2003");
         assertEquals(waitForElementVisible(cssSelector(".s-interval-from input"), browser).getAttribute("value"),
                 "01/01/2003");
 
-        fillInDateRange(".s-interval-to input", "01/01/200");
+        panel.fillInDateRange(waitForElementVisible(cssSelector(".s-interval-to input"), browser), "01/01/200");
         waitForElementVisible(cssSelector(".s-interval-from input"), browser).click();
         assertEquals(waitForElementVisible(cssSelector(".s-interval-from input"), browser).getAttribute("value"),
                 "01/01/2003");
@@ -134,13 +132,5 @@ public class DateFiltersTest extends AbstractAdE2ETest {
 
     private String getValueFrom(String locator) {
         return waitForElementVisible(cssSelector(locator), browser).getText();
-    }
-
-    private void fillInDateRange(String cssLocator, String date) {
-        WebElement elem = waitForElementVisible(cssSelector(cssLocator), browser);
-        for (int i = 0, n = elem.getAttribute("value").trim().length(); i < n; i++) {
-            elem.sendKeys(Keys.BACK_SPACE);
-        }
-        elem.sendKeys(date, Keys.ENTER);
     }
 }
