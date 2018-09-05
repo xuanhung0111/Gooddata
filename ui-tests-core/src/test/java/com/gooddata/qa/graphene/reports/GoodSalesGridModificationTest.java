@@ -15,6 +15,7 @@ import com.gooddata.qa.graphene.entity.report.HowItem;
 import com.gooddata.qa.graphene.entity.report.HowItem.Position;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.report.WhatItem;
+import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
@@ -36,6 +37,8 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import static com.gooddata.md.Restriction.title;
@@ -219,7 +222,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
                             stageNamePosition == Position.TOP ? Pair.of(3, 4) : Pair.of(4, 3));
             Screenshots.takeScreenshot(browser, format("Report has two attributes on %s and %s with feature set %s",
                     stageNamePosition, departmentPosition, isFeatureFlagEnable), getClass());
-            assertTrue(reportPage.isSelectionQuickInfoDisplay(), "Selection Quick Info should display");
+                assertTrue(reportPage.isSelectionQuickInfoDisplay(), "Selection Quick Info should display");
 
             tableReport.clickOnCellElement(INTEREST, CellType.ATTRIBUTE_VALUE).waitForLoaded();
             assertFalse(reportPage.isSelectionQuickInfoDisplay(), "Selection Quick Info shouldn't display");
@@ -230,6 +233,28 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void renderTabularReportWithReportHeaderPagingEnabled() {
+        List<Float> expectedValue =
+                asList(0.0f, 0.0f, 0.0f, 0.0f, 0.4f, 1309000.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 142968.0f, 0.0f, 0.0f,
+                        0.0f, 0.0f, 520000.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 92492.17f, 0.0f, 1236000.0f,
+                        0.0f, 0.0f, 0.0f, 0.0f, 3.9984416E7f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 80265.6f, 0.0f,
+                        0.0f, 0.0f, 0.0f, 4.0f, 0.0f, 48000.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1196000.0f, 0.0f, 0.0f, 0.0f,
+                        0.0f, 31200.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 92009.2f, 0.0f, 0.0f, 0.0f, 0.0f, 34.8f, 0.0f,
+                        0.0f, 0.0f, 0.0f, 634000.0f, 0.0f, 0.0f, 0.0f, 0.0f, 44.8f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+                        0.0f, 0.0f, 730433.2f, 0.0f, 0.0f, 0.0f, 0.0f, 8784800.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+                        0.0f, 83510.0f, 0.0f, 1248000.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 30.8f, 0.0f, 0.0f, 0.0f, 30.8f,
+                        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 32.8f, 0.0f, 0.0f, 0.0f, 0.0f, 634822.94f, 0.0f, 0.0f, 0.0f, 0.0f,
+                        1234021.8f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 879488.4f, 0.0f, 0.0f, 0.0f, 0.0f, 1.6f, 0.0f,
+                        0.0f, 2.4f, 0.0f, 0.0f, 0.0f, 0.0f, 32.8f, 0.0f, 0.0f, 0.0f, 0.0f, 32.8f, 0.0f, 0.0f, 0.0f, 0.0f,
+                        368904.94f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.2f, 0.0f, 0.0f, 1042499.4f, 0.0f, 0.0f, 0.0f,
+                        0.0f, 0.0f, 0.0f, 14250.0f, 0.0f, 0.0f, 0.0f, 0.0f, 2.4f, 0.0f, 0.0f, 0.0f, 0.0f, 45691.2f, 0.0f,
+                        0.0f, 414509.7f, 0.0f, 0.0f, 0.0f, 0.0f, 1082764.8f, 0.0f, 0.0f, 0.0f, 0.0f, 24.4f, 0.0f, 0.0f,
+                        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 124000.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 9340.02f,
+                        0.0f, 0.0f, 0.0f, 0.0f, 3.2f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 6952.8f, 0.0f,
+                        0.0f, 2.4f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 67133.88f, 0.0f, 0.0f, 599840.0f, 0.0f, 0.0f,
+                        0.0f, 0.0f, 0.0f, 0.0f, 1.2f, 0.0f, 0.0f, 0.0f, 0.0f, 6000.0f, 0.0f, 0.0f, 0.0f, 0.0f, 226172.22f,
+                        0.0f, 0.0f, 34.8f, 0.0f, 0.0f, 0.0f, 0.0f, 19.2f, 0.0f, 0.0f, 0.0f, 0.0f, 1380000.0f, 0.0f, 0.0f,
+                        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 3.2f, 0.0f, 0.0f, 0.0f, 0.0f, 428024.94f,
+                        0.0f, 0.0f, 29843.2f, 0.0f, 0.0f);
         projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.REPORT_HEADER_PAGING_ENABLED, true);
         try {
             initReportCreation().createReport(new UiReportDefinition()
@@ -241,23 +266,18 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
                             new HowItem(ATTR_OPPORTUNITY, Position.LEFT)));
             initDashboardsPage().editDashboard().addReportToDashboard("Large Report");
             TableReport tableReport = dashboardsPage.getReport("Large Report", TableReport.class);
+            DashboardWidgetDirection.LEFT.moveElementToRightPlace(tableReport.getRoot());
             tableReport.showAnyway();
             tableReport
-                    .resizeFromBottomRightButton(370, 250)
-                    .resizeFromTopLeftButton(-300, 0);
-            tableReport.waitForLoaded();
+                    .resizeFromBottomRightButton(600, 1200)
+                    .waitForLoaded();
             dashboardsPage.saveDashboard();
             tableReport.showAnyway();
             tableReport.waitForLoaded();
-            assertEquals(tableReport.getMetricValues(),
-                    asList(0.0f, 1309000.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-                            0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 142968.0f, 520000.0f, 0.0f,
-                            1236000.0f, 3.9984416E7f, 0.0f, 0.0f, 48000.0f, 1196000.0f, 31200.0f, 0.0f,
-                            0.0f, 0.0f, 0.0f, 0.0f, 730433.2f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-                            0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 92009.2f, 34.8f, 634000.0f, 44.8f, 0.0f, 0.0f,
-                            0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-                            0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.4f, 0.0f, 0.0f, 0.0f, 92492.17f, 0.0f, 0.0f,
-                            80265.6f, 4.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
+            Screenshots.takeScreenshot(browser, "Tabular Report", getClass());
+            Graphene.waitGui().withTimeout(5, TimeUnit.SECONDS)
+                    .until(browser -> tableReport.getMetricValues().size() == expectedValue.size());
+            assertEquals(tableReport.getMetricValues(), expectedValue);
         } finally {
             projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.REPORT_HEADER_PAGING_ENABLED, false);
         }
