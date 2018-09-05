@@ -46,6 +46,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_OPPORTUNITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_REGION;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STATUS;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PROBABILITY;
@@ -56,6 +57,7 @@ import static java.util.Collections.singletonList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -221,6 +223,41 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
 
             tableReport.clickOnCellElement(INTEREST, CellType.ATTRIBUTE_VALUE).waitForLoaded();
             assertFalse(reportPage.isSelectionQuickInfoDisplay(), "Selection Quick Info shouldn't display");
+        } finally {
+            projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.REPORT_HEADER_PAGING_ENABLED, false);
+        }
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void renderTabularReportWithReportHeaderPagingEnabled() {
+        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.REPORT_HEADER_PAGING_ENABLED, true);
+        try {
+            initReportCreation().createReport(new UiReportDefinition()
+                    .withName("Large Report")
+                    .withWhats(AMOUNT_METRIC)
+                    .withHows(
+                            new HowItem(ATTR_YEAR_CREATED, Position.TOP),
+                            new HowItem(ATTR_STAGE_NAME, Position.LEFT),
+                            new HowItem(ATTR_OPPORTUNITY, Position.LEFT)));
+            initDashboardsPage().editDashboard().addReportToDashboard("Large Report");
+            TableReport tableReport = dashboardsPage.getReport("Large Report", TableReport.class);
+            tableReport.showAnyway();
+            tableReport
+                    .resizeFromBottomRightButton(370, 250)
+                    .resizeFromTopLeftButton(-300, 0);
+            tableReport.waitForLoaded();
+            dashboardsPage.saveDashboard();
+            tableReport.showAnyway();
+            tableReport.waitForLoaded();
+            assertEquals(tableReport.getMetricValues(),
+                    asList(0.0f, 1309000.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+                            0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 142968.0f, 520000.0f, 0.0f,
+                            1236000.0f, 3.9984416E7f, 0.0f, 0.0f, 48000.0f, 1196000.0f, 31200.0f, 0.0f,
+                            0.0f, 0.0f, 0.0f, 0.0f, 730433.2f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+                            0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 92009.2f, 34.8f, 634000.0f, 44.8f, 0.0f, 0.0f,
+                            0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+                            0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.4f, 0.0f, 0.0f, 0.0f, 92492.17f, 0.0f, 0.0f,
+                            80265.6f, 4.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
         } finally {
             projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.REPORT_HEADER_PAGING_ENABLED, false);
         }
