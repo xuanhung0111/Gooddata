@@ -157,18 +157,20 @@ public class DateFilterPickerPanel extends AbstractFragment {
     private void configTimeFilterByRangeHelper(String from, String to, boolean apply) {
         selectStaticPeriod();
 
-        fillInDateRange(fromDate, from);
+        fillInDateRange(waitForElementVisible(fromDate), from);
         waitForElementVisible(fromDateCalendarIcon).click();
 
-        fillInDateRange(toDate, to);
+        fillInDateRange(waitForElementVisible(toDate), to);
         waitForElementVisible(toDateCalendarIcon).click();
 
         waitForElementVisible(apply ? applyButton : cancelButton).click();
         waitForFragmentNotVisible(this);
     }
 
-    private void fillInDateRange(WebElement dateInput, String date) {
-        for (int i = 0, n = dateInput.getAttribute("value").trim().length(); i < n; i++) {
+    public void fillInDateRange(WebElement dateInput, String date) {
+        dateInput.sendKeys(Keys.END);
+        int length = dateInput.getAttribute("value").length();
+        for (int i = 0; i <= length; i++) {
             dateInput.sendKeys(Keys.BACK_SPACE);
         }
         dateInput.sendKeys(date, Keys.ENTER);
