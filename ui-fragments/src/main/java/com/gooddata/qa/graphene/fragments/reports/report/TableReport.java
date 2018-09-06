@@ -38,6 +38,9 @@ import static java.util.stream.Collectors.toList;
  */
 public class TableReport extends AbstractDashboardReport {
 
+    private By BY_BOTTOM_RIGHT_RESIZE_BUTTON = By.className("yui3-selectionbox-resize-br");
+    private By BY_TOP_LEFT_RESIZE_BUTTON = By.className("yui3-selectionbox-resize-tl");
+
     public TableReport sortBy(String value, CellType type, Sort howToSort) {
         WebElement cell = getCellElement(value, type);
 
@@ -182,6 +185,14 @@ public class TableReport extends AbstractDashboardReport {
         return this;
     }
 
+    public TableReport resizeFromTopLeftButton(int xOffset, int yOffset) {
+        return resize(BY_TOP_LEFT_RESIZE_BUTTON, xOffset, yOffset);
+    }
+
+    public TableReport resizeFromBottomRightButton(int xOffset, int yOffset) {
+        return resize(BY_BOTTOM_RIGHT_RESIZE_BUTTON, xOffset, yOffset);
+    }
+
     private WebElement getCellElementBy(int row, int column) {
         row = row -1;
         column = column -1;
@@ -298,6 +309,15 @@ public class TableReport extends AbstractDashboardReport {
                 + "arguments[0].naturalWidth > 0";
 
         return (Boolean) BrowserUtils.runScript(browser, js, image);
+    }
+
+    private TableReport resize(By button, int xOffset, int yOffset) {
+        getActions()
+                .clickAndHold(waitForElementVisible(button, browser))
+                .moveByOffset(xOffset, yOffset)
+                .release()
+                .perform();
+        return this;
     }
 
     public enum Sort {
