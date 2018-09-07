@@ -62,7 +62,7 @@ public class TableReport extends AbstractFragment {
 
     public String getTooltipText(String headerName) {
         getActions().moveToElement(getHeader(headerName)).perform();
-        return waitForElementVisible(className("content"), browser).getText();
+        return waitForElementVisible(className("gd-table-header-bubble-overlay"), browser).getText();
     }
 
     public List<List<String>> getContent() {
