@@ -20,7 +20,8 @@ public enum ProjectFeatureFlags {
     EXPORT_TO_XLSX_ENABLED("exportToXLSXEnabled"),
     CELL_MERGED_BY_DEFAULT("cellMergedByDefault"),
     ACTIVE_FILTERS_BY_DEFAULT("activeFiltersByDefault"),
-    REPORT_HEADER_PAGING_ENABLED("reportHeaderPagingEnabled");
+    REPORT_HEADER_PAGING_ENABLED("reportHeaderPagingEnabled"),
+    ENABLE_METRIC_DATE_FILTER("enableMetricDateFilter");
 
     private final String featureFlag;
 

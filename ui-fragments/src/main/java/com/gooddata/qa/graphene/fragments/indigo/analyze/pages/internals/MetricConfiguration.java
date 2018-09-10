@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
@@ -16,10 +17,12 @@ import static org.testng.Assert.assertTrue;
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.AbstractPicker;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.description.DescriptionPanel;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -31,6 +34,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class MetricConfiguration extends AbstractFragment {
+
+    @FindBy(className = "s-metric-date-filter-button")
+    private WebElement filterByDate;
 
     @FindBy(className = "adi-bucket-item-header")
     private WebElement header;
@@ -45,7 +51,9 @@ public class MetricConfiguration extends AbstractFragment {
     private WebElement showInPercents;
 
     private static final By BY_REMOVE_ATTRIBUTE_FILTER = By.className("s-remove-attribute-filter");
+    private static final By BY_REMOVE_FILTER_BY_DATE = By.className("s-remove-date-filter");
     public static final By BY_ATTRIBUTE_FILTER_PICKER = By.className("adi-attr-filter-picker");
+    public static final By BY_DATE_BY_FILTER_PICKER = By.className("adi-date-filter-picker");
     public static final By BY_SELECT_ALL_CHECKBOX = By.cssSelector(".adi-attr-filter-picker .s-select-all-checkbox");
     private static final By BY_ATTRIBUTE_FILTER_BUTTON = By.className("adi-attr-filter-button");
     private static final By BY_FACT_AGGREGATION = By.className("s-fact-aggregation-switch");
@@ -54,6 +62,16 @@ public class MetricConfiguration extends AbstractFragment {
     private static final String ADD_ATTRIBUTE_FILTER_CLASS = "s-add_attribute_filter";
 
     private static final String DISABLED = "is-disabled";
+
+    public List<String> getByDateAndAttributeFilterButton() {
+        waitForElementVisible(filterByDate);
+        return browser.findElements(By.cssSelector(".adi-metric-bucket-item-configuration button"))
+                .stream().map(WebElement::getText).collect(Collectors.toList());
+    }
+
+    public boolean isFilterByDateButtonVisible() {
+        return isElementVisible(filterByDate);
+    }
 
     public String getHeader() {
         return waitForElementVisible(className("s-title"), waitForElementVisible(header)).getText();
@@ -124,6 +142,38 @@ public class MetricConfiguration extends AbstractFragment {
         return waitForElementVisible(header).getAttribute("class").contains("collapsed");
     }
 
+    public void expandFilterByDate() {
+        if (!isFilterByDateExpanded()) {
+            waitForElementVisible(filterByDate).click();
+        }
+    }
+
+    public boolean isFilterByDateExpanded() {
+        return waitForElementVisible(filterByDate).getAttribute("class").contains("is-active");
+    }
+
+    public FilterByDatePicker getFilterByDatePicker() {
+        return Graphene.createPageFragment(FilterByDatePicker.class,
+                waitForElementVisible(BY_DATE_BY_FILTER_PICKER, browser));
+    }
+
+    public MetricConfiguration changeDateDimension(String switchDimension) {
+        getFilterByDatePicker().expandDateDimension().changeDateDimension(switchDimension);
+        return this;
+    }
+
+    public String getDateDimension() {
+        return getFilterByDatePicker().expandDateDimension().getDateDimension();
+    }
+
+    public Boolean isDateDimensionVisible() {
+        return getFilterByDatePicker().expandDateDimension().isDateDimensionVisible();
+    }
+
+    public String getToolTipDimensionDropdown() {
+        return getFilterByDatePicker().getToolTipDimensionDropdown();
+    }
+
     public AttributeFilterPicker clickAddAttributeFilter() {
         waitForElementVisible(addAttributeFilter).click();
         return Graphene.createPageFragment(AttributeFilterPicker.class,
@@ -152,9 +202,30 @@ public class MetricConfiguration extends AbstractFragment {
         return addFilter(attribute, attributeFilterPicker -> attributeFilterPicker.clear().selectOnly(value).apply(), value);
     }
 
+    public MetricConfiguration addFilterByDate(String dateDimension, String from, String to) {
+        FilterByDatePicker filterByDatePicker;
+        expandFilterByDate();
+        filterByDatePicker = getFilterByDatePicker().expandDateDimension().changeDateDimension(dateDimension);
+        filterByDatePicker.configTimeFilter(from, to);
+        return this;
+    }
+
+    public MetricConfiguration addFilterByDate(String dateDimension, String dateRange) {
+        FilterByDatePicker filterByDatePicker;
+        expandFilterByDate();
+        filterByDatePicker = getFilterByDatePicker().expandDateDimension().changeDateDimension(dateDimension);
+        filterByDatePicker.selectDateFilter(dateRange);
+        return this;
+    }
+
     public void addFilterWithLargeNumberValues(String attribute, String... unselectedValues) {
         addFilter(attribute, attributeFilterPicker ->
                 attributeFilterPicker.selectAll().selectItems(unselectedValues).apply(), unselectedValues);
+    }
+
+    public MetricConfiguration removeFilterByDate() {
+        waitForElementVisible(BY_REMOVE_FILTER_BY_DATE, getRoot()).click();
+        return this;
     }
 
     public String getFilterText() {
@@ -232,7 +303,7 @@ public class MetricConfiguration extends AbstractFragment {
 
         @Override
         protected void waitForPickerLoaded() {
-            waitForElementNotPresent(cssSelector(".s-dropdown-loading"));
+            waitForElementNotPresent(className("s-dropdown-loading"));
         }
 
         @Override
@@ -311,7 +382,7 @@ public class MetricConfiguration extends AbstractFragment {
             Stream.of(items).forEach(element -> {
                 searchForText(element);
                 getElement(format("[title='%s']", element))
-                    .click();
+                        .click();
             });
             return this;
         }
@@ -326,6 +397,114 @@ public class MetricConfiguration extends AbstractFragment {
             //Click action on element does not affect sometimes, so switch to use java script executor.
             BrowserUtils.runScript(browser, "arguments[0].click();", waitForElementVisible(cancelButton));
             waitForElementNotVisible(getRoot());
+        }
+    }
+
+    private class FilterByDatePicker extends AbstractPicker {
+
+        public static final String STATIC_PERIOD_DROPDOWN_ITEM = "Static period";
+
+        @FindBy(css = ".adi-date-input-from input")
+        private WebElement fromDateInput;
+
+        @FindBy(css = ".adi-date-input-from > span")
+        private WebElement fromDateCalendarIcon;
+
+        @FindBy(css = ".adi-date-input-to input")
+        private WebElement toDateInput;
+
+        @FindBy(css = ".adi-date-dataset-select-dropdown button")
+        private WebElement dateDimension;
+
+        @FindBy(className = "s-date-range-cancel")
+        private WebElement cancelButton;
+
+        @FindBy(className = "s-date-range-apply")
+        private WebElement applyButton;
+
+        @Override
+        protected String getListItemsCssSelector() {
+            return ".gd-list-item";
+        }
+
+        @Override
+        protected void waitForPickerLoaded() { }
+
+        @Override
+        protected WebElement getElementByName(final String name) {
+            //Prevent to same attribute name
+            return getElement(".s-" + simplifyText(name) + ":not(.is-selected)");
+        }
+
+        public FilterByDatePicker expandDateDimension() {
+            if (!isConfigurationExpanded()) {
+                waitForElementVisible(dateDimension).click();
+            }
+            return this;
+        }
+
+        public boolean isConfigurationExpanded() {
+            return waitForElementVisible(dateDimension).getAttribute("class").contains("is-active");
+        }
+
+        public String getToolTipDimensionDropdown() {
+            getActions().moveToElement(dateDimension).perform();
+            return waitForElementVisible(BY_BUBBLE_CONTENT, browser).getText();
+        }
+
+        public void selectStaticPeriod() { selectDateFilter(STATIC_PERIOD_DROPDOWN_ITEM); }
+
+        public FilterByDatePicker selectDateFilter(String element) {
+            getElementByName(element).click();
+            return this;
+        }
+
+        public String getDateDimension() {
+            return waitForElementVisible(dateDimension).getText();
+        }
+
+        public boolean isDateDimensionVisible() {
+            return !waitForElementVisible(dateDimension)
+                    .getAttribute("class").contains("disabled");
+        }
+
+        public FilterByDatePicker changeDateDimension(String switchDimension) {
+            getDateDatasetSelect().selectByName(switchDimension);
+            return this;
+        }
+
+        public DateDimensionSelect getDateDatasetSelect() {
+            return Graphene.createPageFragment(DateDimensionSelect.class,
+                    waitForElementVisible(By.cssSelector(".adi-date-dataset-select-dropdown div"), browser));
+        }
+
+        public FilterByDatePicker configTimeFilter(String from, String to) {
+            configTimeFilterByRangeHelper(from, to, true);
+            return this;
+        }
+
+        public void fillInDateRange(WebElement dateInput, String date) {
+            dateInput.sendKeys(Keys.END);
+            int length = dateInput.getAttribute("value").length();
+            for (int i = 0; i <= length; i++) {
+                dateInput.sendKeys(Keys.BACK_SPACE);
+            }
+            dateInput.sendKeys(date, Keys.ENTER);
+        }
+
+        private FilterByDatePicker configTimeFilterByRangeHelper(String from, String to, boolean apply) {
+            selectStaticPeriod();
+
+            fillInDateRange(waitForElementVisible(fromDateInput), from);
+            waitForElementVisible(fromDateCalendarIcon).click();
+
+            fillInDateRange(waitForElementVisible(toDateInput), to);
+            waitForElementVisible(fromDateCalendarIcon).click();
+
+            waitForElementVisible(apply ? applyButton : cancelButton).click();
+            waitForFragmentNotVisible(this);
+
+            return this;
         }
     }
 }
