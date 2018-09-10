@@ -18,6 +18,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -58,6 +59,9 @@ public class AnalysisPage extends AbstractFragment {
 
     @FindBy(css = ".s-bucket-attribute, .s-bucket-view, .s-bucket-trend")
     private AttributesBucket attributesBucket;
+
+    @FindBy(css = ".s-bucket-attribute-title, .s-bucket-view-title, .s-bucket-trend-title")
+    private WebElement attributesBucketTitle;
 
     @FindBy(css = StacksBucket.CSS_SELECTOR)
     private StacksBucket stacksBucket;
@@ -141,6 +145,12 @@ public class AnalysisPage extends AbstractFragment {
     public AnalysisPage addAttribute(String attribute) {
         WebElement source = getCataloguePanel().searchAndGet(attribute, FieldType.ATTRIBUTE);
         WebElement target = getAttributesBucket().getInvitation();
+        //To avoid move target out of bounds of viewport, should scroll element into view
+        Point location = target.getLocation();
+        Dimension dimension = target.getSize();
+        if ((location.y + dimension.height) > getRoot().getSize().height) {
+            getActions().click(attributesBucketTitle).sendKeys(Keys.END).perform();
+        }
         return drag(source, target);
     }
 
