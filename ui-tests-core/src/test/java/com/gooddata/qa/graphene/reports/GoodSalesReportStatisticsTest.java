@@ -15,6 +15,8 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForSchedulesPageLoade
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -64,7 +66,8 @@ public class GoodSalesReportStatisticsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void testReportStatistics() {
-        assertTrue(initReportsPage().openReport(SIMPLE_REPORT).showConfiguration().getReportStatistic().contains("0 Filters"));
+        assertThat(initReportsPage().openReport(SIMPLE_REPORT).showConfiguration().getReportStatistic(),
+                containsString("0 Filters"));
         reportPage.addFilter(FilterItem.Factory.createAttributeFilter(SALES_REP,
                 "Adam Bradley", "Alejandro Vabiano", "Alexsandr Fyodr"));
         assertTrue(reportPage.getReportStatistic().indexOf("3 Lines") > 0

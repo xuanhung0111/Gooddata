@@ -3,6 +3,8 @@ package com.gooddata.qa.graphene.account;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -24,8 +26,8 @@ public class ManageUserTest extends AbstractProjectTest {
     public void addNewUserToProject() throws ParseException, IOException, JSONException {
         newAdminUser = createAndAddUserToProject(UserRoles.ADMIN);
 
-        assertTrue(accessProjectWithAnotherLogin(newAdminUser, testParams.getPassword(), "viewer-can-access-the-project", true)
-                .contains(testParams.getProjectId()));
+        assertThat(accessProjectWithAnotherLogin(newAdminUser, testParams.getPassword(),
+                "viewer-can-access-the-project", true), containsString(testParams.getProjectId()));
     }
 
     @Test(dependsOnMethods = "addNewUserToProject")
@@ -40,7 +42,7 @@ public class ManageUserTest extends AbstractProjectTest {
         assertTrue(ProjectAndUsersPage.getInstance(browser).openDeactivatedUserTab().isUserDisplayedInList(newAdminUser),
                 newAdminUser + " does not exist in deactive tab");
 
-        assertTrue(accessProjectWithAnotherLogin(newAdminUser, testParams.getPassword(), 
+        assertTrue(accessProjectWithAnotherLogin(newAdminUser, testParams.getPassword(),
                 "Deactivated-user-cannot-access-the-project", false)
                 .contains("#status=notAuthorized"), "Not authorized msg is not displayed ");
     }
@@ -57,8 +59,8 @@ public class ManageUserTest extends AbstractProjectTest {
         assertTrue(ProjectAndUsersPage.getInstance(browser).openActiveUserTab().isUserDisplayedInList(newAdminUser),
                 newAdminUser + " does not exist in active tab");
         
-        assertTrue(accessProjectWithAnotherLogin(newAdminUser, testParams.getPassword(), "Viewer-can-access-the-project-again", true)
-                .contains(testParams.getProjectId()));
+        assertThat(accessProjectWithAnotherLogin(newAdminUser, testParams.getPassword(),
+                "Viewer-can-access-the-project-again", true), containsString(testParams.getProjectId()));
 
         assertFalse(initProjectsAndUsersPage().openActiveUserTab()
                 .isDeactivePermissionAvailable(newAdminUser), "Deactive button is displayed");

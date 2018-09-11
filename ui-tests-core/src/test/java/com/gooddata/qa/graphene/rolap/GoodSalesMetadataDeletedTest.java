@@ -24,9 +24,13 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoade
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Collections.singletonList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
@@ -113,8 +117,10 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
             initEmailSchedulesPage().deleteSchedule(dashboardSchedule)
                 .deleteSchedule(reportSchedule);
 
-            assertFalse(isObjectDeleted(getReportByTitle(REPORT_ACTIVITIES_BY_TYPE).getUri()));
-            assertFalse(isObjectDeleted(dashboardRequest.getDashboardUri(DASHBOARD_NAME)));
+            assertFalse(isObjectDeleted(getReportByTitle(REPORT_ACTIVITIES_BY_TYPE).getUri()),
+                    REPORT_ACTIVITIES_BY_TYPE + " shouldn't be deleted");
+            assertFalse(isObjectDeleted(dashboardRequest.getDashboardUri(DASHBOARD_NAME)),
+                    DASHBOARD_NAME + " shouldn't be deleted");
         } finally {
             tryDeleteDashboard();
         }
@@ -137,12 +143,18 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
             dropObject(getIdentifierFromObjLink(link, COMMENT), DropStrategy.CASCADE);
         }
 
-        assertFalse(isObjectDeleted(getReportByTitle(REPORT_NEW_LOST_DRILL_IN).getUri()));
-        assertFalse(isObjectDeleted(getDatasetByTitle("Account").getUri()));
-        assertFalse(isObjectDeleted(getAttributeByTitle(ATTR_ACCOUNT).getUri()));
-        assertFalse(isObjectDeleted(getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri()));
-        assertFalse(isObjectDeleted(getFactByTitle(FACT_VELOCITY).getUri()));
-        assertFalse(isObjectDeleted(varRequest.getVariableUri(VARIABLE_QUOTA)));
+        assertFalse(isObjectDeleted(getReportByTitle(REPORT_NEW_LOST_DRILL_IN).getUri()),
+                REPORT_NEW_LOST_DRILL_IN + " shouldn't be deleted");
+        assertFalse(isObjectDeleted(getDatasetByTitle("Account").getUri()),
+                "Account shouldn't be deleted");
+        assertFalse(isObjectDeleted(getAttributeByTitle(ATTR_ACCOUNT).getUri()),
+                ATTR_ACCOUNT + " shouldn't be deleted");
+        assertFalse(isObjectDeleted(getMetricByTitle(METRIC_NUMBER_OF_OPPORTUNITIES).getUri()),
+                METRIC_NUMBER_OF_OPPORTUNITIES + " shouldn't be deleted");
+        assertFalse(isObjectDeleted(getFactByTitle(FACT_VELOCITY).getUri()),
+                FACT_VELOCITY + " shouldn't be deleted");
+        assertFalse(isObjectDeleted(varRequest.getVariableUri(VARIABLE_QUOTA)),
+                VARIABLE_QUOTA + " shouldn't be deleted");
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
@@ -168,17 +180,19 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
                     getAttributeByTitle(ATTR_IS_WON).getDefaultDisplayForm().getUri())));
 
             dropObject(getAttributeByTitle(ATTR_IS_WON).getIdentifier(), DropStrategy.CASCADE);
-            assertFalse(isObjectDeleted(getDatasetByTitle("Stage").getUri()));
-            assertFalse(isObjectDeleted(getAttributeByTitle(computedAttributeName).getUri()));
-            assertTrue(isObjectDeleted(filterVariableNameUri));
-            assertTrue(isObjectDeleted(metricNameUri));
-            assertTrue(isObjectDeleted(reportNameUri));
+            assertFalse(isObjectDeleted(getDatasetByTitle("Stage").getUri()), "Stage shouldn't be deleted");
+            assertFalse(isObjectDeleted(getAttributeByTitle(computedAttributeName).getUri()),
+                    computedAttributeName + " shouldn't be deleted");
+            assertTrue(isObjectDeleted(filterVariableNameUri), filterVariableName + " should be deleted");
+            assertTrue(isObjectDeleted(metricNameUri), metricName + " should be deleted");
+            assertTrue(isObjectDeleted(reportNameUri), reportName + " should be deleted");
 
             initDashboardsPage();
             dashboardsPage.selectDashboard(DASHBOARD_NAME);
-            assertTrue(dashboardsPage.getContent().getFilterWidget(CssUtils.simplifyText(ATTR_IS_WON)) == null);
-            assertFalse(!dashboardsPage.getSavedViewWidget().openSavedViewMenu().getSavedViewPopupMenu()
-                    .getAllSavedViewNames().contains(savedViewName));
+            assertNull(dashboardsPage.getContent().getFilterWidget(CssUtils.simplifyText(ATTR_IS_WON)),
+                    "Dashboard shouldn't have attribute filter");
+            assertThat(dashboardsPage.getSavedViewWidget().openSavedViewMenu().getSavedViewPopupMenu()
+                    .getAllSavedViewNames(), hasItem(savedViewName));
             for (Pair<String, Integer> labelUri : labelUris) {
                 assertTrue(isObjectDeleted(String.format(labelUri.getRight().toString(), testParams.getProjectId())));
             }
@@ -196,8 +210,8 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         String identifierVelocityFact = getFactByTitle(FACT_VELOCITY).getIdentifier(); 
 
         dropObject(identifierVelocityFact, DropStrategy.CASCADE);
-        assertFalse(isObjectDeleted(getDatasetByTitle("stagehistory").getUri()));
-        assertTrue(isObjectDeleted(metricUri));
+        assertFalse(isObjectDeleted(getDatasetByTitle("stagehistory").getUri()), "stagehistory shouldn't be deleted");
+        assertTrue(isObjectDeleted(metricUri), metricName + " should be deleted");
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"group1"})
@@ -215,15 +229,15 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
 
         dropObject(getIdentifierFromObjLink(
                 varRequest.getVariableUri(VARIABLE_QUOTA), "prompt"), DropStrategy.CASCADE);
-        assertTrue(isObjectDeleted(quotaMetricUri));
-        assertTrue(isObjectDeleted(reportUsingQuotaVariableUri));
+        assertTrue(isObjectDeleted(quotaMetricUri), METRIC_QUOTA + " should be deleted");
+        assertTrue(isObjectDeleted(reportUsingQuotaVariableUri), ReportUsingQuotaVariable + " should be deleted");
 
         try {
             createDashboardWithAttributeFilter(DashAttributeFilterTypes.PROMPT, VARIABLE_STATUS);
 
             dropObject(getIdentifierFromObjLink(
                     varRequest.getVariableUri(VARIABLE_STATUS), "prompt"), DropStrategy.CASCADE);
-            assertTrue(isObjectDeleted(VARIABLE_STATUS));
+            assertTrue(isObjectDeleted(VARIABLE_STATUS), VARIABLE_STATUS + " should be deleted");
         } finally {
             tryDeleteDashboard();
         }
@@ -239,11 +253,11 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         try {
             createDashboardWithGeoChart(METRIC_NUMBER_OF_WON_OPPS);
             dropObject(getMetricByTitle(METRIC_NUMBER_OF_WON_OPPS).getIdentifier(), DropStrategy.CASCADE);
-            assertTrue(isObjectDeleted(metricNumberOfWonOppsUri));
-            assertTrue(isObjectDeleted(reportTop5WonByCashUri));
+            assertTrue(isObjectDeleted(metricNumberOfWonOppsUri), METRIC_NUMBER_OF_WON_OPPS + " should be deleted");
+            assertTrue(isObjectDeleted(reportTop5WonByCashUri), REPORT_SALES_SEASONALITY + " should be deleted");
             initDashboardsPage();
             dashboardsPage.selectDashboard(DASHBOARD_NAME);
-            assertTrue(dashboardsPage.getContent().getNumberOfReports() == 0);
+            assertEquals(dashboardsPage.getContent().getNumberOfReports(), 0);
 
         } finally {
             tryDeleteDashboard();
@@ -261,8 +275,9 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
             dropObject(getReportByTitle(REPORT_NEW_WON_DRILL_IN).getIdentifier(), DropStrategy.CASCADE);
             initDashboardsPage();
             dashboardsPage.selectDashboard(DASHBOARD_NAME);
-            assertTrue(dashboardsPage.getContent().getNumberOfReports() == 0);
-            assertFalse(!initEmailSchedulesPage().isGlobalSchedulePresent(reportSchedule));
+            assertEquals(dashboardsPage.getContent().getNumberOfReports(), 0);
+            assertTrue(initEmailSchedulesPage().isGlobalSchedulePresent(reportSchedule),
+                    reportSchedule + " should be present");
         } finally {
             tryDeleteDashboard();
             deleteSchedule(reportSchedule);
@@ -283,9 +298,10 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
 
         dropObject(dashboardIdentifier, DropStrategy.CASCADE);
         browser.get(previewUri);
-        assertTrue(REQUESTED_DASHBOARD_NOT_EXIST.equals(
-                waitForElementVisible(By.cssSelector("#notFoundPage > p"), browser).getText().trim()));
-        assertTrue(!initEmailSchedulesPage().isGlobalSchedulePresent(dashboardSchedule));
+        assertEquals(REQUESTED_DASHBOARD_NOT_EXIST,
+                waitForElementVisible(By.cssSelector("#notFoundPage > p"), browser).getText().trim());
+        assertFalse(initEmailSchedulesPage().isGlobalSchedulePresent(dashboardSchedule),
+                dashboardSchedule + " shouldn't be present");
     }
 
     @Test(dependsOnGroups = {"group1"}, alwaysRun = true)
@@ -324,7 +340,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
             dropObject(folderIdentifier, DropStrategy.CASCADE);
             initDashboardsPage();
             dashboardsPage.selectDashboard(DASHBOARD_NAME);
-            assertTrue(dashboardsPage.getContent().getNumberOfReports() == 0);
+            assertEquals(dashboardsPage.getContent().getNumberOfReports(), 0);
         } finally {
             tryDeleteDashboard();
         }
@@ -368,9 +384,10 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
             dropObject("dataset.stage", DropStrategy.CASCADE);
             initDashboardsPage();
             dashboardsPage.selectDashboard(DASHBOARD_NAME);
-            assertTrue(dashboardsPage.getContent().getFilterWidget(CssUtils.simplifyText(firstAttribute)) == null);
+            assertNull(dashboardsPage.getContent().getFilterWidget(CssUtils.simplifyText(firstAttribute)),
+                    firstAttribute + "shouldn't exist");
             for (String attribute : attributeUris) {
-                assertTrue(isObjectDeleted(attribute));
+                assertTrue(isObjectDeleted(attribute), "attribute should be deleted");
             }
         } finally {
             tryDeleteDashboard();
@@ -401,7 +418,8 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"deleteDatasetWithNoAttributeUsageUsingAllInStrategy"}, groups = {"group2"})
     public void deleteConnectedDataset() throws IOException, JSONException {
-        assertFalse(isObjectDeleted(getDatasetByTitle("OpportunitySnapshot").getUri()));
+        assertFalse(isObjectDeleted(getDatasetByTitle("OpportunitySnapshot").getUri()),
+                "OpportunitySnapshot shouldn't be deleted");
     }
 
     @Test(dependsOnGroups = {"group2"})
@@ -440,7 +458,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         }
 
         dropObject(folderIdentifier, strategy);
-        assertTrue(!initReportsPage().getAllFolderNames().contains(folderName));
+        assertThat(initReportsPage().getAllFolderNames(), not(hasItem(folderName)));
         for (String reportUri : reportUris) {
             assertTrue(isObjectDeleted(reportUri));
         }
@@ -514,7 +532,8 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         String pollingUri = request.executeMAQL(strategy.getMaql(identifier));
         request.waitingForAsyncTask(pollingUri);
         assertEquals(request.getAsyncTaskStatus(pollingUri), "ERROR");
-        assertTrue(getErrorMessageFromPollingUri(pollingUri).startsWith(DROP_OBJECT_ERROR_MESSAGE));
+        assertTrue(getErrorMessageFromPollingUri(pollingUri).startsWith(DROP_OBJECT_ERROR_MESSAGE),
+                "Error message is wrong");
     }
 
     private String getErrorMessageFromPollingUri(String pollingUri)

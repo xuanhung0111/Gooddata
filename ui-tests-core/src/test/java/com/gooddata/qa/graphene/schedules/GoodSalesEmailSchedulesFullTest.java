@@ -26,6 +26,9 @@ import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -164,7 +167,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
                 singletonList(DASHBOARD_HAVING_TAB));
         userManagementRestRequest.updateUserStatusInProject(testParams.getUser(), UserStatus.DISABLED);
         try {
-            assertFalse(emailSchedulePage.openSchedule(dashboard).getEmailToListItem().contains(testParams.getUser()));
+            assertThat(emailSchedulePage.openSchedule(dashboard).getEmailToListItem(), not(hasItem(testParams.getUser())));
 
             emailSchedulePage.trySaveSchedule();
             assertEquals(emailSchedulePage.getValidationErrorMessages(), "Should not be empty");
@@ -193,7 +196,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
                 "Scheduled email test - dashboard.", singletonList(DASHBOARD_HAVING_TAB));
         userManagementRestRequest.updateUserStatusInProject(testParams.getUser(), UserStatus.DISABLED);
         try {
-            assertFalse(emailSchedulePage.openSchedule(dashboard).getEmailToListItem().contains(testParams.getUser()));
+            assertThat(emailSchedulePage.openSchedule(dashboard).getEmailToListItem(), not(hasItem(testParams.getUser())));
             emailSchedulePage.changeDashboards(dashboard, asList(DASHBOARD_HAVING_TAB, OTHER_DASHBOARD_HAVING_TAB));
             userManagementRestRequest.updateUserStatusInProject(testParams.getUser(), UserStatus.ENABLED);
             assertEquals(emailSchedulePage.openSchedule(dashboard).getEmailToListItem(),
@@ -388,8 +391,10 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
                 .setMessage("Scheduled email test - report. (Updated)")
                 .selectReportFormat(ExportFormat.ALL)
                 .saveSchedule();
-            assertFalse(EmailSchedulePage.getInstance(browser).isGlobalSchedulePresent(title));
-            assertTrue(EmailSchedulePage.getInstance(browser).isGlobalSchedulePresent(updatedTitle));
+            assertFalse(EmailSchedulePage.getInstance(browser).isGlobalSchedulePresent(title),
+                    title + " shouldn't display");
+            assertTrue(EmailSchedulePage.getInstance(browser).isGlobalSchedulePresent(updatedTitle),
+                    updatedTitle + " should display");
 
             assertEquals(EmailSchedulePage.getInstance(browser).openSchedule(updatedTitle).getMessageFromInput(),
                     "Scheduled email test - report. (Updated)");

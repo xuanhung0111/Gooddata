@@ -5,6 +5,8 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForObjectPageLoaded;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.id;
@@ -123,8 +125,8 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
                 objectType.getName());
         assertEquals(waitForElementVisible(cssSelector(".hd span"), confirmDialog).getText(),
                 deleteConfirmDialogTitle);
-        assertTrue(waitForElementVisible(tagName("form"), confirmDialog).getText()
-                .contains(deleteConfirmDialogMessage));
+        assertThat(waitForElementVisible(tagName("form"), confirmDialog).getText(),
+                containsString(deleteConfirmDialogMessage));
         takeScreenshot(browser,
                 "delete-confirm-dialog-for-" + objectType.getObjectsTableID(), this.getClass());
     }
@@ -207,7 +209,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
     protected void assertRowTitles(ObjectTypes objectType, List<String> rowTitles) {
         int index = 0;
         for (WebElement row : ObjectsTable.getInstance(id(objectType.getObjectsTableID()), browser).getRows()) {
-            assertTrue(row.getText().contains(rowTitles.get(index)));
+            assertThat(row.getText(), containsString(rowTitles.get(index)));
             index++;
         }
         takeScreenshot(browser, "assert-row-titles-in-" + objectType.getObjectsTableID(), this.getClass());

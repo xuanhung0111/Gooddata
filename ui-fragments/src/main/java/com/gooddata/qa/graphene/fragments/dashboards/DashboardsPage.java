@@ -549,7 +549,7 @@ public class DashboardsPage extends AbstractFragment {
         return lockIcon.isDisplayed();
     }
 
-    public boolean isUnlisted() {
+    public boolean isPrivate() {
         return unlistedIcon.isDisplayed();
     }
 

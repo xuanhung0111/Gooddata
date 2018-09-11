@@ -17,7 +17,7 @@ import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 public class DynamicImageTest extends AbstractProjectTest {
@@ -60,8 +60,7 @@ public class DynamicImageTest extends AbstractProjectTest {
         reportPage.waitForReportExecutionProgress();
         takeScreenshot(browser, "drill-on-an-image", getClass());
 
-        assertTrue(isEqualCollection(reportPage.getTableReport().getAttributeValues(),
-                asList("Image 1", "Image 2", "Image 3")));
+        assertEquals(reportPage.getTableReport().getAttributeValues(), asList("Image 1", "Image 2", "Image 3"));
 
         howItem.setPosition(Position.TOP);
 

@@ -85,7 +85,7 @@ public class GoodSalesPersonalObjectsInDashboardWidgetTest extends GoodSalesAbst
     private void checkCannotFindPersonalReport() {
         waitForElementVisible(className("s-btn-report"), browser).click();
         waitForElementVisible(cssSelector(".searchfield input"), browser).sendKeys(PERSONAL_REPORT);
-        assertTrue(isElementPresent(className("gd-list-view-noResults"), browser));
+        assertTrue(isElementPresent(className("gd-list-view-noResults"), browser), "List should be empty");
     }
 
     private void checkCannotFindPersonalMetric(WidgetTypes type) {

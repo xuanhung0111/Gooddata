@@ -222,7 +222,8 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
             Sleeper.sleepTightInSeconds(3);
             AssertUtils.assertIgnoreCase(asList("Negotiation", "2011"),
                     dashboardsPage.getContent().getReport("Report1", TableReport.class).getAttributeValues());
-            assertTrue(dashboardsPage.getContent().getReport("Report2", TableReport.class).hasNoData());
+            assertTrue(dashboardsPage.getContent().getReport("Report2", TableReport.class).hasNoData(),
+                    "Report should be empty");
 
             dashboardsPage.getTabs().openTab(0);
             assertEquals(dashboardsPage.getContent().getFilterWidget(simplifyText(V_STAGE)).getCurrentValue(),
@@ -230,13 +231,16 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
             Sleeper.sleepTightInSeconds(3);
             AssertUtils.assertIgnoreCase(asList("Negotiation", "2011"),
                     dashboardsPage.getContent().getReport("Report1", TableReport.class).getAttributeValues());
-            assertTrue(dashboardsPage.getContent().getReport("Report2", TableReport.class).hasNoData());
+            assertTrue(dashboardsPage.getContent().getReport("Report2", TableReport.class).hasNoData(),
+                    "Report should be empty");
 
             dashboardsPage.getContent().getFilterWidget("filter-time")
                 .changeTimeFilterValueByClickInTimeLine("2013");
             Sleeper.sleepTightInSeconds(2);
-            assertTrue(dashboardsPage.getContent().getReport("Report1", TableReport.class).hasNoData());
-            assertTrue(dashboardsPage.getContent().getReport("Report2", TableReport.class).hasNoData());
+            assertTrue(dashboardsPage.getContent().getReport("Report1", TableReport.class).hasNoData(),
+                    "Report should be empty");
+            assertTrue(dashboardsPage.getContent().getReport("Report2", TableReport.class).hasNoData(),
+                    "Report should be empty");
 
             dashboardsPage.getTabs().openTab(1);
             assertEquals(dashboardsPage.getContent().getFilterWidget("filter-time").getCurrentValue(), "2013");

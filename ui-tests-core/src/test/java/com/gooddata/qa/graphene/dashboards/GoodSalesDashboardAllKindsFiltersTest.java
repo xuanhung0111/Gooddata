@@ -40,7 +40,6 @@ import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
-import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
@@ -98,7 +97,8 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
 
             filter.openPanel();
             assertTrue(Graphene.createPageFragment(AttributeFilterPanel.class,
-                    waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser)).isOnSingleMode());
+                    waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser)).isOnSingleMode(),
+                    "Attribute filter panel should be on single mode");
         } finally {
             dashboardsPage.deleteDashboard();
         }
@@ -116,7 +116,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             DashboardEditBar dashboardEditBar = dashboardsPage.editDashboard();
             assertEquals(report.getAllFilterNames(), singleton(ATTR_STAGE_NAME));
             dashboardEditBar.saveDashboard();
-            assertTrue(getRowElementsFrom(report).size() > 1);
+            assertTrue(getRowElementsFrom(report).size() > 1, "Report should have records");
 
             getFilterWidget(STAGE_NAME_FILTER).changeAttributeFilterValues("Short List");
 
@@ -132,8 +132,8 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
 
             // reload table report
             report = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            assertTrue(getRowElementsFrom(report).size() > 1);
-            assertTrue(report.openReportInfoViewPanel().getAllFilterNames().isEmpty());
+            assertTrue(getRowElementsFrom(report).size() > 1, "Report should have records");
+            assertTrue(report.openReportInfoViewPanel().getAllFilterNames().isEmpty(), "Report should have no filter");
         } finally {
             dashboardsPage.deleteDashboard();
         }
@@ -151,16 +151,20 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
 
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
             assertEquals(report.openReportInfoViewPanel().getAllFilterNames(), singleton(DATE_DIMENSION_SNAPSHOT));
-            assertTrue(report.getRoot().findElement(By.cssSelector("div[title='2012']")).isDisplayed());
-            assertTrue(report.getRoot().findElements(By.cssSelector("div[title='2011']")).isEmpty());
+            assertTrue(report.getRoot().findElement(By.cssSelector("div[title='2012']")).isDisplayed(),
+                    "Should have record of 2012");
+            assertTrue(report.getRoot().findElements(By.cssSelector("div[title='2011']")).isEmpty(),
+                    "Shouldn't have record of 2011");
             report.closeReportInfoViewPanel();
 
             FilterWidget filter = getFilterWidget("filter-time");
             filter.changeTimeFilterValueByClickInTimeLine("2011");
 
             report = dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
-            assertTrue(report.getRoot().findElements(By.cssSelector("div[title='2012']")).isEmpty());
-            assertTrue(report.getRoot().findElement(By.cssSelector("div[title='2011']")).isDisplayed());
+            assertTrue(report.getRoot().findElements(By.cssSelector("div[title='2012']")).isEmpty(),
+                    "Shouldn't have record of 2012");
+            assertTrue(report.getRoot().findElement(By.cssSelector("div[title='2011']")).isDisplayed(),
+                    "Should have record of 2011");
 
             dashboardsPage.editDashboard();
             report = dashboardsPage.getContent().getLatestReport(TableReport.class);
@@ -168,9 +172,11 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             dashboardsPage.saveDashboard();
 
             report = dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
-            assertTrue(report.getRoot().findElement(By.cssSelector("div[title='2010']")).isDisplayed());
+            assertTrue(report.getRoot().findElement(By.cssSelector("div[title='2010']")).isDisplayed(),
+                    "Should have record of 2010");
             getFilterWidget("filter-time").changeTimeFilterValueByClickInTimeLine("2011");
-            assertTrue(report.getRoot().findElement(By.cssSelector("div[title='2010']")).isDisplayed());
+            assertTrue(report.getRoot().findElement(By.cssSelector("div[title='2010']")).isDisplayed(),
+                    "Should have record of 2010");
         } finally {
             dashboardsPage.deleteDashboard();
         }
@@ -264,7 +270,8 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
 
             getFilterWidget("fstagename").changeAttributeFilterValues("Short List");
             assertEquals(getRowElementsFrom(getReport(REPORT_1, TableReport.class)).size(), 1);
-            assertTrue(getRowElementsFrom(getReport(REPORT_2, TableReport.class)).size() > 1);
+            assertTrue(getRowElementsFrom(getReport(REPORT_2, TableReport.class)).size() > 1,
+                    "Report should have records");
         } finally {
             dashboardsPage.deleteDashboard();
         }
@@ -283,12 +290,14 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             filter.changeSelectionToOneValue();
             filter.openPanel();
             assertTrue(Graphene.createPageFragment(AttributeFilterPanel.class,
-                    waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser)).isOnSingleMode());
+                    waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser)).isOnSingleMode(),
+                    "Attribute filter panel should be on single mode");
             dashboardsPage.saveDashboard();
 
             assertEquals(filter.getCurrentValue(), "Interest");
             assertEquals(getRowElementsFrom(getReport(REPORT_1, TableReport.class)).size(), 1);
-            assertTrue(getRowElementsFrom(getReport(REPORT_2, TableReport.class)).size() > 1);
+            assertTrue(getRowElementsFrom(getReport(REPORT_2, TableReport.class)).size() > 1,
+                    "Report should have records");
         } finally {
             dashboardsPage.deleteDashboard();
         }
@@ -349,7 +358,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
             assertEquals(getRowElementsFrom(report).size(), 1);
             addAttributeFilterToDashboard(ATTR_STAGE_NAME, DashAttributeFilterTypes.ATTRIBUTE);
-            assertTrue(getRowElementsFrom(report).size() > 1);
+            assertTrue(getRowElementsFrom(report).size() > 1, "Report should have records");
         } finally {
             dashboardsPage.deleteDashboard();
         }

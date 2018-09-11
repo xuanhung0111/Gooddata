@@ -11,7 +11,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -83,26 +82,25 @@ public class GoodSalesReportsPageTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"})
     public void verifyReportsPage() {
         ReportsPage reportsPage = initReportsPage();
-        assertTrue(isEqualCollection(reportsPage.getAllFolderNames(),
-                asList(ALL_FOLDER, FAVORITES_FOLDER, "My Reports", "Unsorted", CURRENT_SALES_FOLDER)));
-        assertTrue(isEqualCollection(reportsPage.getGroupByVisibility(), asList("Time", "Author", "Report Name",
-                "Folders")));
+        assertEquals(reportsPage.getAllFolderNames(),
+                asList(ALL_FOLDER, FAVORITES_FOLDER, "My Reports", "Unsorted", CURRENT_SALES_FOLDER));
+        assertEquals(reportsPage.getGroupByVisibility(), asList("Time", "Author", "Report Name", "Folders"));
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void verifyTagReport() {
         ReportsPage reportsPage = initReportsPage();
         waitForFragmentVisible(reportsPage).openFolder(ALL_FOLDER);
-        assertTrue(reportsPage.isTagCloudVisible());
-        assertTrue(reportsPage.getReportsCount() > 1);
+        assertTrue(reportsPage.isTagCloudVisible(), "Tag cloud should be visible");
+        assertTrue(reportsPage.getReportsCount() > 1, "List off report shouldn't be empty");
         assertEquals(reportsPage.filterByTag(TAG_NAME).getReportsCount(), 1);
 
         reportsPage.openFolder(CURRENT_SALES_FOLDER);
-        assertFalse(reportsPage.isTagCloudVisible());
+        assertFalse(reportsPage.isTagCloudVisible(), "Tag cloud shouldn't be visible");
         assertEquals(reportsPage.getReportsCount(), 1);
 
         reportsPage.openFolder(ALL_FOLDER);
-        assertTrue(reportsPage.deselectAllTags().getReportsCount() > 1);
+        assertTrue(reportsPage.deselectAllTags().getReportsCount() > 1, "List of report shouldn't be empty");
     }
 
     @Test(dependsOnMethods = {"verifyTagReport"})

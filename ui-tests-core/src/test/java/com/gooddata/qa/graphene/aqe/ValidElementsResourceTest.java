@@ -160,8 +160,9 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
                     "Metric values in report 'Top 5 Open (by $)' are not properly");
 
             assertTrue(getDashboardTableReport(REPORT_TOP_5_WON_BY_CASH).hasNoData(),
-                    "The message in report is not properly.");
-            assertTrue(getDashboardTableReport(REPORT_TOP_5_LOST_BY_CASH).hasNoData());
+                    "The data in report are not correct");
+            assertTrue(getDashboardTableReport(REPORT_TOP_5_LOST_BY_CASH).hasNoData(),
+                    "The data in report are not correct");
         } finally {
             new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
                     .deleteObjectsUsingCascade(workingDashboard);

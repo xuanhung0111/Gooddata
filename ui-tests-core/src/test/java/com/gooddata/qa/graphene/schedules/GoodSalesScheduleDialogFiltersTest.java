@@ -9,6 +9,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
@@ -116,18 +117,20 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
 
     @Test(dependsOnMethods = {"createDashboardSchedule"}, groups = {"schedules"})
     public void checkManagePageForScheduleExistence() {
-        assertFalse(initEmailSchedulesPage().isGlobalSchedulePresent(customSubject));
+        assertFalse(initEmailSchedulesPage().isGlobalSchedulePresent(customSubject),
+                customSubject + " shouldn't be present");
     }
 
     @Test(dependsOnMethods = {"createDashboardSchedule"}, groups = {"schedules"})
     public void checkGreyPagesForScheduleExistence() {
         initGreyPage("/query/scheduledmails", queryScheduledEmailsFragment);
-        assertTrue(queryScheduledEmailsFragment.existsScheduleWithTitle(customSubject));
+        assertTrue(queryScheduledEmailsFragment.existsScheduleWithTitle(customSubject),
+                "Schedule with title : " + customSubject + " should exist");
     }
 
     @Test(dependsOnMethods = {"checkGreyPagesForScheduleExistence"}, groups = {"schedules"})
     public void checkScheduleExecutionContext() throws JSONException {
-        assertTrue(scheduleHasValidExecutionContext(customSubject));
+        assertTrue(scheduleHasValidExecutionContext(customSubject), "Schedule should have valid execution content");
     }
 
     /**
@@ -144,7 +147,7 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
                 .addExecutionContext(getScheduleId(PUBLIC_SCHEDULE),
                         getExecutionContextId(getScheduleId(customSubject)));
         initEmailSchedulesPage().changeMessage(PUBLIC_SCHEDULE, "check execution context");
-        assertTrue(scheduleHasValidExecutionContext(PUBLIC_SCHEDULE));
+        assertTrue(scheduleHasValidExecutionContext(PUBLIC_SCHEDULE), "Schedule should have valid execution content");
     }
 
     private void getMDBaseUri() {
@@ -163,11 +166,11 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
     private int getExecutionContextId(int scheduleId) throws JSONException {
         initGreyPage("/obj/" + scheduleId, scheduledEmailFragment);
 
-        assertTrue(scheduledEmailFragment.hasExecutionContext());
+        assertTrue(scheduledEmailFragment.hasExecutionContext(), "Schedule should have valid execution content");
 
         int executionContextId = scheduledEmailFragment.getExecutionContextId();
 
-        assertTrue(executionContextId != ObjectScheduledEmailFragment.WRONG_ID);
+        assertNotEquals(executionContextId, ObjectScheduledEmailFragment.WRONG_ID);
 
         return executionContextId;
     }
@@ -177,7 +180,7 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
 
         int scheduleID = queryScheduledEmailsFragment.getScheduleId(scheduleTitle);
 
-        assertTrue(scheduleID != QueryScheduledEmailsFragment.WRONG_ID);
+        assertNotEquals(scheduleID, QueryScheduledEmailsFragment.WRONG_ID);
 
         return scheduleID;
     }

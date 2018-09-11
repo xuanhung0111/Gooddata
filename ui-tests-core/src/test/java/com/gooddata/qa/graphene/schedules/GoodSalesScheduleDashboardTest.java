@@ -239,7 +239,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
 
             // wait for embedded dashboard to be fully loaded before checking
             waitForElementPresent(By.cssSelector(".embedded.s-dashboardLoaded"), this.browser);
-            assertTrue(dashboardsPage.isScheduleButtonVisible());
+            assertTrue(dashboardsPage.isScheduleButtonVisible(), "Schedule button should be visible");
 
             checkScheduleButtonStatusThroughTabs();
 
@@ -502,7 +502,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         DashboardTabs tabs = dashboardsPage.getTabs();
         int size = tabs.getNumberOfTabs();
 
-        assertFalse(dashboardsPage.isScheduleButtonDisabled());
+        assertFalse(dashboardsPage.isScheduleButtonDisabled(), "Schedule button should be enabled");
 
         for (int i = 1; i < size; i++) {
             tabs.getTab(i).open();

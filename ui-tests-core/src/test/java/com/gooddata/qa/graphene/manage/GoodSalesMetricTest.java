@@ -152,7 +152,8 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         String expectedMaql =
                 "SELECT " + METRIC_AMOUNT + " / (SELECT " + METRIC_AMOUNT + " BY " + ATTR_YEAR_SNAPSHOT + ", ALL OTHER WITHOUT PF)";
         assertTrue(initMetricPage().createShareMetric(metricName, METRIC_AMOUNT, ATTR_YEAR_SNAPSHOT)
-                .isMetricCreatedSuccessfully(metricName, expectedMaql, DEFAULT_METRIC_NUMBER_FORMAT));
+                .isMetricCreatedSuccessfully(metricName, expectedMaql, DEFAULT_METRIC_NUMBER_FORMAT),
+                "Metric isn't created successfully");
 
         List<Float> metricValues = asList(0.23f, 0.2f, 0.33f, 0.07f, 0.08f, 0.09f);
         checkMetricValuesInReport(metricName, ATTR_PRODUCT, metricValues, PRODUCT_VALUES);
@@ -165,7 +166,8 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                 "SELECT " + METRIC_AMOUNT + " - (SELECT " + METRIC_AMOUNT + " BY ALL " + ATTR_YEAR_SNAPSHOT + " WHERE "
                         + ATTR_YEAR_SNAPSHOT + " IN (" + YEAR_2010 + ") WITHOUT PF)";
         assertTrue(initMetricPage().createDifferentMetric(metricName, METRIC_AMOUNT, ATTR_YEAR_SNAPSHOT, YEAR_2010)
-                .isMetricCreatedSuccessfully(metricName, expectedMaql, DEFAULT_METRIC_NUMBER_FORMAT));
+                .isMetricCreatedSuccessfully(metricName, expectedMaql, DEFAULT_METRIC_NUMBER_FORMAT),
+                "Metric isn't created successfully");
 
         List<Float> metricValues =
                 asList(20171686.25f, 16271278.69f, 32627524.67f, 6273858.91f, 7532925.39f, 6825820.63f);
@@ -177,7 +179,8 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         String metricName = "Ratio " + getCurrentDateString();
         String expectedMaql = "SELECT " + METRIC_NUMBER_OF_WON_OPPS + " / " + METRIC_NUMBER_OF_OPEN_OPPS;
         assertTrue(initMetricPage().createRatioMetric(metricName, METRIC_NUMBER_OF_WON_OPPS, METRIC_NUMBER_OF_OPEN_OPPS)
-                .isMetricCreatedSuccessfully(metricName, expectedMaql, DEFAULT_METRIC_NUMBER_FORMAT));
+                .isMetricCreatedSuccessfully(metricName, expectedMaql, DEFAULT_METRIC_NUMBER_FORMAT),
+                "Metric isn't created successfully");
 
         checkMetricValuesInReport(metricName, asList(3.61f));
     }
@@ -996,7 +999,8 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         }
 
         assertTrue(MetricPage.getInstance(browser)
-                .isMetricCreatedSuccessfully(customMetricInfo.getName(), expectedMaql, DEFAULT_METRIC_NUMBER_FORMAT));
+                .isMetricCreatedSuccessfully(customMetricInfo.getName(), expectedMaql, DEFAULT_METRIC_NUMBER_FORMAT),
+                "Metric isn't created successfully");
     }
 
     private Metric createLikeMetric(MetricTypes metricLikeType, Attribute attrObj, Metric metricObj , String pattern){
@@ -1195,7 +1199,9 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     private void checkReportRenderedWell(String reportName) {
         takeScreenshot(browser, "checkReportRenderedWell - " + reportName, getClass());
         checkRedBar(browser);
-        assertFalse(waitForFragmentVisible(reportPage).isReportTooLarge());
-        assertFalse(reportPage.isInvalidDataReportMessageVisible());
+        assertFalse(waitForFragmentVisible(reportPage).isReportTooLarge(),
+                "The created report is a large report type");
+        assertFalse(reportPage.isInvalidDataReportMessageVisible(),
+                "Invalid date report message shouldn't be visible");
     }
 }

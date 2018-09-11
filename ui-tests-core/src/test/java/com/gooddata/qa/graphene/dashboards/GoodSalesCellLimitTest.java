@@ -15,7 +15,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_QUOTA;
 import static java.util.Arrays.asList;
-import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
@@ -70,11 +70,11 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
             addReportToNewDashboard(TESTING_REPORT_TABLE, TEST_CELL_LIMIT + TESTING_REPORT_TABLE);
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
 
-            assertTrue(report.isCellLimit());
+            assertTrue(report.isCellLimit(), "Report shouldn't display");
             report.showAnyway();
 
-            assertTrue(isEqualCollection(asList(METRIC_AMOUNT, METRIC_QUOTA), report.getMetricHeaders()));
-            assertTrue(isEqualCollection(asList(ATTR_ACCOUNT, ATTR_DATE_CREATED), report.getAttributeHeaders()));
+            assertEquals(report.getMetricHeaders(), asList(METRIC_QUOTA, METRIC_AMOUNT));
+            assertEquals(report.getAttributeHeaders(), asList(ATTR_DATE_CREATED, ATTR_ACCOUNT));
         } finally {
             dashboardsPage.deleteDashboard();
         }
@@ -86,10 +86,10 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
             addReportToNewDashboard(TESTING_REPORT_CHART, TEST_CELL_LIMIT + TESTING_REPORT_CHART);
             ChartReport report = dashboardsPage.getContent().getLatestReport(ChartReport.class);
 
-            assertTrue(report.isCellLimit());
+            assertTrue(report.isCellLimit(), "Report shouldn't display");
             report.showAnyway();
 
-            assertTrue(report.isChart());
+            assertTrue(report.isChart(), "Should be chart report");
             Sleeper.sleepTightInSeconds(5);
         } finally {
             dashboardsPage.deleteDashboard();

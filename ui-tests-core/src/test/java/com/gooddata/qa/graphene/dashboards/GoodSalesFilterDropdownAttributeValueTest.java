@@ -173,10 +173,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
             List<String> attributeValues = asList("Short List", "Risk Assessment", "Conviction");
 
             FilterWidget filter = dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME));
-            assertTrue(isEqualCollection(filter.openPanel()
-                    .getAttributeFilterPanel()
-                    .getItems(),
-                    attributeValues));
+            assertEquals(filter.openPanel().getAttributeFilterPanel().getItems(), attributeValues);
 
             filter.changeAttributeFilterValues("Conviction");
             sleepTightInSeconds(2);
@@ -188,7 +185,8 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
             dashboardEditBar.addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, "Account");
             dashboardEditBar.saveDashboard();
 
-            assertTrue(isUseAvailableStillRemainInDashboard(getCurrentDashboardUri()));
+            assertTrue(isUseAvailableStillRemainInDashboard(getCurrentDashboardUri()),
+                    "UseAvailable is removed from dashboard!");
         } finally {
             dashboardsPage.deleteDashboard();
         }
@@ -200,10 +198,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
 
         try {
             FilterWidget filter = dashboardsPage.getContent().getFilterWidget(simplifyText(F_STAGE_NAME));
-            assertTrue(isEqualCollection(filter.openPanel()
-                    .getAttributeFilterPanel()
-                    .getItems(),
-                    singleton("Risk Assessment")));
+            assertEquals(filter.openPanel().getAttributeFilterPanel().getItems(), singleton("Risk Assessment"));
             assertHeadersEqual(getAttributeValuesInFirstRow(REPORT_2), asList("Risk Assessment", "Discovery"),
                     "Report2 doesnt apply StageName filter correctly!");
 
@@ -244,11 +239,8 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
             dashboardEditBar.saveDashboard();
 
             FilterWidget filterWidget = dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_STAGE_NAME));
-            assertTrue(isEqualCollection(filterWidget.openPanel()
-                    .getAttributeFilterPanel()
-                    .getItems(),
-                    asList("Short List", "Risk Assessment", "Conviction")),
-                    "Attribute values of StageName filter is not correct!");
+            assertEquals(filterWidget.openPanel().getAttributeFilterPanel().getItems(),
+                    asList("Short List", "Risk Assessment", "Conviction"));
         } finally {
             dashboardsPage.deleteDashboard();
         }
