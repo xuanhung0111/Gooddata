@@ -12,17 +12,6 @@
         </classes>
     </test>
 
-    <test name="PardotPremiumConnectorCheck">
-        <groups>
-            <run>
-                <exclude name="brokenTest"/>
-            </run>
-        </groups>
-        <classes>
-            <class name="com.gooddata.qa.graphene.connectors.pardot.PardotPremiumCheckTest"/>
-        </classes>
-    </test>
-
     <test name="CoupaConnectorCheck">
         <groups>
             <run>
