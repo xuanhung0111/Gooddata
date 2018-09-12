@@ -25,6 +25,7 @@ import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.utils.PdfUtils;
+import com.gooddata.qa.utils.XlsxUtils;
 import com.gooddata.qa.utils.mail.ImapClientAction;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -36,6 +37,8 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -139,7 +142,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public LoginFragment logout() {
         openUrl(PAGE_PROJECTS);
 
-        //after logged user button displays, 
+        //after logged user button displays,
         //there could be still a layer of spinner icon, for loading projects paging
         //and the button is not clickable
         //we must wait until the button is clickable
@@ -289,7 +292,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
         // client-demo does not support dashboard export
         if (testParams.isClientDemoEnvironment()) {
             log.info("client-demo does not support dashboard export");
-            return; 
+            return;
         }
 
         File pdfExport = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator() + dashboardName + ".pdf");
@@ -305,6 +308,30 @@ public class AbstractUITest extends AbstractGreyPageTest {
         assertTrue(PdfUtils.getTextContentFrom(pdfExport).contains(tabName), "Content of exported PDF is wrong");
         assertTrue(fileSize > minimalSize, "Export is probably invalid, check the PDF manually! Current size is "
                 + fileSize + ", but minimum " + minimalSize + " was expected");
+    }
+
+    public List<List<String>> verifyDashboardExportToXLSX (String fileName, long minimalSize)
+        throws IOException {
+        List<List<String>> xlsxContent = new ArrayList<>();
+        // client-demo does not support dashboard export
+        if (testParams.isClientDemoEnvironment()) {
+            log.info("client-demo does not support dashboard export");
+            return xlsxContent;
+        }
+
+        String xlsxUrl = testParams.getDownloadFolder() + testParams.getFolderSeparator() + fileName + ".xlsx";
+        File xlsxExport = new File(xlsxUrl);
+        System.out.println("xlsxExport = " + xlsxExport);
+
+        long fileSize = xlsxExport.length();
+        System.out.println("File size: " + fileSize);
+
+        xlsxContent = XlsxUtils.excelFileToRead(xlsxUrl, 0);
+
+        assertTrue(fileSize > minimalSize, "Export is probably invalid, check the XLSX manually! Current size is "
+                + fileSize + ", but minimum " + minimalSize + " was expected");
+
+        return xlsxContent;
     }
 
     public String getContentFrom(String pdfFile) {

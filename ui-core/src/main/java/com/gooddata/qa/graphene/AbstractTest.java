@@ -81,7 +81,14 @@ public abstract class AbstractTest extends Arquillian {
     }
 
     public void openUrl(String url) {
-        String pageURL = getRootUrl() + url.replaceAll("^/", "");
+        String pageURL;
+
+        if (url.contains(getRootUrl())) {
+            pageURL = url.replaceAll("^/", "");
+        } else {
+            pageURL = getRootUrl() + url.replaceAll("^/", "");
+        }
+
         System.out.println("Loading page ... " + pageURL);
 
         BrowserUtils.addMagicElementToDOM(browser);
