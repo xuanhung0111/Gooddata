@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.connectors.coupa;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -27,9 +28,6 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
     private static final By BY_INPUT_TIMEZONE = By.name("timeZone");
     private static final By BY_GP_LINK_INSTANCES = By.partialLinkText("instances");
 
-    private static final By BY_DIV_BEFORE_CONFIG = By.xpath("//div[contains(@class,'yui3-coupa-ftue-content')]//span[text()=\"Oops, there's information missing.\"]");
-    private static final By BY_DIV_SYNCHRONIZATION_PROGRESS = By.xpath("//div[contains(@class,'yui3-coupa-ftue-content')]//span[text()='Your Coupa Optimizer project is almost ready!']");
-
     private static final String COUPA_INTEGRATION_TIMEZONE = "Europe/Prague";
 
     private String coupaInstanceApiUrl;
@@ -53,11 +51,10 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
             dependsOnMethods = {"testConnectorIntegrationResource"})
     public void testCoupaIntegrationConfiguration() throws JSONException {
         if (testParams.isReuseProject()) return;
-        // verify empty Coupa dashboard
+
+        // verify default dashboard
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId());
-        waitForElementVisible(BY_IFRAME, browser);
-        browser.switchTo().frame(browser.findElement(BY_IFRAME));
-        waitForElementVisible(BY_DIV_BEFORE_CONFIG, browser);
+        waitForDashboardPageLoaded(browser);
 
         // go to page with integration settings
         openUrl(getIntegrationUri());
@@ -76,12 +73,6 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
         waitForElementPresent(coupaInstance.getRoot());
         coupaInstance.createCoupaInstance(Connectors.COUPA.getConnectorId(), coupaInstanceApiUrl, coupaInstanceApiKey);
         verifyCoupaInstance(coupaInstanceApiUrl);
-
-        // verify progress on Coupa dashboard
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId());
-        waitForElementVisible(BY_IFRAME, browser);
-        browser.switchTo().frame(browser.findElement(BY_IFRAME));
-        waitForElementVisible(BY_DIV_SYNCHRONIZATION_PROGRESS, browser);
     }
 
     /**
