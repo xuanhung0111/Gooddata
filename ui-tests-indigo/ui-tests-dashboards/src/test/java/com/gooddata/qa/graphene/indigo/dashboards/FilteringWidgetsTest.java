@@ -193,7 +193,7 @@ public class FilteringWidgetsTest extends AbstractDashboardTest {
                     .isChecked();
 
             takeScreenshot(browser, "kpi-date-filter-ignore-persisted", getClass());
-            assertFalse(isDateChecked);
+            assertFalse(isDateChecked, "Date should be unchecked");
 
             indigoDashboardsPage.leaveEditMode();
         } finally {

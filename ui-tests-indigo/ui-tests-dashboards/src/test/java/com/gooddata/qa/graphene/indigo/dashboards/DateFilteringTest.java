@@ -84,7 +84,7 @@ public class DateFilteringTest extends AbstractDashboardTest {
         dateFilter.ensureDropdownOpen();
 
         takeScreenshot(browser, "testInfoMessage-hidden", getClass());
-        assertFalse(dateFilter.isInfoMessageDisplayed());
+        assertFalse(dateFilter.isInfoMessageDisplayed(), "Information message shouldn't display");
 
         dateFilter = waitForFragmentVisible(indigoDashboardsPage)
                 .switchToEditMode()
@@ -93,7 +93,7 @@ public class DateFilteringTest extends AbstractDashboardTest {
         dateFilter.ensureDropdownOpen();
 
         takeScreenshot(browser, "testInfoMessage-displayed", getClass());
-        assertTrue(dateFilter.isInfoMessageDisplayed());
+        assertTrue(dateFilter.isInfoMessageDisplayed(), "Information message should display");
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = "desktop")
@@ -138,8 +138,8 @@ public class DateFilteringTest extends AbstractDashboardTest {
                         dateFilter.selectByName(filter);
                         indigoDashboardsPage.waitForWidgetsLoading();
                         takeScreenshot(browser, "testFilterDateByPreset-" + filter, getClass());
-                        assertTrue(indigoDashboardsPage
-                                .getWidgetByHeadline(Kpi.class, filteredOutMetric.getTitle()).isEmptyValue());
+                        assertTrue(indigoDashboardsPage.getWidgetByHeadline(Kpi.class, filteredOutMetric.getTitle())
+                                .isEmptyValue(), "Widget should have empty value");
                     });
         } finally {
             indigoRestRequest.deleteWidgetsUsingCascade(attributeFilterKpiUri,

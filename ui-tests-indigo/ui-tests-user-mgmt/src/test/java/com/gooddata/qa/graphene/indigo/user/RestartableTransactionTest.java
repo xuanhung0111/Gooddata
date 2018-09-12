@@ -3,7 +3,9 @@ package com.gooddata.qa.graphene.indigo.user;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
-import static org.testng.Assert.assertFalse;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 
 import com.gooddata.qa.utils.http.RestClient;
@@ -60,7 +62,7 @@ public class RestartableTransactionTest extends AbstractUITest {
 
     private void checkError() {
         final WebElement e = waitForElementVisible(By.className("gd-message"), browser);
-        assertFalse(e.getAttribute("class").contains("error"));
+        assertThat(e.getAttribute("class"), not(containsString("error")));
         // dismiss the message to avoid catching it as old one next time
         try {
             e.findElement(By.cssSelector(".gd-message-dismiss-container")).click();

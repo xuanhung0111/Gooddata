@@ -23,6 +23,8 @@ import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -73,7 +75,7 @@ public class MetricFormattingTest extends AbstractDashboardTest {
 
             String kpiValue = lastKpi.getValue();
             if (compareFormat) {
-                assertTrue(format.toString().contains(kpiValue));
+                assertThat(format.toString(), containsString(kpiValue));
             } else {
                 assertEquals(kpiValue, expectedValue);
             }
@@ -177,7 +179,7 @@ public class MetricFormattingTest extends AbstractDashboardTest {
             Kpi lastKpi = initIndigoDashboardsPageWithWidgets().getLastWidget(Kpi.class);
 
             takeScreenshot(browser, "checkKpiStateWithNoDataMetric", getClass());
-            assertTrue(lastKpi.isEmptyValue());
+            assertTrue(lastKpi.isEmptyValue(), "KPI should have empty value");
 
         } finally {
             indigoRestRequest.deleteWidgetsUsingCascade(invalidMetric.getUri());

@@ -67,23 +67,23 @@ public class MetricsAccessibilityTest extends AbstractDashboardTest {
 
         metricSelect.searchForText(PUBLIC_METRIC_OF_ADMIN);
         takeScreenshot(browser, "admin-can-see-his-public-metric", this.getClass());
-        assertFalse(metricSelect.getValues().isEmpty());
-        assertFalse(metricSelect.isShowingNoMatchingDataMessage());
+        assertFalse(metricSelect.getValues().isEmpty(), "Admin public metric should display");
+        assertFalse(metricSelect.isShowingNoMatchingDataMessage(), "No matching data message shouldn't display");
 
         metricSelect.searchForText(PRIVATE_METRIC_OF_ADMIN);
         takeScreenshot(browser, "admin-can-see-his-private-metric", this.getClass());
-        assertFalse(metricSelect.getValues().isEmpty());
-        assertFalse(metricSelect.isShowingNoMatchingDataMessage());
+        assertFalse(metricSelect.getValues().isEmpty(), "Admin private metric should display");
+        assertFalse(metricSelect.isShowingNoMatchingDataMessage(), "No matching data message shouldn't display");
 
         metricSelect.searchForText(PUBLIC_METRIC_OF_EDITOR);
         takeScreenshot(browser, "admin-can-see-editor-public-metric", this.getClass());
-        assertFalse(metricSelect.getValues().isEmpty());
-        assertFalse(metricSelect.isShowingNoMatchingDataMessage());
+        assertFalse(metricSelect.getValues().isEmpty(), "Editor public metric should display");
+        assertFalse(metricSelect.isShowingNoMatchingDataMessage(), "No matching data message shouldn't display");
 
         metricSelect.searchForText(PRIVATE_METRIC_OF_EDITOR);
         takeScreenshot(browser, "admin-can-NOT-see-editor-private-metric", this.getClass());
-        assertTrue(metricSelect.getValues().isEmpty());
-        assertTrue(metricSelect.isShowingNoMatchingDataMessage());
+        assertTrue(metricSelect.getValues().isEmpty(), "Editor private metric shouldn't display");
+        assertTrue(metricSelect.isShowingNoMatchingDataMessage(), "No matching data message should display");
     }
 
     @Override

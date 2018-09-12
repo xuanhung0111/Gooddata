@@ -53,7 +53,7 @@ public class EmptyErrorKpiValuesTest extends AbstractDashboardTest {
 
         takeScreenshot(browser, "testEmptyMetricWithoutConditionalFormat", getClass());
 
-        assertTrue(lastKpi.isEmptyValue());
+        assertTrue(lastKpi.isEmptyValue(), "Kpi should have empty value");
         assertEquals(lastKpi.getTooltipOfValue(),
                 "No data for current filter settings. Try changing the filters.");
     }
@@ -84,7 +84,7 @@ public class EmptyErrorKpiValuesTest extends AbstractDashboardTest {
 
         takeScreenshot(browser, "testEmptyMetricWithoutConditionalFormat", getClass());
 
-        assertTrue(lastKpi.isErrorValue());
+        assertTrue(lastKpi.isErrorValue(), "Kpi should show error value");
         assertEquals(lastKpi.getTooltipOfValue(),
                 "KPI cannot be displayed. Contact your administrator to fix the KPI definition.");
 

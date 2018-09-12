@@ -170,8 +170,8 @@ public class KpiDashboardNamingTest extends AbstractDashboardTest {
 
         // validate just prefix/suffix for shortened name.
         if (displayedName.indexOf("…") != -1) {
-            assertTrue(expectedName.startsWith(displayedName.split("…")[0]));
-            assertTrue(expectedName.endsWith(displayedName.split("…")[1]));
+            assertTrue(expectedName.startsWith(displayedName.split("…")[0]), "Prefix of shortened name is incorrect");
+            assertTrue(expectedName.endsWith(displayedName.split("…")[1]), "Suffix of shortened name is incorrect");
         } else {
             assertEquals(displayedName, expectedName);
         }

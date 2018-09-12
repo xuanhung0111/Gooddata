@@ -254,9 +254,9 @@ public class InsightOnDashboardTest extends AbstractDashboardTest {
 
             AnalysisPage ap = initAnalysePage();
 
-            assertTrue(ap.searchInsight(TEST_INSIGHT));
+            assertTrue(ap.searchInsight(TEST_INSIGHT), TEST_INSIGHT + " should exist");
             takeScreenshot(browser, "testInsightTitleInADAfterRenamedOnDashboard-insightWithOriginalNameFound", getClass());
-            assertFalse(ap.searchInsight(RENAMED_TEST_INSIGHT));
+            assertFalse(ap.searchInsight(RENAMED_TEST_INSIGHT), RENAMED_TEST_INSIGHT + " shouldn't exist");
             takeScreenshot(browser, "testInsightTitleInADAfterRenamedOnDashboard-insightWithNewNameNotFound", getClass());
         } finally {
             indigoRestRequest.deleteAnalyticalDashboard(dashboardUri);

@@ -235,7 +235,8 @@ public class AttributeFilterManipulationTest extends AbstractDashboardTest {
                 .perform();
 
         indigoDashboardsPage.selectFirstWidget(Kpi.class);
-        assertTrue(indigoDashboardsPage.getAttributeFiltersPanel().isFilterVisible(ATTR_ACCOUNT));
+        assertTrue(indigoDashboardsPage.getAttributeFiltersPanel().isFilterVisible(ATTR_ACCOUNT),
+                ATTR_ACCOUNT + " filter should display");
         assertTrue(indigoDashboardsPage.getConfigurationPanel().getFilterByAttributeFilters().stream()
                 .anyMatch(e -> e.getTitle().equals(ATTR_ACCOUNT)), "Selected kpi is not applied attribute filter");
 

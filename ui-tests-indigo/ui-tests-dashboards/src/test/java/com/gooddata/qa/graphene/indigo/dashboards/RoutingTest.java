@@ -11,6 +11,9 @@ import java.io.IOException;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import org.json.JSONException;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
@@ -49,7 +52,7 @@ public class RoutingTest extends AbstractDashboardTest {
 
         try {
             initIndigoDashboardsPageWithWidgets();
-            assertTrue(browser.getCurrentUrl().contains("/dashboard/"));
+            assertThat(browser.getCurrentUrl(), containsString("/dashboard/"));
         } finally {
             new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
                     .deleteAnalyticalDashboard(getWorkingDashboardUri());

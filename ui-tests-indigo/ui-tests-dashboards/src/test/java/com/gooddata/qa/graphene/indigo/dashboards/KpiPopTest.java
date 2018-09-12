@@ -35,13 +35,13 @@ public class KpiPopTest extends AbstractDashboardTest {
     @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void checkKpiPopInMobile() {
         Kpi amount = initIndigoDashboardsPageWithWidgets().getWidgetByHeadline(Kpi.class, METRIC_AMOUNT);
-        assertFalse(amount.hasPopSection());
+        assertFalse(amount.hasPopSection(), METRIC_AMOUNT + " KPI shouldn't have pop section");
 
         Kpi lost = waitForFragmentVisible(indigoDashboardsPage).getWidgetByHeadline(Kpi.class, METRIC_LOST);
-        assertTrue(lost.hasPopSection());
+        assertTrue(lost.hasPopSection(), METRIC_LOST + " KPI should have pop section");
 
         Kpi numberOfActivities = indigoDashboardsPage.getWidgetByHeadline(Kpi.class, METRIC_NUMBER_OF_ACTIVITIES);
-        assertTrue(numberOfActivities.hasPopSection());
+        assertTrue(numberOfActivities.hasPopSection(), METRIC_NUMBER_OF_ACTIVITIES + " KPI should have pop section");
 
         assertEquals(numberOfActivities.getPopSection().getChangeTitle(), "change");
         assertEquals(numberOfActivities.getPopSection().getPeriodTitle(), "prev. period");
@@ -58,7 +58,7 @@ public class KpiPopTest extends AbstractDashboardTest {
         assertEquals(lost.getPopSection().getPeriodTitle(), "prev. year");
 
         numberOfActivities = indigoDashboardsPage.getWidgetByHeadline(Kpi.class, METRIC_NUMBER_OF_ACTIVITIES);
-        assertTrue(numberOfActivities.hasPopSection());
+        assertTrue(numberOfActivities.hasPopSection(), METRIC_NUMBER_OF_ACTIVITIES + " KPI should have pop section");
 
         assertEquals(numberOfActivities.getPopSection().getChangeTitle(), "change");
         assertEquals(numberOfActivities.getPopSection().getPeriodTitle(), "prev. month");
@@ -74,12 +74,12 @@ public class KpiPopTest extends AbstractDashboardTest {
                 .build())
             .selectLastWidget(Kpi.class);
 
-        assertTrue(justAddedKpi.hasPopSection());
+        assertTrue(justAddedKpi.hasPopSection(), "KPI should have pop section");
 
         Kpi lastKpi = indigoDashboardsPage.saveEditModeWithWidgets().getLastWidget(Kpi.class);
 
         takeScreenshot(browser, "checkNewlyAddedKpiHasPopSection", getClass());
-        assertTrue(lastKpi.hasPopSection());
+        assertTrue(lastKpi.hasPopSection(), "Newly added KPI should have pop section");
 
         indigoDashboardsPage.switchToEditMode().getLastWidget(Kpi.class).delete();
         indigoDashboardsPage.saveEditModeWithWidgets();
@@ -96,7 +96,7 @@ public class KpiPopTest extends AbstractDashboardTest {
                 .build())
             .selectLastWidget(Kpi.class);
 
-        assertFalse(kpi.hasPopSection());
+        assertFalse(kpi.hasPopSection(), "KPI shouldn't have pop section");
 
         waitForFragmentVisible(indigoDashboardsPage)
             .saveEditModeWithWidgets();
@@ -104,7 +104,7 @@ public class KpiPopTest extends AbstractDashboardTest {
         Kpi lastKpi = indigoDashboardsPage.getLastWidget(Kpi.class);
 
         takeScreenshot(browser, "checkKpiWithoutComparison", getClass());
-        assertFalse(lastKpi.hasPopSection());
+        assertFalse(lastKpi.hasPopSection(), "Newly added KPI shouldn't have pop section");
 
         indigoDashboardsPage.switchToEditMode().getLastWidget(Kpi.class).delete();
         indigoDashboardsPage.saveEditModeWithWidgets();

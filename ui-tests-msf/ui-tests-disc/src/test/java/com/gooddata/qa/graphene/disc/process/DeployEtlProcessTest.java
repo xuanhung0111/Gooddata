@@ -12,6 +12,7 @@ import org.testng.annotations.Test;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.disc.EtlProcessRestRequest.ETL_PROCESS_TYPE_LABEL;
 import static java.lang.String.format;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -84,9 +85,9 @@ public class DeployEtlProcessTest extends AbstractEtlProcessTest {
                 .enterS3Region("")
                 .submit();
 
-        assertTrue(deployForm.isS3ConfigurationPathError());
-        assertTrue(deployForm.isS3AccessKeyError());
-        assertTrue(deployForm.isS3SecretKeyError());
+        assertTrue(deployForm.isS3ConfigurationPathError(), "S3 configuration path should show error");
+        assertTrue(deployForm.isS3AccessKeyError(), "S3 access key should show error");
+        assertTrue(deployForm.isS3SecretKeyError(), "S3 secret key should show error");
     }
 
     @Test(dependsOnGroups = {"createProject"}, dataProvider = "processTypeProvider")
@@ -129,10 +130,10 @@ public class DeployEtlProcessTest extends AbstractEtlProcessTest {
             processDetail.openTab(AbstractProcessDetail.Tab.METADATA);
             assertTrue(processDetail.isTabActive(AbstractProcessDetail.Tab.METADATA),
                     "Process metadata tab is not active");
-            assertTrue(processDetail.getMetadata("Author").equals(testParams.getUser()));
-            assertTrue(processDetail.getMetadata("Component").equals(processType.getTitle()));
-            assertTrue(processDetail.getMetadata("Configuration Path").equals(s3ConfigurationPath));
-            assertTrue(ETL_PROCESS_TYPE_LABEL.equals(processDetail.getMetadata("Type")));
+            assertEquals(processDetail.getMetadata("Author"), testParams.getUser());
+            assertEquals(processDetail.getMetadata("Component"), processType.getTitle());
+            assertEquals(processDetail.getMetadata("Configuration Path"), s3ConfigurationPath);
+            assertEquals(processDetail.getMetadata("Type"), ETL_PROCESS_TYPE_LABEL);
             validateProcessMetadata(processName, processType, s3ConfigurationPath, s3AccessKey, s3Region,
                     serverSideEncryption);
         } finally {

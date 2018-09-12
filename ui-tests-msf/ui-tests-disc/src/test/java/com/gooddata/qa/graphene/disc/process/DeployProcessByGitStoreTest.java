@@ -34,7 +34,7 @@ public class DeployProcessByGitStoreTest extends AbstractProcessTest {
                 .enterGitPath(gitPath)
                 .enterProcessName(generateProcessName())
                 .submit();
-        assertTrue(deployForm.isGitPathInputError());
+        assertTrue(deployForm.isGitPathInputError(), "Git path input should show error");
         assertEquals(getBubbleMessage(browser), "Path doesn't have proper format");
     }
 

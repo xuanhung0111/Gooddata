@@ -3,6 +3,10 @@ package com.gooddata.qa.graphene.indigo.user;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.not;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -154,12 +158,10 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
                 .createNewGroup(xssGroup)
                 .getAllUserGroups();
         takeScreenshot(browser, "Check-xss-in-group-name", getClass());
-        assertTrue(userGroups.contains(xssGroup));
+        assertThat(userGroups, hasItem(xssGroup));
 
-        assertFalse(UserManagementPage.getInstance(browser).openSpecificGroupPage(xssGroup)
-                .deleteUserGroup()
-                .getAllUserGroups()
-                .contains(xssGroup));
+        assertThat(UserManagementPage.getInstance(browser).openSpecificGroupPage(xssGroup)
+                .deleteUserGroup().getAllUserGroups(), not(hasItem(xssGroup)));
     }
 
     @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement", "sanity" })
@@ -285,7 +287,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
         try {
             UserManagementPage userManagementPage = initUngroupedUsersPage();
             takeScreenshot(browser, "Verify-ungrouped-user-group", getClass());
-            assertTrue(userManagementPage.getAllUserEmails().contains(testParams.getUser()));
+            assertThat(userManagementPage.getAllUserEmails(), hasItem(testParams.getUser()));
         } finally {
             initUserManagementPage().addUsersToGroup(GROUP1, testParams.getUser());
         }
@@ -325,7 +327,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
                 .openSpecificGroupPage(GROUP3)
                 .getAllUserEmails();
         takeScreenshot(browser, "Admin-change-group-shared", getClass());
-        assertTrue(userEmails.contains(testParams.getUser()));
+        assertThat(userEmails, hasItem(testParams.getUser()));
     }
 
     @Test(dependsOnMethods = { "verifyUserManagementUI" }, groups = { "userManagement", "sanity" })
@@ -390,7 +392,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
 
         userManagementPage.filterUserState(UserStates.INVITED).selectUsers(INVITED_EMAIL);
         takeScreenshot(browser, "User-cannot-change-role-of-pending-user", getClass());
-        assertFalse(userManagementPage.isChangeRoleButtonPresent());
+        assertFalse(userManagementPage.isChangeRoleButtonPresent(), "Change role button shouldn't display");
     }
 
     @Test(dependsOnMethods = { "verifyUserManagementUI" }, groups = { "userManagement", "sanity" })
@@ -403,12 +405,12 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
 
         userManagementPage.filterUserState(UserStates.INVITED);
         takeScreenshot(browser, "User-appears-in-invited-stage", getClass());
-        assertTrue(userManagementPage.getAllUserEmails().contains(imapUser));
+        assertThat(userManagementPage.getAllUserEmails(), hasItem(imapUser));
 
         activeEmailUser(projectTitle + " Invitation");
         initUserManagementPage().filterUserState(UserStates.ACTIVE);
         takeScreenshot(browser, "User-appears-in-active-stage", getClass());
-        assertTrue(userManagementPage.getAllUserEmails().contains(imapUser));
+        assertThat(userManagementPage.getAllUserEmails(), hasItem(imapUser));
     }
 
     @Test(dependsOnMethods = { "verifyUserManagementUI" }, groups = { "userManagement" })
@@ -431,7 +433,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
         UserManagementPage userManagementPage = initUserManagementPage().deactivateUsers(testParams.getUser());
         takeScreenshot(browser, "User-cannot-deactivate-himself", getClass());
         assertEquals(userManagementPage.getMessageText(), CAN_NOT_DEACTIVATE_HIMSELF_MESSAGE);
-        assertTrue(userManagementPage.getAllUserEmails().contains(testParams.getUser()));
+        assertThat(userManagementPage.getAllUserEmails(), hasItem(testParams.getUser()));
         assertEquals(userManagementPage.filterUserState(UserStates.DEACTIVATED)
                 .waitForEmptyGroup()
                 .getStateGroupMessage(), NO_DEACTIVATED_USER_MESSAGE);
@@ -446,9 +448,9 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
                 .deactivateUsers(testParams.getEditorUser(), testParams.getViewerUser());
         takeScreenshot(browser, "Deactivate-users", getClass());
         assertEquals(userManagementPage.getMessageText(), DEACTIVATE_SUCCESSFUL_MESSAGE);
-        assertFalse(userManagementPage.getAllUserEmails().containsAll(emailsList));
-        assertTrue(compareCollections( userManagementPage.filterUserState(UserStates.DEACTIVATED)
-                .getAllUserEmails(), emailsList));
+        assertFalse(userManagementPage.getAllUserEmails().containsAll(emailsList),
+                "Editor and View User should be in deactivated users list");
+        assertEquals(userManagementPage.filterUserState(UserStates.DEACTIVATED).getAllUserEmails(), emailsList);
     }
 
     @Test(dependsOnMethods = { "deactivateUsers" }, groups = { "activeUser", "sanity" }, alwaysRun = true)
@@ -461,8 +463,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
 
         UserManagementPage userManagementPage = initUserManagementPage();
         takeScreenshot(browser, "Users-activate-successfully", getClass());
-        assertTrue(userManagementPage.getAllUserEmails().containsAll(
-                asList(testParams.getEditorUser(), testParams.getViewerUser())));
+        assertThat(userManagementPage.getAllUserEmails(), hasItems(testParams.getEditorUser(), testParams.getViewerUser()));
     }
 
     @Test(dependsOnGroups = { "verifyUI" }, groups = { "sanity" })
@@ -474,7 +475,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
                 .openSpecificGroupPage(group);
 
         takeScreenshot(browser, "Add-new-group", getClass());
-        assertTrue(userManagementPage.getAllUserEmails().contains(testParams.getUser()));
+        assertThat(userManagementPage.getAllUserEmails(), hasItem(testParams.getUser()));
     }
 
     @Test(dependsOnGroups = "verifyUI")
@@ -491,7 +492,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
         UserManagementPage userManagementPage = initUserManagementPage().cancelCreatingNewGroup(group);
 
         takeScreenshot(browser, "Cancel-adding-new-group", getClass());
-        assertFalse(userManagementPage.getAllUserGroups().contains(group));
+        assertThat(userManagementPage.getAllUserGroups(), not(hasItem(group)));
     }
 
     @Test(dependsOnGroups = "verifyUI")
@@ -500,7 +501,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
         GroupDialog groupDialog = initUserManagementPage().openGroupDialog(GroupDialog.State.CREATE);
         groupDialog.enterGroupName(GROUP1);
         takeScreenshot(browser, "Add-existing-group-name", getClass());
-        assertFalse(groupDialog.isSubmitButtonVisible());
+        assertFalse(groupDialog.isSubmitButtonVisible(), "Submit button shouldn't be visible");
         assertEquals(groupDialog.getErrorMessage(), String.format(EXISTING_USER_GROUP_MESSAGE, GROUP1));
     }
 
@@ -523,7 +524,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
 
             userManagementPage.renameUserGroup(newGroupName);
             takeScreenshot(browser, "Rename-user-group", getClass());
-            assertTrue(userManagementPage.getAllSidebarActiveLinks().contains(newGroupName));
+            assertThat(userManagementPage.getAllSidebarActiveLinks(), hasItem(newGroupName));
             assertEquals(userManagementPage.getUserPageTitle(), newGroupName);
         } finally {
             userManagementRestRequest.deleteUserGroup(groupUri);
@@ -540,7 +541,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
                 .enterGroupName(GROUP2);
 
         takeScreenshot(browser, "Rename-user-group-with-existing-name", getClass());
-        assertFalse(editGroupDialog.isSubmitButtonVisible());
+        assertFalse(editGroupDialog.isSubmitButtonVisible(), "Submit button shouldn't be visible");
         assertEquals(editGroupDialog.getErrorMessage(), String.format(EXISTING_USER_GROUP_MESSAGE, GROUP2));
     }
 
@@ -554,9 +555,9 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
                 .cancelRenamingUserGroup(group);
 
         takeScreenshot(browser, "Cancel-rename-user-group", getClass());
-        assertTrue(userManagementPage.getAllSidebarActiveLinks().contains(GROUP1));
+        assertThat(userManagementPage.getAllSidebarActiveLinks(), hasItem(GROUP1));
         assertEquals(userManagementPage.getUserPageTitle(), GROUP1 + " " + userManagementPage.getUsersCount());
-        assertFalse(userManagementPage.getAllUserGroups().contains(group));
+        assertThat(userManagementPage.getAllUserGroups(), not(hasItem(group)));
     }
 
     @Test(dependsOnGroups = { "activeUser" }, groups = { "deleteGroup" })
@@ -702,8 +703,8 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
                 .waitForEmptyGroup();
 
         assertEquals(UserManagementPage.getInstance(browser).getStateGroupMessage(), EMPTY_GROUP_STATE_MESSAGE);
-        assertTrue(UserManagementPage.getInstance(browser).getAllUserGroups().contains(group));
-        assertTrue(UserManagementPage.getInstance(browser).getAllSidebarActiveLinks().contains(group));
+        assertThat(UserManagementPage.getInstance(browser).getAllUserGroups(), hasItem(group));
+        assertThat(UserManagementPage.getInstance(browser).getAllSidebarActiveLinks(), hasItem(group));
     }
 
     private void waitForNewTabOpen(int currentTabs) {
