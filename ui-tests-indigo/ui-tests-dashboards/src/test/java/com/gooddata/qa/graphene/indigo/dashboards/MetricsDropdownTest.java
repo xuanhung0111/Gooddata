@@ -93,8 +93,8 @@ public class MetricsDropdownTest extends AbstractDashboardTest {
         ms.searchForText("name-of-nonexisting-metric-&!~$#");
         takeScreenshot(browser, "checkNoMatchingMessage", this.getClass());
 
-        assertTrue(ms.getValues().isEmpty());
-        assertTrue(ms.isShowingNoMatchingDataMessage());
+        assertTrue(ms.getValues().isEmpty(), "There is selected metric");
+        assertTrue(ms.isShowingNoMatchingDataMessage(), "No matching data message should display");
     }
 
     private MetricSelect getMetricSelect() {
@@ -110,7 +110,7 @@ public class MetricsDropdownTest extends AbstractDashboardTest {
                 .getConfigurationPanel()
                 .getMetricSelect();
 
-        assertTrue(ms.getSearchText().isEmpty());
-        assertTrue(ms.getValues().size() > 10);
+        assertTrue(ms.getSearchText().isEmpty(), "Search box should be empty");
+        assertTrue(ms.getValues().size() > 10, "Missing some selected metrics");
     }
 }

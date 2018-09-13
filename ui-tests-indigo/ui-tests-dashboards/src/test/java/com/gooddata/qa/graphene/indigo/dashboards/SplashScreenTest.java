@@ -174,11 +174,8 @@ public class SplashScreenTest extends AbstractDashboardTest {
 
     @Test(dependsOnMethods = {"checkNewProjectWithoutKpisFallsToSplashScreen"}, groups = {"desktop", "empty-state"})
     public void checkDeleteDashboardButtonMissingOnUnsavedDashboard() {
-        assertFalse(initIndigoDashboardsPage()
-                .getSplashScreen()
-                .startEditingWidgets()
-                .waitForEditingControls()
-                .isDeleteButtonVisible());
+        assertFalse(initIndigoDashboardsPage().getSplashScreen().startEditingWidgets().waitForEditingControls()
+                .isDeleteButtonVisible(), "Delete button shouldn't display with unsaved dashboard");
 
         takeScreenshot(browser, "checkDeleteDashboardButtonMissingOnUnsavedDashboard", getClass());
     }
@@ -260,7 +257,7 @@ public class SplashScreenTest extends AbstractDashboardTest {
                 .selectDateFilterByName(DATE_FILTER_THIS_QUARTER);
 
         takeScreenshot(browser, "checkCannotSaveNewEmptyDashboard", getClass());
-        assertFalse(indigoDashboardsPage.isSaveEnabled());
+        assertFalse(indigoDashboardsPage.isSaveEnabled(), "Empty dashboard cannot be saved");
     }
 
     @Override

@@ -69,7 +69,7 @@ public class EditModeTest extends AbstractDashboardTest {
 
         takeScreenshot(browser, "checkEditButtonPresent", getClass());
 
-        assertTrue(indigoDashboardsPage.isEditButtonVisible());
+        assertTrue(indigoDashboardsPage.isEditButtonVisible(), "Edit button should display");
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
@@ -98,7 +98,7 @@ public class EditModeTest extends AbstractDashboardTest {
         try {
             signIn(canAccessGreyPage(browser), UserRoles.EDITOR);
 
-            assertTrue(initIndigoDashboardsPageWithWidgets().isEditButtonVisible());
+            assertTrue(initIndigoDashboardsPageWithWidgets().isEditButtonVisible(), "Editor can edit dashboard");
 
         } finally {
             signIn(canAccessGreyPage(browser), UserRoles.ADMIN);

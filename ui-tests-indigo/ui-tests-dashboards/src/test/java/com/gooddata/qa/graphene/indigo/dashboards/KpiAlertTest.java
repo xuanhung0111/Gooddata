@@ -74,7 +74,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
 
         try {
             takeScreenshot(browser, "checkNewKpiDoesNotHaveAlertSet", getClass());
-            assertFalse(getLastKpiAfterAlertsLoaded().hasSetAlert());
+            assertFalse(getLastKpiAfterAlertsLoaded().hasSetAlert(), "Kpi shouldn't be set alert");
         } finally {
             indigoRestRequest.deleteWidgetsUsingCascade(indigoRestRequest.getKpiUri(METRIC_AVG_AMOUNT));
         }
@@ -98,7 +98,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
         kpi.hoverAndClickKpiAlertButton();
 
         takeScreenshot(browser, "checkKpiAlertDialog", getClass());
-        assertTrue(kpi.hasAlertDialogOpen());
+        assertTrue(kpi.hasAlertDialogOpen(), "Alert dialog should open");
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
@@ -119,7 +119,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
             setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, KPI_ALERT_THRESHOLD);
 
             takeScreenshot(browser, "checkAddKpiAlert", getClass());
-            assertTrue(getLastKpiAfterAlertsLoaded().hasSetAlert());
+            assertTrue(getLastKpiAfterAlertsLoaded().hasSetAlert(), "Kpi should be set alert");
         } finally {
             indigoRestRequest.deleteWidgetsUsingCascade(kpiUri);
         }
@@ -136,7 +136,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
             initIndigoDashboardsPageWithWidgets();
             setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, KPI_ALERT_THRESHOLD);
 
-            assertTrue(getLastKpiAfterAlertsLoaded().hasSetAlert());
+            assertTrue(getLastKpiAfterAlertsLoaded().hasSetAlert(), "Kpi should be set alert");
 
             kpiAlertDialog = waitForFragmentVisible(indigoDashboardsPage)
                 .getLastWidget(Kpi.class)
@@ -148,7 +148,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
 
             setAlertForLastKpi(TRIGGERED_WHEN_DROPS_BELOW, updatedThreshold);
 
-            assertTrue(getLastKpiAfterAlertsLoaded().hasSetAlert());
+            assertTrue(getLastKpiAfterAlertsLoaded().hasSetAlert(), "Kpi should be set alert");
 
             kpiAlertDialog = waitForFragmentVisible(indigoDashboardsPage)
                 .getLastWidget(Kpi.class)
@@ -175,7 +175,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
                 .hasInputSuffix();
 
             takeScreenshot(browser, "checkKpiAlertDialogWithPercentMetric", getClass());
-            assertTrue(hasPercentSymbol);
+            assertTrue(hasPercentSymbol, "Alert dialog should have input suffix");
         } finally {
             indigoRestRequest.deleteWidgetsUsingCascade(percentMetric.getUri());
         }
@@ -191,11 +191,11 @@ public class KpiAlertTest extends AbstractDashboardTest {
                 .getLastWidget(Kpi.class)
                 .openAlertDialog();
 
-            assertFalse(kpiAlertDialog.hasAlertMessage());
+            assertFalse(kpiAlertDialog.hasAlertMessage(), "Alert dialog shouldn't have alert message");
 
             setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, KPI_ALERT_THRESHOLD);
 
-            assertTrue(getLastKpiAfterAlertsLoaded().hasSetAlert());
+            assertTrue(getLastKpiAfterAlertsLoaded().hasSetAlert(), "Kpi should be set alert");
 
             boolean isAlertMessageDisplayed = waitForFragmentVisible(indigoDashboardsPage)
                 .selectDateFilterByName(DATE_FILTER_ALL_TIME)
@@ -203,7 +203,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
                 .openAlertDialog()
                 .hasAlertMessage();
 
-            assertTrue(isAlertMessageDisplayed);
+            assertTrue(isAlertMessageDisplayed, "Alert message should display");
 
         } finally {
             indigoRestRequest.deleteWidgetsUsingCascade(kpiUri);
@@ -264,7 +264,7 @@ public class KpiAlertTest extends AbstractDashboardTest {
             setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, KPI_ALERT_THRESHOLD);
 
             Kpi kpi = getLastKpiAfterAlertsLoaded();
-            assertTrue(kpi.hasSetAlert());
+            assertTrue(kpi.hasSetAlert(), "Kpi should be set alert");
 
             String kpiAlertDialogTextBefore = kpi
                 .openAlertDialog()
@@ -296,12 +296,12 @@ public class KpiAlertTest extends AbstractDashboardTest {
             setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, KPI_ALERT_THRESHOLD);
 
             takeScreenshot(browser, "checkKpiAlertDelete_before", getClass());
-            assertTrue(getLastKpiAfterAlertsLoaded().hasSetAlert());
+            assertTrue(getLastKpiAfterAlertsLoaded().hasSetAlert(), "Kpi should be set alert");
 
             deleteAlertForLastKpi();
 
             takeScreenshot(browser, "checkKpiAlertDelete_after", getClass());
-            assertFalse(getLastKpiAfterAlertsLoaded().hasSetAlert());
+            assertFalse(getLastKpiAfterAlertsLoaded().hasSetAlert(), "Kpi shouldn't be set alert");
         } finally {
             // working dashboard should not be empty after delete the kpi
             // because following method will delete it in that case

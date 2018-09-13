@@ -63,10 +63,10 @@ public class OverviewPageTest extends AbstractProcessTest {
         initDiscOverviewPage();
 
         takeScreenshot(browser, "Default-overview-stages", getClass());
-        assertTrue(overviewPage.isStateActive(OverviewState.FAILED));
-        assertFalse(overviewPage.isStateActive(OverviewState.RUNNING));
-        assertFalse(overviewPage.isStateActive(OverviewState.SCHEDULED));
-        assertFalse(overviewPage.isStateActive(OverviewState.SUCCESSFUL));
+        assertTrue(overviewPage.isStateActive(OverviewState.FAILED), "Status should be failed");
+        assertFalse(overviewPage.isStateActive(OverviewState.RUNNING), "Status should be failed");
+        assertFalse(overviewPage.isStateActive(OverviewState.SCHEDULED), "Status should be failed");
+        assertFalse(overviewPage.isStateActive(OverviewState.SUCCESSFUL), "Status should be failed");
     }
 
     @DataProvider(name = "emptyStatesProvider")

@@ -43,7 +43,7 @@ public class HeaderTest extends AbstractDashboardTest {
             waitForDashboardPageLoaded(browser);
 
             takeScreenshot(browser, "KPI-header-not-display-when-FF-is-off", getClass());
-            assertFalse(ApplicationHeaderBar.isKpisLinkVisible(browser));
+            assertFalse(ApplicationHeaderBar.isKpisLinkVisible(browser), "KPI link shouldn't be visible");
 
         } finally {
             projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
@@ -76,7 +76,7 @@ public class HeaderTest extends AbstractDashboardTest {
                 waitForDashboardPageLoaded(browser);
 
                 takeScreenshot(browser, "KPI-header-display-when-FF-is-off-and-there-is-saved-KPI", getClass());
-                assertTrue(ApplicationHeaderBar.isKpisLinkVisible(browser));
+                assertTrue(ApplicationHeaderBar.isKpisLinkVisible(browser), "KPI link should be visible");
             } finally {
                 new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
                         .deleteDashboardsUsingCascade();
@@ -86,7 +86,7 @@ public class HeaderTest extends AbstractDashboardTest {
             browser.navigate().refresh();
             waitForDashboardPageLoaded(browser);
             takeScreenshot(browser, "KPI-header-not-display-when-FF-is-off-and-KPI-is-removed", getClass());
-            assertFalse(ApplicationHeaderBar.isKpisLinkVisible(browser));
+            assertFalse(ApplicationHeaderBar.isKpisLinkVisible(browser), "KPI link shouldn't be visible");
 
         } finally {
             projectRestRequest.setFeatureFlagInProjectAndCheckResult(

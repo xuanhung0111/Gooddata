@@ -91,7 +91,7 @@ public class PartialExportDashboardsTest extends GoodSalesAbstractTest {
             IndigoDashboardsPage.getInstance(browser).getLastWidget(Kpi.class).clickKpiValue();
             waitForDashboardPageLoaded(browser);
             takeScreenshot(browser, "Dashboard tab: " + SECOND_TAB + " is selected", getClass());
-            assertTrue(dashboardsPage.getTabs().isTabSelected(1));
+            assertTrue(dashboardsPage.getTabs().isTabSelected(1), "Second tab should be selected");
         } finally {
             testParams.setProjectId(oldPid);
             if (nonNull(newPid)) {

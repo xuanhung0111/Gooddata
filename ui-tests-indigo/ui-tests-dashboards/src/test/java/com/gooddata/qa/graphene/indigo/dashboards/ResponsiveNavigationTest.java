@@ -5,6 +5,9 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForStringInUrl;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Collections.singletonList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -48,7 +51,7 @@ public class ResponsiveNavigationTest extends AbstractDashboardTest {
 
         HamburgerMenu menu = waitForFragmentVisible(indigoDashboardsPage).openHamburgerMenu();
         List<String> pages = menu.getAllMenuItems();
-        assertTrue(pages.contains("Dashboards"));
+        assertThat(pages, hasItem("Dashboards"));
         indigoDashboardsPage.closeHamburgerMenu();
 
         pages.forEach(page -> {
@@ -57,7 +60,7 @@ public class ResponsiveNavigationTest extends AbstractDashboardTest {
             navigateToEachHamburgerMenuItem(page);
 
             takeScreenshot(browser, "checkHamburgerMenuItems-" + page, getClass());
-            assertTrue(browser.getCurrentUrl().contains(testParams.getProjectId()));
+            assertThat(browser.getCurrentUrl(), containsString(testParams.getProjectId()));
         });
     }
 
@@ -79,7 +82,7 @@ public class ResponsiveNavigationTest extends AbstractDashboardTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkHamburgerMenuNotPresentInDesktop() {
-        assertFalse(initIndigoDashboardsPage().isHamburgerMenuLinkPresent());
+        assertFalse(initIndigoDashboardsPage().isHamburgerMenuLinkPresent(), "Hamburger menu link shouldn't display");
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
@@ -98,10 +101,10 @@ public class ResponsiveNavigationTest extends AbstractDashboardTest {
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void accessDashboardsFromTopMenu() throws JSONException {
         initDashboardsPage();
-        assertTrue(isElementPresent(className(ApplicationHeaderBar.KPIS_LINK_CLASS), browser));
+        assertTrue(isElementPresent(className(ApplicationHeaderBar.KPIS_LINK_CLASS), browser), "KPI link should be visible");
 
         ApplicationHeaderBar.goToReportsPage(browser);
-        assertTrue(isElementPresent(className(ApplicationHeaderBar.KPIS_LINK_CLASS), browser));
+        assertTrue(isElementPresent(className(ApplicationHeaderBar.KPIS_LINK_CLASS), browser), "KPI link should be visible");
 
         ApplicationHeaderBar.goToKpisPage(browser);
         waitForFragmentVisible(indigoDashboardsPage)

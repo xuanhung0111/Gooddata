@@ -3,8 +3,9 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
@@ -87,7 +88,7 @@ public class ReorderInsightTest extends AbstractDashboardTest {
         initIndigoDashboardsPageWithWidgets();
         checkInsightOrder(SECOND_INSIGHT, FIRST_INSIGHT, THIRD_INSIGHT, "Insight-Order-Before-Switching-Page");
         initAnalysePage();
-        assertTrue(browser.getCurrentUrl().contains("/reportId/edit"));
+        assertThat(browser.getCurrentUrl(), containsString("/reportId/edit"));
         initIndigoDashboardsPage().waitForDashboardLoad();
         checkInsightOrder(SECOND_INSIGHT, FIRST_INSIGHT, THIRD_INSIGHT, "Insight-Order-After-Switching-Page");
     }

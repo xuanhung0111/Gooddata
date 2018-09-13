@@ -124,9 +124,9 @@ public class KpiDrillToTest extends AbstractDashboardTest {
 
 
             // check no other tab was opened
-            assertTrue(browser.getWindowHandles().size() == 1);
+            assertEquals(browser.getWindowHandles().size(), 1);
             // check that url is the same, but after refresh it has /dashboard/<id> appended
-            assertTrue(browser.getCurrentUrl().startsWith(currentUrl));
+            assertTrue(browser.getCurrentUrl().startsWith(currentUrl), "Page was loaded incorrectly");
         } finally {
             indigoRestRequest.deleteDashboardsUsingCascade();
         }
@@ -252,8 +252,8 @@ public class KpiDrillToTest extends AbstractDashboardTest {
                 .clickKpiValue();
             waitForDashboardPageLoaded(browser);
 
-            assertFalse(dashboardsPage.getTabs().isTabSelected(0));
-            assertTrue(dashboardsPage.getTabs().isTabSelected(1));
+            assertFalse(dashboardsPage.getTabs().isTabSelected(0), "First tab shouldn't be selected");
+            assertTrue(dashboardsPage.getTabs().isTabSelected(1), "Second tab should be selected");
         } finally {
             indigoRestRequest.deleteDashboardsUsingCascade();
         }
@@ -419,7 +419,7 @@ public class KpiDrillToTest extends AbstractDashboardTest {
     }
 
     private void checkNoNewBrowserTabOrWindowNorRedirected(String currentUrl) {
-        assertTrue(browser.getWindowHandles().size() == 1);
+        assertEquals(browser.getWindowHandles().size(), 1);
         assertEquals(browser.getCurrentUrl(), currentUrl);
     }
 
