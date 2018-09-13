@@ -191,7 +191,7 @@ public class GoodSalesRunningTotalsTest extends GoodSalesAbstractTest {
                 .waitForReportExecutionProgress()
                 .openMetricAxisConfiguration();
 
-        assertTrue(isEqualCollection(reportPage.getMetricAxisConfigurationNames(), singletonList(metricAlias)));
+        assertEquals(reportPage.getMetricAxisConfigurationNames(), singletonList(metricAlias));
 
         //back to table type to reduce height of configuration panel
         assertTrue(reportPage.selectReportVisualisation(ReportTypes.TABLE)

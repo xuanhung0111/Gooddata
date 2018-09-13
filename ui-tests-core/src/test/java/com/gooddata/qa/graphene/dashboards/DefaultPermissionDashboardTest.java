@@ -22,7 +22,7 @@ public class DefaultPermissionDashboardTest extends GoodSalesAbstractTest {
     public void hiddenDashboardByDefault() {
         initDashboardsPage().openEditExportEmbedMenu().select("Add Dashboard");
         assertEquals(dashboardsPage.getBubbleBlueTooltip(), "This dashboard is hidden. Only you can see it.");
-        assertTrue(dashboardsPage.isUnlisted(), "Eye icon should display");
+        assertTrue(dashboardsPage.isPrivate(), "Eye icon should display");
         dashboardsPage.saveDashboard();
         assertEquals(dashboardsPage.getBubbleBlueTooltip(),
                 "This dashboard is hidden. Only you can see it. Share it with others");

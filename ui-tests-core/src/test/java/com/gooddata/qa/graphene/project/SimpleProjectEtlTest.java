@@ -2,6 +2,8 @@ package com.gooddata.qa.graphene.project;
 
 import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsAndUsersPageLoaded;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -116,7 +118,7 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
         for (int i = 0; i < jsonPartsArray.length(); i++) {
             String columnName = jsonPartsArray.getJSONObject(i).getString("columnName");
             ArrayList<String> populateFields = parsePopulatesFields(jsonPartsArray.getJSONObject(i).getJSONArray("populates"));
-            assertTrue(sliParts.contains(new SLIManifestPart(columnName, populateFields).hashCode()));
+            assertThat(sliParts, hasItem(new SLIManifestPart(columnName, populateFields).hashCode()));
         }
     }
 

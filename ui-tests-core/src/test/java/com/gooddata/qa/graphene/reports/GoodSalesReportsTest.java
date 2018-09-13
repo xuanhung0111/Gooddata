@@ -335,7 +335,8 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"verifyCreatedReports"})
     public void deleteReport() {
         initReportPage(SIMPLE_CA_REPORT).deleteCurrentReport();
-        assertFalse(ReportsPage.getInstance(browser).isReportVisible(SIMPLE_CA_REPORT));
+        assertFalse(ReportsPage.getInstance(browser).isReportVisible(SIMPLE_CA_REPORT), SIMPLE_CA_REPORT +
+                " shouldn't be visible");
     }
 
     private void prepareReport(String reportName, ReportTypes reportType, List<String> what,

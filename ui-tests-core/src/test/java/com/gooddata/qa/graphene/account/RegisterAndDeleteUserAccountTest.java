@@ -223,7 +223,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
                 "Emailing Dashboards tab is still displayed");
 
         ProjectAndUsersPage.getInstance(browser).clickInviteUserButton();
-        assertFalse(isElementPresent(INVITE_USER_DIALOG_LOCATOR, browser));
+        assertFalse(isElementPresent(INVITE_USER_DIALOG_LOCATOR, browser), "Invite user dialog shouldn't be present");
         assertEquals(waitForElementVisible(NEED_ACTIVATE_ACCOUNT_DIALOG_TITLE, browser).getText(),
                 NEED_ACTIVATE_ACCOUNT_MESSAGE);
         takeScreenshot(browser, "Need activate account before inviting users", getClass());

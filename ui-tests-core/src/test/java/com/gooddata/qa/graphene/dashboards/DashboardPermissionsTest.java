@@ -7,6 +7,9 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoade
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -45,6 +48,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     private static final String ALCOHOLICS_ANONYMOUS = "Alcoholics anonymous";
     private static final String UNCHANGED_DASHBOARD = "Unchanged dashboard";
     private static final String WAR_MSG = "You do not have permission to access this dashboard.";
+    private static final String DASHBOARD_IS_SHARED_TO_USER_GROUP = "Dashboard is shared to user group";
     private String userGroup1Id;
     private String userGroup2Id;
     private DashboardRestRequest dashboardRequest;
@@ -57,7 +61,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests", "sanity"}, priority = 0)
-    public void checkBackToTheOnlyOneVisibileDashboard() throws IOException, JSONException {
+    public void checkBackToTheOnlyOneVisibleDashboard() throws IOException, JSONException {
         String dashboardName = "Admin Unpublished Dashboard";
         try {
             String dashboardUri = createTestDashboard(dashboardName);
@@ -113,7 +117,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         dashboardRequest.setPrivateDashboard(dashboardName, false);
         initDashboardsPage();
 
-        assertFalse(dashboardsPage.isUnlisted());
+        assertFalse(dashboardsPage.isPrivate(), "Dashboard should be public");
     }
 
     /**
@@ -128,7 +132,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         dashboardRequest.setPrivateDashboard(dashboardName, true);
         initDashboardsPage();
 
-        assertTrue(dashboardsPage.isUnlisted());
+        assertTrue(dashboardsPage.isPrivate(), "Dashboard should be private");
     }
 
     /**
@@ -148,8 +152,8 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         permissionsDialog.cancel();
 
         waitForElementVisible(dashboardsPage.getRoot());
-        assertFalse(dashboardsPage.isLocked());
-        assertTrue(dashboardsPage.isUnlisted());
+        assertFalse(dashboardsPage.isLocked(), "Dashboard shouldn't be locked");
+        assertTrue(dashboardsPage.isPrivate(), "Dashboard should be private");
     }
 
     /**
@@ -168,7 +172,8 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
 
             assertEquals(permissionsDialog.getTitleOfSubmitButton(), "Done");
             assertEquals(permissionsDialog.getAddedGrantees().size(), 1);
-            assertTrue(permissionsDialog.isStrictAccessControlCheckBoxSelected());
+            assertTrue(permissionsDialog.isStrictAccessControlCheckBoxSelected(),
+                    "Strict access control checkbox should be selected");
             permissionsDialog.done();
         } finally {
             logoutAndLoginAs(false, UserRoles.ADMIN);
@@ -220,7 +225,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         PermissionsDialog permissionsDialog = dashboardsPage.unlistedIconClick();
         permissionsDialog.publish(PublishType.ALL_USERS_IN_THIS_PROJECT);
         permissionsDialog.submit();
-        assertFalse(dashboardsPage.isUnlisted());
+        assertFalse(dashboardsPage.isPrivate(), "Dashboard should be private");
         assertEquals(dashboardsPage.getListedConfirmationBubble(),
                 "Dashboard is now visible to all. To hide it again, see Permissions.\nOk, got it");
     }
@@ -274,7 +279,8 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
 
         assertEquals(permissionsDialog.getAddedGrantees().size(), 1);
-        assertTrue(permissionsDialog.isStrictAccessControlCheckBoxSelected());
+        assertTrue(permissionsDialog.isStrictAccessControlCheckBoxSelected(),
+                "Strict access control checkbox should be selected");
         permissionsDialog.done();
         dashboardsPage.deleteDashboard();
     }
@@ -300,7 +306,8 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
 
             final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
             assertEquals(permissionsDialog.getAddedGrantees().size(), 1);
-            assertTrue(permissionsDialog.isStrictAccessControlCheckBoxSelected());
+            assertTrue(permissionsDialog.isStrictAccessControlCheckBoxSelected(),
+                    "Strict access control checkbox should be selected");
             permissionsDialog.submit();
         } finally {
             logoutAndLoginAs(false, UserRoles.ADMIN);
@@ -390,10 +397,10 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         initDashboardsPage();
         List<String> dashboards = dashboardsPage.getDashboardsNames();
 
-        assertTrue(dashboards.contains("Unlocked and published for viewer"));
-        assertTrue(dashboards.contains("Locked and published for viewer"));
-        assertFalse(dashboards.contains("Unlocked and unpublished for viewer"));
-        assertFalse(dashboards.contains("Locked and unpublished for viewer"));
+        assertThat(dashboards, hasItem("Unlocked and published for viewer"));
+        assertThat(dashboards, hasItem("Locked and published for viewer"));
+        assertThat(dashboards, not(hasItem("Unlocked and unpublished for viewer")));
+        assertThat(dashboards, not(hasItem("Locked and unpublished for viewer")));
     }
 
     /**
@@ -402,10 +409,10 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"prepareViewerTests"}, groups = {"viewer-tests"})
     public void shouldNotShowLockIconToViewer() {
         selectDashboard("Locked and published for viewer");
-        assertFalse(dashboardsPage.isLocked());
+        assertFalse(dashboardsPage.isLocked(), "Dashboard shouldn't be locked");
 
         selectDashboard("Unlocked and published for viewer");
-        assertFalse(dashboardsPage.isLocked());
+        assertFalse(dashboardsPage.isLocked(), "Dashboard shouldn't be locked");
     }
 
     @Test(dependsOnGroups = {"viewer-tests"}, groups = {"editor-tests", "sanity"}, alwaysRun = true)
@@ -421,27 +428,27 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         initDashboardsPage();
         List<String> dashboards = dashboardsPage.getDashboardsNames();
 
-        assertTrue(dashboards.contains("Unlocked and published for viewer"));
-        assertTrue(dashboards.contains("Locked and published for viewer"));
-        assertFalse(dashboards.contains("Unlocked and unpublished for viewer"));
-        assertFalse(dashboards.contains("Locked and unpublished for viewer"));
+        assertThat(dashboards, hasItem("Unlocked and published for viewer"));
+        assertThat(dashboards, hasItem("Locked and published for viewer"));
+        assertThat(dashboards, not(hasItem("Unlocked and unpublished for viewer")));
+        assertThat(dashboards, not(hasItem("Locked and unpublished for viewer")));
     }
 
     @Test(dependsOnMethods = {"prepareEditorTests"}, groups = {"editor-tests"})
     public void shouldShowLockIconToEditor() {
         selectDashboard("Locked and published for viewer");
-        assertTrue(dashboardsPage.isLocked());
+        assertTrue(dashboardsPage.isLocked(), "Dashboard should be locked");
         assertEquals(dashboardsPage.getTooltipFromLockIcon(), "View only. You don't have permission to edit this dashboard.");
 
         selectDashboard("Unlocked and published for viewer");
-        assertFalse(dashboardsPage.isLocked());
+        assertFalse(dashboardsPage.isLocked(), "Dashboard shouldn't be locked");
     }
 
     @Test(dependsOnMethods = {"prepareEditorTests"}, groups = {"editor-tests"})
     public void shouldNotAllowEditorToEditLockedDashboard() {
         selectDashboard("Locked and published for viewer");
         waitForDashboardPageLoaded(browser);
-        assertFalse(dashboardsPage.isEditButtonPresent());
+        assertFalse(dashboardsPage.isEditButtonPresent(), "Should not allow editor to edit locked dashboard");
     }
 
     /**
@@ -455,11 +462,11 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         dashboardRequest.setPrivateDashboard(dashboardName, true);
         initDashboardsPage();
 
-        assertEquals(dashboardsPage.isUnlisted(), true);
+        assertTrue(dashboardsPage.isPrivate(), "Dashboard should be private");
 
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
 
-        assertFalse(permissionsDialog.isLockOptionDisplayed());
+        assertFalse(permissionsDialog.isLockOptionDisplayed(), "Lock option shouldn't display");
 
         final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
 
@@ -495,7 +502,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
             final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
 
             assertEquals(permissionsDialog.getAddedGrantees().size(), 1);
-            assertFalse(permissionsDialog.isSACOptionDisplayed());
+            assertFalse(permissionsDialog.isSACOptionDisplayed(), "SAC option shouldn't display");
         } finally {
             logoutAndLoginAs(false, UserRoles.ADMIN);
             new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
@@ -516,7 +523,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
             signInAndInitDashboardWithEdior();
 
             List<String> dashboards = dashboardsPage.getDashboardsNames();
-            assertTrue(dashboards.contains(dashboardName));
+            assertThat(dashboards, hasItem(dashboardName));
         } finally {
             logoutAndLoginAs(false, UserRoles.ADMIN);
             new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
@@ -537,7 +544,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
             signInAndInitDashboardWithEdior();
 
             List<String> dashboards = dashboardsPage.getDashboardsNames();
-            assertTrue(dashboards.contains(dashboardName));
+            assertThat(dashboards, hasItem(dashboardName));
         } finally {
             logoutAndLoginAs(false, UserRoles.ADMIN);
             new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
@@ -558,7 +565,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
             signInAndInitDashboardWithEdior();
 
             List<String> dashboards = dashboardsPage.getDashboardsNames();
-            assertFalse(dashboards.contains(dashboardName));
+            assertThat(dashboards, not(hasItem(dashboardName)));
         } finally {
             logoutAndLoginAs(false, UserRoles.ADMIN);
             new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
@@ -579,7 +586,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
             signInAndInitDashboardWithEdior();
 
             List<String> dashboards = dashboardsPage.getDashboardsNames();
-            assertFalse(dashboards.contains(dashboardName));
+            assertThat(dashboards, not(hasItem(dashboardName)));
         } finally {
             logoutAndLoginAs(false, UserRoles.ADMIN);
             new CommonRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
@@ -816,7 +823,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
             permissionsDialog.publish(PublishType.ALL_USERS_IN_THIS_PROJECT);
             permissionsDialog.submit();
 
-            assertFalse(dashboardsPage.isUnlisted());
+            assertFalse(dashboardsPage.isPrivate(), "Dashboard should be public");
             waitForElementVisible(By.cssSelector(".s-btn-ok__got_it"), browser).click();
         } finally {
             logout();
@@ -881,7 +888,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"prepareUsergroupTests"}, groups = {"acl-tests-usergroups", "sanity"})
     public void shouldVisibleToUserInGroup() throws JSONException, IOException {
-        createTestDashboard("Dashboard shared to user group");
+        createTestDashboard(DASHBOARD_IS_SHARED_TO_USER_GROUP);
 
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
         final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
@@ -890,24 +897,26 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         assertEquals(permissionsDialog.getAddedGrantees().size(), 3);
 
         permissionsDialog.submit();
-        assertTrue(checkDashboardVisible("Dashboard shared to user group"));
+        assertTrue(checkDashboardVisible(DASHBOARD_IS_SHARED_TO_USER_GROUP),
+                "Dashboard should be shared to user group");
     }
 
     @Test(dependsOnMethods = {"shouldVisibleToUserInGroup"}, groups = {"acl-tests-usergroups"})
     public void shouldInvisibleToUserIfRelatedGroupIsRemoved() throws JSONException {
-        selectDashboard("Dashboard shared to user group");
+        selectDashboard(DASHBOARD_IS_SHARED_TO_USER_GROUP);
 
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
 
         permissionsDialog.removeGroup(ALCOHOLICS_ANONYMOUS);
         permissionsDialog.submit();
 
-        assertFalse(checkDashboardVisible("Dashboard shared to user group"));
+        assertFalse(checkDashboardVisible(DASHBOARD_IS_SHARED_TO_USER_GROUP),
+                "Dashboard shouldn't share to user group");
     }
 
     @Test(dependsOnMethods = {"shouldInvisibleToUserIfRelatedGroupIsRemoved"}, groups = {"acl-tests-usergroups"})
     public void shouldVisibleToUserIfRelatedGroupIsRemovedButUserIsKept() throws JSONException {
-        selectDashboard("Dashboard shared to user group");
+        selectDashboard(DASHBOARD_IS_SHARED_TO_USER_GROUP);
 
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
         assertEquals(permissionsDialog.getAddedGrantees().size(), 2);
@@ -919,7 +928,8 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         permissionsDialog.removeGroup(ALCOHOLICS_ANONYMOUS);
 
         permissionsDialog.submit();
-        assertTrue(checkDashboardVisible("Dashboard shared to user group"));
+        assertTrue(checkDashboardVisible(DASHBOARD_IS_SHARED_TO_USER_GROUP),
+                "Dashboard should be shared to user group");
     }
 
     @Test(dependsOnMethods = {"prepareUsergroupTests"}, groups = {"acl-tests-usergroups"})
@@ -989,7 +999,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
             waitForDashboardPageLoaded(browser);
 
             List<String> dashboards = dashboardsPage.getDashboardsNames();
-            assertFalse(dashboards.contains("Hide yourself test dashboard"));
+            assertThat(dashboards, not(hasItem("Hide yourself test dashboard")));
         } finally {
             logout();
             signIn(false, UserRoles.ADMIN);

@@ -160,7 +160,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         waitForDataPageLoaded(browser);
         By computedAttributeItem =
                 By.cssSelector(String.format(".s-title-%s a", CssUtils.simplifyText(COMPUTED_ATTRIBUTE_NAME)));
-        assertTrue(browser.findElements(computedAttributeItem).isEmpty());
+        assertTrue(browser.findElements(computedAttributeItem).isEmpty(), "Computed attribute item should be empty");
 
         AttributePage.getInstance(browser).moveToCreateAttributePage().createComputedAttribute(DEFINITION);
         Screenshots.takeScreenshot(browser, "computed-attribute-details-page", this.getClass());
@@ -224,7 +224,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         By newNameAttributeItem =
                 By.cssSelector(String.format(".s-title-%s a", CssUtils.simplifyText(newAttributeName)));
         initAttributePage();
-        assertTrue(!browser.findElements(newNameAttributeItem).isEmpty());
+        assertFalse(browser.findElements(newNameAttributeItem).isEmpty(), "New name attribute item shouldn't be empty");
         initAttributePage().renameAttribute(newAttributeName, COMPUTED_ATTRIBUTE_NAME);
         Screenshots.takeScreenshot(browser, "attribute-list", this.getClass());
     }
@@ -338,7 +338,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
         TableReport report = openTableReport(name);
         assertEquals(report.getAttributeHeaders(), asList(attribute));
-        assertTrue(reportPage.getFilters().isEmpty());
+        assertTrue(reportPage.getFilters().isEmpty(), "Shouldn't have filter");
 
         report = drillOnAttributeFromReport(report,value);
         assertEquals(report.getAttributeHeaders(), asList(target));
@@ -346,7 +346,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
         report = backToPreviousReport();
         assertEquals(report.getAttributeHeaders(), asList(attribute));
-        assertTrue(reportPage.getFilters().isEmpty());
+        assertTrue(reportPage.getFilters().isEmpty(), "Shouldn't have filter");
     }
 
     @Test(dependsOnMethods = {"createReportWithComputedAttribute"})

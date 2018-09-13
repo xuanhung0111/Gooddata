@@ -222,7 +222,7 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
             takeScreenshot(browser, "configReportTitleVisibility - report title is visible", getClass());
 
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            assertTrue(report.isReportTitleVisible());
+            assertTrue(report.isReportTitleVisible(), "Report title should be visible");
 
             dashboardsPage.editDashboard();
             WidgetConfigPanel configPanel = WidgetConfigPanel.openConfigurationPanelFor(report.getRoot(), browser);
@@ -233,7 +233,7 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
             takeScreenshot(browser, "configReportTitleVisibility - report title is not visible", getClass());
 
             report = dashboardsPage.getContent().getLatestReport(TableReport.class);
-            assertFalse(report.isReportTitleVisible());
+            assertFalse(report.isReportTitleVisible(), "Report title shouldn't be visible");
         } finally {
             dashboardsPage.deleteDashboard();
         }

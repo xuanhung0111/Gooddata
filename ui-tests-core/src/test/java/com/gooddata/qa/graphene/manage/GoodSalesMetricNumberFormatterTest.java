@@ -18,6 +18,8 @@ import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -42,7 +44,7 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
         assertTrue(Formatter.DEFAULT.toString().startsWith(initMetricPage()
                 .openMetricDetailPage(METRIC_NUMBER_OF_ACTIVITIES)
                 .changeMetricFormatButDiscard(Formatter.BARS)
-                .getMetricFormat()));
+                .getMetricFormat()), "Be wrong format");
         Screenshots.takeScreenshot(browser, "testNumberFormatEditor-beforeChangeFormat", getClass());
         MetricDetailsPage.getInstance(browser).changeMetricFormat(Formatter.BARS);
         Screenshots.takeScreenshot(browser, "testNumberFormatEditor-afterChangeFormat", getClass());
@@ -60,7 +62,7 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
             List<String> values = reportPage.selectReportVisualisation(ReportTypes.TABLE)
                     .getTableReport().getRawMetricValues();
             assertEquals(values.size(), 1);
-            assertTrue(Formatter.BARS.toString().contains(values.get(0)));
+            assertThat(Formatter.BARS.toString(), containsString(values.get(0)));
 
             assertEquals(reportPage.showConfiguration()
                     .showCustomNumberFormat()
@@ -93,7 +95,7 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
             reportPage.changeNumberFormat(Formatter.BARS);
             values = report.getRawMetricValues();
             assertEquals(values.size(), 1);
-            assertTrue(Formatter.BARS.toString().contains(values.get(0)));
+            assertThat(Formatter.BARS.toString(), containsString(values.get(0)));
         } finally {
             resetMetricFormat();
         }
@@ -134,7 +136,7 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
                     waitForElementVisible(MetricFormatterDialog.LOCATOR, browser));
             formatterDialog.changeFormatButDiscard(Formatter.BARS);
             // don't know why get text of metric format in metric detail page return #,##0 instead of #,##0.00
-            assertTrue(Formatter.DEFAULT.toString().startsWith(editFormat.getText()));
+            assertTrue(Formatter.DEFAULT.toString().startsWith(editFormat.getText()), "Be wrong format");
 
             Screenshots.takeScreenshot(browser, "editExistFormatInSnDDialog-beforeChangeFormat", getClass());
             waitForElementVisible(editFormat).click();

@@ -55,7 +55,7 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
 
         TableReport report = openTableReport(ATTRIBUTE_REPORT_NAME);
         assertEquals(report.getAttributeHeaders(), asList(ATTR_ACCOUNT));
-        assertTrue(reportPage.getFilters().isEmpty());
+        assertTrue(reportPage.getFilters().isEmpty(), "Report shouldn't have filter");
 
         report = drillOnAttributeFromReport(report, ATTRIBUTE_VALUE_TO_DRILL);
         assertEquals(report.getAttributeHeaders(), asList(ATTR_PRODUCT));
@@ -63,7 +63,7 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
 
         report = backToPreviousReport();
         assertEquals(report.getAttributeHeaders(), asList(ATTR_ACCOUNT));
-        assertTrue(reportPage.getFilters().isEmpty());
+        assertTrue(reportPage.getFilters().isEmpty(), "Report shouldn't have filter");
     }
 
     @Test(dependsOnMethods = {"drillDownAttributeElement"})
@@ -77,18 +77,20 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
 
         report = backToPreviousReport();
         assertEquals(report.getAttributeHeaders(), asList(ATTR_ACCOUNT));
-        assertTrue(reportPage.getFilters().isEmpty());
+        assertTrue(reportPage.getFilters().isEmpty(), "Report shouldn't have filter");
     }
 
     @Test(dependsOnMethods = {"updateDrillDownInReport"})
     public void removeDrillDownForAttribute() {
         TableReport report = openTableReport(ATTRIBUTE_REPORT_NAME);
-        assertTrue(report.isDrillable(ATTRIBUTE_VALUE_TO_DRILL, CellType.ATTRIBUTE_VALUE));
+        assertTrue(report.isDrillable(ATTRIBUTE_VALUE_TO_DRILL, CellType.ATTRIBUTE_VALUE),
+                "Report should drill to attribute value");
 
         clearDrillAttribute(ATTR_ACCOUNT);
 
         report = openTableReport(ATTRIBUTE_REPORT_NAME);
-        assertFalse(report.isDrillable(ATTRIBUTE_VALUE_TO_DRILL, CellType.ATTRIBUTE_VALUE));
+        assertFalse(report.isDrillable(ATTRIBUTE_VALUE_TO_DRILL, CellType.ATTRIBUTE_VALUE),
+                "Report shouldn't drill to attribute value");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -102,7 +104,7 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
 
         TableReport report = openTableReport(METRIC_REPORT_NAME);
         assertEquals(report.getAttributeHeaders(), asList(ATTR_STAGE_NAME));
-        assertTrue(reportPage.getFilters().isEmpty());
+        assertTrue(reportPage.getFilters().isEmpty(), "Report shouldn't have filter");
 
         report = drillOnMetricFromReport(report, METRIC_VALUE_TO_DRILL);
         assertEquals(report.getAttributeHeaders(), asList(ATTR_ACCOUNT));
@@ -110,18 +112,20 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
 
         report = backToPreviousReport();
         assertEquals(report.getAttributeHeaders(), asList(ATTR_STAGE_NAME));
-        assertTrue(reportPage.getFilters().isEmpty());
+        assertTrue(reportPage.getFilters().isEmpty(), "Report shouldn't have filter");
     }
 
     @Test(dependsOnMethods = {"drillDownMetric"})
     public void removeDrillDownForMetric() {
         TableReport report = openTableReport(METRIC_REPORT_NAME);
-        assertTrue(report.isDrillable(METRIC_VALUE_TO_DRILL, CellType.METRIC_VALUE));
+        assertTrue(report.isDrillable(METRIC_VALUE_TO_DRILL, CellType.METRIC_VALUE),
+                "Report should drill to metric value");
 
         reportPage.showConfiguration()
             .removeDrillStepInConfigPanel(METRIC_AMOUNT, ATTR_ACCOUNT)
             .waitForReportExecutionProgress();
-        assertFalse(report.isDrillable(METRIC_VALUE_TO_DRILL, CellType.METRIC_VALUE));
+        assertFalse(report.isDrillable(METRIC_VALUE_TO_DRILL, CellType.METRIC_VALUE),
+                "Report shouldn't drill to metric value");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -174,7 +178,7 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
 
         TableReport report = openTableReport(reportName);
         assertEquals(report.getAttributeHeaders(), asList(ATTR_ACCOUNT));
-        assertTrue(reportPage.getFilters().isEmpty());
+        assertTrue(reportPage.getFilters().isEmpty(), "Report shouldn't have filter");
 
         report = drillOnAttributeFromReport(report, ATTRIBUTE_VALUE_TO_DRILL);
         assertEquals(report.getAttributeHeaders(), asList(ATTR_PRODUCT));
@@ -182,7 +186,7 @@ public class GoodSalesDrillReportInReportPageTest extends GoodSalesAbstractTest 
 
         report = backToPreviousReport();
         assertEquals(report.getAttributeHeaders(), asList(ATTR_ACCOUNT));
-        assertTrue(reportPage.getFilters().isEmpty());
+        assertTrue(reportPage.getFilters().isEmpty(), "Report shouldn't have filter");
 
         report = drillOnMetricFromReport(report, metricValueToDrill);
         assertEquals(report.getAttributeHeaders(), asList(ATTR_DEPARTMENT));

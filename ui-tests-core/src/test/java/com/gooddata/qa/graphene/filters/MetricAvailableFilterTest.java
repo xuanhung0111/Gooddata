@@ -54,6 +54,9 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -270,8 +273,8 @@ public class MetricAvailableFilterTest extends AbstractDashboardWidgetTest {
                 .openWidgetConfigPanel(filterName)
                 .getTab(Tab.AVAILABLE_VALUES, AvailableValuesConfigPanel.class)
                 .openMetricPickerDropDown();
-        assertFalse(selectItemPopupPanel.getItems().contains(PRIVATE_EDITOR_METRIC));
-        assertTrue(selectItemPopupPanel.getHiddenItems().contains(PRIVATE_METRIC));
+        assertThat(selectItemPopupPanel.getItems(), not(hasItem(PRIVATE_EDITOR_METRIC)));
+        assertThat(selectItemPopupPanel.getHiddenItems(), hasItem(PRIVATE_METRIC));
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"attribute", "prompt"})
@@ -360,7 +363,7 @@ public class MetricAvailableFilterTest extends AbstractDashboardWidgetTest {
                 .getDashboardEditFilter()
                 .openWidgetConfigPanel(filterName)
                 .getTab(Tab.AVAILABLE_VALUES, AvailableValuesConfigPanel.class);
-        assertTrue(availableValuesConfigPanel.getSelectedMetrics().contains(METRIC_AVAILABLE));
+        assertThat(availableValuesConfigPanel.getSelectedMetrics(), hasItem(METRIC_AVAILABLE));
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"attribute", "prompt"})

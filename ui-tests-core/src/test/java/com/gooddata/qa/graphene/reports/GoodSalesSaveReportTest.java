@@ -104,11 +104,11 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         reportPage.openVersion(1);
         checkBlueBar(browser);
         waitForAnalysisPageLoaded(browser);
-        assertTrue(reportPage.verifyOldVersionState());
+        assertTrue(reportPage.verifyOldVersionState(), "Should be old version");
         reportPage.setReportName(VERSION_REPORT_2);
         sleepTightInSeconds(3);
         reportPage.revertToCurrentVersion();
-        assertTrue(waitForReportLoading().hasUnsavedVersion());
+        assertTrue(waitForReportLoading().hasUnsavedVersion(), "Report should have unsaved version");
         takeScreenshot(browser, "workWithOldVersion - hasUnsavedVersion", getClass());
         assertThat(reportPage.saveReport().getVersionsCount(), equalTo(3));
     }
@@ -118,7 +118,8 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         createReport(new UiReportDefinition().withName("R1").withWhats("Amount").withHows("Opp. Snapshot"),
                 "saveTooLargeReport");
         waitForAnalysisPageLoaded(browser);
-        assertTrue(waitForFragmentVisible(reportPage).isReportTooLarge());
+        assertTrue(waitForFragmentVisible(reportPage).isReportTooLarge(),
+                "The created report is not large report type");
     }
 
     @Test(dependsOnGroups = {"createProject"})

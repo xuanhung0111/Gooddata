@@ -198,8 +198,9 @@ public class MetricVisibilityTest extends GoodSalesAbstractTest {
         try {
             initReportsPage().setVisibility(false, REPORT_AMOUNT_BY_STAGE_NAME);
             initDashboardsPage().addReportToDashboard(REPORT_AMOUNT_BY_STAGE_NAME).saveDashboard();
-            assertFalse(initReportsPage().isPrivateReport(REPORT_AMOUNT_BY_STAGE_NAME));
-            assertFalse(initMetricPage().isPrivateMetric(METRIC_AMOUNT));
+            assertFalse(initReportsPage().isPrivateReport(REPORT_AMOUNT_BY_STAGE_NAME),
+                    REPORT_AMOUNT_BY_STAGE_NAME + "Should be public report");
+            assertFalse(initMetricPage().isPrivateMetric(METRIC_AMOUNT), METRIC_AMOUNT + "Should be public metric");
         } finally {
             commonRestRequest.deleteObjectsUsingCascade(getReportByTitle(REPORT_AMOUNT_BY_STAGE_NAME).getUri());
         }

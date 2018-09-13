@@ -25,7 +25,6 @@ import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
-import com.gooddata.qa.graphene.fragments.reports.report.ExportXLSXDialog;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.google.common.collect.Lists;
@@ -39,7 +38,6 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.io.File;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
@@ -57,10 +55,11 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.String.valueOf;
 import static java.nio.file.Files.deleteIfExists;
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static java.util.Arrays.asList;
+import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -525,9 +524,9 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
             browser.get(embedUri);
             String notAuthorizedMessage = LoginFragment.getInstance(browser).getNotAuthorizedMessage();
             log.info("Not authorized message: " + notAuthorizedMessage);
-            assertTrue(notAuthorizedMessage.contains("ACCESS DENIED"));
-            assertTrue(notAuthorizedMessage
-                    .contains("You are not authorized to access this area. Please contact your administrator."));
+            assertThat(notAuthorizedMessage, containsString("ACCESS DENIED"));
+            assertThat(notAuthorizedMessage,
+                    containsString("You are not authorized to access this area. Please contact your administrator."));
         } finally {
             logoutAndLoginAs(true, UserRoles.ADMIN);
         }
@@ -589,7 +588,8 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
                 .setCustomRecipients(Lists.newArrayList(testParams.getViewerUser()))
                 .schedule();
 
-        assertTrue(initEmailSchedulesPage().isPrivateSchedulePresent(customScheduleSubject));
+        assertTrue(initEmailSchedulesPage().isPrivateSchedulePresent(customScheduleSubject),
+                "Private schedule should be present");
         WebElement schedule1 = EmailSchedulePage.getInstance(browser).getPrivateSchedule(customScheduleSubject);
         assertEquals(EmailSchedulePage.getInstance(browser).getBccEmailsOfPrivateSchedule(schedule1), testParams.getViewerUser());
 
@@ -610,7 +610,8 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
                 .setCustomRecipients(Lists.newArrayList(testParams.getViewerUser()))
                 .schedule();
 
-        assertTrue(initEmailSchedulesPage().isPrivateSchedulePresent(customScheduleSubject));
+        assertTrue(initEmailSchedulesPage().isPrivateSchedulePresent(customScheduleSubject),
+                "Private schedule should be present");
         WebElement schedule2 = EmailSchedulePage.getInstance(browser).getPrivateSchedule(customScheduleSubject);
         assertEquals(EmailSchedulePage.getInstance(browser).getBccEmailsOfPrivateSchedule(schedule2), testParams.getViewerUser());
     }

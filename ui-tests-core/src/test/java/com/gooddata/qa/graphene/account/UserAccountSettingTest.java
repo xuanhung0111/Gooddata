@@ -91,7 +91,7 @@ public class UserAccountSettingTest extends AbstractUITest {
     @Test(dependsOnMethods = { "prepareDataForTest" })
     public void editUserInformation() {
         PersonalInfoDialog personalInfoDialog = initAccountPage().openPersonalInfoDialog();
-        assertFalse(personalInfoDialog.isEmailInputFieldEditable());
+        assertFalse(personalInfoDialog.isEmailInputFieldEditable(), "Email shouldn't be input field");
 
         PersonalInfo personalInfoOrigin = personalInfoDialog.getUserInfo();
         personalInfoDialog.fillInfoFrom(personalInfo);
@@ -113,7 +113,7 @@ public class UserAccountSettingTest extends AbstractUITest {
     @Test(dependsOnMethods = { "prepareDataForTest" })
     public void editUserInformationWithEmptyData() {
         PersonalInfoDialog personalInfoDialog = initAccountPage().openPersonalInfoDialog();
-        assertFalse(personalInfoDialog.isEmailInputFieldEditable());
+        assertFalse(personalInfoDialog.isEmailInputFieldEditable(), "Email shouldn't be input field");
 
         personalInfoDialog.fillInfoFrom(new PersonalInfo())
                 .saveChange();
@@ -129,7 +129,7 @@ public class UserAccountSettingTest extends AbstractUITest {
             ChangePasswordDialog changePasswordDialog = initAccountPage().openChangePasswordDialog();
             changePasswordDialog.enterOldPassword(testParams.getPassword()).enterNewPassword(NEW_PASSWORD)
                     .enterConfirmPassword(NEW_PASSWORD);
-            assertTrue(changePasswordDialog.areAllInputsFilled());
+            assertTrue(changePasswordDialog.areAllInputsFilled(), "All inputs should be filled");
 
             changePasswordDialog.discardChange();
             logout()

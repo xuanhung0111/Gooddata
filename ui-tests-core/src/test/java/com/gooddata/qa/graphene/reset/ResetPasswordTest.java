@@ -141,7 +141,7 @@ public class ResetPasswordTest extends AbstractUITest {
      */
     @Test(dependsOnMethods = {"resetWithValidAndInvalidPassword"}, enabled = false)
     public void openOneProject() {
-        assertTrue(initProjectsPage().isProjectDisplayed(PROJECT_NAME));
+        assertTrue(initProjectsPage().isProjectDisplayed(PROJECT_NAME), PROJECT_NAME + " should display");
 
         ProjectsPage.ProjectItem projectItem = initProjectsPage().getProjectItem(PROJECT_NAME);
         projectItem.open();

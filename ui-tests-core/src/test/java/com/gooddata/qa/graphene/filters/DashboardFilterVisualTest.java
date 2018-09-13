@@ -112,11 +112,11 @@ public class DashboardFilterVisualTest extends GoodSalesAbstractTest {
 
         assertTrue(attributeElements.stream()
                 .filter(e -> e.getText().toLowerCase().contains("on"))
-                .allMatch(this::isSelected));
+                .allMatch(this::isSelected), "All attribute elements should be selected");
 
         assertTrue(attributeElements.stream()
                 .filter(e -> !e.getText().toLowerCase().contains("on"))
-                .allMatch(e -> !isSelected(e)));
+                .allMatch(e -> !isSelected(e)), "All attribute elements shouldn't be selected");
     }
 
     @Test(dependsOnGroups = {"createProject"})

@@ -81,7 +81,7 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
         initVariablePage()
                 .createVariable(new NumericVariable(variable).withDefaultNumber(NUMERIC_VALUE));
 
-        assertTrue(initVariablePage().hasVariable(variable));
+        assertTrue(initVariablePage().hasVariable(variable), variable + " should be listed");
         assertEquals(VariablesPage.getInstance(browser).openVariableFromList(variable).getDefaultNumericValue(),
                 NUMERIC_VALUE);
     }
@@ -94,7 +94,7 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
                 .withDefaultNumber(NUMERIC_VALUE)
                 .withUserSpecificNumber(userProfileUri, NUMERIC_VALUE));
 
-        assertTrue(initVariablePage().hasVariable(NUMERIC_VARIABLE));
+        assertTrue(initVariablePage().hasVariable(NUMERIC_VARIABLE), NUMERIC_VARIABLE + " should be listed");
         assertEquals(VariablesPage.getInstance(browser).openVariableFromList(NUMERIC_VARIABLE)
                 .getUserSpecificNumericValue(userProfileUri), NUMERIC_VALUE);
     }
@@ -107,7 +107,7 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
                 .withAttribute(ATTR_STAGE_NAME)
                 .withAttributeValues(ATTRIBUTE_VALUES));
 
-        assertTrue(initVariablePage().hasVariable(variable));
+        assertTrue(initVariablePage().hasVariable(variable), variable + " should be listed");
         assertEquals(VariablesPage.getInstance(browser).openVariableFromList(variable).getDefaultAttributeValues(),
                 ATTRIBUTE_VALUES);
     }
@@ -121,7 +121,7 @@ public class GoodSalesVariableTest extends GoodSalesAbstractTest {
                 .withAttributeValues(ATTRIBUTE_VALUES)
                 .withUserSpecificValues(userProfileUri, ATTRIBUTE_VALUES));
 
-        assertTrue(initVariablePage().hasVariable(ATTRIBUTE_VARIABLE));
+        assertTrue(initVariablePage().hasVariable(ATTRIBUTE_VARIABLE), ATTRIBUTE_VARIABLE + " should be listed");
         assertEquals(VariablesPage.getInstance(browser).openVariableFromList(ATTRIBUTE_VARIABLE)
                 .getUserSpecificAttributeValues(userProfileUri), ATTRIBUTE_VALUES);
     }

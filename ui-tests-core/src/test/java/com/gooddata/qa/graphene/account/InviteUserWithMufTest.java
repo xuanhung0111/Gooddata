@@ -108,7 +108,7 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
 
         assertEquals(attributeCount, 2, "The MUF has been not applied");
 
-        assertTrue(isUserUsingMuf(defaultMufUri, imapUser));
+        assertTrue(isUserUsingMuf(defaultMufUri, imapUser), "User is not using MUF");
 
         ++expectedMessageCount;
     }

@@ -16,26 +16,21 @@ import com.gooddata.qa.utils.http.variable.VariableRestRequest;
 import com.google.common.collect.Iterables;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
 import java.util.Calendar;
-import java.util.function.Function;
 
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DIMENSION_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Calendar.YEAR;
-import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.xpath;
 import static org.testng.Assert.assertEquals;
@@ -103,13 +98,14 @@ public class GoodSalesKeyMetricTest extends GoodSalesAbstractTest {
         metricConfigPanel.selectMetric(METRIC_AMOUNT, "Created");
 
         waitForKeyMetricUpdateValue();
-        assertFalse(waitForFragmentVisible(metricConfigPanel).isWhenDropdownEnabled());
-        assertTrue(waitForFragmentVisible(metricConfigPanel).isLinkExternalFilterSelected());
+        assertFalse(waitForFragmentVisible(metricConfigPanel).isWhenDropdownEnabled(),
+                "When dropdown should be disabled");
+        assertTrue(waitForFragmentVisible(metricConfigPanel).isLinkExternalFilterSelected(),
+                "Link external filter should be selected");
         widgetConfigPanel.getTab(Tab.METRIC_STYLE, MetricStyleConfigPanel.class)
             .editMetricFormat("#,##0.00USD");
         FiltersConfigPanel filtersConfigPanel = widgetConfigPanel.getTab(Tab.FILTERS, FiltersConfigPanel.class);
-        assertTrue(isEqualCollection(filtersConfigPanel.getAllFilters(),
-                asList(DATE_DIMENSION_CREATED, VARIABLE_NAME, ATTR_PRODUCT)));
+        assertEquals(filtersConfigPanel.getAllFilters(), asList(DATE_DIMENSION_CREATED, ATTR_PRODUCT, VARIABLE_NAME));
         filtersConfigPanel.removeFiltersFromSelectedList(ATTR_PRODUCT);
         widgetConfigPanel.getTab(Tab.METRIC, MetricConfigPanel.class)
             .selectMetric(METRIC_VARIABLE, "Created");

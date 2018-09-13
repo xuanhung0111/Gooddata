@@ -99,12 +99,12 @@ public class LockingReportTest extends AbstractEmbeddedModeTest {
             waitForAnalysisPageLoaded(browser);
             assertTrue(reportPage.isVisibleLockIcon(), "Lock icon should be displayed");
             assertEquals(reportPage.getTooltipFromLockIcon(), VIEWER_HELP_TEXT);
-            assertFalse(reportPage.isVisibleSaveButton());
+            assertFalse(reportPage.isVisibleSaveButton(), "Save button shouldn't be visible");
 
             SimpleMenu simpleMenu = reportPage.openOptionsMenu();
-            assertFalse(simpleMenu.contains("Setting"));
-            assertFalse(simpleMenu.contains("Delete"));
-            assertTrue(simpleMenu.contains("Save as..."));
+            assertFalse(simpleMenu.contains("Setting"), "Simple menu shouldn't have setting option");
+            assertFalse(simpleMenu.contains("Delete"), "Simple menu shouldn't have delete option");
+            assertTrue(simpleMenu.contains("Save as..."), "Simple menu shouldn't have save as option");
             assertFalse(reportPage.openWhatPanel().selectMetrics(singletonList(new WhatItem(METRIC_WON))).isEditable(),
                     "editor can't edit/remove metric in embedded mode");
 

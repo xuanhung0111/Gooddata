@@ -169,7 +169,7 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
                 Graphene.createPageFragment(DashboardDrillDialog.class,
                         waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
         tableReport = drillDialog.getReport(TableReport.class);
-        assertTrue(tableReport.hasValue("Rollup", CellType.TOTAL_HEADER));
+        assertTrue(tableReport.hasValue("Rollup", CellType.TOTAL_HEADER), "Total header should have roll up");
         AssertUtils.assertIgnoreCase(tableReport.getAttributeHeaders(), Arrays.asList("Account"));
         assertIgnoreCaseAndIndex(tableReport.getMetricHeaders(), Sets.newHashSet("Amount"));
         assertEquals(drillDialog.getBreadcrumbsString(),
