@@ -99,6 +99,7 @@ public class AnalysisPage extends AbstractFragment {
         startDrag(source);
         try {
             getActions().moveToElement(target.get()).moveByOffset(1,1).perform();
+            Graphene.waitGui().until(browser -> !isElementPresent(className("s-loading"), target.get()));
         } finally {
             getActions().release().perform();
         }

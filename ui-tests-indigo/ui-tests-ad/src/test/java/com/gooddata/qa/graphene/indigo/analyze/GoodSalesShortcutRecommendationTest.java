@@ -48,7 +48,7 @@ public class GoodSalesShortcutRecommendationTest extends AbstractAnalyseTest {
                 .searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC);
 
         Supplier<WebElement> recommendation = () ->
-            waitForElementPresent(ShortcutPanel.AS_A_COLUMN_CHART.getLocator(), browser);
+                waitForElementPresent(ShortcutPanel.AS_A_COLUMN_CHART.getLocator(), browser);
 
         ChartReport report = analysisPage.drag(metric, recommendation)
                 .waitForReportComputing().getChartReport();
@@ -78,7 +78,7 @@ public class GoodSalesShortcutRecommendationTest extends AbstractAnalyseTest {
                 .searchAndGet(METRIC_SNAPSHOT_BOP, FieldType.METRIC);
 
         Supplier<WebElement> trendRecommendation = () ->
-            waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
+                waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
 
         ChartReport report = analysisPage.drag(metric, trendRecommendation)
                 .waitForReportComputing().getChartReport();
@@ -100,11 +100,11 @@ public class GoodSalesShortcutRecommendationTest extends AbstractAnalyseTest {
                 .searchAndGet(METRIC_SNAPSHOT_BOP, FieldType.METRIC);
 
         Supplier<WebElement> trendRecommendation = () ->
-            waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
+                waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
 
         // TODO: Flaky test: Missing drag waiting as before showing Trend Recommendation there is loading recommendation
         analysisPage.drag(metric, trendRecommendation)
-            .waitForReportComputing();
+                .waitForReportComputing();
 
         assertThat(analysisPage.getAttributesBucket().getItemNames(), hasItem(DATE));
         assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"), "Filter should display");
@@ -119,7 +119,7 @@ public class GoodSalesShortcutRecommendationTest extends AbstractAnalyseTest {
                 .searchAndGet(FACT_AMOUNT, FieldType.FACT);
 
         Supplier<WebElement> recommendation = () ->
-            waitForElementPresent(ShortcutPanel.AS_A_COLUMN_CHART.getLocator(), browser);
+                waitForElementPresent(ShortcutPanel.AS_A_COLUMN_CHART.getLocator(), browser);
 
         assertEquals(analysisPage.drag(fact, recommendation)
                 .waitForReportComputing()
@@ -132,10 +132,10 @@ public class GoodSalesShortcutRecommendationTest extends AbstractAnalyseTest {
         analysisPage.resetToBlankState();
 
         recommendation = () ->
-            waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
+                waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
 
         analysisPage.drag(fact, recommendation)
-            .waitForReportComputing();
+                .waitForReportComputing();
         assertEquals(parseFilterText(analysisPage.getFilterBuckets().getDateFilterText()), Arrays.asList("Closed", "Last 4 quarters"));
         assertThat(analysisPage.getAttributesBucket().getItemNames(), hasItem(DATE));
         assertEquals(analysisPage.getAttributesBucket().getSelectedGranularity(), "Quarter");
