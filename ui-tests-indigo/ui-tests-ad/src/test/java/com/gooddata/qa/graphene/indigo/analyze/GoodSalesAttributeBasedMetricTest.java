@@ -3,6 +3,8 @@ package com.gooddata.qa.graphene.indigo.analyze;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -35,19 +37,21 @@ public class GoodSalesAttributeBasedMetricTest extends AbstractAnalyseTest {
         assertTrue(analysisPage.addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
                 .waitForReportComputing()
                 .getChartReport()
-                .getTrackersCount() > 0);
+                .getTrackersCount() > 0, "Tracker should display");
 
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND),
+                "Recommendation should be visible");
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE),
+                "Recommendation should be visible");
 
         analysisPage.undo();
-        assertTrue(metricsBucket.isEmpty());
+        assertTrue(metricsBucket.isEmpty(), "Metric bucket should be empty");
 
         analysisPage.redo();
-        assertFalse(metricsBucket.isEmpty());
+        assertFalse(metricsBucket.isEmpty(), "Metric bucket is empty");
 
         assertEquals(analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing()
@@ -63,7 +67,7 @@ public class GoodSalesAttributeBasedMetricTest extends AbstractAnalyseTest {
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .getChartReport()
-                .getTrackersCount() > 0);
+                .getTrackersCount() > 0, "Tracker should display");
 
         analysisPage.getMetricsBucket()
             .getMetricConfiguration(COUNT_OF_ACTIVITY)
@@ -72,7 +76,7 @@ public class GoodSalesAttributeBasedMetricTest extends AbstractAnalyseTest {
 
         assertTrue(analysisPage.waitForReportComputing()
                 .getChartReport()
-                .getTrackersCount() > 0);
+                .getTrackersCount() > 0, "Tracker should display");
 
         checkingOpenAsReport("showInPercent");
     }
@@ -84,7 +88,7 @@ public class GoodSalesAttributeBasedMetricTest extends AbstractAnalyseTest {
                 .addAttribute(ATTR_ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .getChartReport()
-                .getTrackersCount() > 0);
+                .getTrackersCount() > 0,"Tracker should display");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -100,13 +104,12 @@ public class GoodSalesAttributeBasedMetricTest extends AbstractAnalyseTest {
             .get()
             .split("-")[2];
 
-        assertTrue(analysisPage.removeMetric(COUNT_OF_ACTIVITY)
+        assertThat(analysisPage.removeMetric(COUNT_OF_ACTIVITY)
             .waitForReportComputing()
             .addMetric(ATTR_ACTIVITY, FieldType.ATTRIBUTE)
             .waitForReportComputing()
             .getMetricsBucket()
             .get(COUNT_OF_ACTIVITY)
-            .getAttribute("class")
-            .contains("s-id-" + identifier));
+            .getAttribute("class"), containsString("s-id-" + identifier));
     }
 }

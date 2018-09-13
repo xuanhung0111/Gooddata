@@ -42,7 +42,8 @@ public class OverTimeComparisonRecommendationTest extends AbstractAdE2ETest {
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
 
-        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser),
+                "Recommendation comparison with period shouldn't be present");
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing();
 
@@ -53,7 +54,8 @@ public class OverTimeComparisonRecommendationTest extends AbstractAdE2ETest {
 
         analysisPage.waitForReportComputing();
 
-        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser),
+                "Recommendation comparison with period shouldn't be present");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -61,7 +63,8 @@ public class OverTimeComparisonRecommendationTest extends AbstractAdE2ETest {
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
 
-        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser),
+                "Recommendation comparison with period shouldn't be present");
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing();
 
@@ -77,7 +80,8 @@ public class OverTimeComparisonRecommendationTest extends AbstractAdE2ETest {
         initAnalysePage().addMetric(METRIC_SNAPSHOT_BOP)
             .waitForReportComputing();
 
-        assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-with-period"), browser));
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-with-period"), browser),
+                "Recommendation metric with period shouldn't be present");
         RecommendationContainer container = Graphene.createPageFragment(RecommendationContainer.class,
             waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         container.<TrendingRecommendation>getRecommendation(RecommendationStep.SEE_TREND).apply();
@@ -90,7 +94,8 @@ public class OverTimeComparisonRecommendationTest extends AbstractAdE2ETest {
         assertThat(waitForElementVisible(cssSelector(LEGEND_ITEM_NAME), browser).getText(),
                 containsString(METRIC_SNAPSHOT_BOP_YEAR_AGO));
 
-        assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-with-period"), browser));
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-with-period"), browser),
+                "Recommendation metric with period shouldn't be present");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -100,8 +105,10 @@ public class OverTimeComparisonRecommendationTest extends AbstractAdE2ETest {
             .addStack(ATTR_ACCOUNT)
             .waitForReportComputing();
 
-        assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-with-period"), browser));
-        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-with-period"), browser),
+                "Recommendation metric with period shouldn't be present");
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser),
+                "Recommendation comparison with period shouldn't be present");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -111,8 +118,10 @@ public class OverTimeComparisonRecommendationTest extends AbstractAdE2ETest {
             .addStack(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing();
 
-        assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-with-period"), browser));
-        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-with-period"), browser),
+                "Recommendation metric with period shouldn't be present");
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser),
+                "Recommendation comparison with period shouldn't be present");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -121,9 +130,12 @@ public class OverTimeComparisonRecommendationTest extends AbstractAdE2ETest {
             .addStack(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing();
 
-        assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-with-period"), browser));
-        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
-        assertTrue(isElementPresent(cssSelector(".s-recommendation-trending"), browser));
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-with-period"), browser),
+                "Recommendation metric with period shouldn't be present");
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser),
+                "Recommendation comparison with period shouldn't be present");
+        assertTrue(isElementPresent(cssSelector(".s-recommendation-trending"), browser),
+                "Recommendation trending should present");
 //        enable with CL-9443
 //        assertTrue(isElementPresent(cssSelector(".s-recommendation-comparison"), browser));
     }

@@ -83,11 +83,9 @@ public class GoodSalesShortcutRecommendationTest extends AbstractAnalyseTest {
         ChartReport report = analysisPage.drag(metric, trendRecommendation)
                 .waitForReportComputing().getChartReport();
 
-        assertTrue(report.getTrackersCount() >= 1, "Number of Trackers should be greater or equal 1");
-        assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"),
-                "Attribute filter should display");
-        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText("Activity")),
-                Arrays.asList("Activity", "Last 4 quarters"));
+        assertTrue(report.getTrackersCount() >= 1, "Trackers should display");
+        assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"), "Filter should display");
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText("Activity")), Arrays.asList("Activity", "Last 4 quarters"));
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
@@ -109,12 +107,9 @@ public class GoodSalesShortcutRecommendationTest extends AbstractAnalyseTest {
             .waitForReportComputing();
 
         assertThat(analysisPage.getAttributesBucket().getItemNames(), hasItem(DATE));
-        assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"),
-                "Attribute filter should display");
-        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText("Activity")),
-                Arrays.asList("Activity", "Last 4 quarters"));
-        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1,
-                "Number of Trackers should be greater or equal 1");
+        assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"), "Filter should display");
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText("Activity")), Arrays.asList("Activity", "Last 4 quarters"));
+        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1, "Tracker should display");
         checkingOpenAsReport("displayWhenDraggingFirstMetric");
     }
 

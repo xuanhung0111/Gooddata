@@ -51,7 +51,7 @@ public class AggregationResultTest extends AbstractAnalyseTest {
 
         tableReport.deleteTotalsResultCell(AggregationItem.MAX, METRIC_NUMBER_OF_ACTIVITIES);
         Screenshots.takeScreenshot(browser, "delete-aggregation-result-from-cell", getClass());
-        assertTrue(tableReport.isAddTotalResultCellButtonVisible());
+        assertTrue(tableReport.isAddTotalResultCellButtonVisible(), "Add total result cell button should be visible");
     }
 
     @Test(dependsOnGroups = "createProject")

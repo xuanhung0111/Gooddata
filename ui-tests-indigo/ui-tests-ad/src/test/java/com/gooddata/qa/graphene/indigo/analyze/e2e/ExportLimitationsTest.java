@@ -29,7 +29,7 @@ public class ExportLimitationsTest extends AbstractAdE2ETest {
             .addStack(ATTR_ACTIVITY_TYPE)
             .waitForReportComputing()
             .getPageHeader()
-            .isExportButtonEnabled());
+            .isExportButtonEnabled(), "Export button should be disabled");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -38,6 +38,6 @@ public class ExportLimitationsTest extends AbstractAdE2ETest {
             .addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing()
             .getPageHeader()
-            .isExportButtonEnabled());
+            .isExportButtonEnabled(), "Export button should be disabled");
     }
 }

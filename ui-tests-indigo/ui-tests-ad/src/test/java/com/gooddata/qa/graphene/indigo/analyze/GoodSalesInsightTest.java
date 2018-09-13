@@ -23,6 +23,8 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACT
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -169,7 +171,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
         takeScreenshot(browser, type.toString() + " is created", getClass());
 
         //make sure data is cleared before opening insight
-        assertTrue(analysisPage.resetToBlankState().isBlankState());
+        assertTrue(analysisPage.resetToBlankState().isBlankState(), "State should be blank");
         assertEquals(analysisPage.openInsight(insight).waitForReportComputing().getChartReport().getChartType(),
                 type.getLabel(), "The expected chart type is not displayed");
         assertEquals(analysisPage.getChartReport().getTrackersCount(), expectedTrackersCount,
@@ -190,7 +192,7 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
         takeScreenshot(browser, "Table-Chart-is-created", getClass());
 
         //make sure data is cleared before opening insight
-        assertTrue(analysisPage.resetToBlankState().isBlankState());
+        assertTrue(analysisPage.resetToBlankState().isBlankState(), "State should be blank");
         assertEquals(
                 analysisPage.openInsight(insight)
                         .waitForReportComputing()
@@ -321,12 +323,12 @@ public class GoodSalesInsightTest extends AbstractAnalyseTest {
         testParams.setProjectId(blankProjectId);
         try {
             initAnalysePage();
-            assertTrue(browser.getCurrentUrl().contains(blankProjectId));
+            assertThat(browser.getCurrentUrl(), containsString(blankProjectId));
         } finally {
             testParams.setProjectId(mainProjectId);
             initAnalysePage();
             deleteProject(blankProjectId);
-            assertTrue(browser.getCurrentUrl().contains(mainProjectId));
+            assertThat(browser.getCurrentUrl(), containsString(mainProjectId));
             assertTrue(analysisPage.isBlankState(), "AD does not show blank state after switching project");
         }
     }

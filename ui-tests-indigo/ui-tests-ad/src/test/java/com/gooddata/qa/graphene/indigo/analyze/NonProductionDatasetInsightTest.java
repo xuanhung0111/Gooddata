@@ -70,7 +70,7 @@ public class NonProductionDatasetInsightTest extends AbstractAnalyseTest {
             .expandConfiguration()
             .clickAddAttributeFilter()
             .getAllAttributesInViewPort()
-            .size() > 0);
+            .size() > 0, "Attribute shouldn't be empty in view port");
 
         analysisPage.saveInsight(insight);
         panel.changeDataset(PRODUCTION_DATASET);
@@ -84,6 +84,6 @@ public class NonProductionDatasetInsightTest extends AbstractAnalyseTest {
             .expandConfiguration()
             .clickAddAttributeFilter()
             .getAllAttributesInViewPort()
-            .size() > 0);
+            .size() > 0, "Attribute shouldn't be empty in view port");
     }
 }

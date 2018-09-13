@@ -20,7 +20,6 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static java.util.Arrays.asList;
 import static org.openqa.selenium.By.className;
 
 /**
@@ -141,14 +140,6 @@ public class CataloguePanel extends AbstractFragment {
     public List<String> getFieldNamesInViewPort() {
         waitForItemLoaded();
         return getElementTexts(items);
-    }
-
-    public boolean hasItem(String item) {
-        return hasItems(item);
-    }
-
-    public boolean hasItems(String... items) {
-        return getFieldNamesInViewPort().containsAll(asList(items));
     }
 
     public boolean isEmpty() {

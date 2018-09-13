@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_WON;
@@ -10,6 +9,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PERCENT_OF_GO
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.openqa.selenium.By.className;
@@ -22,7 +22,6 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.jboss.arquillian.graphene.Graphene;
-import org.jboss.arquillian.graphene.findby.ByJQuery;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.Test;
 
@@ -63,16 +62,16 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
                 final String cssClass = input.getAttribute("class");
                 return cssClass.contains(FieldType.METRIC.toString()) ||
                         cssClass.contains(FieldType.FACT.toString());
-            })
-        );
+            }), "Catalogue panel should contain metric and fact");
 
         cataloguePanel.filterCatalog(CatalogFilterType.ATTRIBUTES)
             .search("am");
 
-        assertTrue(cataloguePanel.getFieldsInViewPort()
-            .stream()
-            .allMatch(input -> input.getAttribute("class").contains(FieldType.ATTRIBUTE.toString()))
-        );
+        assertTrue(
+            cataloguePanel.getFieldsInViewPort()
+                .stream()
+                .allMatch(input -> input.getAttribute("class").contains(FieldType.ATTRIBUTE.toString())),
+            "Catalogue panel should contain metric and fact");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -84,7 +83,8 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
         cataloguePanel.filterCatalog(CatalogFilterType.ATTRIBUTES);
         analysisPage.addAttribute(ATTR_STAGE_NAME)
             .waitForReportComputing();
-        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
+        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1,
+                "Number of Trackers should be greater or equal 1");
     }
 
     @Test(dependsOnGroups = {"createProject"}, description = "https://jira.intgdc.com/browse/CL-6942")
@@ -131,11 +131,11 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
             final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
 
             cataloguePanel.search("<button> test XSS </button>");
-            assertTrue(cataloguePanel.isEmpty());
+            assertTrue(cataloguePanel.isEmpty(), "Catalogue Panel should be empty");
             cataloguePanel.search("<script> alert('test'); </script>");
-            assertTrue(cataloguePanel.isEmpty());
+            assertTrue(cataloguePanel.isEmpty(), "Catalogue Panel should be empty");
             cataloguePanel.search("<button>");
-            assertTrue(cataloguePanel.hasItems(xssMetric, xssAttribute));
+            assertEquals(cataloguePanel.getFieldNamesInViewPort(), asList(xssMetric, xssAttribute));
 
             StringBuilder expected = new StringBuilder(xssMetric).append("\n")
                     .append("Field Type\n")
@@ -154,9 +154,10 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
 
             analysisPage.addMetric(xssMetric).addAttribute(xssAttribute)
                 .waitForReportComputing();
-            assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(xssMetric));
-            assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(xssAttribute));
-            assertTrue(analysisPage.getFilterBuckets().isFilterVisible(xssAttribute));
+            assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(xssMetric));
+            assertEquals(analysisPage.getAttributesBucket().getItemNames(), singletonList(xssAttribute));
+            assertTrue(analysisPage.getFilterBuckets().isFilterVisible(xssAttribute),
+                    xssAttribute + "filter should display");
             assertEquals(analysisPage.getChartReport().getTooltipTextOnTrackerByIndex(0),
                     asList(asList(xssAttribute, "true"), asList(xssMetric, "1,160.9%")));
         } finally {
@@ -200,7 +201,7 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
 
         Stream.of(CatalogFilterType.values()).forEach(type -> {
             cataloguePanel.filterCatalog(type).search("abcxyz");
-            assertTrue(cataloguePanel.isEmpty());
+            assertTrue(cataloguePanel.isEmpty(), "Catalogue panel should be empty");
             assertEquals(cataloguePanel.getEmptyMessage(), "No data matching\n\"abcxyz\"");
         });
 
@@ -208,10 +209,10 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE);
         Stream.of(CatalogFilterType.values()).forEach(type -> {
             cataloguePanel.filterCatalog(type).search("Am");
-            assertTrue(cataloguePanel.isEmpty());
+            assertTrue(cataloguePanel.isEmpty(), "Catalogue panel should be empty");
 
             assertTrue(waitForElementVisible(className("s-unavailable-items-matched"), browser)
-                    .getText().matches("^\\d unrelated data item[s]? hidden$"));
+                    .getText().matches("^\\d unrelated data item[s]? hidden$"), "Be wrong format text");
         });
     }
 
@@ -219,6 +220,6 @@ public class GoodSalesCatalogueTest extends AbstractAnalyseTest {
         initMetricPage()
             .openMetricDetailPage(metric)
             .deleteObject();
-        assertFalse(MetricPage.getInstance(browser).isMetricVisible(metric));
+        assertFalse(MetricPage.getInstance(browser).isMetricVisible(metric), "Deleted metric shouldn't be visible");
     }
 }

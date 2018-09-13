@@ -124,9 +124,8 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
 
         panel.uncheckAllCheckbox();
         panel.selectItem("Email");
-        assertFalse(panel.getApplyButton()
-                .getAttribute("class")
-                .contains("disabled"));
+        assertFalse(panel.getApplyButton().getAttribute("class").contains("disabled"),
+                "Apply button should be disabled");
 
         panel.getApplyButton().click();
         assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText(ATTR_ACTIVITY_TYPE)), Arrays.asList(ATTR_ACTIVITY_TYPE, "Email"));

@@ -70,15 +70,18 @@ public class MetricBucketTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"})
     public void should_be_possible_to_open_and_close_configuration() {
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES);
-        assertFalse(isElementPresent(cssSelector(".s-bucket-measures input[type=checkbox]"), browser));
+        assertFalse(isElementPresent(cssSelector(".s-bucket-measures input[type=checkbox]"), browser),
+                "Checkbox shouldn't display");
 
         MetricConfiguration configuration = analysisPage.getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
-        assertTrue(isElementPresent(cssSelector(".s-bucket-measures input[type=checkbox]"), browser));
+        assertTrue(isElementPresent(cssSelector(".s-bucket-measures input[type=checkbox]"), browser),
+                "Checkbox should display");
 
         configuration.collapseConfiguration();
-        assertFalse(isElementPresent(cssSelector(".s-bucket-measures input[type=checkbox]"), browser));
+        assertFalse(isElementPresent(cssSelector(".s-bucket-measures input[type=checkbox]"), browser),
+                "Checkbox shouldn't display");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -99,16 +102,16 @@ public class MetricBucketTest extends AbstractAdE2ETest {
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
-        assertFalse(configuration.isShowPercentEnabled());
+        assertFalse(configuration.isShowPercentEnabled(), "Show percent should be disabled");
 
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE);
-        assertTrue(configuration.isShowPercentEnabled());
+        assertTrue(configuration.isShowPercentEnabled(), "Show percent should be enabled");
 
         assertFalse(analysisPage.addMetric(METRIC_QUOTA)
             .getMetricsBucket()
             .getMetricConfiguration(METRIC_QUOTA)
             .expandConfiguration()
-            .isShowPercentEnabled());
+            .isShowPercentEnabled(), "Show percent should be disabled");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -137,7 +140,7 @@ public class MetricBucketTest extends AbstractAdE2ETest {
         assertFalse(analysisPage.removeMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing()
             .getChartReport()
-            .isLegendVisible());
+            .isLegendVisible(), "Legend shouldn't display");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -154,7 +157,7 @@ public class MetricBucketTest extends AbstractAdE2ETest {
         assertFalse(initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing()
             .getChartReport()
-            .isLegendVisible());
+            .isLegendVisible(), "Legend shouldn't display");
     }
 
     private void hover(String cssLocator) {

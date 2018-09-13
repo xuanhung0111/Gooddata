@@ -96,17 +96,17 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
         analysisPage.changeReportType(ReportType.TABLE)
             .waitForReportComputing();
-        assertFalse(isElementPresent(cssSelector(
-                ".adi-editor-canvas .adi-canvas-message"), browser));
+        assertFalse(isElementPresent(cssSelector(".adi-editor-canvas .adi-canvas-message"), browser),
+                "Canvas message shouldn't be present");
 
         analysisPage.changeReportType(ReportType.LINE_CHART)
             .waitForReportComputing();
-        assertTrue(isElementPresent(cssSelector(
-                ".adi-editor-canvas .adi-canvas-message.adi-canvas-message-missing-metric"), browser));
+        assertTrue(isElementPresent(cssSelector(".adi-editor-canvas .adi-canvas-message.adi-canvas-message-missing-metric"),
+                browser), "Canvas message missing metric should be present");
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
-        assertFalse(isElementPresent(cssSelector(
-                ".adi-editor-canvas .adi-canvas-message"), browser));
+        assertFalse(isElementPresent(cssSelector(".adi-editor-canvas .adi-canvas-message"), browser),
+                "Canvas message shouldn't be present");
     }
 }

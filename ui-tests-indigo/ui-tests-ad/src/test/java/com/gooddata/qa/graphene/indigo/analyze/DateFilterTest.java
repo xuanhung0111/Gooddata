@@ -9,7 +9,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Arrays.asList;
-import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static java.lang.String.format;
@@ -88,7 +87,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
         BrowserUtils.switchToLastTab(browser);
         waitForFragmentVisible(reportPage);
         takeScreenshot(browser, "allowDateFilterByRange-emptyFilters", getClass());
-        assertTrue(reportPage.getFilters().isEmpty());
+        assertTrue(reportPage.getFilters().isEmpty(), "Should be empty filter");
         browser.close();
         BrowserUtils.switchToFirstTab(browser);
 
@@ -116,7 +115,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
                 .addDate()
                 .waitForReportComputing()
                 .getChartReport()
-                .getTrackersCount() >= 1);
+                .getTrackersCount() >= 1, "Tracker should display");
         assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText(DATE_INVOICE)), Arrays.asList("templ:DateInvoice", "All time"));
         assertEquals(analysisPage.getAttributesBucket().getAllGranularities(),
                 Arrays.asList("Day", "Week (Sun-Sat)", "Month", "Quarter", "Year"));
@@ -148,7 +147,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
             public boolean apply(String input) {
                 return input.endsWith("%");
             }
-        }));
+        }), "Missing data");
         checkingOpenAsReport("showPercentAfterConfigDate");
     }
 
@@ -172,8 +171,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
 
         ChartReport report = analysisPage.getChartReport();
 
-        assertTrue(isEqualCollection(report.getLegends(),
-                asList(METRIC_NUMBER_OF_PERSONS_YEAR_AGO, METRIC_NUMBER_OF_PERSONS)));
+        assertEquals(report.getLegends(), asList(METRIC_NUMBER_OF_PERSONS_YEAR_AGO, METRIC_NUMBER_OF_PERSONS));
         checkingOpenAsReport("applySamePeriodComparisonAfterConfigDate");
     }
 

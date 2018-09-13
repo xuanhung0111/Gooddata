@@ -127,7 +127,7 @@ public class GoodSalesDescriptionTest extends AbstractAnalyseTest {
         final MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
-        assertTrue(metricConfiguration.canAddAnotherFilter());
+        assertTrue(metricConfiguration.canAddAnotherFilter(), "Another filter can be added");
 
         StringBuilder expected = new StringBuilder(ATTR_DEPARTMENT).append("\n")
                 .append("Field Type\n")

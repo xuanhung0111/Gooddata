@@ -4,6 +4,9 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -55,8 +58,8 @@ public class GoodSalesDropAttributeTest extends AbstractAnalyseTest {
 
         analysisPage.replaceAttribute(ATTR_ACTIVITY_TYPE, PRIORITY);
         Collection<String> addedAttributes = analysisPage.getAttributesBucket().getItemNames();
-        assertTrue(addedAttributes.contains(PRIORITY));
-        assertFalse(addedAttributes.contains(ATTR_ACTIVITY_TYPE));
+        assertThat(addedAttributes, hasItem(PRIORITY));
+        assertThat(addedAttributes, not(hasItem(ATTR_ACTIVITY_TYPE)));
 
         analysisPage.replaceStack(REGION);
         assertEquals(analysisPage.getStacksBucket().getAttributeName(), REGION);
@@ -69,7 +72,7 @@ public class GoodSalesDropAttributeTest extends AbstractAnalyseTest {
 
         analysisPage.removeAttribute(ATTR_ACTIVITY_TYPE);
         Collection<String> addedAttributes = analysisPage.getAttributesBucket().getItemNames();
-        assertFalse(addedAttributes.contains(ATTR_ACTIVITY_TYPE));
+        assertThat(addedAttributes, not(hasItem(ATTR_ACTIVITY_TYPE)));
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -79,19 +82,19 @@ public class GoodSalesDropAttributeTest extends AbstractAnalyseTest {
         MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
                 .getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
-        assertFalse(metricConfiguration.isShowPercentEnabled());
-        assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
+        assertFalse(metricConfiguration.isShowPercentEnabled(), "Show percent shouldn't be enabled");
+        assertEquals(browser.findElements(RecommendationContainer.LOCATOR).size(), 0);
 
         analysisPage.resetToBlankState();
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
         metricConfiguration.expandConfiguration();
-        assertFalse(metricConfiguration.isShowPercentEnabled());
-        assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() > 0);
+        assertFalse(metricConfiguration.isShowPercentEnabled(), "Show percent shouldn't be enabled");
+        assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() > 0, "Recommendation should display");
 
         analysisPage.addStack(ATTR_DEPARTMENT);
         analysisPage.waitForReportComputing();
-        assertFalse(metricConfiguration.isShowPercentEnabled());
-        assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() > 0);
+        assertFalse(metricConfiguration.isShowPercentEnabled(), "Show percent shouldn't be enabled");
+        assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() > 0, "Recommendation should display");
         checkingOpenAsReport("recommendNextStep");
     }
 
@@ -117,7 +120,8 @@ public class GoodSalesDropAttributeTest extends AbstractAnalyseTest {
         assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
 
         analysisPage.changeReportType(ReportType.TABLE);
-        assertFalse(isElementPresent(cssSelector(StacksBucket.CSS_SELECTOR), browser));
+        assertFalse(isElementPresent(cssSelector(StacksBucket.CSS_SELECTOR), browser),
+                "Stack bucket shouldn't be present");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -126,7 +130,7 @@ public class GoodSalesDropAttributeTest extends AbstractAnalyseTest {
         final StacksBucket stacksBucket = analysisPage.getStacksBucket();
 
         analysisPage.undo();
-        assertTrue(stacksBucket.isEmpty());
+        assertTrue(stacksBucket.isEmpty(), "Stacks bucket should be empty");
         analysisPage.redo();
         assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
 
@@ -137,7 +141,7 @@ public class GoodSalesDropAttributeTest extends AbstractAnalyseTest {
         assertEquals(stacksBucket.getAttributeName(), ATTR_DEPARTMENT);
 
         analysisPage.undo();
-        assertTrue(stacksBucket.isEmpty());
+        assertTrue(stacksBucket.isEmpty(), "Stacks bucket should be empty");
 
         analysisPage.redo().redo();
         assertEquals(stacksBucket.getAttributeName(), REGION);

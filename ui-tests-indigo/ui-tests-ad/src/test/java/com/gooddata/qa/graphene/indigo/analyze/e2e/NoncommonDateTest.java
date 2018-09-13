@@ -55,15 +55,18 @@ public class NoncommonDateTest extends AbstractAdE2ETest {
             .getDateFilter();
 
         dateFilter.click();
-        assertFalse(isElementPresent(cssSelector(".adi-date-dataset-select-dropdown button.disabled"), browser));
+        assertFalse(isElementPresent(cssSelector(".adi-date-dataset-select-dropdown button.disabled"), browser),
+                "Select dropdown button should be enabled");
         dateFilter.click();
 
         analysisPage.addDate();
-        assertFalse(isElementPresent(cssSelector(".s-date-dataset-switch button.disabled"), browser));
+        assertFalse(isElementPresent(cssSelector(".s-date-dataset-switch button.disabled"), browser),
+                "Switch button should be enabled");
 
         // date dimension picker in select is now disabled
         dateFilter.click();
-        assertTrue(isElementPresent(cssSelector(".adi-date-dataset-select-dropdown button.disabled"), browser));
+        assertTrue(isElementPresent(cssSelector(".adi-date-dataset-select-dropdown button.disabled"), browser),
+                "Select dropdown button should be disabled");
     }
 
     @Test(dependsOnGroups = {"createProject"})

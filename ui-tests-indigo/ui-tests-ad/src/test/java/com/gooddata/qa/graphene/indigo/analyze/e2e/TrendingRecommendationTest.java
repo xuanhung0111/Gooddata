@@ -47,7 +47,8 @@ public class TrendingRecommendationTest extends AbstractAdE2ETest {
                 waitForElementVisible(RecommendationContainer.LOCATOR, browser))
                 .<TrendingRecommendation>getRecommendation(RecommendationStep.SEE_TREND).select("Month").apply();
         analysisPage.waitForReportComputing();
-        assertFalse(isElementPresent(cssSelector(".s-recommendation-trending"), browser));
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-trending"), browser),
+                "Recommendation trending shouldn't be present");
         assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
     }
 

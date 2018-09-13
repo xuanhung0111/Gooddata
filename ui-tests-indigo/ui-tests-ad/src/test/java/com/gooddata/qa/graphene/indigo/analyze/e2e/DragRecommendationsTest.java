@@ -62,7 +62,8 @@ public class DragRecommendationsTest extends AbstractAdE2ETest {
         analysisPage.resetToBlankState();
 
         // check that filter to the last four quarters is now disabled again
-        assertFalse(isElementPresent(cssSelector(".adi-components .visualization-column .s-property-where"), browser));
+        assertFalse(isElementPresent(cssSelector(".adi-components .visualization-column .s-property-where"), browser),
+                "Filter the last four quarters is now disabled again");
     }
 
     @Test(dependsOnGroups = {"createProject"})

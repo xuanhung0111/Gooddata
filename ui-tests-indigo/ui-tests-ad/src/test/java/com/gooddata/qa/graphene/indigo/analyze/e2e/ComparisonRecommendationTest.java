@@ -4,6 +4,8 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -40,8 +42,9 @@ public class ComparisonRecommendationTest extends AbstractAdE2ETest {
             waitForElementVisible(RecommendationContainer.LOCATOR, browser))
             .<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).select(ATTR_ACTIVITY_TYPE).apply();
         analysisPage.waitForReportComputing();
-        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison"), browser));
-        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison"), browser),
+                "Recommendation comparision shouldn't be present");
+        assertThat(analysisPage.getAttributesBucket().getItemNames(), hasItem(ATTR_ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -55,7 +58,8 @@ public class ComparisonRecommendationTest extends AbstractAdE2ETest {
 
         waitForElementVisible(RecommendationContainer.LOCATOR, browser);
 
-        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison"), browser));
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison"), browser),
+                "Recommendation comparision shouldn't be present");
         assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ATTR_ACTIVITY_TYPE));
         assertTrue(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
         assertTrue(isElementPresent(cssSelector(".s-recommendation-contribution"), browser));

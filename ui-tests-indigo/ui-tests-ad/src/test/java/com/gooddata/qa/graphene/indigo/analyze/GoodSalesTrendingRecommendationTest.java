@@ -4,6 +4,8 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -53,7 +55,7 @@ public class GoodSalesTrendingRecommendationTest extends AbstractAnalyseTest {
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();
         analysisPage.waitForReportComputing();
         assertEquals(parseFilterText(FiltersBucketReact.getFilterText("Activity")), Arrays.asList("Activity", "Last 4 quarters"));
-        assertTrue(report.getTrackersCount() >= 1);
+        assertTrue(report.getTrackersCount() >= 1, "Trackers should display");
         checkingOpenAsReport("testOverrideDateFilter");
     }
 
@@ -69,20 +71,24 @@ public class GoodSalesTrendingRecommendationTest extends AbstractAnalyseTest {
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND),
+                "See trend recommendation should display");
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE),
+                "Compare recommendation should display");
 
         TrendingRecommendation trendingRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND);
         trendingRecommendation.select("Month").apply();
         analysisPage.waitForReportComputing();
-        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
-        assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
+        assertThat(analysisPage.getAttributesBucket().getItemNames(), hasItem(DATE));
+        assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"), "Filter should display");
         assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText("Activity")), Arrays.asList("Activity", "Last 4 quarters"));
-        assertTrue(metricConfiguration.isShowPercentEnabled());
-        assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
-        assertTrue(report.getTrackersCount() >= 1);
+        assertTrue(metricConfiguration.isShowPercentEnabled(), "Show percent should be enabled");
+        assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND),
+                "See trend recommendation shouldn't display");
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE),
+                "Compare recommendation should display");
+        assertTrue(report.getTrackersCount() >= 1, "Tracker should display");
         checkingOpenAsReport("applyParameter");
     }
 
@@ -94,19 +100,23 @@ public class GoodSalesTrendingRecommendationTest extends AbstractAnalyseTest {
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND),
+                "See trend recommendation should display");
 
         analysisPage.addFilter(ATTR_ACTIVITY_TYPE).waitForReportComputing();
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND),
+                "See trend recommendation should display");
 
         analysisPage.changeReportType(ReportType.BAR_CHART).waitForReportComputing();
-        assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
+        assertEquals(browser.findElements(RecommendationContainer.LOCATOR).size(), 0);
 
         analysisPage.changeReportType(ReportType.COLUMN_CHART).waitForReportComputing();
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND),
+                "See trend recommendation should display");
 
         analysisPage.addAttribute(ATTR_ACTIVITY_TYPE).waitForReportComputing();
-        assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
+        assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND),
+                "See trend recommendation shouldn't display");
         checkingOpenAsReport("displayInColumnChartWithOnlyMetric");
     }
 }

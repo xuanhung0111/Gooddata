@@ -112,7 +112,7 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
         assertFalse(analysisPage.undo()
             .redo()
             .getMetricsBucket()
-            .isEmpty());
+            .isEmpty(), "Metric bucket shouldn't be empty");
 
         analysisPage.getMetricsBucket()
             .getMetricConfiguration("Sum of " + FACT_AMOUNT)

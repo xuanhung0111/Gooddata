@@ -39,7 +39,8 @@ public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
             .waitForReportComputing();
 //        enable with CL-9443
 //        assertTrue(isElementPresent(cssSelector(".s-recommendation-comparison"), browser));
-        assertFalse(isElementPresent(cssSelector(".s-recommendation-trending"), browser));
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-trending"), browser),
+                "Recommendation trending shouldn't be present");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -47,7 +48,9 @@ public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
         initAnalysePage().addMetric(FACT_AMOUNT, FieldType.FACT)
             .addAttribute("id")
             .waitForReportComputing();
-        assertTrue(isElementPresent(cssSelector(".s-recommendation-contribution"), browser));
-        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
+        assertTrue(isElementPresent(cssSelector(".s-recommendation-contribution"), browser),
+                "Recommendation contribution should be present");
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser),
+                "Recommendation comparison with period shouldn't be present");
     }
 }
