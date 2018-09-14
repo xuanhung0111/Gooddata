@@ -256,7 +256,7 @@ public final class WaitUtils {
     public static void waitForIndigoMessageDisappear(SearchContext context) {
         WebElement message = waitForElementVisible(By.className("gd-messages"), context);
 
-        Graphene.waitGui().withTimeout(10, TimeUnit.SECONDS).until(browser -> {
+        Graphene.waitGui().withTimeout(30, TimeUnit.SECONDS).until(browser -> {
             if (isElementPresent(By.className("success"), message)) {
                 waitForElementNotVisible(message);
                 return true;
