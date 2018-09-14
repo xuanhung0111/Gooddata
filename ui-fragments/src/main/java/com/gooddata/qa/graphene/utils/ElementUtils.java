@@ -46,6 +46,10 @@ public final class ElementUtils {
         return element.isDisplayed();
     }
 
+    public static boolean isElementDisabled(WebElement element) {
+        return element.getAttribute("class").contains("disabled");
+    }
+
     public static void scrollElementIntoView(WebElement element, WebDriver browser) {
         BrowserUtils.runScript(browser, "arguments[0].scrollIntoView(true);", element);
     }

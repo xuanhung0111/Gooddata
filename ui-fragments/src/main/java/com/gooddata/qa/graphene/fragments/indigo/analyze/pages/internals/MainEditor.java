@@ -25,6 +25,9 @@ public class MainEditor extends AbstractFragment {
     @FindBy(css = CSS_EXPLORER_MESSAGE)
     private WebElement explorerMessage;
 
+    @FindBy(className = "adi-canvas-message")
+    private WebElement canvasMessage;
+
     private static final String CSS_EXPLORER_MESSAGE = ".adi-canvas-message h2";
     private static final String CSS_REPORT_EMPTY = ".s-blank-canvas-message";
     private static final By BY_TABLE_REPORT = By.className("indigo-table-component-content");
@@ -52,6 +55,10 @@ public class MainEditor extends AbstractFragment {
 
     public String getExplorerMessage() {
         return waitForElementVisible(explorerMessage).getText().trim();
+    }
+
+    public String getCanvasMessage() {
+        return waitForElementVisible(canvasMessage).getText();
     }
 
     public boolean isExplorerMessageVisible() {

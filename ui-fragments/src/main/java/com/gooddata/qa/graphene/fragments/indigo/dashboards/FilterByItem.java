@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static java.util.Objects.isNull;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -32,5 +33,9 @@ public class FilterByItem extends AbstractFragment {
 
     public String getTitle() {
         return waitForElementPresent(title).getText();
+    }
+
+    public boolean isCheckboxEnabled() {
+        return isNull(waitForElementPresent(checkbox).getAttribute("disabled"));
     }
 }
