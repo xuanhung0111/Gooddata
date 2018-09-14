@@ -9,8 +9,6 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 
-import java.util.stream.Stream;
-
 public class PartialExportFragment extends AbstractGreyPagesFragment {
 
     @FindBy
@@ -34,10 +32,7 @@ public class PartialExportFragment extends AbstractGreyPagesFragment {
     @Override
     protected State getPollState() throws JSONException {
         Graphene.waitGui().until(browser -> !loadJSON().getJSONObject("wTaskStatus").getString("status").isEmpty());
-        return Stream.of(State.values())
-                .filter(state -> state.toString().equals(loadJSON().getJSONObject("wTaskStatus").getString("status")))
-                .findFirst()
-                .get();
+        return State.valueOf(loadJSON().getJSONObject("wTaskStatus").getString("status"));
     }
 
     protected String getExportToken() throws JSONException {
