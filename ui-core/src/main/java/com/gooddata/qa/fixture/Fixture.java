@@ -8,6 +8,7 @@ import com.gooddata.GoodDataRestException;
 import com.gooddata.PollResult;
 import com.gooddata.fixture.ResourceManagement;
 import com.gooddata.fixture.ResourceManagement.ResourceTemplate;
+import com.gooddata.gdc.DataStoreService;
 import com.gooddata.gdc.GdcError;
 import com.gooddata.gdc.TaskStatus;
 import com.gooddata.project.Environment;
@@ -93,12 +94,18 @@ public class Fixture {
             String uploadDir = "fixture_" + RandomStringUtils.randomAlphabetic(6);
             log.info("uploading data files to staging area named " + uploadDir);
             try (InputStream stream = resourceManagement.getUploadInfoFileContent(fixture, version)) {
-                restClient.getDataStoreService().upload(uploadDir + "/upload_info.json", stream);
+                DataStoreService dataStoreService = restClient.getDataStoreService();
+                String path = uploadDir + "/upload_info.json";
+                dataStoreService.getUri(path); //Enable preemptive authentication in getUri help avoid 500 error
+                dataStoreService.upload(path, stream);
             }
 
             for (String entry : resourceManagement.getCsvEntryNames(fixture, version)) {
                 try (InputStream stream = resourceManagement.getFileContent(entry)) {
-                    restClient.getDataStoreService().upload(uploadDir + "/" + getFileName(entry), stream);
+                    DataStoreService dataStoreService = restClient.getDataStoreService();
+                    String path = uploadDir + "/" + getFileName(entry);
+                    dataStoreService.getUri(path); //Enable preemptive authentication in getUri help avoid 500 error
+                    dataStoreService.upload(path, stream);
                 }
             }
 
