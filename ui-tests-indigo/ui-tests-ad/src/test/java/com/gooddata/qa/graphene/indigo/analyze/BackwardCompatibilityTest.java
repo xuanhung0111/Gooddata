@@ -5,11 +5,14 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
 
+import java.util.List;
+
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 
 public class BackwardCompatibilityTest extends AbstractProjectTest {
 
@@ -50,6 +53,22 @@ public class BackwardCompatibilityTest extends AbstractProjectTest {
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(avgAmountAgo, avgAmount));
         analysisPage.waitForReportComputing();
         assertThat(analysisPage.getTableReport().getHeaders(), hasItems(avgAmountAgo, avgAmount));
+    }
+
+    @Test(dependsOnGroups = "createProject")
+    public void openSavedInsight() {
+        if (!isOnStagingCluster()) {
+            throw new SkipException("Test just runs on Staging, Staging2 and Staging3");
+        }
+        final List<String> insights = asList("3123", "date range", "headline_1", "pop_renamed", "pop_cũ + filter att",
+                "area", "pie chart  too many", "RT_Pie: Restricted with CA based on other CA");
+
+        AnalysisPage analysisPage = initAnalysePage();
+        for (String insight: insights) {
+            analysisPage.openInsight(insight).waitForReportComputing();
+            assertFalse(analysisPage.getPageHeader().isSaveButtonEnabled(),
+                    "Save button should be disabled with saved insight");
+        }
     }
 
     private boolean isOnStagingCluster() {
