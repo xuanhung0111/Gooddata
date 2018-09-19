@@ -23,6 +23,7 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -100,7 +101,7 @@ public class DashboardsDistributedByLcmTest extends AbstractDashboardTest {
         addUsersToClientProject();
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = "createProject")
     public void testSyncLockedFlag() throws IOException {
         IndigoRestRequest indigoRestRequest = new IndigoRestRequest(
                 new RestClient(getProfile(Profile.ADMIN)), devProjectId);
@@ -124,7 +125,7 @@ public class DashboardsDistributedByLcmTest extends AbstractDashboardTest {
         assertEquals(lockedValue, 1, SECOND_DASHBOARD + " should be locked");
     }
 
-    @Test(dependsOnMethods = {"testSyncLockedFlag"})
+    @Test(dependsOnMethods = "testSyncLockedFlag")
     public void testKpiDashboardsWithAdminRole() {
         logoutAndLoginAs(true, UserRoles.ADMIN);
         initIndigoDashboardsPageWithWidgets();
@@ -136,7 +137,7 @@ public class DashboardsDistributedByLcmTest extends AbstractDashboardTest {
         assertEquals(indigoDashboardsPage.getLastWidget(Insight.class).getHeadline(), SECOND_TEST_INSIGHT);
     }
 
-    @Test(dependsOnMethods = {"testSyncLockedFlag"})
+    @Test(dependsOnMethods = "testSyncLockedFlag")
     public void testInsightsWithAdminRole() {
         AnalysisPage analysisPage = initAnalysePage();
         InsightItem insightItem = analysisPage.getPageHeader()
@@ -149,7 +150,23 @@ public class DashboardsDistributedByLcmTest extends AbstractDashboardTest {
         assertEquals(analysisPage.getPageHeader().getInsightTitle(), "new insight");
     }
 
-    @Test(dependsOnMethods = {"testSyncLockedFlag"})
+    @Test(dependsOnMethods = "testSyncLockedFlag")
+    public void testDefaultDataProduce() throws IOException {
+        IndigoRestRequest indigoRestRequest = new IndigoRestRequest(
+                new RestClient(getProfile(Profile.ADMIN)), clientProjectId);
+        String identifier = getObjIdentifiers(singletonList(indigoRestRequest.getInsightUri(FIRST_TEST_INSIGHT))).get(0);
+        AnalysisPage analysisPage = initAnalysePage().openInsight(FIRST_TEST_INSIGHT);
+        openUrl(browser.getCurrentUrl().replace(clientProjectId, "client/default:" + CLIENT_ID));
+        assertEquals(analysisPage.waitForReportComputing().getChartReport().getTrackersCount(), 1);
+
+        openUrl(format("/analyze/#/client/default:%s/%s/edit", CLIENT_ID, identifier));
+        assertEquals(analysisPage.waitForReportComputing().getChartReport().getTrackersCount(), 1);
+
+        openUrl(format("/analyze/#/%s/%s/edit", clientProjectId, identifier));
+        assertEquals(analysisPage.waitForReportComputing().getChartReport().getTrackersCount(), 1);
+    }
+
+    @Test(dependsOnMethods = "testSyncLockedFlag")
     public void testKpiDashboardsWithEditor() {
         logoutAndLoginAs(true, UserRoles.EDITOR);
         try {
@@ -160,7 +177,7 @@ public class DashboardsDistributedByLcmTest extends AbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnMethods = {"testSyncLockedFlag"})
+    @Test(dependsOnMethods = "testSyncLockedFlag")
     public void testInsightsWithEditor() {
         logoutAndLoginAs(true, UserRoles.EDITOR);
         try {
@@ -182,7 +199,7 @@ public class DashboardsDistributedByLcmTest extends AbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnMethods = {"testSyncLockedFlag"})
+    @Test(dependsOnMethods = "testSyncLockedFlag")
     public void testWithViewer() {
         logoutAndLoginAs(true, UserRoles.VIEWER);
         try {
@@ -197,7 +214,7 @@ public class DashboardsDistributedByLcmTest extends AbstractDashboardTest {
         }
     }
 
-    @Test(dependsOnMethods = {"testSyncLockedFlag"})
+    @Test(dependsOnMethods = "testSyncLockedFlag")
     public void testUnlockDashboards() throws IOException {
         IndigoRestRequest indigoRestRequest = new IndigoRestRequest(
                 new RestClient(getProfile(Profile.ADMIN)), clientProjectId);
