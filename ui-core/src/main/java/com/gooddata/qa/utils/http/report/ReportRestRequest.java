@@ -1,6 +1,7 @@
 package com.gooddata.qa.utils.http.report;
 
 import com.gooddata.md.report.Report;
+import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestRequest;
@@ -44,6 +45,14 @@ public class ReportRestRequest extends CommonRestRequest {
         String reportUri = getReportByTitle(reportTitle).getUri();
         final JSONObject json = getJsonObject(reportUri);
         json.getJSONObject("report").getJSONObject("meta").put("unlisted", BooleanUtils.toInteger(isPrivate));
+        executeRequest(RestRequest.initPutRequest(reportUri, json.toString()), HttpStatus.OK);
+    }
+
+    public void updateReport(String title, ReportDefinition reportDefinition) throws IOException {
+        ReportDefinition definition = getMdService().createObj(getProject(), reportDefinition);
+        String reportUri = getReportByTitle(title).getUri();
+        final JSONObject json = getJsonObject(reportUri);
+        json.getJSONObject("report").getJSONObject("content").append("definitions", definition.getUri());
         executeRequest(RestRequest.initPutRequest(reportUri, json.toString()), HttpStatus.OK);
     }
 

@@ -284,6 +284,48 @@ public class CommonRestRequest {
                 payload.toString()), HttpStatus.NO_CONTENT);
     }
 
+    /**
+     * get schedule email uri
+     *
+     * @param scheduleTitle
+     * @return
+     * @throws JSONException
+     * @throws IOException
+     */
+    public String getScheduleUri(String scheduleTitle) throws JSONException, IOException {
+        final String schedulesUri = "/gdc/md/" + getProjectId() + "/query/scheduledmails";
+        final JSONArray schedules = getJsonObject(schedulesUri)
+                .getJSONObject("query")
+                .getJSONArray("entries");
+
+        for (int i = 0, n = schedules.length(); i < n; i++) {
+            final JSONObject schedule = schedules.getJSONObject(i);
+            if (scheduleTitle.equals(schedule.getString("title"))) {
+                return schedule.getString("link");
+            }
+        }
+        throw new NullPointerException(scheduleTitle + " doesn't exist");
+    }
+
+    /**
+     * get last schedule email uri
+     *
+     * @return
+     * @throws JSONException
+     * @throws IOException
+     */
+    public String getLastScheduleUri() throws JSONException, IOException {
+        final String schedulesUri = "/gdc/md/" + getProjectId() + "/query/scheduledmails";
+        final JSONArray schedules = getJsonObject(schedulesUri)
+                .getJSONObject("query")
+                .getJSONArray("entries");
+
+        if (schedules.length() != 0) {
+            return schedules.getJSONObject(schedules.length() - 1).getString("link");
+        }
+        throw new NullPointerException("There isn't scheduled mail");
+    }
+
     protected Project getProject() {
         return restClient.getProjectService().getProjectById(projectId);
     }

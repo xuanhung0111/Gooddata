@@ -74,7 +74,8 @@ public abstract class TabItem implements MdObject {
         TOP_LEFT(0, 0),
         TOP_RIGHT(750, 0),
         LEFT(0, 150),
-        RIGHT(750, 151);
+        RIGHT(750, 151),
+        BOTTOM(370, 151);
 
         private int posX;
         private int posY;
