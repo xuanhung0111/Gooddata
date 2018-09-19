@@ -41,6 +41,28 @@ public class TableReport extends AbstractDashboardReport {
     private By BY_BOTTOM_RIGHT_RESIZE_BUTTON = By.className("yui3-selectionbox-resize-br");
     private By BY_TOP_LEFT_RESIZE_BUTTON = By.className("yui3-selectionbox-resize-tl");
 
+    /**
+     * Get number of data row
+     *
+     * @return number of rows
+     */
+    public int getNumberOfDataRows() {
+        return browser.findElements(By.cssSelector(".cell.rows.even,.cell.rows.odd")).size();
+    }
+
+    /**
+     * Get height
+     *
+     * @return height in pixel of a row
+     */
+    public int getRowHeight() {
+        WebElement firstRowElement = browser.findElement(By.cssSelector(".cell.rows.even,.cell.rows.odd"));
+        if (firstRowElement == null) {
+            return 0;
+        }
+        return firstRowElement.getSize().getHeight();
+    }
+
     public TableReport sortBy(String value, CellType type, Sort howToSort) {
         WebElement cell = getCellElement(value, type);
 

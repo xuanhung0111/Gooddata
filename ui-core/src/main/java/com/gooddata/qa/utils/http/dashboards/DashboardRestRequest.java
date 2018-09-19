@@ -394,6 +394,31 @@ public class DashboardRestRequest extends CommonRestRequest {
         setDefault(uri, requestedFormat);
     }
 
+    /**
+     * Adjust the size of first report of first tab, this is just workaround for firefox which resize the report cause
+     * out of viewport exception, obsolete once firefox webdriver fixed
+     *
+     * @param dashboardID
+     * @param width
+     * @param height
+     * @throws IOException
+     */
+    public void adjustReportSize(final String dashboardID, int width, int height) throws IOException {
+        final String dashboardEditModeURI = format(DASHBOARD_EDIT_MODE_LINK, projectId, dashboardID);
+        final JSONObject json = getJsonObject(initGetRequest(dashboardEditModeURI));
+        final JSONObject expectedTab = json.getJSONObject("projectDashboard")
+                .getJSONObject("content")
+                .getJSONArray("tabs").getJSONObject(0);
+        final JSONObject reportItem = expectedTab.getJSONArray("items")
+                .getJSONObject(0)
+                .getJSONObject("reportItem");
+
+        reportItem.put("sizeX", reportItem.getInt("sizeX") + width);
+        reportItem.put("sizeY", reportItem.getInt("sizeY") + height);
+
+        executeRequest(initPostRequest(dashboardEditModeURI, json.toString()), HttpStatus.OK);
+    }
+
     private void setDefault(String uri, int requestedFormat) throws IOException {
         JSONObject json = getJsonObject(uri);
         json.getJSONObject("attributeDisplayForm").getJSONObject("content").put("default", requestedFormat);
