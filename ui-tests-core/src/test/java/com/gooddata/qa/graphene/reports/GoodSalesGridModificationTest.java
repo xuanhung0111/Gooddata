@@ -23,6 +23,7 @@ import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
 import com.gooddata.qa.graphene.fragments.reports.report.AttributeSndPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
+import com.gooddata.qa.graphene.utils.UrlParserUtils;
 import com.gooddata.qa.graphene.utils.WaitUtils;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestClient;
@@ -80,10 +81,13 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
     private final static String REPORT_NOT_COMPUTABLE_MESSAGE = "Report not computable due to improper metric definition";
     private final static String DISPLAY_LABEL = "http://www.google.com";
     private ProjectRestRequest projectRestRequest;
+    private DashboardRestRequest dashboardRequest;
 
     @Override
     protected void customizeProject() throws Throwable {
         projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+        dashboardRequest = new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId());
+
         getMetricCreator().createAmountMetric();
         getMetricCreator().createProbabilityMetric();
         final Attribute stageName = getMdService().getObj(getProject(), Attribute.class, title(ATTR_STAGE_NAME));
@@ -232,7 +236,7 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void renderTabularReportWithReportHeaderPagingEnabled() {
+    public void renderTabularReportWithReportHeaderPagingEnabled() throws IOException{
         List<Float> expectedValue =
                 asList(0.0f, 0.0f, 0.0f, 0.0f, 0.4f, 1309000.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 142968.0f, 0.0f, 0.0f,
                         0.0f, 0.0f, 520000.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 92492.17f, 0.0f, 1236000.0f,
@@ -267,13 +271,18 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
             initDashboardsPage().editDashboard().addReportToDashboard("Large Report");
             TableReport tableReport = dashboardsPage.getReport("Large Report", TableReport.class);
             DashboardWidgetDirection.LEFT.moveElementToRightPlace(tableReport.getRoot());
-            tableReport.showAnyway();
-            tableReport
-                    .resizeFromBottomRightButton(600, 1200)
-                    .waitForLoaded();
             dashboardsPage.saveDashboard();
             tableReport.showAnyway();
+
             tableReport.waitForLoaded();
+            int adjustHeight = getHeightAdjustmentToRenderReportWithExpectedRowNumber(tableReport, 60);
+            dashboardRequest.adjustReportSize(UrlParserUtils.getObjId(browser.getCurrentUrl()), 600, adjustHeight);
+
+            initDashboardsPage();
+            tableReport.showAnyway();
+            tableReport.waitForLoaded();
+            log.info("-----------Number of rows after the adjustment:" + tableReport.getNumberOfDataRows());
+
             Screenshots.takeScreenshot(browser, "Tabular Report", getClass());
             Graphene.waitGui().withTimeout(5, TimeUnit.SECONDS)
                     .until(browser -> tableReport.getMetricValues().size() == expectedValue.size());
@@ -379,5 +388,16 @@ public class GoodSalesGridModificationTest extends GoodSalesAbstractTest {
         } finally {
             BrowserUtils.switchToFirstTab(browser);
         }
+    }
+
+    private int getHeightAdjustmentToRenderReportWithExpectedRowNumber(final TableReport tableReport, int expectedRows) {
+        int numberRows = tableReport.getNumberOfDataRows();
+        log.info("--------number of rows:" + numberRows);
+        int rowHeight = tableReport.getRowHeight();
+        log.info("---------row height:" + rowHeight);
+        int heightAdjustment = (expectedRows - numberRows - 1) * rowHeight;
+        log.info(String.format("---------numberRows=%d; expectedRows=%d; heightAdjustment=%d",
+                numberRows, expectedRows, heightAdjustment));
+        return heightAdjustment;
     }
 }
