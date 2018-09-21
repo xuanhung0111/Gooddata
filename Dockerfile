@@ -1,13 +1,13 @@
-FROM docker-registry.na.intgdc.com/gdc_base_co7:latest
+FROM harbor.intgdc.com/base/gdc-base-centos:latest
 
-LABEL name="Checklist xvfb image based on CentOS-7" \
-      maintainer="Silent Assassins Scrum <scrumsa@gooddata.com>" \
-      vendor="CentOS" \
-      license="GPLv2"
+ARG GIT_COMMIT=unspecified
+LABEL image_name="Checklist xvfb image based on CentOS-7"
+LABEL maintainer="ATT Scrum <lhv-auto@gooddata.com>"
+LABEL git_repository_url="https://github.com/gooddata/graphene-tests"
+LABEL parent_image="harbor.intgdc.com/base/gdc-base-centos:latest"
+LABEL git_commit=$GIT_COMMIT
 
-COPY google-chrome.repo /etc/yum.repos.d/google-chrome.repo
-
-ARG CHROME_VERSION=67.0.3396.62-1
+ARG CHROME_VERSION=67.0.3396.79-1
 ARG CHROMEDRIVER_VERSION=2.39
 ARG FIREFOX_VERSION=60.0.1
 ARG GECKODRIVER_VERSION=0.20.1
@@ -19,13 +19,14 @@ ARG GECKODRIVER_VERSION=0.20.1
 # Note: Firefox is installed with yum to resolve dependencies, but it is ESR version,
 # so then it is replaced with specific version.
 RUN set -x && \
-    rpm --import https://dl-ssl.google.com/linux/linux_signing_key.pub && \
     yum clean all && \
     yum install --setopt=tsflags=nodocs -y xorg-x11-server-Xvfb xorg-x11-xinit \
                 dejavu-sans-fonts dejavu-sans-mono-fonts dejavu-serif-fonts \
-                phantomjs maven-bin which curl unzip bzip2 \
-                google-chrome-stable-$CHROME_VERSION firefox && \
+                phantomjs maven-bin which curl unzip bzip2 firefox && \
     echo "checklist_image" | md5sum |cut -f1 -d\ > /etc/machine-id && \
+    curl http://orion.lcg.ufrj.br/RPMS/myrpms/google/google-chrome-stable-$CHROME_VERSION.x86_64.rpm > /tmp/google-chrome-stable-$CHROME_VERSION.x86_64.rpm && \
+    yum localinstall --setopt=tsflags=nodocs -y /tmp/google-chrome-stable-$CHROME_VERSION.x86_64.rpm && \
+    rm -f /tmp/google-chrome-stable-$CHROME_VERSION.x86_64.rpm && \
     curl https://download-installer.cdn.mozilla.net/pub/firefox/releases/$FIREFOX_VERSION/linux-x86_64/en-US/firefox-$FIREFOX_VERSION.tar.bz2 > /tmp/firefox.tar.bz2 && \
     yum remove -y firefox && \
     rm -rf /opt/firefox && \
