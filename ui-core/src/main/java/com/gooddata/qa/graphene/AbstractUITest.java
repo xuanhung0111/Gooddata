@@ -38,7 +38,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -310,15 +309,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
                 + fileSize + ", but minimum " + minimalSize + " was expected");
     }
 
-    public List<List<String>> verifyDashboardExportToXLSX (String fileName, long minimalSize)
-        throws IOException {
-        List<List<String>> xlsxContent = new ArrayList<>();
-        // client-demo does not support dashboard export
-        if (testParams.isClientDemoEnvironment()) {
-            log.info("client-demo does not support dashboard export");
-            return xlsxContent;
-        }
-
+    public List<List<String>> verifyDashboardExportToXLSX (String fileName, long minimalSize) throws IOException {
         String xlsxUrl = testParams.getDownloadFolder() + testParams.getFolderSeparator() + fileName + ".xlsx";
         File xlsxExport = new File(xlsxUrl);
         System.out.println("xlsxExport = " + xlsxExport);
@@ -326,7 +317,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
         long fileSize = xlsxExport.length();
         System.out.println("File size: " + fileSize);
 
-        xlsxContent = XlsxUtils.excelFileToRead(xlsxUrl, 0);
+        List<List<String>> xlsxContent = XlsxUtils.excelFileToRead(xlsxUrl, 0);
 
         assertTrue(fileSize > minimalSize, "Export is probably invalid, check the XLSX manually! Current size is "
                 + fileSize + ", but minimum " + minimalSize + " was expected");
