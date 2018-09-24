@@ -119,8 +119,8 @@ public class UserAccountSettingTest extends AbstractUITest {
                 .saveChange();
         assertThat(personalInfoDialog.getFirstNameErrorMessage(), equalTo(SHOULD_NOT_EMPTY));
         assertThat(personalInfoDialog.getLastNameErrorMessage(), equalTo(SHOULD_NOT_EMPTY));
-        assertThat(personalInfoDialog.getCompanyErrorMessage(), equalTo(SHOULD_NOT_EMPTY));
-        assertThat(personalInfoDialog.getPhoneNumberErrorMessage(), equalTo(INVALID_PHONE_NUMBER));
+        assertThat(personalInfoDialog.getCompanyErrorMessage(), equalTo(""));
+        assertThat(personalInfoDialog.getPhoneNumberErrorMessage(), equalTo(""));
     }
 
     @Test(dependsOnMethods = {"prepareDataForTest"})
