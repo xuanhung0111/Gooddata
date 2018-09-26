@@ -8,14 +8,17 @@ import com.gooddata.GoodDataRestException;
 import com.gooddata.PollResult;
 import com.gooddata.fixture.ResourceManagement;
 import com.gooddata.fixture.ResourceManagement.ResourceTemplate;
+import com.gooddata.gdc.DataStoreException;
 import com.gooddata.gdc.DataStoreService;
 import com.gooddata.gdc.GdcError;
 import com.gooddata.gdc.TaskStatus;
 import com.gooddata.project.Environment;
 import com.gooddata.project.Project;
 import com.gooddata.project.ProjectDriver;
+import com.gooddata.qa.graphene.utils.Sleeper;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestRequest;
+import com.gooddata.qa.utils.java.RetryCommand;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpEntity;
@@ -56,6 +59,8 @@ public class Fixture {
     private String projectId;
     private RestClient restClient;
 
+    private static final int MAXIMUM_TRIES = 2;
+    private static final int RETRY_WAIT_TIME_IN_SECOND = 3;
     private static final String PULL_DATA_LINK = "/gdc/md/%s/etl/pull2";
     private static final int FIXTURE_DEFAULT_VERSION = 1;
 
@@ -94,18 +99,14 @@ public class Fixture {
             String uploadDir = "fixture_" + RandomStringUtils.randomAlphabetic(6);
             log.info("uploading data files to staging area named " + uploadDir);
             try (InputStream stream = resourceManagement.getUploadInfoFileContent(fixture, version)) {
-                DataStoreService dataStoreService = restClient.getDataStoreService();
                 String path = uploadDir + "/upload_info.json";
-                dataStoreService.getUri(path); //Enable preemptive authentication in getUri help avoid 500 error
-                dataStoreService.upload(path, stream);
+                uploadCsvToWebDAVWithRetries(path, stream);
             }
 
             for (String entry : resourceManagement.getCsvEntryNames(fixture, version)) {
                 try (InputStream stream = resourceManagement.getFileContent(entry)) {
-                    DataStoreService dataStoreService = restClient.getDataStoreService();
                     String path = uploadDir + "/" + getFileName(entry);
-                    dataStoreService.getUri(path); //Enable preemptive authentication in getUri help avoid 500 error
-                    dataStoreService.upload(path, stream);
+                    uploadCsvToWebDAVWithRetries(path, stream);
                 }
             }
 
@@ -137,6 +138,29 @@ public class Fixture {
         }
 
         return projectId;
+    }
+
+    private void uploadCsvToWebDAVWithRetries(String uploadPath, InputStream inputStream) {
+        DataStoreService dataStoreService = restClient.getDataStoreService();
+        // Retry for this known limitation https://github.com/gooddata/gooddata-java/wiki/Known-limitations
+        int retryCounter = 0;
+        do {
+            try {
+                dataStoreService.getUri(uploadPath); //Enable preemptive authentication in getUri help avoid 500 error
+                dataStoreService.upload(uploadPath, inputStream);
+                return;
+            } catch (DataStoreException exception) {
+                if (exception.getMessage().contains("This can be known limitation, " +
+                        "see https://github.com/gooddata/gooddata-java/wiki/Known-limitations")) {
+                    log.info(String.format("Catch %s: retry count = %d", exception.getMessage(), retryCounter));
+                    Sleeper.sleepTightInSeconds(RETRY_WAIT_TIME_IN_SECOND);
+                } else {
+                    throw exception;
+                }
+            } finally {
+                retryCounter++;
+            }
+        } while (retryCounter <= MAXIMUM_TRIES);
     }
 
     private void pullDataToProject(String dirPath) throws JSONException, IOException {
