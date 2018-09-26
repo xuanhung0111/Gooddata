@@ -42,4 +42,8 @@ describe "Dockerfile" do
   it "can start Xvfb-run" do
     expect(command("xvfb-run echo 'test'").stdout).to eq "test\n"
   end
+
+  it "verify chrome package" do
+    expect(file('/etc/google-sign-check')).to contain("dsa sha1 md5 gpg OK")
+  end
 end
