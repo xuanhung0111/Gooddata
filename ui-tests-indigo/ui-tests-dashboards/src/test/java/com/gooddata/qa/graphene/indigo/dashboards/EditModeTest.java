@@ -253,14 +253,14 @@ public class EditModeTest extends AbstractDashboardTest {
     @Test(dependsOnGroups = {"createProject"}, groups = {"desktop"})
     public void checkNoVisualizationsList() {
         ProjectRestRequest projectRestRequest = new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
-        projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ANALYTICAL_DESIGNER, false);
+        projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ANALYTICAL_DESIGNER, false);
         try {
             initIndigoDashboardsPageWithWidgets().switchToEditMode();
 
             takeScreenshot(browser, "checkNoVisualizationsList", getClass());
             assertFalse(IndigoInsightSelectionPanel.isPresent(browser));
         } finally {
-            projectRestRequest.setFeatureFlagInProject(ProjectFeatureFlags.ANALYTICAL_DESIGNER, true);
+            projectRestRequest.setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ANALYTICAL_DESIGNER, true);
         }
     }
 }

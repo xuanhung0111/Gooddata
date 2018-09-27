@@ -372,16 +372,16 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     private void enableExportXLSXFlag() throws JSONException {
         new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                .setFeatureFlagInProject(ProjectFeatureFlags.EXPORT_TO_XLSX_ENABLED, true);
+                .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.EXPORT_TO_XLSX_ENABLED, true);
     }
 
     private void setCellMergedFlag(Boolean value) throws JSONException {
         new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                .setFeatureFlagInProject(ProjectFeatureFlags.CELL_MERGED_BY_DEFAULT, value);
+                .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.CELL_MERGED_BY_DEFAULT, value);
     }
 
     private void setActiveFiltersFlag(Boolean value) throws JSONException {
         new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
-                .setFeatureFlagInProject(ProjectFeatureFlags.ACTIVE_FILTERS_BY_DEFAULT, value);
+                .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ACTIVE_FILTERS_BY_DEFAULT, value);
     }
 }
