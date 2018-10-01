@@ -9,9 +9,11 @@ import static java.lang.String.format;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -27,9 +29,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.GDEmails;
@@ -147,12 +146,12 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
         System.out.println(" - current recurrency: " + when.get("recurrency"));
 
         content.remove("lastSuccessfull");
-        DateTime dateTime = new DateTime(DateTimeZone.forTimeZone(TimeZone.getTimeZone(timeZone)));
-        DateTimeFormatter fmt = DateTimeFormat.forPattern("*Y:M:0:d:H:m:s");
-        System.out.println(" - current time: " + fmt.print(dateTime));
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneId.of(timeZone));
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("*Y:M:0:d:H:m:s");
+        System.out.println(" - current time: " + format.format(localDateTime));
 
-        // plusSeconds(1) - to be meta.updated <= recurrency (cannot be older)
-        when.put("recurrency", fmt.print(dateTime.plusSeconds(1)));
+        // plusSeconds(3) - to be meta.updated <= recurrency (cannot be older)
+        when.put("recurrency", format.format(localDateTime.plusSeconds(3)));
         System.out.println(" - set recurrency to: " + when.get("recurrency"));
 
         return mapper.writeValueAsString(rootNode);
