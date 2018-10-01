@@ -44,7 +44,7 @@ public class DeployProcessByGitStoreTest extends AbstractProcessTest {
         String missingInfoJsonPath = "${PUBLIC_APPSTORE}:branch/prodigy-testing:/abc/doesnotexist";
         //TODO: this failed message will be updated after the bug MSF-11118 is fixed
         String missingInfoJsonErrorMessage = "Failed to deploy .*\\. Reasons?: Deployment failed"
-                + " on internal error, error_messsage: Info.json is missing in root application directory .";
+                + " on internal error, error_messsage: Info.json is missing in root application directory or path does not exist .";
 
         String relativeGitPath = "${PUBLIC_APPSTORE}:branch/prodigy-testing:/../ReadFile";
         String relativeGitPathErrorMessage = "Failed to deploy .*\\. Reasons?: Invalid path. "
