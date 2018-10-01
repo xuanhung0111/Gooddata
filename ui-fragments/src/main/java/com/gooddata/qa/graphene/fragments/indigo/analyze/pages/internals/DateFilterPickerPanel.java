@@ -154,6 +154,10 @@ public class DateFilterPickerPanel extends AbstractFragment {
         return getCompareTypeDropdown().isCompareTypeEnabled(compareType);
     }
 
+    public boolean isApplyButtonEnabled() {
+        return !waitForElementVisible(applyButton).getAttribute("class").contains("disabled");
+    }
+
     private void configTimeFilterByRangeHelper(String from, String to, boolean apply) {
         selectStaticPeriod();
 
