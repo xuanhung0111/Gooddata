@@ -300,7 +300,7 @@ public class EventingWidgetDrillToPreventDefaultDashboardTest extends AbstractDa
             throws Exception {
         initIndigoDashboardsPageWithWidgets().selectKpiDashboard(dashboardTitle);
         indigoDashboardsPage.switchToEditMode().waitForWidgetsLoading().selectLastWidget(Kpi.class);
-        if (indigoDashboardsPage.getConfigurationPanel().isDateFilterCheckboxEnabled()) {
+        if (indigoDashboardsPage.getConfigurationPanel().isDateFilterCheckboxChecked()) {
             indigoDashboardsPage.getConfigurationPanel().disableDateFilter();
             indigoDashboardsPage.saveEditModeWithWidgets().waitForWidgetsLoading();
         }

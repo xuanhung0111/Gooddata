@@ -171,9 +171,13 @@ public class ConfigurationPanel extends AbstractFragment {
         return this;
     }
 
-    public boolean isDateFilterCheckboxEnabled() {
+    public boolean isDateFilterCheckboxChecked() {
         return getFilterByDateFilter().isChecked();
     }
+
+    public boolean isDateFilterCheckboxEnabled() {
+        return getFilterByDateFilter().isCheckboxEnabled();
+     }
 
     public DateDimensionSelect openDateDataSet() {
         waitForFragmentVisible(dateDataSetSelect).ensureDropdownOpen();
