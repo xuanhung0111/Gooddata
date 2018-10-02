@@ -12,7 +12,7 @@ public class CompareTypeDropdown extends AbstractReactDropDown {
     protected String getDropdownCssSelector() {
         return ".s-compare-types-list";
     }
-    
+
     public boolean isCompareTypeEnabled(final CompareType compareType) {
         ensureDropdownOpen();
         final WebElement elementByName = getElementByName(compareType.getCompareTypeName());
@@ -34,7 +34,8 @@ public class CompareTypeDropdown extends AbstractReactDropDown {
     public enum CompareType {
 
         NOTHING("nothing"),
-        SAME_PERIOD_PREVIOUS_YEAR("same_period_previous_year");
+        SAME_PERIOD_PREVIOUS_YEAR("same_period_previous_year"),
+        PREVIOUS_PERIOD("Previous Period");
 
         private String compareTypeName;
 

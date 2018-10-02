@@ -17,6 +17,7 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 
+import com.gooddata.qa.graphene.enums.DateGranularity;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import com.gooddata.qa.utils.http.RestClient;
@@ -117,7 +118,7 @@ public class CustomDateDimensionsTest extends AbstractAnalyseTest {
         initAnalysePage().addMetric(NUMBER, FieldType.FACT)
                 .addDate()
                 .getAttributesBucket()
-                .changeGranularity("Month");
+                .changeGranularity(DateGranularity.MONTH);
         assertThat(analysisPage.waitForReportComputing().getChartReport().getTrackersCount(), greaterThanOrEqualTo(1));
 
         List<String> headers = analysisPage.changeReportType(ReportType.TABLE)

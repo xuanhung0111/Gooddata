@@ -47,10 +47,7 @@ public class FiltersBucket extends AbstractBucket {
     public FiltersBucket configDateFilter(String period) {
         WebElement filter = getDateFilter();
         filter.click();
-        
-        DateFilterPickerPanel panel = getFilterPickerPanel();
-        panel.select(period);
-        panel.apply();
+        getFilterPickerPanel().changePeriod(period).apply();
 
         if (STATIC_PERIOD_DROPDOWN_ITEM.equals(period)) {
             assertTrue(getFilterTextHelper(filter).matches(DATE_RANGE_REGEX), "The format of filter help text is wrong");
@@ -141,17 +138,12 @@ public class FiltersBucket extends AbstractBucket {
     public void changeDateDimension(String currentDimension, String switchDimension) {
         WebElement filter = getFilter(currentDimension);
         openDatePanelOfFilter(filter).changeDateDimension(switchDimension);
-
-        DateFilterPickerPanel panel = getFilterPickerPanel();
-        panel.apply();
+        getFilterPickerPanel().apply();
     }
 
     public FiltersBucket changeDateDimension(String switchDimension) {
         openDatePanelOfFilter(getDateFilter()).changeDateDimension(switchDimension);
-
-        DateFilterPickerPanel panel = getFilterPickerPanel();
-        panel.apply();
-
+        getFilterPickerPanel().apply();
         return this;
     } 
 

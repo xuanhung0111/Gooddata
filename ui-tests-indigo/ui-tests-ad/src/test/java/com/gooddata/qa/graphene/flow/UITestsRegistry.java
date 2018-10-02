@@ -38,6 +38,7 @@ import com.gooddata.qa.graphene.indigo.analyze.GoodSalesTrendingRecommendationTe
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesUndoRedoSavedInsightTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesUndoTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesVisualizationTest;
+import com.gooddata.qa.graphene.indigo.analyze.InsightCompareToPreviousPeriodTest;
 import com.gooddata.qa.graphene.indigo.analyze.MultipleDatasetsTest;
 import com.gooddata.qa.graphene.indigo.analyze.NonProductionDatasetInsightTest;
 import com.gooddata.qa.graphene.indigo.analyze.SpecialCasesTest;
@@ -138,6 +139,7 @@ public class UITestsRegistry {
             EventingFiltersUnderMetric.class,
             EventingSpecialCaseTest.class,
             DateFilterADMeasureExtendedTest.class,
+            InsightCompareToPreviousPeriodTest.class,
             "testng-ad-ChartLabelFormat.xml",
             "testng-ad-MetricNumberFormat.xml"
         });
@@ -159,7 +161,8 @@ public class UITestsRegistry {
         suites.put("filters", new Object[] {
             GoodSalesAttributeFilterTest.class,
             DateFilterTest.class,
-            GoodSalesMetricFilterTest.class
+            GoodSalesMetricFilterTest.class,
+            InsightCompareToPreviousPeriodTest.class
         });
 
         suites.put("total-results", new Object[] {

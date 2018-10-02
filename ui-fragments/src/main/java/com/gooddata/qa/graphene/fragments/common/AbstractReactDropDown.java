@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.gooddata.qa.graphene.utils.Sleeper;
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -87,6 +88,17 @@ public abstract class AbstractReactDropDown extends AbstractDropDown {
         // wait until the selection is made and propagated to the button title
         waitForSelectionIsApplied(name);
 
+        return this;
+    }
+
+    public AbstractReactDropDown addByNames(String... names) {
+        ensureDropdownOpen();
+        for (String name : names) {
+            searchForText(name);
+            getElementByName(name).click();
+            Graphene.waitGui().until(browser ->
+                    getElementByName(name).getAttribute("class").contains("is-selected"));
+        }
         return this;
     }
 

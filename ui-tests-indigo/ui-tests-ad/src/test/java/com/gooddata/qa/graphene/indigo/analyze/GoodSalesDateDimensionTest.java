@@ -1,5 +1,8 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_ACTIVITY;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CLOSED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.FACT_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_SNAPSHOT_BOP;
@@ -10,6 +13,8 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import com.gooddata.qa.graphene.enums.DateGranularity;
+import com.gooddata.qa.graphene.enums.DateRange;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
@@ -24,9 +29,6 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.Filters
 import java.util.Arrays;
 
 public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
-
-    private static final String ACTIVITY = "Activity";
-    private static final String CREATED = "Created";
 
     @Override
     public void initProperties() {
@@ -48,19 +50,20 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
                 .addMetric(METRIC_SNAPSHOT_BOP)
                 .addDateFilter()
                 .waitForReportComputing();
-        assertEquals(parseFilterText(filtersBucketReact.getFilterText(ACTIVITY)), Arrays.asList(ACTIVITY, "All time"));
+        assertEquals(parseFilterText(filtersBucketReact.getFilterText(DATE_DATASET_ACTIVITY)),
+                Arrays.asList(DATE_DATASET_ACTIVITY, DateRange.ALL_TIME.toString()));
         assertEquals(analysisPage.getChartReport().getTrackersCount(), 2);
 
-        WebElement filter = filtersBucketReact.getFilter(ACTIVITY);
+        WebElement filter = filtersBucketReact.getFilter(DATE_DATASET_ACTIVITY);
         filter.click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
-        assertEquals(panel.getDimensionSwitchs(), asList(ACTIVITY, CREATED));
+        assertEquals(panel.getDimensionSwitchs(), asList(DATE_DATASET_ACTIVITY, DATE_DATASET_CREATED));
 
-        panel.select("This year");
-        panel.apply();
+        panel.changePeriod(DateRange.THIS_YEAR.toString()).apply();
         analysisPage.waitForReportComputing();
-        assertEquals(parseFilterText(filtersBucketReact.getFilterText(ACTIVITY)), Arrays.asList(ACTIVITY, "This year"));
+        assertEquals(parseFilterText(filtersBucketReact.getFilterText(DATE_DATASET_ACTIVITY)),
+                Arrays.asList(DATE_DATASET_ACTIVITY, DateRange.THIS_YEAR.toString()));
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1, "Tracker should display");
         checkingOpenAsReport("applyOnFilter");
     }
@@ -70,9 +73,10 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
         final FiltersBucket filtersBucketReact = initAnalysePage().getFilterBuckets();
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
-        assertEquals(parseFilterText(filtersBucketReact.getFilterText(ACTIVITY)), Arrays.asList(ACTIVITY, "All time"));
+        assertEquals(parseFilterText(filtersBucketReact.getFilterText(DATE_DATASET_ACTIVITY)),
+                Arrays.asList(DATE_DATASET_ACTIVITY, DateRange.ALL_TIME.toString()));
 
-        analysisPage.getAttributesBucket().changeGranularity("Month");
+        analysisPage.getAttributesBucket().changeGranularity(DateGranularity.MONTH);
         analysisPage.waitForReportComputing();
 
         filtersBucketReact.configDateFilter("Last 90 days");
@@ -90,20 +94,23 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
         final FiltersBucket filtersBucketReact = initAnalysePage().getFilterBuckets();
 
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDateFilter();
-        assertEquals(parseFilterText(filtersBucketReact.getFilterText(ACTIVITY)), Arrays.asList(ACTIVITY, "All time"));
+        assertEquals(parseFilterText(filtersBucketReact.getFilterText(DATE_DATASET_ACTIVITY)),
+                Arrays.asList(DATE_DATASET_ACTIVITY, DateRange.ALL_TIME.toString()));
 
-        filtersBucketReact.changeDateDimension(ACTIVITY, CREATED);
-        assertEquals(parseFilterText(filtersBucketReact.getFilterText(CREATED)), Arrays.asList(CREATED, "All time"));
+        filtersBucketReact.changeDateDimension(DATE_DATASET_ACTIVITY, DATE_DATASET_CREATED);
+        assertEquals(parseFilterText(filtersBucketReact.getFilterText(DATE_DATASET_CREATED)),
+                Arrays.asList(DATE_DATASET_CREATED, DateRange.ALL_TIME.toString()));
 
         analysisPage.addDate();
-        WebElement filter = filtersBucketReact.getFilter(CREATED);
+        WebElement filter = filtersBucketReact.getFilter(DATE_DATASET_CREATED);
         filter.click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
         assertFalse(panel.isDimensionSwitcherEnabled(), "Dimension switcher shouldn't be enabled");
 
-        analysisPage.getAttributesBucket().changeDateDimension(ACTIVITY);
-        assertEquals(parseFilterText(filtersBucketReact.getFilterText(ACTIVITY)), Arrays.asList(ACTIVITY, "All time"));
+        analysisPage.getAttributesBucket().changeDateDimension(DATE_DATASET_ACTIVITY);
+        assertEquals(parseFilterText(filtersBucketReact.getFilterText(DATE_DATASET_ACTIVITY)),
+                Arrays.asList(DATE_DATASET_ACTIVITY, DateRange.ALL_TIME.toString()));
         checkingOpenAsReport("applyOnBothFilterAndBucket");
     }
 
@@ -111,9 +118,9 @@ public class GoodSalesDateDimensionTest extends AbstractAnalyseTest {
             description = "CL-9980: Date filter isn't remained when adding trending from recommendation panel, " +
                     "covered by TestCafe")
     public void keepDateDimensionAfterApplyingSeeTrendRecommendation() {
-        final String newDateDimension = CREATED;
+        final String newDateDimension = DATE_DATASET_CREATED;
         initAnalysePage().addMetric(FACT_AMOUNT, FieldType.FACT).addDateFilter().getFilterBuckets()
-                .changeDateDimension("Closed", newDateDimension);
+                .changeDateDimension(DATE_DATASET_CLOSED, newDateDimension);
 
         assertTrue(analysisPage.waitForReportComputing().getFilterBuckets().getDateFilterText()
                 .startsWith(newDateDimension), "Date dimension was not changed to " + newDateDimension);

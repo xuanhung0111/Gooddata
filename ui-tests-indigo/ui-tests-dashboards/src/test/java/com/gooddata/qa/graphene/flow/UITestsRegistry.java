@@ -13,6 +13,7 @@ import com.gooddata.qa.graphene.indigo.dashboards.EmbeddingSingleDashboardTest;
 import com.gooddata.qa.graphene.indigo.dashboards.HeaderTest;
 import com.gooddata.qa.graphene.indigo.dashboards.InsightOnDashboardTest;
 import com.gooddata.qa.graphene.indigo.dashboards.InvalidDateDataSetTest;
+import com.gooddata.qa.graphene.indigo.dashboards.KpiCompareToPreviousPeriodTest;
 import com.gooddata.qa.graphene.indigo.dashboards.KpiDashboardCreationTest;
 import com.gooddata.qa.graphene.indigo.dashboards.KpiDashboardsParamsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ManipulateWidgetsTest;
@@ -116,6 +117,7 @@ public class UITestsRegistry {
             EventingWidgetDrillToPreventDefaultDashboardTest.class,
             EventingWidgetDrillToDashboardTest.class,
             EventingMultipleWidgetsTest.class,
+            KpiCompareToPreviousPeriodTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-desktop-EditMode.xml",
@@ -184,6 +186,7 @@ public class UITestsRegistry {
             DeleteAttributeFilterTest.class,
             MultipleAttributeFilteringTest.class,
             MultipleAttributeFilterManipulationTest.class,
+            KpiCompareToPreviousPeriodTest.class,
             "testng-desktop-AttributeFiltering.xml",
             "testng-desktop-DateFiltering.xml",
             "testng-mobile-AttributeFiltering.xml",

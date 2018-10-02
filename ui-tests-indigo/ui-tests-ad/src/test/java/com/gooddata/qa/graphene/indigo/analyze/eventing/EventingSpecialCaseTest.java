@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze.eventing;
 
+import com.gooddata.qa.graphene.enums.DateGranularity;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.EmbeddedAnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
@@ -454,7 +455,7 @@ public class EventingSpecialCaseTest extends AbstractEventingTest {
         initAnalysePage();
         analysisPage.changeReportType(ReportType.TABLE).waitForReportComputing();
         analysisPage.addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
-        analysisPage.getAttributesBucket().changeGranularity("Quarter");
+        analysisPage.getAttributesBucket().changeGranularity(DateGranularity.QUARTER);
         analysisPage.saveInsight("special_test_insight_18_2_" + generateHashString());
 
         final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
