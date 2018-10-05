@@ -48,6 +48,9 @@ public class MetricConfiguration extends AbstractFragment {
     @FindBy(className = "s-show-in-percent")
     private WebElement showInPercents;
 
+    @FindBy(className = "button-dropdown")
+    private List<WebElement> byDateAndAddAttributeFilter;
+
     private static final By BY_REMOVE_ATTRIBUTE_FILTER = By.className("s-remove-attribute-filter");
     private static final By BY_REMOVE_FILTER_BY_DATE = By.className("s-remove-date-filter");
     public static final By BY_ATTRIBUTE_FILTER_PICKER = By.className("adi-attr-filter-picker");
@@ -61,8 +64,7 @@ public class MetricConfiguration extends AbstractFragment {
     private static final String DISABLED = "is-disabled";
 
     public List<String> getByDateAndAttributeFilterButton() {
-        return browser.findElements(By.cssSelector(".adi-metric-bucket-item-configuration button"))
-                .stream().map(WebElement::getText).collect(Collectors.toList());
+        return byDateAndAddAttributeFilter.stream().map(WebElement::getText).collect(Collectors.toList());
     }
 
     public boolean isFilterByDateButtonVisible() {
