@@ -16,7 +16,9 @@ import com.gooddata.qa.mdObjects.dashboard.tab.ReportItem;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
 import com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition;
 import com.gooddata.qa.utils.http.CommonRestRequest;
+import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.report.ReportRestRequest;
 import com.gooddata.qa.utils.http.variable.VariableRestRequest;
 import org.apache.commons.lang3.tuple.Pair;
@@ -100,9 +102,11 @@ public class GoodSalesEmailScheduleEmbeddedDashboardHasFilterTest extends Abstra
     }
 
     @Test(dependsOnGroups = "createProject", groups = "schedules")
-    public void signInImapUser() throws JSONException {
+    public void signInImapUser() throws JSONException, IOException {
         logout();
         signInAtGreyPages(imapUser, imapPassword);
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .updateProjectConfiguration("newUIEnabled", "classic");
     }
 
     @Test(dependsOnMethods = "signInImapUser")
