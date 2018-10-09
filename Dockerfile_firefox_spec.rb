@@ -33,4 +33,8 @@ describe "Dockerfile" do
   it "can start Xvfb-run" do
     expect(command("xvfb-run echo 'test'").stdout).to eq "test\n"
   end
+
+  it "ensure /etc/machine-id exists for D-Bus configuration" do
+    expect(file('/etc/machine-id')).to contain("eff45cad5ee285945f958f2c7a1b9f64")
+  end
 end
