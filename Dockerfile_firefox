@@ -18,6 +18,7 @@ RUN set -x && \
     yum install --setopt=tsflags=nodocs -y xorg-x11-server-Xvfb xorg-x11-xinit \
                 dejavu-sans-fonts dejavu-sans-mono-fonts dejavu-serif-fonts \
                 maven-bin which bzip2 firefox gtk3-devel && \
+    echo "checklist_image" | md5sum |cut -f1 -d\ > /etc/machine-id && \
     yum remove -y firefox && \
     rm -rf /opt/firefox
 
