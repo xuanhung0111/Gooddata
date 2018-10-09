@@ -34,7 +34,7 @@ import com.gooddata.qa.utils.java.Builder;
 
 public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 
-    private static final long expectedDashboardExportSize = 45000L;
+    private static final long expectedDashboardExportSize = 30000L;
     private static final int FIRST_TAB_INDEX = 0;
     private final String SOURCE_TAB = "Source Tab";
     private final String TARGET_TAB = "Target Tab";
