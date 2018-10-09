@@ -22,17 +22,18 @@ import java.util.function.Consumer;
 import static java.util.Objects.isNull;
 
 public class LcmRestUtils {
-    private static final String DEFAULT_DOMAIN_SEGMENT_LINK = "/gdc/domains/default/dataproducts/default/segments";
-    private static final String DEFAULT_DOMAIN_CLIENT_LINK = "/gdc/domains/default/dataproducts/default/clients";
+    public static final String ATT_LCM_DATA_PRODUCT = "att_lcm_default_data_product";
 
-    public static void deleteClient(final RestClient restClient, final String clientId) {
-        final String deleteUri = DEFAULT_DOMAIN_CLIENT_LINK + "/" + clientId;
+    public static void deleteClient(final RestClient restClient, final String domain, final String clientId) {
+        final String deleteUri = String.format("/gdc/domains/%s/dataproducts/%s/clients/%s",
+                domain, ATT_LCM_DATA_PRODUCT, clientId);
         restClient.execute(RestRequest.initDeleteRequest(deleteUri), HttpStatus.NO_CONTENT);
     }
 
-    public static String getMasterProjectId(final RestClient restClient, final String segmentId) {
+    public static String getMasterProjectId(final RestClient restClient, final String domain, final String segmentId) {
         try {
-            final String segment = DEFAULT_DOMAIN_SEGMENT_LINK + "/" + segmentId;
+            final String segment = String.format("/gdc/domains/%s/dataproducts/%s/segments/%s",
+                    domain, ATT_LCM_DATA_PRODUCT, segmentId);
             final String masterUri = getJsonObject(restClient, segment).getJSONObject("segment").getString("masterProject");
             return masterUri.split("/gdc/projects/")[1];
         } catch (Exception ex) {
@@ -40,10 +41,11 @@ public class LcmRestUtils {
         }
     }
 
-    public static Map<String, Set<String>> getClientProjectIds(final RestClient restClient, final String segmentId) {
+    public static Map<String, Set<String>> getClientProjectIds(final RestClient restClient, final String domain,
+                                                               final String dataProduct, final String segmentId) {
         try {
-            final String segment = String.format("/gdc/domains/default/clients?segment=%s&limit=1000",
-                    segmentId);
+            final String segment = String.format("/gdc/domains/%s/dataproducts/%s/clients?segment=%s&limit=1000",
+                    domain, dataProduct, segmentId);
             final JSONArray clients = getJsonObject(restClient, segment).getJSONObject("clients").getJSONArray("items");
             Map<String, Set<String>> clientProjects = new HashMap<>();
             clients.forEach(client -> {
@@ -70,21 +72,22 @@ public class LcmRestUtils {
      * @param restClient
      * @param segmentId
      */
-    public static void deleteSegment(final RestClient restClient, final String segmentId) {
+    public static void deleteSegment(final RestClient restClient, final String domain, final String segmentId) {
         try {
             //delete clients projects
             final ProjectService service = restClient.getProjectService();
-            getClientProjectIds(restClient, segmentId).forEach((k, v) -> {
+            getClientProjectIds(restClient, domain,ATT_LCM_DATA_PRODUCT, segmentId).forEach((k, v) -> {
                 v.forEach(clientProj -> {
                     service.removeProject(service.getProjectById(clientProj));
                 });
-                deleteClient(restClient, k);
+                deleteClient(restClient, domain, k);
             });
             //delete master project
-            final String masterProject = getMasterProjectId(restClient, segmentId);
+            final String masterProject = getMasterProjectId(restClient, domain, segmentId);
             service.removeProject(service.getProjectById(masterProject));
             //delete segment
-            final String segment = DEFAULT_DOMAIN_SEGMENT_LINK + "/" + segmentId;
+            final String segment = String.format("/gdc/domains/%s/dataproducts/%s/segments/%s",
+                    domain, ATT_LCM_DATA_PRODUCT, segmentId);
             restClient.execute(RestRequest.initDeleteRequest(segment), HttpStatus.NO_CONTENT);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
@@ -98,8 +101,8 @@ public class LcmRestUtils {
      * @param restClient
      * @param segments
      */
-    public static void deleteSegments(final RestClient restClient, final Set<String> segments) {
-        segments.forEach(segment -> deleteSegment(restClient, segment));
+    public static void deleteSegments(final RestClient restClient, final String domain, final Set<String> segments) {
+        segments.forEach(segment -> deleteSegment(restClient, domain, segment));
     }
 
     private static JSONObject getJsonObject(final RestClient restClient, String resourceUri) throws IOException {
