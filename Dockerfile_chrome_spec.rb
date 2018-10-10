@@ -15,7 +15,7 @@ describe "Dockerfile" do
   packages = ['xorg-x11-server-Xvfb', 'xorg-x11-xinit',
               'google-chrome-stable',
               'dejavu-sans-fonts', 'dejavu-sans-mono-fonts',
-              'dejavu-serif-fonts', 'phantomjs', 'maven-bin']
+              'dejavu-serif-fonts', 'maven-bin']
 
   it "installs required packages" do
     packages.each do |p|
@@ -23,16 +23,8 @@ describe "Dockerfile" do
     end
   end
 
-  it "installs Firefox" do
-    expect(command('firefox --version').stdout).to contain("Firefox")
-  end
-
   it "installs Chrome" do
     expect(command('chrome --version').stdout).to contain("Google Chrome")
-  end
-
-  it "installs Geckodriver" do
-    expect(command('geckodriver --version').stdout).to contain("geckodriver")
   end
 
   it "installs Chromedriver" do

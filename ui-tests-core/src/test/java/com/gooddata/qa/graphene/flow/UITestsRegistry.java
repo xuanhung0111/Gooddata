@@ -118,7 +118,8 @@ public class UITestsRegistry {
                     GoodSalesDashboardTest.class,
                     GoodSalesReportsTest.class,
                     "testng-imap-GoodSales-email-schedule.xml",
-                    "testng-imap-project-n-users-sanity-test.xml"
+                    "testng-imap-project-n-users-sanity-test.xml",
+                    "testng-imap-GoodSales-email-schedule-uri-parameter-embedded-dashboard.xml"
             });
             //separate localization test into one phase so it does not affect to other tests
             put("localization", new Object[] {
@@ -291,7 +292,12 @@ public class UITestsRegistry {
             GoodSalesScheduleDialogFiltersTest.class,
             GoodSalesScheduleDashboardTest.class,
             "testng-imap-GoodSales-email-unsubscribe.xml",
-            "testng-imap-GoodSales-email-schedule-full.xml"
+            "testng-imap-GoodSales-email-schedule-full.xml",
+            "testng-imap-GoodSales-email-schedule-dashboard.xml",
+            "testng-imap-GoodSales-email-schedule-embedded-dashboard.xml",
+            "testng-imap-GoodSales-email-schedule-embedded-dashboard-has-filter.xml",
+            "testng-imap-GoodSales-email-schedule-saved-view-embedded-dashboard.xml",
+            "testng-imap-GoodSales-email-schedule-uri-parameter-embedded-dashboard.xml"
         });
 
         suites.put("misc", new Object[] {

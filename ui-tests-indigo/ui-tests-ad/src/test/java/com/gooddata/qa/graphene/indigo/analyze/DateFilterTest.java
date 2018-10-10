@@ -10,6 +10,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static java.lang.String.format;
 
@@ -18,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import com.gooddata.qa.graphene.enums.DateRange;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import com.gooddata.qa.utils.http.RestClient;
 import org.jboss.arquillian.graphene.Graphene;
@@ -70,6 +72,17 @@ public class DateFilterTest extends AbstractAnalyseTest {
         panel.selectStaticPeriod();
         assertEquals(panel.getToDate(), DateRange.now().format(dateTimeFormatter));
         assertEquals(panel.getFromDate(), DateRange.LAST_30_DAYS.getFrom().format(dateTimeFormatter));
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void applyFilterWithoutChange() {
+        initAnalysePage().addDateFilter()
+                .getFilterBuckets()
+                .getFilter(DATE_INVOICE).click();
+
+        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
+                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+        assertFalse(panel.isApplyButtonEnabled(), "Apply button should be disabled without change");
     }
 
     @Test(dependsOnGroups = {"createProject"})

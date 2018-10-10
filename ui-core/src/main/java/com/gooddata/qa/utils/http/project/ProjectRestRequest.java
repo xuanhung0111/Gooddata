@@ -15,9 +15,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
+
+import static com.gooddata.qa.utils.http.RestRequest.initPutRequest;
+import static java.lang.String.format;
 
 /**
  * REST request for project task
@@ -25,8 +29,8 @@ import java.util.logging.Logger;
 public final class ProjectRestRequest extends CommonRestRequest {
 
     private static final Logger log = Logger.getLogger(ProjectRestRequest.class.getName());
-
     private static final String PROJECT_LINK = "/gdc/projects/%s";
+    private static final String PROJECT_CONFIGURATION_LINK = "/gdc/projects/%s/config";
 
     public ProjectRestRequest(final RestClient restClient, final String projectId) {
         super(restClient, projectId);
@@ -103,5 +107,12 @@ public final class ProjectRestRequest extends CommonRestRequest {
                 .conditionEvaluationListener(condition -> service.createProjectFeatureFlag(project,
                         new ProjectFeatureFlag(featureFlag.getFlagName(), enabled)))
                 .until(() -> service.getProjectFeatureFlag(project, featureFlag.getFlagName()).isEnabled() == enabled);
+    }
+
+    public void updateProjectConfiguration(final String key, final String value) throws IOException {
+        String url = format(PROJECT_CONFIGURATION_LINK, projectId) + "/" + key;
+        JSONObject settingItem = getJsonObject(url);
+        settingItem.getJSONObject("settingItem").put("value", value);
+        executeRequest(initPutRequest(url, settingItem.toString()), HttpStatus.NO_CONTENT);
     }
 }

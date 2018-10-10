@@ -30,7 +30,7 @@ import static org.testng.Assert.assertFalse;
 
 public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void eventingTableReportSingleMetric() throws IOException {
         String insightUri = createInsight("single_metric_table_insight", TABLE,
                 singletonList(METRIC_NUMBER_OF_ACTIVITIES), emptyList());
@@ -49,7 +49,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void eventingColumnReportSingleMetric() throws IOException {
         String insightUri = createInsight("single_metric_column_insight", COLUMN_CHART,
                 singletonList(METRIC_NUMBER_OF_ACTIVITIES), emptyList());
@@ -73,7 +73,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         verifyColumnIntersection(intersection.getJSONObject(0), METRIC_NUMBER_OF_ACTIVITIES, activityUri);
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void eventingTableReportMultipleMetrics() throws IOException {
         String insightUri = createInsight("multiple_metrics_table_insight", TABLE,
                 Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES), emptyList());
@@ -99,7 +99,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         verifyTableReport(content, METRIC_NUMBER_OF_OPPORTUNITIES, opportunityUri);
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void eventingColumnReportMultipleMetrics() throws IOException {
         String insightUri = createInsight("multiple_metrics_column_insight", COLUMN_CHART,
                 Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES), emptyList());
@@ -135,7 +135,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         verifyColumnIntersection(intersection.getJSONObject(0), METRIC_NUMBER_OF_OPPORTUNITIES, opportunityUri);
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void eventingTableReportSingleAttribute() throws IOException {
         String insightUri = createInsight("single_attribute_table_insight", TABLE, emptyList(),
                 singletonList(ATTR_STAGE_NAME));
@@ -154,7 +154,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         verifyTableReport(content, ATTR_STAGE_NAME, stageUri);
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void eventingTableReportMultipleAttributes() throws IOException {
         String insightUri = createInsight("multiple_attributes_table_insight", TABLE, emptyList(),
                 Arrays.asList(ATTR_STAGE_NAME, ATTR_REGION));
@@ -180,7 +180,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         verifyTableReport(content, ATTR_REGION, regionUri);
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void eventingTableReportMultipleMetricsSingleAttribute() throws IOException {
         String insightUri = createInsight("single_attribute__multiple_metric_table_insight", TABLE,
                 Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES),
@@ -210,7 +210,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void eventingTableReportSingleMetricSingleAttribute() throws IOException {
         String insightUri = createInsight("single_attribute_single_metric_table_insight", TABLE,
                 singletonList(METRIC_NUMBER_OF_ACTIVITIES),
@@ -237,7 +237,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void eventingColumnReportSingleMetricSingleAttribute() throws IOException {
         String insightUri = createInsight("single_attribute_single_metric_column_insight", COLUMN_CHART,
                 singletonList(METRIC_NUMBER_OF_ACTIVITIES), singletonList(ATTR_REGION));
@@ -266,7 +266,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         verifyColumnIntersection(intersection.getJSONObject(1), "East Coast", regionUri);
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void eventingColumnReportHasStackBy() throws IOException {
         String insightUri = createInsight("test_stackby_column_insight", COLUMN_CHART,
                 singletonList(METRIC_NUMBER_OF_ACTIVITIES),
@@ -299,7 +299,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         verifyColumnIntersection(intersection.getJSONObject(2), "East Coast", regionUri);
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void eventingColumnReportHasStackBySameAsViewBy() throws IOException {
         String insightUri = createInsight("test_same_attr_column_insight", COLUMN_CHART,
                 singletonList(METRIC_NUMBER_OF_ACTIVITIES), singletonList(ATTR_ACTIVITY_TYPE), ATTR_ACTIVITY_TYPE);
@@ -330,7 +330,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         verifyColumnIntersection(intersection.getJSONObject(2), "Email", activityTypeUri);
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void eventingTableReportSingleMetricViewByDate() throws IOException {
         String insightUri = createInsight("test_view_date_table_insight", TABLE,
                 singletonList(METRIC_NUMBER_OF_ACTIVITIES), singletonList(ATTR_YEAR_ACTIVITY));
@@ -357,7 +357,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         verifyTableReport(content, ATTR_YEAR_ACTIVITY, yearActivity);
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void eventingColumnReportSingleMetricViewByDate() throws IOException {
         String insightUri = createInsight("test_view_date_column_insight", COLUMN_CHART,
                 singletonList(METRIC_NUMBER_OF_ACTIVITIES), singletonList(ATTR_YEAR_ACTIVITY));
@@ -389,7 +389,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         verifyColumnIntersection(intersection.getJSONObject(1), "2011", yearActivity);
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void eventingColumnReportMultipleMetricsViewByDate() throws IOException {
         String insightUri = createInsight("test_view_date_multi_metrics_column_insight", COLUMN_CHART,
                 Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES),
@@ -433,7 +433,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         verifyColumnIntersection(intersection.getJSONObject(1), "2011", yearCreated);
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void eventingColumnReportSingleMetricViewByDateHasStack() throws IOException {
         String insightUri = createInsight("test_view_date_has_stack_column_insight", COLUMN_CHART,
                 singletonList(METRIC_NUMBER_OF_ACTIVITIES), singletonList(ATTR_YEAR_ACTIVITY), ATTR_REGION);
@@ -454,7 +454,7 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         Pair<Integer, Integer> position = getColumnPosition(insight.getChartReport(), "East Coast", "2011");
         cleanUpLogger();
         insight.getChartReport().clickOnElement(position);
-
+        
         JSONObject content = getLatestPostMessageObj();
         verifyColumnDrillContext(content);
         JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");

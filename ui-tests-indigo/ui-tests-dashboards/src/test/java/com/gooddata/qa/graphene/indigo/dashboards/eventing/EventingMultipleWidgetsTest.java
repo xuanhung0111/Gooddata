@@ -39,7 +39,7 @@ public class EventingMultipleWidgetsTest extends AbstractDashboardEventingTest {
                 testParams.getProjectId(), oldDashboardUri, firstTabIdentifier);
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"mobile"})
     public void eventingOnDashboardHasGreaterThan20Widgets() throws IOException {
         List<Pair<String, String>> widgetAndMetricUris = new ArrayList<>();
         widgetAndMetricUris.addAll(createMultipleWidgets());

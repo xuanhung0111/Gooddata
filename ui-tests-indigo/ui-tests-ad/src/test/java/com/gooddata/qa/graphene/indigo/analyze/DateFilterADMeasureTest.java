@@ -1,4 +1,5 @@
 package com.gooddata.qa.graphene.indigo.analyze;
+
 import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
@@ -21,6 +22,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 public class DateFilterADMeasureTest extends AbstractAnalyseTest {
+
     private static final String INSIGHT_HAS_DATE_ON_VIEWBY = "Insight has date on view by and no date on filter section";
     private static final String INSIGHT_HAS_DATE_ON_FILTER_SECTION = "Insight has date on filter section and no date" +
             " on view by";
@@ -80,14 +82,13 @@ public class DateFilterADMeasureTest extends AbstractAnalyseTest {
                 .addFilterByDate(DATE_DATASET_CLOSED, DateRange.THIS_YEAR.toString());
         metricConfiguration.collapseConfiguration();
 
-        metricConfiguration.expandConfiguration().expandFilterByDate();
-        metricConfiguration.changeDateDimension(DATE_DATASET_CREATED).collapseConfiguration();
+        metricConfiguration.expandConfiguration().expandFilterByDate().changeDateDimension(DATE_DATASET_CREATED);
+        metricConfiguration.collapseConfiguration();
 
         metricConfiguration = analysisPage.getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT)
                 .expandConfiguration();
-        metricConfiguration.expandFilterByDate();
 
-        assertEquals(metricConfiguration.getDateDimension(), DATE_DATASET_CREATED);
+        assertEquals(metricConfiguration.expandFilterByDate().getDateDimension(), DATE_DATASET_CREATED);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -107,14 +108,14 @@ public class DateFilterADMeasureTest extends AbstractAnalyseTest {
                 .addFilterByDate(DATE_DATASET_CLOSED, DateRange.THIS_YEAR.toString());
         metricConfiguration.collapseConfiguration();
 
-        metricConfiguration.expandConfiguration().expandFilterByDate();
-        metricConfiguration.changeDateDimension(DATE_DATASET_CREATED).collapseConfiguration();
+        metricConfiguration.expandConfiguration().expandFilterByDate()
+                .changeDateDimension(DATE_DATASET_CREATED);
+        metricConfiguration.collapseConfiguration();
 
         metricConfiguration = analysisPage.getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT)
                 .expandConfiguration();
-        metricConfiguration.expandFilterByDate();
 
-        assertEquals(metricConfiguration.getDateDimension(), DATE_DATASET_CREATED);
+        assertEquals(metricConfiguration.expandFilterByDate().getDateDimension(), DATE_DATASET_CREATED);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -189,9 +190,8 @@ public class DateFilterADMeasureTest extends AbstractAnalyseTest {
 
         metricConfiguration = analysisPage.getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT)
                 .expandConfiguration();
-        metricConfiguration.expandFilterByDate();
-
-        assertFalse(metricConfiguration.isDateDimensionVisible(), "Date Dismension button isn't be greyed out");
+        assertFalse(metricConfiguration.expandFilterByDate().isDateDimensionEnabled(),
+                "Date dimension button should be disabled");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -210,25 +210,17 @@ public class DateFilterADMeasureTest extends AbstractAnalyseTest {
 
         metricConfiguration = analysisPage.getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT)
                 .expandConfiguration();
-        metricConfiguration.expandFilterByDate();
 
-        assertEquals(metricConfiguration.getDateDimension(), DATE_DATASET_CREATED);
+        assertEquals(metricConfiguration.expandFilterByDate().getDateDimension(), DATE_DATASET_CREATED);
     }
 
     @Test(dependsOnGroups = {"createProject"})
     public void selectDateDimensionWithoutAppliedDateFilter() {
-        MetricConfiguration metricConfiguration;
-        analysisPage = initAnalysePage();
-        analysisPage.openInsight(INSIGHT_HAS_DATE_ON_VIEWBY).waitForReportComputing();
+        initAnalysePage().openInsight(INSIGHT_HAS_DATE_ON_VIEWBY).waitForReportComputing().removeAttribute("Date")
+                .waitForReportComputing();
 
-        analysisPage.removeAttribute("Date").waitForReportComputing();
-
-        metricConfiguration = analysisPage.getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT)
-                .expandConfiguration();
-        metricConfiguration.expandFilterByDate();
-        metricConfiguration.changeDateDimension(DATE_DATASET_CREATED);
-
-        assertEquals(metricConfiguration.getDateDimension(), DATE_DATASET_CREATED);
+        assertEquals(analysisPage.getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
+                .expandFilterByDate().changeDateDimension(DATE_DATASET_CREATED).getDateDimension(), DATE_DATASET_CREATED);
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -239,9 +231,8 @@ public class DateFilterADMeasureTest extends AbstractAnalyseTest {
 
         metricConfiguration = analysisPage.getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT)
                 .expandConfiguration();
-        metricConfiguration.expandFilterByDate();
 
-        assertEquals(metricConfiguration.getToolTipDimensionDropdown(), TOOLTIP_CONTENT);
+        assertEquals(metricConfiguration.expandFilterByDate().getToolTipDimensionDropdown(), TOOLTIP_CONTENT);
     }
 
     @Test(dependsOnGroups = {"createProject"})

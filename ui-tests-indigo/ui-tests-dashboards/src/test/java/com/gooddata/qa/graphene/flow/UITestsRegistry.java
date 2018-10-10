@@ -147,7 +147,9 @@ public class UITestsRegistry {
             "testng-mobile-ProjectSwitch.xml",
             "testng-mobile-KpiDashboards.xml",
             "testng-mobile-DropDownNavigation.xml",
-            "testng-mobile-KpiDashboardWithTotalsResult.xml"
+            "testng-mobile-KpiDashboardWithTotalsResult.xml",
+            "testng-mobile-EventingBasicInsight.xml",
+            "testng-mobile-EventingMultipleWidgets.xml"
         });
 
         suites.put("crud", new Object[] {

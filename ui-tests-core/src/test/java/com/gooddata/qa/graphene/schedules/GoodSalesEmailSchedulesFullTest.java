@@ -443,7 +443,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     }
 
     @Test(dependsOnMethods = {"updateScheduledMailRecurrency"})
-    public void waitForScheduleMessages() throws MessagingException, IOException {
+    public void waitForScheduledMailMessages() throws MessagingException, IOException {
         ScheduleEmailRestRequest scheduleEmailRestRequest = initScheduleEmailRestRequest();
         try (ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword)) {
             System.out.println("ACCELERATE scheduled mails processing");
@@ -455,7 +455,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         }
     }
 
-    @Test(dependsOnMethods = {"waitForScheduleMessages"})
+    @Test(dependsOnMethods = {"waitForScheduledMailMessages"})
     public void verifyEmptyDashboardSchedule() {
         assertEquals(attachments.get(emptyDashboardTitle).savedAttachments.size(), 1,
                 "ERROR: Dashboard message does not have correct number of attachments.");
@@ -465,7 +465,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         verifyAttachment(attachments.get(emptyDashboardTitle).savedAttachments.get(0), "PDF", 22000);
     }
 
-    @Test(dependsOnMethods = {"waitForScheduleMessages"})
+    @Test(dependsOnMethods = {"waitForScheduledMailMessages"})
     public void verifyNoDataReport() {
         String error = format("Report '%s' produced an empty result during conversion to '%s' format",
                 REPORT_NO_DATA, "html");
@@ -473,7 +473,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
                 "Cannot find message: [" + error + "] in email!");
     }
 
-    @Test(dependsOnMethods = {"waitForScheduleMessages"})
+    @Test(dependsOnMethods = {"waitForScheduledMailMessages"})
     public void verifyIncomputableReport() {
         String error = format("Report '%s' you wanted to export to '%s' format is not currently computable",
                 REPORT_INCOMPUTABLE, "pdf");
@@ -481,7 +481,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
                 "Cannot find message: [" + error + "] in email!");
     }
 
-    @Test(dependsOnMethods = {"waitForScheduleMessages"})
+    @Test(dependsOnMethods = {"waitForScheduledMailMessages"})
     public void verifyTooLargeReport() {
         String error = format("Report '%s' cannot be exported to '%s' format as it is too large", REPORT_TOO_LARGE,
                 "pdf");
@@ -489,7 +489,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
                 "Cannot find message: [" + error + "] in email!");
     }
 
-    @Test(dependsOnMethods = {"waitForScheduleMessages"})
+    @Test(dependsOnMethods = {"waitForScheduledMailMessages"})
     public void verifyFilteredVariableReport() throws IOException {
         List<String> reportResult = getCsvContent(new File(attachmentsDirectory,
                 attachments.get(filteredVariableReportTitle).savedAttachments.get(0).fileName));
@@ -497,7 +497,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
                 "Data in report is not correct!");
     }
 
-    @Test(dependsOnMethods = {"waitForScheduleMessages"})
+    @Test(dependsOnMethods = {"waitForScheduledMailMessages"})
     public void verifyNumericVariableReport() throws IOException {
         List<String> reportResult = getCsvContent(new File(attachmentsDirectory,
                 attachments.get(numericVariableReportTitle).savedAttachments.get(0).fileName));
@@ -505,7 +505,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
                 "Data in report is not correct!");
     }
 
-    @Test(dependsOnMethods = {"waitForScheduleMessages"})
+    @Test(dependsOnMethods = {"waitForScheduledMailMessages"})
     public void verifyMufReport() throws IOException {
         List<String> reportResult = getCsvContent(new File(attachmentsDirectory,
                 attachments.get(mufReportTitle).savedAttachments.get(0).fileName));
@@ -513,7 +513,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
                 "Data in report is not correct!");
     }
 
-    @Test(dependsOnMethods = {"waitForScheduleMessages"})
+    @Test(dependsOnMethods = {"waitForScheduledMailMessages"})
     public void verifyEmailToWhenUserHasDifferentLoginAndEmail() {
         //To test for issue CL-12072
         assertEquals(initEmailSchedulesPage().openSchedule(mufReportTitle).getEmailToListItem(),

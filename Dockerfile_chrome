@@ -1,0 +1,41 @@
+FROM harbor.intgdc.com/base/gdc-base-centos:7.5.1804
+
+ARG GIT_COMMIT=unspecified
+LABEL image_name="Graphene Chrome Image"
+LABEL maintainer="ATT Scrum <lhv-auto@gooddata.com>"
+LABEL git_repository_url="https://github.com/gooddata/graphene-tests"
+LABEL parent_image="harbor.intgdc.com/base/gdc-base-centos:7.5.1804"
+LABEL git_commit=$GIT_COMMIT
+
+ARG BROWSER_VERSION=67.0.3396.79-1
+ARG DRIVER_VERSION=2.39
+
+#===============
+# Google Chrome
+#===============
+RUN set -x && \
+    yum clean all && \
+    yum install --setopt=tsflags=nodocs -y xorg-x11-server-Xvfb xorg-x11-xinit \
+                dejavu-sans-fonts dejavu-sans-mono-fonts dejavu-serif-fonts maven-bin unzip && \
+    curl https://dl.google.com/linux/linux_signing_key.pub > /tmp/linux_signing_key.pub && \
+    rpm --import /tmp/linux_signing_key.pub && \
+    rm -f /tmp/linux_signing_key.pub
+
+# download and install chrome rpm package
+RUN curl http://orion.lcg.ufrj.br/RPMS/myrpms/google/google-chrome-stable-$BROWSER_VERSION.x86_64.rpm > /tmp/google-chrome-stable-$BROWSER_VERSION.x86_64.rpm && \
+    rpm --checksig /tmp/google-chrome-stable-$BROWSER_VERSION.x86_64.rpm > /etc/google-sign-check && \
+    yum localinstall --setopt=tsflags=nodocs -y /tmp/google-chrome-stable-$BROWSER_VERSION.x86_64.rpm && \
+    ln -fs /opt/google/chrome/chrome /usr/bin/chrome && \
+    rm -f /tmp/google-chrome-stable-$BROWSER_VERSION.x86_64.rpm && \
+    yum clean all && rm -rf /var/cache/yum
+
+
+#==============
+# ChromeDriver
+#==============
+RUN curl https://chromedriver.storage.googleapis.com/$DRIVER_VERSION/chromedriver_linux64.zip > /tmp/chromedriver-$DRIVER_VERSION-linux64.zip && \
+    unzip /tmp/chromedriver-$DRIVER_VERSION-linux64.zip -d /opt/selenium && \
+    rm /tmp/chromedriver-$DRIVER_VERSION-linux64.zip && \
+    mv /opt/selenium/chromedriver /opt/selenium/chromedriver-$DRIVER_VERSION && \
+    chmod 755 /opt/selenium/chromedriver-$DRIVER_VERSION && \
+    ln -fs /opt/selenium/chromedriver-$DRIVER_VERSION /usr/bin/chromedriver

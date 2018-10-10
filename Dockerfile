@@ -24,8 +24,12 @@ RUN set -x && \
                 dejavu-sans-fonts dejavu-sans-mono-fonts dejavu-serif-fonts \
                 phantomjs maven-bin which curl unzip bzip2 firefox && \
     echo "checklist_image" | md5sum |cut -f1 -d\ > /etc/machine-id && \
+    curl https://dl.google.com/linux/linux_signing_key.pub > /tmp/linux_signing_key.pub && \
+    rpm --import /tmp/linux_signing_key.pub && \
     curl http://orion.lcg.ufrj.br/RPMS/myrpms/google/google-chrome-stable-$CHROME_VERSION.x86_64.rpm > /tmp/google-chrome-stable-$CHROME_VERSION.x86_64.rpm && \
+    rpm --checksig /tmp/google-chrome-stable-$CHROME_VERSION.x86_64.rpm > /etc/google-sign-check && \
     yum localinstall --setopt=tsflags=nodocs -y /tmp/google-chrome-stable-$CHROME_VERSION.x86_64.rpm && \
+    rm -f /tmp/linux_signing_key.pub && \
     rm -f /tmp/google-chrome-stable-$CHROME_VERSION.x86_64.rpm && \
     curl https://download-installer.cdn.mozilla.net/pub/firefox/releases/$FIREFOX_VERSION/linux-x86_64/en-US/firefox-$FIREFOX_VERSION.tar.bz2 > /tmp/firefox.tar.bz2 && \
     yum remove -y firefox && \
