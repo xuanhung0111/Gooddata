@@ -309,22 +309,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
                 + fileSize + ", but minimum " + minimalSize + " was expected");
     }
 
-    public List<List<String>> verifyDashboardExportToXLSX (String fileName, long minimalSize) throws IOException {
-        String xlsxUrl = testParams.getDownloadFolder() + testParams.getFolderSeparator() + fileName + ".xlsx";
-        File xlsxExport = new File(xlsxUrl);
-        System.out.println("xlsxExport = " + xlsxExport);
-
-        long fileSize = xlsxExport.length();
-        System.out.println("File size: " + fileSize);
-
-        List<List<String>> xlsxContent = XlsxUtils.excelFileToRead(xlsxUrl, 0);
-
-        assertTrue(fileSize > minimalSize, "Export is probably invalid, check the XLSX manually! Current size is "
-                + fileSize + ", but minimum " + minimalSize + " was expected");
-
-        return xlsxContent;
-    }
-
     public String getContentFrom(File pdfFile) {
         if (!pdfFile.exists()) {
             throw new NullPointerException();

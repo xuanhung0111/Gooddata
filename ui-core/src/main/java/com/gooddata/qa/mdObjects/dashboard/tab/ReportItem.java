@@ -11,12 +11,14 @@ public class ReportItem extends TabItem {
     private String objUri;
     private List<String> appliedFilterIds = new ArrayList<>();
 
-    public void setObjUri(String objUri) {
+    public ReportItem setObjUri(String objUri) {
         this.objUri = objUri;
+        return this;
     }
 
-    public void setAppliedFilterIds(List<String> appliedFilterIds) {
+    public ReportItem setAppliedFilterIds(List<String> appliedFilterIds) {
         this.appliedFilterIds = appliedFilterIds;
+        return this;
     }
 
     @Override

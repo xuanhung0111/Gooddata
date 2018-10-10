@@ -172,6 +172,10 @@ public class TestParameters {
         return folderSeparator;
     }
 
+    public String getExportFilePath(String fileNameExtension) {
+        return getDownloadFolder() + getFolderSeparator() + fileNameExtension;
+    }
+
     public boolean isReuseProject() {
         return reuseProject;
     }

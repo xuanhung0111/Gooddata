@@ -25,6 +25,7 @@ import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport.CellType;
+import com.gooddata.qa.utils.XlsxUtils;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.google.common.collect.Lists;
@@ -76,7 +77,6 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     private static final String EMBEDDED_DASHBOARD_NAME = "Embedded Dashboard";
 
     private static final long EXPECTED_EXPORT_DASHBOARD_SIZE = 62000L;
-    private static final long EXPECTED_EXPORT_DASHBOARD_TO_XLSX_SIZE = 5700L;
     private static final long EXPECTED_EXPORT_CHART_SIZE = 28000L;
 
     private UiReportDefinition tabularReportDef;
@@ -211,7 +211,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
             verifyReportExport(ExportFormat.PDF, chartReportDef.getName(), EXPECTED_EXPORT_CHART_SIZE);
 
         } finally {
-            deleteIfExists(Paths.get(getExportFilePath(chartReportDef.getName(), ExportFormat.PDF)));
+            deleteIfExists(Paths.get(testParams.getExportFilePath(chartReportDef.getName() + ".pdf")));
         }
 
         OneNumberReport oneNumberReport =  embeddedDashboard.openTab(HEADLINE_REPORT_TAB_INDEX)
@@ -231,7 +231,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
             verifyDashboardExport(exportedDashboardName, "other_widgets", EXPECTED_EXPORT_DASHBOARD_SIZE);
 
         } finally {
-            deleteIfExists(Paths.get(getExportFilePath(exportedDashboardName, ExportFormat.PDF)));
+            deleteIfExists(Paths.get(testParams.getExportFilePath(exportedDashboardName + ".pdf")));
         }
 
         checkRedBar(browser);
@@ -240,13 +240,13 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = "createAdditionalProject")
     public void viewerExportToXLSXOnEmbeddedDashboard() throws IOException {
         logoutAndLoginAs(false, UserRoles.VIEWER);
-        EmbeddedDashboard embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
+        initEmbeddedDashboardWithUri(embedUri);
         String fileName = dashboardsPage.printDashboardTabToXLSX(EMBEDDED_DASHBOARD_NAME);
         try {
-            List<List<String>> xlsxContent = verifyDashboardExportToXLSX(fileName, EXPECTED_EXPORT_DASHBOARD_TO_XLSX_SIZE);
+            List<List<String>> xlsxContent = XlsxUtils.excelFileToRead(testParams.getExportFilePath(fileName), 0);
             checkXlsxContent(xlsxContent);
         } finally {
-            deleteIfExists(Paths.get(getExportFilePath(fileName, ExportFormat.DASHBOARD_XLSX)));
+            deleteIfExists(Paths.get(testParams.getExportFilePath(fileName)));
             logoutAndLoginAs(false, UserRoles.ADMIN);
         }
     }
@@ -254,39 +254,40 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = "createAdditionalProject")
     public void dashboardOnlyToXLSXExportOnEmbeddedDashboard() throws IOException {
         logoutAndLoginAs(false, UserRoles.DASHBOARD_ONLY);
-        EmbeddedDashboard embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
+        initEmbeddedDashboardWithUri(embedUri);
         String fileName = dashboardsPage.printDashboardTabToXLSX(EMBEDDED_DASHBOARD_NAME);
         try {
-            List<List<String>> xlsxContent = verifyDashboardExportToXLSX(fileName, EXPECTED_EXPORT_DASHBOARD_TO_XLSX_SIZE);
+            List<List<String>> xlsxContent = XlsxUtils.excelFileToRead(testParams.getExportFilePath(fileName), 0);
             checkXlsxContent(xlsxContent);
         } finally {
-            deleteIfExists(Paths.get(getExportFilePath(fileName, ExportFormat.DASHBOARD_XLSX)));
+            deleteIfExists(Paths.get(testParams.getExportFilePath(fileName)));
             logoutAndLoginAs(false, UserRoles.ADMIN);
         }
     }
 
     @Test(dependsOnMethods = "createAdditionalProject")
     public void adminExportToXLSXOnEmbeddedDashboard() throws IOException {
-        EmbeddedDashboard embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
+        initEmbeddedDashboardWithUri(embedUri);
         String fileName = dashboardsPage.printDashboardTabToXLSX(EMBEDDED_DASHBOARD_NAME);
         try {
-            List<List<String>> xlsxContent = verifyDashboardExportToXLSX(fileName, EXPECTED_EXPORT_DASHBOARD_TO_XLSX_SIZE);
+            List<List<String>> xlsxContent = XlsxUtils.excelFileToRead(
+                    testParams.getExportFilePath(fileName), 0);
             checkXlsxContent(xlsxContent);
         } finally {
-            deleteIfExists(Paths.get(getExportFilePath(fileName, ExportFormat.DASHBOARD_XLSX)));
+            deleteIfExists(Paths.get(testParams.getExportFilePath(fileName)));
         }
     }
 
     @Test(dependsOnMethods = "createAdditionalProject")
     public void editorExportToXLSXOnEmbeddedDashboard() throws IOException {
         logoutAndLoginAs(false, UserRoles.EDITOR);
-        EmbeddedDashboard embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
+        initEmbeddedDashboardWithUri(embedUri);
         String fileName = dashboardsPage.printDashboardTabToXLSX(EMBEDDED_DASHBOARD_NAME);
         try {
-            List<List<String>> xlsxContent = verifyDashboardExportToXLSX(fileName, EXPECTED_EXPORT_DASHBOARD_TO_XLSX_SIZE);
+            List<List<String>> xlsxContent = XlsxUtils.excelFileToRead(testParams.getExportFilePath(fileName), 0);
             checkXlsxContent(xlsxContent);
         } finally {
-            deleteIfExists(Paths.get(getExportFilePath(fileName, ExportFormat.DASHBOARD_XLSX)));
+            deleteIfExists(Paths.get(testParams.getExportFilePath(fileName)));
             logoutAndLoginAs(false, UserRoles.ADMIN);
         }
     }
@@ -294,7 +295,6 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = "createAdditionalProject")
     public void exportToXLSXOnEmbeddedDashboardWithUrlParameter() throws IOException {
         openUrl(sharedDashboardUrl);
-        long EXPORT_TO_XLSX_SIZE = 5600L;
         EmbedDashboardDialog embedDialog = dashboardsPage.openEmbedDashboardDialog();
         String[] filteredAttributeValues = {"2009", "2011"};
         List<Float> filteredMetricValues = asList(8656468.20F, 60270072.20F);
@@ -306,7 +306,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         String fileName = dashboardsPage.printDashboardTabToXLSX(EMBEDDED_DASHBOARD_NAME);
 
         try {
-            List<List<String>> xlsxContent = verifyDashboardExportToXLSX(fileName, EXPORT_TO_XLSX_SIZE);
+            List<List<String>> xlsxContent = XlsxUtils.excelFileToRead(testParams.getExportFilePath(fileName), 0);
             //verify header title
             assertThat(xlsxContent, hasItem(asList("Year (Created)", "Amount")));
             //verify content
@@ -319,7 +319,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
             assertThat(tableReport.getAttributeValues(), is(newArrayList(filteredAttributeValues)));
             assertThat(tableReport.getMetricValues(), is(filteredMetricValues));
         } finally {
-            deleteIfExists(Paths.get(getExportFilePath(fileName, ExportFormat.DASHBOARD_XLSX)));
+            deleteIfExists(Paths.get(testParams.getExportFilePath(fileName)));
         }
     }
 
@@ -663,10 +663,6 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         }
 
         configPanel.saveConfiguration();
-    }
-
-    private String getExportFilePath(String name, ExportFormat format) {
-        return testParams.getDownloadFolder() + testParams.getFolderSeparator() + name + "." + format.getName();
     }
 
     private String getEmbeddedUriWithIdentifier() {
