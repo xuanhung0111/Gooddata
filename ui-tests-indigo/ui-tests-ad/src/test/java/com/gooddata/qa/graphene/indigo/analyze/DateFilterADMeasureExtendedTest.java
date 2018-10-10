@@ -234,7 +234,7 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
 
         assertFalse(metricFilterByDatePicker.isDateRangePickerVisible(), "System don't close date range picker");
         assertTrue(metricConfiguration.isFilterByDateExpanded(),
-        "System should come back to date filter dropdown");
+                "System should come back to date filter dropdown");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -355,21 +355,24 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
 
         metricConfiguration.addFilterByDate(DateRange.LAST_YEAR.toString());
         analysisPage.saveInsight();
-        assertEquals(metricConfiguration.expandConfiguration().getFilterByDate(), DateRange.LAST_YEAR.toString());
+        assertEquals(metricConfiguration.expandConfiguration().getFilterByDate(),
+                DATE_DATASET_CLOSED + ":\n" + DateRange.LAST_YEAR.toString());
         assertThat(analysisPage.getAttributesBucket().getItemNames(), contains(DATE));
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_AMOUNT));
         assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_DEPARTMENT);
 
         //Do not edit anymore, press Save as button
         analysisPage.saveInsightAs(RENAMED_TEST_INSIGHT);
-        assertEquals(metricConfiguration.expandConfiguration().getFilterByDate(), DateRange.LAST_YEAR.toString());
+        assertEquals(metricConfiguration.expandConfiguration().getFilterByDate(),
+                DATE_DATASET_CLOSED + ":\n" + DateRange.LAST_YEAR.toString());
         assertThat(analysisPage.getAttributesBucket().getItemNames(), contains(DATE));
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_AMOUNT));
         assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_DEPARTMENT);
 
         //Switch between kind of insights, press Save as button
         analysisPage.openInsight(TEST_INSIGHT).openInsight(RENAMED_TEST_INSIGHT).saveInsightAs(RENAMED_TEST_INSIGHT_AGAIN);
-        assertEquals(metricConfiguration.expandConfiguration().getFilterByDate(), DateRange.LAST_YEAR.toString());
+        assertEquals(metricConfiguration.expandConfiguration().getFilterByDate(),
+                DATE_DATASET_CLOSED + ":\n" + DateRange.LAST_YEAR.toString());
         assertThat(analysisPage.getAttributesBucket().getItemNames(), contains(DATE));
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_AMOUNT));
         assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_DEPARTMENT);
@@ -388,7 +391,8 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
 
         metricConfiguration.addFilterByDate(DateRange.LAST_YEAR.toString());
         analysisPage.saveInsight();
-        assertEquals(metricConfiguration.getFilterByDate(), DateRange.LAST_YEAR.toString());
+        assertEquals(metricConfiguration.getFilterByDate(),
+                DATE_DATASET_CLOSED + ":\n" + DateRange.LAST_YEAR.toString());
         assertThat(analysisPage.getAttributesBucket().getItemNames(), contains(DATE));
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(METRIC_AMOUNT, METRIC_AMOUNT));
 
@@ -401,18 +405,21 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
         MetricConfiguration metricConfiguration = initAnalysePage().addMetric(METRIC_AMOUNT).addFilter(ATTR_DEPARTMENT)
                 .waitForReportComputing().saveInsight(TEST_INSIGHT).getMetricsBucket()
                 .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration();
-        metricConfiguration.expandFilterByDate();
         assertEquals(metricConfiguration.getByDateAndAttributeFilterButton(),
                 asList(FILTER_BY_DATE_BUTTON, ADD_ATTRIBUTE_FILTER_BUTTON));
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText(ATTR_DEPARTMENT)),
+                asList(ATTR_DEPARTMENT, "All"));
 
         metricConfiguration.addFilterByDate(DateRange.LAST_YEAR.toString());
         analysisPage.saveInsight();
-        assertEquals(metricConfiguration.getFilterByDate(), DateRange.LAST_YEAR.toString());
+        assertEquals(metricConfiguration.getFilterByDate(),
+                DATE_DATASET_CLOSED + ":\n" + DateRange.LAST_YEAR.toString());
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_AMOUNT));
         assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText(ATTR_DEPARTMENT)),
                 asList(ATTR_DEPARTMENT, "All"));
         analysisPage.addMetric(METRIC_AMOUNT).waitForReportComputing().saveInsightAs(RENAMED_TEST_INSIGHT);
-        assertEquals(metricConfiguration.getFilterByDate(), DateRange.LAST_YEAR.toString());
+        assertEquals(metricConfiguration.getFilterByDate(),
+                DATE_DATASET_CLOSED + ":\n" + DateRange.LAST_YEAR.toString());
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(METRIC_AMOUNT, METRIC_AMOUNT));
         assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText(ATTR_DEPARTMENT)),
                 asList(ATTR_DEPARTMENT, "All"));
@@ -427,20 +434,21 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
         MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT)
                 .expandConfiguration();
         assertEquals(metricConfiguration.getByDateAndAttributeFilterButton(),
-                asList(FILTER_BY_DATE_BUTTON, "", ADD_ATTRIBUTE_FILTER_BUTTON));
+                asList(FILTER_BY_DATE_BUTTON, ATTR_ACCOUNT + ":\nAll", ADD_ATTRIBUTE_FILTER_BUTTON));
+        assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_AMOUNT));
 
         metricConfiguration.addFilterByDate(DateRange.LAST_YEAR.toString());
         analysisPage.saveInsight();
-        assertEquals(metricConfiguration.getFilterByDate(), DateRange.LAST_YEAR.toString());
+        assertEquals(metricConfiguration.getFilterByDate(),
+                DATE_DATASET_CLOSED + ":\n" + DateRange.LAST_YEAR.toString());
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_AMOUNT));
         assertEquals(metricConfiguration.getFilterText(), ATTR_ACCOUNT + ": All");
 
         metricConfiguration.removeFilterByDate();
         analysisPage.waitForReportComputing().saveInsightAs(RENAMED_TEST_INSIGHT);
         assertEquals(metricConfiguration.getByDateAndAttributeFilterButton(),
-                asList(FILTER_BY_DATE_BUTTON, "", ADD_ATTRIBUTE_FILTER_BUTTON));
+                asList(FILTER_BY_DATE_BUTTON, ATTR_ACCOUNT + ":\nAll", ADD_ATTRIBUTE_FILTER_BUTTON));
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList(METRIC_AMOUNT));
-        assertEquals(metricConfiguration.getFilterText(), ATTR_ACCOUNT + ": All");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -450,15 +458,15 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
         analysisPage.waitForReportComputing().saveInsight(TEST_INSIGHT);
         assertEquals(metricConfiguration.getByDateAndAttributeFilterButton(),
                 asList(FILTER_BY_DATE_BUTTON, ADD_ATTRIBUTE_FILTER_BUTTON));
+        assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList("% " + METRIC_AMOUNT));
 
         metricConfiguration.addFilterByDate(DateRange.LAST_YEAR.toString());
         analysisPage.saveInsight();
-
-        assertEquals(metricConfiguration.getFilterByDate(), DateRange.LAST_YEAR.toString());
+        assertEquals(metricConfiguration.getFilterByDate(),
+                DATE_DATASET_CLOSED + ":\n" + DateRange.LAST_YEAR.toString());
         assertThat(analysisPage.getAttributesBucket().getItemNames(), contains(DATE));
         assertEquals(analysisPage.getMetricsBucket().getItemNames(), singletonList("% " + METRIC_AMOUNT));
     }
-
 
     @Test(dependsOnGroups = "createProject")
     public void prepareInsightsApplyDateFilter() {
@@ -516,7 +524,7 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
         initAnalysePage().addMetric(ATTR_ACCOUNT, FieldType.ATTRIBUTE).saveInsight(INSIGHT_HAS_ONLY_ATTRIBUTES);
     }
 
-   @DataProvider
+    @DataProvider
     public Object[][] getSavedInsightNotDateFilter() {
         return new Object[][]{
                 {INSIGHT_HAS_MEASURE_WITHOUT_DATE_FILTER},
@@ -553,9 +561,9 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
         createInsightUsingDateFilterOnAD(
                 INSIGHT_HAS_TWO_MEASURE_ONLY_DATE_ON_FILTER, DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME);
 
-        List<List<String>> expectedValues = asList(asList("2010", "–", "$15,043.52"), asList("2011", "–", "$20,578.25"),
-                asList("2012", "–", "$21,881.00"), asList("2013", "–", "$66,436.38"), asList("2014", "–", "$8,875.86"),
-                asList("2016", "–", "–"), asList("2017", "$3,644.00", "$3,644.00"));
+        List<List<String>> expectedValues = asList(asList("2017", "$3,644.00", "$3,644.00"),
+                asList("2010", "–", "$15,043.52"), asList("2011", "–", "$20,578.25"), asList("2012", "–", "$21,881.00"),
+                asList("2013", "–", "$66,436.38"), asList("2014", "–", "$8,875.86"), asList("2016", "–", "–"));
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage();
         Insight insight = addInsightOnKD(INSIGHT_HAS_TWO_MEASURE_DATE_ON_VIEWBY_AND_FILTER, indigoDashboardsPage);
         configIndigoDashbroard(DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME, indigoDashboardsPage);
@@ -599,9 +607,9 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
         createInsightUsingDateFilterOnAD(
                 INSIGHT_HAS_TWO_MEASURE_ONLY_DATE_ON_FILTER, DATE_DATASET_CLOSED, DATE_FILTER_THIS_MONTH);
 
-        List<List<String>> expectedValues = asList(asList("2010", "–", "$15,043.52"), asList("2011", "–", "$20,578.25"),
-                asList("2012", "–", "$21,881.00"), asList("2013", "–", "$66,436.38"), asList("2014", "–", "$8,875.86"),
-                asList("2016", "–", "–"), asList("2017", "$3,644.00", "$3,644.00"));
+        List<List<String>> expectedValues = asList(asList("2017", "$3,644.00", "$3,644.00"),
+                asList("2010", "–", "$15,043.52"), asList("2011", "–", "$20,578.25"), asList("2012", "–", "$21,881.00"),
+                asList("2013", "–", "$66,436.38"), asList("2014", "–", "$8,875.86"), asList("2016", "–", "–"));
         IndigoDashboardsPage indigoDashboardsPage = initIndigoDashboardsPage();
         Insight insight = addInsightOnKD(INSIGHT_HAS_TWO_MEASURE_DATE_ON_VIEWBY_AND_FILTER, indigoDashboardsPage);
         configIndigoDashbroard(DATE_DATASET_CLOSED, DATE_FILTER_ALL_TIME, indigoDashboardsPage);
@@ -713,7 +721,6 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
         configIndigoDashbroard(DATE_DATASET_CREATED, DATE_FILTER_THIS_MONTH, indigoDashboardsPage);
         assertTrue(insight.isEmptyValue(), "The empty state on Insight is not correct");
     }
-
     @Test(dependsOnGroups = {"createProject"})
     public void combineDateOnThisMonthADAndUncheckedDateKD() {
         createInsightUsingDateViewByOnAD(
@@ -750,20 +757,22 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
     }
 
     private void createInsightUsingDateFilterOnAD(String insight, String switchDimension, String periodTime) {
-        initAnalysePage().addMetric(METRIC_AMOUNT).addMetric(METRIC_AVG_AMOUNT).addDateFilter()
-                .changeReportType(ReportType.TABLE).getMetricsBucket()
-                .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
-                .addFilterByDate(DateRange.LAST_YEAR.toString());
-        analysisPage.getFilterBuckets().configDateFilter(periodTime)
-                .openDateFilterPickerPanel().changeDateDimension(switchDimension);
+        initAnalysePage().changeReportType(ReportType.TABLE).addMetric(METRIC_AMOUNT).addMetric(METRIC_AVG_AMOUNT)
+                .addDateFilter().waitForReportComputing().getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT)
+                .expandConfiguration().addFilterByDate(DateRange.LAST_YEAR.toString());
+        analysisPage.getFilterBuckets().configDateFilter(periodTime);
+        analysisPage.waitForReportComputing();
+        analysisPage.getFilterBuckets().openDateFilterPickerPanel().changeDateDimension(switchDimension);
         analysisPage.waitForReportComputing().saveInsight(insight);
     }
 
     private void createInsightUsingDateViewByOnAD(String insight, String switchDimension, String periodTime) {
-        initAnalysePage().addMetric(METRIC_AMOUNT).addMetric(METRIC_AVG_AMOUNT).addDate()
-                .changeReportType(ReportType.TABLE).getMetricsBucket().getMetricConfiguration(METRIC_AMOUNT)
-                .expandConfiguration().addFilterByDate(DateRange.LAST_YEAR.toString());
+        initAnalysePage().changeReportType(ReportType.TABLE).addMetric(METRIC_AMOUNT)
+                .addMetric(METRIC_AVG_AMOUNT).addDate().waitForReportComputing().getMetricsBucket()
+                .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
+                .addFilterByDate(DateRange.LAST_YEAR.toString());
         analysisPage.getFilterBuckets().configDateFilter(periodTime);
+        analysisPage.waitForReportComputing();
         analysisPage.getAttributesBucket().changeDateDimension(switchDimension);
         analysisPage.waitForReportComputing().saveInsight(insight);
     }

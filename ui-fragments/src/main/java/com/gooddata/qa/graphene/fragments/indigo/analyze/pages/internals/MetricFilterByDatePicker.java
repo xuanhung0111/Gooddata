@@ -86,11 +86,6 @@ public class MetricFilterByDatePicker extends AbstractPicker {
         return waitForElementVisible(dateDimension).getAttribute("class").contains("is-active");
     }
 
-    public String getToolTipDimensionDropdown() {
-        getActions().moveToElement(dateDimension).perform();
-        return waitForElementVisible(BY_BUBBLE_CONTENT, browser).getText();
-    }
-
     public MetricFilterByDatePicker selectStaticPeriod() { selectDateFilter(STATIC_PERIOD_DROPDOWN_ITEM); return this; }
 
     public MetricFilterByDatePicker selectDateFilter(String dateRange) {
@@ -124,8 +119,6 @@ public class MetricFilterByDatePicker extends AbstractPicker {
     public String getToDate() {
         return waitForElementVisible(toDateInput).getAttribute("value");
     }
-
-    public boolean isDateDimensionEnabled() { return !isElementDisabled(waitForElementVisible(dateDimension)); }
 
     public boolean isDateRangePickerVisible() {
         return isElementVisible(dateRangePicker);
