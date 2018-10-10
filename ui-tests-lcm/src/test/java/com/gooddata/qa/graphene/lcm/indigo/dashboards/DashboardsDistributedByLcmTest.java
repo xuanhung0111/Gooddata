@@ -1,27 +1,40 @@
-package com.gooddata.qa.graphene.indigo.dashboards;
+package com.gooddata.qa.graphene.lcm.indigo.dashboards;
 
 import com.gooddata.fixture.ResourceManagement.ResourceTemplate;
+import com.gooddata.md.Dataset;
+import com.gooddata.md.ObjNotFoundException;
+import com.gooddata.qa.fixture.utils.GoodSales.Metrics;
+import com.gooddata.qa.graphene.AbstractProjectTest;
+import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.enums.project.DeleteMode;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.FilterType;
 import com.gooddata.qa.graphene.fragments.indigo.insight.AbstractInsightSelectionPanel.InsightItem;
-import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.indigo.IndigoRestRequest;
 import com.gooddata.qa.utils.lcm.LCMServiceProject;
+import com.gooddata.qa.utils.lcm.LcmRestUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+
+import static com.gooddata.fixture.ResourceManagement.ResourceTemplate.GOODSALES;
+import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -31,14 +44,18 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-public class DashboardsDistributedByLcmTest extends AbstractDashboardTest {
-    private final String FIRST_DASHBOARD = "dashboard 1";
-    private final String SECOND_DASHBOARD = "dashboard 2";
+public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
+
+    @FindBy(id = IndigoDashboardsPage.MAIN_ID)
+    protected IndigoDashboardsPage indigoDashboardsPage;
+
+    private final String FIRST_DASHBOARD = "dashboard_1_" + generateHashString();
+    private final String SECOND_DASHBOARD = "dashboard_2_" + generateHashString();
     private final String SEGMENT_ID = "att_segment_" + generateHashString();
     private final String CLIENT_ID = "att_client_" + generateHashString();
     private final String CLIENT_PROJECT_TITLE = "Client project " + generateHashString();
-    private final String FIRST_TEST_INSIGHT = "ATT-Test-Insight1";
-    private final String SECOND_TEST_INSIGHT = "ATT-Test-Insight2";
+    private final String FIRST_TEST_INSIGHT = "ATT-Test-Insight1_" + generateHashString();
+    private final String SECOND_TEST_INSIGHT = "ATT-Test-Insight2_" + generateHashString();
 
     private String devProjectId;
     private String clientProjectId;
@@ -49,7 +66,8 @@ public class DashboardsDistributedByLcmTest extends AbstractDashboardTest {
 
     @Override
     protected void initProperties() {
-        super.initProperties();
+        appliedFixture = GOODSALES;
+        validateAfterClass = false;
         projectTitle = "KPI Dashboards with LCM";
     }
 
@@ -89,7 +107,7 @@ public class DashboardsDistributedByLcmTest extends AbstractDashboardTest {
                 put("segment_id", SEGMENT_ID);
                 put("development_pid", devProjectId);
                 put("driver", testParams.getProjectDriver().getValue());
-                put("master_name", "master of " + SEGMENT_ID);
+                put("master_name", "Master of " + SEGMENT_ID);
             }});
         }};
         datasource = lcmServiceProject.createProvisionDatasource(SEGMENT_ID, CLIENT_ID, clientProjectId);
@@ -156,10 +174,13 @@ public class DashboardsDistributedByLcmTest extends AbstractDashboardTest {
                 new RestClient(getProfile(Profile.ADMIN)), clientProjectId);
         String identifier = getObjIdentifiers(singletonList(indigoRestRequest.getInsightUri(FIRST_TEST_INSIGHT))).get(0);
         AnalysisPage analysisPage = initAnalysePage().openInsight(FIRST_TEST_INSIGHT);
-        openUrl(browser.getCurrentUrl().replace(clientProjectId, "client/default:" + CLIENT_ID));
+
+        String urlUtilizeClientId = browser.getCurrentUrl().replace(clientProjectId,
+                String.format("client/%s:%s", LcmRestUtils.ATT_LCM_DATA_PRODUCT, CLIENT_ID));
+        openUrl(urlUtilizeClientId);
         assertEquals(analysisPage.waitForReportComputing().getChartReport().getTrackersCount(), 1);
 
-        openUrl(format("/analyze/#/client/default:%s/%s/edit", CLIENT_ID, identifier));
+        openUrl(format("/analyze/#/client/%s:%s/%s/edit", LcmRestUtils.ATT_LCM_DATA_PRODUCT, CLIENT_ID, identifier));
         assertEquals(analysisPage.waitForReportComputing().getChartReport().getTrackersCount(), 1);
 
         openUrl(format("/analyze/#/%s/%s/edit", clientProjectId, identifier));
@@ -237,8 +258,11 @@ public class DashboardsDistributedByLcmTest extends AbstractDashboardTest {
     @AfterClass(alwaysRun = true)
     public void tearDown() {
         testParams.setProjectId(devProjectId);
+        if (testParams.getDeleteMode() == DeleteMode.DELETE_NEVER) {
+            return;
+        }
         log.info("--------------start cleanup lcm service");
-        lcmServiceProject.cleanUp();
+        lcmServiceProject.cleanUp(testParams.getUserDomain());
     }
 
     private void runLcmFlow() {
@@ -256,5 +280,40 @@ public class DashboardsDistributedByLcmTest extends AbstractDashboardTest {
         addUserToProject(testParams.getUser(), UserRoles.ADMIN);
         addUserToProject(testParams.getEditorUser(), UserRoles.EDITOR);
         addUserToProject(testParams.getViewerUser(), UserRoles.VIEWER);
+    }
+
+    private String createNumOfActivitiesKpi() {
+        try {
+            getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES);
+        } catch (ObjNotFoundException e) {
+            getMetricCreator().createNumberOfActivitiesMetric();
+        }
+
+        return createKpiUsingRest(new KpiMDConfiguration.Builder()
+                .title(getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getTitle())
+                .metric(getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri())
+                .dateDataSet(getDateDatasetUri(DATE_DATASET_CREATED))
+                .comparisonType(Kpi.ComparisonType.PREVIOUS_PERIOD)
+                .comparisonDirection(Kpi.ComparisonDirection.GOOD)
+                .build());
+    }
+
+    private Metrics getMetricCreator() {
+        return new Metrics(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
+    }
+
+    private String createKpiUsingRest(final KpiMDConfiguration kpiConfig) {
+        String kpiWidget;
+        try {
+            kpiWidget = new IndigoRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                    .createKpiWidget(kpiConfig);
+        } catch (JSONException | IOException e) {
+            throw new RuntimeException("There is error while create Kpi Widget");
+        }
+        return kpiWidget;
+    }
+
+    private String getDateDatasetUri(final String dataset) {
+        return getMdService().getObjUri(getProject(), Dataset.class, title(format("Date (%s)", dataset)));
     }
 }

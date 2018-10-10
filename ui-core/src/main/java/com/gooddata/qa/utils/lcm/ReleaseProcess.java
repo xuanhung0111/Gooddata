@@ -33,7 +33,8 @@ public final class ReleaseProcess extends RubyProcess {
         }};
 
         return () -> new Parameters()
-                .addParameter("organization", "default")
+                .addParameter("organization", testParameters.getUserDomain())
+                .addParameter("DATA_PRODUCT", LcmRestUtils.ATT_LCM_DATA_PRODUCT)
                 .addParameter("GDC_USERNAME", testParameters.getDomainUser())
                 .addSecureParameter("GDC_PASSWORD", testParameters.getPassword())
                 .addParameter("CLIENT_GDC_HOSTNAME", testParameters.getHost())
