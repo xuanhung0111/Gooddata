@@ -3,6 +3,7 @@
  */
 package com.gooddata.qa.graphene.schedules;
 
+import static com.gooddata.qa.utils.mail.ImapUtils.getAttachmentParts;
 import static java.util.Arrays.asList;
 import static java.lang.String.format;
 
@@ -12,13 +13,16 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Part;
+import javax.mail.internet.MimeUtility;
 
+import com.gooddata.qa.graphene.i18n.AbstractEmbeddedModeTest;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestClient.RestProfile;
@@ -30,12 +34,14 @@ import org.apache.http.client.methods.HttpRequestBase;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.DateTime;
 
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
+public class AbstractGoodSalesEmailSchedulesTest extends AbstractEmbeddedModeTest {
 
     protected static final String CANNOT_DELETE_DASHBOARD_MESSAGE = "Dashboard cannot be deleted"
             + " because it is linked from a scheduled email or KPI dashboard. Remove all links and retry.";
@@ -106,6 +112,35 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
         }
 
         throw new RuntimeException("There are too many messages than expected: " + expectedMessages);
+    }
+
+    protected List<Message> waitForScheduleMessages(String title, int expectedMessages) throws MessagingException, IOException {
+        ScheduleEmailRestRequest scheduleEmailRestRequest = initScheduleEmailRestRequest();
+        try (ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword)) {
+            System.out.println("ACCELERATE scheduled mails processing");
+            scheduleEmailRestRequest.accelerate();
+            List<Message> messages = ImapUtils.waitForMessages(imapClient, GDEmails.NOREPLY, title, expectedMessages);
+            saveMessageAttachments(messages);
+            return messages;
+        } finally {
+            System.out.println("DECELERATE scheduled mails processing");
+            scheduleEmailRestRequest.decelerate();
+        }
+    }
+
+    protected String getPdfContentFrom(List<Message> messages, int indexOfMessage)
+            throws MessagingException, UnsupportedEncodingException {
+        List<Part> parts = getAttachmentParts(messages.get(indexOfMessage));
+        File pdfExport = new File(attachmentsDirectory,
+                MimeUtility.decodeText(findPartByContentType(parts, "application/pdf").getFileName()));
+        return getContentFrom(pdfExport);
+    }
+
+    private void saveMessageAttachments(List<Message> messages) throws MessagingException, IOException {
+        System.out.println("Saving message ...");
+        for (Message message : messages) {
+            ImapUtils.saveMessageAttachments(message, attachmentsDirectory);
+        }
     }
 
     /**

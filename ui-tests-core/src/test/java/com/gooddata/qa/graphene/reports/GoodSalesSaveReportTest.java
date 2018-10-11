@@ -22,7 +22,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.checkBlueBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACCOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DATE_CREATED;
-import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_CLOSED;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_IS_WON;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_ACTIVITIES_BY_TYPE;
@@ -278,7 +278,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
             .openFolder(ALL)
             .openReport(REPORT_ACTIVITIES_BY_TYPE)
             .openHowPanel()
-            .selectItem(ATTR_IS_CLOSED)
+            .selectItem(ATTR_DEPARTMENT)
             .done();
         waitForReportLoading();
         reportPage.clickSaveReport().confirmSaveReport().waitForReportSaved();

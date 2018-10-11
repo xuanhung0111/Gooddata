@@ -189,7 +189,8 @@ public class OverviewPageTest extends AbstractProcessTest {
                     .waitForPageLoaded();
 
             takeScreenshot(browser, "Disable-failed-schedule-from-project-successfully", getClass());
-            assertEquals(overviewPage.getStateNumber(OverviewState.FAILED), 0);
+            //MSF-14072: DISC: Include disabled schedule executions in Overview-Running metric
+            assertEquals(overviewPage.getStateNumber(OverviewState.FAILED), 1);
             assertTrue(initScheduleDetail(schedule).isDisabled(),
                     "Schedule is not disabled after being disabled from overview page");
 
@@ -220,6 +221,15 @@ public class OverviewPageTest extends AbstractProcessTest {
             takeScreenshot(browser, "Run-successful-schedule-from-overview-page-successfully", getClass());
             assertEquals(overviewPage.getStateNumber(OverviewState.SUCCESSFUL), 1);
             assertEquals(initScheduleDetail(schedule).getExecutionHistoryItemNumber(), 2);
+
+            //MSF-14072: DISC: Include disabled schedule executions in Overview-Running metric
+            initDiscOverviewPage()
+                    .selectState(OverviewState.SUCCESSFUL)
+                    .markOnProject(projectTitle)
+                    .disableScheduleExecution()
+                    .waitForPageLoaded();
+            takeScreenshot(browser, "Disable-run-successful-schedule-from-overview-page", getClass());
+            assertEquals(overviewPage.getStateNumber(OverviewState.SUCCESSFUL), 1);
 
         } finally {
             getProcessService().removeProcess(process);

@@ -269,7 +269,7 @@ public class DashboardsDistributedByLcmTest extends AbstractProjectTest {
         lcmServiceProject.release(releaseSegments);
         log.info("----finished releasing--------------");
 
-        lcmServiceProject.provision(datasource);
+        lcmServiceProject.provision(segmentFilters, datasource);
         log.info("----finished provisioning--------------");
 
         lcmServiceProject.rollout(segmentFilters);

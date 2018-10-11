@@ -91,7 +91,7 @@ public class DateDatasetRecommendationTest extends AbstractDashboardTest {
         createInsightUsingDateFilter("Insight-Using-Date-Filter-Snapshot-1", METRIC_OPP_FIRST_SNAPSHOT,
                 DATE_DATASET_SNAPSHOT);
         createInsightUsingDateFilter("Insight-Using-Date-Filter-Snapshot-2", METRIC_OPP_FIRST_SNAPSHOT,
-                DATE_DATASET_SNAPSHOT);
+                DATE_DATASET_ACTIVITY);
         createInsightUsingDateFilter("Insight-Using-Date-Filter-Closed", METRIC_OPP_FIRST_SNAPSHOT, DATE_DATASET_CLOSED);
 
         indigoRestRequest.createInsight(
@@ -104,7 +104,8 @@ public class DateDatasetRecommendationTest extends AbstractDashboardTest {
         DateDimensionSelect dropDown = indigoDashboardsPage.getConfigurationPanel().openDateDataSet();
         takeScreenshot(browser, "Order-Of-Recommended-Date-Dimensions", getClass());
         assertEquals(dropDown.getDateDimensionGroup("RECOMMENDED").getDateDimensions(),
-                asList(DATE_DATASET_SNAPSHOT, DATE_DATASET_CLOSED), "The recommended dimensions are not sorted by most relevant");
+                asList(DATE_DATASET_ACTIVITY, DATE_DATASET_CLOSED, DATE_DATASET_SNAPSHOT),
+                "The recommended dimensions are not sorted by most relevant");
     }
 
     @Test(dependsOnGroups = {"createProject"})

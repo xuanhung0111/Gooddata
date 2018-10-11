@@ -182,7 +182,8 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         initEmailSchedulesPage();
 
         // get schedules via api, dashboard-based are not visible on manage page
-        String uri = getScheduleUri(CUSTOM_SUBJECT);
+        String uri = new CommonRestRequest(getAdminRestClient(), testParams.getProjectId())
+                .getScheduleUri(CUSTOM_SUBJECT);
 
         String[] parts = uri.split("/");
         int id = Integer.parseInt(parts[parts.length - 1]);
@@ -432,23 +433,6 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         DashboardScheduleDialog dashboardScheduleDialog = dashboardsPage.showDashboardScheduleDialog();
         dashboardScheduleDialog.schedule();
         waitForElementVisible(cssSelector("#status .box-success button"), browser).click();
-    }
-
-    private String getScheduleUri(String scheduleTitle) throws JSONException, IOException {
-        final String schedulesUri = "/gdc/md/" + testParams.getProjectId() + "/query/scheduledmails";
-        final CommonRestRequest restRequest = new CommonRestRequest(
-                new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId());
-        final JSONArray schedules = restRequest.getJsonObject(schedulesUri)
-            .getJSONObject("query")
-            .getJSONArray("entries");
-
-        for (int i = 0, n = schedules.length(); i < n; i++) {
-            final JSONObject schedule = schedules.getJSONObject(i);
-            if (schedule.getString("title").equals(scheduleTitle)) {
-                return schedule.getString("link");
-            }
-        }
-        return null;
     }
 
     private void enableHideDashboardScheduleFlag() throws JSONException {

@@ -123,11 +123,13 @@ public final class LCMServiceProject {
 
     /**
      * Run provision project
+     * @param segments segments filter
      * @param inputSource
      */
-    public void provision(final JSONObject inputSource) {
+    public void provision(final JSONArray segments, final JSONObject inputSource) {
         Parameters provisionTemplate = getProvisionParamsTemplate();
         JSONObject encodedParamObj = new JSONObject(provisionTemplate.getParameters().get("gd_encoded_params"));
+        encodedParamObj.put("SEGMENTS_FILTER", segments);
         encodedParamObj.put("input_source", inputSource);
         String encodesString = encodedParamObj.toString();
         log.info(encodesString);
@@ -144,7 +146,7 @@ public final class LCMServiceProject {
     public void rollout(final JSONArray segments) {
         Parameters rolloutTemplate = getRolloutParamsTemplate();
         JSONObject encodedParamObj = new JSONObject(rolloutTemplate.getParameters().get("gd_encoded_params"));
-        encodedParamObj.put("segments_filter", segments);
+        encodedParamObj.put("SEGMENTS_FILTER", segments);
         String encodesString = encodedParamObj.toString();
         log.info(encodesString);
         rolloutTemplate.getParameters().put("gd_encoded_params", encodesString);
