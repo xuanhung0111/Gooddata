@@ -51,6 +51,9 @@ public class MetricConfiguration extends AbstractFragment {
     @FindBy(className = "button-dropdown")
     private List<WebElement> byDateAndAddAttributeFilter;
 
+    @FindBy(className = "adi-bucket-item-sequence-number")
+    private WebElement itemSequenceNumber;
+
     private static final By BY_REMOVE_ATTRIBUTE_FILTER = By.className("s-remove-attribute-filter");
     private static final By BY_REMOVE_FILTER_BY_DATE = By.className("s-remove-date-filter");
     public static final By BY_ATTRIBUTE_FILTER_PICKER = By.className("adi-attr-filter-picker");
@@ -124,10 +127,7 @@ public class MetricConfiguration extends AbstractFragment {
         // Header element is not scrolled automatically into view (last check with Geckodriver 0.21 / Firefox 60.0.2).
         // All works as expected with Chrome. Workaround - explicitly scroll metric header into view.
         ElementUtils.scrollElementIntoView(header, browser);
-
-        // now click with offset because clicking in the middle (default by graphene/selenium)
-        // causes activating editableLabel renaming instead of toggling measure configuration
-        ElementUtils.moveToElementActions(header, 2, 2).click().perform();
+        waitForElementVisible(itemSequenceNumber).click();
     }
 
     public MetricConfiguration expandConfiguration() {
