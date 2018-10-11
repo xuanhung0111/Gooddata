@@ -159,12 +159,17 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
         setCellMergedFlag(false);
         setActiveFiltersFlag(false);
         sleepTightInSeconds(3);
-        browser.navigate().refresh();
-        waitForAnalysisPageLoaded(browser);
-        reportPage.doExporting(ExportFormat.EXCEL_XLSX);
+        try {
+            browser.navigate().refresh();
+            waitForAnalysisPageLoaded(browser);
+            reportPage.doExporting(ExportFormat.EXCEL_XLSX);
 
-        assertFalse(dialog.isCellMergedChecked(), "Cells merged checkbox is checked when cell merged flag is not set");
-        assertFalse(dialog.isActiveFiltersChecked(), "Active filters checkbox is checked when active filters flag is not set");
+            assertFalse(dialog.isCellMergedChecked(), "Cells merged checkbox is checked when cell merged flag is not set");
+            assertFalse(dialog.isActiveFiltersChecked(), "Active filters checkbox is checked when active filters flag is not set");
+        } finally {
+            setCellMergedFlag(true);
+            setActiveFiltersFlag(true);
+        }
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
@@ -218,29 +223,24 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createTabularReport4"}, groups = {"tabular-report-exports"})
     public void verifyExportedTabularReportXLSX() throws IOException {
-        setActiveFiltersFlag(true);
-        try {
-            exportReport("Simple tabular report - 4", ExportFormat.EXCEL_XLSX);
-            List<List<String>> xlsxContent;
-            verifyReportExport(ExportFormat.EXCEL_XLSX, "Simple tabular report - 4",
-                    expectedTabularReportExportXLSXSize);
-            xlsxContent = XlsxUtils.excelFileToRead(testParams.getDownloadFolder() +
-                    testParams.getFolderSeparator() + "Simple tabular report - 4.xlsx", 0);
-            //verify header title
-            assertThat(xlsxContent, hasItem(asList("Region", "Product", "Sales Rep", "Department", "# of Opportunities")));
-            //verify content
-            assertThat(xlsxContent, hasItem(asList("East Coast", "Educationly", "Adam Bradley", "Direct Sales", "55.0")));
-            assertThat(xlsxContent, hasItem(asList("East Coast", "Educationly", "Alejandro Vabiano", "Direct Sales", "53.0")));
-            assertThat(xlsxContent, hasItem(asList("East Coast", "Explorer", "Adam Bradley", "Direct Sales", "42.0")));
-            assertThat(xlsxContent, hasItem(asList("East Coast", "Explorer", "Alejandro Vabiano", "Direct Sales", "45.0")));
-            //verify filter
-            assertThat(xlsxContent, not(hasItem(asList("West Coast", "CompuSci", "John Jovi", "Direct Sales", "46.0"))));
-            //verify attribute filter
-            assertThat(xlsxContent, hasItem(asList("Applied filters:", "Product IN (Educationly, Explorer)")));
-            assertThat(xlsxContent, hasItem(asList("Sales Rep IN (Adam Bradley, Alejandro Vabiano)")));
-        } finally {
-            setActiveFiltersFlag(false);
-        }
+        exportReport("Simple tabular report - 4", ExportFormat.EXCEL_XLSX);
+        List<List<String>> xlsxContent;
+        verifyReportExport(ExportFormat.EXCEL_XLSX, "Simple tabular report - 4",
+                expectedTabularReportExportXLSXSize);
+        xlsxContent = XlsxUtils.excelFileToRead(testParams.getDownloadFolder() +
+                testParams.getFolderSeparator() + "Simple tabular report - 4.xlsx", 0);
+        //verify header title
+        assertThat(xlsxContent, hasItem(asList("Region", "Product", "Sales Rep", "Department", "# of Opportunities")));
+        //verify content
+        assertThat(xlsxContent, hasItem(asList("East Coast", "Educationly", "Adam Bradley", "Direct Sales", "55.0")));
+        assertThat(xlsxContent, hasItem(asList("Alejandro Vabiano", "Direct Sales", "53.0")));
+        assertThat(xlsxContent, hasItem(asList("Explorer", "Adam Bradley", "Direct Sales", "42.0")));
+        assertThat(xlsxContent, hasItem(asList("Alejandro Vabiano", "Direct Sales", "45.0")));
+        //verify filter
+        assertThat(xlsxContent, not(hasItem(asList("West Coast", "CompuSci", "John Jovi", "Direct Sales", "46.0"))));
+        //verify attribute filter
+        assertThat(xlsxContent, hasItem(asList("Applied filters:", "Product IN (Educationly, Explorer)")));
+        assertThat(xlsxContent, hasItem(asList("Sales Rep IN (Adam Bradley, Alejandro Vabiano)")));
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
