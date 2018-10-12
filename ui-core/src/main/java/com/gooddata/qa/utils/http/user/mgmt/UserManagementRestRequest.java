@@ -10,9 +10,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestRequest;
@@ -411,16 +408,12 @@ public final class UserManagementRestRequest extends CommonRestRequest {
                 .replace("${email}", email);
         log.info("content of json: " + contentBody);
 
-        final JSONObject result = getJsonObject(RestRequest.initPostRequest(usersUri, contentBody));
-        logPrettyPrintJsonObject(result);
-        assertTrue(result.getJSONObject("projectUsersUpdateResult")
+        final String result = getResource(RestRequest.initPostRequest(usersUri, contentBody), HttpStatus.OK);
+        log.info(result);
+        final JSONObject resultJson = new JSONObject(result);
+        assertTrue(resultJson.getJSONObject("projectUsersUpdateResult")
                 .getJSONArray("successful").length() > 0, "User isn't assigned properly into the project");
         log.info(format("Successfully assigned user %s to project %s", email, projectId));
-    }
-
-    private void logPrettyPrintJsonObject(JSONObject jsonObject) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        log.info(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonObject));
     }
 
     /**
