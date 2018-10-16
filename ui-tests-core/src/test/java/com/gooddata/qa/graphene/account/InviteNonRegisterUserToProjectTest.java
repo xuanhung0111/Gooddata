@@ -43,11 +43,9 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
 
     private static final By INVITATION_PAGE_LOCATOR = By.cssSelector(".s-invitationPage");
 
-    private static final String SHORT_PASSWORD_ERROR_MESSAGE = "Password too short. "
-            + "Minimum length is 7 characters.";
-    
-    private static final String COMMONLY_PASSWORD_ERROR_MESSAGE = "You selected a commonly used password. "
-            + "Choose something unique.";
+    private static final String SHORT_PASSWORD_ERROR_MESSAGE = "Minimum length of password is 7 characters.";
+
+    private static final String COMMONLY_PASSWORD_ERROR_MESSAGE = "Given password is commonly used.";
 
     private static final String SEQUENTIAL_PASSWORD_ERROR_MESSAGE = "Sequential and repeated characters are "
             + "not allowed in passwords.";
@@ -208,7 +206,7 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
         Graphene.waitGui().until(dashboardOrWalkmeAppear);
 
         try {
-            WebElement walkmeCloseElement = 
+            WebElement walkmeCloseElement =
                     waitForElementVisible(walkmeCloseLocator, browser, walkmeLoadTimeoutSeconds);
 
             walkmeCloseElement.click();

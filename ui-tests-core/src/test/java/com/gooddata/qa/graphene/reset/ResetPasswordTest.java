@@ -31,16 +31,14 @@ import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 public class ResetPasswordTest extends AbstractUITest {
 
     private static final By RESET_PASSWORD_PAGE_LOCATOR = By.className("s-resetPasswordPage");
-    
+
     private static final String PROJECT_NAME = "GoodSales";
 
     private static final String NEW_PASSWORD = "Gooddata12345";
 
-    private static final String SHORT_PASSWORD_ERROR_MESSAGE = "Password too short. "
-            + "Minimum length is 7 characters.";
-    
-    private static final String COMMONLY_PASSWORD_ERROR_MESSAGE = "You selected a commonly used password. "
-            + "Choose something unique.";
+    private static final String SHORT_PASSWORD_ERROR_MESSAGE = "Minimum length of password is 7 characters.";
+
+    private static final String COMMONLY_PASSWORD_ERROR_MESSAGE = "Given password is commonly used.";
 
     private static final String SEQUENTIAL_PASSWORD_ERROR_MESSAGE = "Sequential and repeated characters are "
             + "not allowed in passwords.";

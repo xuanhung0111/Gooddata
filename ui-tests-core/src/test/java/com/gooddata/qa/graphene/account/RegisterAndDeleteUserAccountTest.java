@@ -46,11 +46,9 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
     private static final String GOODDATA_PRODUCT_TOUR_PROJECT = "GoodData Product Tour";
 
-    private static final String SHORT_PASSWORD_ERROR_MESSAGE = "Password too short. "
-            + "Minimum length is 7 characters.";
-    
-    private static final String COMMONLY_PASSWORD_ERROR_MESSAGE = "You selected a commonly used password. "
-            + "Choose something unique.";
+    private static final String SHORT_PASSWORD_ERROR_MESSAGE = "Minimum length of password is 7 characters.";
+
+    private static final String COMMONLY_PASSWORD_ERROR_MESSAGE = "Given password is commonly used.";
 
     private static final String SEQUENTIAL_PASSWORD_ERROR_MESSAGE = "Sequential and repeated characters are "
             + "not allowed in passwords.";
@@ -107,8 +105,8 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     /**
      * Due to bug CL-9252, Walkme just appears one time and never display again.
      * So all test that depend on this test will continue and no need to check Walkme display or not
-     * 
-     * Notes: This test always run first base on alphabet order. 
+     *
+     * Notes: This test always run first base on alphabet order.
      */
     @Test
     public void checkWalkme() throws ParseException, JSONException, IOException {
@@ -260,7 +258,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
     @Test(groups = {"sanity"})
     public void registerNewUser() throws MessagingException, IOException, ParseException, JSONException {
-        if (testParams.isPIEnvironment() || testParams.isProductionEnvironment() 
+        if (testParams.isPIEnvironment() || testParams.isProductionEnvironment()
                 || testParams.isPerformanceEnvironment()) {
             log.warning("Register New User is not tested on PI or Production environment");
             return;
@@ -284,7 +282,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
             waitForDashboardPageLoaded(browser);
 
             openProject(GOODDATA_PRODUCT_TOUR_PROJECT);
-            assertTrue(dashboardsPage.isEditButtonPresent(), format("Dashboard cannot be edited in %s project", 
+            assertTrue(dashboardsPage.isEditButtonPresent(), format("Dashboard cannot be edited in %s project",
                     GOODDATA_PRODUCT_TOUR_PROJECT));
         } finally {
             logout();
@@ -386,7 +384,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
     @AfterClass(alwaysRun = true)
     public void tearDown() throws ParseException, JSONException, IOException {
-        if (testParams.isPIEnvironment() || testParams.isProductionEnvironment() 
+        if (testParams.isPIEnvironment() || testParams.isProductionEnvironment()
                 || testParams.isPerformanceEnvironment()) return;
         new UserManagementRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
                 .deleteUserByEmail(testParams.getUserDomain(), registrationUser);
