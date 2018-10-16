@@ -18,8 +18,8 @@ import java.text.ParseException;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import com.gooddata.qa.graphene.enums.DateGranularity;
 import com.gooddata.qa.graphene.enums.DateRange;
-import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import com.gooddata.qa.utils.http.RestClient;
 import org.jboss.arquillian.graphene.Graphene;
@@ -129,9 +129,11 @@ public class DateFilterTest extends AbstractAnalyseTest {
                 .waitForReportComputing()
                 .getChartReport()
                 .getTrackersCount() >= 1, "Tracker should display");
-        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText(DATE_INVOICE)), Arrays.asList("templ:DateInvoice", "All time"));
-        assertEquals(analysisPage.getAttributesBucket().getAllGranularities(),
-                Arrays.asList("Day", "Week (Sun-Sat)", "Month", "Quarter", "Year"));
+        assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText(DATE_INVOICE)),
+                asList("templ:DateInvoice", DateRange.ALL_TIME.toString()));
+        assertEquals(analysisPage.getAttributesBucket().getAllGranularities(), asList(DateGranularity.DAY.toString(),
+                DateGranularity.WEEK_SUN_SAT.toString(), DateGranularity.MONTH.toString(),
+                DateGranularity.QUARTER.toString(), DateGranularity.YEAR.toString()));
         checkingOpenAsReport("testDateInCategoryAndDateInFilter");
     }
 

@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import com.gooddata.qa.graphene.enums.DateGranularity;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
@@ -19,9 +20,6 @@ import static org.testng.Assert.assertTrue;
 
 public class GoodSalesOvertimeComparisonTest extends AbstractAnalyseTest {
 
-    private static final String WEEK_GRANULARITY = "Week (Sun-Sat)";
-    private static final String MONTH_GRANULARITY = "Month";
-
     @Override
     protected void customizeProject() throws Throwable {
         getMetricCreator().createNumberOfActivitiesMetric();
@@ -33,7 +31,7 @@ public class GoodSalesOvertimeComparisonTest extends AbstractAnalyseTest {
         initAnalysePage().addMetric(METRIC_NUMBER_OF_ACTIVITIES).addDate();
 
         AttributesBucket attributeBucket = analysisPage.getAttributesBucket();
-        attributeBucket.changeGranularity(WEEK_GRANULARITY);
+        attributeBucket.changeGranularity(DateGranularity.WEEK_SUN_SAT);
 
         MetricsBucket metricsBucket = analysisPage.waitForReportComputing().getMetricsBucket();
         metricsBucket.getMetricConfiguration(METRIC_NUMBER_OF_ACTIVITIES).expandConfiguration();
@@ -42,7 +40,7 @@ public class GoodSalesOvertimeComparisonTest extends AbstractAnalyseTest {
         assertFalse(analysisPage.getFilterBuckets().openDateFilterPickerPanel().isCompareTypeEnabled(CompareTypeDropdown.CompareType.SAME_PERIOD_PREVIOUS_YEAR),
                 "same period last year comparison should be disabled");
 
-        attributeBucket.changeGranularity(MONTH_GRANULARITY);
+        attributeBucket.changeGranularity(DateGranularity.MONTH);
 
         analysisPage.waitForReportComputing();
         Screenshots.takeScreenshot(browser, "applyWeekGranularityToHidePopComparison-apply-month-granularity", getClass());
@@ -60,7 +58,7 @@ public class GoodSalesOvertimeComparisonTest extends AbstractAnalyseTest {
         container.getRecommendation(RecommendationStep.SEE_TREND).apply();
 
         AttributesBucket attributesBucket = analysisPage.waitForReportComputing().getAttributesBucket();
-        attributesBucket.changeGranularity(WEEK_GRANULARITY);
+        attributesBucket.changeGranularity(DateGranularity.WEEK_SUN_SAT);
 
         analysisPage.waitForReportComputing();
         Screenshots.takeScreenshot(browser,
@@ -68,7 +66,7 @@ public class GoodSalesOvertimeComparisonTest extends AbstractAnalyseTest {
 
         assertFalse(isElementVisible(RecommendationContainer.LOCATOR, browser), "Recommendation container is not empty");
 
-        attributesBucket.changeGranularity(MONTH_GRANULARITY);
+        attributesBucket.changeGranularity(DateGranularity.MONTH);
 
         analysisPage.waitForReportComputing();
         Screenshots.takeScreenshot(browser,
@@ -89,7 +87,7 @@ public class GoodSalesOvertimeComparisonTest extends AbstractAnalyseTest {
         analysisPage.waitForReportComputing();
 
         assertFalse(analysisPage.waitForReportComputing().getAttributesBucket().getAllGranularities()
-                .stream().anyMatch(WEEK_GRANULARITY::equals), "week granularity is not hidden");
+                .stream().anyMatch(DateGranularity.WEEK_SUN_SAT.toString()::equals), "week granularity is not hidden");
 
         analysisPage.getFilterBuckets()
                 .openDateFilterPickerPanel()
@@ -98,6 +96,6 @@ public class GoodSalesOvertimeComparisonTest extends AbstractAnalyseTest {
         analysisPage.waitForReportComputing();
 
         assertTrue(analysisPage.waitForReportComputing().getAttributesBucket().getAllGranularities()
-                .stream().anyMatch(WEEK_GRANULARITY::equals), "week granularity is not displayed");
+                .stream().anyMatch(DateGranularity.WEEK_SUN_SAT.toString()::equals), "week granularity is not displayed");
     }
 }

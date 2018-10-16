@@ -1,13 +1,16 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown.CompareType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.DatePresetsSelect;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -47,11 +50,44 @@ public class DateFilterPickerPanel extends AbstractFragment {
     @FindBy(className = "s-date-filter-apply")
     private WebElement applyButton;
 
+    @FindBy(className = "s-compare-apply-measures-button")
+    private WebElement compareApplyMeasuresButton;
+
+    @FindBy(className = "s-compare-apply-measures")
+    private CompareApplyMeasure compareApplyMeasures;
+
     public static final By LOCATOR = By.className("adi-date-filter-picker");
 
-    public void select(final String period) {
+    public DateFilterPickerPanel changeDateDimension(String switchDimension) {
+        getDateDatasetSelect().selectByName(switchDimension);
+        return this;
+    }
+
+    public DateFilterPickerPanel changePeriod(final String period) {
         getDatePresetSelect().selectByName(period);
         getDatePresetSelect().ensureDropdownClosed();
+        return this;
+    }
+
+    public DateFilterPickerPanel selectStaticPeriod() {
+        changePeriod(STATIC_PERIOD_DROPDOWN_ITEM);
+        return this;
+    }
+
+    public DateFilterPickerPanel configTimeFilterByRangeHelper(String from, String to) {
+        selectStaticPeriod();
+
+        fillInDateRange(waitForElementVisible(fromDate), from);
+        waitForElementVisible(fromDateCalendarIcon).click();
+
+        fillInDateRange(waitForElementVisible(toDate), to);
+        waitForElementVisible(toDateCalendarIcon).click();
+        return this;
+    }
+
+    public DateFilterPickerPanel changeCompareType(CompareType compareType) {
+        getCompareTypeDropdown().selectCompareType(compareType.getCompareTypeName());
+        return this;
     }
 
     public List<String> getPeriods() {
@@ -88,10 +124,6 @@ public class DateFilterPickerPanel extends AbstractFragment {
         configTimeFilterByRangeHelper(from, to, true);
     }
 
-    public void selectStaticPeriod() {
-        select(STATIC_PERIOD_DROPDOWN_ITEM);
-    }
-
     public String getFromDate() {
         return waitForElementVisible(fromDate).getAttribute("value");
     }
@@ -100,8 +132,8 @@ public class DateFilterPickerPanel extends AbstractFragment {
         return waitForElementVisible(toDate).getAttribute("value");
     }
 
-    public void changeDateDimension(String switchDimension) {
-        getDateDatasetSelect().selectByName(switchDimension);
+    public String getCompareApplyMeasuresText() {
+        return waitForElementVisible(compareApplyMeasuresButton).getText();
     }
 
     public boolean isDimensionSwitcherEnabled() {
@@ -122,9 +154,12 @@ public class DateFilterPickerPanel extends AbstractFragment {
                 waitForElementVisible(By.className("adi-date-preset-select-dropdown"), browser));
     }
 
-    public CompareTypeDropdown getCompareTypeDropdown() {
-        return Graphene.createPageFragment(CompareTypeDropdown.class,
-                waitForElementVisible(By.className("adi-compare-apply-select"), browser));
+    public CompareApplyMeasure openCompareApplyMeasures() throws NoSuchFieldException {
+        if(!isElementVisible(compareApplyMeasuresButton)) {
+            throw new NoSuchFieldException("Compare the period with nothing doesn't need to choose measure");
+        }
+        waitForFragmentVisible(compareApplyMeasures).ensureDropdownOpen();
+        return compareApplyMeasures;
     }
 
     public void apply() {
@@ -135,14 +170,10 @@ public class DateFilterPickerPanel extends AbstractFragment {
     /**
      * applies given compareType on insight
      * @param compareType compare type to be applied
-     * @return DateFilterPickerPanel object
      */
-    public DateFilterPickerPanel applyCompareType(CompareTypeDropdown.CompareType compareType) {
-
+    public void applyCompareType(CompareType compareType) {
         getCompareTypeDropdown().selectCompareType(compareType.getCompareTypeName());
         apply();
-
-        return this;
     }
 
     /**
@@ -150,25 +181,12 @@ public class DateFilterPickerPanel extends AbstractFragment {
      * @param compareType compare type to check whether it is enabled
      * @return true whether it is enabled
      */
-    public boolean isCompareTypeEnabled(final CompareTypeDropdown.CompareType compareType) {
+    public boolean isCompareTypeEnabled(final CompareType compareType) {
         return getCompareTypeDropdown().isCompareTypeEnabled(compareType);
     }
 
     public boolean isApplyButtonEnabled() {
         return !waitForElementVisible(applyButton).getAttribute("class").contains("disabled");
-    }
-
-    private void configTimeFilterByRangeHelper(String from, String to, boolean apply) {
-        selectStaticPeriod();
-
-        fillInDateRange(waitForElementVisible(fromDate), from);
-        waitForElementVisible(fromDateCalendarIcon).click();
-
-        fillInDateRange(waitForElementVisible(toDate), to);
-        waitForElementVisible(toDateCalendarIcon).click();
-
-        waitForElementVisible(apply ? applyButton : cancelButton).click();
-        waitForFragmentNotVisible(this);
     }
 
     public void fillInDateRange(WebElement dateInput, String date) {
@@ -178,5 +196,16 @@ public class DateFilterPickerPanel extends AbstractFragment {
             dateInput.sendKeys(Keys.BACK_SPACE);
         }
         dateInput.sendKeys(date, Keys.ENTER);
+    }
+
+    private void configTimeFilterByRangeHelper(String from, String to, boolean apply) {
+        configTimeFilterByRangeHelper(from, to);
+        waitForElementVisible(apply ? applyButton : cancelButton).click();
+        waitForFragmentNotVisible(this);
+    }
+
+    private CompareTypeDropdown getCompareTypeDropdown() {
+        return Graphene.createPageFragment(CompareTypeDropdown.class,
+                waitForElementVisible(By.className("adi-compare-apply-select"), browser));
     }
 }

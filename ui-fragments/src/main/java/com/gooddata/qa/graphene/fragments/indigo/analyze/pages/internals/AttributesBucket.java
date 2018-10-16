@@ -6,6 +6,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import java.util.Collection;
 import java.util.List;
 
+import com.gooddata.qa.graphene.enums.DateGranularity;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -25,8 +26,8 @@ public class AttributesBucket extends AbstractBucket {
         return getElementTexts(items, e -> e.findElement(BY_HEADER));
     }
 
-    public void changeGranularity(String time) {
-        getDateGranularitySelect().selectByName(time);
+    public void changeGranularity(DateGranularity dateGranularity) {
+        getDateGranularitySelect().selectByName(dateGranularity.toString());
     }
 
     public String getSelectedGranularity() {
