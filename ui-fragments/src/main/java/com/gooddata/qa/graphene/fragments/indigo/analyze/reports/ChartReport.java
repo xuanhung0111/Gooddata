@@ -55,6 +55,7 @@ public class ChartReport extends AbstractFragment {
     @FindBy(css = ".highcharts-xaxis-labels text[text-anchor = 'middle'], .highcharts-xaxis-labels text[text-anchor = 'end']")
     private List<WebElement> xAxisLabels;
 
+    private static final By BY_X_AXIS_TITLE = By.className("highcharts-xaxis-title");
     private static final By BY_Y_AXIS_TITLE = By.className("highcharts-yaxis-title");
 
     public boolean isColumnHighlighted(Pair<Integer, Integer> position) {
@@ -99,6 +100,14 @@ public class ChartReport extends AbstractFragment {
             return "";
         }
         return yAxisTitle.get(0).getText();
+    }
+
+    public String getXaxisTitle() {
+        List<WebElement> xAxisTitle = getRoot().findElements(BY_X_AXIS_TITLE);
+        if (xAxisTitle.isEmpty()) {
+            return "";
+        }
+        return xAxisTitle.get(0).getText();
     }
 
     public int getTrackersCount() {
