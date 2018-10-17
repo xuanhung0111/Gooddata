@@ -190,7 +190,7 @@ public class BulkPermissionReportSetting extends AbstractEmbeddedModeTest {
 
             reportRequest.setLockedReport(lockedReport, true);
             browser.navigate().refresh();
-            waitForFragmentVisible(reportsPage)
+            waitForFragmentVisible(reportsPage.waitForListReportLoading())
                     .selectReportsAndOpenPermissionDialog(REPORT_AMOUNT_BY_STAGE_NAME, lockedReport)
                     .setEditingPermission(PermissionType.ADMIN).save();
             waitForFragmentNotVisible(permissionSettingDialog);
