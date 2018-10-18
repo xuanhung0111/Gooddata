@@ -218,13 +218,14 @@ public class DashboardEditBar extends AbstractFragment {
         return this;
     }
 
-    public void addVariableStatusToDashboard(String variable) {
+    public DashboardEditBar addVariableStatusToDashboard(String variable) {
         int widgetCountBefore = listDashboardWidgets.size();
         waitForElementVisible(addText).click();
         waitForElementVisible(dashboardTextObject.getRoot());
         dashboardTextObject.addVariableStatus(variable);
         Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1,
                 "Widget wasn't added");
+        return this;
     }
 
     public DashboardEditBar addLineToDashboard() {

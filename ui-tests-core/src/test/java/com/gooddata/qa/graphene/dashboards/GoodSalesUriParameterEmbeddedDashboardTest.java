@@ -144,12 +144,12 @@ public class GoodSalesUriParameterEmbeddedDashboardTest extends AbstractEmbedded
             log.info("Client-demo does not support dashboard export");
             return;
         }
-        embeddedDashboard.printDashboardTab(0);
+        embeddedDashboard.printDashboardTab();
         verifyTabExport(FIRST_TAB, INTEREST);
 
         embeddedDashboard.getFirstFilter().changeAttributeFilterValues(discovery);
         Screenshots.takeScreenshot(browser, "export_dashboard", getClass());
-        embeddedDashboard.printDashboardTab(0);
+        embeddedDashboard.printDashboardTab();
         verifyTabExport(FIRST_TAB, discovery);
     }
 

@@ -53,9 +53,10 @@ public class DashboardsPage extends AbstractFragment {
     protected static final By BY_PRINT_PDF_BUTTON = By.className("s-printButton");
     protected static final By BY_PRINTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' " +
             "and text()='Preparing printable PDF for download…']");
+    protected static final By BY_EXPORTING_PANEL =
+            By.xpath("//div[@class='box']//div[@class='rightContainer' and text()='Exporting…']");
 
     private static final By SAVE_AS_DIALOG_LOCATOR = By.className("dashboardSettingsDialogView");
-    private static final By BY_EXPORTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' and text()='Exporting…']");
     private static final By BY_TAB_DROPDOWN_MENU = By.xpath("//div[contains(@class, 's-tab-menu')]");
     private static final By BY_TAB_DROPDOWN_DELETE_BUTTON = By.xpath("//li[contains(@class, 's-delete')]//a");
     private static final By BY_TAB_DROPDOWN_RENAME_BUTTON = By.xpath("//li[contains(@class, 's-rename___')]//a");
@@ -233,48 +234,40 @@ public class DashboardsPage extends AbstractFragment {
         return Graphene.createPageFragment(DashboardEditBar.class, waitForElementVisible(BY_DASHBOARD_EDIT_BAR, browser));
     }
 
-    public String exportDashboardTab(int tabIndex, ExportFormat format) {
+    public String exportDashboardTabToPDF() {
         //wait for exporting dashboard tab in maximum 10 minutes
         int exportingTextDisplayedTimeoutInSeconds = 600;
 
-        tabs.openTab(tabIndex);
         waitForDashboardPageLoaded(browser);
-        String tabName = tabs.getTabLabel(0);
-        openEditExportEmbedMenu().select(format.getLabel());
-
-        if (format == ExportFormat.DASHBOARD_XLSX) {
-            ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
-            exportXLSXDialog.confirmExport();
-        }
+        openEditExportEmbedMenu().select(ExportFormat.DASHBOARD_PDF.getLabel());
 
         waitForElementVisible(BY_EXPORTING_PANEL, browser);
         sleepTightInSeconds(3);
         waitForElementNotPresent(BY_EXPORTING_PANEL, exportingTextDisplayedTimeoutInSeconds);
         sleepTightInSeconds(3);
-        System.out.println("Dashboard " + tabName + " exported to " + format.getName() + "...");
 
-        return tabName;
+        return tabs.getTabLabel(tabs.getSelectedTabIndex());
     }
 
-    public String printDashboardTab(int tabIndex) {
-        waitForFragmentVisible(tabs).openTab(tabIndex);
+    public String printDashboardTab() {
         waitForDashboardPageLoaded(browser);
 
         waitForElementVisible(BY_PRINT_PDF_BUTTON, getRoot()).click();
         waitForElementVisible(BY_PRINTING_PANEL, browser);
         waitForElementNotPresent(BY_PRINTING_PANEL);
 
-        return tabs.getTabLabel(tabIndex);
+        return tabs.getTabLabel(tabs.getSelectedTabIndex());
     }
 
-    public String printDashboardTabToXLSX(String dashboardName) {
+    public String exportDashboardToXLSX() {
         int exportingTextDisplayedTimeoutInSeconds = 600;
+        String dashboardName = getDashboardName();
         openEditExportEmbedMenu().select(ExportFormat.DASHBOARD_XLSX.getLabel());
         ExportXLSXDialog exportXLSXDialog = ExportXLSXDialog.getInstance(browser);
         exportXLSXDialog.confirmExport();
 
-        waitForElementVisible(BY_EXPORTING_PANEL, browser);
         String fileName = dashboardName + " " + exportXLSXDialog.getExportDashboardFormat() + ".xlsx";
+        waitForElementVisible(BY_EXPORTING_PANEL, browser);
         sleepTightInSeconds(3);
         waitForElementNotPresent(BY_EXPORTING_PANEL, exportingTextDisplayedTimeoutInSeconds);
         sleepTightInSeconds(3);

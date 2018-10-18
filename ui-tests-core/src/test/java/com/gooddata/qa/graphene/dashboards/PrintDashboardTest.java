@@ -4,17 +4,12 @@ import com.gooddata.md.report.AttributeInGrid;
 import com.gooddata.md.report.Filter;
 import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.MetricElement;
-import com.gooddata.qa.fixture.utils.GoodSales.Reports;
 import com.gooddata.qa.graphene.enums.DateRange;
-import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.enums.dashboard.TextObject;
 import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
-import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
-import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbedDashboardDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
-import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
 import com.gooddata.qa.graphene.i18n.AbstractEmbeddedModeTest;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.filter.FilterItemContent;
@@ -27,7 +22,6 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
-import com.gooddata.qa.utils.java.Builder;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONException;
 import org.testng.SkipException;
@@ -35,41 +29,29 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
-import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_AMOUNT_BY_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_AMOUNT_BY_STAGE_NAME;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.MIDDLE;
 import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.RIGHT;
 import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.TOP_RIGHT;
-import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.lang.String.format;
-import static java.nio.file.Files.deleteIfExists;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.not;
 import static org.testng.Assert.assertEquals;
 
-public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
+public class PrintDashboardTest extends AbstractEmbeddedModeTest {
 
-    private static final long expectedDashboardExportSize = 50000L;
-    private static final String FIRST_TAB = "First Tab";
-    private static final String SECOND_TAB = "Second Tab";
-    private static final String COMPUSCI = "CompuSci";
-    private static final String EDUCATIONLY = "Educationly";
     private static final String REPORT_AMOUNT_BY_F_STAGE_NAME = "Amount by f stage name";
     private static final String INTEREST = "Interest";
     private static final String DISCOVERY = "Discovery";
@@ -77,13 +59,10 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
     private static final String RISK_ASSESSMENT = "Risk Assessment";
     private static final String CONVICTION = "Conviction";
     private static final String F_STAGE_NAME = "FStage Name";
-    private static final String DASHBOARD_TEST = "Dashboard Test";
-    private static final String DASHBOARD_HAVING_REPORT_AND_FILTER = "Dashboard Having Report And Filter";
 
     private static final int currentYear = DateRange.now().getYear();
     private String today;
 
-    private String exportedDashboardName;
     private String dashboardTitle;
     private String firstTab;
     private DashboardRestRequest dashboardRequest;
@@ -101,9 +80,8 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
 
     @Override
     protected void customizeProject() throws Throwable {
-        Reports reports = getReportCreator();
-        reports.createAmountByProductReport();
-        reports.createAmountByStageNameReport();
+        getReportCreator().createAmountByProductReport();
+        getReportCreator().createAmountByStageNameReport();
         promptUri = getVariableCreator().createFilterVariable(F_STAGE_NAME, getAttributeByTitle(ATTR_STAGE_NAME).getUri(),
                 asList(INTEREST, DISCOVERY, SHORT_LIST, RISK_ASSESSMENT, CONVICTION));
         createReport(GridReportDefinitionContent.create(REPORT_AMOUNT_BY_F_STAGE_NAME,
@@ -118,22 +96,10 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
     }
 
     @Test(dependsOnGroups = "createProject")
-    public void prepareDashboard() {
-        initDashboardsPage().addNewDashboard(DASHBOARD_TEST);
-        dashboardsPage.editDashboard()
-                .addReportToDashboard(REPORT_AMOUNT_BY_PRODUCT)
-                .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_PRODUCT);
-        DashboardWidgetDirection.RIGHT.moveElementToRightPlace(getFilter(ATTR_PRODUCT).getRoot());
-        dashboardsPage.getContent().getFilterWidget(simplifyText(ATTR_PRODUCT))
-                .changeAttributeFilterValues(COMPUSCI, EDUCATIONLY);
-        dashboardsPage.saveDashboard();
-    }
-
-    @Test(dependsOnGroups = "createProject")
-    public void exportDashboardHasTableReportToPdf() throws IOException {
+    public void printDashboardHasTableReportToPdf() throws IOException {
         dashboardTitle = generateDashboardName();
         openDashboardHasReports(Pair.of(REPORT_AMOUNT_BY_PRODUCT, ItemPosition.LEFT));
-        dashboardsPage.exportDashboardTabToPDF();
+        dashboardsPage.printDashboardTab();
         today = DateRange.getCurrentDate();
         List<String> contents = asList(getContentFrom(firstTab).split("\n"));
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Table_Report", getClass());
@@ -144,13 +110,13 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
     }
 
     @Test(dependsOnGroups = "createProject")
-    public void exportDashboardHasChartReportToPdf() throws IOException {
+    public void printDashboardHasChartReportToPdf() throws IOException {
         String headlineReport = "Headline Report";
         dashboardTitle = generateDashboardName();
         initReportsPage().openReport(REPORT_AMOUNT_BY_PRODUCT)
                 .selectReportVisualisation(ReportTypes.HEADLINE).saveAsReport(headlineReport);
         openDashboardHasReports(Pair.of(headlineReport, ItemPosition.LEFT));
-        dashboardsPage.exportDashboardTabToPDF();
+        dashboardsPage.printDashboardTab();
         today = DateRange.getCurrentDate();
         List<String> contents = asList(getContentFrom(firstTab).split("\n"));
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Chart_Report", getClass());
@@ -158,13 +124,13 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
     }
 
     @Test(dependsOnGroups = "createProject")
-    public void exportDashboardHasLineReportToPdf() throws IOException {
+    public void printDashboardHasLineReportToPdf() throws IOException {
         String lineReport = "Line Report";
         dashboardTitle = generateDashboardName();
         initReportsPage().openReport(REPORT_AMOUNT_BY_PRODUCT)
                 .selectReportVisualisation(ReportTypes.LINE).waitForReportExecutionProgress().saveAsReport(lineReport);
         openDashboardHasReports(Pair.of(lineReport, ItemPosition.LEFT));
-        dashboardsPage.exportDashboardTabToPDF();
+        dashboardsPage.printDashboardTab();
         today = DateRange.getCurrentDate();
         List<String> contents = asList(getContentFrom(firstTab).split("\n"));
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Line_Report", getClass());
@@ -173,11 +139,11 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
     }
 
     @Test(dependsOnGroups = "createProject")
-    public void exportDashboardHasAttributeSingleFilterToPdf() throws IOException {
+    public void printDashboardHasAttributeSingleFilterToPdf() throws IOException {
         dashboardTitle = generateDashboardName();
         FilterItemContent filterContent = createSingleValueFilter(getAttributeByTitle(ATTR_PRODUCT));
-        openDashboardHasReportAndFilters(REPORT_AMOUNT_BY_PRODUCT, Pair.of(filterContent, RIGHT));
-        dashboardsPage.exportDashboardTabToPDF();
+        openDashboardHasReportAndFilter(REPORT_AMOUNT_BY_PRODUCT, filterContent);
+        dashboardsPage.printDashboardTab();
         today = DateRange.getCurrentDate();
         List<String> contents = asList(getContentFrom(firstTab).split("\n"));
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Attribute_Single_Filter", getClass());
@@ -186,11 +152,11 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
     }
 
     @Test(dependsOnGroups = "createProject")
-    public void exportDashboardHasPromptSingleFilterToPdf() throws IOException {
+    public void printDashboardHasPromptSingleFilterToPdf() throws IOException {
         dashboardTitle = generateDashboardName();
         FilterItemContent filterContent = createSingleValuesFilterBy(promptUri);
-        openDashboardHasReportAndFilters(REPORT_AMOUNT_BY_F_STAGE_NAME, Pair.of(filterContent, RIGHT));
-        dashboardsPage.exportDashboardTabToPDF();
+        openDashboardHasReportAndFilter(REPORT_AMOUNT_BY_F_STAGE_NAME, filterContent);
+        dashboardsPage.printDashboardTab();
         today = DateRange.getCurrentDate();
         List<String> contents = asList(getContentFrom(firstTab).split("\n"));
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Prompt_Single_Filter", getClass());
@@ -199,12 +165,12 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
     }
 
     @Test(dependsOnGroups = "createProject")
-    public void exportDashboardHasDateRangeFilterToPdf() throws IOException {
+    public void printDashboardHasDateRangeFilterToPdf() throws IOException {
         dashboardTitle = generateDashboardName();
         FilterItemContent filterContent =
                 createDateFilter(getAttributeByTitle(ATTR_YEAR_SNAPSHOT), 2010 - currentYear, 2011 - currentYear);
-        openDashboardHasReportAndFilters(REPORT_AMOUNT_BY_F_STAGE_NAME, Pair.of(filterContent, RIGHT));
-        dashboardsPage.exportDashboardTabToPDF();
+        openDashboardHasReportAndFilter(REPORT_AMOUNT_BY_F_STAGE_NAME, filterContent);
+        dashboardsPage.printDashboardTab();
         today = DateRange.getCurrentDate();
         List<String> contents = asList(getContentFrom(firstTab).split("\n"));
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Date_Range_Filter", getClass());
@@ -214,7 +180,7 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
     }
 
     @Test(dependsOnGroups = "createProject")
-    public void exportDashboardHasTextToPdf() throws IOException {
+    public void printDashboardHasTextToPdf() throws IOException {
         String googleUri = "google.com";
         firstTab = generateHashString();
         initDashboardsPage().addNewDashboard(generateDashboardName())
@@ -225,7 +191,7 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
                 .addTextToDashboard(TextObject.DESCRIPTION, REPORT_AMOUNT_BY_PRODUCT, googleUri)
                 .addVariableStatusToDashboard(F_STAGE_NAME)
                 .saveDashboard();
-        dashboardsPage.exportDashboardTabToPDF();
+        dashboardsPage.printDashboardTab();
         today = DateRange.getCurrentDate();
         List<String> contents = asList(getContentFrom(firstTab).split("\n"));
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Text", getClass());
@@ -235,11 +201,11 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
     }
 
     @Test(dependsOnGroups = "createProject")
-    public void exportDashboardHasKeyMetricToPdf() throws IOException {
+    public void printDashboardHasKeyMetricToPdf() throws IOException {
         firstTab = generateHashString();
         initDashboardsPage().addNewDashboard(generateDashboardName()).renameTab(0, firstTab)
                 .addWidgetToDashboard(WidgetTypes.KEY_METRIC, METRIC_AMOUNT).saveDashboard();
-        dashboardsPage.exportDashboardTabToPDF();
+        dashboardsPage.printDashboardTab();
         today = DateRange.getCurrentDate();
         List<String> contents = asList(getContentFrom(firstTab).split("\n"));
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Key_Metric", getClass());
@@ -247,14 +213,14 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
     }
 
     @Test(dependsOnGroups = "createProject")
-    public void exportHugeDashboardToPdf() throws IOException {
+    public void printHugeDashboardToPdf() throws IOException {
         firstTab = generateHashString();
         dashboardTitle = generateDashboardName();
         openDashboardHasReports(Pair.of(REPORT_AMOUNT_BY_PRODUCT, ItemPosition.TOP),
                 Pair.of(REPORT_AMOUNT_BY_PRODUCT, ItemPosition.RIGHT), Pair.of(REPORT_AMOUNT_BY_PRODUCT, ItemPosition.TOP_LEFT),
                 Pair.of(REPORT_AMOUNT_BY_PRODUCT, ItemPosition.LEFT), Pair.of(REPORT_AMOUNT_BY_PRODUCT, ItemPosition.MIDDLE),
                 Pair.of(REPORT_AMOUNT_BY_PRODUCT, ItemPosition.TOP_RIGHT));
-        dashboardsPage.exportDashboardTabToPDF();
+        dashboardsPage.printDashboardTab();
         today = DateRange.getCurrentDate();
         List<String> contents = asList(getContentFrom(firstTab).split("\n"));
         Screenshots.takeScreenshot(browser, "Huge_Dashboard", getClass());
@@ -262,7 +228,7 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
     }
 
     @Test(dependsOnGroups = "createProject")
-    public void exportDashboardHasWebContentToPdf() throws IOException {
+    public void printDashboardHasWebContentToPdf() throws IOException {
         firstTab = generateHashString();
         dashboardTitle = generateDashboardName();
         openDashboardHasReports(Pair.of(REPORT_AMOUNT_BY_PRODUCT, ItemPosition.TOP_LEFT));
@@ -270,7 +236,7 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
         String embeddedUri = embedDashboardDialog.getPreviewURI();
         embedDashboardDialog.close();
         dashboardsPage.editDashboard().addWebContentToDashboard(embeddedUri).saveDashboard();
-        dashboardsPage.exportDashboardTabToPDF();
+        dashboardsPage.printDashboardTab();
         today = DateRange.getCurrentDate();
         List<String> contents = asList(getContentFrom(firstTab).split("\n"));
         Screenshots.takeScreenshot(browser, "Dashboard_Has_WebContent", getClass());
@@ -282,11 +248,11 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
     }
 
     @Test(dependsOnGroups = "createProject")
-    public void exportDashboardWithPageBreakMarkerToPdf() throws IOException {
+    public void printDashboardWithPageBreakMarkerToPdf() throws IOException {
         dashboardTitle = generateDashboardName();
         openDashboardHasReports(Pair.of(REPORT_AMOUNT_BY_PRODUCT, ItemPosition.LEFT),
                 Pair.of(REPORT_AMOUNT_BY_F_STAGE_NAME, ItemPosition.NEXT_PAGE));
-        dashboardsPage.exportDashboardTabToPDF();
+        dashboardsPage.printDashboardTab();
         today = DateRange.getCurrentDate();
         List<String> contents = asList(getContentFrom(firstTab).split("\n"));
         Screenshots.takeScreenshot(browser, "Dashboard_With_Page_Break_Marker", getClass());
@@ -299,16 +265,15 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
     }
 
     @Test(dependsOnGroups = "createProject")
-    public void exportEmbeddedDashboardWithURLParameterToPdf() throws IOException {
+    public void printEmbeddedDashboardWithURLParameterToPdf() throws IOException {
         dashboardTitle = generateDashboardName();
         FilterItemContent attributeFilterContent = createMultipleValuesFilter(getAttributeByTitle(ATTR_STAGE_NAME));
         FilterItemContent dateFilterContent = createMultipleValuesFilter(getAttributeByTitle(ATTR_YEAR_SNAPSHOT));
-        openDashboardHasReportAndFilters(REPORT_AMOUNT_BY_F_STAGE_NAME, Pair.of(attributeFilterContent, MIDDLE),
-                Pair.of(dateFilterContent, TOP_RIGHT));
+        openDashboardHasReportAndFilters(REPORT_AMOUNT_BY_F_STAGE_NAME, attributeFilterContent, dateFilterContent);
         embeddedUri = dashboardsPage.openEmbedDashboardDialog().selectFilterAttribute(ATTR_STAGE_NAME, INTEREST)
                 .selectFilterAttribute(ATTR_YEAR_SNAPSHOT, "2010").getPreviewURI();
         EmbeddedDashboard embeddedDashboard = initEmbeddedDashboard();
-        embeddedDashboard.exportDashboardTabToPDF();
+        embeddedDashboard.printDashboardTab();
         today = DateRange.getCurrentDate();
         List<String> contents = asList(getContentFrom(firstTab).split("\n"));
         Screenshots.takeScreenshot(browser, "Embedded_Dashboard_With_URL_Parameter", getClass());
@@ -317,17 +282,16 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
     }
 
     @Test(dependsOnGroups = "createProject")
-    public void exportEmbeddedDashboardAfterChangingFilterPdf() throws IOException {
+    public void printEmbeddedDashboardAfterChangingFilterPdf() throws IOException {
         dashboardTitle = generateDashboardName();
         FilterItemContent attributeFilterContent = createMultipleValuesFilter(getAttributeByTitle(ATTR_STAGE_NAME));
         FilterItemContent dateFilterContent = createMultipleValuesFilter(getAttributeByTitle(ATTR_YEAR_SNAPSHOT));
-        openDashboardHasReportAndFilters(REPORT_AMOUNT_BY_F_STAGE_NAME, Pair.of(attributeFilterContent, MIDDLE),
-                Pair.of(dateFilterContent, TOP_RIGHT));
+        openDashboardHasReportAndFilters(REPORT_AMOUNT_BY_F_STAGE_NAME, attributeFilterContent, dateFilterContent);
         embeddedUri = dashboardsPage.openEmbedDashboardDialog().selectFilterAttribute(ATTR_STAGE_NAME, INTEREST)
                 .selectFilterAttribute(ATTR_YEAR_SNAPSHOT, "2010").getPreviewURI();
         EmbeddedDashboard embeddedDashboard = initEmbeddedDashboard();
         embeddedDashboard.getFilterWidgetByName(ATTR_STAGE_NAME).changeAttributeFilterValues(DISCOVERY);
-        embeddedDashboard.exportDashboardTabToPDF();
+        embeddedDashboard.printDashboardTab();
         today = DateRange.getCurrentDate();
         List<String> contents = asList(getContentFrom(firstTab).split("\n"));
         Screenshots.takeScreenshot(browser, "Embedded_Dashboard_After_Changing_Filter", getClass());
@@ -335,125 +299,21 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
                 "STAGE NAME", DISCOVERY, "YEAR (SNAPSHOT)", "2010", firstTab + " " + today, "Page 1/1"));
     }
 
-    @Test(dependsOnMethods = "prepareDashboard")
-    public void verifyExportedDashboardPDF() throws IOException {
-        initDashboardsPage().selectDashboard(DASHBOARD_TEST);
-        waitForDashboardPageLoaded(browser);
-        exportedDashboardName = dashboardsPage.exportDashboardTabToPDF();
-        try {
-            checkRedBar(browser);
-            verifyDashboardExport(exportedDashboardName, FIRST_TAB, expectedDashboardExportSize);
-
-            List<String> contents = asList(getContentFrom(FIRST_TAB).split("\n"));
-            //verify report title
-            assertThat(contents, hasItem(REPORT_AMOUNT_BY_PRODUCT));
-            //verify header title
-            assertThat(contents, hasItem(ATTR_PRODUCT + " " + METRIC_AMOUNT));
-            //verify content
-            assertThat(contents, hasItems(COMPUSCI, EDUCATIONLY));
-            assertThat(contents, hasItems("$27,222,899.64", "$22,946,895.47"));
-            //verify filter
-            assertThat(contents, not(hasItems("Explorer", "Grammar Plus", "PhoenixSoft", "TouchAll", "WonderKid")));
-        } finally {
-            deleteIfExists(Paths.get(testParams.getDownloadFolder() + testParams.getFolderSeparator() +
-                    exportedDashboardName + "." + ExportFormat.PDF.getName()));
-        }
-    }
-
-    @Test(dependsOnMethods = "prepareDashboard")
-    public void exportCopiedDashboard() throws IOException {
-        String copiedDashboard = "Copied Dashboard";
-        initDashboardsPage().selectDashboard(DASHBOARD_TEST)
-                .editDashboard()
-                .saveAsDashboard(copiedDashboard, false, PermissionType.USE_EXISTING_PERMISSIONS);
-        exportedDashboardName = dashboardsPage.exportDashboardTabToPDF();
-        try {
-            checkRedBar(browser);
-            verifyDashboardExport(exportedDashboardName, FIRST_TAB, expectedDashboardExportSize);
-
-            List<String> contents = asList(getContentFrom(FIRST_TAB).split("\n"));
-            //verify report title
-            assertThat(contents, hasItem(REPORT_AMOUNT_BY_PRODUCT));
-            //verify header title
-            assertThat(contents, hasItem(format("%s %s", ATTR_PRODUCT, METRIC_AMOUNT)));
-            //verify content
-            assertThat(contents, hasItems(COMPUSCI, EDUCATIONLY));
-            assertThat(contents, hasItems("$27,222,899.64", "$22,946,895.47"));
-            //verify filter
-            assertThat(contents, not(hasItems("Explorer", "Grammar Plus", "PhoenixSoft", "TouchAll", "WonderKid")));
-        } finally {
-            deleteIfExists(Paths.get(testParams.getDownloadFolder() + testParams.getFolderSeparator() +
-                    exportedDashboardName + "." + ExportFormat.PDF.getName()));
-        }
-    }
-
-    @Test(dependsOnMethods = "prepareDashboard")
-    public void exportDashboardWithDuplicateFilter() throws IOException {
-        createDashboardWithDuplicateFilter();
-        initDashboardsPage().selectDashboard(DASHBOARD_HAVING_REPORT_AND_FILTER)
-                .getFirstFilter().changeAttributeFilterValues(COMPUSCI);
-        exportedDashboardName = dashboardsPage.printDashboardTab();
-        try {
-            checkRedBar(browser);
-            verifyDashboardExport(exportedDashboardName, SECOND_TAB, expectedDashboardExportSize);
-
-            List<String> contents = asList(getContentFrom(SECOND_TAB).split("\n"));
-            //verify report title
-            assertThat(contents, hasItem(REPORT_AMOUNT_BY_PRODUCT));
-            //verify header title
-            assertThat(contents, hasItem(format("%s %s", ATTR_PRODUCT, METRIC_AMOUNT)));
-            //verify content
-            assertThat(contents, hasItem("CompuSci $27,222,899.64"));
-            //verify filter
-            assertThat(contents, not(hasItems("Educationly $22,946,895.47")));
-            assertThat(contents, hasItem("PRODUCT"));
-        } finally {
-            deleteIfExists(Paths.get(testParams.getDownloadFolder() + testParams.getFolderSeparator() +
-                    exportedDashboardName + "." + ExportFormat.PDF.getName()));
-        }
-    }
-
-    private void createDashboardWithDuplicateFilter() throws IOException {
-        FilterItemContent productFilter = createMultipleValuesFilter(getAttributeByTitle(ATTR_PRODUCT));
-
-        Dashboard dashboard = Builder.of(Dashboard::new).with(dash -> {
-            dash.setName(DASHBOARD_HAVING_REPORT_AND_FILTER);
-            dash.addTab(Builder.of(Tab::new)
-                    .with(tab -> {
-                        FilterItem filterItem = Builder.of(FilterItem::new).with(item -> {
-                            item.setContentId(productFilter.getId());
-                            item.setPosition(TabItem.ItemPosition.RIGHT);
-                        }).build();
-
-                        tab.setTitle(SECOND_TAB);
-                        tab.addItem(Builder.of(ReportItem::new).with(reportItem -> {
-                            reportItem.setObjUri(getReportByTitle(REPORT_AMOUNT_BY_PRODUCT).getUri());
-                            reportItem.setPosition(TabItem.ItemPosition.LEFT);
-                            reportItem.setAppliedFilterIds(singletonList(filterItem.getId()));
-                        }).build());
-                        tab.addItem(filterItem);
-                    })
-                    .build());
-            dash.addFilter(productFilter).addFilter(productFilter);
-        }).build();
-        new DashboardRestRequest(getAdminRestClient(), testParams.getProjectId())
-                .createDashboard(dashboard.getMdObject());
-    }
-
-    private void openDashboardHasReportAndFilters(String titleReport,
-            Pair<FilterItemContent, ItemPosition>... filterContents) throws IOException {
+    private void openDashboardHasReportAndFilters(String titleReport, FilterItemContent attributeFilterContent,
+                                                  FilterItemContent dateFilterContent) throws IOException {
         Dashboard dashboard = new Dashboard()
                 .setName(dashboardTitle)
-                .addTab(initTab(titleReport, filterContents));
-        for (Pair<FilterItemContent, ItemPosition> filterContent : filterContents) {
-            dashboard.addFilter(filterContent.getKey());
-        }
+                .addTab(initTab(titleReport, asList(
+                        Pair.of(attributeFilterContent, MIDDLE),
+                        Pair.of(dateFilterContent, TOP_RIGHT))))
+                .addFilter(attributeFilterContent)
+                .addFilter(dateFilterContent);
         dashboardRequest.createDashboard(dashboard.getMdObject());
         initDashboardsPage().selectDashboard(dashboardTitle);
     }
 
     private void openDashboardHasReports(Pair<String, ItemPosition>... reports) throws IOException {
-        firstTab = format("First tab - %s", dashboardTitle);
+        firstTab = format("First Tab - %s", dashboardTitle);
         List<TabItem> tabItems = Stream.of(reports).map(this::createReportItem).collect(Collectors.toList());
         Dashboard dashboard = new Dashboard().setName(dashboardTitle)
                 .addTab(new Tab().setTitle(firstTab).addItems(tabItems));
@@ -468,9 +328,21 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
         return reportItem;
     }
 
-    private Tab initTab(String report, Pair<FilterItemContent, ItemPosition>... appliedFilters) {
+    private void openDashboardHasReportAndFilter(String titleReport, FilterItemContent filterItemContent)
+            throws IOException {
+        Dashboard dashboard = new Dashboard()
+                .setName(dashboardTitle)
+                .addTab(initTab(titleReport, singletonList(
+                        Pair.of(filterItemContent, RIGHT))))
+                .addFilter(filterItemContent);
+
+        dashboardRequest.createDashboard(dashboard.getMdObject());
+        initDashboardsPage().selectDashboard(dashboardTitle);
+    }
+
+    private Tab initTab(String report, List<Pair<FilterItemContent, ItemPosition>> appliedFilters) {
         firstTab = format("First tab - %s", dashboardTitle);
-        List<FilterItem> filterItems = Stream.of(appliedFilters)
+        List<FilterItem> filterItems = appliedFilters.stream()
                 .map(this::buildFilterItem)
                 .collect(Collectors.toList());
         ReportItem reportItem = createReportItem(getReportByTitle(report).getUri(),

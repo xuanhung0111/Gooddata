@@ -21,6 +21,7 @@ import com.gooddata.qa.graphene.dashboards.DrillToUpdatedDashboardTabTest;
 import com.gooddata.qa.graphene.dashboards.DynamicImageOnDashboardTest;
 import com.gooddata.qa.graphene.dashboards.ExportDashboardPDFTest;
 import com.gooddata.qa.graphene.dashboards.ExportDashboardXLSXTest;
+import com.gooddata.qa.graphene.dashboards.PrintDashboardTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesCascadingFilterTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesCellLimitTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesConnectingFilterTest;
@@ -240,6 +241,7 @@ public class UITestsRegistry {
                     DefaultPermissionDashboardTest.class,
                     ExportDashboardPDFTest.class,
                     ExportDashboardXLSXTest.class,
+                    PrintDashboardTest.class,
                     "testng-dashboard-default-filter-multiple-choice.xml",
                     "testng-dashboard-default-filter-single-choice.xml",
                     "testng-dashboard-default-filter-savedView-multiple-choice.xml",
