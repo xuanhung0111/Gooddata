@@ -35,7 +35,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.not;
 
-public class ExportDashboardTest extends AbstractDashboardWidgetTest {
+public class ExportDashboardPDFTest extends AbstractDashboardWidgetTest {
 
     private static final long expectedDashboardExportSize = 50000L;
     private final String FIRST_TAB = "First Tab";

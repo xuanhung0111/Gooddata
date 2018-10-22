@@ -19,7 +19,8 @@ import com.gooddata.qa.graphene.dashboards.DrillToDashboardTabSettingTest;
 import com.gooddata.qa.graphene.dashboards.DrillToHiddenDashboardTabTest;
 import com.gooddata.qa.graphene.dashboards.DrillToUpdatedDashboardTabTest;
 import com.gooddata.qa.graphene.dashboards.DynamicImageOnDashboardTest;
-import com.gooddata.qa.graphene.dashboards.ExportDashboardTest;
+import com.gooddata.qa.graphene.dashboards.ExportDashboardPDFTest;
+import com.gooddata.qa.graphene.dashboards.ExportDashboardXLSXTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesCascadingFilterTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesCellLimitTest;
 import com.gooddata.qa.graphene.dashboards.GoodSalesConnectingFilterTest;
@@ -237,7 +238,8 @@ public class UITestsRegistry {
                     GoodSalesUriParameterEmbeddedDashboardTest.class,
                     LockingAndVisibilityDashboardTest.class,
                     DefaultPermissionDashboardTest.class,
-                    ExportDashboardTest.class,
+                    ExportDashboardPDFTest.class,
+                    ExportDashboardXLSXTest.class,
                     "testng-dashboard-default-filter-multiple-choice.xml",
                     "testng-dashboard-default-filter-single-choice.xml",
                     "testng-dashboard-default-filter-savedView-multiple-choice.xml",

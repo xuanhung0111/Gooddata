@@ -19,7 +19,7 @@ public class Tab implements MdObject {
         return this;
     }
 
-    public Tab addItems(List<TabItem> tabItems) {
+    public Tab addItems(List<? extends TabItem> tabItems) {
         items.addAll(tabItems.stream().map(TabItem::getMdObject).collect(toList()));
         return this;
     }
