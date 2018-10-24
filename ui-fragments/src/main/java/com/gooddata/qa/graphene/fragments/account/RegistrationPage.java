@@ -199,6 +199,7 @@ public class RegistrationPage extends AbstractFragment {
         if(Objects.isNull(data)){
             return this;
         }
+        Graphene.waitGui().until(browser -> !registerButton.getAttribute("class").contains("disabled"));
         waitForElementVisible(input).clear();
         input.sendKeys(data);
         return this;
