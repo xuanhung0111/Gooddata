@@ -226,7 +226,7 @@ public class DateFilterTest extends AbstractAnalyseTest {
 
         final List<String> dateFilterTexts = parseFilterText(analysisPage.getFilterBuckets().getDateFilterText());
         final List<String> expectedDateFilterTexts = Arrays.asList(
-                "templ:DateInvoice\n:\nThis quarter; Compare (all) to", "Same period (SP) last year");
+                "templ:DateInvoice\n:\nThis quarter\nCompare (all) to", "Same period (SP) previous year");
         assertEquals(dateFilterTexts, expectedDateFilterTexts,
                 "Date was not displayed after applying compare recommendation");
 

@@ -64,7 +64,7 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select("This month").apply();
         assertEquals(parseFilterText(analysisPage.getFilterBuckets().getFilterText("Activity")),
-                Arrays.asList("Activity\n:\nThis month; Compare (all) to", "Same period (SP) last year"));
+                Arrays.asList("Activity\n:\nThis month\nCompare (all) to", "Same period (SP) previous year"));
         analysisPage.waitForReportComputing();
         if (analysisPage.isExplorerMessageVisible()) {
             log.info("Error message: " + analysisPage.getExplorerMessage());
@@ -110,8 +110,8 @@ public class GoodSalesComparisonRecommendationTest extends AbstractAnalyseTest {
         analysisPage.waitForReportComputing();
 
         List<String> dateFilterTexts = parseFilterText(filtersBucketReact.getDateFilterText());
-        assertEquals(dateFilterTexts, Arrays.asList("Activity\n:\nThis month; Compare (all) to",
-                "Same period (SP) last year"));
+        assertEquals(dateFilterTexts, Arrays.asList("Activity\n:\nThis month\nCompare (all) to",
+                "Same period (SP) previous year"));
         if (analysisPage.isExplorerMessageVisible()) {
             log.info("Error message: " + analysisPage.getExplorerMessage());
             log.info("Stop testing because of no data in [This month]");
