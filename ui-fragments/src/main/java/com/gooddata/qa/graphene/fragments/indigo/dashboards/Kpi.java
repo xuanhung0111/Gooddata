@@ -35,7 +35,7 @@ public class Kpi extends Widget {
     @FindBy(className = KPI_ALERT_BUTTON_CLASS)
     private WebElement alertButton;
 
-    @FindBy(className = "kpi-value")
+    @FindBy(css = ".kpi-value div")
     private WebElement value;
 
     @FindBy(className = KPI_POP_SECTION_CLASS)
