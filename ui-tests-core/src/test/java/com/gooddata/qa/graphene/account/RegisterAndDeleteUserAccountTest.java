@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.fragments.account.InviteUserDialog.INVITE
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -154,7 +155,8 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
                 .enterEmail(registrationEmail)
                 .enterPassword("aaaaaa")
                 .agreeRegistrationLicense()
-                .submitForm();
+                .submitForm()
+                .waitForRegistrationNotSuccessfully();
         takeScreenshot(browser, "Error-message-for-short-password-shows", getClass());
         softAssert.assertEquals(registrationPage.getErrorMessage(),
                 SHORT_PASSWORD_ERROR_MESSAGE);
@@ -266,18 +268,18 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         new UserManagementRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
                 .deleteUserByEmail(testParams.getUserDomain(), registrationUser);
 
-        activationLink = doActionWithImapClient(
-                imapClient -> initRegistrationPage().registerNewUserSuccessfully(imapClient, registrationForm));
-
-        waitForDashboardPageLoaded(browser);
-
-        openUrl(activationLink);
-        LoginFragment.waitForPageLoaded(browser);
-
-        takeScreenshot(browser, "register user successfully", this.getClass());
-        assertEquals(LoginFragment.getInstance(browser).getNotificationMessage(), ACTIVATION_SUCCESS_MESSAGE);
-
         try {
+            activationLink = doActionWithImapClient(
+                    imapClient -> initRegistrationPage().registerNewUserSuccessfully(imapClient, registrationForm));
+
+            waitForDashboardPageLoaded(browser);
+
+            openUrl(activationLink);
+            LoginFragment.waitForPageLoaded(browser);
+
+            takeScreenshot(browser, "register user successfully", this.getClass());
+            assertEquals(LoginFragment.getInstance(browser).getNotificationMessage(), ACTIVATION_SUCCESS_MESSAGE);
+
             LoginFragment.getInstance(browser).login(registrationUser, testParams.getPassword(), true);
             waitForDashboardPageLoaded(browser);
 
@@ -333,7 +335,8 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         RegistrationPage.getInstance(browser)
                 .fillInRegistrationForm(registrationForm)
                 .enterSpecialCaptcha()
-                .submitForm();
+                .submitForm()
+                .waitForRegistrationNotSuccessfully();
 
         takeScreenshot(browser, "Error-message-displays-when-register-user-with-an-existed-email", getClass());
         assertTrue(RegistrationPage.getInstance(browser).isEmailInputError(), "Error not show on email input");
@@ -349,6 +352,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         logout()
             .login(registrationUser, testParams.getPassword(), true);
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
+        waitForDashboardPageLoaded(browser);
 
         initAccountPage()
             .deleteAccount();
