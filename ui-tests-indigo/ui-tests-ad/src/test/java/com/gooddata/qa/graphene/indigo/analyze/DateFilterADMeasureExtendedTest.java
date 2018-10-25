@@ -11,6 +11,7 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.ConfigurationPanel;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
+import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.testng.annotations.DataProvider;
@@ -229,8 +230,9 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
                 .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
                 .addFilterByDate(DATE_DATASET_CLOSED, validFromDate, validToDate);
 
-        MetricFilterByDatePicker metricFilterByDatePicker = metricConfiguration.expandFilterByDate()
-                .backToOtherPeriods();
+        MetricFilterByDatePicker metricFilterByDatePicker = metricConfiguration.expandFilterByDate();
+        ElementUtils.makeSureNoPopupVisible();
+        metricFilterByDatePicker.backToOtherPeriods();
 
         assertFalse(metricFilterByDatePicker.isDateRangePickerVisible(), "System don't close date range picker");
         assertTrue(metricConfiguration.isFilterByDateExpanded(),
@@ -245,7 +247,9 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
                 .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
                 .addFilterByDate(DATE_DATASET_CLOSED, validFromDate, validToDate);
 
-        metricConfiguration.expandFilterByDate().backToOtherPeriods().changeDateDimension(DATE_DATASET_SNAPSHOT);
+        MetricFilterByDatePicker metricFilterByDatePicker = metricConfiguration.expandFilterByDate();
+        ElementUtils.makeSureNoPopupVisible();
+        metricFilterByDatePicker.backToOtherPeriods().changeDateDimension(DATE_DATASET_SNAPSHOT);
         assertEquals(getListDataChartReportRender(), singletonList("$116,625,456.54"),
                 "Chart does not render correctly");
     }
@@ -273,11 +277,12 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
     public void undoButtonAfterChangingDateDimension() {
         String validFromDate = "01/01/2011";
         String validToDate = "01/01/2018";
-        initAnalysePage().addMetric(METRIC_AMOUNT).getMetricsBucket()
+        MetricFilterByDatePicker metricFilterByDatePicker = initAnalysePage().addMetric(METRIC_AMOUNT).getMetricsBucket()
                 .getMetricConfiguration(METRIC_AMOUNT).expandConfiguration()
                 .addFilterByDate(DATE_DATASET_CLOSED, validFromDate, validToDate)
-                .expandFilterByDate().backToOtherPeriods().changeDateDimension(DATE_DATASET_CREATED);
-
+                .expandFilterByDate();
+        ElementUtils.makeSureNoPopupVisible();
+        metricFilterByDatePicker.backToOtherPeriods().changeDateDimension(DATE_DATASET_CREATED);
         assertEquals(getListDataChartReportRender(), singletonList("$76,055,152.30"),
                 "Chart does not render correctly");
 
@@ -296,9 +301,10 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
         assertEquals(getListDataChartReportRender(), singletonList("$97,685,666.02"),
                 "Chart does not render correctly");
 
-        metricConfiguration.expandFilterByDate().backToOtherPeriods();
+        MetricFilterByDatePicker metricFilterByDatePicker = metricConfiguration.expandFilterByDate();
+        ElementUtils.makeSureNoPopupVisible();
+        metricFilterByDatePicker.backToOtherPeriods();
         metricConfiguration.addFilterByDate(DATE_DATASET_CLOSED, DateRange.LAST_YEAR.toString());
-
         assertEquals(getListDataChartReportRender(), singletonList("$3,644.00"),
                 "Chart does not render correctly");
 
@@ -721,6 +727,7 @@ public class DateFilterADMeasureExtendedTest extends AbstractAnalyseTest {
         configIndigoDashbroard(DATE_DATASET_CREATED, DATE_FILTER_THIS_MONTH, indigoDashboardsPage);
         assertTrue(insight.isEmptyValue(), "The empty state on Insight is not correct");
     }
+
     @Test(dependsOnGroups = {"createProject"})
     public void combineDateOnThisMonthADAndUncheckedDateKD() {
         createInsightUsingDateViewByOnAD(
