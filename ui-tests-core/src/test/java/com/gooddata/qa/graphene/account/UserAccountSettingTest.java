@@ -44,14 +44,11 @@ public class UserAccountSettingTest extends AbstractUITest {
     private static final String NUMBER_FORMAT_SUCCESS_MESSAGE = "Your regional number formatting "
             + "settings were saved successfully.";
 
-    private static final String SHORT_PASSWORD_ERROR_MESSAGE = "Password too short. Minimum length is 7 characters."
-            + "\nSequential and repeated characters are not allowed in passwords.";
+    private static final String SHORT_PASSWORD_ERROR_MESSAGE = "Minimum length of password is 7 characters.";
 
     private static final String FIELD_REQUIRED_ERROR_MESSAGE = "Field is required.";
 
-    private static final String COMMONLY_PASSWORD_ERROR_MESSAGE = "You selected a commonly used password. "
-            + "Choose something unique.\nSequential and repeated characters "
-            + "are not allowed in passwords.";
+    private static final String COMMONLY_PASSWORD_ERROR_MESSAGE = "Given password is commonly used.";
 
     private static final String SEQUENTIAL_PASSWORD_ERROR_MESSAGE = "Sequential and repeated characters are "
             + "not allowed in passwords.";
