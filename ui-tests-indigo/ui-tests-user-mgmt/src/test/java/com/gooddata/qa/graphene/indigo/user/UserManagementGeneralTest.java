@@ -441,16 +441,15 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = { "checkUserCannotDeactivateHimself" }, groups = { "activeUser", "sanity" }, alwaysRun = true)
     public void deactivateUsers() {
-        List<String> emailsList = asList(testParams.getEditorUser(), testParams.getViewerUser());
-
         initDashboardsPage();
         UserManagementPage userManagementPage = initUserManagementPage()
                 .deactivateUsers(testParams.getEditorUser(), testParams.getViewerUser());
         takeScreenshot(browser, "Deactivate-users", getClass());
         assertEquals(userManagementPage.getMessageText(), DEACTIVATE_SUCCESSFUL_MESSAGE);
-        assertFalse(userManagementPage.getAllUserEmails().containsAll(emailsList),
-                "Editor and View User should be in deactivated users list");
-        assertEquals(userManagementPage.filterUserState(UserStates.DEACTIVATED).getAllUserEmails(), emailsList);
+        assertThat(userManagementPage.getAllUserEmails(),
+                not(hasItems(testParams.getEditorUser(), testParams.getViewerUser())));
+        assertThat(userManagementPage.filterUserState(UserStates.DEACTIVATED).getAllUserEmails(),
+                hasItems(testParams.getEditorUser(), testParams.getViewerUser()));
     }
 
     @Test(dependsOnMethods = { "deactivateUsers" }, groups = { "activeUser", "sanity" }, alwaysRun = true)
