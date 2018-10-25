@@ -5,6 +5,7 @@ import com.gooddata.md.report.Filter;
 import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.ReportDefinition;
+import com.gooddata.qa.graphene.enums.DateRange;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
@@ -32,7 +33,6 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,9 +55,7 @@ import static org.hamcrest.Matchers.hasItems;
 
 public class GoodSalesEmailScheduleSavedViewEmbeddedDashboardTest extends AbstractGoodSalesEmailSchedulesTest {
 
-    private static final LocalDate now = LocalDate.now(ZoneId.of("America/Los_Angeles"));
-    private static final int currentYear = now.getYear();
-    private static final String currentDate = now.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+    private static final int currentYear = LocalDate.now(ZoneId.of("America/Los_Angeles")).getYear();
     private static final String FIRST_TAB = "First Tab";
     private static final String NUMBER_OF_PAGE = "Page 1/1";
     private static final String VARIABLE_FPRODUCT = "FProduct";
@@ -76,6 +74,7 @@ public class GoodSalesEmailScheduleSavedViewEmbeddedDashboardTest extends Abstra
     private DashboardRestRequest dashboardRestRequest;
     private String promptFilterUri;
     private CommonRestRequest commonRestRequest;
+    private String today;
 
     @BeforeClass
     public void setUp() {
@@ -132,6 +131,7 @@ public class GoodSalesEmailScheduleSavedViewEmbeddedDashboardTest extends Abstra
 
         initEmbeddedDashboard().showDashboardScheduleDialog().schedule();
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
+        today = DateRange.getCurrentDate();
         List<String> contents =
                 asList(getPdfContentFrom(waitForScheduleMessages(firstDashboard, 2), 1).split("\n"));
         //verify report
@@ -140,7 +140,7 @@ public class GoodSalesEmailScheduleSavedViewEmbeddedDashboardTest extends Abstra
         assertThat(contents, hasItems(FILTER_FPRODUCT, "All", FILTER_STAGE_NAME, "Short List",
                 FILTER_DATE_DIMENSION, "2010 - 2012"));
         //verify title
-        assertThat(contents, hasItem(format("%s %s", FIRST_TAB, currentDate)));
+        assertThat(contents, hasItem(format("%s %s", FIRST_TAB, today)));
         //verify page
         assertThat(contents, hasItem(NUMBER_OF_PAGE));
     }
@@ -160,6 +160,7 @@ public class GoodSalesEmailScheduleSavedViewEmbeddedDashboardTest extends Abstra
 
         initEmbeddedDashboard().showDashboardScheduleDialog().schedule();
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
+        today = DateRange.getCurrentDate();
         List<String> contents =
                 asList(getPdfContentFrom(waitForScheduleMessages(firstDashboard, 3), 2).split("\n"));
         //verify report
@@ -168,7 +169,7 @@ public class GoodSalesEmailScheduleSavedViewEmbeddedDashboardTest extends Abstra
         assertThat(contents, hasItems(FILTER_FPRODUCT, "All", FILTER_STAGE_NAME, "Short List",
                 FILTER_DATE_DIMENSION, "2010 - 2012"));
         //verify title
-        assertThat(contents, hasItem(format("%s %s", FIRST_TAB, currentDate)));
+        assertThat(contents, hasItem(format("%s %s", FIRST_TAB, today)));
         //verify page
         assertThat(contents, hasItem(NUMBER_OF_PAGE));
     }
@@ -196,6 +197,7 @@ public class GoodSalesEmailScheduleSavedViewEmbeddedDashboardTest extends Abstra
 
         initEmbeddedDashboard().showDashboardScheduleDialog().schedule();
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
+        today = DateRange.getCurrentDate();
         List<String> contents =
                 asList(getPdfContentFrom(waitForScheduleMessages(secondDashboard, 2), 1).split("\n"));
         //verify report
@@ -204,7 +206,7 @@ public class GoodSalesEmailScheduleSavedViewEmbeddedDashboardTest extends Abstra
         assertThat(contents, hasItems(FILTER_FPRODUCT, EXPLORER, FILTER_STAGE_NAME, "All",
                 FILTER_DATE_DIMENSION, "2010 - 2012"));
         //verify title
-        assertThat(contents, hasItem(format("%s %s", FIRST_TAB, currentDate)));
+        assertThat(contents, hasItem(format("%s %s", FIRST_TAB, today)));
         //verify page
         assertThat(contents, hasItem(NUMBER_OF_PAGE));
     }
@@ -225,6 +227,7 @@ public class GoodSalesEmailScheduleSavedViewEmbeddedDashboardTest extends Abstra
 
         initEmbeddedDashboard().showDashboardScheduleDialog().schedule();
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
+        today = DateRange.getCurrentDate();
         List<String> contents =
                 asList(getPdfContentFrom(waitForScheduleMessages(secondDashboard, 3), 2).split("\n"));
         //verify report
@@ -233,7 +236,7 @@ public class GoodSalesEmailScheduleSavedViewEmbeddedDashboardTest extends Abstra
         assertThat(contents, hasItems(FILTER_FPRODUCT, EXPLORER, FILTER_STAGE_NAME, "All",
                 FILTER_DATE_DIMENSION, "2010 - 2012"));
         //verify title
-        assertThat(contents, hasItem(format("%s %s", FIRST_TAB, currentDate)));
+        assertThat(contents, hasItem(format("%s %s", FIRST_TAB, today)));
         //verify page
         assertThat(contents, hasItem(NUMBER_OF_PAGE));
     }
@@ -258,6 +261,7 @@ public class GoodSalesEmailScheduleSavedViewEmbeddedDashboardTest extends Abstra
                 .removeWidget(embeddedDashboard.getFilterWidgetByName(FILTER_DATE_DIMENSION).getRoot(), browser);
         embeddedDashboard.saveDashboard().showDashboardScheduleDialog().schedule();
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
+        today = DateRange.getCurrentDate();
         List<String> contents =
                 asList(getPdfContentFrom(waitForScheduleMessages(thirdDashboard, 2), 1).split("\n"));
         //verify report
@@ -265,7 +269,7 @@ public class GoodSalesEmailScheduleSavedViewEmbeddedDashboardTest extends Abstra
         //verify filter
         assertThat(contents, hasItems(FILTER_FPRODUCT, "All", FILTER_STAGE_NAME, "All"));
         //verify title
-        assertThat(contents, hasItem(format("%s %s", FIRST_TAB, currentDate)));
+        assertThat(contents, hasItem(format("%s %s", FIRST_TAB, today)));
         //verify page
         assertThat(contents, hasItem(NUMBER_OF_PAGE));
     }
@@ -282,6 +286,7 @@ public class GoodSalesEmailScheduleSavedViewEmbeddedDashboardTest extends Abstra
                 .saveDashboard();
         embeddedDashboard.showDashboardScheduleDialog().schedule();
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
+        today = DateRange.getCurrentDate();
         List<String> contents =
                 asList(getPdfContentFrom(waitForScheduleMessages(thirdDashboard, 3), 2).split("\n"));
         //verify report
@@ -290,7 +295,7 @@ public class GoodSalesEmailScheduleSavedViewEmbeddedDashboardTest extends Abstra
         assertThat(contents, hasItems(FILTER_FPRODUCT, "All", FILTER_STAGE_NAME, "All",
                 ATTR_YEAR_SNAPSHOT.toUpperCase(), "All"));
         //verify title
-        assertThat(contents, hasItem(format("%s %s", FIRST_TAB, currentDate)));
+        assertThat(contents, hasItem(format("%s %s", FIRST_TAB, today)));
         //verify page
         assertThat(contents, hasItem(NUMBER_OF_PAGE));
     }
