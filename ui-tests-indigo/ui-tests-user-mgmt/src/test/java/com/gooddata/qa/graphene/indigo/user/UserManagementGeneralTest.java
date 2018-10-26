@@ -22,6 +22,7 @@ import javax.mail.MessagingException;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
+import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestRequest;
@@ -397,7 +398,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = { "verifyUserManagementUI" }, groups = { "userManagement", "sanity" })
     public void inviteUserToProject() throws IOException, MessagingException {
-        initDashboardsPage();
+        String successMessage = "Congratulations!\nYou have successfully joined the project. Please log in below.";
         UserManagementPage userManagementPage = initUserManagementPage();
         userManagementPage.openInviteUserDialog().invitePeople(UserRoles.ADMIN, "Invite new admin user", imapUser);
 
@@ -407,7 +408,14 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
         takeScreenshot(browser, "User-appears-in-invited-stage", getClass());
         assertThat(userManagementPage.getAllUserEmails(), hasItem(imapUser));
 
-        activeEmailUser(projectTitle + " Invitation");
+        logout();
+        try {
+            ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword);
+            openInvitationEmailLink(getEmailContent(imapClient, projectTitle + " Invitation"));
+            assertEquals(LoginFragment.getInstance(browser).getNotificationMessage(), successMessage);
+        } finally {
+            signIn(true, UserRoles.ADMIN);
+        }
         initUserManagementPage().filterUserState(UserStates.ACTIVE);
         takeScreenshot(browser, "User-appears-in-active-stage", getClass());
         assertThat(userManagementPage.getAllUserEmails(), hasItem(imapUser));
@@ -658,13 +666,6 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
         dialog.invitePeople(UserRoles.ADMIN, "Invite new admin user", email);
         assertEquals(dialog.getErrorMessage(), expectedMessage);
         dialog.cancelInvitation();
-    }
-
-    private void activeEmailUser(String mailTitle) throws IOException, MessagingException {
-        ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword);
-        openInvitationEmailLink(getEmailContent(imapClient, mailTitle));
-        waitForFragmentVisible(dashboardsPage);
-        System.out.println("Dashboard page is loaded.");
     }
 
     private void openInvitationEmailLink(String mailContent) {
