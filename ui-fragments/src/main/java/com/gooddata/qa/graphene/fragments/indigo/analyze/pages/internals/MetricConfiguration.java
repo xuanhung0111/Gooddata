@@ -21,6 +21,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.description.Description
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -39,7 +40,7 @@ public class MetricConfiguration extends AbstractFragment {
     @FindBy(className = "adi-bucket-item-header")
     private WebElement header;
 
-    @FindBy(className = "adi-bucket-item-sub-header")
+    @FindBy(className = SUB_HEADER_CLASS_NAME)
     private WebElement subHeader;
 
     @FindBy(className = ADD_ATTRIBUTE_FILTER_CLASS)
@@ -62,6 +63,7 @@ public class MetricConfiguration extends AbstractFragment {
     private static final By BY_ATTRIBUTE_FILTER_BUTTON = By.className("adi-attr-filter-button");
     private static final By BY_FACT_AGGREGATION = By.className("s-fact-aggregation-switch");
     private static final By BY_BUBBLE_CONTENT = By.className("bubble-content");
+    private static final String SUB_HEADER_CLASS_NAME = "adi-bucket-item-sub-header";
     private static final String ADD_ATTRIBUTE_FILTER_CLASS = "s-add_attribute_filter";
 
     private static final String DISABLED = "is-disabled";
@@ -89,6 +91,10 @@ public class MetricConfiguration extends AbstractFragment {
     public String getToolTipSubHeader() {
         getActions().moveToElement(subHeader).perform();
         return waitForElementVisible(BY_BUBBLE_CONTENT, browser).getText();
+    }
+
+    public Boolean isSubHeaderPresent() {
+        return isElementPresent(By.className(SUB_HEADER_CLASS_NAME), getRoot());
     }
 
     public String getFilterText() {
