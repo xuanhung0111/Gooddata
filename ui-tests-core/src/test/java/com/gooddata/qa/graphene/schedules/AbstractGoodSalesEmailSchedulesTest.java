@@ -37,9 +37,6 @@ import org.joda.time.DateTime;
 import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class AbstractGoodSalesEmailSchedulesTest extends AbstractEmbeddedModeTest {
 
