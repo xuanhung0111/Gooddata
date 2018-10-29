@@ -5,6 +5,7 @@ import com.gooddata.md.report.Filter;
 import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.MetricElement;
 import com.gooddata.md.report.ReportDefinition;
+import com.gooddata.qa.graphene.enums.DateRange;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.AddDashboardFilterPanel.DashAttributeFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
@@ -26,9 +27,6 @@ import org.testng.annotations.Test;
 import javax.mail.MessagingException;
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,8 +44,6 @@ import static org.hamcrest.Matchers.not;
 
 public class GoodSalesEmailScheduleEmbeddedDashboardTest extends AbstractGoodSalesEmailSchedulesTest {
 
-    private static final String currentDate = LocalDate.now(ZoneId.of("America/Los_Angeles"))
-            .format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
     private static final String TAB_NAME = "Tab having report";
     private static final String NUMBER_OF_PAGE = "Page 1/1";
     private String firstDashboard = "First Dashboard";
@@ -59,6 +55,7 @@ public class GoodSalesEmailScheduleEmbeddedDashboardTest extends AbstractGoodSal
     private ReportRestRequest reportRestRequest;
     private DashboardRestRequest dashboardRestRequest;
     private CommonRestRequest commonRestRequest;
+    private String today;
 
     @BeforeClass
     public void setUp() {
@@ -111,6 +108,7 @@ public class GoodSalesEmailScheduleEmbeddedDashboardTest extends AbstractGoodSal
 
         initEmbeddedDashboard().showDashboardScheduleDialog().schedule();
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
+        today = DateRange.getCurrentDate();
         List<String> contents =
                 asList(getPdfContentFrom(waitForScheduleMessages(firstDashboard, 2), 1).split("\n"));
         //verify report
@@ -118,7 +116,7 @@ public class GoodSalesEmailScheduleEmbeddedDashboardTest extends AbstractGoodSal
                 "Conviction", "Negotiation", "Closed Won", "Closed Lost", "$18,447,266.14", "$4,249,027.88", "$5,612,062.60",
                 "$2,606,293.46", "$3,067,466.12", "$1,862,015.73", "$38,310,753.45", "$42,470,571.16"));
         //verify title
-        assertThat(contents, hasItem(format("%s %s", TAB_NAME, currentDate)));
+        assertThat(contents, hasItem(format("%s %s", TAB_NAME, today)));
         //verify page
         assertThat(contents, hasItem(NUMBER_OF_PAGE));
     }
@@ -137,12 +135,13 @@ public class GoodSalesEmailScheduleEmbeddedDashboardTest extends AbstractGoodSal
 
         initEmbeddedDashboard().showDashboardScheduleDialog().schedule();
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
+        today = DateRange.getCurrentDate();
         List<String> contents =
                 asList(getPdfContentFrom(waitForScheduleMessages(firstDashboard, 3), 2).split("\n"));
         //verify report
         assertThat(contents, hasItems(firstReport, "Available area too small to display", "report"));
         //verify title
-        assertThat(contents, hasItem(format("%s %s", TAB_NAME, currentDate)));
+        assertThat(contents, hasItem(format("%s %s", TAB_NAME, today)));
         //verify page
         assertThat(contents, hasItem(NUMBER_OF_PAGE));
     }
@@ -168,12 +167,13 @@ public class GoodSalesEmailScheduleEmbeddedDashboardTest extends AbstractGoodSal
 
         initEmbeddedDashboard().showDashboardScheduleDialog().schedule();
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
+        today = DateRange.getCurrentDate();
         List<String> contents =
                 asList(getPdfContentFrom(waitForScheduleMessages(secondDashboard, 2), 1).split("\n"));
         //verify report
         assertThat(contents, hasItems(secondReport, "No data"));
         //verify title
-        assertThat(contents, hasItem(format("%s %s", TAB_NAME, currentDate)));
+        assertThat(contents, hasItem(format("%s %s", TAB_NAME, today)));
         //verify page
         assertThat(contents, hasItem(NUMBER_OF_PAGE));
     }
@@ -192,12 +192,13 @@ public class GoodSalesEmailScheduleEmbeddedDashboardTest extends AbstractGoodSal
 
         initEmbeddedDashboard().showDashboardScheduleDialog().schedule();
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
+        today = DateRange.getCurrentDate();
         List<String> contents =
                 asList(getPdfContentFrom(waitForScheduleMessages(secondDashboard, 3), 2).split("\n"));
         //verify report
         assertThat(contents, hasItems(secondReport, "Available area too small to display", "report"));
         //verify title
-        assertThat(contents, hasItem(format("%s %s", TAB_NAME, currentDate)));
+        assertThat(contents, hasItem(format("%s %s", TAB_NAME, today)));
         //verify page
         assertThat(contents, hasItem(NUMBER_OF_PAGE));
     }
@@ -219,6 +220,7 @@ public class GoodSalesEmailScheduleEmbeddedDashboardTest extends AbstractGoodSal
                 .saveDashboard();
         embeddedDashboard.showDashboardScheduleDialog().schedule();
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
+        today = DateRange.getCurrentDate();
         List<String> contents =
                 asList(getPdfContentFrom(waitForScheduleMessages(thirdDashboard, 2), 1).split("\n"));
         //verify report
@@ -226,7 +228,7 @@ public class GoodSalesEmailScheduleEmbeddedDashboardTest extends AbstractGoodSal
         //verify filter
         assertThat(contents, hasItems("STAGE NAME", "All"));
         //verify title
-        assertThat(contents, hasItem(format("%s %s", TAB_NAME, currentDate)));
+        assertThat(contents, hasItem(format("%s %s", TAB_NAME, today)));
         //verify page
         assertThat(contents, hasItem(NUMBER_OF_PAGE));
     }
@@ -241,6 +243,7 @@ public class GoodSalesEmailScheduleEmbeddedDashboardTest extends AbstractGoodSal
         DashboardEditWidgetToolbarPanel.removeWidget(embeddedDashboard.getContent().getFirstFilter().getRoot(), browser);
         embeddedDashboard.saveDashboard().showDashboardScheduleDialog().schedule();
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
+        today = DateRange.getCurrentDate();
         List<String> contents =
                 asList(getPdfContentFrom(waitForScheduleMessages(thirdDashboard, 3), 2).split("\n"));
         //verify report
@@ -248,7 +251,7 @@ public class GoodSalesEmailScheduleEmbeddedDashboardTest extends AbstractGoodSal
         //verify filter
         assertThat(contents, not(hasItems("STAGE NAME", "All")));
         //verify title
-        assertThat(contents, hasItem(format("%s %s", TAB_NAME, currentDate)));
+        assertThat(contents, hasItem(format("%s %s", TAB_NAME, today)));
         //verify page
         assertThat(contents, hasItem(NUMBER_OF_PAGE));
     }
