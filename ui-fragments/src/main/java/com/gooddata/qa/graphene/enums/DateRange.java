@@ -4,6 +4,7 @@ import org.threeten.extra.YearQuarter;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 
@@ -33,6 +34,10 @@ public enum DateRange {
 
     public static LocalDate now() {
         return LocalDate.now(ZONE_ID);
+    }
+
+    public static String getCurrentDate() {
+        return DateTimeFormatter.ofPattern("MM/dd/yyyy").format(now());
     }
 
     public LocalDate getFrom() {
