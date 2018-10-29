@@ -67,7 +67,6 @@ import static org.testng.Assert.assertTrue;
 
 public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
-    private static final int OTHER_WIDGETS_TAB_INDEX = 3;
     private static final int HEADLINE_REPORT_TAB_INDEX = 2;
     private static final int CHART_REPORT_TAB_INDEX = 1;
     private static final int TABULAR_REPORT_TAB_INDEX = 0;
@@ -225,7 +224,8 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
             return;
         }
 
-        String exportedDashboardName = embeddedDashboard.printDashboardTab(OTHER_WIDGETS_TAB_INDEX);
+        embeddedDashboard.getTabs().openTab(3);
+        String exportedDashboardName = embeddedDashboard.printDashboardTab();
 
         try {
             verifyDashboardExport(exportedDashboardName, "other_widgets", EXPECTED_EXPORT_DASHBOARD_SIZE);
@@ -240,8 +240,8 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = "createAdditionalProject")
     public void viewerExportToXLSXOnEmbeddedDashboard() throws IOException {
         logoutAndLoginAs(false, UserRoles.VIEWER);
-        initEmbeddedDashboardWithUri(embedUri);
-        String fileName = dashboardsPage.printDashboardTabToXLSX(EMBEDDED_DASHBOARD_NAME);
+        EmbeddedDashboard embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
+        String fileName = embeddedDashboard.exportDashboardToXLSX(EMBEDDED_DASHBOARD_NAME);
         try {
             List<List<String>> xlsxContent = XlsxUtils.excelFileToRead(testParams.getExportFilePath(fileName), 0);
             checkXlsxContent(xlsxContent);
@@ -254,8 +254,8 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = "createAdditionalProject")
     public void dashboardOnlyToXLSXExportOnEmbeddedDashboard() throws IOException {
         logoutAndLoginAs(false, UserRoles.DASHBOARD_ONLY);
-        initEmbeddedDashboardWithUri(embedUri);
-        String fileName = dashboardsPage.printDashboardTabToXLSX(EMBEDDED_DASHBOARD_NAME);
+        EmbeddedDashboard embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
+        String fileName = embeddedDashboard.exportDashboardToXLSX(EMBEDDED_DASHBOARD_NAME);
         try {
             List<List<String>> xlsxContent = XlsxUtils.excelFileToRead(testParams.getExportFilePath(fileName), 0);
             checkXlsxContent(xlsxContent);
@@ -267,8 +267,8 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = "createAdditionalProject")
     public void adminExportToXLSXOnEmbeddedDashboard() throws IOException {
-        initEmbeddedDashboardWithUri(embedUri);
-        String fileName = dashboardsPage.printDashboardTabToXLSX(EMBEDDED_DASHBOARD_NAME);
+        EmbeddedDashboard embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
+        String fileName = embeddedDashboard.exportDashboardToXLSX(EMBEDDED_DASHBOARD_NAME);
         try {
             List<List<String>> xlsxContent = XlsxUtils.excelFileToRead(
                     testParams.getExportFilePath(fileName), 0);
@@ -281,8 +281,8 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = "createAdditionalProject")
     public void editorExportToXLSXOnEmbeddedDashboard() throws IOException {
         logoutAndLoginAs(false, UserRoles.EDITOR);
-        initEmbeddedDashboardWithUri(embedUri);
-        String fileName = dashboardsPage.printDashboardTabToXLSX(EMBEDDED_DASHBOARD_NAME);
+        EmbeddedDashboard embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
+        String fileName = embeddedDashboard.exportDashboardToXLSX(EMBEDDED_DASHBOARD_NAME);
         try {
             List<List<String>> xlsxContent = XlsxUtils.excelFileToRead(testParams.getExportFilePath(fileName), 0);
             checkXlsxContent(xlsxContent);
@@ -303,7 +303,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         String embedUri = embedDialog.getPreviewURI();
 
         EmbeddedDashboard embeddedDashboard = initEmbeddedDashboardWithUri(embedUri);
-        String fileName = dashboardsPage.printDashboardTabToXLSX(EMBEDDED_DASHBOARD_NAME);
+        String fileName = embeddedDashboard.exportDashboardToXLSX(EMBEDDED_DASHBOARD_NAME);
 
         try {
             List<List<String>> xlsxContent = XlsxUtils.excelFileToRead(testParams.getExportFilePath(fileName), 0);

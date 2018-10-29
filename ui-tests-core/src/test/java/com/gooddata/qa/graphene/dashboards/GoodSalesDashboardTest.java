@@ -35,7 +35,6 @@ import com.gooddata.qa.utils.java.Builder;
 public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 
     private static final long expectedDashboardExportSize = 30000L;
-    private static final int FIRST_TAB_INDEX = 0;
     private final String SOURCE_TAB = "Source Tab";
     private final String TARGET_TAB = "Target Tab";
     private String exportedDashboardName;
@@ -71,7 +70,8 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
         initDashboardsPage();
         dashboardsPage.selectDashboard(DASH_PIPELINE_ANALYSIS);
         waitForDashboardPageLoaded(browser);
-        exportedDashboardName = dashboardsPage.exportDashboardTab(FIRST_TAB_INDEX, ExportFormat.DASHBOARD_PDF);
+        dashboardsPage.openTab(0);
+        exportedDashboardName = dashboardsPage.exportDashboardTabToPDF();
         checkRedBar(browser);
     }
 

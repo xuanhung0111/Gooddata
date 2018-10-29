@@ -141,7 +141,7 @@ public class GoodSalesPublicDashboardTest extends GoodSalesAbstractTest {
         logout();
         openLink(publicDashboardUri);
         waitForDashboardPageLoaded(browser);
-        String exportedDashboardName = dashboardsPage.printDashboardTab(0);
+        String exportedDashboardName = dashboardsPage.printDashboardTab();
         try {
             verifyDashboardExport(exportedDashboardName, selectedTab, EXPECTED_EXPORT_DASHBOARD_SIZE);
             checkRedBar(browser);

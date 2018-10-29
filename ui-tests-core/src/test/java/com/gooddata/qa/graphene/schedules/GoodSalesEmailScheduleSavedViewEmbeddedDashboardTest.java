@@ -43,7 +43,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
-import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.BOTTOM;
+import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.MIDDLE;
 import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.RIGHT;
 import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.TOP_RIGHT;
 import static java.lang.String.format;
@@ -322,7 +322,7 @@ public class GoodSalesEmailScheduleSavedViewEmbeddedDashboardTest extends Abstra
         JSONObject dashboardContent = new Dashboard()
                 .setName(titleDashboard)
                 .addTab(initTab(FIRST_TAB, titleReport, asList(
-                        Pair.of(promptFilterContent, BOTTOM),
+                        Pair.of(promptFilterContent, MIDDLE),
                         Pair.of(stageNameFilterContent, TOP_RIGHT),
                         Pair.of(dateFilterContent, RIGHT))))
                 .addFilter(promptFilterContent)

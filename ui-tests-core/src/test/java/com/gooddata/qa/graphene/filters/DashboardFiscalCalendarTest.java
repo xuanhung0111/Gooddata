@@ -172,7 +172,7 @@ public class DashboardFiscalCalendarTest extends AbstractDashboardWidgetTest {
         if (testParams.isClientDemoEnvironment()) {
             return;
         }
-        String exportedDashboardName = dashboardsPage.saveDashboard().printDashboardTab(0);
+        String exportedDashboardName = dashboardsPage.saveDashboard().printDashboardTab();
         try {
             checkRedBar(browser);
             verifyDashboardExport(exportedDashboardName, "First Tab", expectedDashboardExportSize);
@@ -202,7 +202,7 @@ public class DashboardFiscalCalendarTest extends AbstractDashboardWidgetTest {
         if (testParams.isClientDemoEnvironment()) {
             return;
         }
-        embededDashboard.printDashboardTab(0);
+        embededDashboard.printDashboardTab();
         try {
             checkRedBar(browser);
             verifyDashboardExport(firstTab, firstTab, expectedDashboardExportSize);

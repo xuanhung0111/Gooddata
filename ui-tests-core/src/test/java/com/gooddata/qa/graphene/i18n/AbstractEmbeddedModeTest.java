@@ -3,6 +3,8 @@ package com.gooddata.qa.graphene.i18n;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
+import com.gooddata.qa.graphene.AbstractDashboardWidgetTest;
+import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
 import com.gooddata.qa.graphene.fragments.reports.report.EmbeddedReportContainer;
 import com.gooddata.qa.mdObjects.dashboard.Dashboard;
 import com.gooddata.qa.mdObjects.dashboard.tab.Tab;
@@ -10,10 +12,7 @@ import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import com.gooddata.qa.utils.java.Builder;
 import org.jboss.arquillian.graphene.Graphene;
 
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboard;
-
-public abstract class AbstractEmbeddedModeTest extends GoodSalesAbstractTest {
+public abstract class AbstractEmbeddedModeTest extends AbstractDashboardWidgetTest {
 
     protected String embeddedUri;
     protected String embeddedReportUri;

@@ -25,7 +25,6 @@ import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.utils.PdfUtils;
-import com.gooddata.qa.utils.XlsxUtils;
 import com.gooddata.qa.utils.mail.ImapClientAction;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -37,7 +36,6 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;

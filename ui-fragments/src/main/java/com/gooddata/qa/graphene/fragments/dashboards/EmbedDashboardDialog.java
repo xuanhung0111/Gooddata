@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.fragments.dashboards;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static org.testng.Assert.assertTrue;
 
 import java.util.Optional;
@@ -39,6 +40,9 @@ public class EmbedDashboardDialog extends AbstractFragment {
 
     @FindBy(xpath = "//label[contains(text(), 'Set URL Parameter Filters')]")
     private WebElement filterContentLabel;
+
+    @FindBy(className = "s-btn-close")
+    private WebElement closeButton;
 
     private By SELECT_ATTRIBUTE_BUTTON_LOCATOR = By.cssSelector(".s-btn-select_attribute___");
     private By ADD_FILTER_BUTTON_LOCATOR = By.cssSelector(".s-btn-add_filter");
@@ -78,5 +82,10 @@ public class EmbedDashboardDialog extends AbstractFragment {
         }
         getRoot().click();
         return this;
+    }
+
+    public void close() {
+        waitForElementVisible(closeButton).click();
+        waitForFragmentNotVisible(this);
     }
 }

@@ -54,7 +54,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_INCOMPUTABLE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_NO_DATA;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_SALES_SEASONALITY;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOO_LARGE;
-import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.BOTTOM;
+import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.MIDDLE;
 import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.RIGHT;
 import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.TOP_RIGHT;
 import static java.lang.String.format;
@@ -119,10 +119,9 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
 
     @Test(dependsOnGroups = "createProject")
     public void exportDashboardHasTableReportsToXLSX() throws IOException {
-        dashboardTitle = generateDashboardName();
         openDashboardHasReports(Pair.of(REPORT_AMOUNT_BY_PRODUCT, ItemPosition.LEFT),
-                Pair.of(REPORT_ACTIVITIES_BY_TYPE, BOTTOM));
-        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.printDashboardTabToXLSX(dashboardTitle));
+                Pair.of(REPORT_ACTIVITIES_BY_TYPE, MIDDLE));
+        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Table_Reports", getClass());
         //Table reports
         assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(asList(ATTR_PRODUCT, METRIC_AMOUNT),
@@ -139,13 +138,12 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
     public void exportDashboardHasChartReportsToXLSX() throws IOException {
         String lineReport = "Line Report";
         String headlineReport = "Headline Report";
-        dashboardTitle = generateDashboardName();
         initReportsPage().openReport(REPORT_AMOUNT_BY_PRODUCT)
                 .selectReportVisualisation(ReportTypes.HEADLINE).saveAsReport(headlineReport);
         initReportsPage().openReport(REPORT_AMOUNT_BY_PRODUCT)
                 .selectReportVisualisation(ReportTypes.LINE).saveAsReport(lineReport);
-        openDashboardHasReports(Pair.of(headlineReport, ItemPosition.LEFT), Pair.of(lineReport, BOTTOM));
-        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.printDashboardTabToXLSX(dashboardTitle));
+        openDashboardHasReports(Pair.of(headlineReport, ItemPosition.LEFT), Pair.of(lineReport, MIDDLE));
+        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Chart_Reports", getClass());
         //Headline report
         assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0),
@@ -161,14 +159,13 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
     @Test(dependsOnGroups = "createProject")
     public void exportDashboardHasReportsIncludeTotalsToXLSX() throws IOException {
         String reportHasTotals = "Report has totals";
-        dashboardTitle = generateDashboardName();
         TableReport tableReport = initReportsPage().openReport(REPORT_AMOUNT_BY_F_STAGE_NAME).getTableReport().waitForLoaded();
         tableReport.openContextMenuFrom(METRIC_AMOUNT, TableReport.CellType.METRIC_HEADER)
                 .aggregateTableData(ContextMenu.AggregationType.MINIMUM, "Of All Rows");
         tableReport.waitForLoaded();
         reportPage.saveAsReport(reportHasTotals);
         openDashboardHasReports(Pair.of(reportHasTotals, ItemPosition.LEFT));
-        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.printDashboardTabToXLSX(dashboardTitle));
+        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Reports_Include_Totals", getClass());
         assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
                 asList("Applied filters:", "Stage Name IN (Interest, Discovery, Short List, Risk Assessment, Conviction)"),
@@ -182,12 +179,11 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
         String headlineReportWithSpecialFormat = "Headline Report with special format";
         dashboardRequest.changeMetricFormat(getMetricByTitle(METRIC_AMOUNT).getUri(), "[=NULL]empty;#,##0.00");
         try {
-            dashboardTitle = generateDashboardName();
             initReportsPage().openReport(REPORT_NO_DATA)
                     .selectReportVisualisation(ReportTypes.HEADLINE).saveAsReport(headlineReportWithSpecialFormat);
             openDashboardHasReports(Pair.of(REPORT_NO_DATA, ItemPosition.LEFT),
-                    Pair.of(headlineReportWithSpecialFormat, BOTTOM));
-            String xlsxUrl = testParams.getExportFilePath(dashboardsPage.printDashboardTabToXLSX(dashboardTitle));
+                    Pair.of(headlineReportWithSpecialFormat, MIDDLE));
+            String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
             Screenshots.takeScreenshot(browser, "Dashboard_Has_Empty_Reports", getClass());
             //Report no data
             assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
@@ -205,10 +201,9 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
 
     @Test(dependsOnGroups = "createProject")
     public void exportDashboardHasBigDataReportsToXLSX() throws IOException {
-        dashboardTitle = generateDashboardName();
         openDashboardHasReports(Pair.of(REPORT_TOO_LARGE, ItemPosition.LEFT),
-                Pair.of(REPORT_SALES_SEASONALITY, BOTTOM));
-        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.printDashboardTabToXLSX(dashboardTitle));
+                Pair.of(REPORT_SALES_SEASONALITY, MIDDLE));
+        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Big_Data_Reports", getClass());
         //Too large report
         assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), singletonList(
@@ -235,9 +230,8 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
         FactRestRequest factRestRequest = new FactRestRequest(getAdminRestClient(), testParams.getProjectId());
         factRestRequest.setFactRestricted(getFactByTitle(FACT_AMOUNT).getUri());
         try {
-            dashboardTitle = generateDashboardName();
             openDashboardHasReports(Pair.of(REPORT_AMOUNT_BY_PRODUCT, ItemPosition.LEFT));
-            String xlsxUrl = testParams.getExportFilePath(dashboardsPage.printDashboardTabToXLSX(dashboardTitle));
+            String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
             Screenshots.takeScreenshot(browser, "Dashboard_Has_Report_Contains_Restricted_Data", getClass());
             assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), singletonList(singletonList("Export failed: " +
                     "Your report can't be exported because it contains restricted data. " +
@@ -249,9 +243,8 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
 
     @Test(dependsOnGroups = "createProject")
     public void exportDashboardHasNotComputedReportToXLSX() throws IOException {
-        dashboardTitle = generateDashboardName();
         openDashboardHasReports(Pair.of(REPORT_INCOMPUTABLE, ItemPosition.LEFT));
-        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.printDashboardTabToXLSX(dashboardTitle));
+        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Not_Computed_Report", getClass());
         assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), singletonList(
                 singletonList("Export failed: Sorry, we can't export this report. Contact your administrator.")));
@@ -259,10 +252,9 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
 
     @Test(dependsOnGroups = "createProject")
     public void exportDashboardHasAttributeSingleFilterToXLSX() throws IOException {
-        dashboardTitle = generateDashboardName();
         FilterItemContent filterContent = createSingleValueFilter(getAttributeByTitle(ATTR_PRODUCT));
         openDashboardHasReportAndFilter(REPORT_AMOUNT_BY_PRODUCT, filterContent);
-        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.printDashboardTabToXLSX(dashboardTitle));
+        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Attribute_Single_Filter", getClass());
         assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
                 asList("Applied filters:", "Product IN (CompuSci)"),
@@ -271,10 +263,9 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
 
     @Test(dependsOnGroups = "createProject")
     public void exportDashboardHasAttributeMultipleFilterToXLSX() throws IOException {
-        dashboardTitle = generateDashboardName();
         FilterItemContent filterContent = createMultipleValuesFilter(getAttributeByTitle(ATTR_PRODUCT));
         openDashboardHasReportAndFilter(REPORT_AMOUNT_BY_PRODUCT, filterContent);
-        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.printDashboardTabToXLSX(dashboardTitle));
+        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Attribute_Multiple_Filter", getClass());
         assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(asList(ATTR_PRODUCT, METRIC_AMOUNT),
                 asList("CompuSci", "2.722289964E7"), asList("Educationly", "2.294689547E7"),
@@ -284,12 +275,11 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
 
     @Test(dependsOnGroups = "createProject")
     public void exportDashboardHasFilterAppliedUseAvailableToXLSX() throws IOException {
-        dashboardTitle = generateDashboardName();
         FilterItemContent filterContent = createSingleValueFilter(getAttributeByTitle(ATTR_STAGE_NAME));
         openDashboardHasReportAndFilter(REPORT_AMOUNT_BY_STAGE_NAME, filterContent);
         dashboardRequest.addUseAvailableMetricToDashboardFilters(dashboardTitle, METRIC_AVAILABLE);
         initDashboardsPage().selectDashboard(dashboardTitle);
-        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.printDashboardTabToXLSX(dashboardTitle));
+        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Filter_Applied_Use_Available", getClass());
         assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
                 asList("Applied filters:", "Stage Name IN (Short List)"),
@@ -300,10 +290,9 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
 
     @Test(dependsOnGroups = "createProject")
     public void exportDashboardHasPromptSingleFilterToXLSX() throws IOException {
-        dashboardTitle = generateDashboardName();
         FilterItemContent filterContent = createSingleValuesFilterBy(promptUri);
         openDashboardHasReportAndFilter(REPORT_AMOUNT_BY_F_STAGE_NAME, filterContent);
-        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.printDashboardTabToXLSX(dashboardTitle));
+        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Prompt_Single_Filter", getClass());
         assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
                 asList("Applied filters:", "Stage Name IN (Interest)"), asList(ATTR_STAGE_NAME, METRIC_AMOUNT),
@@ -312,10 +301,9 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
 
     @Test(dependsOnGroups = "createProject")
     public void exportDashboardHasPromptMultipleFilterToXLSX() throws IOException {
-        dashboardTitle = generateDashboardName();
         FilterItemContent filterContent = createMultipleValuesFilterBy(promptUri);
         openDashboardHasReportAndFilter(REPORT_AMOUNT_BY_F_STAGE_NAME, filterContent);
-        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.printDashboardTabToXLSX(dashboardTitle));
+        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Prompt_Multiple_Filter", getClass());
         assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
                 asList("Applied filters:", "Stage Name IN (Interest, Discovery, Short List, Risk Assessment, Conviction)"),
@@ -325,12 +313,11 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
 
     @Test(dependsOnGroups = "createProject")
     public void exportDashboardHasPromptFilterAppliedUseAvailableToXLSX() throws IOException {
-        dashboardTitle = generateDashboardName();
         FilterItemContent filterContent = createSingleValuesFilterBy(promptUri);
         openDashboardHasReportAndFilter(REPORT_AMOUNT_BY_F_STAGE_NAME, filterContent);
         dashboardRequest.addUseAvailableMetricToDashboardFilters(dashboardTitle, METRIC_AVAILABLE);
         initDashboardsPage().selectDashboard(dashboardTitle);
-        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.printDashboardTabToXLSX(dashboardTitle));
+        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Prompt_Filter_Applied_Use_Available", getClass());
         assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
                 asList("Applied filters:", "Stage Name IN (Short List)"),
@@ -339,11 +326,10 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
 
     @Test(dependsOnGroups = "createProject")
     public void exportDashboardHasDateRangeFilterToXLSX() throws IOException {
-        dashboardTitle = generateDashboardName();
         FilterItemContent filterContent =
                 createDateFilter(getAttributeByTitle(ATTR_YEAR_SNAPSHOT), 2010 - currentYear, 2011 - currentYear);
         openDashboardHasReportAndFilter(REPORT_AMOUNT_BY_STAGE_NAME, filterContent);
-        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.printDashboardTabToXLSX(dashboardTitle));
+        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Date_Range_Filter", getClass());
         assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
                 asList("Applied filters:", "Year (Snapshot) BETWEEN THIS-8 AND THIS-7"),
@@ -358,7 +344,6 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
 
     @Test(dependsOnGroups = "createProject")
     public void exportDashboardHasGroupFilterToXLSX() throws IOException {
-        dashboardTitle = generateDashboardName();
         FilterItemContent attributeFilterContent = createMultipleValuesFilter(getAttributeByTitle(ATTR_STAGE_NAME));
         FilterItemContent promptFilterContent = createSingleValuesFilterBy(promptUri);
         FilterItemContent dateFilterContent =
@@ -368,7 +353,7 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
         dashboardsPage.editDashboard()
                 .groupFiltersOnDashboard(ATTR_STAGE_NAME, F_STAGE_NAME, "Date dimension (Snapshot)").saveDashboard();
         dashboardsPage.getReport(REPORT_AMOUNT_BY_F_STAGE_NAME, TableReport.class).waitForLoaded();
-        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.printDashboardTabToXLSX(dashboardTitle));
+        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Group_Filter", getClass());
         assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
                 asList("Applied filters:", "Year (Snapshot) BETWEEN THIS-8 AND THIS-7"),
@@ -378,14 +363,13 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
 
     @Test(dependsOnGroups = "createProject")
     public void exportDashboardHasTypeFiltersToXLSX() throws IOException {
-        dashboardTitle = generateDashboardName();
         FilterItemContent attributeFilterContent = createMultipleValuesFilter(getAttributeByTitle(ATTR_STAGE_NAME));
         FilterItemContent promptFilterContent = createSingleValuesFilterBy(promptUri);
         FilterItemContent dateFilterContent =
                 createDateFilter(getAttributeByTitle(ATTR_YEAR_SNAPSHOT), 2010 - currentYear, 2011 - currentYear);
         openDashboardHasReportAndFilters(REPORT_AMOUNT_BY_F_STAGE_NAME, attributeFilterContent,
                 promptFilterContent, dateFilterContent);
-        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.printDashboardTabToXLSX(dashboardTitle));
+        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Type_Filters", getClass());
         assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
                 asList("Applied filters:", "Year (Snapshot) BETWEEN THIS-8 AND THIS-7"),
@@ -401,10 +385,9 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
                 getAttributeByTitle(ATTR_STAGE_NAME).getUri(), stageNameValue.getUri());
         dashboardRequest.addMufToUser(userUri, dashboardRequest.createMufObjectByUri(MUF_NAME, expression));
         try {
-            dashboardTitle = generateDashboardName();
             FilterItemContent filterContent = createMultipleValuesFilter(getAttributeByTitle(ATTR_STAGE_NAME));
             openDashboardHasReportAndFilter(REPORT_AMOUNT_BY_STAGE_NAME, filterContent);
-            String xlsxUrl = testParams.getExportFilePath(dashboardsPage.printDashboardTabToXLSX(dashboardTitle));
+            String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
             Screenshots.takeScreenshot(browser, "Dashboard_Has_Muf_Applied_On_Attribute_Filter", getClass());
             assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
                     asList(ATTR_YEAR_SNAPSHOT, ATTR_STAGE_NAME, METRIC_AMOUNT), asList("2010", INTEREST, "1185127.28"),
@@ -423,10 +406,9 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
                 stageNameValue.getUri());
         dashboardRequest.addMufToUser(userUri, dashboardRequest.createMufObjectByUri(MUF_NAME, expression));
         try {
-            dashboardTitle = generateDashboardName();
             FilterItemContent filterContent = createMultipleValuesFilter(getAttributeByTitle(ATTR_STAGE_NAME));
             openDashboardHasReportAndFilter(REPORT_AMOUNT_BY_STAGE_NAME, filterContent);
-            String xlsxUrl = testParams.getExportFilePath(dashboardsPage.printDashboardTabToXLSX(dashboardTitle));
+            String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
             Screenshots.takeScreenshot(browser,
                     "Dashboard_Has_Muf_Applied_On_Negative_Attribute_Filter", getClass());
             assertFalse(XlsxUtils.excelFileToRead(xlsxUrl, 0)
@@ -444,10 +426,9 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
                 getAttributeByTitle(ATTR_STAGE_NAME).getUri(), stageNameValue.getUri());
         dashboardRequest.addMufToUser(userUri, dashboardRequest.createMufObjectByUri(MUF_NAME, expression));
         try {
-            dashboardTitle = generateDashboardName();
             FilterItemContent filterContent = createMultipleValuesFilterBy(promptUri);
             openDashboardHasReportAndFilter(REPORT_AMOUNT_BY_STAGE_NAME, filterContent);
-            String xlsxUrl = testParams.getExportFilePath(dashboardsPage.printDashboardTabToXLSX(dashboardTitle));
+            String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
             Screenshots.takeScreenshot(browser, "Dashboard_Has_Muf_Applied_On_Prompt_Filter", getClass());
             assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
                     asList(ATTR_YEAR_SNAPSHOT, ATTR_STAGE_NAME, METRIC_AMOUNT), asList("2010", DISCOVERY, "2080448.83"),
@@ -465,10 +446,9 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
                 getAttributeByTitle(ATTR_STAGE_NAME).getUri(), stageNameValue.getUri());
         dashboardRequest.addMufToUser(userUri, dashboardRequest.createMufObjectByUri(MUF_NAME, expression));
         try {
-            dashboardTitle = generateDashboardName();
             FilterItemContent filterContent = createMultipleValuesFilterBy(promptUri);
             openDashboardHasReportAndFilter(REPORT_AMOUNT_BY_STAGE_NAME, filterContent);
-            String xlsxUrl = testParams.getExportFilePath(dashboardsPage.printDashboardTabToXLSX(dashboardTitle));
+            String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
             Screenshots.takeScreenshot(browser,
                     "Dashboard_Has_Muf_Applied_On_Negative_Prompt_Filter", getClass());
             assertFalse(XlsxUtils.excelFileToRead(xlsxUrl, 0)
@@ -484,9 +464,8 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
                 getAttributeByTitle(ATTR_YEAR_SNAPSHOT).getUri());
         dashboardRequest.addMufToUser(userUri, dashboardRequest.createMufObjectByUri(MUF_NAME, expression));
         try {
-            dashboardTitle = generateDashboardName();
             openDashboardHasReports(Pair.of(REPORT_AMOUNT_BY_STAGE_NAME, ItemPosition.LEFT));
-            String xlsxUrl = testParams.getExportFilePath(dashboardsPage.printDashboardTabToXLSX(dashboardTitle));
+            String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
             Screenshots.takeScreenshot(browser, "Dashboard_Has_Muf_Applied_On_Date_Filter", getClass());
             assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
                     asList(ATTR_YEAR_SNAPSHOT, ATTR_STAGE_NAME, METRIC_AMOUNT), asList("2012", INTEREST, "1.844726614E7"),
@@ -508,9 +487,8 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
 
         dashboardRequest.addMufToUser(userUri, dashboardRequest.createMufObjectByUri(MUF_NAME, expression));
         try {
-            dashboardTitle = generateDashboardName();
             openDashboardHasReports(Pair.of(REPORT_AMOUNT_BY_STAGE_NAME, ItemPosition.LEFT));
-            String xlsxUrl = testParams.getExportFilePath(dashboardsPage.printDashboardTabToXLSX(dashboardTitle));
+            String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
             Screenshots.takeScreenshot(browser, "Dashboard_Has_Muf_Applied_Filters", getClass());
             assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
                     asList(ATTR_YEAR_SNAPSHOT, ATTR_STAGE_NAME, METRIC_AMOUNT),
@@ -530,9 +508,8 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
 
         dashboardRequest.addMufToUser(userUri, dashboardRequest.createMufObjectByUri(MUF_NAME, expression));
         try {
-            dashboardTitle = generateDashboardName();
             openDashboardHasReports(Pair.of(REPORT_AMOUNT_BY_STAGE_NAME, ItemPosition.LEFT));
-            String xlsxUrl = testParams.getExportFilePath(dashboardsPage.printDashboardTabToXLSX(dashboardTitle));
+            String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
             Screenshots.takeScreenshot(browser, "Dashboard_Has_Muf_Applied_Negative_Filters", getClass());
             assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
                     asList(ATTR_YEAR_SNAPSHOT, ATTR_STAGE_NAME, METRIC_AMOUNT), asList("2012", DISCOVERY, "4249027.88"),
@@ -546,7 +523,6 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
 
     @Test(dependsOnGroups = "createProject")
     public void exportDashboardHasAnotherLabelFilterToXLSX() throws IOException {
-        dashboardTitle = generateDashboardName();
         openDashboardHasReports(Pair.of(REPORT_AMOUNT_BY_STAGE_NAME, ItemPosition.LEFT));
         dashboardsPage.editDashboard()
                 .addAttributeFilterToDashboard(DashAttributeFilterTypes.ATTRIBUTE, ATTR_STAGE_NAME, "Order")
@@ -554,7 +530,7 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
         TableReport tableReport = dashboardsPage.getReport(REPORT_AMOUNT_BY_STAGE_NAME, TableReport.class).waitForLoaded();
         dashboardsPage.getFirstFilter().changeAttributeFilterValues("101");
         tableReport.waitForLoaded();
-        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.printDashboardTabToXLSX(dashboardTitle));
+        String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Another_Label_Filter", getClass());
         assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
                 asList("Applied filters:", "Stage Name IN (Interest)"),
@@ -564,6 +540,7 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
     }
 
     private void openDashboardHasReports(Pair<String, ItemPosition>... reports) throws IOException {
+        dashboardTitle = generateDashboardName();
         List<TabItem> tabItems = Stream.of(reports).map(this::createReportItem).collect(Collectors.toList());
         Dashboard dashboard = new Dashboard().setName(dashboardTitle).addTab(new Tab().addItems(tabItems));
 
@@ -579,6 +556,7 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
 
     private void openDashboardHasReportAndFilter(String titleReport, FilterItemContent filterItemContent)
             throws IOException {
+        dashboardTitle = generateDashboardName();
         Dashboard dashboard = new Dashboard()
                 .setName(dashboardTitle)
                 .addTab(initTab(titleReport, singletonList(
@@ -591,10 +569,11 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
 
     private void openDashboardHasReportAndFilters(String titleReport, FilterItemContent attributeFilterContent,
             FilterItemContent promptFilterContent, FilterItemContent dateFilterContent) throws IOException {
+        dashboardTitle = generateDashboardName();
         Dashboard dashboard = new Dashboard()
                 .setName(dashboardTitle)
                 .addTab(initTab(titleReport, asList(
-                        Pair.of(attributeFilterContent, BOTTOM),
+                        Pair.of(attributeFilterContent, MIDDLE),
                         Pair.of(promptFilterContent, TOP_RIGHT),
                         Pair.of(dateFilterContent, RIGHT))))
                 .addFilter(attributeFilterContent)
