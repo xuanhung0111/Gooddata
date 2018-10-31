@@ -7,6 +7,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.CssUtils.isShortendTilteDesignByCss;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
+import static org.openqa.selenium.By.className;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -17,7 +18,9 @@ import java.util.stream.Stream;
 
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -58,8 +61,14 @@ public class ChartReport extends AbstractFragment {
     @FindBy(css = ".highcharts-series")
     private List<WebElement> tracker;
 
-    private static final By BY_X_AXIS_TITLE = By.className("highcharts-xaxis-title");
-    private static final By BY_Y_AXIS_TITLE = By.className("highcharts-yaxis-title");
+    private static final By BY_X_AXIS_TITLE = className("highcharts-xaxis-title");
+    private static final By BY_Y_AXIS_TITLE = className("highcharts-yaxis-title");
+    private static final By BY_LEGEND = className("viz-static-legend-wrap");
+
+    public static ChartReport getInstance(SearchContext context) {
+        return Graphene.createPageFragment(ChartReport.class,
+                waitForElementVisible(className("viz-line-family-chart-wrap"), context));
+    }
 
     public boolean isColumnHighlighted(Pair<Integer, Integer> position) {
         WebElement element = getTracker(position.getLeft(), position.getRight());
@@ -87,7 +96,7 @@ public class ChartReport extends AbstractFragment {
     //Some type charts don't exist legend will return Zero
     public int getLegendIndex(String legendName) {
         List<WebElement> elements = getRoot()
-                .findElements(By.className("series-item"));
+                .findElements(className("series-item"));
         if(elements.isEmpty()) {
             return 0;
         }
@@ -129,18 +138,18 @@ public class ChartReport extends AbstractFragment {
         return waitForCollectionIsNotEmpty(markers).size();
     }
 
-    public List<List<String>> getTooltipTextOnTrackerByIndex(int index) {
-        displayTooltipOnTrackerByIndex(index);
+    public List<List<String>> getTooltipTextOnTrackerByIndex(int groupIndex, int index) {
+        displayTooltipOnTrackerByIndex(groupIndex, index);
         return getTooltipText();
     }
 
-    public boolean isShortenTooltipTextOnTrackerByIndex(int index, int width) {
-        displayTooltipOnTrackerByIndex(index);
-        return isShortendTilteDesignByCss(waitForElementVisible(tooltip.findElement(By.className("title"))), width);
+    public boolean isShortenTooltipTextOnTrackerByIndex(int groupNumber, int index, int width) {
+        displayTooltipOnTrackerByIndex(groupNumber, index);
+        return isShortendTilteDesignByCss(waitForElementVisible(tooltip.findElement(className("title"))), width);
     }
 
     public boolean isLegendVisible() {
-        return !legendNames.isEmpty();
+        return isElementVisible(BY_LEGEND, browser);
     }
 
     public boolean areLegendsHorizontal() {
@@ -208,11 +217,10 @@ public class ChartReport extends AbstractFragment {
         return getElementTexts(labels);
     }
 
-    private void displayTooltipOnTrackerByIndex(int index) {
+    private void displayTooltipOnTrackerByIndex(int groupIndex, int index) {
+        WebElement tracker = getTracker(groupIndex, index);
         checkIndex(index);
-        getActions().moveToElement(trackers.get(index)).moveByOffset(1, 1).perform();
-        if (isLineChart())
-            waitForElementVisible(markers.get(index)).click();
+        getActions().moveToElement(tracker).moveByOffset(1, 1).click().perform();
         waitForElementVisible(tooltip);
     }
 
@@ -230,11 +238,11 @@ public class ChartReport extends AbstractFragment {
         }
     }
 
-    private WebElement getTracker(int xAxis, int yAxis) {
+    private WebElement getTracker(int groupIndex, int index) {
         List<WebElement> list = waitForCollectionIsNotEmpty(getRoot()
                 .findElements(By.cssSelector(String.format(".highcharts-series-%s.highcharts-tracker rect," +
-                        ".highcharts-series-%s.highcharts-tracker path", xAxis, xAxis))));
-        return list.get(yAxis);
+                        ".highcharts-series-%s.highcharts-tracker path", groupIndex, groupIndex))));
+        return list.get(index);
     }
 
     public String checkColorColumn(int xAxis, int yAxis) {

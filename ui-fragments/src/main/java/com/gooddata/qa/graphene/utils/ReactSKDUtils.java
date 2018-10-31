@@ -13,6 +13,21 @@ public class ReactSKDUtils {
     public static final String TEMPLATE_HEADLINE_WITH_NEGATIVE_FILTER_INSIGHT =
             "HeadlineWithNegativeFilterInsight.js";
 
+    //Headline
+    public static final String TEMPLATE_HEADLINE_WITH_ATTRIBUTE = "HeadlineWithAttribute.js";
+    public static final String TEMPLATE_HEADLINE_WITH_MEASURE = "HeadlineWithMeasure.js";
+    public static final String TEMPLATE_HEADLINE_WITH_MEASURES = "HeadlineWithMeasures.js";
+    public static final String TEMPLATE_HEADLINE_WITH_MEASURE_AND_FORMAT = "HeadlineWithMeasureAndFormat.js";
+    public static final String TEMPLATE_HEADLINE_WITH_ABSOLUTE_DATE_FILTER = "HeadlineWithAbsoluteDateFilter.js";
+    public static final String TEMPLATE_HEADLINE_WITH_AGGREGATION = "HeadlineWithAggregation.js";
+    public static final String TEMPLATE_HEADLINE_WITH_ALIAS_MEASURES = "HeadlineWithAliasMeasures.js";
+    public static final String TEMPLATE_HEADLINE_WITH_FILTER = "HeadlineWithFilter.js";
+    public static final String TEMPLATE_HEADLINE_WITH_FILTERS = "HeadlineWithFilters.js";
+    public static final String TEMPLATE_HEADLINE_WITH_NEGATIVE_FILTERS = "HeadlineWithNegativeFilter.js";
+    public static final String TEMPLATE_HEADLINE_WITH_PERCENT_MEASURE = "HeadlineWithPercentMeasure.js";
+    public static final String TEMPLATE_HEADLINE_WITH_PP_COMPARISON = "HeadlineWithPPComparison.js";
+    public static final String TEMPLATE_HEADLINE_WITH_SPPY_COMPARISON = "HeadlineWithSPPYComparison.js";
+
     //Warning
     public static final String WARNING_CAN_NOT_DISPLAY = "SORRY, WE CAN'T DISPLAY THIS INSIGHT\nContact your administrator.";
 }

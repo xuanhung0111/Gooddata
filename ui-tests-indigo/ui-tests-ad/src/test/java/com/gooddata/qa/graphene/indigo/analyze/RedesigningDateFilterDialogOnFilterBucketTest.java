@@ -112,12 +112,12 @@ public class RedesigningDateFilterDialogOnFilterBucketTest extends AbstractAnaly
         dateFilterPickerPanel.apply();
 
         ChartReport chartReport = analysisPage.waitForReportComputing().getChartReport();
-        assertThat(chartReport.getTooltipTextOnTrackerByIndex(0), hasItems(asList(METRIC_TIMELINE_BOP, "36,525")));
+        assertThat(chartReport.getTooltipTextOnTrackerByIndex(0, 0), hasItems(asList(METRIC_TIMELINE_BOP, "36,525")));
         assertEquals(parseFilterText(filterBucket.getDateFilterText()),
                 asList(DATE_DATASET_CREATED, LAST_YEAR.toString()));
 
         filterBucket.openDateFilterPickerPanel().cancel();
-        assertThat(chartReport.getTooltipTextOnTrackerByIndex(0), hasItems(asList(METRIC_TIMELINE_BOP, "36,525")));
+        assertThat(chartReport.getTooltipTextOnTrackerByIndex(0, 0), hasItems(asList(METRIC_TIMELINE_BOP, "36,525")));
 
         dateFilterPickerPanel = filterBucket.openDateFilterPickerPanel();
         assertEquals(dateFilterPickerPanel.getDateDatasetSelect().getSelection(), DATE_DATASET_CREATED);
@@ -126,7 +126,7 @@ public class RedesigningDateFilterDialogOnFilterBucketTest extends AbstractAnaly
         analysisPage.getMetricsBucket()
                 .getMetricConfiguration(METRIC_TIMELINE_BOP)
                 .expandConfiguration();
-        assertThat(chartReport.getTooltipTextOnTrackerByIndex(0), hasItems(asList(METRIC_TIMELINE_BOP, "36,525")));
+        assertThat(chartReport.getTooltipTextOnTrackerByIndex(0, 0), hasItems(asList(METRIC_TIMELINE_BOP, "36,525")));
         dateFilterPickerPanel = filterBucket.openDateFilterPickerPanel();
         assertEquals(dateFilterPickerPanel.getDateDatasetSelect().getSelection(), DATE_DATASET_CREATED);
         assertEquals(dateFilterPickerPanel.getDatePresetSelect().getSelection(), LAST_YEAR.toString());
