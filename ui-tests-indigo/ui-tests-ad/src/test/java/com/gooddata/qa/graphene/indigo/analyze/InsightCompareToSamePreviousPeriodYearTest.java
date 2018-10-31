@@ -145,7 +145,7 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         assertEquals(metricsBucket.getItemHeaderAndSequenceNumber(), listExpectedMeasure);
 
         ChartReport chartReport = analysisPage.getChartReport();
-        assertThat(chartReport.getTooltipTextOnTrackerByIndex(1),
+        assertThat(chartReport.getTooltipTextOnTrackerByIndex(0, 1),
                 hasItems(asList(DERIVED_METRIC_AMOUNT, "$116,625,456.54")));
         assertEquals(chartReport.getLegendColors(), asList("rgb(20,178,226)", "rgb(153,230,209)", "rgb(0,193,141)"));
         assertFalse(metricsBucket.getMetricConfiguration(DERIVED_METRIC_AMOUNT).expandConfiguration()
@@ -174,8 +174,8 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         assertEquals(metricsBucket.getItemHeaderAndSequenceNumber(), listExpectedMeasure);
 
         ChartReport chartReport = analysisPage.getChartReport();
-        assertThat(chartReport.getTooltipTextOnTrackerByIndex(0), hasItems(asList(DERIVED_METRIC_WON, "38,310,753")));
-        assertThat(chartReport.getTooltipTextOnTrackerByIndex(2),
+        assertThat(chartReport.getTooltipTextOnTrackerByIndex(0, 0), hasItems(asList(DERIVED_METRIC_WON, "38,310,753")));
+        assertThat(chartReport.getTooltipTextOnTrackerByIndex(0, 2),
                 hasItems(asList(DERIVED_METRIC_AMOUNT, "$116,625,456.54")));
         assertEquals(chartReport.getLegendColors(), asList("rgb(161,224,243)", "rgb(20,178,226)",
                 "rgb(153,230,209)", "rgb(0,193,141)"));
@@ -200,27 +200,27 @@ public class InsightCompareToSamePreviousPeriodYearTest extends AbstractAnalyseT
         filterBucket.openDatePanelOfFilter(filterBucket.getDateFilter())
                 .changeCompareType(CompareType.SAME_PERIOD_PREVIOUS_YEAR).apply();
         ChartReport chartReport = analysisPage.getChartReport();
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0), asList(asList(ATTR_FORECAST_CATEGORY, "Exclude"),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0), asList(asList(ATTR_FORECAST_CATEGORY, "Exclude"),
                 asList("% " + DERIVED_METRIC_AMOUNT, "41.96%")));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(2), asList(asList(ATTR_FORECAST_CATEGORY, "Exclude"),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 2), asList(asList(ATTR_FORECAST_CATEGORY, "Exclude"),
                 asList("% " + METRIC_AMOUNT, "41.96%")));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(1), asList(asList(ATTR_FORECAST_CATEGORY, "Include"),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 1), asList(asList(ATTR_FORECAST_CATEGORY, "Include"),
                 asList("% " + DERIVED_METRIC_AMOUNT, "58.04%")));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(3), asList(asList(ATTR_FORECAST_CATEGORY, "Include"),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 3), asList(asList(ATTR_FORECAST_CATEGORY, "Include"),
                 asList("% " + METRIC_AMOUNT, "58.04%")));
 
         ///change attribute filter of master measure
         analysisPage.getMetricsBucket().getMetricConfiguration("% " + METRIC_AMOUNT)
                 .expandConfiguration().addFilterBySelectOnly(ATTR_DEPARTMENT, "Inside Sales");
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0), asList(asList(ATTR_FORECAST_CATEGORY, "Exclude"),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 0), asList(asList(ATTR_FORECAST_CATEGORY, "Exclude"),
                 asList("% " + METRIC_AMOUNT + " (" + ATTR_DEPARTMENT + ": Inside Sales)"
                         + SP_YEAR_AGO, "42.44%")));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(2), asList(asList(ATTR_FORECAST_CATEGORY, "Exclude"),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 2), asList(asList(ATTR_FORECAST_CATEGORY, "Exclude"),
                 asList("% " + METRIC_AMOUNT + " (" + ATTR_DEPARTMENT + ": Inside Sales)", "42.44%")));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(1), asList(asList(ATTR_FORECAST_CATEGORY, "Include"),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 1), asList(asList(ATTR_FORECAST_CATEGORY, "Include"),
                 asList("% " + METRIC_AMOUNT + " (" + ATTR_DEPARTMENT + ": Inside Sales)"
                         + SP_YEAR_AGO, "57.56%")));
-        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(3), asList(asList(ATTR_FORECAST_CATEGORY, "Include"),
+        assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0, 3), asList(asList(ATTR_FORECAST_CATEGORY, "Include"),
                 asList("% " + METRIC_AMOUNT + " (" + ATTR_DEPARTMENT + ": Inside Sales)", "57.56%")));
     }
 

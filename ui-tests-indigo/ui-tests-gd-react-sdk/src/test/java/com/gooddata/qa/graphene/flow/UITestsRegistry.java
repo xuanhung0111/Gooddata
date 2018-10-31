@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.flow;
 
 import com.gooddata.qa.graphene.indigo.sdk.EmbeddedHeadlineTest;
+import com.gooddata.qa.graphene.indigo.sdk.HeadlineByBucketComponentTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 import java.util.HashMap;
@@ -12,7 +13,8 @@ public class UITestsRegistry {
         Map<String, Object> suites = new HashMap<>();
 
         suites.put("all", new Object[] {
-                EmbeddedHeadlineTest.class
+                EmbeddedHeadlineTest.class,
+                HeadlineByBucketComponentTest.class
         });
 
         TestsRegistry.getInstance()
