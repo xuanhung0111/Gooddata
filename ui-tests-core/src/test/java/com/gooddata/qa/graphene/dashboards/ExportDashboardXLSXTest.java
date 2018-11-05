@@ -356,8 +356,8 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
         String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Group_Filter", getClass());
         assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
-                asList("Applied filters:", "Year (Snapshot) BETWEEN THIS-8 AND THIS-7"),
-                singletonList("Stage Name IN (Interest)"), asList(ATTR_STAGE_NAME, METRIC_AMOUNT),
+                asList("Applied filters:", "Stage Name IN (Interest)"),
+                singletonList("Year (Snapshot) BETWEEN THIS-8 AND THIS-7"), asList(ATTR_STAGE_NAME, METRIC_AMOUNT),
                 asList(INTEREST, "1.642738857E7")));
     }
 
@@ -372,8 +372,8 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
         String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Type_Filters", getClass());
         assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
-                asList("Applied filters:", "Year (Snapshot) BETWEEN THIS-8 AND THIS-7"),
-                singletonList("Stage Name IN (Interest)"), asList(ATTR_STAGE_NAME, METRIC_AMOUNT),
+                asList("Applied filters:", "Stage Name IN (Interest)"),
+                singletonList("Year (Snapshot) BETWEEN THIS-8 AND THIS-7"), asList(ATTR_STAGE_NAME, METRIC_AMOUNT),
                 asList(INTEREST, "1.642738857E7")));
     }
 
