@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.gooddata.qa.graphene.utils.ElementUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -74,7 +75,10 @@ public class ChartReport extends AbstractFragment {
 
     public void clickOnElement(Pair<Integer, Integer> position) {
         WebElement element = getColumnElement(position);
-        getActions().moveToElement(element).moveByOffset(1, 1).click().perform();
+        // Because geckodriver follows W3C and moves the mouse pointer from the centre of the screen,
+        // Move the mouse pointer to the top-left corner of the fragment before moving to the specific Element
+        ElementUtils.moveToElementActions(getRoot(), 0, 0).moveToElement(element)
+                .moveByOffset(1, 1).click().perform();
     }
 
     public void clickOnDataLabel(Pair<Integer, Integer> position) {
