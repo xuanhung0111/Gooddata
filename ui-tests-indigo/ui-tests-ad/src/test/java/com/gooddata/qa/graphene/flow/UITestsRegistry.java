@@ -9,6 +9,7 @@ import com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerSanityTest;
 import com.gooddata.qa.graphene.indigo.analyze.BackwardCompatibilityTest;
 import com.gooddata.qa.graphene.indigo.analyze.DateFilterADMeasureTest;
 import com.gooddata.qa.graphene.indigo.analyze.DateFilterADMeasureExtendedTest;
+import com.gooddata.qa.graphene.indigo.analyze.RenamingMeasuresAndAttributesTest;
 import com.gooddata.qa.graphene.indigo.analyze.CustomDateDimensionsTest;
 import com.gooddata.qa.graphene.indigo.analyze.EmbeddedAdTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesAttributeBasedMetricTest;
@@ -140,6 +141,7 @@ public class UITestsRegistry {
             EventingSpecialCaseTest.class,
             DateFilterADMeasureExtendedTest.class,
             InsightCompareToPreviousPeriodTest.class,
+            RenamingMeasuresAndAttributesTest.class,
             "testng-ad-ChartLabelFormat.xml",
             "testng-ad-MetricNumberFormat.xml"
         });
