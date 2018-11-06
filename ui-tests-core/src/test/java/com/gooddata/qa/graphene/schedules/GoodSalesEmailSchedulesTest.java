@@ -95,7 +95,7 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
     @Test(dependsOnMethods = {"signInImapUser"}, groups = {"schedules"})
     public void createReportSchedule() {
         initEmailSchedulesPage().scheduleNewReportEmail(singletonList(imapUser), reportTitle,
-                "Scheduled email test - report.", REPORT_ACTIVITIES_BY_TYPE, ExportFormat.ALL);
+                "Scheduled email test - report.", singletonList(REPORT_ACTIVITIES_BY_TYPE), ExportFormat.ALL);
         checkRedBar(browser);
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-report", this.getClass());
     }

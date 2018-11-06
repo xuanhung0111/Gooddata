@@ -112,7 +112,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
                 .scheduleNewDashboardEmail(singletonList(testParams.getUser()),
                         dashboardSchedule, "test", singletonList(DASHBOARD_NAME))
                 .scheduleNewReportEmail(singletonList(testParams.getUser()),
-                        reportSchedule, "test", REPORT_ACTIVITIES_BY_TYPE, ExportFormat.ALL);
+                        reportSchedule, "test", singletonList(REPORT_ACTIVITIES_BY_TYPE), ExportFormat.ALL);
 
             initEmailSchedulesPage().deleteSchedule(dashboardSchedule)
                 .deleteSchedule(reportSchedule);
@@ -489,8 +489,8 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
 
     private String createReportSchedule(String report) {
         String subject = "Report Schedule " + System.currentTimeMillis();
-        initEmailSchedulesPage().scheduleNewReportEmail(singletonList(testParams.getUser()), subject, "body", report, ExportFormat.ALL);
-
+        initEmailSchedulesPage().scheduleNewReportEmail(singletonList(testParams.getUser()), subject, "body",
+                singletonList(report), ExportFormat.ALL);
         return subject;
     }
 

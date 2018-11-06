@@ -106,7 +106,7 @@ public class GoodSalesEmailScheduleDashboardTest extends AbstractGoodSalesEmailS
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
         today = DateRange.getCurrentDate();
         List<String> contents =
-                asList(getPdfContentFrom(waitForScheduleMessages(firstDashboard, 2), 1).split("\n"));
+                asList(getFirstPdfContentFrom(waitForScheduleMessages(firstDashboard, 2).get(1)).split("\n"));
         //verify report
         assertThat(contents, hasItems(firstReport, "Stage Name Amount", "Interest", "Discovery", "Short List", "Risk Assessment",
                 "Conviction", "Negotiation", "Closed Won", "Closed Lost", "$18,447,266.14", "$4,249,027.88", "$5,612,062.60",
@@ -131,7 +131,7 @@ public class GoodSalesEmailScheduleDashboardTest extends AbstractGoodSalesEmailS
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
         today = DateRange.getCurrentDate();
         List<String> contents =
-                asList(getPdfContentFrom(waitForScheduleMessages(firstDashboard, 3), 2).split("\n"));
+                asList(getFirstPdfContentFrom(waitForScheduleMessages(firstDashboard, 3).get(2)).split("\n"));
         //verify report
         assertThat(contents, hasItems(firstReport, "Available area too small to display", "report"));
         //verify title
@@ -160,7 +160,7 @@ public class GoodSalesEmailScheduleDashboardTest extends AbstractGoodSalesEmailS
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
         today = DateRange.getCurrentDate();
         List<String> contents =
-                asList(getPdfContentFrom(waitForScheduleMessages(secondDashboard, 2), 1).split("\n"));
+                asList(getFirstPdfContentFrom(waitForScheduleMessages(secondDashboard, 2).get(1)).split("\n"));
         //verify report
         assertThat(contents, hasItems(secondReport, "No data"));
         //verify title
@@ -183,7 +183,7 @@ public class GoodSalesEmailScheduleDashboardTest extends AbstractGoodSalesEmailS
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
         today = DateRange.getCurrentDate();
         List<String> contents =
-                asList(getPdfContentFrom(waitForScheduleMessages(secondDashboard, 3), 2).split("\n"));
+                asList(getFirstPdfContentFrom(waitForScheduleMessages(secondDashboard, 3).get(2)).split("\n"));
         //verify report
         assertThat(contents, hasItems(secondReport, "Available area too small to display", "report"));
         //verify title
@@ -208,7 +208,7 @@ public class GoodSalesEmailScheduleDashboardTest extends AbstractGoodSalesEmailS
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
         today = DateRange.getCurrentDate();
         List<String> contents =
-                asList(getPdfContentFrom(waitForScheduleMessages(thirdDashboard, 2), 1).split("\n"));
+                asList(getFirstPdfContentFrom(waitForScheduleMessages(thirdDashboard, 2).get(1)).split("\n"));
         //verify report
         assertThat(contents, hasItems(thirdReport, "Available area too small to display", "report"));
         //verify filter
@@ -229,7 +229,7 @@ public class GoodSalesEmailScheduleDashboardTest extends AbstractGoodSalesEmailS
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
         today = DateRange.getCurrentDate();
         List<String> contents =
-                asList(getPdfContentFrom(waitForScheduleMessages(thirdDashboard, 3), 2).split("\n"));
+                asList(getFirstPdfContentFrom(waitForScheduleMessages(thirdDashboard, 3).get(2)).split("\n"));
         //verify report
         assertThat(contents, hasItems(thirdReport, "Available area too small to display", "report"));
         //verify filter

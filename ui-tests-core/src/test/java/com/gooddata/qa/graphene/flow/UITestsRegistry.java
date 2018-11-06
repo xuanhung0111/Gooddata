@@ -301,7 +301,8 @@ public class UITestsRegistry {
             "testng-imap-GoodSales-email-schedule-embedded-dashboard.xml",
             "testng-imap-GoodSales-email-schedule-embedded-dashboard-has-filter.xml",
             "testng-imap-GoodSales-email-schedule-saved-view-embedded-dashboard.xml",
-            "testng-imap-GoodSales-email-schedule-uri-parameter-embedded-dashboard.xml"
+            "testng-imap-GoodSales-email-schedule-uri-parameter-embedded-dashboard.xml",
+            "testng-imap-GoodSales-email-schedule-report.xml",
         });
 
         suites.put("misc", new Object[] {

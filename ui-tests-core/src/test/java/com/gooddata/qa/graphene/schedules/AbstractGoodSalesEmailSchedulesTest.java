@@ -44,6 +44,7 @@ public class AbstractGoodSalesEmailSchedulesTest extends AbstractEmbeddedModeTes
             + " because it is linked from a scheduled email or KPI dashboard. Remove all links and retry.";
 
     protected File attachmentsDirectory;
+    protected String identification;
 
     @Override
     protected void initProperties() {
@@ -54,9 +55,14 @@ public class AbstractGoodSalesEmailSchedulesTest extends AbstractEmbeddedModeTes
     }
 
     protected Part findPartByContentType(List<Part> parts, String contentType) throws MessagingException {
+        return findPartByFileName(parts, contentType, "");
+    }
+
+    protected Part findPartByFileName(List<Part> parts, String contentType, String prefixFileName) throws MessagingException {
         for (Part part : parts) {
-            if (part.getContentType().contains(contentType.toUpperCase())) {
-                return part;
+            if (part.getContentType().contains(contentType.toUpperCase()) &&
+                part.getFileName().contains(prefixFileName)) {
+                    return part;
             }
         }
         return null;
@@ -125,12 +131,23 @@ public class AbstractGoodSalesEmailSchedulesTest extends AbstractEmbeddedModeTes
         }
     }
 
-    protected String getPdfContentFrom(List<Message> messages, int indexOfMessage)
+    protected int getNumberOfPartsFrom(Message message) {
+        return getAttachmentParts(message).size();
+    }
+
+    protected String getFirstPdfContentFrom(Message message)
             throws MessagingException, UnsupportedEncodingException {
-        List<Part> parts = getAttachmentParts(messages.get(indexOfMessage));
+        List<Part> parts = getAttachmentParts(message);
         File pdfExport = new File(attachmentsDirectory,
                 MimeUtility.decodeText(findPartByContentType(parts, "application/pdf").getFileName()));
         return getContentFrom(pdfExport);
+    }
+
+    protected File getPdfFileFrom(Message message, String prefixName)
+            throws MessagingException, UnsupportedEncodingException {
+        List<Part> parts = getAttachmentParts(message);
+        return new File(attachmentsDirectory,
+                MimeUtility.decodeText(findPartByFileName(parts, "application/pdf", prefixName).getFileName()));
     }
 
     private void saveMessageAttachments(List<Message> messages) throws MessagingException, IOException {

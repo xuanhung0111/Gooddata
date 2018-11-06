@@ -256,7 +256,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     @Test(dependsOnGroups = {"precondition"}, groups = {"schedules"})
     public void scheduleEmptyReport() {
         initEmailSchedulesPage().scheduleNewReportEmail(singletonList(imapUser), noDataReportTitle,
-                "Scheduled email test - no data report.", REPORT_NO_DATA, ExportFormat.ALL);
+                "Scheduled email test - no data report.", singletonList(REPORT_NO_DATA), ExportFormat.ALL);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-no-data-report", this.getClass());
     }
@@ -264,7 +264,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     @Test(dependsOnGroups = {"precondition"}, groups = {"schedules"})
     public void scheduleIncomputableReport() {
         initEmailSchedulesPage().scheduleNewReportEmail(singletonList(imapUser), incomputableReportTitle,
-                "Scheduled email test - incomputable report.", REPORT_INCOMPUTABLE, ExportFormat.PDF);
+                "Scheduled email test - incomputable report.", singletonList(REPORT_INCOMPUTABLE), ExportFormat.PDF);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-incomputable-report", this.getClass());
     }
@@ -272,7 +272,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     @Test(dependsOnGroups = {"precondition"}, groups = {"schedules"})
     public void scheduleTooLargeReport() {
         initEmailSchedulesPage().scheduleNewReportEmail(singletonList(imapUser), tooLargeReportTitle,
-                "Scheduled email test - too large report.", REPORT_TOO_LARGE, ExportFormat.PDF);
+                "Scheduled email test - too large report.", singletonList(REPORT_TOO_LARGE), ExportFormat.PDF);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-too-large-report", this.getClass());
     }
@@ -290,7 +290,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         reportPage.saveReport();
 
         initEmailSchedulesPage().scheduleNewReportEmail(singletonList(imapUser), filteredVariableReportTitle,
-                "Scheduled email test - Filtered variable report.", "Filtered variable report",
+                "Scheduled email test - Filtered variable report.", singletonList("Filtered variable report"),
                 ExportFormat.SCHEDULES_EMAIL_CSV);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-filtered-variable-report", this.getClass());
@@ -313,7 +313,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
         initEmailSchedulesPage().scheduleNewReportEmail(singletonList(imapUser), numericVariableReportTitle,
-                "Scheduled email test - Numeric variable report.", report, ExportFormat.SCHEDULES_EMAIL_CSV);
+                "Scheduled email test - Numeric variable report.", singletonList(report), ExportFormat.SCHEDULES_EMAIL_CSV);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-numeric-variable-report", this.getClass());
     }
@@ -341,7 +341,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
         initEmailSchedulesPage().scheduleNewReportEmail(asList(imapUser, testParams.getUser(), EDITOR_EMAIL), mufReportTitle,
-                "Scheduled email test - MUF report.", report, ExportFormat.SCHEDULES_EMAIL_CSV);
+                "Scheduled email test - MUF report.", singletonList(report), ExportFormat.SCHEDULES_EMAIL_CSV);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-muf-report", this.getClass());
     }
@@ -361,7 +361,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
         initEmailSchedulesPage().scheduleNewReportEmail(singletonList(imapUser), title,
-                "Scheduled email test - report.", report, ExportFormat.ALL);
+                "Scheduled email test - report.", singletonList(report), ExportFormat.ALL);
 
         try {
             initReportsPage()
@@ -383,8 +383,8 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         String title = "verify-UI-title";
         String updatedTitle = title + "Updated";
         initEmailSchedulesPage().scheduleNewReportEmail(singletonList(imapUser), title,
-                "Scheduled email test - report.", REPORT_ACTIVITIES_BY_TYPE, ExportFormat.SCHEDULES_EMAIL_CSV);
-
+                "Scheduled email test - report.", singletonList(REPORT_ACTIVITIES_BY_TYPE),
+                ExportFormat.SCHEDULES_EMAIL_CSV);
         try {
             EmailSchedulePage.getInstance(browser).openSchedule(title)
                 .setSubject(updatedTitle)
@@ -412,7 +412,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     public void changeScheduleTime() {
         String title = "verify-UI-title";
         initEmailSchedulesPage().scheduleNewReportEmail(singletonList(imapUser), title,
-                "Scheduled email test - report.", REPORT_ACTIVITIES_BY_TYPE, ExportFormat.ALL);
+                "Scheduled email test - report.", singletonList(REPORT_ACTIVITIES_BY_TYPE), ExportFormat.ALL);
 
         try {
             String timeDescription = "";

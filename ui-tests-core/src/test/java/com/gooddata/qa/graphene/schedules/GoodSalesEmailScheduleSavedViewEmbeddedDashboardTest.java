@@ -133,7 +133,7 @@ public class GoodSalesEmailScheduleSavedViewEmbeddedDashboardTest extends Abstra
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
         today = DateRange.getCurrentDate();
         List<String> contents =
-                asList(getPdfContentFrom(waitForScheduleMessages(firstDashboard, 2), 1).split("\n"));
+                asList(getFirstPdfContentFrom(waitForScheduleMessages(firstDashboard, 2).get(1)).split("\n"));
         //verify report
         assertThat(contents, hasItems(firstReport, "Stage Name Amount", "Short List $5,612,062.60"));
         //verify filter
@@ -162,7 +162,7 @@ public class GoodSalesEmailScheduleSavedViewEmbeddedDashboardTest extends Abstra
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
         today = DateRange.getCurrentDate();
         List<String> contents =
-                asList(getPdfContentFrom(waitForScheduleMessages(firstDashboard, 3), 2).split("\n"));
+                asList(getFirstPdfContentFrom(waitForScheduleMessages(firstDashboard, 3).get(2)).split("\n"));
         //verify report
         assertThat(contents, hasItems(firstReport, "Available area too small to display", "report"));
         //verify filter
@@ -199,7 +199,7 @@ public class GoodSalesEmailScheduleSavedViewEmbeddedDashboardTest extends Abstra
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
         today = DateRange.getCurrentDate();
         List<String> contents =
-                asList(getPdfContentFrom(waitForScheduleMessages(secondDashboard, 2), 1).split("\n"));
+                asList(getFirstPdfContentFrom(waitForScheduleMessages(secondDashboard, 2).get(1)).split("\n"));
         //verify report
         assertThat(contents, hasItems(secondReport, "Available area too small to display", "report"));
         //verify filter
@@ -229,7 +229,7 @@ public class GoodSalesEmailScheduleSavedViewEmbeddedDashboardTest extends Abstra
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
         today = DateRange.getCurrentDate();
         List<String> contents =
-                asList(getPdfContentFrom(waitForScheduleMessages(secondDashboard, 3), 2).split("\n"));
+                asList(getFirstPdfContentFrom(waitForScheduleMessages(secondDashboard, 3).get(2)).split("\n"));
         //verify report
         assertThat(contents, hasItems(secondReport, "Available area too small to display", "report"));
         //verify filter
@@ -263,7 +263,7 @@ public class GoodSalesEmailScheduleSavedViewEmbeddedDashboardTest extends Abstra
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
         today = DateRange.getCurrentDate();
         List<String> contents =
-                asList(getPdfContentFrom(waitForScheduleMessages(thirdDashboard, 2), 1).split("\n"));
+                asList(getFirstPdfContentFrom(waitForScheduleMessages(thirdDashboard, 2).get(1)).split("\n"));
         //verify report
         assertThat(contents, hasItems(thirdReport, "Available area too small to display", "report"));
         //verify filter
@@ -288,7 +288,7 @@ public class GoodSalesEmailScheduleSavedViewEmbeddedDashboardTest extends Abstra
         updateRecurrencyString(commonRestRequest.getLastScheduleUri());
         today = DateRange.getCurrentDate();
         List<String> contents =
-                asList(getPdfContentFrom(waitForScheduleMessages(thirdDashboard, 3), 2).split("\n"));
+                asList(getFirstPdfContentFrom(waitForScheduleMessages(thirdDashboard, 3).get(2)).split("\n"));
         //verify report
         assertThat(contents, hasItems(thirdReport, "Available area too small to display", "report"));
         //verify filter
