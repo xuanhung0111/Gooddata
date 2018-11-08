@@ -21,7 +21,6 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.description.Description
 import com.gooddata.qa.graphene.utils.ElementUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -49,7 +48,7 @@ public class MetricConfiguration extends AbstractFragment {
     @FindBy(className = "s-show-in-percent")
     private WebElement showInPercents;
 
-    @FindBy(className = "button-dropdown")
+    @FindBy(className = DATE_AND_ADD_ATTRIBUTE_FILTER_CLASS_NAME)
     private List<WebElement> byDateAndAddAttributeFilter;
 
     @FindBy(className = "adi-bucket-item-sequence-number")
@@ -65,11 +64,16 @@ public class MetricConfiguration extends AbstractFragment {
     private static final By BY_BUBBLE_CONTENT = By.className("bubble-content");
     private static final String SUB_HEADER_CLASS_NAME = "adi-bucket-item-sub-header";
     private static final String ADD_ATTRIBUTE_FILTER_CLASS = "s-add_attribute_filter";
+    private static final String DATE_AND_ADD_ATTRIBUTE_FILTER_CLASS_NAME = "button-dropdown";
 
     private static final String DISABLED = "is-disabled";
 
     public List<String> getByDateAndAttributeFilterButton() {
         return byDateAndAddAttributeFilter.stream().map(WebElement::getText).collect(Collectors.toList());
+    }
+
+    public boolean isDateAndAddAttributeFilterVisible() {
+        return isElementVisible(By.className(DATE_AND_ADD_ATTRIBUTE_FILTER_CLASS_NAME), getRoot());
     }
 
     public boolean isFilterByDateButtonVisible() {
@@ -82,6 +86,10 @@ public class MetricConfiguration extends AbstractFragment {
 
     public String getHeader() {
         return waitForElementVisible(className("s-title"), waitForElementVisible(header)).getText();
+    }
+
+    public String getHeaderAndSequenceNumber() {
+        return waitForElementVisible(header).getText();
     }
 
     public String getSubHeader() {

@@ -57,6 +57,9 @@ public class AnalysisPage extends AbstractFragment {
     @FindBy(className = "s-bucket-measures")
     private MetricsBucket metricsBucket;
 
+    @FindBy(className = "s-bucket-secondary_measures")
+    private MetricsBucket metricsSecondaryBucket;
+
     @FindBy(css = ".s-bucket-attribute, .s-bucket-view, .s-bucket-trend")
     private AttributesBucket attributesBucket;
 
@@ -140,6 +143,16 @@ public class AnalysisPage extends AbstractFragment {
     public AnalysisPage addMetric(String data, FieldType type) {
         WebElement source = getCataloguePanel().searchAndGet(data, type);
         WebElement target = getMetricsBucket().getInvitation();
+        return drag(source, target);
+    }
+
+    public AnalysisPage addMetricToSecondaryBucket(String metric) {
+        return addMetricToSecondaryBucket(metric, FieldType.METRIC);
+    }
+
+    public AnalysisPage addMetricToSecondaryBucket(String data, FieldType type) {
+        WebElement source = getCataloguePanel().searchAndGet(data, type);
+        WebElement target = getMetricsSecondaryBucket().getInvitation();
         return drag(source, target);
     }
 
@@ -330,6 +343,11 @@ public class AnalysisPage extends AbstractFragment {
 
     public MetricsBucket getMetricsBucket() {
         return waitForFragmentVisible(metricsBucket);
+    }
+
+    //using this fragment when applying the Headline insight(Headline Report Type) for Analysis Page
+    public MetricsBucket getMetricsSecondaryBucket() {
+        return waitForFragmentVisible(metricsSecondaryBucket);
     }
 
     public AttributesBucket getAttributesBucket() {

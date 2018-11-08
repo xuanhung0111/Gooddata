@@ -10,6 +10,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -28,8 +29,12 @@ public class MainEditor extends AbstractFragment {
     @FindBy(className = "adi-canvas-message")
     private WebElement canvasMessage;
 
+    @FindBy(className = WARNING_UNSUPPORTED_MESSAGE_CLASS_NAME)
+    private WebElement warningUnsupportedMessage;
+
     private static final String CSS_EXPLORER_MESSAGE = ".adi-canvas-message h2";
     private static final String CSS_REPORT_EMPTY = ".s-blank-canvas-message";
+    private static final String WARNING_UNSUPPORTED_MESSAGE_CLASS_NAME = "s-unsupported-bucket-items-warning";
     private static final By BY_TABLE_REPORT = By.className("indigo-table-component-content");
     private static final By BY_CHART_REPORT = By.className("adi-report-visualization");
     private static final By BY_REPORT_COMPUTING = By.className("adi-computing");
@@ -59,6 +64,14 @@ public class MainEditor extends AbstractFragment {
 
     public String getCanvasMessage() {
         return waitForElementVisible(canvasMessage).getText();
+    }
+
+    public String getWarningUnsupportedMessage() {
+        return waitForElementVisible(warningUnsupportedMessage).getText();
+    }
+
+    public Boolean isWarningUnsupportedMessageVisible() {
+        return isElementVisible(By.className(WARNING_UNSUPPORTED_MESSAGE_CLASS_NAME), browser);
     }
 
     public boolean isExplorerMessageVisible() {

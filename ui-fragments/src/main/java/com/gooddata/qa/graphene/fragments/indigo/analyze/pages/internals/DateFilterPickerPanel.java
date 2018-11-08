@@ -56,6 +56,9 @@ public class DateFilterPickerPanel extends AbstractFragment {
     @FindBy(className = "s-compare-apply-measures")
     private CompareApplyMeasure compareApplyMeasures;
 
+    @FindBy(className = "date-filter-error-message-wrap")
+    private WebElement warningUnsupportedMessage;
+
     public static final By LOCATOR = By.className("adi-date-filter-picker");
 
     public DateFilterPickerPanel changeDateDimension(String switchDimension) {
@@ -88,6 +91,10 @@ public class DateFilterPickerPanel extends AbstractFragment {
     public DateFilterPickerPanel changeCompareType(CompareType compareType) {
         getCompareTypeDropdown().selectCompareType(compareType.getCompareTypeName());
         return this;
+    }
+
+    public String getMessageCompareApplyIncompatible() {
+        return getCompareTypeDropdown().getMessageCompareApplyIncompatible();
     }
 
     public List<String> getPeriods() {
@@ -136,8 +143,16 @@ public class DateFilterPickerPanel extends AbstractFragment {
         return waitForElementVisible(compareApplyMeasuresButton).getText();
     }
 
+    public String getWarningUnsupportedMessage() {
+        return waitForElementVisible(warningUnsupportedMessage).getText();
+    }
+
     public boolean isDimensionSwitcherEnabled() {
         return getDateDatasetSelect().isEnabled();
+    }
+
+    public String getCompareTypeDropdownButtonText() {
+        return getCompareTypeDropdown().getSelection();
     }
 
     public String getSelectedDimensionSwitch() {
@@ -152,6 +167,10 @@ public class DateFilterPickerPanel extends AbstractFragment {
     public AbstractReactDropDown getDatePresetSelect() {
         return Graphene.createPageFragment(DatePresetsSelect.class,
                 waitForElementVisible(By.className("adi-date-preset-select-dropdown"), browser));
+    }
+
+    public CompareApplyMeasure getCompareApplyMeasure() {
+        return waitForFragmentVisible(compareApplyMeasures);
     }
 
     public CompareApplyMeasure openCompareApplyMeasures() throws NoSuchFieldException {

@@ -40,6 +40,7 @@ import com.gooddata.qa.graphene.indigo.analyze.GoodSalesUndoRedoSavedInsightTest
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesUndoTest;
 import com.gooddata.qa.graphene.indigo.analyze.GoodSalesVisualizationTest;
 import com.gooddata.qa.graphene.indigo.analyze.InsightCompareToPreviousPeriodTest;
+import com.gooddata.qa.graphene.indigo.analyze.InsightCompareToSamePreviousPeriodYearTest;
 import com.gooddata.qa.graphene.indigo.analyze.MultipleDatasetsTest;
 import com.gooddata.qa.graphene.indigo.analyze.NonProductionDatasetInsightTest;
 import com.gooddata.qa.graphene.indigo.analyze.SpecialCasesTest;
@@ -142,6 +143,7 @@ public class UITestsRegistry {
             DateFilterADMeasureExtendedTest.class,
             InsightCompareToPreviousPeriodTest.class,
             RenamingMeasuresAndAttributesTest.class,
+            InsightCompareToSamePreviousPeriodYearTest.class,
             "testng-ad-ChartLabelFormat.xml",
             "testng-ad-MetricNumberFormat.xml"
         });
