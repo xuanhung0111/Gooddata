@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementDisabled;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
@@ -200,7 +201,9 @@ public class DateFilterPickerPanel extends AbstractFragment {
 
     private void configTimeFilterByRangeHelper(String from, String to, boolean apply) {
         configTimeFilterByRangeHelper(from, to);
-        waitForElementVisible(apply ? applyButton : cancelButton).click();
+        WebElement button = waitForElementVisible(apply ? applyButton : cancelButton);
+        Graphene.waitGui().until(browser -> !isElementDisabled(button));
+        button.click();
         waitForFragmentNotVisible(this);
     }
 
