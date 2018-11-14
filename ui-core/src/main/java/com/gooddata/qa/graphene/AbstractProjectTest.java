@@ -411,10 +411,15 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     //------------------------- SUPPORT GET OBJECTS - END -------------------------
 
     //------------------------- DASHBOARD MD OBJECTS - BEGIN -------------------------
-    protected FilterItemContent createSingleValueFilter(Attribute attribute) {
+    protected FilterItemContent createSingleValueFilter(Attribute attribute, String... elementValue) {
+        List<String> elementUri = Stream.of(elementValue)
+                .map(e -> getAttributeElementUri(attribute.getTitle(), e)).collect(toList());
         return Builder.of(FilterItemContent::new).with(item -> {
             item.setObjUri(attribute.getDefaultDisplayForm().getUri());
             item.setType(FilterType.LIST);
+            if (elementUri != null) {
+                item.setFilterConstraint(new ListFilterConstraint(elementUri));
+            }
         }).build();
     }
 
