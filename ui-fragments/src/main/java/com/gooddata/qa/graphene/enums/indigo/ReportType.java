@@ -8,7 +8,13 @@ public enum ReportType {
     TABLE("table"),
     COLUMN_CHART("column"),
     PIE_CHART("pie"),
-
+    TREE_MAP("treemap"),
+    STACKS_AREA_CHART("area"),
+    HEADLINE("headline"),
+    SCATTER_PLOT("scatter"),
+    BUBBLE_CHART("bubble"),
+    DONUT_CHART("donut"),
+    HEAT_MAP("heatmap"),
     LINE_CHART("line") {
         @Override
         public String getMetricMessage() {
