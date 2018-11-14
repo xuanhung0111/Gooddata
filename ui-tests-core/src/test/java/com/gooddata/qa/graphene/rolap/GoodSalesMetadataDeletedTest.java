@@ -47,6 +47,7 @@ import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
+import org.testng.ITestContext;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Attribute;
@@ -305,8 +306,8 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"group1"}, alwaysRun = true)
-    public void resetLDM() throws Throwable {
-        deleteProject(testParams.getProjectId());
+    public void resetLDM(ITestContext context) throws Throwable {
+        deleteProjectTearDown(context);
         createProject();
     }
 
