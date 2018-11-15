@@ -42,7 +42,9 @@ public class DeployProcessByGraphTest extends AbstractProcessTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void emptyInputErrorDeployment() {
-        DeployProcessForm deployForm = initDiscProjectDetailPage().clickDeployButton();
+        DeployProcessForm deployForm = initDiscProjectDetailPage()
+                .clickDeployButton()
+                .selectProcessType(DeployProcessForm.ProcessType.CLOUD_CONNECT);
 
         deployForm.submit();
         takeScreenshot(browser, "Package-input-shows-error", getClass());
@@ -67,6 +69,7 @@ public class DeployProcessByGraphTest extends AbstractProcessTest {
     public void deployInvalidPackageFile(File packageFile) throws IOException {
         DeployProcessForm deployForm = initDiscProjectDetailPage()
                 .clickDeployButton()
+                .selectProcessType(DeployProcessForm.ProcessType.CLOUD_CONNECT)
                 .inputPackageFile(packageFile);
 
         takeScreenshot(browser, "Error-shows-with-" + packageFile.getName(), getClass());
