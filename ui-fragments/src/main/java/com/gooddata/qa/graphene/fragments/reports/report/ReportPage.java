@@ -691,7 +691,7 @@ public class ReportPage extends AbstractFragment {
     }
 
     public SimpleMenu openOptionsMenu() {
-        waitForElementVisible(optionsButton).click();
+        waitForElementEnabled(optionsButton).click();
         return SimpleMenu.getInstance(browser);
     }
 
