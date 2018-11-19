@@ -148,7 +148,7 @@ public class InsightCompareToPreviousPeriodTest extends AbstractAnalyseTest {
                         DateGranularity.QUARTER.toString(), DateGranularity.YEAR.toString()));
 
         initAnalysePage().addDate().getAttributesBucket().changeGranularity(DateGranularity.WEEK_SUN_SAT);
-        assertFalse(analysisPage.addDateFilter().getFilterBuckets().openDateFilterPickerPanel().selectStaticPeriod()
+        assertFalse(analysisPage.getFilterBuckets().openDateFilterPickerPanel().selectStaticPeriod()
                 .isCompareTypeEnabled(CompareType.PREVIOUS_PERIOD), "Not apply week filter with previous period compare");
     }
 }
