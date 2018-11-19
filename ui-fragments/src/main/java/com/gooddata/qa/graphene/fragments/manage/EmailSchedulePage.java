@@ -80,11 +80,11 @@ public class EmailSchedulePage extends AbstractFragment {
     @FindBy(css = ".objectSelect .reports")
     private WebElement reportsSelector;
 
-    @FindBy(css = ".dashboards .picker .yui3-c-simpleColumn-window.loaded .c-checkBox")
-    private List<WebElement> dashboardsList;
+    @FindBy(css = ".dashboards .tabsPicker .yui3-c-simpleColumn-window.loaded .c-checkBox:not(.gdc-hidden)")
+    private List<WebElement> visibleDashboards;
 
-    @FindBy(css = ".reports .picker .yui3-c-simpleColumn-window.loaded .c-checkBox")
-    private List<WebElement> reportsList;
+    @FindBy(css = ".reports .picker .yui3-c-simpleColumn-window.loaded .c-checkBox:not(.gdc-hidden)")
+    private List<WebElement> visiblereports;
 
     @FindBy(css = ".reports .exportFormat .c-checkBox")
     private List<WebElement> formatsList;
@@ -285,13 +285,13 @@ public class EmailSchedulePage extends AbstractFragment {
         return this;
     }
 
-    public void scheduleNewReportEmail(List<String> emailsTo, String emailSubject, String emailBody, String reportName,
-            ExportFormat format) {
-        scheduleNewReportEmail(emailsTo, emailSubject, emailBody, reportName, format, null);
+    public void scheduleNewReportEmail(List<String> emailsTo, String emailSubject, String emailBody,
+                                       List<String> reportNames, ExportFormat format) {
+        scheduleNewReportEmail(emailsTo, emailSubject, emailBody, reportNames, format, null);
     }
 
-    public void scheduleNewReportEmail(List<String> emailsTo, String emailSubject, String emailBody, String reportName,
-            ExportFormat format, RepeatTime repeatTime) {
+    public void scheduleNewReportEmail(List<String> emailsTo, String emailSubject, String emailBody,
+                                       List<String> reportNames, ExportFormat format, RepeatTime repeatTime) {
         openNewSchedule()
             .changeEmailTo(emailsTo)
             .changeSubject(emailSubject)
@@ -300,7 +300,7 @@ public class EmailSchedulePage extends AbstractFragment {
         waitForEmailSchedulePageLoaded(browser);
         assertTrue(reportsSelector.getAttribute("class").contains("yui3-c-radiowidgetitem-selected"),
                 "Reports selector is not selected");
-        selectReport(reportName);
+        selectReports(reportNames);
         selectReportFormat(format);
         if (repeatTime != null) {
             changeTime(repeatTime);
@@ -475,38 +475,27 @@ public class EmailSchedulePage extends AbstractFragment {
     private EmailSchedulePage selectDashboards(List<String> dashboardNames) {
         dashboardNames.stream().forEach(dashboardName -> {
             searchDashboardItem(dashboardName);
-            waitForCollectionIsNotEmpty(dashboardsList);
-            if (dashboardsList != null && dashboardsList.size() > 0) {
-                for (WebElement elem : dashboardsList) {
-                    if (elem.findElement(By.tagName("label")).getText().equals(dashboardName)) {
-                        if (elem.findElement(By.tagName("input")).isSelected())
-                            return;
-                        elem.findElement(By.tagName("input")).click();
-                        return;
-                    }
-                }
-                fail("Requested dashboard wasn't found");
-            } else {
-                fail("No dashboards are available");
-            }
+            selectItem(visibleDashboards, dashboardName);
         });
         return this;
     }
 
-    private void selectReport(String reportName) {
-        searchReportItem(reportName);
-        waitForCollectionIsNotEmpty(reportsList);
-        if (reportsList != null && reportsList.size() > 0) {
-            for (WebElement elem : reportsList) {
-                if (elem.findElement(By.tagName("label")).getText().equals(reportName)) {
-                    elem.findElement(By.tagName("input")).click();
-                    return;
-                }
-            }
-            fail("Requested report wasn't found");
-        } else {
-            fail("No reports are available");
-        }
+    private void selectReports(List<String> reportNames) {
+        reportNames.stream().forEach(reportName -> {
+            searchReportItem(reportName);
+            selectItem(visiblereports, reportName);
+        });
+    }
+
+    private void selectItem(List<WebElement> list, String itemName) {
+        waitForCollectionIsNotEmpty(list);
+        list.stream().filter(item -> item.findElement(By.tagName("label")).getText().equals(itemName))
+                .map(item -> item.findElement(By.tagName("input")))
+                .findFirst().ifPresent(checkbox -> {
+                        if (!checkbox.isSelected()) {
+                            checkbox.click();
+                        }
+                });
     }
 
     private WebElement getScheduleLink(String scheduleName) {

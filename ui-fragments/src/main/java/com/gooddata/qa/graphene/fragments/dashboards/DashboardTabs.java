@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-import com.gooddata.qa.graphene.fragments.common.DropDown;
 import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;

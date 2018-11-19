@@ -22,7 +22,6 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 
 import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.scheduleEmail.ScheduleEmailRestRequest;
 import org.json.JSONException;
 import org.openqa.selenium.WebElement;
@@ -77,7 +76,7 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
     @Test(dependsOnMethods = {"signInImapUser"}, groups = {"schedules"})
     public void createReportSchedule() {
         initEmailSchedulesPage().scheduleNewReportEmail(singletonList(imapUser), reportTitle,
-                "Unsubscribe bcc test - report.", REPORT_ACTIVITIES_BY_TYPE,
+                "Unsubscribe bcc test - report.", singletonList(REPORT_ACTIVITIES_BY_TYPE),
                 ExportFormat.SCHEDULES_EMAIL_CSV, RepeatTime.DAILY);
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-report", this.getClass());

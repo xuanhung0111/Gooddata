@@ -88,7 +88,7 @@ public class GoodSalesReportStatisticsTest extends GoodSalesAbstractTest {
                 .saveDashboard();
 
         initEmailSchedulesPage().scheduleNewReportEmail(singletonList(testParams.getUser()), scheduleEmailSubject,
-                "report usage test", SIMPLE_REPORT, ExportFormat.PDF);
+                "report usage test", singletonList(SIMPLE_REPORT), ExportFormat.PDF);
 
         initReportsPage().openReport(SIMPLE_REPORT).showConfiguration().showMoreReportInfo();
         checkReportUsage(new ReportUsage(simpleDashboard, UsageLocation.DASHBOARD));
