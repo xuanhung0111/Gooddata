@@ -222,7 +222,7 @@ public class DrillingConfigPanel extends AbstractFragment {
             WebElement root = browser.findElements(SelectItemPopupPanel.LOCATOR).get(1);
             List<WebElement> elements = root.findElements(By.cssSelector(".gdc-overlay-simple:not(.hidden)" +
                     ":not(.yui3-overlay-hidden):not(.ember-view) div.yui3-c-container-content:not(.m9):not" +
-                    "(footer)"));
+                    "(.footer)"));
 
             for (WebElement element : elements) {
                 if (isElementVisible(element)) {
