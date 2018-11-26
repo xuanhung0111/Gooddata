@@ -26,6 +26,10 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.DateDimensionSelect;
 public class DateFilterPickerPanel extends AbstractFragment {
 
     public static final String STATIC_PERIOD_DROPDOWN_ITEM = "Static period";
+    public static final String FROM_DATE_CSS_SELECTOR = ".adi-date-input-from .input-text";
+    public static final String TO_DATE_CSS_SELECTOR = ".adi-date-input-to .input-text";
+    public static final String APPLY_BUTTON_CLASS_NAME = "s-date-filter-apply";
+    public static final String CANCEL_BUTTON_CLASS_NAME = "s-date-filter-cancel";
 
     @FindBy(className = "s-date-preset-button")
     private WebElement presetsDropdown;
@@ -33,10 +37,10 @@ public class DateFilterPickerPanel extends AbstractFragment {
     @FindBy(css = ".s-date-presets-list .gd-list-item")
     private List<WebElement> periods;
 
-    @FindBy(css = ".adi-date-input-from .input-text")
+    @FindBy(css = FROM_DATE_CSS_SELECTOR)
     private WebElement fromDate;
 
-    @FindBy(css = ".adi-date-input-to .input-text")
+    @FindBy(css = TO_DATE_CSS_SELECTOR)
     private WebElement toDate;
 
     @FindBy(css = ".adi-date-input-from > span")
@@ -45,10 +49,10 @@ public class DateFilterPickerPanel extends AbstractFragment {
     @FindBy(css = ".adi-date-input-to > span")
     private WebElement toDateCalendarIcon;
 
-    @FindBy(className = "s-date-filter-cancel")
+    @FindBy(className = CANCEL_BUTTON_CLASS_NAME)
     private WebElement cancelButton;
 
-    @FindBy(className = "s-date-filter-apply")
+    @FindBy(className = APPLY_BUTTON_CLASS_NAME)
     private WebElement applyButton;
 
     @FindBy(className = "s-compare-apply-measures-button")
@@ -140,6 +144,14 @@ public class DateFilterPickerPanel extends AbstractFragment {
         return waitForElementVisible(toDate).getAttribute("value");
     }
 
+    public Boolean isFromDateVisible() {
+        return isElementVisible(By.cssSelector(FROM_DATE_CSS_SELECTOR), getRoot());
+    }
+
+    public Boolean isToDateVisible() {
+        return isElementVisible(By.cssSelector(TO_DATE_CSS_SELECTOR), getRoot());
+    }
+
     public String getCompareApplyMeasuresText() {
         return waitForElementVisible(compareApplyMeasuresButton).getText();
     }
@@ -187,6 +199,19 @@ public class DateFilterPickerPanel extends AbstractFragment {
         waitForFragmentNotVisible(this);
     }
 
+    public void cancel() {
+        waitForElementVisible(cancelButton).click();
+        waitForFragmentNotVisible(this);
+    }
+
+    public Boolean isApplyButtonVisible() {
+        return isElementVisible(By.className(APPLY_BUTTON_CLASS_NAME), getRoot());
+    }
+
+    public Boolean isCancelButtonVisible() {
+        return isElementVisible(By.className(CANCEL_BUTTON_CLASS_NAME), getRoot());
+    }
+
     /**
      * applies given compareType on insight
      * @param compareType compare type to be applied
@@ -207,6 +232,10 @@ public class DateFilterPickerPanel extends AbstractFragment {
 
     public boolean isApplyButtonEnabled() {
         return !waitForElementVisible(applyButton).getAttribute("class").contains("disabled");
+    }
+
+    public boolean isCancelButtonEnabled() {
+        return !isElementDisabled(waitForElementVisible(cancelButton));
     }
 
     public void fillInDateRange(WebElement dateInput, String date) {
