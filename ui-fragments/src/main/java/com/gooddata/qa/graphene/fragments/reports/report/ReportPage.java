@@ -368,7 +368,7 @@ public class ReportPage extends AbstractFragment {
         if (filterCount == 0)
             return emptyList();
 
-        openFilterPanel();
+        openFilterPanel().waitForFilterContentLoading();
 
         return getElementTexts(waitForElementVisible(REPORT_FILTER_LOCATOR, browser)
             .findElements(cssSelector(".filterLinesContainer li span.text")));
