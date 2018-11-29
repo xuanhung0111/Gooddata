@@ -679,7 +679,7 @@ public class GoodSalesAdvancedConnectingFilterTest extends GoodSalesAbstractTest
     }
 
     private TableReport getReport() {
-        return dashboardsPage.getReport(REPORT, TableReport.class);
+        return dashboardsPage.getReport(REPORT, TableReport.class).waitForLoaded();
     }
 
     private FilterWidget getDateCreatedFilter() {
