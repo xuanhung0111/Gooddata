@@ -41,6 +41,9 @@ public class DashboardAddWidgetPanel extends AbstractFragment {
     @FindBy(css = ".c-geoConfiguration input")
     private List<WebElement> listGeoLayerCheckbox;
 
+    @FindBy(css = ".configPanel-views .metricRow .gdc-wheelSmall")
+    private WebElement dimensionsLoadingWheel;
+
     private static final String widgetLocator =
             "//div[contains(@class,'yui3-c-adddashboardwidgetpickerpanel')]//div[contains(@class,'add-dashboard-item')]/div[contains(text(), '${widgetLabel}')]/../button";
     private static final String widgetMetricLocator =
@@ -60,6 +63,7 @@ public class DashboardAddWidgetPanel extends AbstractFragment {
         By metricInWidget = By.xpath(widgetMetricLocator.replace("${metricLabel}", metricLabel));
         waitForElementVisible(metricInWidget, browser).click();
         sleepTightInSeconds(3);
+        waitForElementNotVisible(dimensionsLoadingWheel);
     }
 
     public void addWidget(WidgetTypes type, String metricLabel) {
