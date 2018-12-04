@@ -329,10 +329,11 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
     public void testDrillToStrictAccessDashboardTab() throws JSONException, IOException {
         Dashboard dashboard = initDashboardHavingNoFilterInSourceTab();
         String dashboardUri = dashboardRequest.createDashboard(dashboard.getMdObject());
-        String sacDashboardUri = dashboardRequest.createDashboard(initDashboardHavingOneTab().getMdObject());
+        Dashboard sacDashboard = initDashboardHavingOneTab();
+        String sacDashboardUri = dashboardRequest.createDashboard(sacDashboard.getMdObject());
         try {
-            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + DASHBOARD_PAGE_SUFFIX + "|" + sacDashboardUri);
-            waitForDashboardPageLoaded(browser);
+            initDashboardsPage().selectDashboard(sacDashboard.getName());
+            TableReport tableReport = dashboardsPage.getReport(REPORT_AMOUNT_BY_PRODUCT, TableReport.class).waitForLoaded();
 
             final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
             permissionsDialog.publish(PublishType.SELECTED_USERS);
@@ -343,16 +344,14 @@ public class DrillToDashboardTabTest extends GoodSalesAbstractTest {
             dashboardsPage.getTabs().getTab(SOURCE_TAB).open();
             dashboardsPage.editDashboard();
 
-            TableReport tableReport = dashboardsPage.getReport(REPORT_AMOUNT_BY_PRODUCT, TableReport.class);
             tableReport.addDrilling(Pair.of(singletonList(ATTR_PRODUCT), TAB_ANOTHER_DASHBOARD), DASHBOARD_DRILLING_GROUP);
 
             dashboardsPage.saveDashboard();
 
             logoutAndLoginAs(false, UserRoles.EDITOR);
 
-            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + DASHBOARD_PAGE_SUFFIX + "|" + dashboardUri);
-            waitForDashboardPageLoaded(browser);
-            tableReport.drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
+            initDashboardsPage().selectDashboard(dashboard.getName());
+            tableReport.waitForLoaded().drillOnFirstValue(CellType.ATTRIBUTE_VALUE);
 
             dashboardsPage.getContent().getLatestReport(TableReport.class).waitForLoaded();
             StatusBar statusBar = StatusBar.getInstance(browser);
