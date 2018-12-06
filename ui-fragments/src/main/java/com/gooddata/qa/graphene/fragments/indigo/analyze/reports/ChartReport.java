@@ -5,10 +5,9 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.CssUtils.isShortendTilteDesignByCss;
+import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -60,21 +59,15 @@ public class ChartReport extends AbstractFragment {
     private static final By BY_Y_AXIS_TITLE = By.className("highcharts-yaxis-title");
 
     public boolean isColumnHighlighted(Pair<Integer, Integer> position) {
-        WebElement element = getColumnElement(position);
+        WebElement element = getTracker(position.getLeft(), position.getRight());
         final String fillBeforeHover = element.getAttribute("fill");
         getActions().moveToElement(element).moveByOffset(1, 1).perform();
         final String fillAfterHover = element.getAttribute("fill");
         return !Objects.equals(fillAfterHover, fillBeforeHover);
     }
 
-    public WebElement getColumnElement(Pair<Integer, Integer> position) {
-        List<WebElement> list = waitForCollectionIsNotEmpty(getRoot()
-                .findElements(By.cssSelector(String.format(".highcharts-series-%s rect", position.getLeft()))));
-        return list.get(position.getRight());
-    }
-
     public void clickOnElement(Pair<Integer, Integer> position) {
-        WebElement element = getColumnElement(position);
+        WebElement element = getTracker(position.getLeft(), position.getRight());
         // Because geckodriver follows W3C and moves the mouse pointer from the centre of the screen,
         // Move the mouse pointer to the top-left corner of the fragment before moving to the specific Element
         ElementUtils.moveToElementActions(getRoot(), 0, 0).moveToElement(element)
@@ -88,6 +81,7 @@ public class ChartReport extends AbstractFragment {
         getActions().moveToElement(element).moveByOffset(1, 1).click().perform();
     }
 
+    //Some type charts don't exist legend will return Zero
     public int getLegendIndex(String legendName) {
         List<WebElement> elements = getRoot()
                 .findElements(By.className("series-item"));
@@ -98,6 +92,7 @@ public class ChartReport extends AbstractFragment {
         return texts.indexOf(legendName);
     }
 
+    //Some type charts don't exist axis will return empty
     public String getYaxisTitle() {
         List<WebElement> yAxisTitle = getRoot().findElements(BY_Y_AXIS_TITLE);
         if (yAxisTitle.isEmpty()) {
@@ -106,6 +101,7 @@ public class ChartReport extends AbstractFragment {
         return yAxisTitle.get(0).getText();
     }
 
+    //Some type charts don't exist axis will return empty
     public String getXaxisTitle() {
         List<WebElement> xAxisTitle = getRoot().findElements(BY_X_AXIS_TITLE);
         if (xAxisTitle.isEmpty()) {
@@ -124,6 +120,10 @@ public class ChartReport extends AbstractFragment {
             .map(Integer::parseInt)
             .filter(i -> i > 0)
             .count();
+    }
+
+    public int getMarkersCount() {
+        return waitForCollectionIsNotEmpty(markers).size();
     }
 
     public List<List<String>> getTooltipTextOnTrackerByIndex(int index) {
@@ -194,21 +194,6 @@ public class ChartReport extends AbstractFragment {
                 .get();
     }
 
-    private void checkIndex(int index) {
-        if (index < 0 || index >= trackers.size()) {
-            throw new IndexOutOfBoundsException();
-        }
-    }
-
-    private List<List<String>> getTooltipText() {
-        List<List<String>> result = new ArrayList<List<String>>();
-        for (WebElement row : tooltip.findElements(By.cssSelector("tr"))) {
-            result.add(Arrays.asList(row.findElement(By.cssSelector(".title")).getText(),
-                                     row.findElement(By.cssSelector(".value")).getText()));
-        }
-        return result;
-    }
-
     private boolean isLineChart() {
         return getRoot().getAttribute("class").contains("visualization-line");
     }
@@ -221,11 +206,31 @@ public class ChartReport extends AbstractFragment {
     }
 
     private void displayTooltipOnTrackerByIndex(int index) {
-        waitForCollectionIsNotEmpty(trackers);
         checkIndex(index);
         getActions().moveToElement(trackers.get(index)).moveByOffset(1, 1).perform();
         if (isLineChart())
             waitForElementVisible(markers.get(index)).click();
         waitForElementVisible(tooltip);
+    }
+
+    private List<List<String>> getTooltipText() {
+        return waitForCollectionIsNotEmpty(tooltip.findElements(By.cssSelector("tr"))).stream()
+                .map(row -> asList(row.findElement(By.cssSelector(".title")).getText(),
+                        row.findElement(By.cssSelector(".value")).getText()))
+                .collect(Collectors.toList());
+    }
+
+    private void checkIndex(int index) {
+        waitForCollectionIsNotEmpty(trackers);
+        if (index < 0 || index >= trackers.size()) {
+            throw new IndexOutOfBoundsException();
+        }
+    }
+
+    private WebElement getTracker(int xAxis, int yAxis) {
+        List<WebElement> list = waitForCollectionIsNotEmpty(getRoot()
+                .findElements(By.cssSelector(String.format(".highcharts-series-%s.highcharts-tracker rect," +
+                        ".highcharts-series-%s.highcharts-tracker path", xAxis, xAxis))));
+        return list.get(yAxis);
     }
 }
