@@ -3,7 +3,9 @@ package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.tagName;
 
 import org.openqa.selenium.By;
@@ -12,9 +14,16 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
+import java.util.List;
+
 public class Widget extends AbstractFragment {
 
     public static final By HINT_LOCATOR = By.cssSelector(".gd-editable-label:hover");
+    public static final String LEGEND_ITEM = ".viz-legend .series .series-item";
+    public static final String LEGEND_ITEM_NAME = LEGEND_ITEM + " .series-name";
+
+    @FindBy(css = LEGEND_ITEM_NAME)
+    private List<WebElement> legendNames;
 
     @FindBy(className = "dash-item-content")
     private WebElement content;
@@ -30,6 +39,12 @@ public class Widget extends AbstractFragment {
 
     @FindBy(css = ".item-headline .s-editable-label textarea")
     private WebElement headlineTextarea;
+
+    public List<String> getLegends() {
+        return waitForCollectionIsNotEmpty(legendNames).stream()
+                .map(e -> e.getText())
+                .collect(toList());
+    }
 
     public String getHeadline() {
         return waitForElementVisible(headline).getText().replace("\n", " ");

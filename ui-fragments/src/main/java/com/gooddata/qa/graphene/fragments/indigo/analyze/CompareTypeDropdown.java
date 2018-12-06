@@ -2,11 +2,17 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze;
 
 import com.gooddata.qa.graphene.fragments.common.AbstractReactDropDown;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 /**
  * Fragment representing dropdown of compare types of date filter
  */
 public class CompareTypeDropdown extends AbstractReactDropDown {
+
+    @FindBy(className = "s-compare-apply-incompatible")
+    private WebElement messageCompareApplyIncompatible;
 
     @Override
     protected String getDropdownCssSelector() {
@@ -26,6 +32,10 @@ public class CompareTypeDropdown extends AbstractReactDropDown {
     public void selectCompareType(final String compareType) {
         selectByName(compareType);
         ensureDropdownClosed();
+    }
+
+    public String getMessageCompareApplyIncompatible() {
+        return waitForElementVisible(messageCompareApplyIncompatible).getText();
     }
 
     /**

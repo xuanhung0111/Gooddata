@@ -38,4 +38,10 @@ public class MetricsBucket extends AbstractBucket {
             .map(MetricConfiguration::getHeader)
             .collect(toList());
     }
+
+    public List<String> getItemHeaderAndSequenceNumber() {
+        return metrics.stream()
+                .map(MetricConfiguration::getHeaderAndSequenceNumber)
+                .collect(toList());
+    }
 }

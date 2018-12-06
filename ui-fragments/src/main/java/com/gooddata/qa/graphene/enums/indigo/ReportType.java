@@ -21,7 +21,9 @@ public enum ReportType {
         }
     },
 
-    BAR_CHART("bar");
+    HEAD_LINE("headline"),
+    BAR_CHART("bar"),
+    STACKED_AREA_CHART("area");
 
     private String label;
 

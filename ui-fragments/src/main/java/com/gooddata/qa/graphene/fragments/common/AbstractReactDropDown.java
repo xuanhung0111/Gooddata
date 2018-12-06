@@ -3,10 +3,15 @@ package com.gooddata.qa.graphene.fragments.common;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.scrollElementIntoView;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementDisabled;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
+import static java.util.stream.Collectors.toList;
+import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 
 import java.util.Collection;
@@ -20,6 +25,7 @@ import org.openqa.selenium.WebElement;
 
 public abstract class AbstractReactDropDown extends AbstractDropDown {
 
+    private static final String IS_SELECTED = "is-selected";
     private static final String DISABLED_CLASS = "disabled";
     private static final String IS_LOADING_CLASS = "s-isLoading";
 
@@ -51,6 +57,21 @@ public abstract class AbstractReactDropDown extends AbstractDropDown {
         return this;
     }
 
+    public boolean isApplyButtonEnabled() {
+        return !isElementDisabled(waitForElementVisible(className("s-apply"), getPanelRoot()));
+    }
+
+    public Boolean isItemSelected(String nameItem) {
+        return waitForCollectionIsNotEmpty(getElements()).stream()
+                .filter(e -> e.getText().equals(nameItem))
+                .map(e -> e.getAttribute("class").contains(IS_SELECTED))
+                .findFirst().get();
+    }
+
+    public Collection<String> getTitleItems() {
+        return getElementTitles(getElements());
+    }
+
     public boolean isDropdownOpen() {
         String enabledButtonCSSSelector = getDropdownButtonCssSelector() + ":not(." + DISABLED_CLASS + ")";
         waitForElementVisible(By.cssSelector(enabledButtonCSSSelector), getRoot());
@@ -76,8 +97,13 @@ public abstract class AbstractReactDropDown extends AbstractDropDown {
     }
 
     protected void toggleDropdown() {
-        waitForElementVisible(By.cssSelector(getDropdownButtonCssSelector()), getRoot())
-                .click();
+        if (isDropdownButtonEnabled()) {
+            waitForElementVisible(By.cssSelector(getDropdownButtonCssSelector()), getRoot()).click();
+        }
+    }
+
+    public Boolean isDropdownButtonEnabled() {
+        return !isElementDisabled(waitForElementVisible(getDropdownButton()));
     }
 
     public AbstractReactDropDown selectByName(String name) {
@@ -145,5 +171,11 @@ public abstract class AbstractReactDropDown extends AbstractDropDown {
 
     protected String getNoMatchingDataMessageCssSelector() {
         return ".gd-no-matching-data";
+    }
+
+    private static List<String> getElementTitles(Collection<WebElement> elements) {
+        return elements.stream()
+                .map(name -> name.getAttribute("title"))
+                .collect(toList());
     }
 }
