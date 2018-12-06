@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -9,8 +10,10 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.openqa.selenium.By.className;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
@@ -86,9 +89,15 @@ public class SavedViewWidget extends AbstractFragment{
     }
 
     public SavedViewWidget openSavedViewMenu() {
+        By loadingIcon = className("loading");
         waitForElementVisible(this.getRoot()).click();
         waitForElementVisible(savedViewPopupMenu.getRoot());
-        waitForElementNotPresent(By.className("loading"));
+        try {
+            waitForElementVisible(loadingIcon, getRoot(), 1);
+            waitForElementNotPresent(loadingIcon);
+        } catch (TimeoutException e) {
+            //SavedViewMenu already loaded so WebDriver unable to catch the loading indicator
+        }
         return this;
     }
 
