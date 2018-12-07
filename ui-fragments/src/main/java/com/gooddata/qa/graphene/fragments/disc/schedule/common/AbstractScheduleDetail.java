@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static java.lang.Integer.parseInt;
@@ -35,6 +36,7 @@ public class AbstractScheduleDetail extends AbstractScheduleFragment {
     private static final By LOCATOR = By.className("ait-schedule-detail-fragment");
     private static final By BY_DISABLE_BUTTON = By.className("ait-schedule-disable-btn");
     private static final By BY_NAME_INPUT = By.cssSelector(".ait-schedule-title-field input");
+    private static final By BY_ICON_REFRESH = By.className("icon-refresh");
 
     @FindBy(className = "s-btn-run")
     protected WebElement runButton;
@@ -146,9 +148,12 @@ public class AbstractScheduleDetail extends AbstractScheduleFragment {
     public AbstractScheduleDetail saveChanges() {
         clickSaveButton();
 
+        if (isElementPresent(BY_ICON_REFRESH, getRoot())) {
+            waitForElementNotPresent(BY_ICON_REFRESH, getRoot());
+        }
+
         Function<WebDriver, Boolean> saved = browser -> !findSaveButtonsGroup().isPresent();
         Graphene.waitGui().until(saved);
-
         return this;
     }
 
