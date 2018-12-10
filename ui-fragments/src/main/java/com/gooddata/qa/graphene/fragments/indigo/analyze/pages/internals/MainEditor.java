@@ -36,6 +36,7 @@ public class MainEditor extends AbstractFragment {
     private static final String CSS_REPORT_EMPTY = ".s-blank-canvas-message";
     private static final String WARNING_UNSUPPORTED_MESSAGE_CLASS_NAME = "s-unsupported-bucket-items-warning";
     private static final By BY_TABLE_REPORT = By.className("indigo-table-component-content");
+    private static final By BY_PIVOT_TABLE_REPORT = By.className("s-pivot-table");
     private static final By BY_CHART_REPORT = By.className("adi-report-visualization");
     private static final By BY_REPORT_COMPUTING = By.className("adi-computing");
     private static final By BY_REPORT_NO_DATA = By.className("s-error-empty-result");
@@ -51,6 +52,11 @@ public class MainEditor extends AbstractFragment {
     public TableReport getTableReport() {
         return Graphene.createPageFragment(TableReport.class,
                 waitForElementVisible(BY_TABLE_REPORT, browser));
+    }
+
+    public TableReport getPivotTableReport() {
+        return Graphene.createPageFragment(TableReport.class,
+                waitForElementVisible(BY_PIVOT_TABLE_REPORT, browser));
     }
 
     public ChartReport getChartReport() {

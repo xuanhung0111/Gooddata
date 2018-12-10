@@ -333,6 +333,10 @@ public class AnalysisPage extends AbstractFragment {
         return getMainEditor().getTableReport();
     }
 
+    public TableReport getPivotTableReport() {
+        return getMainEditor().getPivotTableReport();
+    }
+
     public ChartReport getChartReport() {
         return getMainEditor().getChartReport();
     }
