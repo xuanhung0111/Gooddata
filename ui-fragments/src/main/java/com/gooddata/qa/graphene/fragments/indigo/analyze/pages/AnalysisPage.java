@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages;
 
+import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
@@ -23,6 +24,7 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.Arrays;
@@ -113,7 +115,7 @@ public class AnalysisPage extends AbstractFragment {
         startDrag(source);
         try {
             if (!waitForElementVisible(target).getAttribute("class").contains("adi-droppable-active")) {
-                getActions().moveToElement(target).perform();
+                moveToBottomDropLineOfElement(target);
                 return this;
             }
 
@@ -438,5 +440,22 @@ public class AnalysisPage extends AbstractFragment {
     private AttributeFilterPickerPanel openFilterPanel(String filter) {
         getFilterBuckets().getFilter(filter).click();
         return AttributeFilterPickerPanel.getInstance(browser);
+    }
+
+    private void moveToBottomDropLineOfElement(WebElement target) {
+        String browserName = ((RemoteWebDriver) BrowserUtils.getBrowserContext()).getCapabilities()
+                .getBrowserName().toLowerCase();
+
+        Function<WebDriver, Boolean> droppable = browser -> {
+            if ("chrome".equals(browserName)) {
+                getActions().moveToElement(target, 1, target.getSize().height / 2 + 1).perform();
+            } else {
+                getActions().moveToElement(target).perform();
+            }
+            
+            return isElementPresent(By.className("adi-drop-line-bottom"), getRoot());
+        };
+
+        Graphene.waitGui().until(droppable);
     }
 }

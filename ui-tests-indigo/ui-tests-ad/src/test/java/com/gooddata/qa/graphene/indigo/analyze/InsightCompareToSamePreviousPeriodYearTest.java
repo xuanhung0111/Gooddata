@@ -21,7 +21,6 @@ import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.testng.annotations.Test;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
