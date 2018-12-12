@@ -1,10 +1,10 @@
-FROM harbor.intgdc.com/base/gdc-base-centos:7.5.1804
+FROM harbor.intgdc.com/base/gdc-base-centos:27f4627
 
 ARG GIT_COMMIT=unspecified
 LABEL image_name="Graphene Firefox Image"
 LABEL maintainer="ATT Scrum <lhv-auto@gooddata.com>"
 LABEL git_repository_url="https://github.com/gooddata/graphene-tests"
-LABEL parent_image="harbor.intgdc.com/base/gdc-base-centos:7.5.1804"
+LABEL parent_image="harbor.intgdc.com/base/gdc-base-centos:27f4627"
 LABEL git_commit=$GIT_COMMIT
 
 ARG BROWSER_VERSION=60.0.1

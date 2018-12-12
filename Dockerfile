@@ -1,10 +1,10 @@
-FROM harbor.intgdc.com/base/gdc-base-centos:latest
+FROM harbor.intgdc.com/base/gdc-base-centos:27f4627
 
 ARG GIT_COMMIT=unspecified
 LABEL image_name="Checklist xvfb image based on CentOS-7"
 LABEL maintainer="ATT Scrum <lhv-auto@gooddata.com>"
 LABEL git_repository_url="https://github.com/gooddata/graphene-tests"
-LABEL parent_image="harbor.intgdc.com/base/gdc-base-centos:latest"
+LABEL parent_image="harbor.intgdc.com/base/gdc-base-centos:27f4627"
 LABEL git_commit=$GIT_COMMIT
 
 ARG CHROME_VERSION=67.0.3396.79-1
