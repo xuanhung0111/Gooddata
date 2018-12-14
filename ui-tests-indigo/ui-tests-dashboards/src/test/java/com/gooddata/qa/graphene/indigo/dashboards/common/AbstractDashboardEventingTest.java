@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_ACTIVITY_TYPE;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED;
@@ -186,7 +187,8 @@ public class AbstractDashboardEventingTest extends AbstractDashboardTest {
     protected JSONObject getLatestPostMessageObj() {
         String contentStr = getLoggerContent();
         log.info(contentStr);
-        return new JSONObject(contentStr);
+        return Stream.of(contentStr.split("\n"))
+                .map(JSONObject::new).filter(jsonObject -> jsonObject.getString("name").equals("drill")).findFirst().get();
     }
 
     protected String createAnalyticalDashboardWithWidget(String dashboardTitle, String widget) throws IOException {
