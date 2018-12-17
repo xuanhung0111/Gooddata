@@ -404,6 +404,9 @@ public class EmailSchedulePage extends AbstractFragment {
                     selectCheckbox(ele.findElement(checkboxLocator));
                 }
                 break;
+            case SCHEDULES_EMAIL_INLINE_MESSAGE:
+                selectCheckbox(formatsList.get(0).findElement(checkboxLocator));
+                break;
             case PDF:
                 selectCheckbox(formatsList.get(1).findElement(checkboxLocator));
                 break;

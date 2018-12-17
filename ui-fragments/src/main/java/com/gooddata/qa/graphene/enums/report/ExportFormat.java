@@ -13,6 +13,7 @@ public enum ExportFormat {
     DASHBOARD_PDF("pdf", "Export to PDF"),
     DASHBOARD_XLSX("xlsx", "Export to XLSX..."),
     SCHEDULES_EMAIL_EXCEL_XLSX("xlsx", "Excel (XLSX)"),
+    SCHEDULES_EMAIL_INLINE_MESSAGE("inlineMessage", "Inline message"),
     ALL("all", "Used for schedules...");
 
     private final String name;
