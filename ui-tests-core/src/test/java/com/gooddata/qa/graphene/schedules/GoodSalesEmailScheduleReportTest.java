@@ -6,6 +6,7 @@ import com.gooddata.md.report.Filter;
 import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.MetricElement;
 import com.gooddata.qa.graphene.enums.DateRange;
+import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
@@ -21,11 +22,13 @@ import javax.mail.MessagingException;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
+import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_DEPARTMENT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_MONTH_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_PRODUCT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
@@ -36,9 +39,13 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPE
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPPORTUNITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_ACTIVITY_LEVEL;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_AMOUNT_BY_STAGE_NAME;
+import static com.gooddata.qa.utils.mail.ImapUtils.getLastEmail;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -312,6 +319,29 @@ public class GoodSalesEmailScheduleReportTest extends AbstractGoodSalesEmailSche
                 "924", "942", "317", "355", "336", "320", "322", "327", "109", "130", "130", "955", "989", "1,005",
                 "342", "381", "353", "371", "373", "374", "126", "146", "147", "1,046", "1,079", "1,103", "373",
                 "420", "388", "Page 6/6"));
+    }
+
+    @Test(dependsOnMethods = "signInImapUser")
+    public void sendScheduleReportHasOnlyAttribute() throws IOException, MessagingException {
+        String reportHasAttribute = "Report has only attribute";
+        createReport(GridReportDefinitionContent.create(reportHasAttribute,
+                Collections.emptyList(),
+                singletonList(new AttributeInGrid(getAttributeByTitle(ATTR_DEPARTMENT))),
+                Collections.emptyList()));
+        String emailSubject = reportHasAttribute + identification;
+        initEmailSchedulesPage().scheduleNewReportEmail(singletonList(imapUser), emailSubject,
+                "Scheduled email test - reports.",
+                singletonList(reportHasAttribute), ExportFormat.SCHEDULES_EMAIL_INLINE_MESSAGE);
+        updateRecurrencyString(commonRestRequest.getLastScheduleUri());
+        today = DateRange.getCurrentDate();
+        Message message = waitForScheduleMessages(emailSubject, 1).get(0);
+        final String messageSubject = doActionWithImapClient(imapClient ->
+                getLastEmail(imapClient, GDEmails.NOREPLY, emailSubject, 1).getSubject());
+        final String messageBody = doActionWithImapClient(imapClient ->
+                getLastEmail(imapClient, GDEmails.NOREPLY, emailSubject, 1).getBody());
+        assertEquals(getNumberOfPartsFrom(message), 0);
+        assertThat(messageSubject, not(containsString("Scheduled e-mail failed")));
+        assertThat(messageBody, containsString(reportHasAttribute));
     }
 
     private String createReportAppliesFilter(Filter filter) {

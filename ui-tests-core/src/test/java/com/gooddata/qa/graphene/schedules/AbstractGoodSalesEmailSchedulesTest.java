@@ -150,7 +150,7 @@ public class AbstractGoodSalesEmailSchedulesTest extends AbstractEmbeddedModeTes
                 MimeUtility.decodeText(findPartByFileName(parts, "application/pdf", prefixName).getFileName()));
     }
 
-    private void saveMessageAttachments(List<Message> messages) throws MessagingException, IOException {
+    private void saveMessageAttachments(List<Message> messages) {
         System.out.println("Saving message ...");
         for (Message message : messages) {
             ImapUtils.saveMessageAttachments(message, attachmentsDirectory);
