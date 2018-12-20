@@ -36,7 +36,8 @@ public class DateFiltersTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void should_not_be_possible_to_add_second_date_to_filter_bucket() {
         assertEquals(initAnalysePage().addDateFilter()
-                .addDateFilter() // try to drag a second date filter
+                // try to drag a second date filter
+                .tryToDrag(analysisPage.getCataloguePanel().getDate(), analysisPage.getFilterBuckets().getInvitation())
                 .getFilterBuckets()
                 .getFiltersCount(), 1);
     }
