@@ -85,6 +85,12 @@ public class AnalysisPage extends AbstractFragment {
                 waitForElementVisible(className(MAIN_CLASS), context));
     }
 
+    public AnalysisPage tryToDrag(WebElement source, WebElement target) {
+        startDrag(source);
+        getActions().moveToElement(target).release().perform();
+        return this;
+    }
+
     public AnalysisPage startDrag(WebElement source) {
         WebElement editor = waitForElementVisible(getRoot());
 

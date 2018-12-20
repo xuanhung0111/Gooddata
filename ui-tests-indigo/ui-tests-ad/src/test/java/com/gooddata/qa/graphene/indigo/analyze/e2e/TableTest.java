@@ -219,7 +219,7 @@ public class TableTest extends AbstractAdE2ETest {
     public void should_not_be_possible_to_drag_more_than_one_attribute_to_bar__view_by() {
         assertEquals(initAnalysePage().changeReportType(ReportType.BAR_CHART)
             .addAttribute(ATTR_ACTIVITY_TYPE)
-            .drag(analysisPage.getCataloguePanel().searchAndGet(ATTR_ACCOUNT, FieldType.ATTRIBUTE),
+            .tryToDrag(analysisPage.getCataloguePanel().searchAndGet(ATTR_ACCOUNT, FieldType.ATTRIBUTE),
                     analysisPage.getAttributesBucket().getRoot())
             .getAttributesBucket()
             .getItemNames()

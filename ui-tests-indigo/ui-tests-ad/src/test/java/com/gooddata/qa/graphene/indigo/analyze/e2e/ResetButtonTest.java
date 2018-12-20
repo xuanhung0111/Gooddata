@@ -55,8 +55,9 @@ public class ResetButtonTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"})
     public void should_stay_clear_when_dragged_to_a_non_accepting_bucket() {
         // The category bucket DOES NOT accept a metric
-        assertTrue(initAnalysePage().drag(analysisPage.getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC),
-                analysisPage.getAttributesBucket().getInvitation())
+        assertTrue(initAnalysePage()
+                .tryToDrag(analysisPage.getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC),
+                        analysisPage.getAttributesBucket().getInvitation())
                 .isBlankState());
     }
 

@@ -9,6 +9,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
@@ -58,7 +59,9 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
         analysisPage.getFilterBuckets().getFilter(ATTR_ACTIVITY_TYPE);
 
         // try to drag a duplicate attribute filter
-        assertTrue(analysisPage.addFilter(ATTR_ACTIVITY_TYPE)
+        WebElement attribute = analysisPage.getCataloguePanel()
+                .searchAndGet(ATTR_ACTIVITY_TYPE, FieldType.ATTRIBUTE);
+        assertTrue(analysisPage.tryToDrag(attribute, analysisPage.getStacksBucket().getInvitation())
             .removeFilter(ATTR_ACTIVITY_TYPE)
             .getFilterBuckets()
             .isEmpty());
@@ -73,7 +76,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
             .getFilterBuckets()
             .isEmpty());
 
-        assertTrue(analysisPage.drag(analysisPage.getAttributesBucket().getFirst(),
+        assertTrue(analysisPage.tryToDrag(analysisPage.getAttributesBucket().getFirst(),
                 analysisPage.getFilterBuckets().getInvitation())
             .getFilterBuckets()
             .isEmpty());
