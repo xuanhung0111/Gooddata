@@ -47,7 +47,7 @@ public class TrashTest extends AbstractAdE2ETest {
             .getPageHeader()
             .isResetButtonEnabled());
 
-        assertEquals(analysisPage.drag(analysisPage.getMetricsBucket().get(METRIC_NUMBER_OF_ACTIVITIES),
+        assertEquals(analysisPage.tryToDrag(analysisPage.getMetricsBucket().get(METRIC_NUMBER_OF_ACTIVITIES),
                 analysisPage.getPageHeader().getResetButton())
             .getMetricsBucket()
             .getItemNames(), asList(METRIC_NUMBER_OF_ACTIVITIES));

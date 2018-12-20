@@ -81,11 +81,11 @@ public class BucketsTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"createProject"}, description = "covered by TestCafe")
     public void test_stack_bucket_should_accept_only_attributes() {
         WebElement metric = initAnalysePage().getCataloguePanel().searchAndGet(METRIC_NUMBER_OF_ACTIVITIES, FieldType.METRIC);
-        analysisPage.drag(metric, analysisPage.getStacksBucket().getInvitation());
+        analysisPage.tryToDrag(metric, analysisPage.getStacksBucket().getInvitation());
         assertTrue(analysisPage.getStacksBucket().isEmpty(), "Stacks bucket should be empty");
 
         WebElement date = analysisPage.getCataloguePanel().getDate();
-        analysisPage.drag(date, analysisPage.getStacksBucket().getInvitation());
+        analysisPage.tryToDrag(date, analysisPage.getStacksBucket().getInvitation());
         assertTrue(analysisPage.getStacksBucket().isEmpty(), "Stacks bucket should be empty");
 
         assertFalse(analysisPage.addStack(ATTR_ACTIVITY_TYPE).getStacksBucket().isEmpty(),
@@ -153,7 +153,7 @@ public class BucketsTest extends AbstractAdE2ETest {
         initAnalysePage().addDate()
             .addStack(ATTR_ACTIVITY_TYPE)
             // Drag date to stack by
-            .drag(analysisPage.getAttributesBucket().getFirst(), analysisPage.getStacksBucket().get());
+            .tryToDrag(analysisPage.getAttributesBucket().getFirst(), analysisPage.getStacksBucket().get());
 
         assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(DATE));
         assertEquals(analysisPage.getStacksBucket().getAttributeName(), ATTR_ACTIVITY_TYPE);
