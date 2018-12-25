@@ -1,8 +1,11 @@
 package com.gooddata.qa.graphene.indigo.analyze.eventing;
 
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.EmbeddedAnalysisPage;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractEventingTest;
+import com.gooddata.qa.utils.http.RestClient;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -495,6 +498,53 @@ public class EventingBasicTest extends AbstractEventingTest {
         assertEquals(intersection.getJSONObject(0).get("title"), String.format("Sum of %s", FACT_AMOUNT));
         assertEquals(intersection.getJSONObject(0).getJSONObject("header").get("identifier"), "");
     }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void eventingPivotTableReportSingleMetric() throws IOException {
+        try {
+            setPivotFlag(true);
+            String insightUri = createInsight("single_metric_pivot_table_insight", TABLE,
+                    Arrays.asList(METRIC_NUMBER_OF_ACTIVITIES), Collections.emptyList());
+            final String activityUri = getMetricByTitle(METRIC_NUMBER_OF_ACTIVITIES).getUri();
+            final JSONArray uris = new JSONArray() {{
+                put(activityUri);
+            }};
+            final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+            EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+            embeddedAnalysisPage.waitForReportComputing();
+
+            cleanUpLogger();
+            embeddedAnalysisPage.getPivotTableReport().getPivotCellElement(METRIC_NUMBER_OF_ACTIVITIES, 0).click();
+            JSONObject content = getLatestPostMessageObj();
+            verifyTableReport(content, METRIC_NUMBER_OF_ACTIVITIES, activityUri);
+        } finally {
+            setPivotFlag(false);
+        }
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void eventingPivotTableReportSingleAttribute() throws IOException {
+        try {
+            setPivotFlag(true);
+            String insightUri = createInsight("single_attribute_pivot_table_insight", TABLE, Collections.emptyList(),
+                    Arrays.asList(ATTR_STAGE_NAME));
+            final String stageUri = getAttributeByTitle(ATTR_STAGE_NAME).getDefaultDisplayForm().getUri();
+            final JSONArray uris = new JSONArray() {{
+                put(stageUri);
+            }};
+            final String file = createTemplateHtmlFile(getObjectIdFromUri(insightUri), uris.toString());
+            EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
+            embeddedAnalysisPage.waitForReportComputing();
+
+            cleanUpLogger();
+            embeddedAnalysisPage.getPivotTableReport().getPivotCellElement(ATTR_STAGE_NAME, 0).click();
+            JSONObject content = getLatestPostMessageObj();
+            verifyTableReport(content, ATTR_STAGE_NAME, stageUri);
+        } finally {
+            setPivotFlag(false);
+        }
+    }
+
     private void verifyColumnIntersection(JSONObject intersection, String expectedTitle, String expectedUri) {
         String uri = intersection.getJSONObject("header").getString("uri");
         String title = intersection.getString("title");
@@ -522,5 +572,10 @@ public class EventingBasicTest extends AbstractEventingTest {
         assertEquals(drillContext.getString("element"), "cell");
         assertEquals(uri, expectedUri);
         assertEquals(title, columnTitle);
+    }
+
+    private void setPivotFlag(boolean status) {
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+                .setFeatureFlagInProject(ProjectFeatureFlags.ENABLE_PIVOT_TABLE, status);
     }
 }

@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.reports;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+import com.gooddata.qa.graphene.utils.ElementUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -34,8 +35,14 @@ public class TableReport extends AbstractFragment {
     @FindBy(css = ".public_fixedDataTable_header ." + CELL_CONTENT)
     private List<WebElement> headers;
 
+    @FindBy(className = "gd-pivot-table-header")
+    private List<WebElement> pivotHeaders;
+
     @FindBy(className = "public_fixedDataTable_bodyRow")
     private List<WebElement> rows;
+
+    @FindBy(className = "gd-table-row")
+    private List<WebElement> pivotRows;
 
     @FindBy(className = "indigo-totals-enable-column-button")
     private WebElement addTotalsCellButton;
@@ -54,6 +61,10 @@ public class TableReport extends AbstractFragment {
 
     public List<String> getHeaders() {
         return getElementTexts(waitForCollectionIsNotEmpty(headers));
+    }
+
+    public List<String> getPivotHeaders() {
+        return getElementTexts(waitForCollectionIsNotEmpty(pivotHeaders));
     }
 
     public boolean isShortenHeader(String headerName, int width) {
@@ -79,6 +90,16 @@ public class TableReport extends AbstractFragment {
                         .map(webElement -> webElement.findElement(By.className("s-table-cell"))).collect(toList()))
                 .collect(toList());
         int columnIndex = getHeaders().indexOf(columnTitle);
+        WebElement cell = elements.get(cellIndex).get(columnIndex);
+        return cell;
+    }
+
+    public WebElement getPivotCellElement(String columnTitle, int cellIndex) {
+        List<List<WebElement>> elements = waitForCollectionIsNotEmpty(pivotRows).stream()
+                .filter(ElementUtils::isElementVisible)
+                .map(tableRow -> tableRow.findElements(className("s-table-cell")))
+                .collect(toList());
+        int columnIndex = getPivotHeaders().indexOf(columnTitle);
         WebElement cell = elements.get(cellIndex).get(columnIndex);
         return cell;
     }

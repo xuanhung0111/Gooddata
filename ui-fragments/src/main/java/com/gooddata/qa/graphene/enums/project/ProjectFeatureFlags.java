@@ -21,7 +21,9 @@ public enum ProjectFeatureFlags {
     CELL_MERGED_BY_DEFAULT("cellMergedByDefault"),
     ACTIVE_FILTERS_BY_DEFAULT("activeFiltersByDefault"),
     REPORT_HEADER_PAGING_ENABLED("reportHeaderPagingEnabled"),
-    ENABLE_METRIC_DATE_FILTER("enableMetricDateFilter");
+    ENABLE_METRIC_DATE_FILTER("enableMetricDateFilter"),
+    ENABLE_PIVOT_TABLE("enablePivot");
+
 
     private final String featureFlag;
 
