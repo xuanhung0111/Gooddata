@@ -198,8 +198,6 @@ public class UITestsRegistry {
             put("phaseDashboardMainFunctions", new Object[] {
                     DashboardAndTabManipulationTest.class,
                     GoodSalesDrillReportTest.class,
-                    GoodSalesDrillReportToExportTest.class,
-                    GoodSalesDrillDownToExportSpecialTest.class,
                     GoodSalesDashboardAllKindsFiltersTest.class,
                     GoodSalesFilterDropdownAttributeValueTest.class,
                     GoodSalesCascadingFilterTest.class,
@@ -241,11 +239,6 @@ public class UITestsRegistry {
                     GoodSalesUriParameterEmbeddedDashboardTest.class,
                     LockingAndVisibilityDashboardTest.class,
                     DefaultPermissionDashboardTest.class,
-                    ExportDashboardPDFTest.class,
-                    ExportDashboardXLSXTest.class,
-                    ExportDashboardXLSXAdvancedTest.class,
-                    ExportEmbeddedDashboardXLSXTest.class,
-                    PrintDashboardTest.class,
                     "testng-dashboard-default-filter-multiple-choice.xml",
                     "testng-dashboard-default-filter-single-choice.xml",
                     "testng-dashboard-default-filter-savedView-multiple-choice.xml",
@@ -270,7 +263,8 @@ public class UITestsRegistry {
             DrillToDashBoardTabApplyingDateFilterTest.class,
             DrillToDashboardFromDrilledReportTest.class,
             DeleteDashboardHavingDrillToTabTest.class,
-            DrillToDashBoardTabByDateDimensionTest.class
+            DrillToDashBoardTabByDateDimensionTest.class,
+            DrillFromCopiedDashboardTest.class,
         });
 
         suites.put("manage", new Object[] {
@@ -299,6 +293,13 @@ public class UITestsRegistry {
             GoodSalesScheduleDialogRecurrenceTest.class,
             GoodSalesScheduleDialogFiltersTest.class,
             GoodSalesScheduleDashboardTest.class,
+            GoodSalesDrillReportToExportTest.class,
+            GoodSalesDrillDownToExportSpecialTest.class,
+            ExportDashboardPDFTest.class,
+            ExportDashboardXLSXTest.class,
+            ExportDashboardXLSXAdvancedTest.class,
+            ExportEmbeddedDashboardXLSXTest.class,
+            PrintDashboardTest.class,
             "testng-imap-GoodSales-email-unsubscribe.xml",
             "testng-imap-GoodSales-email-schedule-full.xml",
             "testng-imap-GoodSales-email-schedule-dashboard.xml",
