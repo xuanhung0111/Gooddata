@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import com.gooddata.qa.utils.http.ColorPaletteRequestData;
 import com.gooddata.qa.utils.http.CommonRestRequest;
 import com.gooddata.qa.utils.http.RestClient;
 import com.gooddata.qa.utils.http.RestRequest;
@@ -25,6 +26,8 @@ import com.gooddata.qa.graphene.entity.visualization.CategoryBucket;
 import com.gooddata.qa.graphene.entity.visualization.CategoryBucket.Type;
 import com.gooddata.qa.graphene.entity.visualization.InsightMDConfiguration;
 import com.gooddata.qa.graphene.entity.visualization.MeasureBucket;
+
+import static com.gooddata.qa.utils.http.RestRequest.initPutRequest;
 import static java.lang.String.format;
 
 /**
@@ -32,6 +35,7 @@ import static java.lang.String.format;
  */
 public class IndigoRestRequest extends CommonRestRequest{
     private static final String CREATE_AND_GET_OBJ_LINK = "/gdc/md/%s/obj?createAndGet=true";
+    private static final String COLOR_PALETTE_OBJ_LINK = "/gdc/projects/%s/styleSettings";
 
     public IndigoRestRequest(final RestClient restClient, final String projectId){
         super(restClient, projectId);
@@ -619,5 +623,13 @@ public class IndigoRestRequest extends CommonRestRequest{
 
     private List<String> getFilterContextUris() {
         return getMdObjectValues("filtercontexts", jsonObj -> jsonObj.getString("link"));
+    }
+
+    public void deleteColorsPalette() {
+        executeRequest(RestRequest.initDeleteRequest(format(COLOR_PALETTE_OBJ_LINK, projectId)), HttpStatus.NO_CONTENT);
+    }
+
+    public void setColor(ColorPaletteRequestData colorPaletteRequestData) {
+        executeRequest(initPutRequest(format(COLOR_PALETTE_OBJ_LINK, projectId), colorPaletteRequestData.getJson().toString()), HttpStatus.NO_CONTENT);
     }
 }

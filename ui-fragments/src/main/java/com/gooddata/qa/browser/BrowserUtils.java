@@ -13,6 +13,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -162,6 +165,43 @@ public class BrowserUtils {
             return ((JavascriptExecutor) driver).executeScript(script, args);
         } else {
             throw new IllegalStateException("This driver does not support JavaScript!");
+        }
+    }
+
+    public static void zoomFontSizeFirefoxBrowser() {
+        try {
+            Robot robot = new Robot();
+            robot.keyPress(KeyEvent.VK_CONTROL);
+            robot.keyPress(KeyEvent.VK_ADD);
+            robot.keyRelease(KeyEvent.VK_ADD);
+            robot.keyRelease(KeyEvent.VK_CONTROL);
+        } catch (AWTException e) {
+            throw new RuntimeException("Failed to create java.awt.Robot for Robo instance", e);
+        }
+    }
+
+    public static void zoomFontSizeChromeBrowser(WebDriver browser, double zoom) {
+        browser.get("chrome://settings/");
+        ((JavascriptExecutor) browser).executeScript("chrome.settingsPrivate.setDefaultZoom(" + zoom + ");");
+    }
+
+    /**
+     * When window.devicePixelRatio <= 1 chart report show canvas
+     * zoom browser to access to attribute of chart
+     *
+     * @param browser WebDriver instance
+     */
+    public static void zoomBrowser(WebDriver browser) throws AWTException {
+        if (BrowserUtils.getBrowserContext().toString().contains("chrome")) {
+            zoomFontSizeChromeBrowser(browser, 1.01);
+        } else if (BrowserUtils.getBrowserContext().toString().contains("firefox")) {
+            zoomFontSizeFirefoxBrowser();
+        }
+    }
+
+    public static void resetZoomBrowser(WebDriver browser) {
+        if (BrowserUtils.getBrowserContext().toString().contains("chrome")) {
+            zoomFontSizeChromeBrowser(browser, 1);
         }
     }
 }

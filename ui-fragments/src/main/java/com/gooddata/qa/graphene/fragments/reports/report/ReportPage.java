@@ -37,6 +37,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementAttributeNotContainValue;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
@@ -46,6 +47,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.id;
@@ -87,6 +89,12 @@ public class ReportPage extends AbstractFragment {
     @FindBy(className = "s-unlistedIcon")
     private WebElement eyeIcon;
 
+    @FindBy(css = ".yui3-widget-bd .content.yui3-c-collectionwidget-content")
+    private List<WebElement> colorIcons;
+
+    @FindBy(css = ".yui3-widget-content-expanded g path[fill-opacity=\"1\"]")
+    private List<WebElement> reportLegendIcons;
+
     public static final By LOCATOR = By.id("p-analysisPage");
 
     private static final By SHOW_CONFIGURATION_LOCATOR =
@@ -122,6 +130,12 @@ public class ReportPage extends AbstractFragment {
         // Red bar message: An error occurred while performing this operation.
         sleepTightInSeconds(3);
         return this;
+    }
+
+    public List<String> getReportLegendColors() {
+        return waitForCollectionIsNotEmpty(reportLegendIcons).stream()
+                .map(e -> e.getAttribute("fill"))
+                .collect(toList());
     }
 
     public ReportPage setReportName(String name) {
@@ -742,4 +756,10 @@ public class ReportPage extends AbstractFragment {
                 .findElements(By.className("customMetricFormatItem"));
     }
 
+    public String checkColorColumn(Integer position ) {
+        List<WebElement> list = getRoot()
+                .findElements(By.cssSelector(".yui3-widget-content-expanded g rect[fill-opacity=\"1\"]"));
+        String elementColor = list.get(position).getAttribute("fill");
+        return elementColor;
+    }
 }

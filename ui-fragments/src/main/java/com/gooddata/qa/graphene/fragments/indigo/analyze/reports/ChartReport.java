@@ -55,6 +55,9 @@ public class ChartReport extends AbstractFragment {
     @FindBy(css = ".highcharts-xaxis-labels text[text-anchor = 'middle'], .highcharts-xaxis-labels text[text-anchor = 'end']")
     private List<WebElement> xAxisLabels;
 
+    @FindBy(css = ".highcharts-series")
+    private List<WebElement> tracker;
+
     private static final By BY_X_AXIS_TITLE = By.className("highcharts-xaxis-title");
     private static final By BY_Y_AXIS_TITLE = By.className("highcharts-yaxis-title");
 
@@ -232,5 +235,15 @@ public class ChartReport extends AbstractFragment {
                 .findElements(By.cssSelector(String.format(".highcharts-series-%s.highcharts-tracker rect," +
                         ".highcharts-series-%s.highcharts-tracker path", xAxis, xAxis))));
         return list.get(yAxis);
+    }
+
+    public String checkColorColumn(int xAxis, int yAxis) {
+        WebElement webElement = getTracker(xAxis, yAxis);
+        String getColorColumn = webElement.getAttribute("fill");
+        return getColorColumn;
+    }
+
+    public boolean hasColorLegend() {
+       return waitForCollectionIsNotEmpty(tracker).size() > 1 ;
     }
 }
