@@ -23,12 +23,18 @@ import static com.gooddata.qa.graphene.AbstractTest.Profile.ADMIN;
 public class AbstractEtlProcessTest extends AbstractProcessTest {
 
     public static final String DEFAULT_S3_CONFIGURATION_PATH = "s3://msf-dev-grest/Do_Not_Delete_Using_In_ETL_tests/graphene_tests/data_test/";
-    public static final String DEFAULT_S3_ACCESS_KEY = "AKIAJDZHMIHRXSPO4BYA";
-    public static final String DEFAULT_S3_SECRET_KEY = "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";
     public static final String DEFAULT_S3_REGION = "";
     public static final boolean DEFAULT_S3_SERVER_SIDE_ENCRYPTION = false;
 
+    protected String defaultS3AccessKey;
+    protected String defaultS3SecretKey;
     protected EtlProcessRestRequest etlProcessRequest;
+
+    @Override
+    public void initProperties() {
+        defaultS3AccessKey = testParams.loadProperty("s3.accesskey");
+        defaultS3SecretKey = testParams.loadProperty("s3.secretkey");
+    }
 
     @Override
     protected void customizeProject() throws Throwable {
@@ -42,15 +48,15 @@ public class AbstractEtlProcessTest extends AbstractProcessTest {
         initDiscProjectDetailPage().deployEtlProcess(processName,
                 processType,
                 DEFAULT_S3_CONFIGURATION_PATH,
-                DEFAULT_S3_ACCESS_KEY,
-                DEFAULT_S3_SECRET_KEY,
+                defaultS3AccessKey,
+                defaultS3SecretKey,
                 DEFAULT_S3_REGION,
                 DEFAULT_S3_SERVER_SIDE_ENCRYPTION);
     }
 
     protected void createEtlProcessWithDefaultConfig(String processName, DeployProcessForm.ProcessType processType) {
         etlProcessRequest.createEtlProcess(processName, processType, DEFAULT_S3_CONFIGURATION_PATH,
-                DEFAULT_S3_ACCESS_KEY, DEFAULT_S3_SECRET_KEY);
+                defaultS3AccessKey, defaultS3SecretKey);
     }
 
     protected DataloadProcess getProcessByName(String processName) {
