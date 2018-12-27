@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.CompareTypeDropdown.CompareType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.DatePresetsSelect;
+import com.gooddata.qa.graphene.utils.ElementUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -243,6 +244,9 @@ public class DateFilterPickerPanel extends AbstractFragment {
         int length = dateInput.getAttribute("value").length();
         for (int i = 0; i <= length; i++) {
             dateInput.sendKeys(Keys.BACK_SPACE);
+        }
+        if (!dateInput.getAttribute("value").isEmpty()) {
+            ElementUtils.clear(dateInput);
         }
         dateInput.sendKeys(date, Keys.ENTER);
     }
