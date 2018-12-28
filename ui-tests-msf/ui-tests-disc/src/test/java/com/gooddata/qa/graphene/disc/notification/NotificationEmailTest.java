@@ -232,10 +232,11 @@ public class NotificationEmailTest extends AbstractProcessTest {
                     .createNotificationRule(notificationRule)
                     .closeDialog();
 
-            processDetail.openSchedule(schedule.getName()).executeSchedule().waitForExecutionFinish();
+            ScheduleDetail scheduleDetail = processDetail.openSchedule(schedule.getName());
+            scheduleDetail.executeSchedule().waitForExecutionFinish();
             if (hasConsecutiveFailures) {
                 // consecutiveFailures is two so need execute the schedule two times to check failures message
-                processDetail.openSchedule(schedule.getName()).executeSchedule().waitForExecutionFinish();
+                scheduleDetail.executeSchedule().waitForExecutionFinish();
             }
 
             JSONObject lastExecutionDetail = getLastExecutionDetail(process.getId());
