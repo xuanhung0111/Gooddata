@@ -34,8 +34,8 @@ public class DeployEtlProcessTest extends AbstractEtlProcessTest {
         deployEtlProcessFromDiscAndCheckResult(generateProcessName(),
                 processType,
                 DEFAULT_S3_CONFIGURATION_PATH,
-                DEFAULT_S3_ACCESS_KEY,
-                DEFAULT_S3_SECRET_KEY,
+                defaultS3AccessKey,
+                defaultS3SecretKey,
                 DEFAULT_S3_REGION,
                 DEFAULT_S3_SERVER_SIDE_ENCRYPTION);
     }
@@ -45,8 +45,8 @@ public class DeployEtlProcessTest extends AbstractEtlProcessTest {
         deployEtlProcessFromDiscAndCheckResult(generateProcessName(),
                 processType,
                 DEFAULT_S3_CONFIGURATION_PATH,
-                DEFAULT_S3_ACCESS_KEY,
-                DEFAULT_S3_SECRET_KEY,
+                defaultS3AccessKey,
+                defaultS3SecretKey,
                 generateHashString(),
                 DEFAULT_S3_SERVER_SIDE_ENCRYPTION);
     }
@@ -56,8 +56,8 @@ public class DeployEtlProcessTest extends AbstractEtlProcessTest {
         deployEtlProcessFromDiscAndCheckResult(generateProcessName(),
                 processType,
                 DEFAULT_S3_CONFIGURATION_PATH,
-                DEFAULT_S3_ACCESS_KEY,
-                DEFAULT_S3_SECRET_KEY,
+                defaultS3AccessKey,
+                defaultS3SecretKey,
                 DEFAULT_S3_REGION,
                 true);
     }
@@ -67,8 +67,8 @@ public class DeployEtlProcessTest extends AbstractEtlProcessTest {
         deployEtlProcessFromDiscAndCheckResult(generateProcessName(),
                 processType,
                 DEFAULT_S3_CONFIGURATION_PATH,
-                DEFAULT_S3_ACCESS_KEY,
-                DEFAULT_S3_SECRET_KEY,
+                defaultS3AccessKey,
+                defaultS3SecretKey,
                 generateHashString(),
                 true);
     }
@@ -145,7 +145,7 @@ public class DeployEtlProcessTest extends AbstractEtlProcessTest {
     }
 
     private void validateProcessMetadataWithDefaultConfig(String processName, ProcessType processType) {
-        validateProcessMetadata(processName, processType, DEFAULT_S3_CONFIGURATION_PATH, DEFAULT_S3_ACCESS_KEY,
+        validateProcessMetadata(processName, processType, DEFAULT_S3_CONFIGURATION_PATH, defaultS3AccessKey,
                 DEFAULT_S3_REGION, DEFAULT_S3_SERVER_SIDE_ENCRYPTION);
     }
 
@@ -181,8 +181,8 @@ public class DeployEtlProcessTest extends AbstractEtlProcessTest {
         // Verify deployed data
         assertTrue(deployProcessForm.getS3ConfigurationPath().equals(DEFAULT_S3_CONFIGURATION_PATH),
                 format("Expected '%s' but get '%s'", DEFAULT_S3_CONFIGURATION_PATH, deployProcessForm.getS3ConfigurationPath()));
-        assertTrue(deployProcessForm.getS3AccessKey().equals(DEFAULT_S3_ACCESS_KEY),
-                format("Expected '%s' but get '%s'", DEFAULT_S3_ACCESS_KEY, deployProcessForm.getS3AccessKey()));
+        assertTrue(deployProcessForm.getS3AccessKey().equals(defaultS3AccessKey),
+                format("Expected '%s' but get '%s'", defaultS3AccessKey, deployProcessForm.getS3AccessKey()));
         assertTrue(deployProcessForm.getS3Region().equals(DEFAULT_S3_REGION),
                 format("Expected '%s' but get '%s'", DEFAULT_S3_REGION, deployProcessForm.getS3Region()));
 
