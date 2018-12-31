@@ -42,6 +42,6 @@ public class CategoryBucket {
     }
 
     public enum Type {
-        ATTRIBUTE, VIEW, TREND, STACK, SEGMENT
+        ATTRIBUTE, VIEW, TREND, STACK, SEGMENT, COLUMNS
     }
 }
