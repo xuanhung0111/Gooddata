@@ -36,9 +36,9 @@ public class EtlProcessScheduleDetailTest extends AbstractEtlProcessTest {
         params.put("ID", "csv_downloader_1");
         params.put("bds_path", DEFAULT_S3_CONFIGURATION_PATH);
 
-        secureParams.put("bds_access_key", DEFAULT_S3_ACCESS_KEY);
-        secureParams.put("bds_secret_key", DEFAULT_S3_SECRET_KEY);
-        secureParams.put("csv|options|secret_key", DEFAULT_S3_SECRET_KEY);
+        secureParams.put("bds_access_key", defaultS3AccessKey);
+        secureParams.put("bds_secret_key", defaultS3SecretKey);
+        secureParams.put("csv|options|secret_key", defaultS3SecretKey);
         try {
             // Create schedule
             String scheduleName = generateScheduleName();
