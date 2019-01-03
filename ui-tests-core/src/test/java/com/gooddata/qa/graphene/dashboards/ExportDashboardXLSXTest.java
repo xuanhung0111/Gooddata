@@ -57,6 +57,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_TOO_LARGE;
 import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.MIDDLE;
 import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.RIGHT;
 import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.TOP_RIGHT;
+import static java.lang.Math.abs;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -81,8 +82,12 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
     private static final String F_STAGE_NAME = "FStage Name";
     private static final String MUF_NAME = "Muf";
 
-    private final static int currentYear = LocalDate.now().getYear();
+    private static final int CURRENT_YEAR = LocalDate.now().getYear();
+    private static final int FROM = 2010 - CURRENT_YEAR;
+    private static final int TO = 2011 - CURRENT_YEAR;
 
+    private static final String YEAR_2012 = String.valueOf(CURRENT_YEAR - 2012);
+    private static final String APPLIED_FILTER = String.format("Year (Snapshot) BETWEEN THIS-%s AND THIS-%s", abs(FROM), abs(TO));
     private String dashboardTitle;
     private String promptUri;
     private DashboardRestRequest dashboardRequest;
@@ -327,12 +332,12 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
     @Test(dependsOnGroups = "createProject")
     public void exportDashboardHasDateRangeFilterToXLSX() throws IOException {
         FilterItemContent filterContent =
-                createDateFilter(getAttributeByTitle(ATTR_YEAR_SNAPSHOT), 2010 - currentYear, 2011 - currentYear);
+                createDateFilter(getAttributeByTitle(ATTR_YEAR_SNAPSHOT), FROM, TO);
         openDashboardHasReportAndFilter(REPORT_AMOUNT_BY_STAGE_NAME, filterContent);
         String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Date_Range_Filter", getClass());
         assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
-                asList("Applied filters:", "Year (Snapshot) BETWEEN THIS-8 AND THIS-7"),
+                asList("Applied filters:", APPLIED_FILTER),
                 asList(ATTR_YEAR_SNAPSHOT, ATTR_STAGE_NAME, METRIC_AMOUNT), asList("2010", INTEREST, "1185127.28"),
                 asList(DISCOVERY, "2080448.83"), asList(SHORT_LIST, "1347427.16"), asList(RISK_ASSESSMENT, "1222172.3"),
                 asList(CONVICTION, "494341.51"), asList(NEGOTIATION, "647612.26"), asList(CLOSED_WON, "8886381.82"),
@@ -347,7 +352,7 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
         FilterItemContent attributeFilterContent = createMultipleValuesFilter(getAttributeByTitle(ATTR_STAGE_NAME));
         FilterItemContent promptFilterContent = createSingleValuesFilterBy(promptUri);
         FilterItemContent dateFilterContent =
-                createDateFilter(getAttributeByTitle(ATTR_YEAR_SNAPSHOT), 2010 - currentYear, 2011 - currentYear);
+                createDateFilter(getAttributeByTitle(ATTR_YEAR_SNAPSHOT), FROM, TO);
         openDashboardHasReportAndFilters(REPORT_AMOUNT_BY_F_STAGE_NAME, attributeFilterContent,
                 promptFilterContent, dateFilterContent);
         dashboardsPage.editDashboard()
@@ -357,8 +362,8 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Group_Filter", getClass());
         assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
                 asList("Applied filters:", "Stage Name IN (Interest)"),
-                singletonList("Year (Snapshot) BETWEEN THIS-8 AND THIS-7"), asList(ATTR_STAGE_NAME, METRIC_AMOUNT),
-                asList(INTEREST, "1.642738857E7")));
+                singletonList(APPLIED_FILTER),
+                asList(ATTR_STAGE_NAME, METRIC_AMOUNT), asList(INTEREST, "1.642738857E7")));
     }
 
     @Test(dependsOnGroups = "createProject")
@@ -366,15 +371,15 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
         FilterItemContent attributeFilterContent = createMultipleValuesFilter(getAttributeByTitle(ATTR_STAGE_NAME));
         FilterItemContent promptFilterContent = createSingleValuesFilterBy(promptUri);
         FilterItemContent dateFilterContent =
-                createDateFilter(getAttributeByTitle(ATTR_YEAR_SNAPSHOT), 2010 - currentYear, 2011 - currentYear);
+                createDateFilter(getAttributeByTitle(ATTR_YEAR_SNAPSHOT), FROM, TO);
         openDashboardHasReportAndFilters(REPORT_AMOUNT_BY_F_STAGE_NAME, attributeFilterContent,
                 promptFilterContent, dateFilterContent);
         String xlsxUrl = testParams.getExportFilePath(dashboardsPage.exportDashboardToXLSX());
         Screenshots.takeScreenshot(browser, "Dashboard_Has_Type_Filters", getClass());
         assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
                 asList("Applied filters:", "Stage Name IN (Interest)"),
-                singletonList("Year (Snapshot) BETWEEN THIS-8 AND THIS-7"), asList(ATTR_STAGE_NAME, METRIC_AMOUNT),
-                asList(INTEREST, "1.642738857E7")));
+                singletonList(APPLIED_FILTER),
+                asList(ATTR_STAGE_NAME, METRIC_AMOUNT), asList(INTEREST, "1.642738857E7")));
     }
 
     @Test(dependsOnGroups = "createProject")
@@ -460,7 +465,7 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
 
     @Test(dependsOnGroups = "createProject")
     public void exportDashboardHasMufAppliedOnDateFilterToXLSX() throws IOException {
-        final String expression = format("[%s] >= THIS - " + String.valueOf(currentYear - 2012),
+        final String expression = format("[%s] >= THIS - " + YEAR_2012,
                 getAttributeByTitle(ATTR_YEAR_SNAPSHOT).getUri());
         dashboardRequest.addMufToUser(userUri, dashboardRequest.createMufObjectByUri(MUF_NAME, expression));
         try {
@@ -482,7 +487,7 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
         AttributeElement stageNameValue = getMdService().getAttributeElements(getAttributeByTitle(ATTR_STAGE_NAME))
                 .stream().filter(e -> INTEREST.equals(e.getTitle())).findFirst().get();
         final String expression = format("([%s] >= THIS - %s) AND ([%s] = [%s])",
-                getAttributeByTitle(ATTR_YEAR_SNAPSHOT).getUri(), String.valueOf(currentYear - 2012),
+                getAttributeByTitle(ATTR_YEAR_SNAPSHOT).getUri(), YEAR_2012,
                 getAttributeByTitle(ATTR_STAGE_NAME).getUri(), stageNameValue.getUri());
 
         dashboardRequest.addMufToUser(userUri, dashboardRequest.createMufObjectByUri(MUF_NAME, expression));
@@ -503,7 +508,7 @@ public class ExportDashboardXLSXTest extends AbstractDashboardWidgetTest {
         AttributeElement stageNameValue = getMdService().getAttributeElements(getAttributeByTitle(ATTR_STAGE_NAME))
                 .stream().filter(e -> INTEREST.equals(e.getTitle())).findFirst().get();
         final String expression = format("([%s] >= THIS - %s) AND ([%s] != [%s])",
-                getAttributeByTitle(ATTR_YEAR_SNAPSHOT).getUri(), String.valueOf(currentYear - 2012),
+                getAttributeByTitle(ATTR_YEAR_SNAPSHOT).getUri(), YEAR_2012,
                 getAttributeByTitle(ATTR_STAGE_NAME).getUri(), stageNameValue.getUri());
 
         dashboardRequest.addMufToUser(userUri, dashboardRequest.createMufObjectByUri(MUF_NAME, expression));
