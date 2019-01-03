@@ -47,13 +47,6 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     protected static final int expectedGoodSalesReportsCount = 0;
     protected static final int expectedGoodSalesReportsFoldersCount = 4;
 
-    private static final long expectedLineChartExportPDFSize = 40000L; //quick fix for issue QA-7481
-    private static final long expectedAreaChartReportExportPNGSize = 43000L;
-    private static final long expectedBarChartReportExportCSVSize = 300L;
-    private static final long expectedTabularReportExportPDFSize = 20000L;
-    private static final long expectedTabularReportExportXLSXSize = 4000L;
-    private static final long expectedTabularReportExportCSVSize = 1650L;
-
     private static final String SIMPLE_TABULAR_REPORT = "Simple tabular report";
     private static final String SIMPLE_CA_REPORT = "Simple CA report";
     private static final String FOLDER_UNSORTED = "Unsorted";
@@ -134,7 +127,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createTabularReport"}, groups = {"tabular-report-exports"})
     public void verifyExportedTabularReportPDF() {
         exportReport(SIMPLE_TABULAR_REPORT, ExportFormat.PDF_PORTRAIT);
-        verifyReportExport(ExportFormat.PDF_PORTRAIT, "Simple tabular report", expectedTabularReportExportPDFSize);
+        verifyReportExport(ExportFormat.PDF_PORTRAIT, "Simple tabular report");
         String pdfContent = getContentFrom("Simple tabular report");
         //verify title
         assertThat(pdfContent, containsString("Region Priority Sales Rep Department # of Activities"));
@@ -191,7 +184,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"exportTabularReportToCSV"}, groups = {"tabular-report-exports"})
     public void verifyExportedTabularReportCSV() {
-        verifyReportExport(ExportFormat.CSV, "Simple tabular report - 2", expectedTabularReportExportCSVSize);
+        verifyReportExport(ExportFormat.CSV, "Simple tabular report - 2");
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
@@ -225,8 +218,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     public void verifyExportedTabularReportXLSX() throws IOException {
         exportReport("Simple tabular report - 4", ExportFormat.EXCEL_XLSX);
         List<List<String>> xlsxContent;
-        verifyReportExport(ExportFormat.EXCEL_XLSX, "Simple tabular report - 4",
-                expectedTabularReportExportXLSXSize);
+        verifyReportExport(ExportFormat.EXCEL_XLSX, "Simple tabular report - 4");
         xlsxContent = XlsxUtils.excelFileToRead(testParams.getDownloadFolder() +
                 testParams.getFolderSeparator() + "Simple tabular report - 4.xlsx", 0);
         //verify header title
@@ -260,7 +252,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"exportLineChartToPDF"}, groups = {"chart-exports"})
     public void verifyExportedLineChartPDF() {
-        verifyReportExport(ExportFormat.PDF, "Simple line chart report", expectedLineChartExportPDFSize);
+        verifyReportExport(ExportFormat.PDF, "Simple line chart report");
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
@@ -280,7 +272,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"exportAreaChartToPNG"}, groups = {"chart-exports"})
     public void verifyExportedAreaChartPNG() {
-        verifyReportExport(ExportFormat.IMAGE_PNG, "Simple area chart report", expectedAreaChartReportExportPNGSize);
+        verifyReportExport(ExportFormat.IMAGE_PNG, "Simple area chart report");
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
@@ -310,7 +302,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"exportBarChartToCSV"}, groups = {"chart-exports"})
     public void verifyExportedBarChartCSV() {
-        verifyReportExport(ExportFormat.CSV, "Simple bar chart report", expectedBarChartReportExportCSVSize);
+        verifyReportExport(ExportFormat.CSV, "Simple bar chart report");
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})

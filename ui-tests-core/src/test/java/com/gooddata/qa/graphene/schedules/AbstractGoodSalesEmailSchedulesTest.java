@@ -62,6 +62,8 @@ public class AbstractGoodSalesEmailSchedulesTest extends AbstractEmbeddedModeTes
         for (Part part : parts) {
             if (part.getContentType().contains(contentType.toUpperCase()) &&
                 part.getFileName().contains(prefixFileName)) {
+                    System.out.print("Find result: " + part.getFileName());
+                    System.out.print("File size: " + part.getFileName());
                     return part;
             }
         }
