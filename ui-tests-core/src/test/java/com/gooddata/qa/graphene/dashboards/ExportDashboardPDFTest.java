@@ -65,7 +65,6 @@ import static org.testng.Assert.assertEquals;
 
 public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
 
-    private static final long expectedDashboardExportSize = 50000L;
     private static final String FIRST_TAB = "First Tab";
     private static final String SECOND_TAB = "Second Tab";
     private static final String COMPUSCI = "CompuSci";
@@ -342,7 +341,7 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
         exportedDashboardName = dashboardsPage.exportDashboardTabToPDF();
         try {
             checkRedBar(browser);
-            verifyDashboardExport(exportedDashboardName, FIRST_TAB, expectedDashboardExportSize);
+            verifyDashboardExport(exportedDashboardName, FIRST_TAB);
 
             List<String> contents = asList(getContentFrom(FIRST_TAB).split("\n"));
             //verify report title
@@ -369,7 +368,7 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
         exportedDashboardName = dashboardsPage.exportDashboardTabToPDF();
         try {
             checkRedBar(browser);
-            verifyDashboardExport(exportedDashboardName, FIRST_TAB, expectedDashboardExportSize);
+            verifyDashboardExport(exportedDashboardName, FIRST_TAB);
 
             List<String> contents = asList(getContentFrom(FIRST_TAB).split("\n"));
             //verify report title
@@ -395,7 +394,7 @@ public class ExportDashboardPDFTest extends AbstractEmbeddedModeTest {
         exportedDashboardName = dashboardsPage.printDashboardTab();
         try {
             checkRedBar(browser);
-            verifyDashboardExport(exportedDashboardName, SECOND_TAB, expectedDashboardExportSize);
+            verifyDashboardExport(exportedDashboardName, SECOND_TAB);
 
             List<String> contents = asList(getContentFrom(SECOND_TAB).split("\n"));
             //verify report title

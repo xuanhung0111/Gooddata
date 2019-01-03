@@ -50,10 +50,6 @@ import static org.testng.Assert.assertTrue;
 
 public class GoodSalesEmbeddedReportTest extends AbstractEmbeddedModeTest {
 
-    private static final long MINIMUM_EMBEDDED_REPORT_PDF_SIZE = 20000L;
-    private static final long MINIMUM_EMBEDDED_REPORT_CSV_SIZE = 60L;
-    private static final long MINIMUM_EMBEDDED_CHART_REPORT_PDF_SIZE = 26000L;
-    private static final long MINIMUM_EMBEDDED_CHART_REPORT_CSV_SIZE = 100L;
     private final static String EMBEDDED_REPORT_TITLE = "Embedded Report";
     private final static String ADDITIONAL_PROJECT_TITLE = "GoodSales-project-to-share-report";
 
@@ -188,10 +184,10 @@ public class GoodSalesEmbeddedReportTest extends AbstractEmbeddedModeTest {
         }
 
         embeddedReportContainer.openReportInfoViewPanel().downloadReportAsFormat(ExportFormat.CSV);
-        verifyReportExport(ExportFormat.CSV, EMBEDDED_REPORT_TITLE, MINIMUM_EMBEDDED_REPORT_CSV_SIZE);
+        verifyReportExport(ExportFormat.CSV, EMBEDDED_REPORT_TITLE);
 
         embeddedReportContainer.openReportInfoViewPanel().downloadReportAsFormat(ExportFormat.PDF_LANDSCAPE);
-        verifyReportExport(ExportFormat.PDF_LANDSCAPE, EMBEDDED_REPORT_TITLE, MINIMUM_EMBEDDED_REPORT_PDF_SIZE);
+        verifyReportExport(ExportFormat.PDF_LANDSCAPE, EMBEDDED_REPORT_TITLE);
     }
 
     @Test(dependsOnMethods = {"createAdditionalProject"})
@@ -347,18 +343,18 @@ public class GoodSalesEmbeddedReportTest extends AbstractEmbeddedModeTest {
         checkRedBar(browser);
 
         embeddedReportContainer.openReportInfoViewPanel().downloadReportAsFormat(ExportFormat.CSV);
-        verifyReportExport(ExportFormat.CSV, embeddedChartReport, MINIMUM_EMBEDDED_CHART_REPORT_CSV_SIZE);
+        verifyReportExport(ExportFormat.CSV, embeddedChartReport);
 
         embeddedReportContainer.openReportInfoViewPanel().downloadReportAsFormat(ExportFormat.PDF);
-        verifyReportExport(ExportFormat.PDF, embeddedChartReport, MINIMUM_EMBEDDED_CHART_REPORT_PDF_SIZE);
+        verifyReportExport(ExportFormat.PDF, embeddedChartReport);
 
         embeddedReportContainer = initEmbeddedReport();
 
         embeddedReportContainer.openReportInfoViewPanel().downloadReportAsFormat(ExportFormat.CSV);
-        verifyReportExport(ExportFormat.CSV, embeddedChartReport, MINIMUM_EMBEDDED_CHART_REPORT_CSV_SIZE);
+        verifyReportExport(ExportFormat.CSV, embeddedChartReport);
 
         embeddedReportContainer.openReportInfoViewPanel().downloadReportAsFormat(ExportFormat.PDF);
-        verifyReportExport(ExportFormat.PDF, embeddedChartReport, MINIMUM_EMBEDDED_CHART_REPORT_PDF_SIZE);
+        verifyReportExport(ExportFormat.PDF, embeddedChartReport);
     }
 
     @Test(dependsOnMethods = {"createAdditionalProject"})

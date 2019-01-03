@@ -75,9 +75,6 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     private static final String ADDITIONAL_PROJECT_TITLE = "GoodSales-project-to-share-dashboard";
     private static final String EMBEDDED_DASHBOARD_NAME = "Embedded Dashboard";
 
-    private static final long EXPECTED_EXPORT_DASHBOARD_SIZE = 62000L;
-    private static final long EXPECTED_EXPORT_CHART_SIZE = 28000L;
-
     private UiReportDefinition tabularReportDef;
     private List<String> attributeValues;
     private List<Float> metricValues;
@@ -207,7 +204,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
                 .downloadReportAsFormat(ExportFormat.PDF);
 
         try {
-            verifyReportExport(ExportFormat.PDF, chartReportDef.getName(), EXPECTED_EXPORT_CHART_SIZE);
+            verifyReportExport(ExportFormat.PDF, chartReportDef.getName());
 
         } finally {
             deleteIfExists(Paths.get(testParams.getExportFilePath(chartReportDef.getName() + ".pdf")));
@@ -228,7 +225,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         String exportedDashboardName = embeddedDashboard.printDashboardTab();
 
         try {
-            verifyDashboardExport(exportedDashboardName, "other_widgets", EXPECTED_EXPORT_DASHBOARD_SIZE);
+            verifyDashboardExport(exportedDashboardName, "other_widgets");
 
         } finally {
             deleteIfExists(Paths.get(testParams.getExportFilePath(exportedDashboardName + ".pdf")));

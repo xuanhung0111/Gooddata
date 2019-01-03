@@ -285,7 +285,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
             .startCreateReport();
     }
 
-    public void verifyDashboardExport(String dashboardName, String tabName, long minimalSize) {
+    public void verifyDashboardExport(String dashboardName, String tabName) {
         // client-demo does not support dashboard export
         if (testParams.isClientDemoEnvironment()) {
             log.info("client-demo does not support dashboard export");
@@ -294,17 +294,14 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
         File pdfExport = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator() + dashboardName + ".pdf");
         System.out.println("pdfExport = " + pdfExport);
-        Function<WebDriver, Boolean> exportCompleted = browser -> pdfExport.length() > minimalSize;
+        Function<WebDriver, Boolean> exportCompleted = browser -> pdfExport.exists() && pdfExport.length() != 0;
         Graphene.waitGui()
             .pollingEvery(5, TimeUnit.SECONDS)
             .withTimeout(5, TimeUnit.MINUTES)
             .until(exportCompleted);
-        long fileSize = pdfExport.length();
-        System.out.println("File size: " + fileSize);
+        System.out.println("File size: " + pdfExport.length());
 
         assertTrue(PdfUtils.getTextContentFrom(pdfExport).contains(tabName), "Content of exported PDF is wrong");
-        assertTrue(fileSize > minimalSize, "Export is probably invalid, check the PDF manually! Current size is "
-                + fileSize + ", but minimum " + minimalSize + " was expected");
     }
 
     public String getContentFrom(File pdfFile) {
@@ -319,24 +316,21 @@ public class AbstractUITest extends AbstractGreyPageTest {
         return getContentFrom(pdfExport);
     }
 
-    public void verifyReportExport(ExportFormat format, String reportName, long minimalSize) {
+    public void verifyReportExport(ExportFormat format, String reportName) {
         String fileURL = testParams.getDownloadFolder() + testParams.getFolderSeparator() + reportName + "."
                 + format.getName();
         File export = new File(fileURL);
         System.out.println("pdfExport = " + export);
 
         try {
-            Function<WebDriver, Boolean> exportCompleted = browser -> export.length() > minimalSize;
+            Function<WebDriver, Boolean> exportCompleted = browser -> export.exists() && export.length() != 0;
             Graphene.waitGui()
                 .pollingEvery(5, TimeUnit.SECONDS)
                 .withTimeout(5, TimeUnit.MINUTES)
                 .until(exportCompleted);
         } catch (TimeoutException e) { // do nothing
         } finally {
-            long fileSize = export.length();
-            System.out.println("File size: " + fileSize);
-            assertTrue(fileSize > minimalSize, "Export is probably invalid, check the file manually! Current size is "
-                    + fileSize + ", but minimum " + minimalSize + " was expected");
+            System.out.println("File size: " + export.length());
         }
 
         if (format == ExportFormat.IMAGE_PNG) {

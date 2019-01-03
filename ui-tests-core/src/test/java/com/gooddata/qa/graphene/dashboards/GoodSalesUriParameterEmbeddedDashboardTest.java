@@ -204,7 +204,7 @@ public class GoodSalesUriParameterEmbeddedDashboardTest extends AbstractEmbedded
 
     private void verifyTabExport(String tabName, String expectedValue) throws IOException {
         try {
-            verifyDashboardExport(tabName, tabName, 3000L);
+            verifyDashboardExport(tabName, tabName);
             assertThat(getContentFrom(tabName), containsString(expectedValue));
         } finally {
             deleteIfExists(Paths.get(testParams.getDownloadFolder() + testParams.getFolderSeparator() + tabName + ".pdf"));
