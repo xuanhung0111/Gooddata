@@ -58,7 +58,7 @@ public class AbstractProcessDetail extends AbstractFragment {
     }
 
     public String getScheduleCronTime(String scheduleName) {
-        return findSchedule(scheduleName).get().findElement(By.className("schedule-cron-cell")).getText();
+        return findSchedule(scheduleName).get().findElement(By.className("flex-auto-row-item")).getText();
     }
 
     public CreateScheduleForm clickCreateScheduleLink() {
