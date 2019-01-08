@@ -38,6 +38,7 @@ public class EtlProcessScheduleDetailTest extends AbstractEtlProcessTest {
 
         secureParams.put("bds_access_key", defaultS3AccessKey);
         secureParams.put("bds_secret_key", defaultS3SecretKey);
+        secureParams.put("csv|options|access_key", defaultS3AccessKey);
         secureParams.put("csv|options|secret_key", defaultS3SecretKey);
         try {
             // Create schedule
