@@ -46,10 +46,10 @@ import static org.testng.Assert.assertTrue;
 
 public class TotalsResultWithInsightTest extends AbstractAnalyseTest{
 
-    private static final String INSIGHT_HAS_ATTRIBUTE_AND_MEASURE = "Insight has attribute and measure";
-    private static final String INSIGHT_HAS_ATTRIBUTES_AND_MEASURES = "Insight has attributes and measures";
-    private static final String INSIGHT_HAS_DATE_ATTRIBUTE_AND_MEASURE = "Insight has date attribute and measure";
-    private static final String INSIGHT_SHOW_SAME_PERIOD_COMPARISON = "Insight show same period comparison";
+    private static final String INSIGHT_HAS_ATTRIBUTE_AND_MEASURE = "Attribute and measure";
+    private static final String INSIGHT_HAS_ATTRIBUTES_AND_MEASURES = "Attributes and measures";
+    private static final String INSIGHT_HAS_DATE_ATTRIBUTE_AND_MEASURE = "Date and measure";
+    private static final String INSIGHT_SHOW_SAME_PERIOD_COMPARISON = "Same period comparison";
     private static final String INSIGHT_SHOW_PERCENT = "Insight show percent";
     private IndigoRestRequest indigoRestRequest;
 
