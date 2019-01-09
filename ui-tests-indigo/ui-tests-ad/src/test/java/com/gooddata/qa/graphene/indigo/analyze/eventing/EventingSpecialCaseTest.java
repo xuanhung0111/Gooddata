@@ -228,7 +228,7 @@ public class EventingSpecialCaseTest extends AbstractEventingTest {
         embeddedAnalysisPage.changeReportType(ReportType.COLUMN_CHART);
         embeddedAnalysisPage.waitForReportComputing();
 
-        analysisPage.reorderMetric(METRIC_NUMBER_OF_OPPORTUNITIES, METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
+        analysisPage.reorderMetric(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES).waitForReportComputing();
 
         cleanUpLogger();
         ChartReport chartReport = embeddedAnalysisPage.getChartReport();
@@ -267,13 +267,13 @@ public class EventingSpecialCaseTest extends AbstractEventingTest {
         EmbeddedAnalysisPage embeddedAnalysisPage = openEmbeddedPage(file);
         embeddedAnalysisPage.waitForReportComputing();
 
-        analysisPage.reorderMetric(METRIC_NUMBER_OF_OPPORTUNITIES, METRIC_NUMBER_OF_ACTIVITIES).waitForReportComputing();
+        analysisPage.reorderMetric(METRIC_NUMBER_OF_ACTIVITIES, METRIC_NUMBER_OF_OPPORTUNITIES).waitForReportComputing();
 
         cleanUpLogger();
         embeddedAnalysisPage.getTableReport().getCellElement(METRIC_NUMBER_OF_OPPORTUNITIES, 0).click();
 
         JSONObject drillContext = getLatestPostMessageObj().getJSONObject("data").getJSONObject("drillContext");
-        assertEquals(drillContext.getInt("columnIndex"), 3);
+        assertEquals(drillContext.getInt("columnIndex"), 2);
         assertEquals(drillContext.getInt("rowIndex"), 0);
 
         JSONArray intersection = drillContext.getJSONArray("intersection");
