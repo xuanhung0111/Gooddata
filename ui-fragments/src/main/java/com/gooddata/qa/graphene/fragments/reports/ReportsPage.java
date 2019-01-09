@@ -6,6 +6,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -189,6 +190,8 @@ public class ReportsPage extends AbstractFragment {
         } catch (TimeoutException e) {
             log.info("Report already loaded so WebDriver unable to catch the loading indicator");
         }
+        //Wait for uncheck all checkbox
+        waitForElementNotPresent(className("yui3-dd-locked"), getRoot());
         return this;
     }
 
