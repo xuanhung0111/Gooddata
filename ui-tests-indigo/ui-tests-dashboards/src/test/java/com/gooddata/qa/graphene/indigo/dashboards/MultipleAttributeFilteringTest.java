@@ -27,9 +27,15 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardTest;
+import com.gooddata.qa.graphene.utils.ElementUtils;
+import org.openqa.selenium.By;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -113,6 +119,25 @@ public class MultipleAttributeFilteringTest extends AbstractDashboardTest {
         attributeFilterList.stream().forEach(attribute -> metricConfiguration.addFilterWithAllValue(attribute));
         assertFalse(metricConfiguration.canAddAnotherFilter(), "Add attribute filter button shouldn't be displayed");
         checkRedBar(browser);
+    }
+
+    @Test(dependsOnGroups = {"createProject"})
+    public void limitMetricsOnMeasure() {
+        analysisPage = initAnalysePage();
+        for (int i = 0; i < 20; i++) {
+            analysisPage.addMetric(METRIC_TIMELINE_BOP);
+        }
+        MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
+        ElementUtils.scrollElementIntoView(By.cssSelector(".s-bucket-view .s-bucket-dropzone"), browser, 100);
+        assertFalse(metricsBucket.isInvitationVisible(), "Can not add over 20 metrics");
+        ChartReport chartReport = analysisPage.waitForReportComputing().getChartReport();
+        assertEquals(chartReport.getTrackersCount(), 20);
+        assertEquals(chartReport.getLegends().size(), 20);
+        assertEquals(chartReport.getChartType(), ReportType.COLUMN_CHART.getLabel());
+
+        analysisPage.tryToDrag(analysisPage.getCataloguePanel().searchAndGet(METRIC_TIMELINE_BOP, FieldType.METRIC),
+                analysisPage.getMetricsBucket().getRoot());
+        assertEquals(metricsBucket.getItemNames().size(), 20, "Can not add over 20 metrics");
     }
 
     @Test(dependsOnGroups = {"createProject"})
