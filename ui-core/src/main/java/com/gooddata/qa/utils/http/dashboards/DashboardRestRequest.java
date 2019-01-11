@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import static com.gooddata.qa.utils.http.RestRequest.*;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.joining;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class DashboardRestRequest extends CommonRestRequest {
     private static final String CREATE_AND_GET_OBJ_LINK = "/gdc/md/%s/obj?createAndGet=true";
@@ -304,7 +305,9 @@ public class DashboardRestRequest extends CommonRestRequest {
                     put(new JSONObject() {{
                         put("user", profileUri);
                         put("userFilters", new JSONArray() {{
-                            put(mufURI);
+                            if (isNotEmpty(mufURI)) {
+                                put(mufURI);
+                            }
                         }});
                     }});
                 }});
