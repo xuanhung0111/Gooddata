@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.pages;
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
@@ -65,6 +66,9 @@ public class AnalysisPage extends AbstractFragment {
     @FindBy(css = ".s-bucket-attribute, .s-bucket-view, .s-bucket-trend")
     private AttributesBucket attributesBucket;
 
+    @FindBy(className = "s-bucket-columns")
+    private AttributesBucket attributesColumnsBucket;
+
     @FindBy(css = ".s-bucket-attribute-title, .s-bucket-view-title, .s-bucket-trend-title")
     private WebElement attributesBucketTitle;
 
@@ -104,6 +108,17 @@ public class AnalysisPage extends AbstractFragment {
     public AnalysisPage stopDrag(Point offset) {
         getActions().moveByOffset(offset.x, offset.y).release().perform();
         return this;
+    }
+
+    public AnalysisPage addMetricToRecommendedStepsPanelOnCanvas(String metricTitle) {
+        return addMetricToRecommendedStepsPanelOnCanvas(metricTitle, FieldType.METRIC);
+    }
+
+    public AnalysisPage addMetricToRecommendedStepsPanelOnCanvas(String metricTitle, FieldType type) {
+        WebElement source = getCataloguePanel().searchAndGet(metricTitle, type);
+        Supplier<WebElement> recommendation = () ->
+                waitForElementPresent(ShortcutPanel.AS_A_COLUMN_CHART.getLocator(), browser);
+        return drag(source, recommendation);
     }
 
     public AnalysisPage drag(WebElement source, Supplier<WebElement> target) {
@@ -165,21 +180,23 @@ public class AnalysisPage extends AbstractFragment {
     }
 
     public AnalysisPage addAttribute(String attribute) {
-        WebElement source = getCataloguePanel().searchAndGet(attribute, FieldType.ATTRIBUTE);
         WebElement target = getAttributesBucket().getInvitation();
-        //To avoid move target out of bounds of viewport, should scroll element into view
-        Point location = target.getLocation();
-        Dimension dimension = target.getSize();
-        if ((location.y + dimension.height) > getRoot().getSize().height) {
-            getActions().click(attributesBucketTitle).sendKeys(Keys.END).perform();
-        }
-        return drag(source, target);
+        return addAttribute(target, attribute);
+    }
+
+    public AnalysisPage addColumnsAttribute(String attribute) {
+        WebElement target = getAttributesColumnsBucket().getInvitation();
+        return addAttribute(target, attribute);
     }
 
     public AnalysisPage addDate() {
-        WebElement source = getCataloguePanel().getDate();
         WebElement target = getAttributesBucket().getInvitation();
-        return drag(source, target);
+        return addDate(target);
+    }
+
+    public AnalysisPage addDateToColumnsAttribute() {
+        WebElement target = getAttributesColumnsBucket().getInvitation();
+        return addDate(target);
     }
 
     public AnalysisPage addStack(String attribute) {
@@ -366,6 +383,11 @@ public class AnalysisPage extends AbstractFragment {
         return waitForFragmentVisible(attributesBucket);
     }
 
+    //To use this function when applying the pivot table
+    public AttributesBucket getAttributesColumnsBucket() {
+        return waitForFragmentVisible(attributesColumnsBucket);
+    }
+
     public StacksBucket getStacksBucket() {
         return waitForFragmentVisible(stacksBucket);
     }
@@ -467,5 +489,21 @@ public class AnalysisPage extends AbstractFragment {
         };
 
         Graphene.waitGui().until(droppable);
+    }
+
+    private AnalysisPage addAttribute(WebElement typeAttribute, String attribute) {
+        WebElement source = getCataloguePanel().searchAndGet(attribute, FieldType.ATTRIBUTE);
+        //To avoid move target out of bounds of viewport, should scroll element into view
+        Point location = typeAttribute.getLocation();
+        Dimension dimension = typeAttribute.getSize();
+        if ((location.y + dimension.height) > getRoot().getSize().height) {
+            getActions().click(attributesBucketTitle).sendKeys(Keys.END).perform();
+        }
+        return drag(source, typeAttribute);
+    }
+
+    private AnalysisPage addDate(WebElement typeAttribute) {
+        WebElement source = getCataloguePanel().getDate();
+        return drag(source, typeAttribute);
     }
 }

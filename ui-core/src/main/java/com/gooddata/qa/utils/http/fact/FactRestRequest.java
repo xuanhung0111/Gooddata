@@ -14,8 +14,14 @@ public class FactRestRequest extends CommonRestRequest{
     private static final String RESTRICT_API_TEMPLATE = "/gdc/md/%s/objects/setFlag/restricted";
     private static final String FACT_RESTRICT_TEMPLATE = "{\"setRestricted\": {\"items\": [%s]}}";
 
+    private static final String SET_PROTECT_API_TEMPLATE = "/gdc/md/%s/objects/setFlag/protected";
+    private static final String SET_FACT_PROTECT_TEMPLATE = "{\"setProtected\": {\"items\": [%s]}}";
+
     private static final String UNSET_RESTRICT_API_TEMPLATE = "/gdc/md/%s/objects/unsetFlag/restricted";
     private static final String UNSET_FACT_RESTRICT_TEMPLATE = "{\"unsetRestricted\": {\"items\": [%s]}}";
+
+    private static final String UNSET_PROTECT_API_TEMPLATE = "/gdc/md/%s/objects/unsetFlag/protected";
+    private static final String UNSET_FACT_PROTECT_TEMPLATE = "{\"unsetProtected\": {\"items\": [%s]}}";
 
     private static final String QUOTE_TEMPLATE = "\"%s\"";
 
@@ -36,6 +42,18 @@ public class FactRestRequest extends CommonRestRequest{
     }
 
     /**
+     * Set flag 'protected' to fact
+     * @param factsUri
+     */
+    public void setFactProtected(String... factsUri) {
+        restClient.execute(
+                RestRequest.initPostRequest(
+                        format(SET_PROTECT_API_TEMPLATE, projectId),
+                        format(SET_FACT_PROTECT_TEMPLATE, quoteUris(factsUri))),
+                HttpStatus.NO_CONTENT);
+    }
+
+    /**
      * Unset flag 'restricted' to fact
      * @param factsUri
      */
@@ -44,6 +62,18 @@ public class FactRestRequest extends CommonRestRequest{
                 RestRequest.initPostRequest(
                         format(UNSET_RESTRICT_API_TEMPLATE, projectId),
                         format(UNSET_FACT_RESTRICT_TEMPLATE, quoteUris(factsUri))),
+                HttpStatus.NO_CONTENT);
+    }
+
+    /**
+     * Unset flag 'protected' to fact
+     * @param factsUri
+     */
+    public void unsetFactProtected(String... factsUri) {
+        restClient.execute(
+                RestRequest.initPostRequest(
+                        format(UNSET_PROTECT_API_TEMPLATE, projectId),
+                        format(UNSET_FACT_PROTECT_TEMPLATE, quoteUris(factsUri))),
                 HttpStatus.NO_CONTENT);
     }
 

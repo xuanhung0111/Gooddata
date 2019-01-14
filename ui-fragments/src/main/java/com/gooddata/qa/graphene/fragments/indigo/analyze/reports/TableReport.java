@@ -22,6 +22,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.CssUtils.isShortendTilteDesignByCss;
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
@@ -53,11 +54,42 @@ public class TableReport extends AbstractFragment {
     @FindBy(className = REMOVE_TOTALS_CELL_BUTTON)
     private WebElement removeTotalsCellButton;
 
+    @FindBy(css = ".ag-numeric-header .gd-pivot-table-header-label")
+    private List<WebElement> pivotHeadersMeasure;
+
+    @FindBy(css = ".ag-header-group-cell-with-group[col-id='0_0']")
+    private List<WebElement> pivotHeadersColumn;
+
+    @FindBy(css = ".gd-row-attribute-column-header.gd-column-group-header")
+    private List<WebElement> pivotHeadersRow;
+
     private static final By BY_TOTALS_RESULTS =
             cssSelector(".col-0:not(.fixedDataTableCellLayout_wrap1):not(.indigo-totals-add-cell)");
     private static final By ADD_TOTAL_ROW_BUTTON = className("indigo-totals-add-row-button");
     private static final String CELL_CONTENT = "public_fixedDataTableCell_cellContent";
     private static final String REMOVE_TOTALS_CELL_BUTTON = "indigo-totals-disable-column-button";
+
+    // represents the most top row header
+    public List<String> getPivotHeadersColumn() {
+        if (pivotHeadersColumn.isEmpty()) {
+            return emptyList();
+        }
+        return getElementTexts(pivotHeadersColumn);
+    }
+
+    public List<String> getPivotHeadersRow() {
+        if (pivotHeadersRow.isEmpty()) {
+            return emptyList();
+        }
+        return getElementTexts(pivotHeadersRow);
+    }
+
+    public List<String> getHeadersMeasure() {
+        if (pivotHeadersMeasure.isEmpty()) {
+            return emptyList();
+        }
+        return getElementTexts(pivotHeadersMeasure);
+    }
 
     public List<String> getHeaders() {
         return getElementTexts(waitForCollectionIsNotEmpty(headers));
@@ -81,6 +113,14 @@ public class TableReport extends AbstractFragment {
             .map(e -> e.findElements(className(CELL_CONTENT)))
             .map(es -> es.stream().map(WebElement::getText).collect(toList()))
             .collect(toList());
+    }
+
+    public List<List<String>> getPivotContent() {
+        return waitForCollectionIsNotEmpty(pivotRows).stream()
+                .filter(ElementUtils::isElementVisible)
+                .map(e -> e.findElements(className("s-table-cell")))
+                .map(es -> es.stream().map(WebElement::getText).collect(toList()))
+                .collect(toList());
     }
 
     public WebElement getCellElement(String columnTitle, int cellIndex) {
