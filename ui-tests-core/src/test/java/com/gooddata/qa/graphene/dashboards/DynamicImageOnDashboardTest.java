@@ -45,14 +45,16 @@ public class DynamicImageOnDashboardTest extends AbstractDashboardWidgetTest {
                 "label.csv_image_url.image&attributeElementUri=%FILTER_VALUE(attr.csv_image_url.image)%");
         getFilter(IMAGE_TITLE).openPanel().changeAttributeFilterValues(IMAGE_SOURCE_1);
         Screenshots.takeScreenshot(browser, "add-dynamic-from-public-accessible-images", getClass());
-        assertTrue(IMAGE_SOURCE_1.contains(dashboardsPage.getLastEmbeddedWidget().getImageUri()),
+        assertTrue(IMAGE_SOURCE_1.contains(dashboardsPage.getLastEmbeddedWidget().waitForImageLoading().getImageUri()),
                 "Image should be loaded");
 
         getFilter(IMAGE_TITLE).openPanel().changeAttributeFilterValues(IMAGE_SOURCE_1, IMAGE_SOURCE_2);
-        assertEquals(dashboardsPage.getLastEmbeddedWidget().getContentBodyAsText(), "No image available for this option");
+        assertEquals(dashboardsPage.getLastEmbeddedWidget().waitForImageLoading().getContentBodyAsText(),
+                "No image available for this option");
 
         getFilter(IMAGE_TITLE).openPanel().changeAttributeFilterValues(IMAGE_SOURCE_3);
-        assertEquals(dashboardsPage.getLastEmbeddedWidget().getContentBodyAsText(), "We're sorry but something went wrong...");
+        assertEquals(dashboardsPage.getLastEmbeddedWidget().waitForImageLoading().getContentBodyAsText(),
+                "We're sorry but something went wrong...");
     }
 
     @Test(dependsOnGroups = {"createProject"})
@@ -63,14 +65,16 @@ public class DynamicImageOnDashboardTest extends AbstractDashboardWidgetTest {
                 "label.csv_image_url.image&attributeElementUri=%FILTER_VALUE(attr.csv_image_url.image)%");
         getFilter("IMAGE").openPanel().changeAttributeFilterValues(IMAGE_SOURCE_1);
         Screenshots.takeScreenshot(browser, "add-dynamic-via-macro-for-host-name", getClass());
-        assertTrue(IMAGE_SOURCE_1.contains(dashboardsPage.getLastEmbeddedWidget().getImageUri()),
+        assertTrue(IMAGE_SOURCE_1.contains(dashboardsPage.getLastEmbeddedWidget().waitForImageLoading().getImageUri()),
                 "Image should be loaded");
 
         getFilter(IMAGE_TITLE).openPanel().changeAttributeFilterValues(IMAGE_SOURCE_1, IMAGE_SOURCE_2);
-        assertEquals(dashboardsPage.getLastEmbeddedWidget().getContentBodyAsText(), "No image available for this option");
+        assertEquals(dashboardsPage.getLastEmbeddedWidget().waitForImageLoading().getContentBodyAsText(),
+                "No image available for this option");
 
         getFilter(IMAGE_TITLE).openPanel().changeAttributeFilterValues(IMAGE_SOURCE_3);
-        assertEquals(dashboardsPage.getLastEmbeddedWidget().getContentBodyAsText(), "We're sorry but something went wrong...");
+        assertEquals(dashboardsPage.getLastEmbeddedWidget().waitForImageLoading().getContentBodyAsText(),
+                "We're sorry but something went wrong...");
     }
 
     private void createDashboardHasFilter(FilterItemContent filter) throws IOException {
