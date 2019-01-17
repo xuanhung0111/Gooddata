@@ -244,13 +244,14 @@ public final class WaitUtils {
         Graphene.waitGui().until(missingString);
     }
 
-    public static void waitForExportReport(final File destination, final long minimalSize) {
+    public static void waitForExportReport(final File destination) {
         System.out.println("waiting for export " + destination.getName());
 
-        Function<WebDriver, Boolean> isExportCompleted = browser -> destination.length() >= minimalSize;
-        Graphene.waitGui().pollingEvery(5, TimeUnit.SECONDS)
+        Function<WebDriver, Boolean> isExportCompleted = browser -> destination.exists() && destination.length() != 0;
+        Graphene.waitGui().pollingEvery(1, TimeUnit.SECONDS)
                 .withTimeout(5, TimeUnit.MINUTES)
                 .until(isExportCompleted);
+        System.out.print("File size: " + destination.length());
     }
 
     public static void waitForIndigoMessageDisappear(SearchContext context) {

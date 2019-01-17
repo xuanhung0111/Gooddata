@@ -26,7 +26,6 @@ public class GoodSalesPublicDashboardTest extends GoodSalesAbstractTest {
     private static final String STAGING3 = "staging3.intgdc.com";
     private static final String STAGING2 = "staging2.intgdc.com";
     private static final String STAGING = "staging.intgdc.com";
-    private static final long EXPECTED_EXPORT_DASHBOARD_SIZE = 60000L;
     private String publicDashboardUri;
 
 
@@ -143,7 +142,7 @@ public class GoodSalesPublicDashboardTest extends GoodSalesAbstractTest {
         waitForDashboardPageLoaded(browser);
         String exportedDashboardName = dashboardsPage.printDashboardTab();
         try {
-            verifyDashboardExport(exportedDashboardName, selectedTab, EXPECTED_EXPORT_DASHBOARD_SIZE);
+            verifyDashboardExport(exportedDashboardName, selectedTab);
             checkRedBar(browser);
         } finally {
             deleteIfExists(Paths.get(getExportFilePath(exportedDashboardName, ExportFormat.PDF)));

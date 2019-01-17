@@ -17,8 +17,6 @@ import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 
 public class GoodSalesDashboardRestrictedFacts extends GoodSalesAbstractTest {
 
-    private static final long expectedTabularReportExportPDFSize = 26000L;
-    private static final long expectedTabularReportExportCSVSize = 175L;
     private FactRestRequest factRestRequest;
     private String factUri;
 
@@ -52,7 +50,7 @@ public class GoodSalesDashboardRestrictedFacts extends GoodSalesAbstractTest {
         // export to pdf
         my_report.exportReport(ExportFormat.PDF_PORTRAIT);
         checkRedBar(browser);
-        verifyReportExport(ExportFormat.PDF_PORTRAIT, REPORT_AMOUNT_BY_PRODUCT, expectedTabularReportExportPDFSize);
+        verifyReportExport(ExportFormat.PDF_PORTRAIT, REPORT_AMOUNT_BY_PRODUCT);
 
         // export to csv
         my_report.exportReport(ExportFormat.CSV);
@@ -69,7 +67,7 @@ public class GoodSalesDashboardRestrictedFacts extends GoodSalesAbstractTest {
             // export to csv
             my_report.exportReport(ExportFormat.CSV);
             checkRedBar(browser);
-            verifyReportExport(ExportFormat.CSV, REPORT_AMOUNT_BY_PRODUCT, expectedTabularReportExportCSVSize);
+            verifyReportExport(ExportFormat.CSV, REPORT_AMOUNT_BY_PRODUCT);
         } finally {
             factRestRequest.setFactRestricted(factUri);
         }
