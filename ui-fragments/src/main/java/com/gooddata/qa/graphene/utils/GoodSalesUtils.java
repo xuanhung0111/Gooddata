@@ -170,4 +170,11 @@ public final class GoodSalesUtils {
     public static final String DATE_DATASET_ACTIVITY = "Activity";
     public static final String DATE_DATASET_SNAPSHOT = "Snapshot";
     public static final String DATE_DATASET_TIMELINE = "Timeline";
+
+    // items configuration panel
+    public static final String Y_AXIS = "Y-Axis";
+    public static final String COLORS = "Colors";
+    public static final String X_AXIS = "X-Axis";
+    public static final String LEGEND = "Legend";
+    public static final String CANVAS = "Canvas";
 }
