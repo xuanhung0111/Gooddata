@@ -1,11 +1,13 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.reports;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.CssUtils.isShortendTilteDesignByCss;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
 
@@ -30,7 +32,9 @@ import com.gooddata.qa.graphene.utils.WaitUtils;
 
 public class ChartReport extends AbstractFragment {
 
-    public static final String LEGEND_ITEM = ".viz-legend .series .series-item";
+    public static final String LEGEND_SERIES = ".viz-legend .series";
+    public static final String LEGEND_INDICATOR = LEGEND_SERIES + " .series-axis-indicator";
+    public static final String LEGEND_ITEM = LEGEND_SERIES + " .series-item";
     public static final String LEGEND_ITEM_NAME = LEGEND_ITEM + " .series-name";
     public static final String LEGEND_ITEM_ICON = LEGEND_ITEM + " .series-icon";
     private static final String LEGEND_COLOR_ATTRIBUTE = "style";
@@ -46,6 +50,9 @@ public class ChartReport extends AbstractFragment {
 
     @FindBy(css = LEGEND_ITEM_NAME)
     private List<WebElement> legendNames;
+
+    @FindBy(css = LEGEND_INDICATOR)
+    private List<WebElement> legendIndicators;
 
     @FindBy(css = "div.highcharts-tooltip")
     private WebElement tooltip;
@@ -126,7 +133,7 @@ public class ChartReport extends AbstractFragment {
         return yPrimaryAxisTitle.get(0).getText();
     }
 
-    public String getSencondaryYaxisTitle() {
+    public String getSecondaryYaxisTitle() {
         List<WebElement> ySencondaryAxisTitle = getRoot().findElements(BY_SECONDARY_Y_AXIS_TITLE);
         if (ySencondaryAxisTitle.isEmpty()) {
             return StringUtils.EMPTY;
@@ -140,6 +147,20 @@ public class ChartReport extends AbstractFragment {
 
     public Boolean isSecondaryYaxisVisible() {
         return isElementVisible(BY_SECONDARY_Y_AXIS, getRoot());
+    }
+
+    public List<List<String>> getValuePrimaryYaxis() {
+        return getRoot().findElements(BY_PRIMARY_Y_AXIS).stream()
+                .map(e -> e.findElements(By.tagName("text")))
+                .map(es -> es.stream().map(WebElement::getText).collect(toList()))
+                .collect(toList());
+    }
+
+    public List<List<String>> getValueSecondaryYaxis() {
+        return getRoot().findElements(BY_SECONDARY_Y_AXIS).stream()
+                .map(e -> e.findElements(By.tagName("text")))
+                .map(es -> es.stream().map(WebElement::getText).collect(toList()))
+                .collect(toList());
     }
 
     //Some type charts don't exist axis will return empty
@@ -198,6 +219,16 @@ public class ChartReport extends AbstractFragment {
         return waitForCollectionIsNotEmpty(legendNames).stream()
             .map(e -> e.getText())
             .collect(toList());
+    }
+
+    public List<String> getLegendIndicators() {
+        return waitForCollectionIsNotEmpty(legendIndicators).stream()
+                .map(e -> e.getText())
+                .collect(toList());
+    }
+
+    public Boolean isLegendIndicatorPresent() {
+        return isElementPresent(By.cssSelector(LEGEND_INDICATOR), getRoot());
     }
 
     public List<String> getLegendColors() {
