@@ -9,6 +9,7 @@ import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
 
 import java.io.File;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -49,6 +50,9 @@ public class DeployProcessForm extends AbstractFragment {
     @FindBy(xpath = ".//*[text()='ACCESS KEY FOR S3']/following::input[1]")
     private WebElement s3AccessKeyInput;
 
+    @FindBy(className = "expand-btn")
+    private WebElement expandAdditionalParamsButton;
+
     @FindBy(xpath = ".//*[text()='SECRET KEY FOR S3']/following::input[1]")
     private WebElement s3SecretKeyInput;
 
@@ -71,13 +75,25 @@ public class DeployProcessForm extends AbstractFragment {
                 .inputPackageFile(packageFile)
                 .enterProcessName(processName)
                 .submit();
-        waitForFragmentNotVisible(this);
     }
 
     public void enterEtlProcessNameAndDeploy(String processName) {
         enterProcessName(processName)
                 .submit();
-        waitForFragmentNotVisible(this);
+    }
+
+    public void enterS3RegionAndEnableEncryptAndDeploy(String processName, String s3Region) {
+        enterProcessName(processName)
+                .enterS3Region(s3Region)
+                .selectServerSideEncryption()
+                .submit();
+    }
+
+    public void removeS3RegionAndDisableEncryptAndDeploy(String processName) {
+        enterProcessName(processName)
+                .enterS3Region("")
+                .selectServerSideEncryption()
+                .submit();
     }
 
     public void deployProcessWithZipFile(String processName, ProcessType processType, File packageFile) {
@@ -91,10 +107,9 @@ public class DeployProcessForm extends AbstractFragment {
                 .enterGitPath(gitStorePath)
                 .enterProcessName(processName)
                 .submit();
-        waitForFragmentNotVisible(this);
     }
 
-    public DeployProcessForm deployEtlProcess(String processName,
+    public void deployEtlProcess(String processName,
                                  ProcessType processType,
                                  String s3ConfigurationPath,
                                  String s3AccessKey,
@@ -105,22 +120,20 @@ public class DeployProcessForm extends AbstractFragment {
                 .enterProcessName(processName)
                 .enterS3ConfigurationPath(s3ConfigurationPath)
                 .enterS3AccessKey(s3AccessKey)
-                .enterS3SecretKey(s3SecretKey)
-                .enterS3Region(s3Region);
+                .enterS3SecretKey(s3SecretKey);
+        if (StringUtils.isNotEmpty(s3Region)) {
+            enterS3Region(s3Region);
+        }
         if (serverSideEncryption) {
             selectServerSideEncryption();
         }
         submit();
-        waitForFragmentNotVisible(this);
-        return this;
     }
 
-    public DeployProcessForm deploySqlExecutorProcess(String processName) {
+    public void deploySqlExecutorProcess(String processName) {
         selectProcessType(ProcessType.SQL_EXECUTOR)
                 .enterProcessName(processName)
                 .submit();
-        waitForFragmentNotVisible(this);
-        return this;
     }
 
     public DeployProcessForm selectProcessType(ProcessType processType) {
@@ -176,13 +189,22 @@ public class DeployProcessForm extends AbstractFragment {
         return this;
     }
 
+    public DeployProcessForm expandAdditionalParamsArea() {
+        if (!isAdditionalParamsExpand()) {
+            expandAdditionalParamsButton.click();
+        }
+        return this;
+    }
+
     public DeployProcessForm enterS3Region(String s3Region) {
+        expandAdditionalParamsArea();
         waitForElementVisible(s3RegionInput).clear();
         s3RegionInput.sendKeys(s3Region);
         return this;
     }
 
     public DeployProcessForm selectServerSideEncryption() {
+        expandAdditionalParamsArea();
         waitForElementVisible(s3ServerSideEncryptionInput).click();
         return this;
     }
@@ -196,7 +218,17 @@ public class DeployProcessForm extends AbstractFragment {
     }
 
     public String getS3Region() {
+        expandAdditionalParamsArea();
         return waitForElementVisible(s3RegionInput).getAttribute("value");
+    }
+
+    public boolean isAdditionalParamsExpand() {
+        return waitForElementVisible(expandAdditionalParamsButton).getAttribute("class").contains("icon-navigateup");
+    }
+
+    public boolean isEnableServerSideEncryption() {
+        expandAdditionalParamsArea();
+        return waitForElementVisible(s3ServerSideEncryptionInput).isSelected();
     }
 
     public boolean isPackageInputError() {
@@ -224,8 +256,13 @@ public class DeployProcessForm extends AbstractFragment {
         return waitForElementVisible(s3SecretKeyInput).getAttribute("class").contains("has-error");
     }
 
-    public void submit() {
+    public void submitClick() {
         waitForElementVisible(deployButton).click();
+    }
+
+    public void submit() {
+        submitClick();
+        waitForFragmentNotVisible(this);
     }
 
     private ProcessTypeDropdown getProcessTypeDropdown() {
@@ -267,6 +304,8 @@ public class DeployProcessForm extends AbstractFragment {
         RUBY_SCRIPTS("RUBY", "Generic Ruby"),
         CSV_DOWNLOADER("gdc-etl-csv-downloader", "CSV Downloader"),
         SQL_DOWNLOADER("gdc-etl-sql-downloader", "SQL Downloader"),
+        GOOGLE_ANALYTICS_DOWNLOADER("gdc-etl-ga-downloader", "Google Analytics Downloader"),
+        SALESFORCE_DOWNLOADER("gdc-etl-salesforce-downloader", "Salesforce Downloader"),
         ADS_INTEGRATOR("gdc-etl-ads-integrator", "ADS Integrator"),
         SQL_EXECUTOR("gdc-etl-sql-executor", "SQL Executor");
 
