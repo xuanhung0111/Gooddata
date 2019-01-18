@@ -21,6 +21,7 @@ import com.gooddata.qa.utils.http.dashboards.DashboardRestRequest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +31,7 @@ import static com.gooddata.md.report.MetricGroup.METRIC_GROUP;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_STAGE_NAME;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.ATTR_YEAR_SNAPSHOT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForExporting;
 import static com.gooddata.qa.mdObjects.dashboard.tab.TabItem.ItemPosition.RIGHT;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -93,9 +95,11 @@ public class ExportEmbeddedDashboardXLSXTest extends AbstractEmbeddedModeTest {
         embeddedUri = dashboardsPage.openEmbedDashboardDialog().getPreviewURI();
         embeddedDashboard = initEmbeddedDashboard();
         Screenshots.takeScreenshot(browser, "Dashboard has reports apply filter", getClass());
-        String xlsxUrl = testParams.getExportFilePath(embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
+        final File exportFile = new File(testParams.getDownloadFolder(), embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
+        waitForExporting(exportFile);
+        String pathFile = exportFile.getPath();
         //Date filter
-        assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
+        assertEquals(XlsxUtils.excelFileToRead(pathFile, 0), asList(
                 asList("Applied filters:", "Year (Snapshot)" + format(" BETWEEN This-%d AND This-%d",
                         currentYear - 2010, currentYear - 2011)),
                 asList(ATTR_STAGE_NAME, METRIC_AMOUNT), asList(INTEREST, "1.642738857E7"),
@@ -104,14 +108,14 @@ public class ExportEmbeddedDashboardXLSXTest extends AbstractEmbeddedModeTest {
                 asList(NEGOTIATION, "348745.87"), asList(CLOSED_WON, "2.927793726E7"),
                 asList(CLOSED_LOST, "2.824990059E7")));
         //Prompt filter
-        assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 1), asList(
+        assertEquals(XlsxUtils.excelFileToRead(pathFile, 1), asList(
                 asList("Applied filters:", "Stage Name IN (Short List, Closed Lost)"), asList(ATTR_STAGE_NAME, METRIC_AMOUNT),
                 asList(SHORT_LIST, "5612062.6"), asList(CLOSED_LOST, "4.247057116E7")));
         //Attribute filter
-        assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 2), asList(
+        assertEquals(XlsxUtils.excelFileToRead(pathFile, 2), asList(
                 asList("Applied filters:", "Stage Name IN (Interest, Discovery)"), asList(ATTR_STAGE_NAME, METRIC_AMOUNT),
                 asList(INTEREST, "1.844726614E7"), asList(DISCOVERY, "4249027.88")));
-        assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 3), asList(
+        assertEquals(XlsxUtils.excelFileToRead(pathFile, 3), asList(
                 asList("Applied filters:", "NOT (Stage Name IN " +
                         "(Interest, Discovery, Short List, Risk Assessment, Conviction, Negotiation))"),
                 asList(ATTR_STAGE_NAME, METRIC_AMOUNT), asList(CLOSED_WON, "3.831075345E7"),
@@ -127,8 +131,9 @@ public class ExportEmbeddedDashboardXLSXTest extends AbstractEmbeddedModeTest {
                 .selectFilterAttribute(ATTR_STAGE_NAME, INTEREST).getPreviewURI();
         embeddedDashboard = initEmbeddedDashboard();
         Screenshots.takeScreenshot(browser, "override value filter by attribute parameter filter", getClass());
-        String xlsxUrl = testParams.getExportFilePath(embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
-        assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
+        final File exportFile = new File(testParams.getDownloadFolder(), embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
+        waitForExporting(exportFile);
+        assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0), asList(
                 asList("Applied filters:", "Stage Name IN (Interest)"), asList(ATTR_STAGE_NAME, METRIC_AMOUNT),
                 asList(INTEREST, "1.844726614E7")));
     }
@@ -142,8 +147,9 @@ public class ExportEmbeddedDashboardXLSXTest extends AbstractEmbeddedModeTest {
                 .selectFilterAttribute(ATTR_STAGE_NAME, INTEREST).getPreviewURI();
         embeddedDashboard = initEmbeddedDashboard();
         Screenshots.takeScreenshot(browser, "override all filter by attribute parameter filter", getClass());
-        String xlsxUrl = testParams.getExportFilePath(embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
-        assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
+        final File exportFile = new File(testParams.getDownloadFolder(), embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
+        waitForExporting(exportFile);
+        assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0), asList(
                 asList("Applied filters:", "Stage Name IN (Interest)"), asList(ATTR_STAGE_NAME, METRIC_AMOUNT),
                 asList(INTEREST, "1.844726614E7")));
     }
@@ -157,8 +163,9 @@ public class ExportEmbeddedDashboardXLSXTest extends AbstractEmbeddedModeTest {
                 .selectFilterAttribute(ATTR_YEAR_SNAPSHOT, "2012").getPreviewURI();
         embeddedDashboard = initEmbeddedDashboard();
         Screenshots.takeScreenshot(browser, "override all filter by date attribute parameter filter", getClass());
-        String xlsxUrl = testParams.getExportFilePath(embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
-        assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
+        final File exportFile = new File(testParams.getDownloadFolder(), embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
+        waitForExporting(exportFile);
+        assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0), asList(
                 asList("Applied filters:", "Year (Snapshot) IN (2012)"), asList(ATTR_STAGE_NAME, METRIC_AMOUNT),
                 asList(INTEREST, "1.844726614E7"), asList(DISCOVERY, "4249027.88"), asList(SHORT_LIST, "5612062.6"),
                 asList(RISK_ASSESSMENT, "2606293.46"), asList(CONVICTION, "3067466.12"), asList(NEGOTIATION, "1862015.73"),
@@ -174,8 +181,9 @@ public class ExportEmbeddedDashboardXLSXTest extends AbstractEmbeddedModeTest {
                 .selectFilterAttribute(ATTR_YEAR_SNAPSHOT, "2012").getPreviewURI();
         embeddedDashboard = initEmbeddedDashboard();
         Screenshots.takeScreenshot(browser, "override value filter by date attribute parameter filter", getClass());
-        String xlsxUrl = testParams.getExportFilePath(embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
-        assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
+        final File exportFile = new File(testParams.getDownloadFolder(), embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
+        waitForExporting(exportFile);
+        assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0), asList(
                 asList("Applied filters:", "Year (Snapshot) IN (2012)"), asList(ATTR_STAGE_NAME, METRIC_AMOUNT),
                 asList(INTEREST, "1.844726614E7"), asList(DISCOVERY, "4249027.88"), asList(SHORT_LIST, "5612062.6"),
                 asList(RISK_ASSESSMENT, "2606293.46"), asList(CONVICTION, "3067466.12"), asList(NEGOTIATION, "1862015.73"),
@@ -191,8 +199,9 @@ public class ExportEmbeddedDashboardXLSXTest extends AbstractEmbeddedModeTest {
                 .selectFilterAttribute(ATTR_YEAR_SNAPSHOT, "2010").getPreviewURI();
         embeddedDashboard = initEmbeddedDashboard();
         Screenshots.takeScreenshot(browser, "override date filter by date attribute parameter filter", getClass());
-        String xlsxUrl = testParams.getExportFilePath(embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
-        assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
+        final File exportFile = new File(testParams.getDownloadFolder(), embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
+        waitForExporting(exportFile);
+        assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0), asList(
                 asList("Applied filters:", "Year (Snapshot) = THIS"), singletonList("Year (Snapshot) IN (2010)"),
                 singletonList("Export failed: No data for your filter selection. " +
                         "Try adjusting or removing some of the filters.")));
@@ -207,8 +216,9 @@ public class ExportEmbeddedDashboardXLSXTest extends AbstractEmbeddedModeTest {
                 .selectFilterAttribute(ATTR_YEAR_SNAPSHOT, "2010").getPreviewURI();
         embeddedDashboard = initEmbeddedDashboard();
         Screenshots.takeScreenshot(browser, "override date range filter by date attribute parameter filter", getClass());
-        String xlsxUrl = testParams.getExportFilePath(embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
-        assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
+        final File exportFile = new File(testParams.getDownloadFolder(), embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
+        waitForExporting(exportFile);
+        assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0), asList(
                 asList("Applied filters:", "Year (Snapshot)" + format(" BETWEEN THIS-%d AND THIS-%d",
                         currentYear - 2010, currentYear - 2012)),
                 singletonList("Year (Snapshot) IN (2010)"), asList(ATTR_STAGE_NAME, METRIC_AMOUNT),
@@ -226,8 +236,9 @@ public class ExportEmbeddedDashboardXLSXTest extends AbstractEmbeddedModeTest {
                 .selectFilterAttribute(ATTR_STAGE_NAME, INTEREST, SHORT_LIST).getPreviewURI();
         embeddedDashboard = initEmbeddedDashboard();
         Screenshots.takeScreenshot(browser, "override prompt filter by attribute parameter filters", getClass());
-        String xlsxUrl = testParams.getExportFilePath(embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
-        assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
+        final File exportFile = new File(testParams.getDownloadFolder(), embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
+        waitForExporting(exportFile);
+        assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0), asList(
                 asList("Applied filters:", "Stage Name IN (Interest,Short List)"), singletonList("Stage Name IN (Short List)"),
                 asList(ATTR_STAGE_NAME, METRIC_AMOUNT), asList(SHORT_LIST, "5612062.6")));
     }
@@ -241,10 +252,12 @@ public class ExportEmbeddedDashboardXLSXTest extends AbstractEmbeddedModeTest {
                 .selectFilterAttribute(ATTR_STAGE_NAME, INTEREST, SHORT_LIST, CLOSED_LOST).getPreviewURI();
         embeddedDashboard = initEmbeddedDashboard();
         Screenshots.takeScreenshot(browser, "override prompt negative filter by attribute parameter filter", getClass());
-        String xlsxUrl = testParams.getExportFilePath(embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
-        assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
-                asList("Applied filters:", "Stage Name IN (Interest)"),
-                singletonList("Stage Name IN (Interest,Short List,Closed Lost)"), asList(ATTR_STAGE_NAME, METRIC_AMOUNT),
+        final File exportFile = new File(testParams.getDownloadFolder(), embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
+        waitForExporting(exportFile);
+        //todo - will be reverted after XSH-31 was fixed
+        assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0), asList(
+                asList("Applied filters:", "Stage Name IN (Closed Lost,Interest,Short List)"),
+                singletonList("Stage Name IN (Interest)"), asList(ATTR_STAGE_NAME, METRIC_AMOUNT),
                 asList(INTEREST, "1.844726614E7")));
     }
 
@@ -257,8 +270,9 @@ public class ExportEmbeddedDashboardXLSXTest extends AbstractEmbeddedModeTest {
                 .selectFilterAttribute(ATTR_STAGE_NAME, SHORT_LIST).getPreviewURI();
         embeddedDashboard = initEmbeddedDashboard();
         Screenshots.takeScreenshot(browser, "override prompt filter by attribute parameter filter", getClass());
-        String xlsxUrl = testParams.getExportFilePath(embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
-        assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
+        final File exportFile = new File(testParams.getDownloadFolder(), embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
+        waitForExporting(exportFile);
+        assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0), asList(
                 asList("Applied filters:", "Stage Name IN (Short List)"), asList(ATTR_STAGE_NAME, METRIC_AMOUNT),
                 asList(SHORT_LIST, "5612062.6")));
     }
@@ -273,8 +287,9 @@ public class ExportEmbeddedDashboardXLSXTest extends AbstractEmbeddedModeTest {
         embeddedDashboard = initEmbeddedDashboard();
         Screenshots.takeScreenshot(browser,
                 "override prompt filter by out of attribute parameter filter", getClass());
-        String xlsxUrl = testParams.getExportFilePath(embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
-        assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
+        final File exportFile = new File(testParams.getDownloadFolder(), embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
+        waitForExporting(exportFile);
+        assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0), asList(
                 asList("Applied filters:", "Stage Name IN (Interest)"), singletonList("Stage Name IN (Short List, Closed Lost)"),
                 singletonList("Export failed: No data for your filter selection. Try adjusting or removing some of the filters.")));
     }
@@ -288,8 +303,9 @@ public class ExportEmbeddedDashboardXLSXTest extends AbstractEmbeddedModeTest {
                 .selectFilterAttribute(ATTR_STAGE_NAME, SHORT_LIST).getPreviewURI();
         embeddedDashboard = initEmbeddedDashboard();
         Screenshots.takeScreenshot(browser, "override report negative filter by attribute parameter filter", getClass());
-        String xlsxUrl = testParams.getExportFilePath(embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
-        assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
+        final File exportFile = new File(testParams.getDownloadFolder(), embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
+        waitForExporting(exportFile);
+        assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0), asList(
                 asList("Applied filters:", "NOT (Stage Name IN (Interest))"),
                 singletonList("Stage Name IN (Short List)"),
                 asList(ATTR_STAGE_NAME, METRIC_AMOUNT), asList(SHORT_LIST, "5612062.6")));
@@ -306,8 +322,9 @@ public class ExportEmbeddedDashboardXLSXTest extends AbstractEmbeddedModeTest {
                 .selectFilterAttribute(ATTR_YEAR_SNAPSHOT, "2012").getPreviewURI();
         embeddedDashboard = initEmbeddedDashboard();
         Screenshots.takeScreenshot(browser, "override report date filter date attribute parameter filter", getClass());
-        String xlsxUrl = testParams.getExportFilePath(embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
-        assertEquals(XlsxUtils.excelFileToRead(xlsxUrl, 0), asList(
+        final File exportFile = new File(testParams.getDownloadFolder(), embeddedDashboard.exportDashboardToXLSX(dashboardTitle));
+        waitForExporting(exportFile);
+        assertEquals(XlsxUtils.excelFileToRead(exportFile.getPath(), 0), asList(
                 asList("Applied filters:", "Year (Snapshot) IN (2012)"), asList(ATTR_STAGE_NAME, METRIC_AMOUNT),
                 asList(INTEREST, "1.844726614E7"), asList(DISCOVERY, "4249027.88"), asList(SHORT_LIST, "5612062.6"),
                 asList(RISK_ASSESSMENT, "2606293.46"), asList(CONVICTION, "3067466.12"), asList(NEGOTIATION, "1862015.73"),

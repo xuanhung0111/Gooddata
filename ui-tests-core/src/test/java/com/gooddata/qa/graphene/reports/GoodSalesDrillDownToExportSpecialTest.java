@@ -53,7 +53,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_WON
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_PRODUCTIVE_REPS;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.REPORT_SALES_SEASONALITY;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForExportReport;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForExporting;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
@@ -191,7 +191,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
             setDrillReportTargetAsExport(RAW_FORMAT);
             dashboardsPage.getContent().getLatestReport(TableReport.class).drillOnFirstValue(CellType.METRIC_VALUE);
             final File exportFile = new File(testParams.getDownloadFolder(), "Email.csv");
-            waitForExportReport(exportFile);
+            waitForExporting(exportFile);
             assertEquals(readCsvFile(exportFile), asList(asList("East Coast", "1060"), asList("West Coast", "2251")),
                     "The content of export file is not correct");
             checkRedBar(browser);
@@ -210,7 +210,7 @@ public class GoodSalesDrillDownToExportSpecialTest extends GoodSalesAbstractTest
             setDrillReportTargetAsExport(RAW_FORMAT);
             dashboardsPage.getContent().getLatestReport(TableReport.class).drillOnFirstValue(CellType.METRIC_VALUE);
             final File exportFile = new File(testParams.getDownloadFolder(), "CompuSci.csv");
-            waitForExportReport(exportFile);
+            waitForExporting(exportFile);
             assertEquals(readCsvFile(exportFile).size(), 69923, "The number of lines in export file is not correct");
             checkRedBar(browser);
         } finally {

@@ -15,8 +15,8 @@ public class XlsxUtils {
     private XlsxUtils() {
     }
 
-    public static List<List<String>> excelFileToRead(String name, int sheetNumber) throws IOException {
-        XSSFWorkbook wb = new XSSFWorkbook(name);
+    public static List<List<String>> excelFileToRead(String pathFile, int sheetNumber) throws IOException {
+        XSSFWorkbook wb = new XSSFWorkbook(pathFile);
 
         XSSFSheet sheet = wb.getSheetAt(sheetNumber);
         XSSFRow row;
