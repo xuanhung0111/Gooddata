@@ -128,7 +128,8 @@ public class MultipleAttributeFilteringTest extends AbstractDashboardTest {
             analysisPage.addMetric(METRIC_TIMELINE_BOP);
         }
         MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
-        ElementUtils.scrollElementIntoView(By.cssSelector(".s-bucket-view .s-bucket-dropzone"), browser, 100);
+        ElementUtils.scrollElementIntoView(By.className("adi-buckets-scroller"),
+                By.cssSelector(".s-bucket-view .s-bucket-dropzone"), browser, 100);
         assertFalse(metricsBucket.isInvitationVisible(), "Can not add over 20 metrics");
         ChartReport chartReport = analysisPage.waitForReportComputing().getChartReport();
         assertEquals(chartReport.getTrackersCount(), 20);
