@@ -39,7 +39,7 @@ public class ProcessTypeDropdown extends AbstractDropDown {
 
     public ProcessTypeDropdown selectProcessType(String processType) {
         By selector = By.cssSelector(".s-" + simplifyText(processType));
-        ElementUtils.scrollElementIntoView(By.cssSelector(".ember-view.ember-list-view"), browser, 50);
+        ElementUtils.scrollElementIntoView(By.cssSelector(".ember-view.ember-list-view"), selector, browser, 50);
         waitForElementVisible(selector, browser).click();
         return this;
     }
