@@ -25,6 +25,9 @@ rm -rf addYarnStop.json
 # Install the latest @gooddata/react-components
 yarn add @gooddata/react-components
 
+# Workaround bug https://jira.intgdc.com/browse/ONE-3382
+yes | cp $RESOURCE_DIR/clear.js /usr/local/share/.config/yarn/global/node_modules/gdc-catalog-export/lib/utils/clear.js
+
 # Install node-saas as https://jira.intgdc.com/browse/ONE-3381
 yarn add node-sass
 
