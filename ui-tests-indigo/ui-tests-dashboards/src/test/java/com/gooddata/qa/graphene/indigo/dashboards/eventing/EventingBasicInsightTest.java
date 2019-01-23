@@ -5,9 +5,11 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Insight;
 import com.gooddata.qa.graphene.indigo.dashboards.common.AbstractDashboardEventingTest;
+import com.gooddata.qa.utils.java.RetryCommand;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.openqa.selenium.TimeoutException;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -452,10 +454,16 @@ public class EventingBasicInsightTest extends AbstractDashboardEventingTest {
         Insight insight = indigoDashboardsPage.getLastWidget(Insight.class);
 
         Pair<Integer, Integer> position = getColumnPosition(insight.getChartReport(), "East Coast", "2011");
-        cleanUpLogger();
-        insight.getChartReport().clickOnElement(position);
-        
-        JSONObject content = getLatestPostMessageObj();
+
+        // Firefox have issue with moveToElement which make application cannot catch 'drill' event at first click,
+        // retry is just a workaround
+        RetryCommand retryCommand = new RetryCommand(2);
+        JSONObject content = retryCommand.retryOnException(TimeoutException.class, () -> {
+            cleanUpLogger();
+            insight.getChartReport().clickOnElement(position);
+            return getLatestPostMessageObj();
+        });
+
         verifyColumnDrillContext(content);
         JSONObject drillContext = content.getJSONObject("data").getJSONObject("drillContext");
         JSONArray intersection = drillContext.getJSONArray("intersection");

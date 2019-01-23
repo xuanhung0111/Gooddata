@@ -238,7 +238,10 @@ public class TableReport extends AbstractFragment {
     }
 
     public TableReport hoverItem(WebElement item) {
-        getActions().moveToElement(item).perform();
+        // Selenium 3.8.1 + gecko 0.20.0 has problem with action #moveToElement when working inside docker container.
+        // The element hovered by this action will not trigger the event so it's meaningless when need to check a
+        // tooltip show from that. This additional #moveByOffset is a work around to make it work properly.
+        getActions().moveToElement(item).moveByOffset(1, 1).perform();
         return this;
     }
 

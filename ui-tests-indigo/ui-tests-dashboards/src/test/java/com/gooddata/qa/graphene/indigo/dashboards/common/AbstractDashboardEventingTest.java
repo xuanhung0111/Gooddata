@@ -33,6 +33,7 @@ import static com.gooddata.qa.graphene.utils.GoodSalesUtils.DATE_DATASET_CREATED
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_AMOUNT;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_ACTIVITIES;
 import static com.gooddata.qa.graphene.utils.GoodSalesUtils.METRIC_NUMBER_OF_OPPORTUNITIES;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Collections.singletonList;
 
@@ -174,6 +175,7 @@ public class AbstractDashboardEventingTest extends AbstractDashboardTest {
     protected void cleanUpLogger() {
         browser.switchTo().defaultContent();
         waitForElementVisible(By.id("loggerBtn"), browser).click();
+        waitForElementNotVisible(By.id("logger"));
         browser.switchTo().frame("iframe");
     }
 
