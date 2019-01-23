@@ -5,10 +5,13 @@
     <title>EMBEDDED</title>
     <script>
         window.addEventListener("message", function(e){
-            logInfo(e.data.gdc.event);
-            if(e.data.gdc.event.name == 'listeningForDrillableItems') {
-                //ad loaded
+            if (e.data.gdc.event.name == 'listeningForDrillableItems') {
                 updateDrillItems();
+                document.getElementById("loggerBtn").style.display = "inline";
+                document.getElementById("logger").style.display = "inline";
+            } else if (e.data.gdc.event.name == 'drill') {
+                logInfo(e.data.gdc.event);
+                document.getElementById("logger").style.display = "inline";
             }
         }, false);
     </script>
@@ -25,8 +28,8 @@
 </div>
 
 <div>
-    <textarea id="logger" style="width: 100%"></textarea>
-    <input id="loggerBtn" type="button" class="loggerBtn" onclick="clearText()" name="clearText" value="ClearTex"/>
+    <textarea id="logger" style="width: 100%; display: none"></textarea>
+    <input id="loggerBtn" type="button" class="loggerBtn" onclick="clearText()" name="clearText" value="ClearTex" style="display: none;"/>
 </div>
 
 <div>
@@ -88,6 +91,7 @@
     function clearText () {
         var logger = document.getElementById('logger');
         logger.innerHTML = '';
+        logger.style.display = "none";
     }
 
     function clearUris () {
