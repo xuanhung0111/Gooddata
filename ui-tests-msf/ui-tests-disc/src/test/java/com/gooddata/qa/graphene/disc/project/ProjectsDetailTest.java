@@ -43,7 +43,7 @@ import com.gooddata.qa.graphene.fragments.disc.schedule.ScheduleDetail;
 public class ProjectsDetailTest extends AbstractProcessTest {
 
     private static final String EMPTY_STATE_TITLE = "You don’t have any deployed data loading processes.";
-    private static final String EMPTY_STATE_MESSAGE = "How to deploy a process? Read Preparing a Data Loading Process article";
+    private static final String EMPTY_STATE_MESSAGE = "How to deploy a process? Read Deploy a Process with the Data Integration Console article";
     private static final String NO_SCHEDULE = "No schedules";
 
     @Override
