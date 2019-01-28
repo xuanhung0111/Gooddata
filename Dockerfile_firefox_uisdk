@@ -25,6 +25,9 @@ RUN npm install yarn -g && yarn -v
 ############################
 RUN yarn global add create-react-app && yarn global add gdc-catalog-export
 
+# Workaround bug https://jira.intgdc.com/browse/ONE-3382
+COPY ./ui-tests-indigo/ui-tests-gd-react-sdk/src/test/resources/scripts/clear.js /usr/local/share/.config/yarn/global/node_modules/gdc-catalog-export/lib/utils/clear.js
+
 ###################################
 # Ignore self-sign certificate #
 ###################################
