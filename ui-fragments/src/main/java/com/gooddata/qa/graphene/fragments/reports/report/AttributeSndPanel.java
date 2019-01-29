@@ -51,7 +51,7 @@ public class AttributeSndPanel extends AbstractSndPanel {
         WebElement posElement = findItemElement(attribute).findElement(By.className("sndAttributePosition"));
 
         if (!posElement.getAttribute("class").contains(position.getDirection())) {
-            posElement.click();
+            waitForElementVisible(posElement).click();
             waitForElementAttributeContainValue(posElement, "class", position.getDirection());
         }
 
@@ -68,7 +68,7 @@ public class AttributeSndPanel extends AbstractSndPanel {
     }
 
     public AttributeSndPanel openAttributeDetail(String attribute) {
-        findItemElement(attribute).click();
+        waitForElementVisible(findItemElement(attribute)).click();
         waitForElementVisible(getItemDetailContainerRoot());
         return this;
     }
@@ -79,7 +79,7 @@ public class AttributeSndPanel extends AbstractSndPanel {
     }
 
     public AttributeSndPanel filterValues(Collection<String> values) {
-        getItemDetailContainerRoot().findElement(By.className("s-btn-filter_this_attribute")).click();
+        waitForElementVisible(getItemDetailContainerRoot().findElement(By.className("s-btn-filter_this_attribute"))).click();
         SelectItemPopupPanel.getInstance(By.className("c-attributeElementsFilterEditor"), browser)
                 .searchAndSelectItems(values);
         return this;
@@ -87,7 +87,7 @@ public class AttributeSndPanel extends AbstractSndPanel {
 
     public AttributeSndPanel deleteFilter() {
         WebElement deleteButton = getItemDetailContainerRoot().findElement(By.className("deleteFilter"));
-        deleteButton.click();
+        waitForElementVisible(deleteButton).click();
         waitForElementNotVisible(deleteButton);
         return this;
     }

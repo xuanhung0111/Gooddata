@@ -39,12 +39,12 @@ public class MetricSndPanel extends AbstractSndPanel {
     }
 
     public SimpleMetricEditor clickAddNewMetric() {
-        createNewMetricButton.click();
+        waitForElementVisible(createNewMetricButton).click();
         return SimpleMetricEditor.getInstance(browser);
     }
 
     public MetricEditorDialog clickAddAdvanceMetric() {
-        createAdvanceMetricButton.click();
+        waitForElementVisible(createAdvanceMetricButton).click();
         return MetricEditorDialog.getInstance(browser);
     }
 
@@ -60,7 +60,7 @@ public class MetricSndPanel extends AbstractSndPanel {
     }
 
     public MetricSndPanel openMetricDetail(String metric) {
-        findItemElement(metric).click();
+        waitForElementVisible(findItemElement(metric)).click();
         waitForElementVisible(getItemDetailContainerRoot());
         return this;
     }
@@ -73,13 +73,13 @@ public class MetricSndPanel extends AbstractSndPanel {
     }
 
     public MetricSndPanel addDrillStep(String toAttribute) {
-        getItemDetailContainerRoot().findElement(className("s-btn-add_drill_step")).click();
+        waitForElementVisible(getItemDetailContainerRoot().findElement(className("s-btn-add_drill_step"))).click();
         SelectItemPopupPanel.getInstance(browser).searchAndSelectItem(toAttribute).submitPanel();
         return this;
     }
 
     public MetricEditorDialog editAdvanceMetric() {
-        getItemDetailContainerRoot().findElement(className("c-metricDetailEditButton")).click();
+        waitForElementVisible(getItemDetailContainerRoot().findElement(className("c-metricDetailEditButton"))).click();
         return MetricEditorDialog.getInstance(browser);
     }
 
