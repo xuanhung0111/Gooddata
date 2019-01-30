@@ -15,6 +15,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MainEdi
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.VisualizationReportTypePicker;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.ConfigurationPanelBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import org.jboss.arquillian.graphene.Graphene;
@@ -38,6 +39,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForIndigoMessageDisappear;
 import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -77,6 +79,9 @@ public class AnalysisPage extends AbstractFragment {
 
     @FindBy(className = "s-bucket-filters")
     private FiltersBucket filterBuckets;
+
+    @FindBy(className = "s-configuration-panel")
+    private ConfigurationPanelBucket configurationPanelBucket;
 
     public static final String MAIN_CLASS = "adi-editor";
 
@@ -484,7 +489,7 @@ public class AnalysisPage extends AbstractFragment {
             } else {
                 getActions().moveToElement(target).perform();
             }
-            
+
             return isElementPresent(By.className("adi-drop-line-bottom"), getRoot());
         };
 
@@ -506,4 +511,46 @@ public class AnalysisPage extends AbstractFragment {
         WebElement source = getCataloguePanel().getDate();
         return drag(source, typeAttribute);
     }
+
+    /**
+     *
+     * @param hexColor : Input hex color in custom color palette
+     * @return AnalysisPage after input hex color
+     */
+
+    public AnalysisPage setCustomColorPicker(String hexColor) {
+        getConfigurationPanelBucket().openColorConfiguration().openColorPicker(0)
+                .openColorCustomPicker().setColorCustomPicker(hexColor);
+        return this;
+    }
+
+    public AnalysisPage resetColorPicker() {
+        getConfigurationPanelBucket().openColorConfiguration().resetColor();
+        return this;
+    }
+
+    public ConfigurationPanelBucket getConfigurationPanelBucket() {
+        return waitForFragmentVisible(configurationPanelBucket).expandConfigurationPanel();
+    }
+
+    public String checkColorItems() {
+        getConfigurationPanelBucket().openColorConfiguration();
+        return waitForElementPresent(cssSelector(".gd-color-unsupported"), browser).getText();
+    }
+
+    public AnalysisPage applyCustomColorPicker() {
+        waitForElementPresent(cssSelector(".color-picker-ok-button.s-ok"), browser).click();
+        return this;
+    }
+
+    public AnalysisPage clickCancelButtonInColorCustomPicker() {
+        waitForElementPresent(cssSelector(".color-picker-button.s-cancel"), browser).click();
+        return this;
+    }
+
+    public AnalysisPage resetColor() {
+        waitForElementPresent(cssSelector(".s-reset-colors-button.s-reset_colors"), browser).click();
+        return this;
+    }
+
 }
