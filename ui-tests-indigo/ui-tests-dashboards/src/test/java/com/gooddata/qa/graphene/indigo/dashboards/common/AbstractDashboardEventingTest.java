@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -180,10 +181,16 @@ public class AbstractDashboardEventingTest extends AbstractDashboardTest {
     }
 
     protected String getLoggerContent() {
-        browser.switchTo().defaultContent();
-        String content = waitForElementVisible(By.id("logger"), browser).getText();
-        browser.switchTo().frame("iframe");
-        return content.trim();
+        String content = "";
+        try {
+            browser.switchTo().defaultContent();
+            content = waitForElementVisible(By.id("logger"), browser, 5).getText().trim();
+        } catch (TimeoutException te) {
+            // there no drill event fired, logger would not be visible
+        } finally {
+            browser.switchTo().frame("iframe");
+            return content;
+        }
     }
 
     protected JSONObject getLatestPostMessageObj() {
