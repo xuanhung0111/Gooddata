@@ -103,10 +103,16 @@ public class AbstractEventingTest extends AbstractAnalyseTest {
     }
 
     protected String getLoggerContent() {
-        browser.switchTo().defaultContent();
-        String content = waitForElementVisible(By.id("logger"), browser).getText();
-        browser.switchTo().frame("iframe");
-        return content.trim();
+        String content = "";
+        try {
+            browser.switchTo().defaultContent();
+            content = waitForElementVisible(By.id("logger"), browser, 5).getText().trim();
+        } catch (TimeoutException te) {
+            // there no drill event fired, logger would not be visible
+        } finally {
+            browser.switchTo().frame("iframe");
+            return content;
+        }
     }
 
     protected String getObjectIdFromUri(String uri) {
