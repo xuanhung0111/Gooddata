@@ -532,7 +532,7 @@ public class PivotTableTest extends AbstractAnalyseTest {
         assertEquals(getTitlesMetricFromInsightMetadata(INSIGHT), asList(METRIC_AMOUNT, METRIC_WON));
         assertEquals(getTitlesAttributeFromInsightMetadata(INSIGHT, "attribute"), asList(ATTR_DEPARTMENT));
         assertEquals(getTitlesAttributeFromInsightMetadata(INSIGHT, "columns"), asList(ATTR_STAGE_NAME));
-        assertEquals(getFiltersFromInsightMetadata(INSIGHT), asList(ATTR_DEPARTMENT));
+        assertEquals(getFiltersFromInsightMetadata(INSIGHT), asList(ATTR_DEPARTMENT, ATTR_STAGE_NAME));
     }
 
     @Test(dependsOnGroups = {"createProject"})
