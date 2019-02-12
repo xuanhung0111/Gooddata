@@ -15,10 +15,13 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.indigo.analyze.common.AbstractAnalyseTest;
+import com.gooddata.qa.utils.http.project.ProjectRestRequest;
+import com.gooddata.qa.utils.http.RestClient;
 
 public class GoodSalesAttributeBasedMetricTest extends AbstractAnalyseTest {
 
@@ -28,6 +31,12 @@ public class GoodSalesAttributeBasedMetricTest extends AbstractAnalyseTest {
     public void initProperties() {
         super.initProperties();
         projectTitle += "Attribute-Based-Metric-Test";
+    }
+
+    @Override
+    protected void customizeProject() throws Throwable {
+        new ProjectRestRequest(new RestClient(getProfile(Profile.ADMIN)), testParams.getProjectId())
+            .setFeatureFlagInProjectAndCheckResult(ProjectFeatureFlags.ENABLE_ANALYTICAL_DESIGNER_EXPORT, false);
     }
 
     @Test(dependsOnGroups = {"createProject"})
