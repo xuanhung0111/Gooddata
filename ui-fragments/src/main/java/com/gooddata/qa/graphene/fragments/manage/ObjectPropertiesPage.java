@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmp
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
@@ -13,6 +14,7 @@ import java.util.Collection;
 import java.util.function.Function;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -62,7 +64,13 @@ public abstract class ObjectPropertiesPage extends AbstractFragment {
         }
 
         IpeEditor.getInstance(browser).setText(name);
-        waitForElementNotPresent(By.cssSelector(".gdc-busy-mask-visible"));
+        By busyMask = By.className("gdc-busy-mask-visible");
+        try {
+            waitForElementPresent(busyMask, getRoot());
+            waitForElementNotPresent(busyMask);
+        } catch (TimeoutException e) {
+            // Variable detail already loaded so WebDriver unable to catch the loading indicator
+        }
         return this;
     }
 
