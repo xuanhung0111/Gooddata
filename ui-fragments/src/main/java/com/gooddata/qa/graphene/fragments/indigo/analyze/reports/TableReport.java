@@ -7,6 +7,7 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -68,6 +69,11 @@ public class TableReport extends AbstractFragment {
     private static final By ADD_TOTAL_ROW_BUTTON = className("indigo-totals-add-row-button");
     private static final String CELL_CONTENT = "public_fixedDataTableCell_cellContent";
     private static final String REMOVE_TOTALS_CELL_BUTTON = "indigo-totals-disable-column-button";
+
+    public static TableReport getInstance(SearchContext context) {
+        return Graphene.createPageFragment(TableReport.class,
+                waitForElementVisible(className("indigo-table-component"), context));
+    }
 
     // represents the most top row header
     public List<String> getPivotHeadersColumn() {
