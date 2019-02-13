@@ -203,9 +203,9 @@ public class MultipleAttributeFilterManipulationTest extends AbstractDashboardTe
             .waitForReportComputing();
         takeScreenshot(browser, "check-shorten-measure-name-in-tooltip-with-" + type, getClass());
 
-        assertEquals(analysisPage.getChartReport().getTooltipTextOnTrackerByIndex(0),
+        assertEquals(analysisPage.getChartReport().getTooltipTextOnTrackerByIndex(0, 0),
                 asList(asList(format("%s (%s: 14 West)", METRIC_AMOUNT, ATTR_ACCOUNT), "$109,941.82")));
-        assertTrue(analysisPage.getChartReport().isShortenTooltipTextOnTrackerByIndex(0, 140),
+        assertTrue(analysisPage.getChartReport().isShortenTooltipTextOnTrackerByIndex(0, 0, 140),
                 "Tooltip should be shorten by too long");
     }
 

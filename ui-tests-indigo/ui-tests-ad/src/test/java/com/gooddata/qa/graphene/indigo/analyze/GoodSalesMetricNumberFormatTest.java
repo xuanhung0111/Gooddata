@@ -131,7 +131,7 @@ public class GoodSalesMetricNumberFormatTest extends AbstractAnalyseTest {
             .addAttribute(ATTR_IS_WON)
             .waitForReportComputing()
             .getChartReport()
-            .getTooltipTextOnTrackerByIndex(0);
+            .getTooltipTextOnTrackerByIndex(0, 0);
 
         assertEquals(tooltip.get(0), asList(ATTR_IS_WON, "true"));
         assertEquals(tooltip.get(1).get(0), METRIC_PERCENT_OF_GOAL);

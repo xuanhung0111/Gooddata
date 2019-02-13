@@ -6,6 +6,7 @@ import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.id;
 
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.Headline;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import org.jboss.arquillian.graphene.Graphene;
@@ -25,6 +26,11 @@ public class SDKAnalysisPage extends AnalysisPage {
     public TableReport getTableReport() {
         return Graphene.createPageFragment(TableReport.class,
                 waitForElementVisible(className("indigo-table-component"), getRoot()));
+    }
+
+    public ChartReport getChartReport() {
+        return Graphene.createPageFragment(ChartReport.class,
+                waitForElementVisible(className("viz-line-family-chart-wrap"), getRoot()));
     }
 
     public String getAppIntro() {

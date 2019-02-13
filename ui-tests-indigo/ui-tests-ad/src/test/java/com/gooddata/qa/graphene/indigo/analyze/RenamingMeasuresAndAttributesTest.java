@@ -81,9 +81,9 @@ public class RenamingMeasuresAndAttributesTest extends AbstractAnalyseTest {
         ChartReport chartReport = analysisPage.getChartReport();
         assertEquals(chartReport.getYaxisTitle(), newMetric);
 
-        assertThat(chartReport.getTooltipTextOnTrackerByIndex(0),
+        assertThat(chartReport.getTooltipTextOnTrackerByIndex(0, 0),
                 hasItems(asList(newMetric, "$80,406,324.96"), asList(ATTR_DEPARTMENT, "Direct Sales")));
-        assertThat(chartReport.getTooltipTextOnTrackerByIndex(1),
+        assertThat(chartReport.getTooltipTextOnTrackerByIndex(0, 1),
                 hasItems(asList(newMetric, "$36,219,131.58"), asList(ATTR_DEPARTMENT, "Inside Sales")));
 
         createInsightHaveStack(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE_AND_STACK, METRIC_AMOUNT, ATTR_DEPARTMENT,
@@ -107,9 +107,9 @@ public class RenamingMeasuresAndAttributesTest extends AbstractAnalyseTest {
         assertFalse(metricConfiguration.isSubHeaderPresent(), "SubHeader should be removed");
         ChartReport chartReport = analysisPage.getChartReport();
         assertEquals(chartReport.getYaxisTitle(), METRIC_AMOUNT);
-        assertTrue(chartReport.getTooltipTextOnTrackerByIndex(0).get(1).contains(METRIC_AMOUNT),
+        assertTrue(chartReport.getTooltipTextOnTrackerByIndex(0, 0).get(1).contains(METRIC_AMOUNT),
                 "Tooltip should show alias name");
-        assertTrue(chartReport.getTooltipTextOnTrackerByIndex(1).get(1).contains(METRIC_AMOUNT),
+        assertTrue(chartReport.getTooltipTextOnTrackerByIndex(0, 1).get(1).contains(METRIC_AMOUNT),
                 "Tooltip should show alias name");
 
         createInsightHaveStack(INSIGHT_HAS_ATTRIBUTE_AND_MEASURE_AND_STACK, METRIC_AMOUNT, ATTR_DEPARTMENT,
