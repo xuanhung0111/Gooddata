@@ -12,7 +12,7 @@ public class UITestsRegistry {
     public static void main(String[] args) throws Throwable {
         Map<String, Object> suites = new HashMap<>();
 
-        suites.put("all", new Object[] {
+        suites.put("sanity", new Object[] {
                 EmbeddedHeadlineTest.class,
                 HeadlineByBucketComponentTest.class
         });
